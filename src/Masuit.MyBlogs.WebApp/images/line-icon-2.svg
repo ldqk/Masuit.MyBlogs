@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 18.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="40px" height="40px" viewBox="0 0 40 40" style="enable-background:new 0 0 40 40;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#69AA6F;stroke-width:2;stroke-miterlimit:10;}
+	.st1{fill:none;stroke:#585C5E;stroke-width:2;stroke-miterlimit:10;}
+</style>
+<g>
+	<circle class="st0" cx="20" cy="12.5" r="2.5"/>
+	<path class="st0" d="M27.5,13.6c0-4.5-3.4-8.1-7.5-8.1c-4.2,0-7.5,3.6-7.5,8.1c0,5.8,7.5,15.1,7.5,15.1S27.6,19.4,27.5,13.6z"/>
+</g>
+<polyline class="st1" points="13,23 8,23 2,34 20,34 38,34 32,23 27,23 "/>
+</svg>

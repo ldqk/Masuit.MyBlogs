@@ -1,0 +1,53 @@
+﻿@using Masuit.MyBlogs.WebApp.Models
+@using Masuit.Tools.Net
+@using Models.DTO
+@model Models.ViewModel.IndexPageViewModel
+@{
+    ViewBag.Title = "分类_" + ViewBag.CategoryName;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Random r = new Random();
+}
+<style>
+    .bg-title {
+        height: 50vh;
+        max-height: 400px;
+        position: relative;
+        background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
+        background-size:cover;
+        background-attachment: fixed;
+        margin-bottom: 10px;
+    }
+    .header-content {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+    }
+    .header-content .divider {
+        width: inherit;
+        height: 20px;
+        margin-top: 20px;
+        border-top: 3px solid rebeccapurple;
+    }
+</style>
+<div class="container">
+    <ol class="cd-breadcrumb triangle">
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li class="current"><em>@ViewBag.Title</em></li>
+    </ol>
+</div>
+<div class="bg-title">
+    <div class="header-content text-center">
+        <h1 class="size48">
+            @ViewBag.CategoryName
+        </h1>
+        <div class="divider"></div>
+        <p class="size24">
+            @ViewBag.Desc
+        </p>
+    </div>
+</div>
+@{
+    UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+    Html.RenderPartial(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
+}

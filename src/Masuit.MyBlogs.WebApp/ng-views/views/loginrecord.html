@@ -1,0 +1,21 @@
+﻿<div class="row">
+    <div class="page-header">
+        <h2 class="text-center">最近一个月登陆记录</h2>
+    </div>
+    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
+            <td title="'登录时间'" sortable="'LoginTime'">
+                {{row.LoginTime|date:"yyyy-MM-dd HH:mm:ss"}}
+            </td>
+            <td title="'IP'" sortable="'IP'">
+                {{row.IP}}
+            </td>
+            <td title="'省份'" sortable="'Province'">
+                {{row.Province}}
+            </td>
+            <td title="'详细地址'" sortable="'PhysicAddress'">
+                {{row.PhysicAddress}}
+            </td>
+        </tr>
+    </table>
+</div>

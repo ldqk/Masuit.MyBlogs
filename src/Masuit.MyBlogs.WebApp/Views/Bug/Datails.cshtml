@@ -1,0 +1,111 @@
+﻿@using System.Text.RegularExpressions
+@using Common
+@using Masuit.Tools.Systems
+@using Models.Entity
+@using Models.Enum
+@model Issue
+@{
+    ViewBag.Title = Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container">
+    <ol class="cd-breadcrumb triangle">
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li>@Html.ActionLink("提交网站漏洞和BUG", "Index", "Bug")</li>
+        <li class="current">
+            <em>@ViewBag.Title</em>
+        </li>
+    </ol>
+    <div class="wrapper-content article">
+        <div class="ibox">
+            <div class="ibox-content">
+                <main>
+                    <section>
+                        <header class="page-header">
+                            <div class="text-center">
+                                <a>
+                                    <h3 class="padding-bot10">
+                                        存在的问题：@Model.Title
+                                    </h3>
+                                </a>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-9">
+                                    <div class="padding-bot10">
+                                        提交人：<span class="label label-info">@Model.Name (@Model.Email)</span> | 提交时间：<span class="label label-danger">@Model.SubmitTime.ToString("yyyy-MM-dd HH:mm")</span> | 问题级别：<span class="label label-danger">@Model.Level.GetDisplay()</span>
+                                    </div>
+                                </div>
+                                <div class="pull-right margin-right20">
+                                    @if(Model.Status == Status.WaitingHandle) {
+                                        <span class="label label-danger">@Model.Status.GetDisplay()</span>
+                                    } else {
+                                        <span class="label label-success">@Model.Status.GetDisplay()</span><span> 处理时间：<span class="label label-success">@Model.HandleTime.Value.ToString("yyyy-MM-dd HH:mm")</span></span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    存在问题的链接：<a href="@Model.Link">@Model.Link</a>
+                                </div>
+                            </div>
+                        </header>
+                        <article class="article" id="article">
+                            <h3>问题详细描述：</h3>
+                            @MvcHtmlString.Create(Regex.Replace(Model.Description, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.GetSettings("Title")}' title='{CommonHelper.GetSettings("Title")}'/>"))
+                        </article>
+                    </section>
+                </main>
+                @if(Model.Status == Status.Handled) {
+                    <section class="wow pulse padding-bot20">
+                        <h3>博主回应：</h3>
+                        <p class="size16">
+                            @MvcHtmlString.Create(Model.Msg)
+                        </p>
+                    </section>
+                }
+                <!--PC和WAP自适应版-->
+                <div id="SOHUCS" sid="bug-@Model.Id"></div>
+                <script type="text/javascript">
+	                (function() {
+		                var appid = 'cytsT3QgK';
+		                var conf = 'prod_0358240040a6c9611add9de991099d42';
+		                var width = window.innerWidth || document.documentElement.clientWidth;
+		                if (width < 960) {
+			                window.document.write(
+				                '<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' +
+				                appid + '&conf=' + conf + '"><\/script>');
+		                } else {
+			                var loadJs = function(d, a) {
+				                var c = document.getElementsByTagName("head")[0] || document.head || document.documentElement;
+				                var b = document.createElement("script");
+				                b.setAttribute("type", "text/javascript");
+				                b.setAttribute("charset", "UTF-8");
+				                b.setAttribute("src", d);
+				                if (typeof a === "function") {
+					                if (window.attachEvent) {
+						                b.onreadystatechange = function() {
+							                var e = b.readyState;
+							                if (e === "loaded" || e === "complete") {
+								                b.onreadystatechange = null;
+								                a()
+							                }
+						                }
+					                } else {
+						                b.onload = a
+					                }
+				                }
+				                c.appendChild(b)
+			                };
+			                loadJs("https://changyan.sohu.com/upload/changyan.js", function() {
+				                window.changyan.api.config({
+					                appid: appid,
+					                conf: conf
+				                })
+			                });
+		                }
+	                })();
+                </script>
+            </div>
+        </div>
+    </div>
+</div>

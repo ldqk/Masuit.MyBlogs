@@ -1,0 +1,64 @@
+﻿<div class="row">
+    <div class="btn-group">
+        <button class="btn btn-danger waves-effect" ng-click="add()">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+        <button class="btn btn-info waves-effect" ng-click="list.GetPageData(paginationConf.currentPage, paginationConf.itemsPerPage);">
+            <span class="glyphicon glyphicon-refresh"></span>
+        </button>
+    </div>
+    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
+            <td title="'名称'" filter="{Name: 'text'}" sortable="'Name'" ng-switch="row.isEditing" ng-class="Name.$dirty ? 'bg-warning' : ''" ng-form="Name" tracked-table-cell>
+                <span ng-switch-default>{{row.Name}}</span>
+                <div ng-class="Name.$invalid && Name.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                    <div class="fg-line">
+                        <input type="text" name="name" ng-model="row.Name" class="form-control input-sm" required />
+                    </div>
+                </div>
+            </td>
+            <td title="'链接'" filter="{Url: 'text'}" sortable="'Url'" ng-switch="row.isEditing" ng-class="Url.$dirty ? 'bg-warning' : ''" ng-form="Url" tracked-table-cell>
+                <span ng-switch-default>
+                    <a ng-href="{{row.Url}}" target="_blank">{{row.Url}}</a>
+                </span>
+                <div ng-class="Url.$invalid && Url.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                    <div class="fg-line">
+                        <input type="text" name="name" ng-model="row.Url" class="form-control input-sm" required />
+                    </div>
+                </div>
+            </td>
+            <td title="'白名单'">
+                <label class="el-switch">
+                    <input type="checkbox" name="switch" ng-checked="row.Except">
+                    <span class="el-switch-style" ng-click="toggleWhite(row)"></span>
+                </label>
+            </td>
+            <td title="'是否可用'">
+                <label class="el-switch">
+                    <input type="checkbox" name="switch" ng-checked="row.Status==1">
+                    <span class="el-switch-style" ng-click="toggleState(row)"></span>
+                </label>
+            </td>
+            <td title="'操作'" style="width: 160px;">
+                <div class="btn-group">
+                    <button class="btn btn-primary btn-sm waves-effect" ng-click="list.save(row, rowForm)" ng-if="row.isEditing" ng-disabled="rowForm.$pristine || rowForm.$invalid">
+                        <span class="glyphicon glyphicon-ok"></span>
+                    </button>
+                    <button class="btn btn-default btn-sm waves-effect" ng-click="list.cancel(row, rowForm)" ng-if="row.isEditing">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                    <button class="btn btn-default btn-sm waves-effect" ng-click="row.isEditing = true" ng-if="!row.isEditing">
+                        <i class="icon-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm waves-effect" ng-click="list.del(row)" ng-if="!row.isEditing">
+                        <i class="icon-cross"></i>
+                    </button>
+                    <button class="btn btn-info btn-sm waves-effect" ng-click="list.check(row.Url)" ng-if="!row.isEditing">
+                        <i class="icon-shuffle"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <tm-pagination conf="paginationConf"></tm-pagination>
+</div>

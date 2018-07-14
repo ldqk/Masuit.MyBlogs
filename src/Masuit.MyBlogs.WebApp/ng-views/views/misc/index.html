@@ -1,0 +1,18 @@
+﻿<form class="form-group" id="article-form" method="post" onsubmit="return false">
+    <input type="hidden" ng-model="misc.Id">
+    <div class="input-group">
+        <span class="input-group-addon size18"><label for="article">标题：</label></span>
+    <div class="fg-line">
+        <input type="text" class="form-control input-lg" ng-model="misc.Title" required placeholder="请输入文章标题">
+    </div>
+    </div>
+    <!-- 加载编辑器的容器 -->
+    <div class="form-group overlay animated bounceInDown">
+        <div style="height: 700px;" class="ueditor" ng-model="misc.Content" type="text/plain"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button type="button" class="btn btn-info waves-effect" ng-click="submit(misc)">发布</button>
+        </div>
+    </div>
+</form>

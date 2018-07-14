@@ -1,0 +1,204 @@
+﻿@using Masuit.MyBlogs.WebApp.Models
+@using Masuit.Tools.Net
+@using Models.DTO
+@{
+    ViewBag.Title = "留言板";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+    string cid = Request["cid"]??"0";
+}
+<link href="~/Assets/layui/css/layui.min.css" rel="stylesheet"/>
+<script src="~/Assets/layui/layui.all.js"></script>
+<div class="container min-height780">
+    <ol class="cd-breadcrumb triangle">
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li class="current"><em>@ViewBag.Title</em></li>
+    </ol>
+    <form class="form-horizontal animated pulse" id="msg-form" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="OperatingSystem" id="OperatingSystem"/>
+        <input type="hidden" name="Browser" id="Browser"/>
+        <input type="hidden" class="form-control" value="@user.NickName" name="NickName" id="name">
+        <input type="hidden" class="form-control" value="@user.Email" name="Email" id="email">
+        <input type="hidden" class="form-control" value="@user.QQorWechat" name="QQorWechat" id="chat">
+        <div class="form-group overlay animated fadeInDown" style="margin-bottom: 0px !important;">
+            <textarea class="layui-textarea" id="layedit" name="Content" style="height: 200px"></textarea>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-12">
+                <button type="submit" class="btn btn-info btn-lg">
+                    发表留言
+                </button>
+            </div>
+        </div>
+    </form>
+    <ul class="wow media-list animated fadeInRight">
+        
+    </ul>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div id="pageToolbar"></div>
+        </div>
+    </div>
+</div>
+<div style="position: fixed; left: -20000px; bottom: -20000px; display: none">
+    <div id="reply" class="container-fluid">
+        <form class="form-horizontal" id="reply-form" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="OperatingSystem" id="OperatingSystem2"/>
+            <input type="hidden" name="Browser" id="Browser2"/>
+            <input type="hidden" class="form-control" value="@user.NickName" name="NickName" id="name2">
+            <input type="hidden" class="form-control" value="@user.Email" name="Email" id="email2">
+            <input type="hidden" class="form-control" value="@user.QQorWechat" name="QQorWechat" id="chat2">
+            <input type="hidden" value="" id="uid" name="ParentId"/>
+            <div class="form-group overlay animated fadeInDown">
+                <textarea class="layui-textarea" id="layedit2" name="Content" style="height: 80px"></textarea>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-info btn-lg">
+                            提交回复
+                        </button>
+                        <button type="button" class="btn-cancel btn btn-danger btn-lg">
+                            取消回复
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="~/Scripts/global/leavemsg.js"></script>
+<script>
+    window.onload = function () {
+        loading();
+		$('#pageToolbar').Paging({ //异步加载评论
+			pagesize: 10,
+			count: @ViewBag.TotalCount ,
+			toolbar: true,
+			callback: function(page, size, count) {
+				$.post("/msg/getmsgs", {
+					page: page,
+					size: size
+                }, (data) => {
+                    data = data.Data;
+                    if (data) {
+                        document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
+                        bindReplyBtn();
+					}
+				});
+			}
+        });
+        loadingDone();
+    };
+
+    //递归加载留言
+    //加载父楼层
+    function loadParentMsgs(data) {
+        loading();
+        var html = '';
+		if (data) {
+            var rows = Enumerable.From(data.rows).Where(c => c.ParentId === 0).ToArray();
+            var page = data.page;
+            var size = data.size;
+            var maxPage = Math.ceil(data.total / size);
+            page = page > maxPage ? maxPage : page;
+            page = page < 1 ? 1 : page;
+            var startfloor = data.parentTotal - (page - 1) * size;
+            for (let i = 0; i < rows.length; i++) {
+                html += `<li class="msg-list media animated fadeInRight" id='${rows[i].Id}'>
+                                <div class="media-body">
+                                    <article class="panel panel-info">
+                                        <header class="panel-heading">${startfloor}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""}
+                                            <span class="pull-right" style="font-size: 10px;">${rows[i].Status == 4 ? `<a class="label label-success" onclick="pass(${rows[i].Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${rows[i].Id})">删除</a> | ${rows[i].PostDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span></span>
+                                        </header>
+                                        <div class="panel-body">
+                                            ${rows[i].Content} <a class="btn btn-sm btn-info" href="?uid=${rows[i].Id}">回复</a>
+                                            <div class="pull-right">
+                                                <span class="label label-success">${rows[i].Email}</span>
+                                                <span class="label label-primary">${rows[i].QQorWechat}</span>
+                                            </div>
+                                            ${loadMsgs(data.rows, Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.PostDate).ToArray(), startfloor--)}
+                                        </div>
+                                    </article>
+                                </div>
+                            </li>`;
+            }
+		}
+        loadingDone();
+        return html;
+    }
+
+    //加载子楼层
+    function loadMsgs(data, msg, root, depth = 0) {
+        var colors = ["info", "success", "primary", "warning", "danger"];
+        var floor = 1;
+        depth++;
+        var html = '';
+        Enumerable.From(msg).ForEach((item, index) => {
+            var color = colors[depth % 5];
+            html += `<article id="${item.Id}" class="panel panel-${color}">
+                            <div class="panel-heading">
+                                ${depth}-${floor++}# ${item.IsMaster ?`<i class="icon icon-user"></i>`:""}${item.NickName}${item.IsMaster ?`(管理员)`:""}
+                                <span class="pull-right" style="font-size: 10px;">${item.Status == 4 ? `<a class="label label-success" onclick="pass(${item.Id})">通过</a> |`:""} <a class="label label-danger" onclick="del(${item.Id})">删除</a> | ${item.PostDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span></span>
+                            </div>
+                            <div class="panel-body">
+                                ${item.Content} 
+                                <a class="btn btn-sm btn-${color}" href="?uid=${item.Id}">回复</a>
+                                <div class="pull-right">
+                                    <span class="label label-success">${item.Email}</span>
+                                    <span class="label label-primary">${item.QQorWechat}</span>
+                                </div>
+                                ${loadMsgs(data, Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.PostDate), root, depth)}
+                            </div>
+                        </article>`;
+        });
+        return html;
+    }
+
+	function pass(id) {
+		$.post("/msg/pass", {
+			id: id
+		}, function(res) {
+			swal(res.Message, "", res.Success ? "success" : "error");
+			getmsgs();
+		});
+    }
+
+    function del(id) {
+		swal({
+            title: "确认删除这条留言吗？",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            showLoaderOnConfirm: true,
+            animation: true,
+            allowOutsideClick: false
+        }).then(function () {
+		    $.post("/msg/delete", {
+			    id: id
+		    }, function(res) {
+			    swal(res.Message, "", res.Success ? "success" : "error");
+			    getmsgs();
+		    });
+        }, function () {
+        });
+    }
+
+    /**
+   * 获取留言
+   */
+    function getmsgs() {
+		$.post("/msg/getmsgs", {
+			page: 1,
+            size: 10,
+            cid:@cid
+		}, (data) => {
+            data = data.Data;
+			document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
+			bindReplyBtn();
+		});
+	}
+</script>

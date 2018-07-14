@@ -1,0 +1,49 @@
+﻿<div class="row">
+    <div class="form-inline pull-right">
+        <button class="btn btn-info waves-effect " ng-click="list.GetPageData(paginationConf.currentPage, paginationConf.itemsPerPage);">
+            <span class="glyphicon glyphicon-refresh"></span>
+        </button>
+        <div class="input-group">
+            <span class="input-group-addon">全局搜索：</span>
+            <div class="fg-line">
+                <input type="text" class="form-control" ng-change="search(keyword)" ng-model="keyword" placeholder="全局搜索" />
+            </div>
+        </div>
+    </div>
+    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed editable-table listTable" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
+            <td title="'标题'" filter="{Title: 'text'}" sortable="'Title'">
+                <a href="/{{row.Id}}" target="_blank">{{row.Title}}</a>
+            </td>
+            <td title="'作者'" filter="{Author: 'text'}" sortable="'Author'" ng-if="Author">
+                {{row.Author}}
+            </td>
+            <td title="'发表'" filter="{PostDate: 'text'}" sortable="'PostDate'">
+                {{row.PostDate|date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
+            <td title="'分类'" filter="{CategoryName: 'text'}" sortable="'CategoryName'">
+                {{row.CategoryName}}
+            </td>
+            <td title="'作者邮箱'" filter="{Email: 'text'}" sortable="'Email'" ng-if="Email">
+                {{row.Email}}
+            </td>
+            <td title="'标签'" filter="{Label: 'text'}" sortable="'Label'">
+                {{row.Label}}
+            </td>
+            <td title="'操作'" style="width: 155px;">
+                <div class="btn-group">
+                    <button class="btn btn-danger btn-sm" ng-click="list.del(row)">
+                        <i class="icon-bin"></i>
+                    </button>
+                    <button class="btn btn-default btn-sm" ng-click="list.pass(row)" ng-if="row.Status=='审核中'">
+                        <i class="icon-checkmark"></i>
+                    </button>
+                    <a class="btn btn-success btn-sm" href="#/post/edit?id={{row.Id}}">
+                        <i class="icon-pencil"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <tm-pagination conf="paginationConf"></tm-pagination>
+</div>

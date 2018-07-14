@@ -1,0 +1,61 @@
+﻿<div class="row">
+    <div class="card">
+        <div class="listview lv-bordered lv-lg">
+            <div class="lv-header-alt clearfix">
+                <h2 class="lvh-label hidden-xs" style="font-size: 20px">消息中心</h2>
+                <ul class="lv-actions actions">
+                    <li>
+                        <a ng-click="list.GetPageData(paginationConf.currentPage, paginationConf.itemsPerPage);"><i class="zmdi zmdi-refresh-alt"></i></a>
+                    </li>
+                    <li>
+                        <a ng-click="MarkRead();"><i class="zmdi zmdi-shield-check"></i></a>
+                    </li>
+                    <li>
+                        <a ng-click="clearMsgs();"><i class="zmdi zmdi-delete"></i></a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="lv-body">
+                <div class="lv-item media" ng-repeat="m in Messages">
+                    <div class="checkbox pull-left">
+                        <label>
+                            <input type="checkbox" value="" ng-change="toggleRead(m.Id,m.Read)" ng-model="m.Read">
+                            <i class="input-helper"></i>
+                        </label>
+                    </div>
+                    <div class="media-body">
+                        <a href="{{m.Link}}" target="_blank" ng-click="read(m.Id)">
+                            <div class="lv-title">{{m.Title}}</div>
+                            <small class="lv-small" ng-bind-html="m.Content|htmlString"></small>
+                        </a>
+                        <ul class="lv-attrs">
+                            <li>
+                                <span ng-class="{true:'text-success',false:'text-danger'}[m.Read]">
+                                    {{m.Read?'已读':'未读'}}
+                                </span>
+                            </li>
+                            <li>{{m.Time|date:'yyyy-MM-dd HH:mm:ss'}}</li>
+                        </ul>
+
+                        <div class="lv-actions actions dropdown" uib-dropdown>
+                            <a href="" uib-dropdown-toggle aria-expanded="true">
+                                <i class="zmdi zmdi-more-vert"></i>
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li>
+                                    <a href="">Edit</a>
+                                </li>
+                                <li>
+                                    <a href="">Delete</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <tm-pagination conf="paginationConf"></tm-pagination>
+    </div>
+</div>

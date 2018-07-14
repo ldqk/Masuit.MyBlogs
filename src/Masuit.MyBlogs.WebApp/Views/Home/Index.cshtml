@@ -1,0 +1,77 @@
+﻿@using Common
+@using Masuit.MyBlogs.WebApp.Models
+@using Masuit.Tools.Net
+@using Masuit.Tools.Win32
+@using Models.DTO
+@model Models.ViewModel.IndexPageViewModel
+@{
+    ViewBag.Title = "首页";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    marquee p, marquee br, marquee div, marquee h1, marquee h2, marquee h3, marquee h4 {
+        display: inline !important;
+    }
+</style>
+<link href="~/Assets/banner/bootstrap-touch-slider.min.css" rel="stylesheet"/>
+@if(Model.Banner.Any()) {
+    <div id="bootstrap-touch-slider" class="carousel bs-slider fade  control-round indicators-line" data-ride="carousel" data-pause="hover" data-interval="5000">
+        <ol class="carousel-indicators">
+            @for(int i = 0; i < Model.Banner.Count; i++) {
+                if(i == 0) {
+                    <li data-target="#bootstrap-touch-slider" data-slide-to="@i" class="active"></li>
+                } else {
+                    <li data-target="#bootstrap-touch-slider" data-slide-to="@i"></li>
+                }
+            }
+        </ol>
+        <div class="carousel-inner" role="listbox">
+            @for(int i = 0; i < Model.Banner.Count; i++) {
+                var p = Model.Banner[i];
+                string[] style = {"slide_style_left", "slide_style_center", "slide_style_right"};
+                string[] ani = {"zoomInRight", "flipInX", "fadeInLeft", "lightSpeedIn", "fadeInUp", "zoomInLeft", "fadeInRight"};
+                Random r = new Random();
+                <div class="item @(i == 0 ? "active" : "")" class="img-responsive" style="max-height: 700px;">
+                    <img src="@p.ImageUrl" alt="@p.Title" class="slide-image" title="@CommonHelper.GetSettings("Title")"/>
+                    <div class="bs-slider-overlay"></div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="slide-text @style[r.StrictNext(style.Length)]">
+                                <h2 data-animation="animated @ani[r.StrictNext(ani.Length)]">@p.Title</h2>
+                                <p data-animation="animated @ani[r.StrictNext(ani.Length)]">@p.Description</p>
+                                <a href="/@p.Id" target="_blank" class="btn btn-default" data-animation="animated @ani[r.StrictNext(ani.Length)]">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <a class="left carousel-control" href="#bootstrap-touch-slider" role="button" data-slide="prev">
+            <span class="fa fa-angle-left" aria-hidden="true"></span>
+            <span class="sr-only">上一个</span>
+        </a>
+        <a class="right carousel-control" href="#bootstrap-touch-slider" role="button" data-slide="next">
+            <span class="fa fa-angle-right" aria-hidden="true"></span>
+            <span class="sr-only">下一个</span>
+        </a>
+    </div>
+}
+<br/>
+<script src="https://cdn.bootcss.com/jquery.touchswipe/1.6.18/jquery.touchSwipe.min.js"></script>
+<script src="~/Assets/banner/bootstrap-touch-slider.min.js"></script>
+@if(Model.Notices.Any()) {
+<div class="container notice">
+    <a href="/n/@(Model.Notices.FirstOrDefault()?.Id)">
+        <h3 class="size18 text-red text-center">网站最新公告</h3>
+    </a>
+        @MvcHtmlString.Create(Model.Notices.FirstOrDefault()?.Content.Replace("img src=", $"img title='{CommonHelper.GetSettings("Title")}' alt='{CommonHelper.GetSettings("Title")}' data-original="))
+</div>
+}
+
+@{
+    UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+    Html.RenderPartial(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
+}
+<script type="text/javascript">
+    $('#bootstrap-touch-slider').bsTouchSlider();
+</script>

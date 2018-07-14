@@ -1,0 +1,97 @@
+﻿<div class="card">
+    <div class="card-header">
+        <h2>设置头图轮播页</h2>
+        <ul class="actions">
+            <li>
+                <a ng-click="getdata();"><i class="zmdi zmdi-refresh-alt"></i></a>
+            </li>
+            <li>
+                <a ng-click="add()"><i class="zmdi zmdi-plus"></i></a>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body">
+        <div class="card-body card-padding">
+            <div class="row">
+                <div class="col-sm-6 col-md-3" ng-repeat="item in tops">
+                    <div class="card" style="max-height: 500px;overflow: hidden;">
+                        <div class="card-header ch-alt">
+                            <h4>{{item.Title}}</h4>
+                            <ul class="actions">
+                                <li>
+                                    <a ng-click="remove(item)">
+                                        <i class="zmdi zmdi-delete"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a ng-click="edit(item)">
+                                        <i class="zmdi zmdi-edit"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="thumbnail">
+                                <img class="img img-responsive img-thumbnail img-rounded" style="max-height: 300px;min-height: 300px;" ng-src="{{item.ImageUrl}}" alt="{{item.Title}}">
+                                <div class="caption">
+                                    <p>{{item.Description}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="modal" class="modal">
+    <div class="container-fluid" style="margin: 15px 0;">
+        <form class="card-body bgm-white">
+            <div class="form-group" ng-show="isAdd">
+                <div class="input-group">
+                    <label for="desc" class="input-group-addon control-label">选择文章：</label>
+                    <div class="fg-line">
+                        <div id="post" class="select3-input example-input form-control"></div>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="!isAdd">
+                <input type="hidden" ng-model="post.Id">
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <label for="desc" class="input-group-addon control-label">文章描述：</label>
+                    <div class="fg-line">
+                        <textarea type="text" class="form-control" id="desc" placeholder="请输入文章描述" ng-model="post.Description" rows="5"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <label for="desc" class="input-group-addon control-label">文章头图地址：</label>
+                    <div class="fg-line">
+                        <input type="text" class="form-control" id="desc" placeholder="请输入头图URL" ng-model="post.ImageUrl">
+                    </div>
+                    <span class="input-group-btn">
+                        <button class="btn btn-success" ng-click="upload()">上传本地图片</button>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <div class="fg-line">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info" ng-click="submit(post)">
+                                确认添加
+                            </button>
+                            <button type="button" class="btn btn-danger" ng-click="closeAll()">
+                                取消
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

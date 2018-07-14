@@ -1,0 +1,192 @@
+﻿<!--<style type="text/css">    
+    .lv-body {
+        max-height: 300px;
+        overflow: hidden;
+    }
+</style>-->
+<ul class="header-inner clearfix">
+    <li id="menu-trigger" data-target="mainmenu" data-toggle-sidebar data-model-left="mactrl.sidebarToggle.left" data-ng-class="{ 'open': mactrl.sidebarToggle.left === true }">
+        <div class="line-wrap">
+            <div class="line top"></div>
+            <div class="line center"></div>
+            <div class="line bottom"></div>  
+        </div>
+    </li>
+
+    <li class="logo hidden-xs">
+        <a data-ui-sref="home" data-ng-click="mactrl.sidebarStat($event)">博客管理后台</a>
+    </li>
+
+    <li class="pull-right">
+        <ul class="top-menu">
+
+            <li id="toggle-width">
+                <div class="toggle-switch" data-microtip="切换宽屏" data-microtip-position="bottom">
+                    <input id="tw-switch" type="checkbox" hidden="hidden" data-change-layout="mactrl.layoutType">
+                    <label for="tw-switch" class="ts-helper"></label>
+                </div>
+            </li>
+
+            <li>
+                <a href="/" ng-click="loading()" data-microtip="回主页" data-microtip-position="bottom"><i class="tm-icon zmdi zmdi-home"></i></a>
+            </li>
+            <li>
+                <a data-ui-sref="write-blog" data-microtip="写文章" data-microtip-position="bottom"><i class="tm-icon zmdi zmdi-edit"></i></a>
+            </li>
+            <li>
+                <a data-ui-sref="filemanager" data-microtip="资源管理器" data-microtip-position="bottom"><i class="tm-icon zmdi zmdi-archive"></i></a>
+            </li>
+            <li>
+                <a data-ui-sref="taskcenter" data-microtip="任务管理器" data-microtip-position="bottom"><i class="tm-icon zmdi zmdi-view-list"></i></a>
+            </li>
+            <li>
+                <a data-ui-sref="interview" data-microtip="访客分析" data-microtip-position="bottom"><i class="tm-icon zmdi zmdi-trending-up"></i></a>
+            </li>
+            <!--<li id="top-search">
+        <a href="" data-ng-click="mactrl.openSearch()"><i class="tm-icon zmdi zmdi-search"></i></a>
+    </li>-->
+
+            <li class="dropdown" uib-dropdown ng-if="Msgs.post.length>0">
+                <a uib-dropdown-toggle href="">
+                    <i class="tm-icon zmdi zmdi-email"></i>
+                    <i class="tmn-counts">{{Msgs.post.length}}</i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg stop-propagate pull-right">
+                    <div class="listview">
+                        <div class="lv-header">
+                            待审核文章
+                        </div>
+                        <div class="lv-body">
+                            <a class="lv-item" ng-href="/{{w.Id}}" ng-repeat="w in Msgs.post" target="_blank">
+                                <div class="media">
+                                    <div class="media-body">
+                                        <div class="lv-title">{{ w.Title }}</div>
+                                        <small class="lv-small">{{ w.PostDate }}</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="clearfix"></div>
+                        <a class="lv-footer" ng-href="#/postpending">查看所有</a>
+                    </div>
+                </div>
+            </li>
+            <li class="dropdown" uib-dropdown ng-if="Msgs.comments.length>0">
+                <a uib-dropdown-toggle href="">
+                    <i class="tm-icon zmdi zmdi-notifications"></i>
+                    <i class="tmn-counts">{{Msgs.comments.length}}</i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg stop-propagate pull-right">
+                    <div class="listview" id="notifications">
+                        <div class="lv-header">
+                            待审核评论
+                        </div>
+                        <div class="lv-body">
+                            <a class="lv-item" ng-href="/{{w.PostId}}?cid={{w.Id}}#comment" ng-repeat="w in Msgs.comments" target="_blank">
+                                <div class="media">
+                                    <div class="media-body">
+                                        <div class="lv-title">{{ w.NickName }}</div>
+                                        <small class="lv-small">{{ w.CommentDate }}</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="clearfix"></div>
+                        <a class="lv-footer" ng-href="#/comment">查看所有</a>
+                    </div>
+
+                </div>
+            </li>
+            <li class="dropdown" uib-dropdown ng-if="Msgs.msgs.length>0">
+                <a uib-dropdown-toggle href="">
+                    <i class="tm-icon zmdi zmdi-view-list-alt"></i>
+                    <i class="tmn-counts">{{Msgs.msgs.length}}</i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg stop-propagate pull-right">
+                    <div class="listview" id="msg">
+                        <div class="lv-header">
+                            待审核留言
+                        </div>
+                        <div class="lv-body">
+                            <a class="lv-item" ng-href="/msg?cid={{w.Id}}" ng-repeat="w in Msgs.msgs" target="_blank">
+                                <div class="media">
+                                    <div class="media-body">
+                                        <div class="lv-title">{{ w.NickName }}</div>
+                                        <small class="lv-small">{{ w.PostDate }}</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="clearfix"></div>
+                        <a class="lv-footer" href="">查看所有</a>
+                    </div>
+
+                </div>
+            </li>
+            <li class="dropdown" uib-dropdown ng-if="InternalMsgs.length>0">
+                <a uib-dropdown-toggle href="">
+                    <i class="tm-icon zmdi zmdi-cast"></i>
+                    <i class="tmn-counts">{{InternalMsgs.length}}</i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg stop-propagate pull-right">
+                    <div class="listview">
+                        <div class="lv-header">
+                            未读消息
+                            <ul class="actions">
+                                <li>
+                                    <a href="" data-ng-click="mactrl.clearNotification($event)">
+                                        <i class="zmdi zmdi-check-all"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="lv-body">
+                            <a class="lv-item" ng-href="{{w.Link}}" target="_blank" ng-repeat="w in InternalMsgs" ng-click="read(w.Id)">
+                                <div class="media">
+                                    <div class="media-body">
+                                        <div class="lv-title">{{ w.Title }}</div>
+                                        <small class="lv-small" ng-bind-html="w.Content|htmlString"></small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="clearfix"></div>
+                        <a class="lv-footer" href="#/msgs">查看所有消息</a>
+                    </div>
+
+                </div>
+            </li>
+            <li class="dropdown" uib-dropdown>
+                <a uib-dropdown-toggle href="">
+                    <i class="tm-icon zmdi zmdi-more-vert"></i>
+                </a>
+                <ul class="dropdown-menu dm-icon pull-right">
+                    <li class="skin-switch hidden-xs">
+                        <span ng-repeat="w in mactrl.skinList | limitTo : 6" class="ss-skin bgm-{{ w }}" data-ng-click="mactrl.skinSwitch(w)"></span>
+                    </li>
+                    <li class="divider hidden-xs"></li>
+                    <li>
+                        <a data-ui-sref="system-panel"><i class="zmdi zmdi-settings"></i>网站设置</a>
+                    </li>
+                    <li>
+                        <a data-ui-sref="menu"><i class="zmdi zmdi-layers"></i>菜单管理</a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a data-ng-click="mactrl.fullScreen()" href=""><i class="zmdi zmdi-fullscreen"></i>切换全屏</a>
+                    </li>
+                    <li>
+                        <a data-ng-click="mactrl.clearLocalStorage()" href=""><i class="zmdi zmdi-delete"></i>清除LocalStorage</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<!-- Top Search Content -->
+<div id="top-search-wrap">
+    <div class="tsw-inner">
+        <i id="top-search-close" class="zmdi zmdi-arrow-left" data-ng-click="mactrl.closeSearch()"></i>
+        <input type="text">
+    </div>
+</div>

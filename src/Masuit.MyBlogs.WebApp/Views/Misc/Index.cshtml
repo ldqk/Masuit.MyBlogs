@@ -1,0 +1,106 @@
+﻿@using System.Text.RegularExpressions
+@using Common
+@model Models.Entity.Misc
+@{
+    ViewBag.Title = Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Random r = new Random();
+}
+<link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
+<style>
+    .bg-title {
+        height: 50vh;
+        max-height: 400px;
+        position: relative;
+        background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
+        background-size:cover;
+        background-attachment: fixed;
+    }
+    .header-content {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+    }
+    .header-content .divider {
+        width: inherit;
+        height: 20px;
+        margin-top: 20px;
+        border-top: 3px solid rebeccapurple;
+    }
+    .content {
+        text-indent:36px;
+        line-height: 24px;
+        font-size: 18px;
+    }
+    .content h3{
+        font-size: 24px;
+    }
+</style>
+<ol class="cd-breadcrumb triangle">
+    <li>@Html.ActionLink("首页", "Index", "Home")</li>
+    <li class="current">
+        <em>@ViewBag.Title</em>
+    </li>
+</ol>
+<div class="bg-title">
+    <div class="header-content text-center">
+        <h1 class="size48">
+            @Model.Title
+        </h1>
+        <div class="divider"></div>
+    </div>
+</div>
+<div class="container">
+    <article class="content">
+        @MvcHtmlString.Create(Regex.Replace(Model.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.GetSettings("Title")}' title='{CommonHelper.GetSettings("Title")}'/>"))
+    </article>
+    <!--PC和WAP自适应版-->
+    <div id="SOHUCS" sid="misc@Model.Id"></div>
+    <script type="text/javascript">
+	                (function() {
+		                var appid = 'cytsT3QgK';
+		                var conf = 'prod_0358240040a6c9611add9de991099d42';
+		                var width = window.innerWidth || document.documentElement.clientWidth;
+		                if (width < 960) {
+			                window.document.write(
+				                '<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' +
+				                appid + '&conf=' + conf + '"><\/script>');
+		                } else {
+			                var loadJs = function(d, a) {
+				                var c = document.getElementsByTagName("head")[0] || document.head || document.documentElement;
+				                var b = document.createElement("script");
+				                b.setAttribute("type", "text/javascript");
+				                b.setAttribute("charset", "UTF-8");
+				                b.setAttribute("src", d);
+				                if (typeof a === "function") {
+					                if (window.attachEvent) {
+						                b.onreadystatechange = function() {
+							                var e = b.readyState;
+							                if (e === "loaded" || e === "complete") {
+								                b.onreadystatechange = null;
+								                a()
+							                }
+						                }
+					                } else {
+						                b.onload = a
+					                }
+				                }
+				                c.appendChild(b)
+			                };
+			                loadJs("https://changyan.sohu.com/upload/changyan.js", function() {
+				                window.changyan.api.config({
+					                appid: appid,
+					                conf: conf
+				                })
+			                });
+		                }
+	                })();
+    </script>
+</div>
+<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
+<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
+<script>
+    SyntaxHighlighter.all();
+    SyntaxHighlighter.defaults['toolbar'] = false;
+</script>

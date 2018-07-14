@@ -1,0 +1,94 @@
+
+.mt30{margin-top: 30px;}
+.share-github {
+    float: left;
+    margin-right: 10px;
+}
+.demo-content > h4 {
+    margin-top: 25px;
+}
+.modal-demo {
+    background-color: #FFF;
+    width: 600px;
+    border: #000 solid 1px;
+    border-radius: 10px;
+    box-shadow: 0 8px 6px -6px black;
+    text-align: left;
+    display: none;
+}
+.title {
+    padding: 10px 20px 15px 20px;
+    line-height: 18px;
+    font-size: 18px;
+    border-bottom: #CCC solid 1px;
+}
+.text {
+    padding: 0 20px 20px 20px;
+}
+.close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+.bs-callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+.bs-callout > h4,
+.bs-callout-support {
+    margin-top: 0;
+}
+.bs-callout:not(.bs-callout-support) > p:last-of-type {
+    margin-bottom: 0;
+}
+.bs-callout-info {
+    border-left-color: #D9EDF7;
+}
+#forkme {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+}
+#custompopover {
+    width: 265px;
+}
+.table-popover:not(.table-methods) > tbody > tr:hover td {
+    background-color: #D9EDF7;
+}
+.footer {
+    font-size: 11px;
+    text-align: center;
+    padding-bottom: 20px;
+}
+.download {
+    margin-bottom: 10px;
+    font-size: 16px;
+    line-height: 16px;
+    font-weight: normal;
+}
+#gitfork {
+    display: none;
+}
+.tab-content-demo {
+    overflow: auto;
+}
+@media only screen and (max-device-width: 480px) {
+    #forkme,
+    #custompopover {
+        display: none;
+    }
+    #gitfork {
+        display: block;
+    }
+}
+.modal-demo .infinite {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 45px;
+}

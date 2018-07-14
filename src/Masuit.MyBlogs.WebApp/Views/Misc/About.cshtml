@@ -1,0 +1,264 @@
+﻿@using Common
+@using Masuit.MyBlogs.WebApp.Models
+@using Models.DTO
+@{
+    ViewBag.Title = "关于博主";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Random r = new Random();
+    PageFootViewModel footer = ViewBag.Footer;
+}
+<style>
+    .bg-title {
+        height: 50vh;
+        max-height: 400px;
+        position: relative;
+        background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
+        background-size:cover;
+        background-attachment: fixed;
+    }
+    .header-content {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+    }
+    .header-content .divider {
+        width: inherit;
+        height: 20px;
+        margin-top: 20px;
+        border-top: 3px solid rebeccapurple;
+    }
+</style>
+<ol class="cd-breadcrumb triangle">
+    <li>@Html.ActionLink("首页", "Index", "Home")</li>
+    <li class="current"><em>@ViewBag.Title</em></li>
+</ol>
+<div class="bg-title">
+    <div class="header-content text-center">
+        <h1 class="size48">
+            关于博主
+        </h1>
+        <div class="divider"></div>
+        <p class="size24">
+            博主个人简介
+        </p>
+    </div>
+</div>
+<div class="container">
+    <div class="row" style="font-size: 18px;line-height: 24px;">
+        <div class="col-md-2">
+            <img data-original="@CommonHelper.GetSettings("logo")" alt="@CommonHelper.GetSettings("logo")" class="img-responsive img-thumbnail" style="width: 100%" />
+        </div>
+        <div class="col-md-10">
+            <table class="table-responsive table-condensed">
+                <tr>
+                    <td>江湖名号：</td>
+                    <td>懒得勤快</td>
+                </tr>
+                <tr>
+                    <td>所属人群：</td>
+                    <td>奋斗中的90后高中生</td>
+                </tr>
+                <tr>
+                    <td>毕业院校：</td>
+                    <td>四川省资阳中学</td>
+                </tr>
+                <tr>
+                    <td>目前就职于：</td>
+                    <td>
+                        <a href="http://www.supwin.com">广州实盈投资</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>人生格言：</td>
+                    <td>
+                        自由之思想，独立之人格。跟着靠谱的人，干牛逼的事！
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="page-header">
+            <h2 class="size24 inline">
+                自序
+                <small>
+                    博主的自我简评
+                </small>
+            </h2>
+        </div>
+        <div class="col-md-12">
+            <ol style="text-indent: 36px;">
+                <li>南山下，码农一枚。酷爱编程，乐于分享。</li>
+                <li>09年开始接触编程，致力于更好的分享技术，分享人生。</li>
+                <li>程序老鸟，初心不改！依然喜欢写代码到深夜，最喜欢深夜代码伴随着的键盘声。</li>
+                <li>多年的实战项目经验，擅长.NET、JavaEE、web前端等多种开发技术，擅长于大型互联网项目优化与改进，目前主攻web全栈开发技术，欢迎大家来一起侃技术；</li>
+                <li>喜欢折腾和搞机，追求新鲜的硬件数码设备，也欢迎小伙伴们一起讨论搞机经验，一起来tree new bee；</li>
+                <li>2005年就读于美国联邦总局学院，2006年美国时代周刊年度年度人物，2008年感动中国组委会特别大奖，2010年被奥巴马请回到海豹突击队，2011年参加了美国总统选举二次落选，2012年被提名为世界最具影响力人物，2014年放弃一生辉煌隐退在互联网当码农；</li>
+                <li>同时也是一位B站资深哲♂学家，探索未知领域😏。</li>
+            </ol>
+        </div>
+    </div>
+    <div class="row margin-top10">
+        <div class="page-header">
+            <h2 class="size24 inline">喜欢钻研的技术</h2>
+        </div>
+        <div class="col-md-12" style="line-height: 40px;">
+            <button class="btn btn-info">web前端</button>
+            <button class="btn btn-primary">Javascript</button>
+            <button class="btn btn-success">CSS</button>
+            <button class="btn btn-danger">NoSql</button>
+            <button class="btn btn-default">C#</button>
+            <button class="btn btn-info">JavaEE</button>
+            <button class="btn btn-primary">DotNet</button>
+            <button class="btn btn-success">NodeJS</button>
+            <button class="btn btn-danger">Redis</button>
+            <button class="btn btn-default">MySql</button>
+            <button class="btn btn-info">git</button>
+            <button class="btn btn-primary">nginx</button>
+            <button class="btn btn-danger">linux</button>
+            <button class="btn btn-info">docker</button>
+            <button class="btn btn-primary">Android</button>
+            <button class="btn btn-danger">Windows</button>
+            <button class="btn btn-success">互联网架构</button>
+            <button class="btn btn-default">大数据</button>
+            <button class="btn btn-info">操作系统</button>
+            <button class="btn btn-danger">云计算</button>
+            <button class="btn btn-primary">数码硬件</button>
+            <button class="btn btn-success">软件绿化</button>
+            <button class="btn btn-default">服务器</button>
+            <button class="btn btn-info">自动化运维</button>
+            <button class="btn btn-danger">分布式</button>
+            <button class="btn btn-primary">微服务</button>
+            <button class="btn btn-success">区块链</button>
+            <button class="btn btn-default">自然语言</button>
+            <button class="btn btn-info">搜索引擎</button>
+            <button class="btn btn-danger">金融科技</button>
+            <button class="btn btn-primary">数字货币</button>
+            <button class="btn btn-success">区块链</button>
+        </div>
+    </div>
+    <div class="row margin-top10">
+        <div class="page-header">
+            <h2 class="size24 inline">常用到的工具</h2>
+        </div>
+        <div class="col-md-12" style="line-height: 40px;">
+            <button class="btn btn-danger">VisualStudio</button>
+            <button class="btn btn-default">eclipse</button>
+            <button class="btn btn-success">myeclipse</button>
+            <button class="btn btn-info">IntelliJ idea</button>
+            <button class="btn btn-primary">Photoshop</button>
+            <button class="btn btn-success">Navicat</button>
+            <button class="btn btn-info">VS Code</button>
+            <button class="btn btn-primary">vm ware</button>
+            <button class="btn btn-success">dism++</button>
+            <button class="btn btn-danger">RedisDesktopManager</button>
+            <button class="btn btn-default">chrome</button>
+            <button class="btn btn-info">git</button>
+            <button class="btn btn-primary">nginx</button>
+            <button class="btn btn-danger">SVN</button>
+            <button class="btn btn-success">Internet Download Manager</button>
+            <button class="btn btn-default">TeamViewer</button>
+            <button class="btn btn-info">github</button>
+            <button class="btn btn-primary">npm</button>
+            <button class="btn btn-danger">gitbook</button>
+            <button class="btn btn-info">bilibili</button>
+            <button class="btn btn-success">stackoverflow</button>
+            <button class="btn btn-default">WebStorm</button>
+            <button class="btn btn-info">google</button>
+            <button class="btn btn-primary">bing</button>
+            <button class="btn btn-danger">gitbook</button>
+            <button class="btn btn-success">stackoverflow</button>
+            <button class="btn btn-default">WebStorm</button>
+            <button class="btn btn-info">google</button>
+            <button class="btn btn-primary">JetBrains Rider</button>
+            <button class="btn btn-danger">Postman</button>
+        </div>
+    </div>
+    <div class="row margin-top10">
+        <div class="page-header">
+            <h2 class="size24 inline">常去的网站</h2>
+        </div>
+        <div class="col-md-12" style="line-height: 40px;">
+            <a class="btn btn-danger" href="https://github.com" target="_blank">github</a>
+            <a class="btn btn-default" href="https://www.cnblogs.com" target="_blank">博客园</a>
+            <a class="btn btn-success" href="https://www.csdn.net" target="_blank">CSDN</a>
+            <a class="btn btn-info" href="http://www.51cto.com" target="_blank">51CTO</a>
+            <a class="btn btn-primary" href="http://www.jb51.net" target="_blank">脚本之家</a>
+            <a class="btn btn-success" href="http://www.htmleaf.com" target="_blank">jquery之家</a>
+            <a class="btn btn-info" href="https://www.52pojie.cn" target="_blank">52破解</a>
+            <a class="btn btn-primary" href="http://msdn.itellyou.cn" target="_blank">MSDN</a>
+            <a class="btn btn-success" href="https://www.bilibili.com" target="_blank">哔哩哔哩</a>
+            <a class="btn btn-danger" href="http://zol.com.cn" target="_blank">中关村在线</a>
+            <a class="btn btn-default" href="http://bbs.ithome.com" target="_blank">IT之家</a>
+            <a class="btn btn-info" href="https://stackoverflow.com" target="_blank">stackoverflow</a>
+            <a class="btn btn-primary" href="https://segmentfault.com" target="_blank">segmentfault</a>
+            <a class="btn btn-success" href="http://www.infoq.com/cn" target="_blank">InfoQ</a>
+            <a class="btn btn-default" href="http://www.jobbole.com/" target="_blank">伯乐在线</a>
+            <a class="btn btn-danger" href="https://www.lagou.com/" target="_blank">拉勾</a>
+            <a class="btn btn-info" href="https://www.linkedin.com" target="_blank">领英</a>
+        </div>
+    </div>
+    <div class="row margin-top10">
+        <div class="page-header">
+            <h2 class="size24 inline">博主详细简历</h2>
+        </div>
+        <div class="col-md-12" style="line-height: 40px;">
+            <a class="btn btn-info" href="http://resume.masuit.com">立即前往</a>
+        </div>
+    </div>
+    <div class="row margin-top10">
+        <div class="page-header">
+            <h2 class="size24 inline">联系博主</h2>
+        </div>
+        <div class="col-md-12" style="line-height: 40px;">
+            @{
+                var contacts = footer.Contacts;
+                foreach (ContactsOutputDto c in contacts)
+                {
+                    <a class="btn btn-info" href="@c.Url">@c.Title</a>
+                }
+            }
+        </div>
+    </div>
+    <!--PC和WAP自适应版-->
+    <div id="SOHUCS" sid="about"></div>
+    <script type="text/javascript">
+        (function () {
+            var appid = 'cytsT3QgK';
+            var conf = 'prod_0358240040a6c9611add9de991099d42';
+            var width = window.innerWidth || document.documentElement.clientWidth;
+            if (width < 960) {
+                window.document.write(
+                    '<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' +
+                    appid + '&conf=' + conf + '"><\/script>');
+            } else {
+                var loadJs = function (d, a) {
+                    var c = document.getElementsByTagName("head")[0] || document.head || document.documentElement;
+                    var b = document.createElement("script");
+                    b.setAttribute("type", "text/javascript");
+                    b.setAttribute("charset", "UTF-8");
+                    b.setAttribute("src", d);
+                    if (typeof a === "function") {
+                        if (window.attachEvent) {
+                            b.onreadystatechange = function () {
+                                var e = b.readyState;
+                                if (e === "loaded" || e === "complete") {
+                                    b.onreadystatechange = null;
+                                    a()
+                                }
+                            }
+                        } else {
+                            b.onload = a
+                        }
+                    }
+                    c.appendChild(b)
+                };
+                loadJs("https://changyan.sohu.com/upload/changyan.js", function () {
+                    window.changyan.api.config({
+                        appid: appid,
+                        conf: conf
+                    })
+                });
+            }
+        })();
+    </script>
+</div>

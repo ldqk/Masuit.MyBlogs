@@ -1,0 +1,358 @@
+﻿@using Common
+@using Masuit.MyBlogs.WebApp.Models
+@using Masuit.Tools
+@using Masuit.Tools.Net
+@using Masuit.Tools.Win32
+@using Models.DTO
+@using Models.Enum
+@{
+    string[] colors = { "success", "info", "warning", "danger", "default" };
+    IList<MenuOutputDto> menus = ViewBag.menus;
+    UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+    PageFootViewModel footer = ViewBag.Footer;
+}
+@helper NodeHelper(IEnumerable<MenuOutputDto> menus, int depth = 0)
+{
+    IEnumerable<MenuOutputDto> menu = ViewBag.menus;
+    depth++;
+    foreach (MenuOutputDto mm in menus)
+    {
+        if (menu.Any(m => m.ParentId == mm.Id))
+        {
+            <li class="has-children">
+                <a href="#">@mm.Name</a>
+                <ul class="is-hidden">
+                    <li class="go-back"><a href="#">上级菜单</a></li>
+                    @NodeHelper(menu.Where(m => m.ParentId == mm.Id).OrderBy(c => c.Sort), depth)
+                </ul>
+            </li>
+        }
+        else
+        {
+            if (mm.NewTab)
+            {
+                <li><a href="@mm.Url" target="_blank">@mm.Name</a></li>
+            }
+            else
+            {
+                <li><a href="@mm.Url">@mm.Name</a></li>
+            }
+        }
+    }
+}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    @*上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！*@
+    <meta http-equiv="X-UA-Compatible" content="IE=8">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <title>@(ViewBag.Title + "_" + CommonHelper.GetSettings("Title"))</title>
+    <meta name="keywords" content="@(CommonHelper.GetSettings("Keyword")+","+ViewBag.Keyword)" />
+    <meta name="description" content="@(CommonHelper.GetSettings("Description")+","+ViewBag.Keyword)" />
+    @*导入css*@
+    <link href="https://cdn.bootcss.com/normalize/5.0.0/normalize.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/limonte-sweetalert2/6.6.9/sweetalert2.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/notie/4.3.1/notie.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" media="all">
+    <link href="https://cdn.bootcss.com/animate.css/3.5.2/animate.min.css" rel="stylesheet" media="all">
+    <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
+    <link href="~/fonts/icomoon.min.css" rel="stylesheet" />
+    @Styles.Render("~/styles")
+    @Styles.Render("~/css")
+
+    @*导入Scripts*@
+    <script src="https://cdn.bootcss.com/bluebird/3.5.0/bluebird.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/modernizr/2.8.3/modernizr.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/limonte-sweetalert2/6.6.9/sweetalert2.min.js"></script>
+    <script src="https://cdn.bootcss.com/platform/1.3.4/platform.min.js"></script>
+    <script src="https://cdn.bootcss.com/notie/4.3.1/notie.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.form/4.2.2/jquery.form.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-mobile/1.4.5/jquery.mobile.min.js"></script>
+    <script src="https://cdn.bootcss.com/linq.js/2.2.0.2/linq.min.js"></script>
+    <script src="https://cdn.bootcss.com/wow/1.1.2/wow.min.js"></script>
+    <script src="https://cdn.bootcss.com/ifvisible/1.0.6/ifvisible.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+    <script src="~/Scripts/layer/layer.js"></script>
+    <script src="~/Assets/layui/layui.min.js"></script>
+    @Scripts.Render("~/bundles")
+    @Scripts.Render("~/js")
+    @*<script src="~/Scripts/apps/canvas.bg.js"></script>*@
+</head>
+<body>
+    <div id="toc" style="display: none;">
+        <a class="close">
+            <i class="icon-cross"></i>
+        </a>
+    </div><!--/.well -->
+    <div class="sr-only">
+        <img src="~/images/hx.png" />
+        <img src="~/images/bg1.png" />
+        <img src="~/images/bg0.png" />
+    </div>
+    @*<canvas id="c" width="300" height="150"></canvas>
+        <a class="btn btn-default close-bg">关闭网页背景</a>*@
+    <div class="header">
+        <header class="cd-main-header">
+            <a class="cd-logo" href="/"><img src="@CommonHelper.GetSettings("logo")" alt="@CommonHelper.GetSettings("Title")"><span class="slogan">@CommonHelper.GetSettings("Slogan")</span></a>
+            <ul class="cd-header-buttons">
+                <li><a class="cd-search-trigger" href="#cd-search">搜索<span></span></a></li>
+                <li><a class="cd-nav-trigger" href="#cd-primary-nav">菜单<span></span></a></li>
+            </ul>
+        </header>
+
+        <nav class="cd-nav">
+            <ul id="cd-primary-nav" class="cd-primary-nav is-fixed">
+                @{
+                    if (user.IsAdmin)
+                    {
+                        <li>@Html.ActionLink("控制面板", "Index", "Dashboard", null, new { target = "_blank" })</li>
+                    }
+                    var parent = menus.Where(m => m.ParentId == 0);
+                    foreach (var m in parent)
+                    {
+                        if (m.MenuType == MenuType.SubMenu)
+                        {
+                            <li class="has-children">
+                                <a href="#">@m.Name</a>
+                                <ul class="cd-secondary-nav is-hidden">
+                                    <li class="go-back"><a href="#">上级菜单</a></li>
+                                    <li class="see-all"><a href="/all">所有 @m.Name</a></li>
+                                    @NodeHelper(menus.Where(s => s.ParentId == m.Id).OrderBy(c => c.Sort))
+                                </ul>
+                            </li>
+                        }
+                        else if (m.MenuType == MenuType.GalleryMenu)
+                        {
+                            <li class="has-children">
+                                <a href="#">@m.Name</a>
+                                <ul class="cd-nav-gallery is-hidden">
+                                    <li class="go-back"><a href="#">返回主菜单</a></li>
+                                    <li class="see-all"><a href="/all">所有 @m.Name</a></li>
+                                    @{
+                                        var ms = menus.Where(s => s.ParentId == m.Id);
+                                        foreach (var mm in ms)
+                                        {
+                                            if (mm.NewTab)
+                                            {
+                                                <li>
+                                                    <a class="cd-nav-item" href="@mm.Url" target="_blank">
+                                                        <img src="@mm.Icon" alt="@mm.Name">
+                                                        <h3>@mm.Name</h3>
+                                                    </a>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <a class="cd-nav-item" href="@mm.Url">
+                                                        <img src="@mm.Icon" alt="@mm.Name">
+                                                        <h3>@mm.Name</h3>
+                                                    </a>
+                                                </li>
+                                            }
+                                        }
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        else if (m.MenuType == MenuType.IconMenu)
+                        {
+                            <li class="has-children">
+                                <a href="#">@m.Name</a>
+                                <ul class="cd-nav-icons is-hidden">
+                                    <li class="go-back"><a href="#">返回主菜单</a></li>
+                                    @{
+                                        var ms = menus.Where(s => s.ParentId == m.Id);
+                                        var step = 1;
+                                        foreach (var mm in ms)
+                                        {
+                                            if (mm.NewTab)
+                                            {
+                                                <li>
+                                                    <a class="cd-nav-item item-@(step++%8)" href="@mm.Url" target="_blank">
+                                                        <p>@mm.Name</p>
+                                                    </a>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <a class="cd-nav-item item-@(step++%8)" href="@mm.Url">
+                                                        <p>@mm.Name</p>
+                                                    </a>
+                                                </li>
+                                            }
+                                        }
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            if(m.NewTab) {
+                                <li><a href="@m.Url" target="_blank">@m.Name</a></li>
+                            } else {
+                                <li><a href="@m.Url">@m.Name</a></li>
+                            }
+                        }
+                    }
+                }
+            </ul>
+        </nav>
+        <div id="cd-search" class="cd-search">
+            <form action="/s" method="get">
+                <input type="search" name="wd" placeholder="请在此处输入您想要要搜索的关键词...">
+            </form>
+        </div>
+
+        <main class="cd-main-content">
+            @RenderBody()
+            <div class="cd-overlay"></div>
+            <footer class="footer wow fadeIn">
+                <div class="container">
+                    当前浏览人数：@CommonHelper.OnlineCount 人，总访客量：@CommonHelper.InterviewCount，今日访问量：@AggregatedCounter.TotalInterviews.Todaypv 人，平均访问量：@((CommonHelper.InterviewCount / (DateTime.Now - CommonHelper.RunningStart).TotalDays).ToString("N"))人/天
+                    <section>
+                        友情链接：
+                        <a href="/swagger">博客开放平台</a>
+                        <span> | </span>
+                        @{
+                            if (user.IsAdmin)
+                            {
+                                @Html.ActionLink("资源管理器", "FileManager", "Dashboard", null, new { target = "_blank" })
+                                <span> | </span>
+                                <a href="/taskcenter" target="_blank">任务管理器</a>
+                                <span> | </span>
+                            }
+                            foreach (LinksOutputDto link in footer.Links)
+                            {
+                                <a href="@link.Url" target="_blank">@link.Name</a>
+                                <span> | </span>
+                            }
+                        }
+                        @Html.ActionLink("更多链接>>", "Index", "Links")
+                    </section>
+                    <section>
+                        联系站长：
+                        @{
+                            var contacts = footer.Contacts;
+                            foreach (ContactsOutputDto c in contacts)
+                            {
+                                <a href="@c.Url" target="_blank">@c.Title</a><span> | </span>
+                            }
+                        }
+                    </section>
+                    <section class="copy">
+                        @MvcHtmlString.Create(CommonHelper.GetSettings("Copyright"))
+                    </section>
+                </div>
+            </footer>
+        </main>
+    </div>
+    @*两个loading*@
+    <div id="loading">
+        <div class="loading3">
+            <ul class="c">
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+        <div class="loading2">
+            <div class="bg0 pa">
+                <div class="bg1"></div>
+            </div>
+            <div class="hx-box pa">
+                <ul class="pr">
+                    <li class="hx-k1 pa0">
+                        <span></span>
+                    </li>
+                    <li class="hx-k2 pa0">
+                        <span></span>
+                    </li>
+                    <li class="hx-k3 pa0">
+                        <span></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="loading1 animated fadeIn">
+            <div class="loadEffect">
+                @{
+                    var num = new Random().StrictNext();
+                    for (int i = 0; i < 7; i++)
+                    {
+                        <div>
+                            <span class="bg-@colors[(num+i) % 5]"></span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+    @*返回顶部火箭*@
+    <div style="display: none;" id="rocket-to-top">
+        <div style="opacity: 0; display: block;" class="level-2"></div>
+        <div class="level-3"></div>
+    </div>
+    <a class="bshareDiv" href="//www.bshare.cn/share">分享按钮</a>
+    <script type="text/javascript" charset="utf-8" src="//static.bshare.cn/b/buttonLite.js#uuid=&amp;style=3&amp;fs=4&amp;textcolor=#fff&amp;bgcolor=#9C3&amp;text=分享到&amp;pophcol=3"></script>
+    @*安装畅言*@
+    <script type="text/javascript" charset="utf-8" src="https://changyan.itc.cn/js/lib/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="https://changyan.sohu.com/js/changyan.labs.https.js?appid=cytsT3QgK"></script>
+
+    <script type="text/javascript" color="0,104,183" opacity='1' zIndex="-1" count="100" src="~/Scripts/line.js"></script>
+</body>
+</html>
+@{
+    if (Request.Browser.Type.Contains(new[] { "IE", "InternetExplorer" }))
+    {
+        <script type="text/javascript">
+	        var b = localStorage.getItem("browser");
+	        if (!b) {
+		        layer.open({
+			        title: '浏览器版本提示',
+			        area: '400px;',
+			        closeBtn: false,
+			        content: '亲爱的访客，我们检测到您正在使用IE浏览器，本网站的某些功能或特性可能不会完美地支持IE浏览器，但您可以继续浏览，不过为了更好的体验效果，建议您使用Chrome、Firefox等相同或类似的更高级浏览器访问本网站。珍惜生命，远离IE！',
+			        btn: [ '知道了', '哦'],
+			        btn1: function(layero) {
+				        layer.closeAll();
+				        layer.msg('为消灭IE做一点贡献，就是为世界上所有广大的互联网开发者们少加一点儿班做善事！<br/>IE：只要不升级，我还会回来的，我就是这么倔强！', {
+					        icon: 5
+				        });
+				        window.localStorage.setItem("browser", true);
+			        },
+			        btn2: function(index) {
+			        }
+		        });
+	        }
+        </script>
+    }
+}
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+<script type="text/javascript" src="https://js.users.51.la/19501755.js"></script>

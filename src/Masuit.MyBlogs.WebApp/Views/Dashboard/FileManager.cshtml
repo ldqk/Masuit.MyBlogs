@@ -1,0 +1,87 @@
+﻿@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>资源管理器</title>
+
+    <link href="~/Content/bootswatch.min.css" rel="stylesheet" />
+    <link href="~/fonts/icomoon.min.css" rel="stylesheet" />
+    <link href="~/ng-views/filemanager/css/animations.css" rel="stylesheet">
+    <link href="~/ng-views/filemanager/css/dialogs.css" rel="stylesheet">
+    <link href="~/ng-views/filemanager/css/main.css" rel="stylesheet">
+    <link href="~/Content/common/loading.min.css" rel="stylesheet" />
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/angular.js/1.6.9/angular.min.js"></script>
+    <script src="https://cdn.bootcss.com/angular-translate/2.16.0/angular-translate.min.js"></script>
+    <script src="~/Scripts/ng-file-upload.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    @*<script src="~/ng-views/filemanager/js/app.js"></script>
+        <script src="~/ng-views/filemanager/js/directives/directives.js"></script>
+        <script src="~/ng-views/filemanager/js/filters/filters.js"></script>
+        <script src="~/ng-views/filemanager/js/providers/config.js"></script>
+        <script src="~/ng-views/filemanager/js/entities/chmod.js"></script>
+        <script src="~/ng-views/filemanager/js/entities/item.js"></script>
+        <script src="~/ng-views/filemanager/js/services/apihandler.js"></script>
+        <script src="~/ng-views/filemanager/js/services/apimiddleware.js"></script>
+        <script src="~/ng-views/filemanager/js/services/filenavigator.js"></script>
+        <script src="~/ng-views/filemanager/js/providers/translations.js"></script>
+        <script src="~/ng-views/filemanager/js/controllers/main.js"></script>
+        <script src="~/ng-views/filemanager/js/controllers/selector-controller.js"></script>*@
+    @Scripts.Render("~/ng-views/filemgr")
+</head>
+
+<body class="ng-cloak" data-ng-app="FileManagerApp">
+<angular-filemanager></angular-filemanager>
+@*<div id="loading">
+    <div class="loading1 animated fadeIn">
+        <div class="loadEffect">
+            <div>
+                <span class="bg-warning"></span>
+            </div>
+            <div>
+                <span class="bg-success"></span>
+            </div>
+            <div>
+                <span class="bg-info"></span>
+            </div>
+            <div>
+                <span class="bg-primary"></span>
+            </div>
+            <div>
+                <span class="bg-default"></span>
+            </div>
+            <div>
+                <span class="bg-warning"></span>
+            </div>
+            <div>
+                <span class="bg-info"></span>
+            </div>
+            <div>
+                <span class="bg-success"></span>
+            </div>
+        </div>
+    </div>
+</div>*@
+</body>
+</html>
+<script type="text/javascript">
+    angular.module('FileManagerApp').config(['fileManagerConfigProvider', function (config) {
+        var defaults = config.$get();
+        config.set({
+            appName: '资源管理器',
+            pickCallback: function (item) {
+                var msg = 'Picked %s "%s" for external use'.replace('%s', item.type).replace('%s', item.fullPath());
+                window.alert(msg);
+            },
+
+            allowedActions: angular.extend(defaults.allowedActions, {
+                pickFiles: false,
+                pickFolders: false
+            })
+        });
+    }]);
+</script>

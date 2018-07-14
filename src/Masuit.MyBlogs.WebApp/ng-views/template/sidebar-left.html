@@ -1,0 +1,117 @@
+﻿<div class="sidebar-inner c-overflow">    
+    <div class="profile-menu">
+        <a href="" toggle-submenu>
+            <div class="profile-pic">
+                <img ng-src="{{user.Avatar}}">
+            </div>
+
+            <div class="profile-info">
+                {{user.NickName}}
+                <i class="zmdi zmdi-caret-down"></i>
+            </div>
+        </a>
+
+        <ul class="main-menu">
+            <li>
+                <a ng-click="changeUsername()"><i class="zmdi zmdi-account"></i>修改用户名</a>
+            </li>
+            <li>
+                <a ng-click="changeNickname()"><i class="zmdi zmdi-account"></i>修改昵称</a>
+            </li>
+            <li>
+                <a ng-click="changePassword()"><i class="zmdi zmdi-input-antenna"></i>修改密码</a>
+            </li>
+            <li>
+                <a ng-click="changeAvatar()"><i class="zmdi zmdi-settings"></i>修改头像</a>
+            </li>
+            <li>
+                <a ng-click="logout()"><i class="zmdi zmdi-time-restore"></i>注销登录</a>
+            </li>
+            <li>
+                <a ng-href="#/loginrecord"><i class="zmdi zmdi-cast-connected zmdi-hc-fw"></i>登陆记录</a>
+            </li>
+        </ul>
+    </div>
+
+    <ul class="main-menu">
+        <li data-ui-sref-active="active">
+            <a data-ui-sref="dashboard" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-home"></i>控制面板</a>
+        </li>
+        <li class="sub-menu" data-ng-class="{ 'active toggled': mactrl.$state.includes('headers') }">
+            <a href="" toggle-submenu><i class="zmdi zmdi-view-compact"></i>文章管理</a>
+            <ul>
+                <li><a data-ui-sref-active="active" data-ui-sref="post-pending" data-ng-click="mactrl.sidebarStat($event)">文章审核</a></li>
+                <li><a data-ui-sref-active="active" data-ui-sref="post-list" data-ng-click="mactrl.sidebarStat($event)">文章列表</a></li>
+                <li><a data-ui-sref-active="active" data-ui-sref="write-blog" data-ng-click="mactrl.sidebarStat($event)">写文章</a></li>
+                <li><a data-ui-sref-active="active" data-ui-sref="top-post" data-ng-click="mactrl.sidebarStat($event)">置顶页管理</a></li>
+                <li><a data-ui-sref-active="active" data-ui-sref="post-cat" data-ng-click="mactrl.sidebarStat($event)">文章分类管理</a></li>
+                <li><a data-ui-sref-active="active" data-ui-sref="seminar" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-format-underlined"></i>文章专题管理</a></li>
+            </ul>
+        </li>
+        <li class="sub-menu">
+            <a href="" toggle-submenu><i class="zmdi zmdi-widgets"></i>审核</a>
+            <ul>
+                <li><a data-ui-sref-active="active" data-ui-sref="comment" data-ng-click="mactrl.sidebarStat($event)">评论审核</a></li>
+                <li><a data-ui-sref-active="active" data-ui-sref="msg" data-ng-click="mactrl.sidebarStat($event)">留言审核</a></li>
+            </ul>
+        </li>
+        
+        <li class="sub-menu" data-ng-class="{ 'active toggled': mactrl.$state.includes('form') }">
+            <a href="" toggle-submenu><i class="zmdi zmdi-collection-text"></i>网站公告</a>
+
+            <ul>
+                <li><a data-ui-sref-active="active" data-ui-sref="notice-add" data-ng-click="mactrl.sidebarStat($event)">发布公告</a></li>
+                <li><a data-ui-sref-active="active" data-ui-sref="notice-list" data-ng-click="mactrl.sidebarStat($event)">公告列表</a></li>
+            </ul>
+        </li>
+
+        <li class="sub-menu" data-ng-class="{ 'active toggled': mactrl.$state.includes('user-interface') }">
+            <a href="" toggle-submenu><i class="zmdi zmdi-swap-alt"></i>杂项页</a>
+            <ul>
+                <li><a data-ui-sref-active="active" data-ui-sref="misc-add" data-ng-click="mactrl.sidebarStat($event)">发布杂项页</a></li>
+                <li><a data-ui-sref-active="active" data-ui-sref="misc-list" data-ng-click="mactrl.sidebarStat($event)">杂项页列表</a></li>
+            </ul>
+        </li>
+        <li data-ui-sref-active="active">
+            <a data-ui-sref-active="active" data-ui-sref="filemanager" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-archive"></i>文件管理器</a>
+        </li>
+        <li class="sub-menu" data-ng-class="{ 'active toggled': mactrl.$state.includes('photo-gallery') }">
+            <a href="" toggle-submenu><i class="zmdi zmdi-settings"></i>网站设置</a>
+            <ul>
+                <li><a data-ui-sref-active="active" data-ui-sref="system-panel" data-ng-click="mactrl.sidebarStat($event)">网站主配置</a></li>
+                <li>
+                    <a data-ui-sref-active="active" data-ui-sref="menu" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-layers"></i>菜单管理</a>
+                </li>
+                <li><a data-ui-sref-active="active" data-ui-sref="system-log" data-ng-click="mactrl.sidebarStat($event)">查看网站日志</a></li>
+                <li></li>
+                <li class="sub-menu">
+                    <a href="" toggle-submenu><i class="zmdi zmdi-trending-up"></i>网站资产管理</a>
+                    <ul>
+                        <li><a data-ui-sref-active="active" data-ui-sref="links" data-ng-click="mactrl.sidebarStat($event)">友情链接管理</a></li>
+                        <li><a data-ui-sref-active="active" data-ui-sref="contact" data-ng-click="mactrl.sidebarStat($event)">联系方式管理</a></li>
+                        <li><a data-ui-sref-active="active" data-ui-sref="email" data-ng-click="mactrl.sidebarStat($event)">邮件模版</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li data-ui-sref-active="active">
+            <a data-ui-sref-active="active" data-ui-sref="donate" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-money"></i>捐赠列表</a>
+        </li>
+        <li data-ui-sref-active="active">
+            <a data-ui-sref-active="active" data-ui-sref="subscribe" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-swap-alt"></i>订阅管理</a>
+        </li>
+
+        <li class="sub-menu" data-ng-class="{ 'active toggled': mactrl.$state.includes('pages') }">
+            <a href="" toggle-submenu><i class="zmdi zmdi-trending-up"></i>数据分析</a>
+            <ul>
+                <li><a data-ui-sref-active="active" data-ui-sref="interview" data-ng-click="mactrl.sidebarStat($event)">访客分析</a></li>
+                <li><a data-ui-sref-active="active" data-ui-sref="search" data-ng-click="mactrl.sidebarStat($event)">搜索记录分析</a></li>
+                <li><a data-ui-sref-active="active" data-ui-sref="pages.messages" data-ng-click="mactrl.sidebarStat($event)">文章分析</a></li>
+            </ul>
+        </li>
+
+        <li data-ui-sref-active="active">
+            <a data-ui-sref-active="active" data-ui-sref="taskcenter" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-view-list"></i>后台任务监控</a>
+        </li>
+    </ul>
+</div>

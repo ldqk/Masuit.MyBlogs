@@ -1,0 +1,700 @@
+/*
+ ----------------------------
+ Actions
+ ----------------------------
+ */
+.custombox-open,
+.custombox-open body {
+    overflow: hidden;
+}
+.custombox-perspective,
+.custombox-perspective body  {
+    perspective: 600px;
+    height: 100%;
+}
+.custombox-overlay-open {
+    visibility: visible;
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Defaults
+ ----------------------------
+ */
+.custombox-overlay {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    transition-delay: 0s;
+}
+.custombox-overlay-default {
+    transition-timing-function: linear;
+    transition-property: opacity;
+    opacity: 0;
+}
+.custombox-modal-wrapper {
+    bottom: 0;
+    left: 0;
+    outline: 0 none;
+    overflow-x: auto;
+    overflow-y: scroll;
+    position: fixed;
+    right: 0;
+    top: 0;
+    text-align: center;
+}
+.custombox-modal-container {
+    margin: 0 auto;
+    position: relative;
+}
+.custombox-modal img {
+    max-width: 100%;
+    height: auto;
+}
+
+/*
+ ----------------------------
+ Overlay: Letmein
+ ----------------------------
+ */
+.custombox-overlay-letmein {
+    transition-property: all;
+    transition-timing-function: ease;
+    visibility: hidden;
+}
+.custombox-overlay-open.custombox-overlay-letmein {
+    transform: rotateX(-2deg);
+    transform-origin: 50% 0;
+    transform-style: preserve-3d;
+    visibility: visible;
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Overlay: Slide together
+ ----------------------------
+ */
+.custombox-overlay-slidetogether {
+    transform: translateY(-100%);
+    transition-property: transform ease-in-out;
+}
+
+.custombox-overlay-open.custombox-overlay-slidetogether {
+    transform: translateY(0);
+    transition-property: transform ease-in-out;
+}
+
+/*
+ ----------------------------
+ Overlay: Corner
+ ----------------------------
+ */
+.custombox-overlay-corner {
+    transform: translateY(150px) translateX(150px);
+    transition-property: opacity, transform, visibility;
+}
+.custombox-overlay-open.custombox-overlay-corner {
+    transform: translateY(0);
+    transition-property: opacity, transform;
+}
+
+/*
+ ----------------------------
+ Overlay: Scale
+ ----------------------------
+ */
+.custombox-overlay-scale {
+    transform: scale(0.9);
+    transition-property: transform;
+}
+.custombox-overlay-open.custombox-overlay-scale {
+    transform: scale(1);
+    transition-property: transform;
+}
+
+/*
+ ----------------------------
+ Overlay: Door
+ ----------------------------
+ */
+.custombox-overlay-door {
+    visibility: hidden;
+    width: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    transition-property: width ease-in-out;
+}
+.custombox-overlay-open.custombox-overlay-door {
+    visibility: visible;
+    width: 100%;
+    transition-property: width ease-in-out;
+}
+
+/*
+ ----------------------------
+ Overlay: Push
+ ----------------------------
+ */
+.custombox-container-push {
+    overflow-x: hidden;
+    transition-property: transform;
+}
+.custombox-container-open.custombox-container-push {
+    transform: translateX(100%);
+}
+.custombox-overlay-push {
+    backface-visibility: hidden;
+    transform: translateX(-100%);
+    transition-property: transform ease-in-out;
+}
+.custombox-overlay-open.custombox-overlay-push {
+    transform: translateX(0);
+    transition-property: transform ease-in-out;
+}
+
+/*
+ ----------------------------
+ Overlay: Content Scale
+ ----------------------------
+ */
+.custombox-open-contentscale body {
+    background-color: #DDD;
+}
+.custombox-container-contentscale {
+    transition: transform 0.5s;
+    overflow: hidden;
+    height: 100%;
+}
+.custombox-container-open.custombox-container-contentscale {
+    transform: scale(0.8);
+}
+.custombox-overlay-contentscale {
+    transform: translateY(100%);
+    transition-property: transform ease-in-out;
+}
+.custombox-overlay-open.custombox-overlay-contentscale {
+    transform: translateY(0);
+    transition-property: transform ease-in-out;
+}
+
+/*
+ ----------------------------
+ Overlay: Makeway
+ ----------------------------
+ */
+.custombox-container-open.custombox-container-makeway {
+    height: 100%;
+    overflow: hidden;
+}
+.custombox-overlay-open.custombox-overlay-makeway {
+    transition-property: all;
+}
+.custombox-overlay-open.custombox-overlay-makeway,
+.custombox-container-open.custombox-container-makeway {
+    transform-style: preserve-3d;
+    transform-origin: 0 50%;
+    animation: rotateRightSideFirst 0.5s forwards ease-in;
+}
+@keyframes rotateRightSideFirst {
+    50% {
+        transform: translateZ(-50px) rotateY(5deg);
+        animation-timing-function: ease-out;
+    }
+    100% {
+        transform: translateZ(-200px);
+    }
+}
+
+/*
+ ----------------------------
+ Overlay: Slip
+ ----------------------------
+ */
+.custombox-overlay-open.custombox-overlay-slip {
+    transition-property: all;
+}
+.custombox-overlay-open.custombox-overlay-slip,
+.custombox-container-open.custombox-container-slip {
+    transform-style: preserve-3d;
+    transform-origin: 50% 100%;
+    animation: OpenTop 0.5s forwards ease-in-out;
+}
+@keyframes OpenTop {
+    50% {
+        transform: rotateX(10deg);
+        animation-timing-function: ease-out;
+    }
+}
+
+/*
+ ----------------------------
+ Modal: Fadein
+ ----------------------------
+ */
+.custombox-modal-fadein {
+    transform: scale(0.7);
+    transition-property: all;
+    opacity: 0;
+    visibility: hidden;
+}
+.custombox-modal-open .custombox-modal-fadein {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+}
+
+/*
+ ----------------------------
+ Modal: Slide
+ ----------------------------
+ */
+.custombox-modal-container-slide > div,
+.custombox-modal-container-slidetogether > div {
+    opacity: 0;
+    float: left;
+}
+.custombox-modal-open > .custombox-modal-container-slide > div,
+.custombox-modal-open > .custombox-modal-container-slidetogether > div {
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: Slide from top
+ ----------------------------
+ */
+.custombox-modal-slide-top {
+    transform: translateY(-300%);
+}
+.custombox-modal-open .custombox-modal-slide-top {
+    transform: translateY(0);
+}
+
+/*
+ ----------------------------
+ Modal: Slide from left
+ ----------------------------
+ */
+.custombox-modal-slide-left {
+    transform: translateX(-300%);
+}
+.custombox-modal-open .custombox-modal-slide-left {
+    transform: translateX(0);
+}
+
+/*
+ ----------------------------
+ Modal: Slide from right
+ ----------------------------
+ */
+.custombox-modal-slide-right {
+    transform: translateX(300%);
+}
+.custombox-modal-open .custombox-modal-slide-right {
+    transform: translateX(0);
+}
+
+/*
+ ----------------------------
+ Modal: Slide from bottom
+ ----------------------------
+ */
+.custombox-modal-slide-bottom {
+    transform: translateY(300%);
+}
+.custombox-modal-open .custombox-modal-slide-bottom {
+    transform: translateY(0);
+}
+
+/*
+ ----------------------------
+ Modal: Newspaper
+ ----------------------------
+ */
+.custombox-modal-newspaper {
+    transform: scale(0) rotate(720deg);
+    opacity: 0;
+    transition-property: all;
+    position: absolute;
+}
+.custombox-overlay-newspaper {
+    transition-property: all;
+}
+.custombox-modal-open .custombox-modal-newspaper {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: Fall
+ ----------------------------
+ */
+.custombox-modal-container-fall {
+    perspective: 1300px;
+}
+.custombox-modal-fall {
+    transform-style: preserve-3d;
+    transform: translateZ(600px) rotateX(20deg);
+    opacity: 0;
+}
+.custombox-modal-open .custombox-modal-fall {
+    transition-timing-function: ease-in;
+    transition-property: all;
+    transform: translateZ(0) rotateX(0deg);
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: Sideball
+ ----------------------------
+ */
+.custombox-modal-container-sidefall {
+    perspective: 1300px;
+}
+.custombox-modal-wrapper-sidefall {
+    overflow-x: hidden;
+}
+.custombox-modal-sidefall {
+    transform-style: preserve-3d;
+    transform: translate(30%) translateZ(600px) rotate(10deg);
+    opacity: 0;
+}
+.custombox-modal-open .custombox-modal-sidefall {
+    transition-timing-function: ease-in;
+    transition-property: all;
+    transform: translate(0) translateZ(0) rotate(0deg);
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: Blur
+ ----------------------------
+ */
+.custombox-open-blur .custombox-container-blur {
+    filter: blur(3px);
+}
+@media all and (-ms-high-contrast: none) {
+    .custombox-open-blur .custombox-container-blur {
+        text-shadow: 0 0 8px #000;
+        color: rgba(255,255,255,0);
+        filter: progid:DXImageTransform.Microsoft.Blur(PixelRadius='3');
+        zoom: 1;
+    }
+}
+@-moz-document url-prefix() {
+    .custombox-open-blur .custombox-container-blur {
+        filter: url(blur.svg#blur);
+    }
+}
+.custombox-modal-blur {
+    transform: translateY(-5%);
+    opacity: 0;
+    position: absolute;
+}
+.custombox-overlay-blur,
+.custombox-modal-container-blur {
+    transition-property: all;
+}
+.custombox-modal-open .custombox-modal-blur {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: 3D Flip generic
+ ----------------------------
+ */
+.custombox-modal-container-flip {
+    perspective: 1300px;
+}
+
+/*
+ ----------------------------
+ Modal: 3D Flip horizontal
+ ----------------------------
+ */
+.custombox-modal-flip-horizontal {
+    position: absolute;
+    transform-style: preserve-3d;
+    transform: rotateY(-70deg);
+    transition-property: all;
+    opacity: 0;
+}
+.custombox-modal-open .custombox-modal-flip-horizontal {
+    transform: rotateY(0deg);
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: 3D Flip vertical
+ ----------------------------
+ */
+.custombox-modal-flip-vertical {
+    position: absolute;
+    transform-style: preserve-3d;
+    transform: rotateX(-70deg);
+    transition-property: all;
+    opacity: 0;
+}
+.custombox-modal-open .custombox-modal-flip-vertical {
+    transform: rotateX(0deg);
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: 3D Sign
+ ----------------------------
+ */
+.custombox-modal-container-sign {
+    perspective: 1300px;
+}
+.custombox-modal-sign {
+    transform-style: preserve-3d;
+    transform: rotateX(-60deg);
+    transform-origin: 50% 0;
+    opacity: 0;
+    transition-property: all;
+}
+.custombox-modal-open .custombox-modal-sign {
+    transform: rotateX(0deg);
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: Superscaled
+ ----------------------------
+ */
+.custombox-modal-superscaled {
+    transform: scale(2);
+    opacity: 0;
+    transition-property: all;
+    position: absolute;
+}
+.custombox-modal-open .custombox-modal-superscaled {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: 3D Slit
+ ----------------------------
+ */
+.custombox-modal-container-slit {
+    perspective: 1300px;
+}
+.custombox-modal-slit {
+    transform-style: preserve-3d;
+    transform: translateZ(-3000px) rotateY(90deg);
+    opacity: 0;
+}
+.custombox-modal-open .custombox-modal-slit {
+    animation: slit .7s forwards ease-out;
+}
+@keyframes slit {
+    50% {
+        transform: translateZ(-250px) rotateY(89deg);
+        opacity: 1;
+        animation-timing-function: ease-out;
+    }
+    100% {
+        transform: translateZ(0) rotateY(0deg);
+        opacity: 1;
+    }
+}
+
+/*
+ ----------------------------
+ Modal: 3D Rotate generic
+ ----------------------------
+ */
+.custombox-modal-container-rotate {
+    perspective: 1300px;
+}
+
+/*
+ ----------------------------
+ Modal: 3D Rotate from bottom
+ ----------------------------
+ */
+.custombox-modal-rotate-bottom {
+    transform-style: preserve-3d;
+    transform: translateY(100%) rotateX(90deg);
+    transform-origin: 0 100%;
+    opacity: 0;
+    transition-timing-function: ease-out;
+    transition-property: all;
+    position: absolute;
+}
+.custombox-modal-open .custombox-modal-rotate-bottom {
+    transform: translateY(0) rotateX(0deg);
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: 3D Rotate from left
+ ----------------------------
+ */
+.custombox-modal-rotate-left {
+    transform-style: preserve-3d;
+    transform: translateZ(100px) translateX(-30%) rotateY(90deg);
+    transform-origin: 0 100%;
+    opacity: 0;
+    transition-property: all;
+    position: absolute;
+}
+.custombox-modal-open .custombox-modal-rotate-left {
+    transform: translateZ(0) translateX(0) rotateY(0deg);
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: Letmein
+ ----------------------------
+ */
+.custombox-modal-container-letmein {
+    transition-property: transform;
+    transform: rotateX(-2deg);
+    transform-origin: 50% 0;
+    transform-style: preserve-3d;
+    opacity: 1;
+}
+.custombox-modal-letmein {
+    opacity: 0;
+    transform: translateY(300%);
+    float: left;
+}
+.custombox-modal-open .custombox-modal-letmein {
+    transform: translateY(0);
+    opacity: 1;
+    transition-property: all;
+}
+
+/*
+ ----------------------------
+ Modal: Makeway
+ ----------------------------
+ */
+.custombox-modal-makeway {
+    transform: translateX(200%);
+    opacity: 0;
+    float: left;
+}
+.custombox-modal-open .custombox-modal-makeway {
+    transform: translateX(0);
+    opacity: 1;
+}
+.custombox-modal-wrapper-makeway {
+    overflow: hidden;
+}
+
+/*
+ ----------------------------
+ Modal: Slip
+ ----------------------------
+ */
+.custombox-modal-slip {
+    transform: translateY(-350%);
+}
+.custombox-modal-open .custombox-modal-slip {
+    transform: translateY(0);
+    transition-property: all;
+}
+
+/*
+ ----------------------------
+ Modal: Corner
+ ----------------------------
+ */
+.custombox-modal-corner {
+    opacity: 0;
+    transform: translateY(150px) translateX(150px);
+    transition-property: opacity, transform, visibility;
+}
+.custombox-modal-open .custombox-modal-corner {
+    transform: translateY(0);
+    opacity: 1;
+    transition-property: opacity, transform;
+}
+
+/*
+ ----------------------------
+ Modal: Slide together
+ ----------------------------
+ */
+.custombox-modal-slidetogether {
+    transform: translateY(-600%);
+
+}
+.custombox-modal-open .custombox-modal-slidetogether {
+    transform: translateY(0);
+}
+
+/*
+ ----------------------------
+ Modal: Scale
+ ----------------------------
+ */
+.custombox-modal-scale {
+    transform: scale(0.9);
+    transition: transform;
+    opacity: 0;
+}
+.custombox-modal-open .custombox-modal-scale {
+    transform: scale(1);
+    transition: transform;
+    opacity: 1;
+}
+
+/*
+ ----------------------------
+ Modal: Door
+ ----------------------------
+ */
+.custombox-modal-door {
+    visibility: hidden;
+    opacity: 0;
+}
+.custombox-modal-open .custombox-modal-door {
+    opacity: 1;
+    visibility: visible;
+}
+
+/*
+ ----------------------------
+ Modal: Push
+ ----------------------------
+ */
+.custombox-modal-push {
+    transform: translateX(-300%);
+}
+.custombox-modal-open .custombox-modal-push {
+    transform: translateX(0);
+}
+
+/*
+ ----------------------------
+ Modal: Content Scale
+ ----------------------------
+ */
+.custombox-modal-contentscale {
+    transform: translateY(600%);
+    transition-property: transform ease-in-out;
+    position: absolute;
+}
+.custombox-modal-open .custombox-modal-contentscale {
+    transform: translateY(0);
+}

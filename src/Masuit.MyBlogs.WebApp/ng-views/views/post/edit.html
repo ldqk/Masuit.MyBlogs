@@ -1,0 +1,114 @@
+﻿<form class="form-group" id="article-form" method="post" onsubmit="return false">
+    <input type="hidden" ng-model="post.IsWordDocument"/>
+    <input type="hidden" ng-model="post.ResourceName"/>
+    <input type="hidden" ng-model="post.Author">
+    <input type="hidden" ng-model="post.Email">
+    <div class="input-group">
+        <span class="input-group-addon size18">
+            <label for="article">文章标题：</label>
+        </span>
+        <input type="text" class="form-control input-lg" ng-model="post.Title" required placeholder="请输入文章标题">
+        <span class="input-group-btn">
+            <button type="button" class="btn btn-info btn-lg waves-effect" ng-click="showupload()" style="font-size: 15px;"><i class="icon-upload4 size18"></i>上传word文档</button>
+        </span>
+    </div>
+    <!-- 加载编辑器的容器 -->
+    <div class="form-group overlay animated bounceInDown">
+        <div style="height: 56vh;" class="ueditor" ng-model="post.Content" type="text/plain"></div>
+        <h3 class="size16">文章加密内容：</h3>
+        <div style="height: 200px;" class="ueditor" ng-model="post.ProtectContent" type="text/plain"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 col-sm-5">
+            <div class="input-group">
+                <span class="input-group-addon">分类：</span>
+                <div class="ui fluid search selection dropdown category">
+                    <input name="category" type="hidden" id="category">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">请选择分类</div>
+                    <div class="menu">
+                        <div class="item" ng-repeat="item in cat track by $index" data-value="{{item.Id}}">{{item.Name}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8 col-sm-6">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label for="Label">标签：</label>
+                </span>
+                <div class="ui fluid multiple search selection dropdown tags">
+                    <input name="Label" type="hidden" id="Label">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">标签(选择或输入新标签)</div>
+                    <div class="menu">
+                        <div class="item" ng-repeat="item in Tags track by $index" data-value="{{item}}">{{item}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5 col-sm-3">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label>选择专题：</label>
+                </span>
+                <div class="ui fluid multiple search selection dropdown seminar">
+                    <input name="seminar" type="hidden" id="seminar">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">选择专题(可选)</div>
+                    <div class="menu">
+                        <div class="item" ng-repeat="item in Seminars" data-value="{{item.Title}}">{{item.Title}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 col-sm-3">
+            <div class="input-group">
+                <span class="input-group-addon"><label for="keyword">文章关键词：</label></span>
+                <div class="ui fluid multiple search selection dropdown keyword">
+                    <input name="keyword" type="hidden" id="keyword">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">文章关键词</div>
+                    <div class="menu"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="pull-right">
+                <span class="checkboxWrapper theme4 smallCheckboxSize" ng-click="notify=!notify">
+                    <input type="checkbox" id="sample9" ng-model="notify">
+                    <label for="sample9">
+                        <i>
+                            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
+                            <circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" />
+                            <path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534
+							S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" />
+                        </svg>
+                        </i>
+                        是否广播
+                    </label>
+                </span>
+                <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)">确认修改</button>
+            </div>
+        </div>
+    </div>
+</form>
+<div style="position: absolute; left: -20000px; bottom: -2000px;">
+    <div id="upfile">
+        <form id="fileform" onsubmit="return false" enctype="multipart/form-data">
+            <h4 class="h4">注意：重复上传将会覆盖之前上传的内容！</h4>
+            <div class="file-box">
+                <div class="input-group">
+                    <input type="text" name="copyFile" disabled class="form-control"/>
+                    <span class="input-group-btn">
+                        <a href="javascript:void(0);" class="btn btn-info">浏览</a>
+                    </span>
+                    <input type="file" class="uploadFile" name="upload" onchange="getFile(this, 'copyFile')"/>
+                </div>
+            </div>
+        </form>
+        <button type="button" class="btn btn-primary waves-effect" ng-click="upload()"> 上传 </button>
+    </div>
+</div>

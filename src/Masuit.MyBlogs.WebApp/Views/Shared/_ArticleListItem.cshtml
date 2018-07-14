@@ -1,0 +1,82 @@
+﻿@using System.Text.RegularExpressions
+@using Common
+@using Masuit.Tools.Html
+@using Masuit.Tools.Win32
+@using Models.Enum
+@{
+    string[] colors = {"success", "info", "primary", "warning", "danger", "default", "primary"};
+}
+@model Models.DTO.PostOutputDto
+<div class="ibox wow fadeIn">
+    <div class="ibox-content">
+        <a href="/@Model.Id" target="_blank">
+            <h4>
+                @if (Model.IsFixedTop)
+                {
+                    <i class="icon-thumbsup fixtop">[顶]</i>
+                }
+                @if (DateTime.Now - Model.ModifyDate < TimeSpan.FromDays(1))
+                {
+                    <i class="new">[新]</i>
+                }
+                @Model.Title
+            </h4>
+        </a>
+        <div class="row padding-bot10">
+            @{
+                //随机取合适大小的图片
+                string imgSrc = Model.Content.MatchRandomImgSrc();
+                MatchCollection imgTags = Model.Content.MatchImgTags();
+                for (var i = 0; i < imgTags.Count; i++)
+                {
+                    string src = Model.Content.MatchRandomImgSrc();
+                    if (File.Exists(Request.MapPath("/") + src) && !src.StartsWith("http"))
+                    {
+                        var fileInfo = new FileInfo(Path.Combine(Request.MapPath("/") + src));
+                        if (fileInfo.Length > 5000&& fileInfo.Length < 100000)
+                        {
+                            imgSrc = src.Replace("/large/", "/thumb150/");
+                            break;
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(imgSrc)) {
+                    <div class="col-md-3">
+                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@CommonHelper.GetSettings("Title")" title="@CommonHelper.GetSettings("Title")">
+                    </div>
+                }
+            }
+            <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
+                <div class="small padding-bot10">
+                    作者：<i class="icon-user-check"></i><strong class="label label-primary">@Model.Author</strong> <span class="text-muted">|
+                        发表时间：<i class="fa fa-clock-o"></i> @Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss") |
+                        分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.CategoryName,"Category","Home",new{id=Model.CategoryId},null)
+                    </span>
+                </div>
+                <p>
+                    @Model.Content.RemoveHtmlTag(150) ...
+                </p>
+            </div>
+
+        </div>
+        <div class="row">
+            @if(!string.IsNullOrEmpty(Model.Label)) {
+                <div class="col-md-6">
+                    @foreach(string s in Model.Label.Split(',', '，')) {
+                        <a href="/tag/@Server.UrlEncode(s)" target="_blank">
+                            <span class="label label-@colors[new Random().StrictNext() % colors.Length]">@s</span>
+                        </a>
+                    }
+                </div>
+            }
+            <div class="col-md-6 pull-right">
+                <div class="small text-right">
+                    <i class="fa fa-comments-o"></i>@Model.Comment.Count(c => c.Status==Status.Pended) 评论 |
+                    <i class="fa fa-eye"></i>@Model.ViewCount 浏览 |
+                    <i class="icon-thumbsup"></i>@Model.VoteUpCount 支持 |
+                    <i class="icon-thumbsdown"></i>@Model.VoteDownCount 反对
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

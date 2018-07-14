@@ -1,0 +1,339 @@
+﻿@model List<Models.Entity.Donate>
+@using Common
+
+@{
+    ViewBag.Title = "网站捐赠";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Random r = new Random();
+}
+<style>
+    .bg-title {
+        height: 50vh;
+        max-height: 400px;
+        position: relative;
+        background: url(/Content/images/@(r.Next(1, 9)).jpg) no-repeat center;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+    .flex-box {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+    }
+    .flex-box>div{
+        margin: 0 15px;
+        width: 18%;
+    }
+    @@media only screen and (max-width: 1080px) {
+        .flex-box>div{
+            width: 29.8%;
+        }
+    }
+</style>
+<link href="~/Assets/jedate/jedate.min.css" rel="stylesheet" />
+<script src="https://cdn.bootcss.com/lodash.js/3.10.1/lodash.min.js"></script>
+<script src="https://cdn.bootcss.com/angular.js/1.6.9/angular.min.js"></script>
+<script src="~/Scripts/tm.pagination.js"></script>
+<script src="~/Scripts/ng-table.min.js"></script>
+<script src="~/Assets/jedate/jquery.jedate.min.js"></script>
+<ol class="cd-breadcrumb triangle">
+    <li>@Html.ActionLink("首页", "Index", "Home")</li>
+    <li class="current">
+        <em>@ViewBag.Title</em>
+    </li>
+</ol>
+<div class="bg-title">
+    <div class="header-content text-center">
+        <h1 class="size48">
+            喜欢我的作品和文章？
+        </h1>
+        <div class="divider"></div>
+        <p class="size24">
+            您的捐助就是给我最大的鼓励
+        </p>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="flex-box">
+        <div>
+            <div class="page-header margin-clear margin-top10">
+                <h2 class="size28">
+                    支付宝二维码
+                </h2>
+            </div>
+            <img class="img-responsive img-thumbnail" style="width: 100%" src="@CommonHelper.GetSettings("Donate")" />
+        </div>
+        <div>
+            <div class="page-header margin-clear margin-top10">
+                <h2 class="size28">
+                    微信二维码
+                </h2>
+            </div>
+            <img class="img-responsive img-thumbnail" style="width: 100%" src="@CommonHelper.GetSettings("DonateWechat")" />
+            <div class="protected">
+                <span class="text-red size20">注意：微信无法看见支付人的名称，所以捐赠时最好附上完整个人信息，否则无法将您加入到赞助名单中。</span>
+            </div>
+        </div>
+        <div>
+            <div class="page-header margin-clear margin-top10">
+                <h2 class="size28">
+                    QQ二维码
+                </h2>
+            </div>
+            <img class="img-responsive img-thumbnail" style="width: 100%" src="@CommonHelper.GetSettings("DonateQQ")" />
+        </div>
+        <div>
+            <div class="page-header margin-clear margin-top10">
+                <h2 class="size28">
+                    京东金融收钱码
+                </h2>
+            </div>
+            <img class="img-responsive img-thumbnail" style="width: 100%" src="@CommonHelper.GetSettings("DonateJingdong")" />
+        </div>
+        <div>
+            <div class="page-header margin-clear margin-top10">
+                <h2 class="size28">
+                    支付宝，领红包
+                </h2>
+            </div>
+            <img class="img-responsive img-thumbnail" style="width: 100%" src="http://wx1.sinaimg.cn/mw690/0060lm7Tly1fsnrd1z8shj31kw26ugsz.jpg" />
+        </div>
+    </div>
+</div>
+<div class="container margintop20">
+    <div class="text-green size20" style="line-height: 26px;">
+        <p>
+            本网站由博主一个人打造，开发和运营均为博主本人，如果您是真心喜欢本博客，您可以对博主表示一下感谢，以支持后期发布更多好资源，5毛也好、1元也罢，都是你们的心意。网站运营也需要成本，有你的援助，一切会更好。
+        </p>
+        <p class="text-red size20">
+            捐赠时最好能够附上你的完整信息，包括：您的昵称或真名、邮箱地址、QQ或微信、金额等；因为不能保证能够完全的清楚捐赠者的基本信息，如果你完成了捐赠，推荐你在网站留言板备注一下，或者QQ私信告知你是谁。
+        </p>
+        <p>
+            您可以尽您所能地捐赠，如果您临时改变主意，您可以在事后一个月之内联系作者申请退款！
+        </p>
+        <p>
+            本站的宗旨是：互联网分享精神，乐于发现，勤于分享；
+        </p>
+        <p>
+            我希望的：您将我的网站告诉你的朋友，让更多的人来这里学习，共同进步。
+        </p>
+    </div>
+</div>
+<div class="container-fluid" ng-app="myApp" ng-controller="home as list">
+    <div class="page-header margin-clear">
+        <h2 class="size24" style="display: inline">
+            捐赠名单(排名不分先后)：
+        </h2>
+        <button class="btn btn-info pull-right" ng-click="save()">添加捐赠</button>
+    </div>
+    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed margin-clear" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
+            <td title="'捐赠时间'" filter="{DonateTime: 'text'}" sortable="'DonateTime'">
+                {{row.DonateTime|date:'yyyy-MM-dd'}}
+            </td>
+            <td title="'昵称'" filter="{NickName: 'text'}" sortable="'NickName'">
+                {{row.NickName}}
+            </td>
+            <td title="'金额'" filter="{Amount: 'number'}" sortable="'Amount'">
+                {{row.Amount}}
+            </td>
+            <td title="'捐赠方式'" filter="{Via: 'text'}" sortable="'Via'">
+                {{row.Via}}
+            </td>
+            <td title="'Email'" filter="{Email: 'text'}" sortable="'Email'">
+                {{row.Email}}
+            </td>
+            <td title="'QQ或微信'" filter="{QQorWechat: 'text'}" sortable="'QQorWechat'">
+                {{row.QQorWechat}}
+            </td>
+            <td title="'显示邮箱'" filter="{EmailDisplay: 'text'}" sortable="'EmailDisplay'">
+                {{row.EmailDisplay}}
+            </td>
+            <td title="'显示QQ或微信'" filter="{QQorWechatDisplay: 'text'}" sortable="'QQorWechatDisplay'">
+                {{row.QQorWechatDisplay}}
+            </td>
+            <td title="'操作'">
+                <button class="btn btn-default btn-sm" ng-click="save(row)">编辑</button>
+                <button class="btn btn-danger btn-sm" ng-click="list.del(row)">删除</button>
+            </td>
+        </tr>
+    </table>
+    <tm-pagination conf="paginationConf"></tm-pagination>
+</div>
+<!--PC和WAP自适应版-->
+<div id="SOHUCS" sid="donate"></div>
+<script type="text/javascript">
+(function() {
+	var appid = 'cytsT3QgK';
+	var conf = 'prod_0358240040a6c9611add9de991099d42';
+	var width = window.innerWidth || document.documentElement.clientWidth;
+	if (width < 960) {
+		window.document.write(
+			'<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' +
+			appid + '&conf=' + conf + '"><\/script>');
+	} else {
+		var loadJs = function(d, a) {
+			var c = document.getElementsByTagName("head")[0] || document.head || document.documentElement;
+			var b = document.createElement("script");
+			b.setAttribute("type", "text/javascript");
+			b.setAttribute("charset", "UTF-8");
+			b.setAttribute("src", d);
+			if (typeof a === "function") {
+				if (window.attachEvent) {
+					b.onreadystatechange = function() {
+						var e = b.readyState;
+						if (e === "loaded" || e === "complete") {
+							b.onreadystatechange = null;
+							a()
+						}
+					}
+				} else {
+					b.onload = a
+				}
+			}
+			c.appendChild(b)
+		};
+		loadJs("https://changyan.sohu.com/upload/changyan.js", function() {
+			window.changyan.api.config({
+				appid: appid,
+				conf: conf
+			})
+		});
+	}
+})();
+</script>
+<script>
+angular.module('myApp', ["ngTable", "tm.pagination"]).controller("home", ["$scope", "$http", "NgTableParams",function ($scope, $http, NgTableParams) {
+    var self = this;
+    $scope.paginationConf = {
+        currentPage: 1,
+        itemsPerPage: 10,
+        pagesLength: 15,
+        perPageOptions: [10, 15, 20, 30, 50, 100],
+        rememberPerPage: 'perPageItems',
+        onChange: function () {
+            window.loading();
+            $http.post("/donate/getpagedata", {
+                page: $scope.paginationConf.currentPage,
+                size: $scope.paginationConf.itemsPerPage
+            }).then(function (res) {
+                $scope.paginationConf.totalItems = res.data.TotalCount;
+                $("div[ng-table-pagination]").remove();
+                self.tableParams = new NgTableParams({
+                    count: 50000
+                }, {
+                        filterDelay: 0,
+                        dataset: res.data.Data
+                    });
+                window.loadingDone();
+            });
+        }
+    };
+    self.del = function (row) {
+        swal({
+            title: "确认删除这条捐赠记录吗？",
+            text: row.NickName,
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            showLoaderOnConfirm: true,
+            animation: true,
+            allowOutsideClick: false
+        }).then(function () {
+            $http.post("/donate/delete", {
+                id: row.Id
+            }).then(function (res) {
+                window.notie.alert({
+                    type: 1,
+                    text: res.data.Message,
+                    time: 4
+                });
+                _.remove(self.tableParams.settings().dataset, function (item) {
+                    return row === item;
+                });
+                self.tableParams.reload().then(function (data) {
+                    if (data.length === 0 && self.tableParams.total() > 0) {
+                        self.tableParams.page(self.tableParams.page() - 1);
+                        self.tableParams.reload();
+                    }
+                });
+            });
+        }, function () {
+        });
+    }
+    $scope.save = function (row) {
+        if (row == null) {
+            row = {
+                NickName: "",
+                DonateTime: "",
+                Amount: "",
+                Email: "",
+                EmailDisplay: "",
+                QQorWechat: "",
+                QQorWechatDisplay: "",
+                Via: ""
+            };
+        }
+        swal({
+            title: '添加捐赠记录',
+            html:
+                '<div class="input-group"><span class="input-group-addon">昵称： </span><input type="text" id="name" class="form-control input-lg" placeholder="请输入昵称" value="' + row.NickName + '"></div>' +
+                '<div class="input-group"><span class="input-group-addon">捐赠时间： </span><input id="date" type="text" class="form-control input-lg date datainp dateicon" readonly placeholder="请输入捐赠时间" value="' + row.DonateTime + '"></div>	' +
+                '<div class="input-group"><span class="input-group-addon">捐赠金额： </span><input id="amount" type="text" class="form-control input-lg" placeholder="请输入金额" value="' + row.Amount + '"></div>' +
+                '<div class="input-group"><span class="input-group-addon">捐赠方式： </span><input id="via" type="text" class="form-control input-lg" placeholder="请输入捐赠方式" value="' + row.Via + '"></div>' +
+                '<div class="input-group"><span class="input-group-addon">Email： </span><input type="email" id="email" class="form-control input-lg" placeholder="请输入Email" value="' + row.Email + '"></div>' +
+                '<div class="input-group"><span class="input-group-addon">QQ或微信： </span><input type="text" id="qq" class="form-control input-lg" placeholder="请输入QQ或微信" value="' + row.QQorWechat + '"></div>' +
+                '<div class="input-group"><span class="input-group-addon">显示Email： </span><input type="text" id="demail" class="form-control input-lg" placeholder="请输入显示Email" value="' + row.EmailDisplay + '"></div>' +
+                '<div class="input-group"><span class="input-group-addon">显示QQ或微信： </span><input type="text" id="dqq" class="form-control input-lg" placeholder="请输入显示QQ或微信" value="' + row.QQorWechatDisplay + '"></div>',
+            showCloseButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            showLoaderOnConfirm: true,
+            animation: true,
+            allowOutsideClick: false,
+            preConfirm: function () {
+                return new Promise(function (resolve, reject) {
+                    row.NickName = $("#name").val();
+                    row.DonateTime = $("#date").val();
+                    row.Amount = $("#amount").val();
+                    row.Via = $("#via").val();
+                    row.Email = $("#email").val();
+                    row.QQorWechat = $("#qq").val();
+                    row.EmailDisplay = $("#demail").val();
+                    row.QQorWechatDisplay = $("#dqq").val();
+                    $http.post("/donate/save", row).then(function (res) {
+                        if (res.data.Success) {
+                            resolve(res.data);
+                        } else {
+                            reject(res.data.Message);
+                        }
+                    }, function (error) {
+                        reject("服务请求失败！");
+                    });
+                });
+            }
+        }).then(function (result) {
+            if (result) {
+                if (result.Success) {
+                    swal(result.Message, "", "success");
+                    self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+                } else {
+                    swal(result.Message, "", "error");
+                }
+            }
+        }).catch(swal.noop);
+
+        $(".date").jeDate({
+            isinitVal: true,
+            format: "YYYY-MM-DD",
+            okfun: function (elem) {
+                $("#date").val(elem.val);
+            }
+        });
+    }
+}]);
+</script>

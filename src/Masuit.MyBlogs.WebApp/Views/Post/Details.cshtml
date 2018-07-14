@@ -1,0 +1,373 @@
+﻿@using System.Text.RegularExpressions
+@using Common
+@using Masuit.Tools.Net
+@using Masuit.Tools.Win32
+@using Models.Entity
+@using Models.Enum
+@model Post
+@{
+    ViewBag.Title = Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
+    string cid = Request["cid"] ?? "0";
+}
+<link href="~/Assets/layui/css/layui.css" rel="stylesheet" />
+@*<link href="~/Assets/directory/style.min.css" rel="stylesheet" />*@
+<link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
+<script src="~/Assets/layui/layui.all.js"></script>
+<link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
+<div class="container">
+    <ol class="cd-breadcrumb triangle">
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li>@Html.ActionLink("文章列表", "Post", "Home")</li>
+        <li class="current"><em>@ViewBag.Title</em></li>
+    </ol>
+    <div class="wrapper-content article">
+        <div class="ibox">
+            <div class="ibox-content animated fadeIn">
+                <main>
+                    <section>
+                        <header class="page-header">
+                            <div class="text-center">
+                                <a>
+                                    <h2 class="padding-bot10">
+                                        @Model.Title
+                                    </h2>
+                                </a>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7">
+                                    <div class="padding-bot10">
+                                        发表于<span class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
+                                        <span class="label label-@colors[new Random().StrictNext() % colors.Length]">@Model.Author</span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                    </div>
+                                </div>
+                                @{
+                                    if (!string.IsNullOrEmpty(Model.Label))
+                                    {
+                                        <div class="pull-right margin-right20">
+                                            <div>
+                                                @foreach (string s in Model.Label.Split(',', '，', ' '))
+                                                {
+                                                    if (!string.IsNullOrEmpty(s))
+                                                    {
+                                                        <a href="/tag/@Server.UrlEncode(s)">
+                                                            <span class="label label-@colors[new Random().StrictNext() % colors.Length]">@s</span>
+                                                        </a>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 line-height24">
+                                    分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] }) | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条评论 | 热度：<span class="text-danger">@Model.PostAccessRecord.Sum(r => r.ClickCount)</span>℃
+                                    @if (Model.Seminar.Any())
+                                    {
+                                        <span> | 所属专题：</span>
+                                        var seminars = Model.Seminar;
+                                        foreach (Seminar s in seminars)
+                                        {
+                                            @Html.ActionLink(s.Title, "Index", "Seminar", new { id = s.Id }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })<text> </text>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </header>
+                        <article class="article" id="article">
+                            @MvcHtmlString.Create(Regex.Replace(Model.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.GetSettings("Title")}' title='{CommonHelper.GetSettings("Title")}'/>"))
+                            @if (!string.IsNullOrEmpty(Model.ProtectContent))
+                            {
+                                <div class="row protected">
+                                    @if (string.IsNullOrEmpty(Session.GetByRedis<string>("ArticleViewToken")))
+                                    {
+                                        <p class="text-red text-center size24 margin-bot10">↓↓↓恭喜你发现镇站之宝，请注意，前方高能！非战斗人员请及时撤离，这不是演习！↓↓↓</p>
+                                        <div class="col-md-6">
+                                            <span class="text-red">以下内容已经隐藏，请输入验证码后查看</span>
+                                            <span class="text-green">【完全免费，不收一分钱】</span>
+                                            <form action="/" method="post" class="form-inline" id="code-token">
+                                                <div class="input-group">
+                                                    @Html.AntiForgeryToken()
+                                                    <span class="input-group-addon">验证码：</span>
+                                                    <input type="text" name="token" id="token" class="form-control" />
+                                                    <span class="input-group-btn">
+                                                        <button type="submit" class="btn btn-info">查看文章</button>
+                                                    </span>
+                                                </div>
+                                            </form>
+                                            <p class="text-green">温馨提示：将本页面分享到您的社交平台上，如QQ或微信，并保证3h之内不会删除且获得10个以上的点赞或评论后，通过站长QQ私信获取文章访问密码，<span class="text-red">获取密码后本站所有加密文章将永久开放！</span></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <span class="text-green">如果你曾经获取过密码，请输入您的邮箱后查看</span>
+                                            <form action="/" method="post" class="form-inline" id="email-token">
+                                                <div class="input-group">
+                                                    @Html.AntiForgeryToken()
+                                                    <span class="input-group-addon">邮箱：</span>
+                                                    <input type="email" name="Email" id="email3" class="form-control" />
+                                                    <span class="input-group-btn">
+                                                        <button type="submit" class="btn btn-info">查看文章</button>
+                                                    </span>
+                                                </div>
+                                            </form>
+                                            <p class="text-green">温馨提示：请确保您的邮箱已经通过站长的登记，如果您未使用邮箱登记，请先联系站长获取文章密码并登记邮箱即可！</p>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-red text-center size20">↓↓↓以下是文章加密部分↓↓↓</p>
+                                        @MvcHtmlString.Create(Regex.Replace(Model.ProtectContent, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.GetSettings("Title")}' title='{CommonHelper.GetSettings("Title")}'/>"))
+                                    }
+                                </div>
+                            }
+                        </article>
+                        <div id="cyReward" role="cylabs" data-use="reward"></div>
+                    </section>
+                </main>
+                <section class="wow row padding-top40 padding-bot20 animated fadeIn">
+                    <div class="col-xs-6">
+                        <div class="btn-group">
+                            <button type="button" id="voteup" class="btn btn-success btn-lg">
+                                <i class="icon-thumbsup"></i><span>@Model.VoteUpCount</span>
+                            </button>
+                            <button type="button" id="votedown" class="btn btn-danger btn-lg">
+                                <i class="icon-thumbsdown"></i><span>@Model.VoteDownCount</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 text-right">
+                        <div class="btn-group">
+                            <button type="button" id="donate" class="btn btn-@colors[new Random().StrictNext() % colors.Length] btn-lg">
+                                <i class="icon-coin-yen"></i><span>支持站长</span>
+                            </button>
+                            @if (Model.IsWordDocument)
+                            {
+                                <a class="btn btn-@colors[new Random().StrictNext() % colors.Length] btn-lg" href="~/upload/@(Model.ResourceName)" target="_blank"><i class="icon-download4"></i>下载为Word文档</a>
+                            }
+                        </div>
+                    </div>
+
+                </section>
+                @if (Model.PostHistoryVersion.Any())
+                {
+                    <section class="wow margintop20 animated fadeIn">
+                        <h3>文章历史版本：</h3>
+                        <p>
+                            修改次数：@Model.PostHistoryVersion.Count 次
+                            @Html.ActionLink("查看历史版本", "History", "Post", new { id = Model.Id }, null)
+                        </p>
+                    </section>
+                }
+                <section class="wow padding-bot20 animated fadeIn">
+                    <h3>版权声明：</h3>
+                    <p class="text-danger size16">
+                        本文仅用于学习、研究和交流目的，欢迎非商业性质转载。本文链接：<a href="@Request.Url">@Request.Url</a>。
+                        @MvcHtmlString.Create(CommonHelper.GetSettings("Disclaimer"))
+                    </p>
+                </section>
+                <section class="wow fadeInUp row size16">
+                    <div class="col-xs-6">
+                        上一篇：
+                        @{
+                            Post prev = ViewBag.Prev;
+                            if (prev != null)
+                            {
+                                @Html.ActionLink(prev.Title, "Details", "Post", new { id = prev.Id }, null)
+                            }
+                            else
+                            {
+                                <a>没有了</a>
+                            }
+                        }
+                    </div>
+                    <div class="col-xs-6 text-right">
+                        下一篇：
+                        @{
+                            Post next = ViewBag.Next;
+                            if (next != null)
+                            {
+                                @Html.ActionLink(next.Title, "Details", "Post", new { id = next.Id }, null)
+                            }
+                            else
+                            {
+                                <a>没有了</a>
+                            }
+                        }
+                    </div>
+                </section>
+                @{
+                    var posts = Model.Category.Post.Where(p => p.Status == Status.Pended && p.Id != Model.Id).OrderBy(p => Guid.NewGuid()).ToList();
+                    int count = posts.Count >= 10 ? 10 : posts.Count;
+                    if (posts.Any())
+                    {
+                        <section class="wow margintop20 animated fadeIn">
+                            <h3>相关推荐：</h3>
+                            <table class="table table-condensed size16">
+                                @for (int i = 1; i < count; i += 2)
+                                {
+                                    <tr>
+                                        <td>@Html.ActionLink(posts[i - 1].Title, "Details", "Post", new { id = posts[i - 1].Id }, null)</td>
+                                        <td>@Html.ActionLink(posts[i].Title, "Details", "Post", new { id = posts[i].Id }, null)</td>
+                                    </tr>
+                                }
+                            </table>
+                        </section>
+                    }
+                }
+                <hr>
+                <section class="wow row animated fadeIn">
+                    <div class="col-lg-12">
+                        <h3>评论区：</h3>
+                        <form class="form-horizontal animated pulse" id="comment" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="PostId" value="@Model.Id" />
+                            <input type="hidden" id="OperatingSystem" name="OperatingSystem" />
+                            <input type="hidden" name="Browser" id="Browser" />
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <label for="name">昵称：</label>
+                                        </span>
+                                        <input type="text" class="form-control" name="NickName" id="name" required placeholder="昵称" value="@ViewBag.NickName">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <label for="email">邮箱：</label>
+                                        </span>
+                                        <input type="email" class="form-control" name="Email" id="email" required placeholder="留下您的真实邮箱，以方便接收回复" value="@ViewBag.Email">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">
+                                            <label for="chat">QQ/微信：</label>
+                                        </span>
+                                        <input type="text" class="form-control" name="QQorWechat" id="chat" placeholder="QQ或微信(可选)" value="@ViewBag.QQorWechat">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group overlay animated fadeInDown" style="margin-bottom: 0px !important;">
+                                <textarea class="layui-textarea" id="layedit" name="Content" style="height: 100px"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-xs-12">
+                                    <button type="submit" class="btn btn-info btn-lg">提交</button>
+                                </div>
+                            </div>
+                        </form>
+                        <ul class="wow media-list"></ul>
+                        @if (Model.Comment.Any(c => c.Status == Status.Pended))
+                        {
+                            <div class="row">
+                                <div class="col-md-12 text-center">
+                                    <div id="pageToolbar"></div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <h4>还没有评论哦，赶紧来写评论吧</h4>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="position: absolute; left: -20000px; bottom: 0;">
+    <div id="reply" class="container-fluid">
+        <form class="form-horizontal" id="reply-form" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="PostId" id="postId" value="@Model.Id" />
+            <input type="hidden" name="OperatingSystem" id="OperatingSystem2" />
+            <input type="hidden" name="Browser" id="Browser2" />
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label for="name">昵称：</label>
+                </span>
+                <input type="text" class="form-control" name="NickName" id="name2" required placeholder="昵称" value="@ViewBag.NickName">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label for="email">邮箱：</label>
+                </span>
+                <input type="email" class="form-control" name="Email" id="email2" required placeholder="留下您的真实邮箱，以方便接收回复" value="@ViewBag.Email">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label for="chat">QQ/微信：</label>
+                </span>
+                <input type="text" class="form-control" name="QQorWechat" id="chat2" placeholder="QQ或微信(可选)" value="@ViewBag.QQorWechat">
+            </div>
+            <input type="hidden" value="" id="uid" name="ParentId" />
+            <div class="form-group overlay animated fadeInDown">
+                <textarea class="layui-textarea" id="layedit2" name="Content" style="height: 80px"></textarea>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-info btn-lg">
+                            提交回复
+                        </button>
+                        <button type="button" class="btn-cancel btn btn-danger btn-lg">
+                            取消回复
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
+<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
+<script src="~/Assets/jquery.tocify/jquery.tocify.js"></script>
+@*<script src="~/Assets/directory/script.min.js"></script>*@
+<script src="~/Scripts/global/article.min.js"></script>
+<script>
+	window.onload = function() {
+        loading();
+		$('#pageToolbar').Paging({ //异步加载评论
+			pagesize: 10,
+			count: @Model.Comment.Count(c =>c.ParentId==0&& c.Status==Status.Pended),
+			toolbar: true,
+			callback: function(page, size, count) {
+				$.post("/comment/getcomments", {
+					id: @Model.Id,
+					page: page,
+					size: size
+                }, (data) => {
+                    data = data.Data;
+                    if (data) {
+                        document.querySelector(".media-list").innerHTML = loadParentComments(data);
+                        bindReplyBtn();
+                        commentVoteBind(); //评论投票
+					}
+				});
+			}
+		});
+        loadingDone();
+    };
+
+	/**
+   * 获取评论
+   */
+	function getcomments() {
+		$.post("/comment/getcomments", {
+			id: $("#postId").val(),
+			page: 1,
+            size: 10,
+            cid:@cid
+		}, (data) => {
+            data = data.Data;
+			if (data) {
+                document.querySelector(".media-list").innerHTML = loadParentComments(data);
+                bindReplyBtn();
+                commentVoteBind(); //评论投票
+			}
+		});
+	}
+</script>

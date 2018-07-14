@@ -1,0 +1,226 @@
+.button-effect { padding: 10px 0px; }
+
+.button-effect h2 {
+    font-family: 'Droid Serif', serif;
+    font-size: 20px;
+    margin-bottom: 40px;
+}
+
+.button-effect a { margin-right: 17px; }
+
+.button-effect a:nth-child(n) { background-color: #1e90ff; }
+
+.button-effect a:nth-child(2n) { background-color: #541388; }
+
+.button-effect a:nth-child(3n) { background-color: #D90368; }
+
+.button-effect a:nth-child(4n) { background-color: #104547; }
+
+.button-effect a:nth-child(5n) { background-color: #4F000B; }
+
+.button-effect a:nth-child(6n) { background-color: #F28123; }
+
+.button-effect a:last-child { margin-right: 0px; }
+
+.effect {
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    text-decoration: none;
+    color: #fff;
+    text-transform: capitalize;
+    font-family: 'Roboto', sans-serif;
+    font-size: 18px;
+    padding: 5px 5px;
+    line-height: 24px;
+    width: 150px;
+    border-radius: 6px;
+    background-color: #1e90ff;
+    overflow: hidden;
+}
+
+.effect.effect-1 {
+    -webkit-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s;
+}
+
+.effect.effect-1:before {
+    content: "\f178";
+    font-family: FontAwesome;
+    font-size: 15px;
+    position: absolute;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    height: 100%;
+    width: 40px;
+    -webkit-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s;
+}
+
+.effect.effect-1:hover { text-indent: -20px; }
+
+.effect.effect-1:hover:before {
+    opacity: 1;
+    text-indent: 0px;
+}
+
+.effect.effect-2 {
+    -webkit-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s;
+}
+
+.effect.effect-2:before {
+    content: "\f0a4";
+    font-family: FontAwesome;
+    font-size: 15px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: -30px;
+    width: 30px;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 0px 6px 6px 0px;
+    -webkit-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s;
+    text-align: center;
+}
+
+.effect.effect-2:hover { text-indent: -30px; }
+
+.effect.effect-2:hover:before {
+    right: 0;
+    text-indent: 0px;
+}
+
+.effect.effect-3 {
+    -webkit-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s;
+}
+
+.effect.effect-3:before {
+    content: "\f178";
+    font-family: FontAwesome;
+    position: absolute;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    position: absolute;
+    top: 100%;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-size: 30px;
+    -webkit-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s;
+}
+
+.effect.effect-3:hover { text-indent: -9999px; }
+
+.effect.effect-3:hover:before {
+    top: 0;
+    text-indent: 0;
+}
+
+.effect.effect-4 {
+    -webkit-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s;
+}
+
+.effect.effect-4:before {
+    content: "\f178";
+    font-family: FontAwesome;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-size: 30px;
+    -webkit-transform: scale(0, 1);
+    transform: scale(0, 1);
+    -webkit-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s;
+}
+
+.effect.effect-4:hover { text-indent: -9999px; }
+
+.effect.effect-4:hover:before {
+    -webkit-transform: scale(1, 1);
+    transform: scale(1, 1);
+    text-indent: 0;
+}
+
+.effect.effect-5 {
+    -webkit-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s;
+}
+
+.effect.effect-5:before {
+    content: "\f054";
+    font-family: FontAwesome;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0px;
+    height: 100%;
+    width: 30px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 0 50% 50% 0;
+    -webkit-transform: scale(0, 1);
+    transform: scale(0, 1);
+    -webkit-transform-origin: left center;
+    transform-origin: left center;
+    -webkit-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s;
+}
+
+.effect.effect-5:hover { text-indent: 30px; }
+
+.effect.effect-5:hover:before {
+    -webkit-transform: scale(1, 1);
+    transform: scale(1, 1);
+    text-indent: 0;
+}

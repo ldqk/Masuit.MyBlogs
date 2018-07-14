@@ -1,0 +1,177 @@
+﻿@using Masuit.Tools
+@using Masuit.Tools.Win32
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>404-页面找不到啦！</title>
+    <style type="text/css">
+        #main-scrollbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .link, .texts {
+            margin: 0 auto 15px;
+            color: #505050;
+        }
+
+        .texts {
+            line-height: 2;
+        }
+
+            .texts dd {
+                margin: 0;
+                padding: 0 0 0 15px;
+            }
+
+            .texts ul {
+                margin: 0;
+                padding: 0;
+            }
+
+        .portal {
+            color: #505050;
+            text-align: center;
+            white-space: nowrap;
+            word-spacing: 0.45em;
+        }
+
+            .portal a:link, .portal a:visited {
+                color: #505050;
+                word-spacing: 0;
+            }
+
+            .portal a:hover, .portal a:active {
+                color: #007ab7;
+            }
+
+        .STYLE1 {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 65px;
+        }
+
+        body {
+            background-image: url(/images/bg2.jpg);
+            background-size: cover;
+            background-position: 50% 0;
+            margin: 0;
+        }
+
+            body:before {
+                content: '';
+                display: inline-block;
+                vertical-align: middle;
+            }
+    </style>
+    <meta property="qc:admins" content="153016004160513163145" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="https://cdn.bootcss.com/normalize/5.0.0/normalize.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/animate.css/3.5.2/animate.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/smooth-scrollbar/7.4.1/smooth-scrollbar.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.ripples/0.5.3/jquery.ripples.min.js"></script>
+    <script src="https://cdn.bootcss.com/smooth-scrollbar/7.4.1/smooth-scrollbar.js"></script>
+</head>
+<body id="main-scrollbar" data-scrollbar>
+    <main>
+        <div class="container">
+            <header id="header" class="page-header text-center">
+                <h1><a href="/">Oops!</a></h1>
+            </header>
+            <div id="container">
+                @{
+                    Random r = new Random();
+                    string imgPath = $@"../Assets/images/404/404{r.StrictNext(Directory.GetFiles(Request.MapPath("~/Assets/images/404")).Length) + 1}.jpg";
+                }
+                <img class="img img-responsive img-thumbnail" width="100%" src="@imgPath" alt="@ViewBag.Keywords" />
+                <h3 class="margintop20">
+                    <em>
+                        <span class="STYLE1">404 Error&nbsp;</span>
+                    </em>:所查找的页面不存在,可能已被删除或您输错了网址!
+                </h3>
+                <a class="btn btn-info btn-lg" href="/"><i class="icon-reply">返回首页</i></a>
+                <dl class="texts">
+                    <dt class="h2">正在联系火星总部查找您所需要的页面.请返回等待信息......</dt>
+                    <dd>
+                        <ul>
+                            <li class="h2">不要返回吗?</li>
+                            <li class="h3">确定不要返回吗?</li>
+                            <li class="h4">真的真的确定不要返回吗?</li>
+                            <li class="h5">好吧.还是随便你要不要真的确定返回吧</li>
+                            <li class="h6">要是真的不愿意返回就玩个游戏吧，机会很难得哦——</li>
+                            <li>将猫困在一个深色圆点围成的圈子里面就算成功了！</li>
+                        </ul>
+                    </dd>
+                    <div class="games">
+                        <embed type="application/x-shockwave-flash" width="600" height="400" src="~/Assets/shenjingmao.swf" wmode="transparent" quality="high" scale="noborder" flashvars="width=600&amp;height=400" allowscriptaccess="sameDomain"></embed>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        Scrollbar.initAll({
+            speed: 3,
+            overscrollEffect: 'bounce',
+            overscrollEffectColor: '#d2527f'
+        });
+        try {
+            $('body').ripples({
+                resolution: 512,
+                dropRadius: 20, //px
+                perturbance: 0.04,
+            });
+        }
+        catch (e) {
+            $('.error').show().text(e);
+        }
+
+        //setInterval(function () {
+        //    var $el = $('body');
+        //    var x = Math.random() * $el.outerWidth();
+        //    var y = Math.random() * $el.outerHeight();
+        //    var dropRadius = 20;
+        //    var strength = 0.04 + Math.random() * 0.04;
+
+        //    $el.ripples('drop', x, y, dropRadius, strength);
+        //}, 400);
+    });
+</script>
+<script src="~/Scripts/notify.min.js"></script>
+@{
+    if (Request.Browser.Type.Contains(new[] { "IE", "InternetExplorer" }))
+    {
+        <script type="text/javascript">
+            notie.confirm("亲爱的访客，我们检测到您正在使用IE浏览器，本网站的某些功能或特性可能不会完美地支持IE浏览器，但您可以继续浏览，不过为了更好的体验效果，建议您使用Chrome、Firefox等相同或类似的更高级浏览器访问本网站。珍惜生命，远离IE！", '朕知道了', "挡住我了", function () {
+                    notie.alert(1, '为消灭IE做一点贡献，就是为世界上所有广大的互联网开发者们少加一点儿班做善事！<br/>IE：只要不升级，我还会回来的，我就是这么倔强！', 5);
+                });
+        </script>
+    }
+}
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>

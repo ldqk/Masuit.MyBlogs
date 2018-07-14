@@ -1,0 +1,35 @@
+﻿<style>
+    .file-icon:hover {
+        border: goldenrod 1px solid;
+        border-radius: 5px;
+        box-shadow: 0px 0px 0px 15px whitesmoke inset;
+        transition: ease-in-out .25s;
+    }
+    .height700 {
+        height: 700px;
+        min-height: 700px;
+        overflow: paged-y-controls;
+    }
+    .bin {
+        position: absolute;
+        top: 4px;
+        right: 8px;
+    }
+        .bin:hover {
+            border: whitesmoke 1px solid;
+            border-radius: 4px;
+            transition: ease-in-out .25s;
+        }
+</style>
+<div class="row">
+    <h3 class="text-center" ng-show="files.length<=0">
+        暂无日志文件
+    </h3>
+    <div class="col-md-1 col-sm-2 col-xs-3 file-icon" ng-repeat="item in files" ng-dblclick="view(item)">
+        <div class="text-danger bin" ng-click="delete(item)">
+            <i class="icon icon-bin" style="font-size: 24px"></i>
+        </div>
+        <img src="/Assets/images/file.png" class="img img-responsive img-thumbnail img-rounded"/>
+        <p class="size24 text-center" style="word-wrap: break-word;">{{item}}</p>
+    </div>
+</div>

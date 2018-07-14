@@ -1,0 +1,344 @@
+﻿<style>
+    .datainp {
+        width: 270px;
+        height: 30px;
+        border: 1px #A5D2EC solid;
+    }
+
+    .dateicon {
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAQCAYAAADj5tSrAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABZ0RVh0Q3JlYXRpb24gVGltZQAwNi8xNS8xNGnF/oAAAAAcdEVYdFNvZnR3YXJlAEFkb2JlIEZpcmV3b3JrcyBDUzVxteM2AAAAoElEQVQ4jWPceOnNfwYqAz9dYRQ+E7UtwAaGjyUsDAyYYUgJ2HT5LXZLcEmSCnA6duOlN///////H0bDALl8dPH/////Z8FuNW6Qtvw2nL3lyjsGBgYGhlmRqnj1kGwJuqHIlhJlCXq8EOITEsdqCXLEbbr8FisfFkTo+vBZRFZwERNEFFkCiw90nxJtCalxQmzegltCzVyP1RJq5HZ8AABuNZr0628DMwAAAABJRU5ErkJggg==");
+        background-repeat: no-repeat;
+        background-position: right center;
+    }
+
+    #modal {
+        max-height: 90vh;
+        overflow: auto;
+    }
+</style>
+<div class="row">
+    <div class="form-inline pull-right">
+        <div class="input-group">
+            <span class="input-group-addon">显示字段：</span>
+            <div class="ui multiple search selection dropdown field">
+                <input type="hidden" id="field">
+                <i class="dropdown icon"></i>
+                <div class="default text">选择字段</div>
+                <div class="menu">
+                    <div class="item" data-value="OperatingSystem">操作系统</div>
+                    <div class="item" data-value="UserAgent">用户代理</div>
+                    <div class="item" data-value="BrowserType">浏览器</div>
+                    <div class="item" data-value="ISP">ISP</div>
+                    <div class="item" data-value="HttpMethod">请求方式</div>
+                </div>
+            </div>
+        </div>
+        <span class="checkboxWrapper theme4 smallCheckboxSize" ng-click="doDistinct()">
+            <input type="checkbox" id="sample9" ng-model="distinct">
+            <label for="sample9">
+                <i>
+                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
+                    <circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" />
+                    <path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534
+							S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" />
+                    </svg>
+                </i>
+                去除重复IP
+            </label>
+        </span>
+    </div>
+    <div class="form-inline pull-right">
+        <button class="btn btn-info waves-effect" ng-click="list.GetPageData(paginationConf.currentPage, paginationConf.itemsPerPage);analysis();">
+            <span class="glyphicon glyphicon-refresh"></span>
+        </button>
+        <div class="input-group">
+            <span class="input-group-addon">
+                时间区间：
+            </span>
+            <div class="fg-line">
+                <input id="start" type="text" readonly="readonly" class="form-control date datainp dateicon" placeholder="开始时间">
+                <input id="end" type="text" readonly="readonly" class="form-control date datainp dateicon" placeholder="结束时间">
+            </div>
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon">
+                全局搜索：
+            </span>
+            <div class="fg-line">
+                <input ng-model="query" ng-change="search();" ng-init="query=''" type="search" class="form-control" placeholder="搜索">
+            </div>
+        </div>
+    </div>
+    <table ng-table="list.tableParams" id="interview" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
+            <td title="'IP'" filter="{IP: 'text'}" sortable="'IP'">
+                <a ng-href="/tools/ip?ip={{row.IP}}" target="_blank" style="font-size: 20px;" data-microtip="查看{{row.IP}}的详细信息" data-microtip-position="bottom">{{row.IP}}</a>
+            </td>
+            <td title="'用户代理'" filter="{UserAgent: 'text'}" sortable="'UserAgent'" ng-if="UserAgent">
+                {{row.UserAgent}}
+            </td>
+            <td title="'操作系统'" filter="{OperatingSystem: 'number'}" sortable="'OperatingSystem'" ng-if="OperatingSystem">
+                {{row.OperatingSystem}}
+            </td>
+            <td title="'浏览器'" filter="{BrowserType: 'text'}" sortable="'BrowserType'" ng-if="BrowserType">
+                {{row.BrowserType}}
+            </td>
+            <td title="'访问时间'" filter="{ViewTime: 'text'}" sortable="'ViewTime'">
+                {{row.ViewTime|date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
+            <td title="'来源'" filter="{FromUrl: 'text'}" sortable="'FromUrl'">
+                <a ng-href="{{row.FromUrl}}" target="_blank" data-microtip="打开链接" data-microtip-position="bottom">{{row.FromUrl}}</a>
+            </td>
+            <td title="'着陆页'" filter="{LandPage: 'text'}" sortable="'LandPage'">
+                <a href="{{row.LandPage}}" target="_blank" data-microtip="打开链接" data-microtip-position="bottom">{{row.LandPage}}</a>
+            </td>
+            <td title="'ISP'" filter="{ISP: 'text'}" sortable="'ISP'" ng-if="ISP">
+                {{row.ISP}}
+            </td>
+            <td title="'请求方式'" filter="{HttpMethod: 'text'}" sortable="'HttpMethod'" ng-if="HttpMethod">
+                {{row.HttpMethod}}
+            </td>
+            <td title="'地理位置'" filter="{Address: 'text'}" sortable="'Address'">
+                <a ng-href="/tools/addr?addr={{row.Address}}" target="_blank" data-microtip="在地图上查看详细地理信息" data-microtip-position="bottom">{{row.Address}}</a>
+            </td>
+            <td title="'参考位置'" filter="{ReferenceAddress: 'text'}" sortable="'ReferenceAddress'">
+                <a ng-href="/tools/addr?addr={{row.Address}}" target="_blank" data-microtip="在地图上查看详细地理信息" data-microtip-position="bottom">{{row.ReferenceAddress}}</a>
+            </td>
+            <td title="'在线时长'" filter="{OnlineSpan: 'text'}" sortable="'OnlineSpan'">
+                <a href="javascript:void(0)" ng-click="details(row.Id)">{{row.OnlineSpan}}</a>
+            </td>
+        </tr>
+    </table>
+    <tm-pagination conf="paginationConf"></tm-pagination>
+</div>
+<div class="page-header">
+    <h2 class="text-center">访客数据可视化</h2>
+</div>
+<div class="mini-charts">
+    <div class="row">
+        <div class="col-sm-4 col-md-2">
+            <div class="mini-charts-item bgm-cyan">
+                <div class="clearfix">
+                    <div class="chart stats-bar" data-sparkline-bar></div>
+                    <div class="count">
+                        <small>今日访问量(UV/PV)</small>
+                        <h2>{{interview.todayuv}} / {{interview.todaypv}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4 col-md-2">
+            <div class="mini-charts-item bgm-lightgreen">
+                <div class="clearfix">
+                    <div class="chart stats-bar-2" data-sparkline-bar></div>
+                    <div class="count">
+                        <small>本月访问量(UV/PV)</small>
+                        <h2>{{interview.monthuv}} / {{interview.monthpv}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4 col-md-2">
+            <div class="mini-charts-item bgm-deeporange">
+                <div class="clearfix">
+                    <div class="chart stats-bar-2" data-sparkline-bar></div>
+                    <div class="count">
+                        <small>本年访问量(UV/PV)</small>
+                        <h2>{{interview.yearuv}} / {{interview.yearpv}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4 col-md-2">
+            <div class="mini-charts-item bgm-orange">
+                <div class="clearfix">
+                    <div class="chart stats-line" data-sparkline-line></div>
+                    <div class="count">
+                        <small>总访问量(UV/PV)</small>
+                        <h2>{{interview.totaluv}} / {{interview.totalpv}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4 col-md-2">
+            <div class="mini-charts-item bgm-bluegray">
+                <div class="clearfix">
+                    <div class="chart stats-line-2" data-sparkline-line></div>
+                    <div class="count">
+                        <small>直接访客历史最高({{interview.highpv.date}})(UV/PV)</small>
+                        <h2>{{interview.highpv.uv}} / {{interview.highpv.pv}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4 col-md-2">
+            <div class="mini-charts-item bgm-amber">
+                <div class="clearfix">
+                    <div class="chart stats-line-2" data-sparkline-line></div>
+                    <div class="count">
+                        <small>独立访客历史最高({{interview.highuv.date}})(UV/PV)</small>
+                        <h2>{{interview.highuv.uv}} / {{interview.highuv.pv}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4 col-md-2">
+            <div class="mini-charts-item bgm-amber">
+                <div class="clearfix">
+                    <div class="chart stats-line-2" data-sparkline-line></div>
+                    <div class="count">
+                        <small>今日跳出率</small>
+                        <h2>{{interview.BounceRateToday}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-2">
+            <div class="mini-charts-item bgm-deeporange">
+                <div class="clearfix">
+                    <div class="chart stats-line-2" data-sparkline-line></div>
+                    <div class="count">
+                        <small>平均跳出率</small>
+                        <h2>{{interview.BounceRate}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-2">
+            <div class="mini-charts-item bgm-bluegray">
+                <div class="clearfix">
+                    <div class="chart stats-line-2" data-sparkline-line></div>
+                    <div class="count">
+                        <small>访客平均访问时长</small>
+                        <h2>{{interview.OnlineSpanAggregate.averSpan}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-2">
+            <div class="mini-charts-item bgm-lightgreen">
+                <div class="clearfix">
+                    <div class="chart stats-line-2" data-sparkline-line></div>
+                    <div class="count">
+                        <small>今日访客平均访问时长</small>
+                        <h2>{{interview.OnlineSpanAggregate.averSpanToday}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8 col-md-4">
+            <div class="mini-charts-item bgm-orange">
+                <div class="clearfix">
+                    <div class="chart stats-line-2" data-sparkline-line></div>
+                    <div class="count">
+                        <small>最久访客({{interview.OnlineSpanAggregate.maxSpanViewer.ViewTime|date:'yyyy-MM-dd HH:mm:ss'}})</small>
+                        <h2>
+                            <a ng-href="/tools/ip?ip={{interview.OnlineSpanAggregate.maxSpanViewer.IP}}" target="_blank">{{interview.OnlineSpanAggregate.maxSpanViewer.IP}}</a>
+                            ({{interview.OnlineSpanAggregate.maxSpanViewer.OnlineSpanSeconds}})
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8 col-md-4">
+            <div class="mini-charts-item bgm-orange">
+                <div class="clearfix">
+                    <div class="chart stats-line-2" data-sparkline-line></div>
+                    <div class="count">
+                        <small>今日最久访客({{interview.OnlineSpanAggregate.maxSpanViewerToday.ViewTime|date:'yyyy-MM-dd HH:mm:ss'}})</small>
+                        <h2>
+                            <a ng-href="/tools/ip?ip={{interview.OnlineSpanAggregate.maxSpanViewerToday.IP}}" target="_blank">{{interview.OnlineSpanAggregate.maxSpanViewerToday.IP}}</a>
+                            ({{interview.OnlineSpanAggregate.maxSpanViewerToday.OnlineSpanSeconds}})
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dash-widgets">
+    <div class="dash-widget-item bgm-white">
+        <div class="p-10">
+            <div id="alldata" style="height: 500px;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="page-header">
+        <h2 class="text-center">访客地区和浏览器统计</h2>
+    </div>
+    <div id="map" class="col-md-6" style="height: 700px;"></div>
+    <div id="client" class="col-md-6" style="height: 600px;"></div>
+    <div id="browser" class="col-md-8" style="height: 600px;"></div>
+</div>
+
+<div id="modal" class="modal">
+    <div class="container-fluid">
+        <h3>访客详情</h3>
+        <table class="table table-bordered table-condensed">
+            <tr>
+                <th>IP</th>
+                <td>
+                    <a ng-href="/tools/ip?ip={{viewer.IP}}" target="_blank" data-microtip="查看{{viewer.IP}}的详细信息" data-microtip-position="bottom">{{viewer.IP}}</a>
+                </td>
+                <th>浏览器</th>
+                <td>{{viewer.BrowserType}}</td>
+            </tr>
+            <tr>
+                <th>操作系统</th>
+                <td>{{viewer.OperatingSystem}}</td>
+                <th>访问时间</th>
+                <td>{{viewer.ViewTime|date:"yyyy-MM-dd HH:mm:ss"}}</td>
+            </tr>
+            <tr>
+                <th>用户代理</th>
+                <td colspan="3">{{viewer.UserAgent}}</td>
+            </tr>
+            <tr>
+                <th>来源</th>
+                <td>
+                    <a ng-href="{{viewer.FromUrl}}" target="_blank" data-microtip="新窗口打开链接" data-microtip-position="bottom">{{viewer.FromUrl}}</a>
+                </td>
+                <th>着陆页</th>
+                <td>
+                    <a ng-href="{{viewer.LandPage}}" target="_blank" data-microtip="新窗口打开链接" data-microtip-position="bottom">{{viewer.LandPage}}</a>
+                </td>
+            </tr>
+            <tr>
+                <th>ISP</th>
+                <td>{{viewer.ISP}}</td>
+                <th>请求方式</th>
+                <td>{{viewer.HttpMethod}}</td>
+            </tr>
+            <tr>
+                <th>地理位置</th>
+                <td>
+                    <a ng-href="/tools/addr?addr={{viewer.Address}}" target="_blank" data-microtip="在地图上查看详细地理信息" data-microtip-position="bottom">{{viewer.Address}}</a>
+                </td>
+                <th>在线时长</th>
+                <td>{{viewer.OnlineSpan}}</td>
+            </tr>
+        </table>
+        <div ng-if="viewdetails.length>0">
+            <h3>访客浏览过的页面</h3>
+            <table ng-table="list.ViewDetails" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+                <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
+                    <td title="'访问时间'" sortable="'Time'">
+                        {{row.Time|date:"yyyy-MM-dd HH:mm:ss"}}
+                    </td>
+                    <td title="'Url'" sortable="'Url'">
+                        <a ng-href="{{row.Url}}" target="_blank" data-microtip="新窗口打开链接" data-microtip-position="bottom">{{row.Url}}</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

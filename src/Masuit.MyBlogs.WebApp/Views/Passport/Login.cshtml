@@ -1,0 +1,180 @@
+﻿@{
+    ViewBag.Title = "统一登录";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/login/style.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="~/Content/iconfont.css">
+    <script src="~/Scripts/jquery-2.2.4.js"></script>
+    <link href="~/Content/jquery-labelauty.css" rel="stylesheet"/>@*单选复选框美化插件*@
+    <script src="~/Scripts/jquery.complexify.js"></script>@*密码评级插件*@
+    <script src="~/Scripts/jquery.placeholder.min.js"></script>@*密码评级插件*@
+
+    @*背景图片自动更换*@
+    <script src="~/Scripts/supersized.3.2.7.min.js"></script>
+    <script src="~/Scripts/supersized-init.js"></script>
+
+    @*单选复选框美化插件*@
+    <script src="~/Scripts/jquery-labelauty.js"></script>
+</head>
+<body>
+<div class="login-box">
+    <div class="box-con tran">
+        <form id="login-form" action="" method="POST" onsubmit="return false">
+            <div class="login-con f-l">
+                <div class="form-group">
+                    <header>
+                        <h1>用户认证中心登录</h1>
+                    </header>
+                </div>
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <input type="text" id="username" name="username" placeholder="用户名/邮箱"/>
+                    <span class="error-notic">用户名/邮箱不正确</span>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" id="password" placeholder="您的密码">
+                    <span class="error-notic">用户名或密码不正确</span>
+                </div>
+                <div class="form-group">
+                    <input type="text" placeholder="请输入6位验证码(点击图片刷新验证码)" id="validcode" name="valid" class="valid" maxlength="6" onkeyup="showLoginBtn()">
+                    <img class="validcode1" src="/Passport/ValidateCode" style="display: inline">
+                    <span class="error-notic">验证码不正确</span>
+                </div>
+                <ul class="dowebok">
+                    <li>
+                        <input type="checkbox" name="remem" id="rememberMe" checked data-labelauty="一周内自动登录">
+                    </li>
+                </ul>
+                <div class="form-group" id="btnlogin" style="display: none">
+                    <button type="button" class="tran pr" onclick="login()">
+                        <a class="tran">登录</a>
+                        <img class="loading" id="statues" src="~/Content/images/loading.gif" style="display: none">
+                    </button>
+                    <span id="loginStatues" class="error-notic">登录失败，请检查表单完整性！</span>
+                </div>
+            </div>
+        </form>
+        <!-- 登录 -->
+    </div>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+	$(function() {
+		$(':input').labelauty(); //单选复选框美化插件初始化
+		$("#loginbtn").click(login); //登录按钮事件
+		$(".validcode1").click(flushcode); //刷新验证码
+
+		//绑定各表单事件
+		$("#validcode").on("keyup", function(e) {
+			if (e.keyCode == 13) {
+				//判断回车键
+				login();
+			}
+		}); //验证码
+		$("#myPassword").on("change", function(e) {
+			document.querySelector("#myPassword2").value = "";
+		}); //密码框1内容改变事件
+
+		//表单事件
+		$(".signup-form input").on("focus", function() {
+			$(this).parent().addClass("border");
+		});
+		$(".signup-form input").on("blur", function() {
+			$(this).parent().removeClass("border");
+		});
+	});
+
+	//登录过程
+    function login() {
+        $(".tran").attr({ "disabled": "disabled" });
+		$("#statues").fadeIn(100);
+		$("#statues").parents("button").parents(".form-group").find(".error-notic").fadeOut(100);
+        $.post("/Passport/Login", $("#login-form").serialize(), function (data) {
+			if (data.Success) {
+                location.href = data.Message || "/Home/Index"; //否则直接跳转
+                return;
+			} else {
+                $("#statues").parents("button").parents(".form-group").find(".error-notic").html(data.Message);
+				$("#statues").parents("button").parents(".form-group").find(".error-notic").fadeIn(100);
+                $("#statues").fadeOut(200);
+                $(".tran").removeAttr("disabled");
+                flushcode();
+			}
+		});
+	}
+
+	//刷新验证码
+	function flushcode() {
+		var code = "/Passport/ValidateCode?" + newGuid();
+		$(".validcode1").attr("src", code);
+	}
+
+	//创建一个guid值
+	function newGuid() {
+		var guid = "";
+		for (var i = 1; i <= 32; i++) {
+			var n = Math.floor(Math.random() * 16.0).toString(16);
+			guid += n;
+			if ((i == 8) || (i == 12) || (i == 16) || (i == 20)) {
+				guid += "-";
+			}
+		}
+		return guid;
+	}
+
+	//检查验证码
+	function CheckValidCode(_this) {
+		var code = $(_this).val();
+		$.post("/Passport/CheckValidateCode", {
+			"code": code
+		}, function(data) {
+			if (data.Success) {
+				hideNotic(_this);
+			} else {
+				$(_this).parents(".form-group").find(".error-notic").fadeIn(100);
+			}
+		});
+	}
+
+	var _handle = ''; //储存电话是否填写正确
+
+	//表单验证
+	function showNotic(_this) {
+		$(_this).parents(".form-group").find(".error-notic").fadeIn(100);
+		$(_this).focus();
+	} //错误提示显示
+
+	function hideNotic(_this) {
+		$(_this).parents(".form-group").find(".error-notic").fadeOut(100);
+	} //错误提示隐藏
+
+	var verify = {
+		VerifyCount: function(_this) {
+			var _count = "123456";
+			var _value = $(_this).val();
+			console.log(_value);
+			if (_value != _count) {
+				showNotic(_this);
+			} else {
+				hideNotic(_this);
+			}
+		}, //验证验证码
+
+	}
+
+	//显示登录按钮
+	function showLoginBtn() {
+		if ($(".valid").val().length >= 3) {
+			$("#btnlogin").fadeIn(1000);
+		} else {
+			$("#btnlogin").fadeOut(1000);
+		}
+	}
+</script>

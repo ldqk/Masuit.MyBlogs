@@ -1,0 +1,68 @@
+﻿<div class="row">
+    <div class="btn-group">
+        <button class="btn btn-info waves-effect" ng-click="add()">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+        <button class="btn btn-primary waves-effect" ng-click="list.GetPageData(paginationConf.currentPage, paginationConf.itemsPerPage);">
+            <span class="glyphicon glyphicon-refresh"></span>
+        </button>
+    </div>
+    <div class="form-inline pull-right">
+        <div class="input-group">
+            <span class="input-group-addon">
+                搜索：
+            </span>
+            <div class="fg-line">
+                <input ng-model="query" ng-change="list.GetPageData(paginationConf.currentPage, paginationConf.itemsPerPage);" ng-init="query=''" type="search" class="form-control" placeholder="搜索">
+            </div>
+        </div>
+    </div>
+    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
+            <td title="'邮箱'" filter="{Email: 'text'}" sortable="'Email'" ng-switch="row.isEditing" ng-class="Email.$dirty ? 'bg-warning' : ''" ng-form="Email" tracked-table-cell>
+                <span ng-switch-default>{{row.Email}}</span>
+                <div ng-class="Email.$invalid && Email.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                    <div class="fg-line">
+                        <input type="text" name="Email" ng-model="row.Email" class="form-control input-sm" required />
+                    </div>
+                </div>
+            </td>
+            <td title="'状态'" filter="{Status: 'select'}" sortable="'Status'" ng-switch="row.isEditing" ng-class="Status.$dirty ? 'bg-warning' : ''" filter-data="list.stats" ng-form="Status" tracked-table-cell>
+                <span ng-switch-default>{{AllStatus[row.Status].name}}</span>
+                <div ng-class="Status.$invalid && Status.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                    <select class="form-control" ng-model="row.Status" ng-options="m.e as m.name for m in AllStatus" required>
+                        <option value="">请选择一种状态</option>
+                    </select>
+                </div>
+            </td>
+            <td title="'最后操作时间'" sortable="'UpdateTime'">
+                {{row.UpdateTime|date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
+            <td title="'订阅类型'" ng-switch="row.isEditing" ng-class="SubscribeType.$dirty ? 'bg-warning' : ''" ng-form="SubscribeType" tracked-table-cell>
+                <span ng-switch-default>{{row.SubscribeType==0?'广播订阅':'文章密码获取'}}</span>
+                <div ng-class="SubscribeType.$invalid && SubscribeType.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                    <select class="form-control" ng-model="row.SubscribeType" ng-options="m.key as m.value for m in SubscribeTypes" required>
+                        <option value="">请选择一种状态</option>
+                    </select>
+                </div>
+            </td>
+            <td title="'操作'" style="width: 120px;">
+                <div class="btn-group">
+                    <button class="btn btn-primary btn-sm waves-effect" ng-click="list.save(row, rowForm)" ng-if="row.isEditing" ng-disabled="rowForm.$pristine || rowForm.$invalid">
+                        <span class="glyphicon glyphicon-ok"></span>
+                    </button>
+                    <button class="btn btn-default btn-sm waves-effect" ng-click="list.cancel(row, rowForm)" ng-if="row.isEditing">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                    <button class="btn btn-default btn-sm waves-effect" ng-click="row.isEditing = true;" ng-if="!row.isEditing">
+                        <i class="icon-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm waves-effect" ng-click="list.del(row)" ng-if="!row.isEditing">
+                        <i class="icon-cross"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <tm-pagination conf="paginationConf"></tm-pagination>
+</div>

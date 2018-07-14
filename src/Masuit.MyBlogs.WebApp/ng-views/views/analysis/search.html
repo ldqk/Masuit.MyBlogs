@@ -1,0 +1,106 @@
+﻿<style>
+    .datainp {
+        width: 270px;
+        height: 30px;
+        border: 1px #A5D2EC solid;
+    }
+
+    .dateicon {
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAQCAYAAADj5tSrAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABZ0RVh0Q3JlYXRpb24gVGltZQAwNi8xNS8xNGnF/oAAAAAcdEVYdFNvZnR3YXJlAEFkb2JlIEZpcmV3b3JrcyBDUzVxteM2AAAAoElEQVQ4jWPceOnNfwYqAz9dYRQ+E7UtwAaGjyUsDAyYYUgJ2HT5LXZLcEmSCnA6duOlN///////H0bDALl8dPH/////Z8FuNW6Qtvw2nL3lyjsGBgYGhlmRqnj1kGwJuqHIlhJlCXq8EOITEsdqCXLEbbr8FisfFkTo+vBZRFZwERNEFFkCiw90nxJtCalxQmzegltCzVyP1RJq5HZ8AABuNZr0628DMwAAAABJRU5ErkJggg==");
+        background-repeat: no-repeat;
+        background-position: right center;
+    }
+</style>
+<div class="row">
+    <div class="form-inline pull-right">
+        <button class="btn btn-info waves-effect" ng-click="list.GetPageData(paginationConf.currentPage, paginationConf.itemsPerPage);">
+            <span class="glyphicon glyphicon-refresh"></span>
+        </button>
+        <div class="input-group">
+            <span class="input-group-addon">
+                全局搜索：
+            </span>
+            <div class="fg-line">
+                <input ng-model="query" ng-change="search();" ng-init="query=''" type="search" class="form-control" placeholder="搜索">
+            </div>
+        </div>
+    </div>
+    <table ng-table="list.tableParams" id="interview" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
+            <td title="'关键词'" filter="{KeyWords: 'text'}" sortable="'KeyWords'">
+                <a ng-href="/s/{{row.KeyWords}}" target="_blank">{{row.KeyWords}}</a>
+            </td>
+            <td title="'搜索时间'" filter="{SearchTime: 'text'}" sortable="'SearchTime'">
+                {{row.SearchTime|date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
+            <td title="'客户端IP'" filter="{IP: 'text'}" sortable="'IP'">
+                <a ng-href="/tools/ip?ip={{row.IP}}" target="_blank" style="font-size: 20px;" data-microtip="查看{{row.IP}}的详细信息" data-microtip-position="bottom">{{row.IP}}</a>
+            </td>
+            <td title="'操作'" style="width: 185px;">
+                <button class="btn btn-danger btn-sm waves-effect" ng-click="list.del(row)">
+                    <i class="icon-bin"></i>
+                </button>
+            </td>
+        </tr>
+    </table>
+    <tm-pagination conf="paginationConf"></tm-pagination>
+</div>
+<div class="row">
+    <div class="col-md-4" ng-if="agg.month.length>0">
+        <div class="page-header">
+            <h3 class="text-center">月度搜索排行</h3>
+        </div>
+        <table class="table table-bordered table-condensed table-responsive">
+            <thead>
+            <tr>
+                <th>关键词</th>
+                <th>搜索次数</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="item in agg.month">
+                <td><a ng-href="/s/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
+                <td>{{item.Count}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-4" ng-if="agg.week.length>0">
+        <div class="page-header">
+            <h3 class="text-center">本周搜索排行</h3>
+        </div>
+        <table class="table table-bordered table-condensed table-responsive">
+            <thead>
+            <tr>
+                <th>关键词</th>
+                <th>搜索次数</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in agg.week">
+                    <td><a ng-href="/s/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
+                    <td>{{item.Count}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-4" ng-if="agg.today.length>0">
+        <div class="page-header">
+            <h3 class="text-center">今日搜索排行</h3>
+        </div>
+        <table class="table table-bordered table-condensed table-responsive">
+            <thead>
+            <tr>
+                <th>关键词</th>
+                <th>搜索次数</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in agg.today">
+                    <td><a ng-href="/s/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
+                    <td>{{item.Count}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

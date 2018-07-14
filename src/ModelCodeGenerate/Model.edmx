@@ -1,0 +1,1484 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Broadcast">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="255" />
+          <Property Name="ValidateCode" Type="nvarchar" MaxLength="255" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="UpdateTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Comment">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NickName" Type="nvarchar" MaxLength="24" Nullable="false" />
+          <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="QQorWechat" Type="nvarchar(max)" />
+          <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="ParentId" Type="int" Nullable="false" />
+          <Property Name="PostId" Type="int" Nullable="false" />
+          <Property Name="CommentDate" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Browser" Type="nvarchar" MaxLength="255" />
+          <Property Name="OperatingSystem" Type="nvarchar" MaxLength="255" />
+          <Property Name="IsMaster" Type="bit" Nullable="false" />
+          <Property Name="VoteCount" Type="int" Nullable="false" />
+          <Property Name="AgainstCount" Type="int" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="IP" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Contacts">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Title" Type="varchar" MaxLength="255" />
+          <Property Name="Url" Type="varchar" MaxLength="255" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Donate">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NickName" Type="nvarchar(max)" />
+          <Property Name="Email" Type="nvarchar(max)" />
+          <Property Name="QQorWechat" Type="nvarchar(max)" />
+          <Property Name="EmailDisplay" Type="nvarchar(max)" />
+          <Property Name="QQorWechatDisplay" Type="nvarchar(max)" />
+          <Property Name="Amount" Type="nvarchar(max)" />
+          <Property Name="DonateTime" Type="datetime" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="Via" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="InternalMessage">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Title" Type="nvarchar(max)" />
+          <Property Name="Content" Type="nvarchar(max)" />
+          <Property Name="Link" Type="nvarchar(max)" />
+          <Property Name="Time" Type="datetime" Nullable="false" />
+          <Property Name="Read" Type="bit" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Interview">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IP" Type="varchar(max)" />
+          <Property Name="UserAgent" Type="varchar(max)" />
+          <Property Name="OperatingSystem" Type="varchar(max)" />
+          <Property Name="BrowserType" Type="varchar(max)" />
+          <Property Name="ViewTime" Type="datetime" Nullable="false" />
+          <Property Name="FromUrl" Type="nvarchar(max)" />
+          <Property Name="Province" Type="nvarchar(max)" />
+          <Property Name="ISP" Type="nvarchar(max)" />
+          <Property Name="HttpMethod" Type="nvarchar(max)" />
+          <Property Name="Address" Type="nvarchar(max)" />
+          <Property Name="ReferenceAddress" Type="nvarchar(max)" />
+          <Property Name="LandPage" Type="nvarchar(max)" />
+          <Property Name="OnlineSpan" Type="nvarchar(max)" />
+          <Property Name="Uid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="OnlineSpanSeconds" Type="float" Nullable="false" />
+        </EntityType>
+        <EntityType Name="InterviewDetail">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Url" Type="nvarchar(max)" />
+          <Property Name="Time" Type="datetime" Nullable="false" />
+          <Property Name="InterviewId" Type="bigint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Issue">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Title" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Link" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Level" Type="int" Nullable="false" />
+          <Property Name="SubmitTime" Type="datetime" Nullable="false" />
+          <Property Name="HandleTime" Type="datetime" />
+          <Property Name="Msg" Type="nvarchar(max)" />
+          <Property Name="IPAddress" Type="nvarchar(max)" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LeaveMessage">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NickName" Type="nvarchar" MaxLength="24" Nullable="false" />
+          <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="PostDate" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="QQorWechat" Type="nvarchar(max)" />
+          <Property Name="ParentId" Type="int" Nullable="false" />
+          <Property Name="Browser" Type="nvarchar" MaxLength="255" />
+          <Property Name="OperatingSystem" Type="nvarchar" MaxLength="255" />
+          <Property Name="IsMaster" Type="bit" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="IP" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Links">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Url" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="Except" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LoginRecord">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IP" Type="nvarchar(max)" />
+          <Property Name="LoginTime" Type="datetime" Nullable="false" />
+          <Property Name="PhysicAddress" Type="nvarchar(max)" />
+          <Property Name="LoginType" Type="int" Nullable="false" />
+          <Property Name="UserInfoId" Type="int" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="Province" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Menu">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Icon" Type="nvarchar(max)" />
+          <Property Name="Url" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Sort" Type="int" Nullable="false" />
+          <Property Name="ParentId" Type="int" Nullable="false" />
+          <Property Name="MenuType" Type="int" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Misc">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Title" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="PostDate" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="ModifyDate" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Notice">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Title" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="PostDate" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="ModifyDate" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Post">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="Author" Type="nvarchar" MaxLength="24" Nullable="false" />
+          <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="ViewCount" Type="int" Nullable="false" />
+          <Property Name="PostDate" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="ModifyDate" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="IsFixedTop" Type="bit" Nullable="false" />
+          <Property Name="CategoryId" Type="int" Nullable="false" />
+          <Property Name="ResourceName" Type="nvarchar(max)" />
+          <Property Name="IsWordDocument" Type="bit" Nullable="false" />
+          <Property Name="Email" Type="varchar" MaxLength="255" />
+          <Property Name="Label" Type="varchar" MaxLength="255" />
+          <Property Name="VoteUpCount" Type="int" Nullable="false" />
+          <Property Name="VoteDownCount" Type="int" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="IsBanner" Type="bit" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="255" />
+          <Property Name="ImageUrl" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="PostAccessRecord">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PostId" Type="int" Nullable="false" />
+          <Property Name="AccessTime" Type="datetime" Nullable="false" />
+          <Property Name="ClickCount" Type="int" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PostHistoryVersion">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" MaxLength="64" Nullable="false" />
+          <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="ViewCount" Type="int" Nullable="false" />
+          <Property Name="ModifyDate" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="CategoryId" Type="int" Nullable="false" />
+          <Property Name="PostId" Type="int" Nullable="false" />
+          <Property Name="ResourceName" Type="nvarchar(max)" />
+          <Property Name="IsWordDocument" Type="bit" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="255" />
+          <Property Name="Label" Type="nvarchar" MaxLength="255" />
+          <Property Name="VoteUpCount" Type="int" Nullable="false" />
+          <Property Name="VoteDownCount" Type="int" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SearchDetails">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="KeyWords" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="SearchTime" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="IP" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Seminar">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Title" Type="nvarchar(max)" />
+          <Property Name="SubTitle" Type="nvarchar(max)" />
+          <Property Name="Description" Type="nvarchar(max)" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SeminarPost">
+          <Key>
+            <PropertyRef Name="Post_Id" />
+            <PropertyRef Name="Seminar_Id" />
+          </Key>
+          <Property Name="Post_Id" Type="int" Nullable="false" />
+          <Property Name="Seminar_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SeminarPostHistoryVersion">
+          <Key>
+            <PropertyRef Name="PostHistoryVersion_Id" />
+            <PropertyRef Name="Seminar_Id" />
+          </Key>
+          <Property Name="PostHistoryVersion_Id" Type="int" Nullable="false" />
+          <Property Name="Seminar_Id" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SystemSetting">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Value" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="UserInfo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Username" Type="nvarchar" MaxLength="24" Nullable="false" />
+          <Property Name="Password" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="SaltKey" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="IsAdmin" Type="bit" Nullable="false" />
+          <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="QQorWechat" Type="nvarchar(max)" />
+          <Property Name="NickName" Type="nvarchar" MaxLength="24" />
+          <Property Name="Status" Type="int" Nullable="false" />
+          <Property Name="AccessToken" Type="nvarchar(max)" />
+          <Property Name="Avatar" Type="nvarchar(max)" />
+        </EntityType>
+        <Association Name="FK__Comment__PostId__395884C4">
+          <End Role="Post" Type="Self.Post" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Comment" Type="Self.Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Post">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="PostId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Post__CategoryId__3A4CA8FD">
+          <End Role="Category" Type="Self.Category" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Post" Type="Self.Post" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Post">
+              <PropertyRef Name="CategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_InterviewDetail_dbo_Interview_InterviewId">
+          <End Role="Interview" Type="Self.Interview" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="InterviewDetail" Type="Self.InterviewDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Interview">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InterviewDetail">
+              <PropertyRef Name="InterviewId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId">
+          <End Role="UserInfo" Type="Self.UserInfo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="LoginRecord" Type="Self.LoginRecord" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserInfo">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LoginRecord">
+              <PropertyRef Name="UserInfoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_PostAccessRecords_dbo_Post_PostId">
+          <End Role="Post" Type="Self.Post" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="PostAccessRecord" Type="Self.PostAccessRecord" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Post">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PostAccessRecord">
+              <PropertyRef Name="PostId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_PostHistoryVersion_dbo_Category_CategoryId">
+          <End Role="Category" Type="Self.Category" Multiplicity="1" />
+          <End Role="PostHistoryVersion" Type="Self.PostHistoryVersion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PostHistoryVersion">
+              <PropertyRef Name="CategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_PostHistoryVersion_dbo_Post_PostId">
+          <End Role="Post" Type="Self.Post" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="PostHistoryVersion" Type="Self.PostHistoryVersion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Post">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PostHistoryVersion">
+              <PropertyRef Name="PostId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_SeminarPost_dbo_Post_Post_Id">
+          <End Role="Post" Type="Self.Post" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="SeminarPost" Type="Self.SeminarPost" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Post">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SeminarPost">
+              <PropertyRef Name="Post_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_SeminarPost_dbo_Seminar_Seminar_Id">
+          <End Role="Seminar" Type="Self.Seminar" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="SeminarPost" Type="Self.SeminarPost" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Seminar">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SeminarPost">
+              <PropertyRef Name="Seminar_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_SeminarPostHistoryVersion_dbo_PostHistoryVersion_PostHistoryVersion_Id">
+          <End Role="PostHistoryVersion" Type="Self.PostHistoryVersion" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="SeminarPostHistoryVersion" Type="Self.SeminarPostHistoryVersion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PostHistoryVersion">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SeminarPostHistoryVersion">
+              <PropertyRef Name="PostHistoryVersion_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_SeminarPostHistoryVersion_dbo_Seminar_Seminar_Id">
+          <End Role="Seminar" Type="Self.Seminar" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="SeminarPostHistoryVersion" Type="Self.SeminarPostHistoryVersion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Seminar">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SeminarPostHistoryVersion">
+              <PropertyRef Name="Seminar_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="sp_getChildrenCommentByParentId" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ParentId" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_getChildrenLeaveMsgByParentId" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ParentId" Type="int" Mode="In" />
+        </Function>
+        <Function Name="sp_getInterviewsCurrentMonthDetailsByDays" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="recent" Type="int" Mode="In" />
+        </Function>
+        <EntityContainer Name="ModelStoreContainer">
+          <EntitySet Name="Broadcast" EntityType="Self.Broadcast" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Comment" EntityType="Self.Comment" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Contacts" EntityType="Self.Contacts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Donate" EntityType="Self.Donate" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="InternalMessage" EntityType="Self.InternalMessage" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Interview" EntityType="Self.Interview" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="InterviewDetail" EntityType="Self.InterviewDetail" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Issue" EntityType="Self.Issue" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LeaveMessage" EntityType="Self.LeaveMessage" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Links" EntityType="Self.Links" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LoginRecord" EntityType="Self.LoginRecord" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Menu" EntityType="Self.Menu" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Misc" EntityType="Self.Misc" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Notice" EntityType="Self.Notice" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Post" EntityType="Self.Post" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PostAccessRecord" EntityType="Self.PostAccessRecord" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PostHistoryVersion" EntityType="Self.PostHistoryVersion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SearchDetails" EntityType="Self.SearchDetails" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Seminar" EntityType="Self.Seminar" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SeminarPost" EntityType="Self.SeminarPost" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SeminarPostHistoryVersion" EntityType="Self.SeminarPostHistoryVersion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SystemSetting" EntityType="Self.SystemSetting" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserInfo" EntityType="Self.UserInfo" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Comment__PostId__395884C4" Association="Self.FK__Comment__PostId__395884C4">
+            <End Role="Post" EntitySet="Post" />
+            <End Role="Comment" EntitySet="Comment" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Post__CategoryId__3A4CA8FD" Association="Self.FK__Post__CategoryId__3A4CA8FD">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Post" EntitySet="Post" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_InterviewDetail_dbo_Interview_InterviewId" Association="Self.FK_dbo_InterviewDetail_dbo_Interview_InterviewId">
+            <End Role="Interview" EntitySet="Interview" />
+            <End Role="InterviewDetail" EntitySet="InterviewDetail" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId" Association="Self.FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId">
+            <End Role="UserInfo" EntitySet="UserInfo" />
+            <End Role="LoginRecord" EntitySet="LoginRecord" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_PostAccessRecords_dbo_Post_PostId" Association="Self.FK_dbo_PostAccessRecords_dbo_Post_PostId">
+            <End Role="Post" EntitySet="Post" />
+            <End Role="PostAccessRecord" EntitySet="PostAccessRecord" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_PostHistoryVersion_dbo_Category_CategoryId" Association="Self.FK_dbo_PostHistoryVersion_dbo_Category_CategoryId">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="PostHistoryVersion" EntitySet="PostHistoryVersion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_PostHistoryVersion_dbo_Post_PostId" Association="Self.FK_dbo_PostHistoryVersion_dbo_Post_PostId">
+            <End Role="Post" EntitySet="Post" />
+            <End Role="PostHistoryVersion" EntitySet="PostHistoryVersion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_SeminarPost_dbo_Post_Post_Id" Association="Self.FK_dbo_SeminarPost_dbo_Post_Post_Id">
+            <End Role="Post" EntitySet="Post" />
+            <End Role="SeminarPost" EntitySet="SeminarPost" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_SeminarPost_dbo_Seminar_Seminar_Id" Association="Self.FK_dbo_SeminarPost_dbo_Seminar_Seminar_Id">
+            <End Role="Seminar" EntitySet="Seminar" />
+            <End Role="SeminarPost" EntitySet="SeminarPost" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_SeminarPostHistoryVersion_dbo_PostHistoryVersion_PostHistoryVersion_Id" Association="Self.FK_dbo_SeminarPostHistoryVersion_dbo_PostHistoryVersion_PostHistoryVersion_Id">
+            <End Role="PostHistoryVersion" EntitySet="PostHistoryVersion" />
+            <End Role="SeminarPostHistoryVersion" EntitySet="SeminarPostHistoryVersion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_SeminarPostHistoryVersion_dbo_Seminar_Seminar_Id" Association="Self.FK_dbo_SeminarPostHistoryVersion_dbo_Seminar_Seminar_Id">
+            <End Role="Seminar" EntitySet="Seminar" />
+            <End Role="SeminarPostHistoryVersion" EntitySet="SeminarPostHistoryVersion" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="Model" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="ModelContainer" annotation:LazyLoadingEnabled="true">
+          <FunctionImport Name="sp_getChildrenCommentByParentId" ReturnType="Collection(Model.sp_getChildrenCommentByParentId_Result)">
+          <Parameter Name="ParentId" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_getChildrenLeaveMsgByParentId" ReturnType="Collection(Model.sp_getChildrenLeaveMsgByParentId_Result)">
+          <Parameter Name="ParentId" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="sp_getInterviewsCurrentMonthDetailsByDays" ReturnType="Collection(Model.sp_getInterviewsCurrentMonthDetailsByDays_Result)">
+          <Parameter Name="recent" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="Broadcast" EntityType="Model.Broadcast" />
+          <EntitySet Name="Category" EntityType="Model.Category" />
+          <EntitySet Name="Comment" EntityType="Model.Comment" />
+          <EntitySet Name="Contacts" EntityType="Model.Contacts" />
+          <EntitySet Name="Donate" EntityType="Model.Donate" />
+          <EntitySet Name="InternalMessage" EntityType="Model.InternalMessage" />
+          <EntitySet Name="Interview" EntityType="Model.Interview" />
+          <EntitySet Name="InterviewDetail" EntityType="Model.InterviewDetail" />
+          <EntitySet Name="Issue" EntityType="Model.Issue" />
+          <EntitySet Name="LeaveMessage" EntityType="Model.LeaveMessage" />
+          <EntitySet Name="Links" EntityType="Model.Links" />
+          <EntitySet Name="LoginRecord" EntityType="Model.LoginRecord" />
+          <EntitySet Name="Menu" EntityType="Model.Menu" />
+          <EntitySet Name="Misc" EntityType="Model.Misc" />
+          <EntitySet Name="Notice" EntityType="Model.Notice" />
+          <EntitySet Name="Post" EntityType="Model.Post" />
+          <EntitySet Name="PostAccessRecord" EntityType="Model.PostAccessRecord" />
+          <EntitySet Name="PostHistoryVersion" EntityType="Model.PostHistoryVersion" />
+          <EntitySet Name="SearchDetails" EntityType="Model.SearchDetails" />
+          <EntitySet Name="Seminar" EntityType="Model.Seminar" />
+          <EntitySet Name="SystemSetting" EntityType="Model.SystemSetting" />
+          <EntitySet Name="UserInfo" EntityType="Model.UserInfo" />
+          <AssociationSet Name="FK__Post__CategoryId__3A4CA8FD" Association="Model.FK__Post__CategoryId__3A4CA8FD">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Post" EntitySet="Post" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_PostHistoryVersion_dbo_Category_CategoryId" Association="Model.FK_dbo_PostHistoryVersion_dbo_Category_CategoryId">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="PostHistoryVersion" EntitySet="PostHistoryVersion" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Comment__PostId__395884C4" Association="Model.FK__Comment__PostId__395884C4">
+            <End Role="Post" EntitySet="Post" />
+            <End Role="Comment" EntitySet="Comment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_InterviewDetail_dbo_Interview_InterviewId" Association="Model.FK_dbo_InterviewDetail_dbo_Interview_InterviewId">
+            <End Role="Interview" EntitySet="Interview" />
+            <End Role="InterviewDetail" EntitySet="InterviewDetail" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId" Association="Model.FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId">
+            <End Role="UserInfo" EntitySet="UserInfo" />
+            <End Role="LoginRecord" EntitySet="LoginRecord" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_PostAccessRecords_dbo_Post_PostId" Association="Model.FK_dbo_PostAccessRecords_dbo_Post_PostId">
+            <End Role="Post" EntitySet="Post" />
+            <End Role="PostAccessRecord" EntitySet="PostAccessRecord" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_PostHistoryVersion_dbo_Post_PostId" Association="Model.FK_dbo_PostHistoryVersion_dbo_Post_PostId">
+            <End Role="Post" EntitySet="Post" />
+            <End Role="PostHistoryVersion" EntitySet="PostHistoryVersion" />
+          </AssociationSet>
+          <AssociationSet Name="SeminarPost" Association="Model.SeminarPost">
+            <End Role="Post" EntitySet="Post" />
+            <End Role="Seminar" EntitySet="Seminar" />
+          </AssociationSet>
+          <AssociationSet Name="SeminarPostHistoryVersion" Association="Model.SeminarPostHistoryVersion">
+            <End Role="PostHistoryVersion" EntitySet="PostHistoryVersion" />
+            <End Role="Seminar" EntitySet="Seminar" />
+          </AssociationSet>
+          </EntityContainer>
+        <ComplexType Name="sp_getChildrenCommentByParentId_Result">
+          <Property Type="Int32" Name="Id" Nullable="true" />
+          <Property Type="String" Name="NickName" Nullable="true" />
+          <Property Type="String" Name="Email" Nullable="true" />
+          <Property Type="String" Name="QQorWechat" Nullable="true" />
+          <Property Type="String" Name="Content" Nullable="true" />
+          <Property Type="Boolean" Name="IsPended" Nullable="true" />
+          <Property Type="Int32" Name="ParentId" Nullable="true" />
+          <Property Type="Int32" Name="PostId" Nullable="true" />
+          <Property Type="DateTime" Name="CommentDate" Nullable="true" />
+          <Property Type="String" Name="Browser" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="OperatingSystem" Nullable="true" MaxLength="255" />
+          <Property Type="Boolean" Name="IsDelete" Nullable="true" />
+          <Property Type="Boolean" Name="IsMaster" Nullable="true" />
+          <Property Type="Int32" Name="VoteCount" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="sp_getChildrenLeaveMsgByParentId_Result">
+          <Property Type="Int32" Name="Id" Nullable="true" />
+          <Property Type="String" Name="NickName" Nullable="true" />
+          <Property Type="String" Name="Title" Nullable="true" />
+          <Property Type="String" Name="Content" Nullable="true" />
+          <Property Type="DateTime" Name="PostDate" Nullable="true" />
+          <Property Type="String" Name="Email" Nullable="true" />
+          <Property Type="String" Name="QQorWechat" Nullable="true" />
+          <Property Type="Boolean" Name="IsPended" Nullable="true" />
+          <Property Type="Int32" Name="ParentId" Nullable="true" />
+          <Property Type="String" Name="Browser" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="OperatingSystem" Nullable="true" MaxLength="255" />
+          <Property Type="Boolean" Name="IsDelete" Nullable="true" />
+          <Property Type="Boolean" Name="IsMaster" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="sp_getInterviewsCurrentMonthDetailsByDays_Result">
+          <Property Type="Int32" Name="vt" Nullable="true" />
+          <Property Type="Int32" Name="count" Nullable="true" />
+        </ComplexType>
+        <EntityType Name="Broadcast">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ValidateCode" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="UpdateTime" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Post" Relationship="Model.FK__Post__CategoryId__3A4CA8FD" FromRole="Category" ToRole="Post" />
+          <NavigationProperty Name="PostHistoryVersion" Relationship="Model.FK_dbo_PostHistoryVersion_dbo_Category_CategoryId" FromRole="Category" ToRole="PostHistoryVersion" />
+        </EntityType>
+        <EntityType Name="Comment">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NickName" Type="String" Nullable="false" MaxLength="24" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="QQorWechat" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Content" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ParentId" Type="Int32" Nullable="false" />
+          <Property Name="PostId" Type="Int32" Nullable="false" />
+          <Property Name="CommentDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Browser" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OperatingSystem" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="IsMaster" Type="Boolean" Nullable="false" />
+          <Property Name="VoteCount" Type="Int32" Nullable="false" />
+          <Property Name="AgainstCount" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="IP" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Post" Relationship="Model.FK__Comment__PostId__395884C4" FromRole="Comment" ToRole="Post" />
+        </EntityType>
+        <EntityType Name="Contacts">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Url" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Donate">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NickName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="QQorWechat" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="EmailDisplay" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="QQorWechatDisplay" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Amount" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DonateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="Via" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="InternalMessage">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Content" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Link" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Read" Type="Boolean" Nullable="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Interview">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IP" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="UserAgent" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="OperatingSystem" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="BrowserType" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="ViewTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="FromUrl" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Province" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ISP" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="HttpMethod" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Address" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ReferenceAddress" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="LandPage" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="OnlineSpan" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Uid" Type="Guid" Nullable="false" />
+          <Property Name="OnlineSpanSeconds" Type="Double" Nullable="false" />
+          <NavigationProperty Name="InterviewDetail" Relationship="Model.FK_dbo_InterviewDetail_dbo_Interview_InterviewId" FromRole="Interview" ToRole="InterviewDetail" />
+        </EntityType>
+        <EntityType Name="InterviewDetail">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Url" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="InterviewId" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="Interview" Relationship="Model.FK_dbo_InterviewDetail_dbo_Interview_InterviewId" FromRole="InterviewDetail" ToRole="Interview" />
+        </EntityType>
+        <EntityType Name="Issue">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Link" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Level" Type="Int32" Nullable="false" />
+          <Property Name="SubmitTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="HandleTime" Type="DateTime" Precision="3" />
+          <Property Name="Msg" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IPAddress" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LeaveMessage">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NickName" Type="String" Nullable="false" MaxLength="24" FixedLength="false" Unicode="true" />
+          <Property Name="Content" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PostDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="QQorWechat" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ParentId" Type="Int32" Nullable="false" />
+          <Property Name="Browser" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="OperatingSystem" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="IsMaster" Type="Boolean" Nullable="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="IP" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="Links">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Url" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="Except" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LoginRecord">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IP" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="LoginTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="PhysicAddress" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="LoginType" Type="Int32" Nullable="false" />
+          <Property Name="UserInfoId" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="Province" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="UserInfo" Relationship="Model.FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId" FromRole="LoginRecord" ToRole="UserInfo" />
+        </EntityType>
+        <EntityType Name="Menu">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Icon" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Url" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Sort" Type="Int32" Nullable="false" />
+          <Property Name="ParentId" Type="Int32" Nullable="false" />
+          <Property Name="MenuType" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Misc">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Content" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PostDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ModifyDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Notice">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Content" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PostDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ModifyDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Post">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="Author" Type="String" Nullable="false" MaxLength="24" FixedLength="false" Unicode="true" />
+          <Property Name="Content" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ViewCount" Type="Int32" Nullable="false" />
+          <Property Name="PostDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="ModifyDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IsFixedTop" Type="Boolean" Nullable="false" />
+          <Property Name="CategoryId" Type="Int32" Nullable="false" />
+          <Property Name="ResourceName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IsWordDocument" Type="Boolean" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="Label" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="VoteUpCount" Type="Int32" Nullable="false" />
+          <Property Name="VoteDownCount" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="IsBanner" Type="Boolean" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ImageUrl" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Category" Relationship="Model.FK__Post__CategoryId__3A4CA8FD" FromRole="Post" ToRole="Category" />
+          <NavigationProperty Name="Comment" Relationship="Model.FK__Comment__PostId__395884C4" FromRole="Post" ToRole="Comment" />
+          <NavigationProperty Name="PostAccessRecord" Relationship="Model.FK_dbo_PostAccessRecords_dbo_Post_PostId" FromRole="Post" ToRole="PostAccessRecord" />
+          <NavigationProperty Name="PostHistoryVersion" Relationship="Model.FK_dbo_PostHistoryVersion_dbo_Post_PostId" FromRole="Post" ToRole="PostHistoryVersion" />
+          <NavigationProperty Name="Seminar" Relationship="Model.SeminarPost" FromRole="Post" ToRole="Seminar" />
+        </EntityType>
+        <EntityType Name="PostAccessRecord">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PostId" Type="Int32" Nullable="false" />
+          <Property Name="AccessTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ClickCount" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Post" Relationship="Model.FK_dbo_PostAccessRecords_dbo_Post_PostId" FromRole="PostAccessRecord" ToRole="Post" />
+        </EntityType>
+        <EntityType Name="PostHistoryVersion">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="true" />
+          <Property Name="Content" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ViewCount" Type="Int32" Nullable="false" />
+          <Property Name="ModifyDate" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="CategoryId" Type="Int32" Nullable="false" />
+          <Property Name="PostId" Type="Int32" Nullable="false" />
+          <Property Name="ResourceName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IsWordDocument" Type="Boolean" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Label" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="VoteUpCount" Type="Int32" Nullable="false" />
+          <Property Name="VoteDownCount" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Category" Relationship="Model.FK_dbo_PostHistoryVersion_dbo_Category_CategoryId" FromRole="PostHistoryVersion" ToRole="Category" />
+          <NavigationProperty Name="Post" Relationship="Model.FK_dbo_PostHistoryVersion_dbo_Post_PostId" FromRole="PostHistoryVersion" ToRole="Post" />
+          <NavigationProperty Name="Seminar" Relationship="Model.SeminarPostHistoryVersion" FromRole="PostHistoryVersion" ToRole="Seminar" />
+        </EntityType>
+        <EntityType Name="SearchDetails">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="KeyWords" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="SearchTime" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="IP" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="Seminar">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SubTitle" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Post" Relationship="Model.SeminarPost" FromRole="Seminar" ToRole="Post" />
+          <NavigationProperty Name="PostHistoryVersion" Relationship="Model.SeminarPostHistoryVersion" FromRole="Seminar" ToRole="PostHistoryVersion" />
+        </EntityType>
+        <EntityType Name="SystemSetting">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Value" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="UserInfo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Username" Type="String" Nullable="false" MaxLength="24" FixedLength="false" Unicode="true" />
+          <Property Name="Password" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SaltKey" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IsAdmin" Type="Boolean" Nullable="false" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="QQorWechat" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="NickName" Type="String" MaxLength="24" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="AccessToken" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Avatar" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="LoginRecord" Relationship="Model.FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId" FromRole="UserInfo" ToRole="LoginRecord" />
+        </EntityType>
+        <Association Name="FK__Post__CategoryId__3A4CA8FD">
+          <End Type="Model.Category" Role="Category" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="Model.Post" Role="Post" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Post">
+              <PropertyRef Name="CategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_PostHistoryVersion_dbo_Category_CategoryId">
+          <End Type="Model.Category" Role="Category" Multiplicity="1" />
+          <End Type="Model.PostHistoryVersion" Role="PostHistoryVersion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PostHistoryVersion">
+              <PropertyRef Name="CategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Comment__PostId__395884C4">
+          <End Type="Model.Post" Role="Post" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="Model.Comment" Role="Comment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Post">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Comment">
+              <PropertyRef Name="PostId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_InterviewDetail_dbo_Interview_InterviewId">
+          <End Type="Model.Interview" Role="Interview" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="Model.InterviewDetail" Role="InterviewDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Interview">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="InterviewDetail">
+              <PropertyRef Name="InterviewId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId">
+          <End Type="Model.UserInfo" Role="UserInfo" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="Model.LoginRecord" Role="LoginRecord" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserInfo">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LoginRecord">
+              <PropertyRef Name="UserInfoId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_PostAccessRecords_dbo_Post_PostId">
+          <End Type="Model.Post" Role="Post" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="Model.PostAccessRecord" Role="PostAccessRecord" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Post">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PostAccessRecord">
+              <PropertyRef Name="PostId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_PostHistoryVersion_dbo_Post_PostId">
+          <End Type="Model.Post" Role="Post" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="Model.PostHistoryVersion" Role="PostHistoryVersion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Post">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="PostHistoryVersion">
+              <PropertyRef Name="PostId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="SeminarPost">
+          <End Type="Model.Post" Role="Post" Multiplicity="*" />
+          <End Type="Model.Seminar" Role="Seminar" Multiplicity="*" />
+        </Association>
+        <Association Name="SeminarPostHistoryVersion">
+          <End Type="Model.PostHistoryVersion" Role="PostHistoryVersion" Multiplicity="*" />
+          <End Type="Model.Seminar" Role="Seminar" Multiplicity="*" />
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs" Space="C-S">
+        <Alias Key="Model" Value="Model" />
+        <Alias Key="Target" Value="Model.Store" />
+        <EntityContainerMapping CdmEntityContainer="ModelContainer" StorageEntityContainer="ModelStoreContainer">
+          <FunctionImportMapping FunctionImportName="sp_getChildrenCommentByParentId" FunctionName="Model.Store.sp_getChildrenCommentByParentId">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Model.sp_getChildrenCommentByParentId_Result">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="NickName" ColumnName="NickName" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="QQorWechat" ColumnName="QQorWechat" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="IsPended" ColumnName="IsPended" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="PostId" ColumnName="PostId" />
+                <ScalarProperty Name="CommentDate" ColumnName="CommentDate" />
+                <ScalarProperty Name="Browser" ColumnName="Browser" />
+                <ScalarProperty Name="OperatingSystem" ColumnName="OperatingSystem" />
+                <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+                <ScalarProperty Name="IsMaster" ColumnName="IsMaster" />
+                <ScalarProperty Name="VoteCount" ColumnName="VoteCount" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_getChildrenLeaveMsgByParentId" FunctionName="Model.Store.sp_getChildrenLeaveMsgByParentId">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Model.sp_getChildrenLeaveMsgByParentId_Result">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="NickName" ColumnName="NickName" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="PostDate" ColumnName="PostDate" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="QQorWechat" ColumnName="QQorWechat" />
+                <ScalarProperty Name="IsPended" ColumnName="IsPended" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="Browser" ColumnName="Browser" />
+                <ScalarProperty Name="OperatingSystem" ColumnName="OperatingSystem" />
+                <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+                <ScalarProperty Name="IsMaster" ColumnName="IsMaster" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_getInterviewsCurrentMonthDetailsByDays" FunctionName="Model.Store.sp_getInterviewsCurrentMonthDetailsByDays">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Model.sp_getInterviewsCurrentMonthDetailsByDays_Result">
+                <ScalarProperty Name="vt" ColumnName="vt" />
+                <ScalarProperty Name="count" ColumnName="count" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="Broadcast">
+            <EntityTypeMapping TypeName="Model.Broadcast">
+              <MappingFragment StoreEntitySet="Broadcast">
+                <ScalarProperty Name="UpdateTime" ColumnName="UpdateTime" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ValidateCode" ColumnName="ValidateCode" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Category">
+            <EntityTypeMapping TypeName="Model.Category">
+              <MappingFragment StoreEntitySet="Category">
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Comment">
+            <EntityTypeMapping TypeName="Model.Comment">
+              <MappingFragment StoreEntitySet="Comment">
+                <ScalarProperty Name="IP" ColumnName="IP" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="AgainstCount" ColumnName="AgainstCount" />
+                <ScalarProperty Name="VoteCount" ColumnName="VoteCount" />
+                <ScalarProperty Name="IsMaster" ColumnName="IsMaster" />
+                <ScalarProperty Name="OperatingSystem" ColumnName="OperatingSystem" />
+                <ScalarProperty Name="Browser" ColumnName="Browser" />
+                <ScalarProperty Name="CommentDate" ColumnName="CommentDate" />
+                <ScalarProperty Name="PostId" ColumnName="PostId" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="QQorWechat" ColumnName="QQorWechat" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="NickName" ColumnName="NickName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Contacts">
+            <EntityTypeMapping TypeName="Model.Contacts">
+              <MappingFragment StoreEntitySet="Contacts">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Url" ColumnName="Url" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Donate">
+            <EntityTypeMapping TypeName="Model.Donate">
+              <MappingFragment StoreEntitySet="Donate">
+                <ScalarProperty Name="Via" ColumnName="Via" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="DonateTime" ColumnName="DonateTime" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="QQorWechatDisplay" ColumnName="QQorWechatDisplay" />
+                <ScalarProperty Name="EmailDisplay" ColumnName="EmailDisplay" />
+                <ScalarProperty Name="QQorWechat" ColumnName="QQorWechat" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="NickName" ColumnName="NickName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="InternalMessage">
+            <EntityTypeMapping TypeName="Model.InternalMessage">
+              <MappingFragment StoreEntitySet="InternalMessage">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Read" ColumnName="Read" />
+                <ScalarProperty Name="Time" ColumnName="Time" />
+                <ScalarProperty Name="Link" ColumnName="Link" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Interview">
+            <EntityTypeMapping TypeName="Model.Interview">
+              <MappingFragment StoreEntitySet="Interview">
+                <ScalarProperty Name="OnlineSpanSeconds" ColumnName="OnlineSpanSeconds" />
+                <ScalarProperty Name="Uid" ColumnName="Uid" />
+                <ScalarProperty Name="OnlineSpan" ColumnName="OnlineSpan" />
+                <ScalarProperty Name="LandPage" ColumnName="LandPage" />
+                <ScalarProperty Name="ReferenceAddress" ColumnName="ReferenceAddress" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="HttpMethod" ColumnName="HttpMethod" />
+                <ScalarProperty Name="ISP" ColumnName="ISP" />
+                <ScalarProperty Name="Province" ColumnName="Province" />
+                <ScalarProperty Name="FromUrl" ColumnName="FromUrl" />
+                <ScalarProperty Name="ViewTime" ColumnName="ViewTime" />
+                <ScalarProperty Name="BrowserType" ColumnName="BrowserType" />
+                <ScalarProperty Name="OperatingSystem" ColumnName="OperatingSystem" />
+                <ScalarProperty Name="UserAgent" ColumnName="UserAgent" />
+                <ScalarProperty Name="IP" ColumnName="IP" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="InterviewDetail">
+            <EntityTypeMapping TypeName="Model.InterviewDetail">
+              <MappingFragment StoreEntitySet="InterviewDetail">
+                <ScalarProperty Name="InterviewId" ColumnName="InterviewId" />
+                <ScalarProperty Name="Time" ColumnName="Time" />
+                <ScalarProperty Name="Url" ColumnName="Url" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Issue">
+            <EntityTypeMapping TypeName="Model.Issue">
+              <MappingFragment StoreEntitySet="Issue">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="IPAddress" ColumnName="IPAddress" />
+                <ScalarProperty Name="Msg" ColumnName="Msg" />
+                <ScalarProperty Name="HandleTime" ColumnName="HandleTime" />
+                <ScalarProperty Name="SubmitTime" ColumnName="SubmitTime" />
+                <ScalarProperty Name="Level" ColumnName="Level" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Link" ColumnName="Link" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LeaveMessage">
+            <EntityTypeMapping TypeName="Model.LeaveMessage">
+              <MappingFragment StoreEntitySet="LeaveMessage">
+                <ScalarProperty Name="IP" ColumnName="IP" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="IsMaster" ColumnName="IsMaster" />
+                <ScalarProperty Name="OperatingSystem" ColumnName="OperatingSystem" />
+                <ScalarProperty Name="Browser" ColumnName="Browser" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="QQorWechat" ColumnName="QQorWechat" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="PostDate" ColumnName="PostDate" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="NickName" ColumnName="NickName" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Links">
+            <EntityTypeMapping TypeName="Model.Links">
+              <MappingFragment StoreEntitySet="Links">
+                <ScalarProperty Name="Except" ColumnName="Except" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Url" ColumnName="Url" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LoginRecord">
+            <EntityTypeMapping TypeName="Model.LoginRecord">
+              <MappingFragment StoreEntitySet="LoginRecord">
+                <ScalarProperty Name="Province" ColumnName="Province" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="UserInfoId" ColumnName="UserInfoId" />
+                <ScalarProperty Name="LoginType" ColumnName="LoginType" />
+                <ScalarProperty Name="PhysicAddress" ColumnName="PhysicAddress" />
+                <ScalarProperty Name="LoginTime" ColumnName="LoginTime" />
+                <ScalarProperty Name="IP" ColumnName="IP" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Menu">
+            <EntityTypeMapping TypeName="Model.Menu">
+              <MappingFragment StoreEntitySet="Menu">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="MenuType" ColumnName="MenuType" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="Sort" ColumnName="Sort" />
+                <ScalarProperty Name="Url" ColumnName="Url" />
+                <ScalarProperty Name="Icon" ColumnName="Icon" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Misc">
+            <EntityTypeMapping TypeName="Model.Misc">
+              <MappingFragment StoreEntitySet="Misc">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ModifyDate" ColumnName="ModifyDate" />
+                <ScalarProperty Name="PostDate" ColumnName="PostDate" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Notice">
+            <EntityTypeMapping TypeName="Model.Notice">
+              <MappingFragment StoreEntitySet="Notice">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ModifyDate" ColumnName="ModifyDate" />
+                <ScalarProperty Name="PostDate" ColumnName="PostDate" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Post">
+            <EntityTypeMapping TypeName="Model.Post">
+              <MappingFragment StoreEntitySet="Post">
+                <ScalarProperty Name="ImageUrl" ColumnName="ImageUrl" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="IsBanner" ColumnName="IsBanner" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="VoteDownCount" ColumnName="VoteDownCount" />
+                <ScalarProperty Name="VoteUpCount" ColumnName="VoteUpCount" />
+                <ScalarProperty Name="Label" ColumnName="Label" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="IsWordDocument" ColumnName="IsWordDocument" />
+                <ScalarProperty Name="ResourceName" ColumnName="ResourceName" />
+                <ScalarProperty Name="CategoryId" ColumnName="CategoryId" />
+                <ScalarProperty Name="IsFixedTop" ColumnName="IsFixedTop" />
+                <ScalarProperty Name="ModifyDate" ColumnName="ModifyDate" />
+                <ScalarProperty Name="PostDate" ColumnName="PostDate" />
+                <ScalarProperty Name="ViewCount" ColumnName="ViewCount" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="Author" ColumnName="Author" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PostAccessRecord">
+            <EntityTypeMapping TypeName="Model.PostAccessRecord">
+              <MappingFragment StoreEntitySet="PostAccessRecord">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ClickCount" ColumnName="ClickCount" />
+                <ScalarProperty Name="AccessTime" ColumnName="AccessTime" />
+                <ScalarProperty Name="PostId" ColumnName="PostId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PostHistoryVersion">
+            <EntityTypeMapping TypeName="Model.PostHistoryVersion">
+              <MappingFragment StoreEntitySet="PostHistoryVersion">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="VoteDownCount" ColumnName="VoteDownCount" />
+                <ScalarProperty Name="VoteUpCount" ColumnName="VoteUpCount" />
+                <ScalarProperty Name="Label" ColumnName="Label" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="IsWordDocument" ColumnName="IsWordDocument" />
+                <ScalarProperty Name="ResourceName" ColumnName="ResourceName" />
+                <ScalarProperty Name="PostId" ColumnName="PostId" />
+                <ScalarProperty Name="CategoryId" ColumnName="CategoryId" />
+                <ScalarProperty Name="ModifyDate" ColumnName="ModifyDate" />
+                <ScalarProperty Name="ViewCount" ColumnName="ViewCount" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SearchDetails">
+            <EntityTypeMapping TypeName="Model.SearchDetails">
+              <MappingFragment StoreEntitySet="SearchDetails">
+                <ScalarProperty Name="IP" ColumnName="IP" />
+                <ScalarProperty Name="SearchTime" ColumnName="SearchTime" />
+                <ScalarProperty Name="KeyWords" ColumnName="KeyWords" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Seminar">
+            <EntityTypeMapping TypeName="Model.Seminar">
+              <MappingFragment StoreEntitySet="Seminar">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="SubTitle" ColumnName="SubTitle" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SystemSetting">
+            <EntityTypeMapping TypeName="Model.SystemSetting">
+              <MappingFragment StoreEntitySet="SystemSetting">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserInfo">
+            <EntityTypeMapping TypeName="Model.UserInfo">
+              <MappingFragment StoreEntitySet="UserInfo">
+                <ScalarProperty Name="Avatar" ColumnName="Avatar" />
+                <ScalarProperty Name="AccessToken" ColumnName="AccessToken" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="NickName" ColumnName="NickName" />
+                <ScalarProperty Name="QQorWechat" ColumnName="QQorWechat" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="IsAdmin" ColumnName="IsAdmin" />
+                <ScalarProperty Name="SaltKey" ColumnName="SaltKey" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="SeminarPost" TypeName="Model.SeminarPost" StoreEntitySet="SeminarPost">
+            <EndProperty Name="Seminar">
+              <ScalarProperty Name="Id" ColumnName="Seminar_Id" />
+            </EndProperty>
+            <EndProperty Name="Post">
+              <ScalarProperty Name="Id" ColumnName="Post_Id" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="SeminarPostHistoryVersion" TypeName="Model.SeminarPostHistoryVersion" StoreEntitySet="SeminarPostHistoryVersion">
+            <EndProperty Name="Seminar">
+              <ScalarProperty Name="Id" ColumnName="Seminar_Id" />
+            </EndProperty>
+            <EndProperty Name="PostHistoryVersion">
+              <ScalarProperty Name="Id" ColumnName="PostHistoryVersion_Id" />
+            </EndProperty>
+          </AssociationSetMapping>
+          </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

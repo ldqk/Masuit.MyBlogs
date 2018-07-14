@@ -1,0 +1,347 @@
+﻿.border {
+    border: #ccc 1px solid;
+    border-radius: 5px;
+    /*margin-bottom: 10px;*/
+    /*min-width: 260px;*/
+    box-shadow: #f5deb3 0px 0px 3px inset;
+}
+
+.box-left.box-right {
+    margin-top: 5px;
+}
+
+.box-left {
+    border: #ccc 1.5px solid;
+    border-radius: 8px;
+    box-shadow: #f5deb3 0px 0px 3px inset;
+}
+.box-right {
+    padding-right: 0;
+}
+.box-right .panel {
+    background-color: transparent;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 0 3px;
+}
+
+.box-right .panel .panel-body {
+    padding: 2px;
+}
+
+.box-right .panel .panel-body .list-group {
+    margin-bottom: 0;
+}
+
+.box-right .panel .panel-body .list-group-item {
+    background-color: transparent;
+    padding: 2px;
+    font-size: 16px;
+}
+.orderby {
+    z-index: 10;
+}
+
+.blog h2 {
+    font-weight: 700
+}
+
+.blog .btn, .blog h5 {
+    margin: 0 0 5px
+}
+
+
+.wrapper-content {
+    padding: 10px 0;
+}
+
+.ibox.ui-sortable-placeholder {
+    margin: 0 0 23px !important
+}
+
+.ibox-content.text-box {
+    padding-bottom: 0;
+    padding-top: 15px
+}
+
+.ui-draggable .ibox-title {
+    cursor: move
+}
+
+.ibox {
+    clear: both;
+    margin-bottom: 10px;
+    margin-top: 0;
+    padding: 0
+}
+.ibox-content > a[href] {
+    text-decoration: none;
+}
+    .ibox-content > a[href] h4 {
+        color: #3f3f3f;
+        margin: 0 0 15px 0;
+        letter-spacing: 1px;
+        font-weight: bold;
+        font-size: 20px;
+        transition: ease-in-out .25s;
+    }
+.ibox-content > a[href] > h1:hover, .ibox-content > a[href] > h2:hover, .ibox-content > a[href] > h3:hover, .ibox-content > a[href] > h4:hover, .ibox-content > a[href] > h5:hover, .ibox-content > a[href] > h6:hover {
+    color: cadetblue;
+    transform:scale(1.01,1.1);
+    transition: ease-in-out .25s;
+}
+.ibox.collapsed .ibox-content {
+    display: none
+}
+
+.ibox.collapsed .fa.fa-chevron-up:before {
+    content: "\f078"
+}
+
+.ibox.collapsed .fa.fa-chevron-down:before {
+    content: "\f077"
+}
+
+.ibox:after, .ibox:before {
+    display: table
+}
+
+.ibox-title {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #fff;
+    border-color: #e7eaec;
+    -webkit-border-image: none;
+    -o-border-image: none;
+    border-image: none;
+    border-style: solid solid none;
+    border-width: 4px 0 0;
+    color: inherit;
+    margin-bottom: 0;
+    padding: 14px 15px 7px;
+    min-height: 48px
+}
+
+.ibox-content {
+    clear: both;
+    background-color: transparent;
+    color: inherit;
+    padding: 10px 10px 3px;
+    border-color: #e7eaec;
+    -webkit-border-image: none;
+    -o-border-image: none;
+    border-image: none;
+    border-style: solid solid none;
+    border-width: 1px;
+    border-radius: 10px;
+    box-shadow: #c4c4c4 0 0 10px;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+    .ibox-content p {
+        line-height: 24px;
+        word-break: break-all;
+    }
+    .ibox-content pre {
+        overflow: hidden;
+        word-wrap: break-word;
+        word-break: break-all;
+        white-space: pre-line;
+    }
+
+.article>.ibox>.ibox-content>main header.page-header a h2 {
+    font-size: 24px;
+    line-height: 32px;
+}
+
+.article>.ibox>.ibox-content>main p {
+    font-size: 15px;
+    line-height: 22px;
+    word-break: break-all;
+}
+.ibox-content .thumb {
+    transition: ease-in-out .3s;
+    overflow: hidden;
+}
+.ibox-content article.article h3,.ibox-content section h3, .ibox-content section.row h3 {
+    font-size: 24px;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    white-space: normal;
+    padding: 0 0 2px 7px;
+    line-height: 36px;
+    color: rgb(51, 51, 51);
+    font-weight: 700;
+    border-left: 5px solid rgb(53, 161, 0);
+    border-bottom: 1px solid rgb(221, 221, 221);
+    user-select: text !important;
+    font-family: 微软雅黑, Tahoma, Helvetica, SimSun, sans-serif;
+}
+.ibox-content article.article h4,.ibox-content section h4, .ibox-content section.row h4 {
+    font-size: 20px;
+    margin-top: 6px;
+    margin-bottom: 3px;
+    white-space: normal;
+    padding: 0 0 2px 15px;
+    line-height: 24px;
+    color: rgb(51, 51, 51);
+    font-weight: 700;
+    border-left: 5px solid rgb(53, 161, 0);
+    border-bottom: 1px solid rgb(221, 221, 221);
+    user-select: text !important;
+    font-family: 微软雅黑, Tahoma, Helvetica, SimSun, sans-serif;
+}
+.ibox-content article.article h5,.ibox-content section h5, .ibox-content section.row h5 {
+    font-size: 18px;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    white-space: normal;
+    padding: 0 0 2px 20px;
+    line-height: 20px;
+    color: rgb(51, 51, 51);
+    font-weight: 700;
+    border-left: 5px solid rgb(53, 161, 0);
+    border-bottom: 1px solid rgb(221, 221, 221);
+    user-select: text !important;
+    font-family: 微软雅黑, Tahoma, Helvetica, SimSun, sans-serif;
+}
+.ibox-content article.article h6,.ibox-content section h6, .ibox-content section.row h6 {
+    font-size: 16px;
+    white-space: normal;
+    padding: 0 0 2px 20px;
+    line-height: 18px;
+    color: rgb(51, 51, 51);
+    font-weight: 600;
+    border-left: 5px solid rgb(53, 161, 0);
+    border-bottom: 1px solid rgb(221, 221, 221);
+    user-select: text !important;
+    font-family: 微软雅黑, Tahoma, Helvetica, SimSun, sans-serif;
+}
+.ibox-content .thumb:hover {
+    transform: scale(1.1);
+    transition: ease-in-out .3s;
+}
+.ibox-heading {
+    background-color: #f3f6fb;
+    border-bottom: none
+}
+
+    .ibox-heading h3 {
+        font-weight: 200;
+        font-size: 24px;
+    }
+
+.ibox-title h5 {
+    font-size: 14px;
+    margin: 0 0 7px;
+    padding: 0;
+    text-overflow: ellipsis;
+    float: left
+}
+
+.ibox-title .label {
+    float: left;
+    margin-left: 4px
+}
+
+.ibox-tools {
+    float: right;
+    margin-top: 0;
+    position: relative;
+    padding: 0
+}
+
+.ibox-tools a {
+    cursor: pointer;
+    margin-left: 5px;
+    color: #c4c4c4
+}
+
+.ibox-tools a.btn-primary {
+    color: #fff
+}
+
+.ibox-tools .dropdown-menu > li > a {
+    padding: 4px 10px;
+    font-size: 12px
+}
+
+.ibox .open > .dropdown-menu {
+    left: auto;
+    right: 0
+}
+
+.chat-view .ibox-content {
+    padding: 0
+}
+
+.article .ibox-content {
+    padding: 20px
+}
+.fixtop {
+    font-size: 24px;
+    color: red;
+}
+
+.new {
+    font-size: 24px;
+    color: green;
+}
+
+.float-e-margins .btn {
+    margin-bottom: 5px
+}
+.search-form {
+    margin-top: 10px
+}
+.file-manager .hr-line-dashed {
+    margin: 15px 0
+}
+
+.hr-line-dashed {
+    border-top: 1px dashed #F5afA5;
+    color: #fff;
+    background-color: #fff;
+    height: 1px;
+    margin: 5px 0
+}
+.search-result h3 {
+    margin-bottom: 0;
+    color: #1E0FBE
+}
+
+.search-result .search-link {
+    color: #006621
+}
+
+.search-result p {
+    font-size: 12px;
+    margin-top: 5px
+}
+#cyReward {
+    margin-top: 10px;
+    position: relative;
+    text-align: center;
+}
+    #cyReward #cy-reward-pop {
+        top: auto !important;
+        margin-top: -500px !important
+    }
+.changyan-overlay-outer {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    opacity: 1;
+    transform: translate(-50%);
+}
+.protected {
+    border: 1px dashed #F60;
+    padding: 10px;
+    line-height: 200%;
+    overflow: hidden;
+    clear: both;
+    margin-top: 20px;
+}

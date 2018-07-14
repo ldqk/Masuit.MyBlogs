@@ -1,0 +1,474 @@
+[
+  {
+    "outputFileName": "Assets/UEditor/ueditor.config.front.min.js",
+    "inputFiles": [
+      "Assets/UEditor/ueditor.config.front.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/UEditor/ueditor.config.admin.min.js",
+    "inputFiles": [
+      "Assets/UEditor/ueditor.config.admin.js"
+    ]
+  },
+  {
+    "outputFileName": "dashboard/ng-view/controllers/mainController.min.js",
+    "inputFiles": [
+      "dashboard/ng-view/controllers/mainController.js"
+    ]
+  },
+  {
+    "outputFileName": "dashboard/ng-view/controllers/dashboard.min.js",
+    "inputFiles": [
+      "dashboard/ng-view/controllers/dashboard.js"
+    ]
+  },
+  {
+    "outputFileName": "dashboard/ng-view/app/app.config.min.js",
+    "inputFiles": [
+      "dashboard/ng-view/app/app.config.js"
+    ]
+  },
+  {
+    "outputFileName": "dashboard/ng-view/app/route.config.min.js",
+    "inputFiles": [
+      "dashboard/ng-view/app/route.config.js"
+    ]
+  },
+  {
+    "outputFileName": "dashboard/ng-view/views/dashboard.min.html",
+    "inputFiles": [
+      "dashboard/ng-view/views/dashboard.html"
+    ]
+  },
+  {
+    "outputFileName": "dashboard/controllers/home.min.js",
+    "inputFiles": [
+      "dashboard/controllers/home.js"
+    ]
+  },
+  {
+    "outputFileName": "dashboard/app/route.config.min.js",
+    "inputFiles": [
+      "dashboard/app/route.config.js"
+    ]
+  },
+  {
+    "outputFileName": "dashboard/app/app.config.min.js",
+    "inputFiles": [
+      "dashboard/app/app.config.js"
+    ]
+  },
+  {
+    "outputFileName": "dashboard/views/dashboard.min.html",
+    "inputFiles": [
+      "dashboard/views/dashboard.html"
+    ]
+  },
+  {
+    "outputFileName": "dashboard/css/app.min.css",
+    "inputFiles": [
+      "dashboard/css/app.css"
+    ]
+  },
+  {
+    "outputFileName": "dashboard/app/template.min.js",
+    "inputFiles": [
+      "dashboard/app/template.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/app/angular-ueditor.min.js",
+    "inputFiles": [
+      "ng-views/app/angular-ueditor.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/app/form.min.js",
+    "inputFiles": [
+      "ng-views/app/form.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/dropify/dropify.min.css",
+    "inputFiles": [
+      "Assets/dropify/dropify.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/dropify/dropify.min.js",
+    "inputFiles": [
+      "Assets/dropify/dropify.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/comment.min.js",
+    "inputFiles": [
+      "ng-views/controllers/comment.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/main.min.js",
+    "inputFiles": [
+      "ng-views/controllers/main.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/menu.min.js",
+    "inputFiles": [
+      "ng-views/controllers/menu.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/system.min.js",
+    "inputFiles": [
+      "ng-views/controllers/system.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/post.min.js",
+    "inputFiles": [
+      "ng-views/controllers/post.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/semantic/semantic.min.css",
+    "inputFiles": [
+      "Assets/semantic/semantic.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/semantic/semantic.min.js",
+    "inputFiles": [
+      "Assets/semantic/semantic.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/layui/css/layui.min.css",
+    "inputFiles": [
+      "Assets/layui/css/layui.css"
+    ]
+  },
+  {
+    "outputFileName": "fonts/icomoon.min.css",
+    "inputFiles": [
+      "fonts/icomoon.css"
+    ]
+  },
+  {
+    "outputFileName": "fonts/iconSelector.min.js",
+    "inputFiles": [
+      "fonts/iconSelector.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/layui/layui.min.js",
+    "inputFiles": [
+      "Assets/layui/layui.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/jquery.page/jquery.page.min.css",
+    "inputFiles": [
+      "Assets/jquery.page/jquery.page.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/jquery.page/jquery.page.min.js",
+    "inputFiles": [
+      "Assets/jquery.page/jquery.page.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/misc.min.js",
+    "inputFiles": [
+      "ng-views/controllers/misc.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/msg.min.js",
+    "inputFiles": [
+      "ng-views/controllers/msg.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/notice.min.js",
+    "inputFiles": [
+      "ng-views/controllers/notice.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/links.min.js",
+    "inputFiles": [
+      "ng-views/controllers/links.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/contact.min.js",
+    "inputFiles": [
+      "ng-views/controllers/contact.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/analysis.min.js",
+    "inputFiles": [
+      "ng-views/controllers/analysis.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/template/loading.min.html",
+    "inputFiles": [
+      "ng-views/template/loading.html"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/tm.pagination.min.js",
+    "inputFiles": [
+      "Scripts/tm.pagination.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/css/app.min.css",
+    "inputFiles": [
+      "ng-views/css/app.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/UEditor/ueditor.all.min.js",
+    "inputFiles": [
+      "Assets/UEditor/ueditor.all.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/UEditor/ueditor.parse.min.js",
+    "inputFiles": [
+      "Assets/UEditor/ueditor.parse.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/global/article.min.js",
+    "inputFiles": [
+      "Scripts/global/article.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/global/leavemsg.min.js",
+    "inputFiles": [
+      "Scripts/global/leavemsg.js"
+    ]
+  },
+  {
+    "outputFileName": "Content/common/post-all.min.css",
+    "inputFiles": [
+      "Content/common/post-all.css"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/global/post-all.min.js",
+    "inputFiles": [
+      "Scripts/global/post-all.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/jedate/jedate.min.css",
+    "inputFiles": [
+      "Assets/jedate/jedate.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/jedate/jquery.jedate.min.js",
+    "inputFiles": [
+      "Assets/jedate/jquery.jedate.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/select3/select3-full.min.js",
+    "inputFiles": [
+      "Assets/select3/select3-full.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/modal/custombox.min.js",
+    "inputFiles": [
+      "Assets/modal/custombox.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/modal/custombox.min.css",
+    "inputFiles": [
+      "Assets/modal/custombox.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/modal/bundle.css",
+    "inputFiles": [
+      "Assets/modal/demo.css",
+      "Assets/modal/custombox.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/select3/bundle.css",
+    "inputFiles": [
+      "Assets/select3/select3.css",
+      "Assets/select3/stylesheet.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/fileupload/filestyle.min.css",
+    "inputFiles": [
+      "Assets/fileupload/filestyle.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/common/loading.min.css",
+    "inputFiles": [
+      "Content/common/loading.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/common/app.css",
+    "inputFiles": [
+      "Content/common/style.css",
+      "Content/common/articlestyle.css",
+      "Content/common/btnstyle.css",
+      "Content/common/leaderboard.css",
+      "Content/common/loading.css",
+      "Content/common/post-all.css",
+      "Content/common/reset.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.js",
+    "inputFiles": [
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shAutoloader.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushAppleScript.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushAS3.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushBash.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushColdFusion.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushCpp.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushCSharp.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushCss.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushDelphi.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushDiff.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushErlang.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushGroovy.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushJava.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushJavaFX.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushJScript.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushPerl.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushPhp.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushPlain.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushPowerShell.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushPython.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushRuby.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushSass.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushScala.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushSql.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushVb.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushXml.js",
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shLegacy.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js",
+    "inputFiles": [
+      "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css",
+    "inputFiles": [
+      "Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.css"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/controllers/dashboard.min.js",
+    "inputFiles": [
+      "ng-views/controllers/dashboard.js"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/css/waves.min.css",
+    "inputFiles": [
+      "ng-views/css/waves.css"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/css/waves.min.js",
+    "inputFiles": [
+      "ng-views/css/waves.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/publish/publish.min.js",
+    "inputFiles": [
+      "Scripts/publish/publish.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/apps/app.bug.min.js",
+    "inputFiles": [
+      "Scripts/apps/app.bug.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/directory/script.min.js",
+    "inputFiles": [
+      "Assets/directory/script.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/directory/style.min.css",
+    "inputFiles": [
+      "Assets/directory/style.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/banner/bootstrap-touch-slider.min.css",
+    "inputFiles": [
+      "Assets/banner/bootstrap-touch-slider.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/banner/bootstrap-touch-slider.min.js",
+    "inputFiles": [
+      "Assets/banner/bootstrap-touch-slider.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/jquery.tocify/jquery.tocify.min.css",
+    "inputFiles": [
+      "Assets/jquery.tocify/jquery.tocify.css"
+    ]
+  },
+  {
+    "outputFileName": "Assets/jquery.tocify/jquery.tocify.min.js",
+    "inputFiles": [
+      "Assets/jquery.tocify/jquery.tocify.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/nav/js/main.min.js",
+    "inputFiles": [
+      "Assets/nav/js/main.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/apps/canvas.bg.min.js",
+    "inputFiles": [
+      "Scripts/apps/canvas.bg.js"
+    ]
+  },
+  {
+    "outputFileName": "Assets/checkbox/checkbox.min.css",
+    "inputFiles": [
+      "Assets/checkbox/checkbox.css"
+    ]
+  },
+  {
+    "outputFileName": "ng-views/app/route.config.min.js",
+    "inputFiles": [
+      "ng-views/app/route.config.js"
+    ]
+  }
+]
