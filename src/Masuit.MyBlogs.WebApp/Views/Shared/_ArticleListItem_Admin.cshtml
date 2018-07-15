@@ -26,22 +26,21 @@
                 //随机取合适大小的图片
                 string imgSrc = Model.Content.MatchRandomImgSrc();
                 MatchCollection imgTags = Model.Content.MatchImgTags();
-                FileInfo fileInfo;
                 for (var i = 0; i < imgTags.Count; i++)
                 {
                     string src = Model.Content.MatchRandomImgSrc();
                     if (File.Exists(Request.MapPath("/") + src) && !src.StartsWith("http"))
                     {
-                        fileInfo = new FileInfo(Path.Combine(Request.MapPath("/") + src));
+                        var fileInfo = new FileInfo(Path.Combine(Request.MapPath("/") + src));
                         if(fileInfo.Length > 5000 && fileInfo.Length < 100000) {
-                            imgSrc = src.Replace("/large/", "/thumb150/");
+                            imgSrc = src;
                             break;
                         }
                     }
                 }
                 if (!string.IsNullOrEmpty(imgSrc)) {
                     <div class="col-sm-3">
-                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@Model.Title">
+                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc.Replace("/large/", "/thumb150/")" alt="@Model.Title">
                     </div>
                 }
             }

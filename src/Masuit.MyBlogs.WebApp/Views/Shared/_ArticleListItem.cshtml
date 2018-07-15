@@ -35,14 +35,14 @@
                         var fileInfo = new FileInfo(Path.Combine(Request.MapPath("/") + src));
                         if (fileInfo.Length > 5000&& fileInfo.Length < 100000)
                         {
-                            imgSrc = src.Replace("/large/", "/thumb150/");
+                            imgSrc = src;
                             break;
                         }
                     }
                 }
                 if (!string.IsNullOrEmpty(imgSrc)) {
                     <div class="col-md-3">
-                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@CommonHelper.GetSettings("Title")" title="@CommonHelper.GetSettings("Title")">
+                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc.Replace("/large/", "/thumb150/")" alt="@CommonHelper.GetSettings("Title")" title="@CommonHelper.GetSettings("Title")">
                     </div>
                 }
             }
