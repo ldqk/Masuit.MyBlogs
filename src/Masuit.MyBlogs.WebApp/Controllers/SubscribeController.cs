@@ -82,6 +82,31 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             }
         }
 
+        public ActionResult Cancel()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Cancel(string email)
+        {
+            Broadcast c = BroadcastBll.GetFirstEntity(b => b.Email.Equals(email) && b.Status == Status.Subscribed);
+            if (c != null)
+            {
+                var ts = DateTime.Now.GetTotalMilliseconds();
+                string url = Url.Action("Subscribe", "Subscribe", new
+                {
+                    email,
+                    act = "cancel",
+                    validate = c.ValidateCode,
+                    timespan = ts,
+                    hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"])
+                }, Request.Url.Scheme);
+                BackgroundJob.Enqueue(() => SendMail("取消本站订阅", $"请<a href=\"{url}\">点击这里</a>取消订阅本站更新。", email));
+                return Content("取消订阅的链接已经发送到了您的邮箱，请到您的邮箱内进行取消订阅");
+            }
+            return Content("您输入的邮箱没有订阅本站更新，或者已经取消订阅了");
+        }
         public ActionResult Subscribe(string email, string act, string validate, double timespan, string hash)
         {
             var ts = DateTime.Now.GetTotalMilliseconds();

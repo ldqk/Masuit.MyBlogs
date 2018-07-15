@@ -1299,6 +1299,7 @@
     <Content Include="Views\Post\HistoryVersion.cshtml" />
     <Content Include="Views\Post\CompareVersion.cshtml" />
     <Content Include="Views\Post\HistoryVersion_Admin.cshtml" />
+    <Content Include="Views\Subscribe\Cancel.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
