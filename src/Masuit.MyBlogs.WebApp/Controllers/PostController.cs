@@ -62,17 +62,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             if (post != null)
             {
                 ViewBag.Keyword = post.Keyword + "," + post.Label;
-                string email = Request["email"];
-                if (!string.IsNullOrEmpty(email))
-                {
-                    ViewBag.Email = email;
-                    var com = CommentBll.GetFirstEntityFromL2CacheNoTracking(c => c.Email.Equals(email));
-                    if (com != null)
-                    {
-                        ViewBag.NickName = com.NickName;
-                        ViewBag.QQorWechat = com.QQorWechat;
-                    }
-                }
                 UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
                 DateTime modifyDate = post.ModifyDate;
                 ViewBag.Next = PostBll.GetFirstEntityFromL2CacheNoTracking(p => p.ModifyDate > modifyDate && (p.Status == Status.Pended || user.IsAdmin), p => p.ModifyDate);

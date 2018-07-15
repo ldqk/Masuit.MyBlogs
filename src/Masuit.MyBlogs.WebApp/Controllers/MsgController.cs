@@ -35,17 +35,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         [OutputCache(Duration = 10, VaryByParam = "cid"), Route("msg")]
         public ActionResult Index()
         {
-            string email = Request["email"];
-            if (!string.IsNullOrEmpty(email))
-            {
-                ViewBag.Email = email;
-                var com = LeaveMessageBll.GetFirstEntityFromL2CacheNoTracking(c => c.Email.Equals(email));
-                if (com != null)
-                {
-                    ViewBag.NickName = com.NickName;
-                    ViewBag.QQorWechat = com.QQorWechat;
-                }
-            }
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             ViewBag.TotalCount = LeaveMessageBll.LoadEntitiesNoTracking(m => m.ParentId == 0 && m.Status == Status.Pended).Count();
             if (user.IsAdmin)
@@ -125,31 +114,32 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 {
                     if (!msg2.IsMaster)
                     {
-                        MessageBll.AddEntitySaved(new InternalMessage() { Title = $"来自【{msg2.NickName}】的新留言", Content = msg2.Content, Link = Url.Action("Index", "Msg", new { cid = msg2.Id }, "http") });
+                        MessageBll.AddEntitySaved(new InternalMessage()
+                        {
+                            Title = $"来自【{msg2.NickName}】的新留言",
+                            Content = msg2.Content,
+                            Link = Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Url.Scheme)
+                        });
                     }
 #if !DEBUG
                     if (msg.ParentId == 0)
                     {
                         //新评论，只通知博主
-                        BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客新留言：", content.Replace("{{link}}", Url.Action("Index", "Msg", new { cid = msg2.Id }, "http")), email));
+                        BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客新留言：", content.Replace("{{link}}", Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Url.Scheme)), email));
                     }
                     else
                     {
                         //通知博主和上层所有关联的评论访客
                         var pid = LeaveMessageBll.GetParentMessageIdByChildId(msg2.Id);
-                        var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).ToList();
+                        var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>() { msg2.Email }).ToList();
                         emails.Add(email);
-                        emails = emails.Distinct().Except(new List<string>() { msg2.Email }).ToList();
-                        Parallel.ForEach(emails, e =>
-                        {
-                            string link = Url.Action("Index", "Msg", new { cid = msg2.Id, email = e }, "http");
-                            BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), e));
-                        });
+                        string link = Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Url.Scheme);
+                        BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), string.Join(",", emails)));
                     }
 #endif
                     return ResultData(null, true, "留言发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将会显示到列表中！");
                 }
-                BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客新留言(待审核)：", content.Replace("{{link}}", Url.Action("Index", "Msg", new { cid = msg2.Id }, "http")) + "<p style='color:red;'>(待审核)</p>", email));
+                BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客新留言(待审核)：", content.Replace("{{link}}", Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Url.Scheme)) + "<p style='color:red;'>(待审核)</p>", email));
                 return ResultData(null, true, "留言发表成功，待站长审核通过以后将显示到列表中！");
             }
             return ResultData(null, false, "留言发表失败！");
@@ -167,7 +157,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>() { msg.Email }).ToList();
             Parallel.ForEach(emails, e =>
             {
-                string link = Url.Action("Index", "Msg", new { cid = pid, email = e }, "http");
+                string link = Url.Action("Index", "Msg", new { cid = pid, email = e }, Request.Url.Scheme);
                 BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), e));
             });
 #endif

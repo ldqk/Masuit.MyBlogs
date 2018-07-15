@@ -461,7 +461,7 @@ namespace Common
 
         public static string ReplaceImgSrc(string content)
         {
-            var mc = Regex.Matches(content, "<img.+?src=\"(.+?)\".+?>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            var mc = Regex.Matches(content, "<img.+?src=\"(.+?)\".+?>", RegexOptions.Multiline);
             foreach (Match m in mc)
             {
                 var src = m.Groups[1].Value;

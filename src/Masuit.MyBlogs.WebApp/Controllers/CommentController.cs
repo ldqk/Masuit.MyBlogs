@@ -10,7 +10,6 @@ using Common;
 using Hangfire;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
-using Masuit.Tools;
 using Masuit.Tools.Html;
 using Masuit.Tools.Net;
 using Models.DTO;
@@ -69,31 +68,48 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 {
                     if (!com.IsMaster)
                     {
-                        MessageBll.AddEntitySaved(new InternalMessage() { Title = $"来自【{com.NickName}】的新文章评论", Content = com.Content, Link = Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, "http") + "#comment" });
+                        MessageBll.AddEntitySaved(new InternalMessage()
+                        {
+                            Title = $"来自【{com.NickName}】的新文章评论",
+                            Content = com.Content,
+                            Link = Url.Action("Details", "Post", new
+                            {
+                                id = com.PostId,
+                                cid = com.Id
+                            }, Request.Url.Scheme) + "#comment"
+                        });
                     }
 #if !DEBUG
                     if (com.ParentId == 0)
                     {
                         emails.Add(PostBll.GetById(com.PostId).Email);
                         //新评论，只通知博主和楼主
-                        BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, "http") + "#comment"), string.Join(",", emails.Distinct())));
+                        BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new
+                        {
+                            id = com.PostId,
+                            cid = com.Id
+                        }, Request.Url.Scheme) + "#comment"), string.Join(",", emails.Distinct())));
                     }
                     else
                     {
                         //通知博主和上层所有关联的评论访客
                         var pid = CommentBll.GetParentCommentIdByChildId(com.Id);
-                        emails = CommentBll.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).ToList();
-                        emails = emails.Distinct().Except(new List<string>() { com.Email }).ToList();
-                        Parallel.ForEach(emails, e =>
+                        emails.AddRange(CommentBll.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>() { com.Email }));
+                        string link = Url.Action("Details", "Post", new
                         {
-                            string link = Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id, email = e }, "http") + "#comment";
-                            BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")}文章评论回复：", content.Replace("{{link}}", link), e));
-                        });
+                            id = com.PostId,
+                            cid = com.Id
+                        }, Request.Url.Scheme) + "#comment";
+                        BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")}文章评论回复：", content.Replace("{{link}}", link), string.Join(",", emails)));
                     }
 #endif
                     return ResultData(null, true, "评论发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将显示到评论列表中");
                 }
-                BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, "http") + "#comment") + "<p style='color:red;'>(待审核)</p>", string.Join(",", emails.Distinct())));
+                BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new
+                {
+                    id = com.PostId,
+                    cid = com.Id
+                }, Request.Url.Scheme) + "#comment") + "<p style='color:red;'>(待审核)</p>", string.Join(",", emails.Distinct())));
                 return ResultData(null, true, "评论成功，待站长审核通过以后将显示");
             }
             return ResultData(null, false, "评论失败");
@@ -190,7 +206,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var emails = CommentBll.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>() { comment.Email }).ToList();
             Parallel.ForEach(emails, e =>
             {
-                string link = Url.Action("Details", "Post", new { id = comment.PostId, cid = pid, email = e }, "http") + "#comment";
+                string link = Url.Action("Details", "Post", new { id = comment.PostId, cid = pid, email = e }, Request.Url.Scheme) + "#comment";
                 BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")}文章评论回复：", content.Replace("{{link}}", link), e));
             });
 #endif
