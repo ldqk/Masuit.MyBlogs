@@ -145,6 +145,10 @@ namespace Common
         public static (string, bool) UploadImage(string file)
         {
             string ext = Path.GetExtension(file);
+            if (!File.Exists(file))
+            {
+                return ("", false);
+            }
             if (new FileInfo(file).Length > 5 * 1024 * 1024)
             {
                 if (ext.Equals(".jpg", StringComparison.InvariantCultureIgnoreCase))
