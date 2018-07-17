@@ -15,6 +15,7 @@ using Masuit.Tools.Models;
 #endif
 using Masuit.Tools.Net;
 using Masuit.Tools.NoSQL;
+using Masuit.Tools.Security;
 using Models.Application;
 using Newtonsoft.Json.Linq;
 
@@ -167,7 +168,7 @@ namespace Common
                 return ("", false);
             }
 
-            string[] apis = { "https://zs.mtkan.cc/upload.php", "https://tu.zsczys.com/upload.php", "https://api.yum6.cn/sinaimg.php?type=multipart", "http://180.165.190.225:672/v1/upload" };
+            string[] apis = { "https://zs.mtkan.cc/upload.php", "https://tu.zsczys.com/Zs_UP.php?type=multipart", "https://api.yum6.cn/sinaimg.php?type=multipart", "http://180.165.190.225:672/v1/upload" };
             int index = 0;
             string url = String.Empty;
             bool success = false;
@@ -176,11 +177,16 @@ namespace Common
                 using (HttpClient httpClient = new HttpClient())
                 {
                     httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+                    httpClient.DefaultRequestHeaders.Referrer = new Uri(apis[i]);
                     using (var stream = File.OpenRead(file))
                     {
                         using (var bc = new StreamContent(stream))
                         {
-                            bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "1" + ext, Name = "file" };
+                            bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                            {
+                                FileName = "".MDString() + ext,
+                                Name = "file"
+                            };
                             using (var content = new MultipartFormDataContent { bc })
                             {
                                 var code = httpClient.PostAsync(apis[index], content).ContinueWith(t =>
@@ -195,39 +201,55 @@ namespace Common
                                     var res = t.Result;
                                     if (res.IsSuccessStatusCode)
                                     {
-                                        string s = res.Content.ReadAsStringAsync().Result;
-                                        var token = JObject.Parse(s);
-                                        switch (index)
+                                        try
                                         {
-                                            case 0:
-                                            case 1:
-                                                s = (string)token["original_pic"];
-                                                if (!s.Contains("Array.jpg"))
-                                                {
-                                                    url = s;
-                                                    return 1;
-                                                }
+                                            string s = res.Content.ReadAsStringAsync().Result;
+                                            var token = JObject.Parse(s);
+                                            switch (index)
+                                            {
+                                                case 0:
+                                                    s = (string)token["original_pic"];
+                                                    if (!s.Contains("Array.jpg"))
+                                                    {
+                                                        url = s;
+                                                        return 1;
+                                                    }
 
-                                                return 2;
-                                            case 2:
-                                                s = (string)token["code"];
-                                                if (s.Equals("200"))
-                                                {
-                                                    url = (string)token["url"];
-                                                    return 1;
-                                                }
-
-                                                return 2;
-                                            case 3:
-                                                try
-                                                {
-                                                    url = "https://wx2.sinaimg.cn/large/" + token["wbpid"] + "." + token["type"];
-                                                    return 1;
-                                                }
-                                                catch
-                                                {
                                                     return 2;
-                                                }
+                                                case 1:
+                                                    s = (string)token["code"];
+                                                    if (s.Equals("200"))
+                                                    {
+                                                        url = (string)token["pid"];
+                                                        return 1;
+                                                    }
+
+                                                    return 2;
+                                                case 2:
+                                                    s = (string)token["code"];
+                                                    if (s.Equals("200"))
+                                                    {
+                                                        url = ((string)token["url"]).Replace("thumb150", "large");
+                                                        return 1;
+                                                    }
+
+                                                    return 2;
+                                                case 3:
+                                                    try
+                                                    {
+                                                        url = "https://wx2.sinaimg.cn/large/" + token["wbpid"] + "." + token["type"];
+                                                        return 1;
+                                                    }
+                                                    catch
+                                                    {
+                                                        return 2;
+                                                    }
+                                            }
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            Console.WriteLine(e.Message);
+                                            return 2;
                                         }
                                     }
 
