@@ -193,9 +193,45 @@ namespace DAL
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual IQueryable<T> GetAll<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
+        public virtual IOrderedQueryable<T> GetAll<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return isAsc ? DataContext.Set<T>().OrderBy(orderby) : DataContext.Set<T>().OrderByDescending(orderby);
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IOrderedQueryable<T> GetAll<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            IOrderedQueryable<T> query;
+            if (isAsc)
+            {
+                query = DataContext.Set<T>().OrderBy(@orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenBy(e);
+                    }
+                }
+            }
+            else
+            {
+                query = DataContext.Set<T>().OrderByDescending(@orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenByDescending(e);
+                    }
+                }
+            }
+            return query;
         }
 
         /// <summary>
@@ -216,11 +252,61 @@ namespace DAL
         /// <typeparam name="TS">排序</typeparam>
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IOrderedQueryable<T> GetAllNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            IOrderedQueryable<T> query;
+            if (isAsc)
+            {
+                query = DataContext.Set<T>().AsNoTracking().OrderBy(@orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenBy(e);
+                    }
+                }
+            }
+            else
+            {
+                query = DataContext.Set<T>().AsNoTracking().OrderByDescending(@orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenByDescending(e);
+                    }
+                }
+            }
+            return query;
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
         /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetAllFromCache<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20)
         {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : DataContext.Set<T>().OrderByDescending(orderby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+            return GetAll(orderby, isAsc).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<T> GetAllFromCache<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby)
+        {
+            return GetAll(orderby, isAsc, thenby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
         /// <summary>
@@ -233,7 +319,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual async Task<IEnumerable<T>> GetAllFromCacheAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20)
         {
-            return isAsc ? await DataContext.Set<T>().OrderBy(orderby).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true) : await DataContext.Set<T>().OrderByDescending(orderby).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+            return await GetAll(orderby, isAsc).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IEnumerable<T>> GetAllFromCacheAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await GetAll(orderby, isAsc, thenby).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -246,7 +346,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetAllFromCacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20)
         {
-            return isAsc ? DataContext.Set<T>().AsNoTracking().OrderBy(orderby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : DataContext.Set<T>().AsNoTracking().OrderByDescending(orderby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+            return GetAllNoTracking(orderby, isAsc).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<T> GetAllFromCacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby)
+        {
+            return GetAllNoTracking(orderby, isAsc, thenby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
         /// <summary>
@@ -259,7 +373,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual async Task<IEnumerable<T>> GetAllFromCacheNoTrackingAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20)
         {
-            return isAsc ? await DataContext.Set<T>().AsNoTracking().OrderBy(orderby).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true) : await DataContext.Set<T>().AsNoTracking().OrderByDescending(orderby).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+            return await GetAllNoTracking(orderby, isAsc).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IEnumerable<T>> GetAllFromCacheNoTrackingAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await GetAllNoTracking(orderby, isAsc, thenby).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -271,7 +399,20 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetAllFromL2Cache<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).Cacheable() : DataContext.Set<T>().OrderByDescending(orderby).Cacheable();
+            return GetAll(orderby, isAsc).Cacheable();
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<T> GetAllFromL2Cache<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return GetAll(orderby, isAsc, thenby).Cacheable();
         }
 
         /// <summary>
@@ -283,7 +424,20 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetAllFromL2CacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().AsNoTracking().OrderBy(orderby).Cacheable() : DataContext.Set<T>().AsNoTracking().OrderByDescending(orderby).Cacheable();
+            return GetAllNoTracking(orderby, isAsc).Cacheable();
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<T> GetAllFromL2CacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return GetAllNoTracking(orderby, isAsc, thenby).Cacheable();
         }
 
         /// <summary>
@@ -296,7 +450,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<TDto> GetAll<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).ProjectToQueryable<TDto>() : DataContext.Set<T>().OrderByDescending(orderby).ProjectToQueryable<TDto>();
+            return GetAll(orderby, isAsc).ProjectToQueryable<TDto>();
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IQueryable<TDto> GetAll<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return GetAll(orderby, isAsc, thenby).ProjectToQueryable<TDto>();
         }
 
         /// <summary>
@@ -309,7 +477,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<TDto> GetAllNoTracking<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().AsNoTracking().OrderBy(orderby).ProjectToQueryable<TDto>() : DataContext.Set<T>().AsNoTracking().OrderByDescending(orderby).ProjectToQueryable<TDto>();
+            return GetAllNoTracking(orderby, isAsc).ProjectToQueryable<TDto>();
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IQueryable<TDto> GetAllNoTracking<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return GetAllNoTracking(orderby, isAsc, thenby).ProjectToQueryable<TDto>();
         }
 
         /// <summary>
@@ -323,7 +505,22 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20) where TDto : class
         {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : DataContext.Set<T>().OrderByDescending(orderby).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+            return GetAll<TS, TDto>(orderby, isAsc).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return GetAll<TS, TDto>(orderby, isAsc, thenby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
         /// <summary>
@@ -337,7 +534,22 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual async Task<IEnumerable<TDto>> GetAllFromCacheAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20) where TDto : class
         {
-            return isAsc ? await DataContext.Set<T>().OrderBy(orderby).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true) : await DataContext.Set<T>().OrderByDescending(orderby).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+            return await GetAll<TS, TDto>(orderby, isAsc).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IEnumerable<TDto>> GetAllFromCacheAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return await GetAll<TS, TDto>(orderby, isAsc, thenby).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -351,7 +563,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetAllFromCacheNoTracking<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20) where TDto : class
         {
-            return isAsc ? DataContext.Set<T>().AsNoTracking().OrderBy(orderby).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : DataContext.Set<T>().AsNoTracking().OrderByDescending(orderby).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+            return GetAllNoTracking<TS, TDto>(orderby, isAsc).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> GetAllFromCacheNoTracking<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return GetAllNoTracking<TS, TDto>(orderby, isAsc, thenby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
         /// <summary>
@@ -365,7 +591,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual async Task<IEnumerable<TDto>> GetAllFromCacheNoTrackingAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20) where TDto : class
         {
-            return isAsc ? await DataContext.Set<T>().AsNoTracking().OrderBy(orderby).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true) : await DataContext.Set<T>().AsNoTracking().OrderByDescending(orderby).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+            return await GetAllNoTracking(orderby, isAsc).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IEnumerable<TDto>> GetAllFromCacheNoTrackingAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return await GetAllNoTracking(orderby, isAsc, thenby).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -378,7 +618,20 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetAllFromL2Cache<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).ProjectToQueryable<TDto>().Cacheable() : DataContext.Set<T>().OrderByDescending(orderby).ProjectToQueryable<TDto>().Cacheable();
+            return GetAll(orderby, isAsc).ProjectToQueryable<TDto>().Cacheable();
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> GetAllFromL2Cache<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return GetAll(orderby, isAsc, thenby).ProjectToQueryable<TDto>().Cacheable();
         }
 
         /// <summary>
@@ -391,7 +644,20 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetAllFromL2CacheNoTracking<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return isAsc ? DataContext.Set<T>().AsNoTracking().OrderBy(orderby).ProjectToQueryable<TDto>().Cacheable() : DataContext.Set<T>().AsNoTracking().OrderByDescending(orderby).ProjectToQueryable<TDto>().Cacheable();
+            return GetAllNoTracking(orderby, isAsc).ProjectToQueryable<TDto>().Cacheable();
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> GetAllFromL2CacheNoTracking<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return GetAllNoTracking(orderby, isAsc, thenby).ProjectToQueryable<TDto>().Cacheable();
         }
 
         /// <summary>
@@ -418,6 +684,42 @@ namespace DAL
         }
 
         /// <summary>
+        /// 基本查询方法，获取一个集合
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IOrderedQueryable<T> LoadEntities<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            IOrderedQueryable<T> query;
+            if (isAsc)
+            {
+                query = DataContext.Set<T>().Where(@where).OrderBy(orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenBy(e);
+                    }
+                }
+            }
+            else
+            {
+                query = DataContext.Set<T>().Where(@where).OrderByDescending(orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenByDescending(e);
+                    }
+                }
+            }
+            return query;
+        }
+
+        /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -439,7 +741,22 @@ namespace DAL
         /// <returns></returns>
         public virtual IQueryable<TDto> LoadEntities<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().Where(@where).OrderBy(orderby).ProjectToQueryable<TDto>() : DataContext.Set<T>().Where(@where).OrderByDescending(orderby).ProjectToQueryable<TDto>();
+            return LoadEntities(where, orderby, isAsc).ProjectToQueryable<TDto>();
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        /// <returns></returns>
+        public virtual IQueryable<TDto> LoadEntities<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadEntities(where, orderby, isAsc, thenby).ProjectToQueryable<TDto>();
         }
 
         /// <summary>
@@ -464,7 +781,21 @@ namespace DAL
         /// <returns></returns>
         public virtual IEnumerable<T> LoadEntitiesFromCache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30)
         {
-            return isAsc ? DataContext.Set<T>().Where(@where).OrderBy(orderby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : DataContext.Set<T>().Where(@where).OrderByDescending(orderby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+            return LoadEntities(where, orderby, isAsc).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从缓存读取
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns></returns>
+        public virtual IEnumerable<T> LoadEntitiesFromCache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadEntities(where, orderby, isAsc, thenby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
         /// <summary>
@@ -490,7 +821,22 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> LoadEntitiesFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30) where TDto : class
         {
-            return isAsc ? DataContext.Set<T>().Where(@where).OrderBy(orderby).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : DataContext.Set<T>().Where(@where).OrderByDescending(orderby).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+            return LoadEntities(where, orderby, isAsc).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> LoadEntitiesFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return LoadEntities(where, orderby, isAsc, thenby).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
         /// <summary>
@@ -513,7 +859,20 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> LoadEntitiesFromL2Cache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().Where(@where).OrderBy(orderby).Cacheable() : DataContext.Set<T>().Where(@where).OrderByDescending(orderby).Cacheable();
+            return LoadEntities(where, orderby, isAsc).Cacheable();
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从二级缓存读取
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<T> LoadEntitiesFromL2Cache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadEntities(where, orderby, isAsc, thenby).Cacheable();
         }
 
         /// <summary>
@@ -537,7 +896,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> LoadEntitiesFromL2Cache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().Where(@where).OrderBy(orderby).Cacheable().ProjectToQueryable<TDto>() : DataContext.Set<T>().Where(@where).OrderByDescending(orderby).Cacheable().ProjectToQueryable<TDto>();
+            return LoadEntities(where, orderby, isAsc).Cacheable().ProjectToQueryable<TDto>();
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> LoadEntitiesFromL2Cache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadEntities(where, orderby, isAsc, thenby).Cacheable().ProjectToQueryable<TDto>();
         }
 
         /// <summary>
@@ -566,6 +939,45 @@ namespace DAL
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合(异步)
         /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IOrderedQueryable<T>> LoadEntitiesAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await Task.Run(() =>
+            {
+                IOrderedQueryable<T> query;
+                if (isAsc)
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderBy(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenBy(e);
+                        }
+                    }
+                }
+                else
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderByDescending(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenByDescending(e);
+                        }
+                    }
+                }
+                return query;
+            }).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合(异步)
+        /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>还未执行的SQL语句</returns>
         public virtual async Task<IQueryable<TDto>> LoadEntitiesAsync<TDto>(Expression<Func<T, bool>> @where)
@@ -585,6 +997,46 @@ namespace DAL
         public virtual async Task<IQueryable<TDto>> LoadEntitiesAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return await Task.Run(() => isAsc ? WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderBy(orderby).ProjectToQueryable<TDto>() : WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderByDescending(orderby).ProjectToQueryable<TDto>()).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合(异步)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IQueryable<TDto>> LoadEntitiesAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await Task.Run(() =>
+            {
+                IOrderedQueryable<T> query;
+                if (isAsc)
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderBy(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenBy(e);
+                        }
+                    }
+                }
+                else
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderByDescending(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenByDescending(e);
+                        }
+                    }
+                }
+                return query.ProjectToQueryable<TDto>();
+            }).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -609,7 +1061,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual async Task<IEnumerable<T>> LoadEntitiesFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30)
         {
-            return isAsc ? await DataContext.Set<T>().Where(where).OrderBy(orderby).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true) : await DataContext.Set<T>().Where(where).OrderByDescending(orderby).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+            return await LoadEntities(where, orderby, isAsc).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从缓存读取(异步)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IEnumerable<T>> LoadEntitiesFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await LoadEntities(where, orderby, isAsc, thenby).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -635,7 +1101,22 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual async Task<IEnumerable<TDto>> LoadEntitiesFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30) where TDto : class
         {
-            return isAsc ? await DataContext.Set<T>().Where(@where).OrderBy(orderby).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true) : await DataContext.Set<T>().Where(@where).OrderByDescending(orderby).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+            return await LoadEntities(where, orderby, isAsc).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取(异步)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IEnumerable<TDto>> LoadEntitiesFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return await LoadEntities(where, orderby, isAsc, thenby).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -659,6 +1140,45 @@ namespace DAL
         public virtual async Task<EFCachedQueryable<T>> LoadEntitiesFromL2CacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return await Task.Run(() => isAsc ? WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderBy(orderby).Cacheable() : WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderByDescending(orderby).Cacheable()).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从二级缓存读取(异步)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<EFCachedQueryable<T>> LoadEntitiesFromL2CacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await Task.Run(() =>
+            {
+                IOrderedQueryable<T> query;
+                if (isAsc)
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderBy(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenBy(e);
+                        }
+                    }
+                }
+                else
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderByDescending(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenByDescending(e);
+                        }
+                    }
+                }
+                return query.Cacheable();
+            }).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -686,6 +1206,46 @@ namespace DAL
         }
 
         /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(异步)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<EFCachedQueryable<TDto>> LoadEntitiesFromL2CacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await Task.Run(() =>
+            {
+                IOrderedQueryable<T> query;
+                if (isAsc)
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderBy(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenBy(e);
+                        }
+                    }
+                }
+                else
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderByDescending(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenByDescending(e);
+                        }
+                    }
+                }
+                return query.ProjectToQueryable<TDto>().Cacheable();
+            }).ConfigureAwait(true);
+        }
+
+        /// <summary>
         /// 基本查询方法，获取一个集合（不跟踪实体）
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -709,6 +1269,42 @@ namespace DAL
         }
 
         /// <summary>
+        /// 基本查询方法，获取一个集合（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IOrderedQueryable<T> LoadEntitiesNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            IOrderedQueryable<T> query;
+            if (isAsc)
+            {
+                query = DataContext.Set<T>().Where(@where).AsNoTracking().OrderBy(orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenBy(e);
+                    }
+                }
+            }
+            else
+            {
+                query = DataContext.Set<T>().Where(@where).AsNoTracking().OrderByDescending(orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenByDescending(e);
+                    }
+                }
+            }
+            return query;
+        }
+
+        /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合（不跟踪实体）
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -729,7 +1325,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<TDto> LoadEntitiesNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().Where(@where).OrderBy(orderby).AsNoTracking().ProjectToQueryable<TDto>() : DataContext.Set<T>().Where(@where).OrderByDescending(orderby).AsNoTracking().ProjectToQueryable<TDto>();
+            return LoadEntitiesNoTracking(where, orderby, isAsc).ProjectToQueryable<TDto>();
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IQueryable<TDto> LoadEntitiesNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadEntitiesNoTracking(where, orderby, isAsc, thenby).ProjectToQueryable<TDto>();
         }
 
         /// <summary>
@@ -754,7 +1364,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> LoadEntitiesFromCacheNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30)
         {
-            return isAsc ? DataContext.Set<T>().Where(@where).OrderBy(orderby).AsNoTracking().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : DataContext.Set<T>().Where(@where).AsNoTracking().OrderByDescending(orderby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+            return LoadEntitiesNoTracking(where, orderby, isAsc).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从缓存读取(不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<T> LoadEntitiesFromCacheNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadEntitiesNoTracking(where, orderby, isAsc, thenby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
         /// <summary>
@@ -780,7 +1404,22 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> LoadEntitiesFromCacheNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30) where TDto : class
         {
-            return isAsc ? DataContext.Set<T>().Where(@where).OrderBy(orderby).AsNoTracking().ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : DataContext.Set<T>().Where(@where).OrderByDescending(orderby).AsNoTracking().ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+            return LoadEntitiesNoTracking(where, orderby, isAsc).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取(不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> LoadEntitiesFromCacheNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return LoadEntitiesNoTracking(where, orderby, isAsc, thenby).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
         /// <summary>
@@ -803,7 +1442,20 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> LoadEntitiesFromL2CacheNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().Where(@where).OrderBy(orderby).AsNoTracking().Cacheable() : DataContext.Set<T>().Where(@where).OrderByDescending(orderby).AsNoTracking().Cacheable();
+            return LoadEntitiesNoTracking(where, orderby, isAsc).Cacheable();
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从二级缓存读取(不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<T> LoadEntitiesFromL2CacheNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadEntitiesNoTracking(where, orderby, isAsc, thenby).Cacheable();
         }
 
         /// <summary>
@@ -827,7 +1479,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> LoadEntitiesFromL2CacheNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().Where(@where).OrderBy(orderby).AsNoTracking().Cacheable().ProjectToQueryable<TDto>() : DataContext.Set<T>().Where(@where).OrderByDescending(orderby).AsNoTracking().Cacheable().ProjectToQueryable<TDto>();
+            return LoadEntitiesNoTracking(where, orderby, isAsc).Cacheable().ProjectToQueryable<TDto>();
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> LoadEntitiesFromL2CacheNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadEntitiesNoTracking(where, orderby, isAsc, thenby).Cacheable().ProjectToQueryable<TDto>();
         }
 
         /// <summary>
@@ -851,6 +1517,45 @@ namespace DAL
         public virtual async Task<IQueryable<T>> LoadEntitiesNoTrackingAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return await Task.Run(() => isAsc ? WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderBy(orderby).AsNoTracking() : WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderByDescending(orderby).AsNoTracking()).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合（异步，不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IQueryable<T>> LoadEntitiesNoTrackingAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await Task.Run(() =>
+            {
+                IOrderedQueryable<T> query;
+                if (isAsc)
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).AsNoTracking().OrderBy(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenBy(e);
+                        }
+                    }
+                }
+                else
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).AsNoTracking().OrderByDescending(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenByDescending(e);
+                        }
+                    }
+                }
+                return query;
+            }).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -878,6 +1583,46 @@ namespace DAL
         }
 
         /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合（异步，不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IQueryable<TDto>> LoadEntitiesNoTrackingAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await Task.Run(() =>
+            {
+                IOrderedQueryable<T> query;
+                if (isAsc)
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).AsNoTracking().OrderBy(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenBy(e);
+                        }
+                    }
+                }
+                else
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).AsNoTracking().OrderByDescending(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenByDescending(e);
+                        }
+                    }
+                }
+                return query.ProjectToQueryable<TDto>();
+            }).ConfigureAwait(true);
+        }
+
+        /// <summary>
         ///  基本查询方法，获取一个集合，优先从缓存读取(异步，不跟踪实体)
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -899,7 +1644,21 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual async Task<IEnumerable<T>> LoadEntitiesFromCacheNoTrackingAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30)
         {
-            return isAsc ? await DataContext.Set<T>().Where(@where).OrderBy(orderby).AsNoTracking().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true) : await DataContext.Set<T>().Where(@where).OrderByDescending(orderby).AsNoTracking().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+            return await LoadEntitiesNoTracking(where, orderby, isAsc).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从缓存读取(异步，不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IEnumerable<T>> LoadEntitiesFromCacheNoTrackingAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await LoadEntitiesNoTracking(where, orderby, isAsc, thenby).FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -925,7 +1684,22 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual async Task<IEnumerable<TDto>> LoadEntitiesFromCacheNoTrackingAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30) where TDto : class
         {
-            return isAsc ? await DataContext.Set<T>().Where(@where).OrderBy(orderby).AsNoTracking().ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true) : await DataContext.Set<T>().Where(@where).OrderByDescending(orderby).AsNoTracking().ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+            return await LoadEntitiesNoTracking(where, orderby, isAsc).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取(异步，不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<IEnumerable<TDto>> LoadEntitiesFromCacheNoTrackingAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return await LoadEntitiesNoTracking(where, orderby, isAsc, thenby).ProjectToQueryable<TDto>().FromCacheAsync(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -952,6 +1726,45 @@ namespace DAL
         }
 
         /// <summary>
+        /// 基本查询方法，获取一个集合，优先从二级缓存读取(异步，不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<EFCachedQueryable<T>> LoadEntitiesFromL2CacheNoTrackingAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await Task.Run(() =>
+            {
+                IOrderedQueryable<T> query;
+                if (isAsc)
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).AsNoTracking().OrderBy(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenBy(e);
+                        }
+                    }
+                }
+                else
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).AsNoTracking().OrderByDescending(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenByDescending(e);
+                        }
+                    }
+                }
+                return query.Cacheable();
+            }).ConfigureAwait(true);
+        }
+
+        /// <summary>
         ///  基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(异步，不跟踪实体)
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -973,6 +1786,46 @@ namespace DAL
         public virtual async Task<EFCachedQueryable<TDto>> LoadEntitiesFromL2CacheNoTrackingAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return await Task.Run(() => isAsc ? WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderBy(orderby).AsNoTracking().ProjectToQueryable<TDto>().Cacheable() : WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).OrderByDescending(orderby).AsNoTracking().ProjectToQueryable<TDto>().Cacheable()).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(异步，不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual async Task<EFCachedQueryable<TDto>> LoadEntitiesFromL2CacheNoTrackingAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return await Task.Run(() =>
+            {
+                IOrderedQueryable<T> query;
+                if (isAsc)
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).AsNoTracking().OrderBy(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenBy(e);
+                        }
+                    }
+                }
+                else
+                {
+                    query = WebExtension.GetDbContext<DataContext>().Set<T>().Where(@where).AsNoTracking().OrderByDescending(@orderby);
+                    if (thenby.Length > 0)
+                    {
+                        foreach (var e in thenby)
+                        {
+                            query = query.ThenByDescending(e);
+                        }
+                    }
+                }
+                return query.ProjectToQueryable<TDto>().Cacheable();
+            }).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -1605,6 +2458,56 @@ namespace DAL
             return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize) : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize);
         }
 
+        /// <summary>
+        /// 高效分页查询方法
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IQueryable<T> LoadPageEntities<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, params Expression<Func<T, TS>>[] thenby)
+        {
+            var temp = DataContext.Set<T>().Where(where);
+            totalCount = temp.Count();
+            if (pageIndex * pageSize > totalCount)
+            {
+                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
+            }
+
+            if (pageIndex <= 0)
+            {
+                pageIndex = 1;
+            }
+
+            IOrderedQueryable<T> query;
+            if (isAsc)
+            {
+                query = temp.OrderBy(orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenBy(e);
+                    }
+                }
+            }
+            else
+            {
+                query = temp.OrderByDescending(orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenByDescending(e);
+                    }
+                }
+            }
+            return query.Skip(pageSize * (pageIndex - 1)).Take(pageSize);
+        }
 
         /// <summary>
         /// 高效分页查询方法，取出被AutoMapper映射后的数据集合
@@ -1620,19 +2523,24 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<TDto> LoadPageEntities<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc)
         {
-            var temp = DataContext.Set<T>().Where(where);
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
+            return LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectToQueryable<TDto>();
+        }
 
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>() : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>();
+        /// <summary>
+        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IQueryable<TDto> LoadPageEntities<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc, thenby).ProjectToQueryable<TDto>();
         }
 
         /// <summary>
@@ -1649,21 +2557,25 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> LoadPageEntitiesFromCache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, int timespan = 30)
         {
-            var temp = DataContext.Set<T>().Where(where);
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
-
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+            return LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
+        /// <summary>
+        /// 高效分页查询方法，优先从缓存读取
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<T> LoadPageEntitiesFromCache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, int timespan = 30, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc, thenby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
 
         /// <summary>
         /// 高效分页查询方法，优先从缓存读取，取出被AutoMapper映射后的数据集合
@@ -1680,19 +2592,25 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> LoadPageEntitiesFromCache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, int timespan = 30) where TDto : class
         {
-            var temp = DataContext.Set<T>().Where(where);
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
+            return LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
 
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        /// <summary>
+        /// 高效分页查询方法，优先从缓存读取，取出被AutoMapper映射后的数据集合
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> LoadPageEntitiesFromCache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc, thenby).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
         /// <summary>
@@ -1708,19 +2626,23 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> LoadPageEntitiesFromL2Cache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
         {
-            var temp = DataContext.Set<T>().Where(where);
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
+            return LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc).Cacheable();
+        }
 
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).Cacheable() : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).Cacheable();
+        /// <summary>
+        /// 高效分页查询方法，优先从二级缓存读取
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<T> LoadPageEntitiesFromL2Cache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc, thenby).Cacheable();
         }
 
         /// <summary>
@@ -1737,19 +2659,24 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
         {
-            var temp = DataContext.Set<T>().Where(where);
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
+            return LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectToQueryable<TDto>().Cacheable();
+        }
 
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>().Cacheable() : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>().Cacheable();
+        /// <summary>
+        /// 高效分页查询方法，优先从二级缓存读取，取出被AutoMapper映射后的数据集合
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc, thenby).ProjectToQueryable<TDto>().Cacheable();
         }
 
         /// <summary>
@@ -1781,6 +2708,56 @@ namespace DAL
         }
 
         /// <summary>
+        /// 高效分页查询方法（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IQueryable<T> LoadPageEntitiesNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
+            totalCount = temp.Count();
+            if (pageIndex * pageSize > totalCount)
+            {
+                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
+            }
+
+            if (pageIndex <= 0)
+            {
+                pageIndex = 1;
+            }
+            IOrderedQueryable<T> query;
+            if (isAsc)
+            {
+                query = temp.OrderBy(orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenBy(e);
+                    }
+                }
+            }
+            else
+            {
+                query = temp.OrderByDescending(orderby);
+                if (thenby.Length > 0)
+                {
+                    foreach (var e in thenby)
+                    {
+                        query = query.ThenByDescending(e);
+                    }
+                }
+            }
+            return query.Skip(pageSize * (pageIndex - 1)).Take(pageSize);
+        }
+
+        /// <summary>
         /// 高效分页查询方法，取出被AutoMapper映射后的数据集合（不跟踪实体）
         /// </summary>
         /// <typeparam name="TS"></typeparam>
@@ -1794,19 +2771,24 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<TDto> LoadPageEntitiesNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectToQueryable<TDto>();
+        }
 
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>() : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>();
+        /// <summary>
+        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IQueryable<TDto> LoadPageEntitiesNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc, thenby).ProjectToQueryable<TDto>();
         }
 
         /// <summary>
@@ -1823,19 +2805,26 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> LoadPageEntitiesFromCacheNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30)
         {
-            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
 
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
 
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        /// <summary>
+        /// 高效分页查询方法，优先从缓存读取（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<T> LoadPageEntitiesFromCacheNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby)
+        {
+
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc, thenby).FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
         /// <summary>
@@ -1853,19 +2842,25 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> LoadPageEntitiesFromCacheNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30) where TDto : class
         {
-            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        }
 
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan))) : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
+        /// <summary>
+        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合，优先从缓存读取（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> LoadPageEntitiesFromCacheNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class
+        {
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc, thenby).ProjectToQueryable<TDto>().FromCache(CachePolicy.WithDurationExpiration(TimeSpan.FromSeconds(timespan)));
         }
 
         /// <summary>
@@ -1881,19 +2876,23 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> LoadPageEntitiesFromL2CacheNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).Cacheable();
+        }
 
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).Cacheable() : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).Cacheable();
+        /// <summary>
+        /// 高效分页查询方法，优先从缓存读取（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<T> LoadPageEntitiesFromL2CacheNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc, thenby).Cacheable();
         }
 
         /// <summary>
@@ -1910,19 +2909,24 @@ namespace DAL
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> LoadPageEntitiesFromL2CacheNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectToQueryable<TDto>().Cacheable();
+        }
 
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>().Cacheable() : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize).ProjectToQueryable<TDto>().Cacheable();
+        /// <summary>
+        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合，优先从缓存读取（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual IEnumerable<TDto> LoadPageEntitiesFromL2CacheNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby)
+        {
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc, thenby).ProjectToQueryable<TDto>().Cacheable();
         }
 
         /// <summary>
@@ -2074,6 +3078,16 @@ namespace DAL
         public virtual bool Any(Expression<Func<T, bool>> @where)
         {
             return DataContext.Set<T>().Any(where);
+        }
+
+        /// <summary>
+        /// 符合条件的个数
+        /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <returns>是否存在</returns>
+        public virtual int Count(Expression<Func<T, bool>> @where)
+        {
+            return DataContext.Set<T>().Count(where);
         }
 
         /// <summary>

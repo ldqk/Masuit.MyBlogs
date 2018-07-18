@@ -17,6 +17,7 @@ namespace IBLL
         /// </summary>
         /// <returns>还未执行的SQL语句</returns>
         IQueryable<T> GetAll();
+
         /// <summary>
         /// 获取所有实体（不跟踪）
         /// </summary>
@@ -36,6 +37,7 @@ namespace IBLL
         /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
         IEnumerable<T> GetAllFromCacheNoTracking(int timespan = 20);
+
         /// <summary>
         /// 获取所有实体（不跟踪）
         /// </summary>
@@ -127,7 +129,17 @@ namespace IBLL
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IQueryable<T> GetAll<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true);
+        IOrderedQueryable<T> GetAll<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IOrderedQueryable<T> GetAll<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 获取所有实体
@@ -136,7 +148,17 @@ namespace IBLL
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IQueryable<T> GetAllNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true);
+        IOrderedQueryable<T> GetAllNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IOrderedQueryable<T> GetAllNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 获取所有实体
@@ -155,8 +177,30 @@ namespace IBLL
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<T> GetAllFromCache<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby);
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
         Task<IEnumerable<T>> GetAllFromCacheAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20);
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IEnumerable<T>> GetAllFromCacheAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 获取所有实体
@@ -175,8 +219,30 @@ namespace IBLL
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<T> GetAllFromCacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby);
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
         Task<IEnumerable<T>> GetAllFromCacheNoTrackingAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20);
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IEnumerable<T>> GetAllFromCacheNoTrackingAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 获取所有实体
@@ -193,8 +259,28 @@ namespace IBLL
         /// <typeparam name="TS">排序</typeparam>
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<T> GetAllFromL2Cache<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
         IEnumerable<T> GetAllFromL2CacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<T> GetAllFromL2CacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 获取所有实体
@@ -213,8 +299,30 @@ namespace IBLL
         /// <typeparam name="TDto">映射实体</typeparam>
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IQueryable<TDto> GetAll<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
         IQueryable<TDto> GetAllNoTracking<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IQueryable<TDto> GetAllNoTracking<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 获取所有实体
@@ -235,8 +343,32 @@ namespace IBLL
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby) where TDto : class;
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
         Task<IEnumerable<TDto>> GetAllFromCacheAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20) where TDto : class;
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="thenby">次排序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IEnumerable<TDto>> GetAllFromCacheAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby) where TDto : class;
 
         /// <summary>
         /// 获取所有实体
@@ -258,7 +390,29 @@ namespace IBLL
         /// <param name="isAsc">是否升序</param>
         /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> GetAllFromCacheNoTracking<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby) where TDto : class;
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
         Task<IEnumerable<TDto>> GetAllFromCacheNoTrackingAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20) where TDto : class;
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IEnumerable<TDto>> GetAllFromCacheNoTrackingAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 20, params Expression<Func<T, TS>>[] thenby) where TDto : class;
 
         /// <summary>
         /// 获取所有实体
@@ -278,7 +432,27 @@ namespace IBLL
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> GetAllFromL2Cache<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby) where TDto : class;
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
         IEnumerable<TDto> GetAllFromL2CacheNoTracking<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class;
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> GetAllFromL2CacheNoTracking<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby) where TDto : class;
 
         /// <summary>
         /// 基本查询方法，获取一个集合
@@ -295,7 +469,17 @@ namespace IBLL
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IQueryable<T> LoadEntities<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+        IOrderedQueryable<T> LoadEntities<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IOrderedQueryable<T> LoadEntities<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合
@@ -317,6 +501,18 @@ namespace IBLL
         IQueryable<TDto> LoadEntities<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
 
         /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        /// <returns></returns>
+        IQueryable<TDto> LoadEntities<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
+
+        /// <summary>
         /// 基本查询方法，获取一个集合，优先从缓存读取
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -334,6 +530,17 @@ namespace IBLL
         /// <param name="isAsc">是否升序</param>
         /// <returns></returns>
         IEnumerable<T> LoadEntitiesFromCache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30);
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从缓存读取
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns></returns>
+        IEnumerable<T> LoadEntitiesFromCache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取
@@ -356,6 +563,18 @@ namespace IBLL
         IEnumerable<TDto> LoadEntitiesFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30) where TDto : class;
 
         /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> LoadEntitiesFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class;
+
+        /// <summary>
         /// 基本查询方法，获取一个集合，优先从二级缓存读取
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -371,6 +590,16 @@ namespace IBLL
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
         IEnumerable<T> LoadEntitiesFromL2Cache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从二级缓存读取
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<T> LoadEntitiesFromL2Cache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取
@@ -389,6 +618,17 @@ namespace IBLL
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
         IEnumerable<TDto> LoadEntitiesFromL2Cache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> LoadEntitiesFromL2Cache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合(异步)
@@ -410,6 +650,16 @@ namespace IBLL
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合(异步)
         /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IOrderedQueryable<T>> LoadEntitiesAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合(异步)
+        /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>还未执行的SQL语句</returns>
         Task<IQueryable<TDto>> LoadEntitiesAsync<TDto>(Expression<Func<T, bool>> @where);
@@ -424,6 +674,17 @@ namespace IBLL
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
         Task<IQueryable<TDto>> LoadEntitiesAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合(异步)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IQueryable<TDto>> LoadEntitiesAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 基本查询方法，获取一个集合，优先从缓存读取(异步)
@@ -443,6 +704,17 @@ namespace IBLL
         /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
         Task<IEnumerable<T>> LoadEntitiesFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30);
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从缓存读取(异步)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IEnumerable<T>> LoadEntitiesFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取(异步)
@@ -465,6 +737,18 @@ namespace IBLL
         Task<IEnumerable<TDto>> LoadEntitiesFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30) where TDto : class;
 
         /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取(异步)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IEnumerable<TDto>> LoadEntitiesFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class;
+
+        /// <summary>
         /// 基本查询方法，获取一个集合，优先从二级缓存读取(异步)
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -480,6 +764,16 @@ namespace IBLL
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
         Task<EFCachedQueryable<T>> LoadEntitiesFromL2CacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从二级缓存读取(异步)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<EFCachedQueryable<T>> LoadEntitiesFromL2CacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(异步)
@@ -500,6 +794,17 @@ namespace IBLL
         Task<EFCachedQueryable<TDto>> LoadEntitiesFromL2CacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
 
         /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(异步)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<EFCachedQueryable<TDto>> LoadEntitiesFromL2CacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
+
+        /// <summary>
         /// 基本查询方法，获取一个集合（不跟踪实体）
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -515,6 +820,16 @@ namespace IBLL
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
         IOrderedQueryable<T> LoadEntitiesNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IOrderedQueryable<T> LoadEntitiesNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合（不跟踪实体）
@@ -535,6 +850,17 @@ namespace IBLL
         IQueryable<TDto> LoadEntitiesNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
 
         /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IQueryable<TDto> LoadEntitiesNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
+
+        /// <summary>
         /// 基本查询方法，获取一个集合，优先从缓存读取(不跟踪实体)
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -552,6 +878,17 @@ namespace IBLL
         /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
         IEnumerable<T> LoadEntitiesFromCacheNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30);
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从缓存读取(不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<T> LoadEntitiesFromCacheNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取(不跟踪实体)
@@ -574,6 +911,18 @@ namespace IBLL
         IEnumerable<TDto> LoadEntitiesFromCacheNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30) where TDto : class;
 
         /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取(不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> LoadEntitiesFromCacheNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class;
+
+        /// <summary>
         /// 基本查询方法，获取一个集合，优先从二级缓存读取(不跟踪实体)
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -589,6 +938,16 @@ namespace IBLL
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
         IEnumerable<T> LoadEntitiesFromL2CacheNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从二级缓存读取(不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<T> LoadEntitiesFromL2CacheNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(不跟踪实体)
@@ -609,6 +968,17 @@ namespace IBLL
         IEnumerable<TDto> LoadEntitiesFromL2CacheNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
 
         /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> LoadEntitiesFromL2CacheNoTracking<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
+
+        /// <summary>
         /// 基本查询方法，获取一个集合（异步，不跟踪实体）
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -624,6 +994,16 @@ namespace IBLL
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
         Task<IQueryable<T>> LoadEntitiesNoTrackingAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合（异步，不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IQueryable<T>> LoadEntitiesNoTrackingAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合（异步，不跟踪实体）
@@ -644,6 +1024,17 @@ namespace IBLL
         Task<IQueryable<TDto>> LoadEntitiesNoTrackingAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
 
         /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合（异步，不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IQueryable<TDto>> LoadEntitiesNoTrackingAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
+
+        /// <summary>
         ///  基本查询方法，获取一个集合，优先从缓存读取(异步，不跟踪实体)
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -661,6 +1052,17 @@ namespace IBLL
         /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
         Task<IEnumerable<T>> LoadEntitiesFromCacheNoTrackingAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30);
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从缓存读取(异步，不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IEnumerable<T>> LoadEntitiesFromCacheNoTrackingAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         ///  基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取(异步，不跟踪实体)
@@ -683,6 +1085,18 @@ namespace IBLL
         Task<IEnumerable<TDto>> LoadEntitiesFromCacheNoTrackingAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30) where TDto : class;
 
         /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从缓存读取(异步，不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<IEnumerable<TDto>> LoadEntitiesFromCacheNoTrackingAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class;
+
+        /// <summary>
         ///  基本查询方法，获取一个集合，优先从二级缓存读取(异步，不跟踪实体)
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -698,6 +1112,16 @@ namespace IBLL
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
         Task<EFCachedQueryable<T>> LoadEntitiesFromL2CacheNoTrackingAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从二级缓存读取(异步，不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<EFCachedQueryable<T>> LoadEntitiesFromL2CacheNoTrackingAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         ///  基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(异步，不跟踪实体)
@@ -716,6 +1140,17 @@ namespace IBLL
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
         Task<EFCachedQueryable<TDto>> LoadEntitiesFromL2CacheNoTrackingAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(异步，不跟踪实体)
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        Task<EFCachedQueryable<TDto>> LoadEntitiesFromL2CacheNoTrackingAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 获取第一条数据
@@ -1026,7 +1461,6 @@ namespace IBLL
         /// <returns>实体</returns>
         T GetFirstEntityFromL2CacheNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
 
-
         /// <summary>
         /// 获取第一条被AutoMapper映射后的数据，优先从二级缓存读取（不跟踪实体）
         /// </summary>
@@ -1140,7 +1574,7 @@ namespace IBLL
         /// 获取第一条被AutoMapper映射后的数据，优先从缓存读取（异步，不跟踪实体）
         /// </summary>
         /// <param name="where">查询条件</param>
-        /// <returns>映射实体</returns>
+        /// <returns>实体</returns>
         Task<TDto> GetFirstEntityFromL2CacheNoTrackingAsync<TDto>(Expression<Func<T, bool>> @where);
 
         /// <summary>
@@ -1179,8 +1613,20 @@ namespace IBLL
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IQueryable<T> LoadPageEntities<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true);
+        IQueryable<T> LoadPageEntities<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc);
 
+        /// <summary>
+        /// 高效分页查询方法
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IQueryable<T> LoadPageEntities<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 高效分页查询方法，取出被AutoMapper映射后的数据集合
@@ -1194,7 +1640,21 @@ namespace IBLL
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IQueryable<TDto> LoadPageEntities<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true);
+        IQueryable<TDto> LoadPageEntities<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc);
+
+        /// <summary>
+        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IQueryable<TDto> LoadPageEntities<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 高效分页查询方法，优先从缓存读取
@@ -1208,8 +1668,21 @@ namespace IBLL
         /// <param name="isAsc">升序降序</param>
         /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
-        IEnumerable<T> LoadPageEntitiesFromCache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true, int timespan = 30);
+        IEnumerable<T> LoadPageEntitiesFromCache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, int timespan = 30);
 
+        /// <summary>
+        /// 高效分页查询方法，优先从缓存读取
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<T> LoadPageEntitiesFromCache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, int timespan = 30, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 高效分页查询方法，优先从缓存读取，取出被AutoMapper映射后的数据集合
@@ -1224,7 +1697,22 @@ namespace IBLL
         /// <param name="isAsc">升序降序</param>
         /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
-        IEnumerable<TDto> LoadPageEntitiesFromCache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true, int timespan = 30) where TDto : class;
+        IEnumerable<TDto> LoadPageEntitiesFromCache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, int timespan = 30) where TDto : class;
+
+        /// <summary>
+        /// 高效分页查询方法，优先从缓存读取，取出被AutoMapper映射后的数据集合
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> LoadPageEntitiesFromCache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class;
 
         /// <summary>
         /// 高效分页查询方法，优先从二级缓存读取
@@ -1237,7 +1725,20 @@ namespace IBLL
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IEnumerable<T> LoadPageEntitiesFromL2Cache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+        IEnumerable<T> LoadPageEntitiesFromL2Cache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc);
+
+        /// <summary>
+        /// 高效分页查询方法，优先从二级缓存读取
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<T> LoadPageEntitiesFromL2Cache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 高效分页查询方法，优先从二级缓存读取，取出被AutoMapper映射后的数据集合
@@ -1251,7 +1752,21 @@ namespace IBLL
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IEnumerable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+        IEnumerable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc);
+
+        /// <summary>
+        /// 高效分页查询方法，优先从二级缓存读取，取出被AutoMapper映射后的数据集合
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 高效分页查询方法（不跟踪实体）
@@ -1265,6 +1780,19 @@ namespace IBLL
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
         IQueryable<T> LoadPageEntitiesNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 高效分页查询方法（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IQueryable<T> LoadPageEntitiesNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 高效分页查询方法，取出被AutoMapper映射后的数据集合（不跟踪实体）
@@ -1281,6 +1809,20 @@ namespace IBLL
         IQueryable<TDto> LoadPageEntitiesNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
 
         /// <summary>
+        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IQueryable<TDto> LoadPageEntitiesNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
+
+        /// <summary>
         /// 高效分页查询方法，优先从缓存读取（不跟踪实体）
         /// </summary>
         /// <typeparam name="TS"></typeparam>
@@ -1293,6 +1835,20 @@ namespace IBLL
         /// <param name="timespan">缓存过期时间</param>
         /// <returns>还未执行的SQL语句</returns>
         IEnumerable<T> LoadPageEntitiesFromCacheNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30);
+
+        /// <summary>
+        /// 高效分页查询方法，优先从缓存读取（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<T> LoadPageEntitiesFromCacheNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 高效分页查询方法，取出被AutoMapper映射后的数据集合，优先从缓存读取（不跟踪实体）
@@ -1310,6 +1866,21 @@ namespace IBLL
         IEnumerable<TDto> LoadPageEntitiesFromCacheNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30) where TDto : class;
 
         /// <summary>
+        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合，优先从缓存读取（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <param name="timespan">缓存过期时间</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> LoadPageEntitiesFromCacheNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, int timespan = 30, params Expression<Func<T, TS>>[] thenby) where TDto : class;
+
+        /// <summary>
         /// 高效分页查询方法，优先从缓存读取（不跟踪实体）
         /// </summary>
         /// <typeparam name="TS"></typeparam>
@@ -1321,6 +1892,19 @@ namespace IBLL
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
         IEnumerable<T> LoadPageEntitiesFromL2CacheNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 高效分页查询方法，优先从缓存读取（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<T> LoadPageEntitiesFromL2CacheNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 高效分页查询方法，取出被AutoMapper映射后的数据集合，优先从缓存读取（不跟踪实体）
@@ -1335,6 +1919,20 @@ namespace IBLL
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
         IEnumerable<TDto> LoadPageEntitiesFromL2CacheNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+
+        /// <summary>
+        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合，优先从缓存读取（不跟踪实体）
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="totalCount">数据总数</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        IEnumerable<TDto> LoadPageEntitiesFromL2CacheNoTracking<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true, params Expression<Func<T, TS>>[] thenby);
 
         /// <summary>
         /// 根据ID删除实体
@@ -1503,6 +2101,13 @@ namespace IBLL
         /// <param name="where">查询条件</param>
         /// <returns>是否存在</returns>
         bool Any(Expression<Func<T, bool>> @where);
+        
+        /// <summary>
+        /// 统计符合条件的个数
+        /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <returns></returns>
+        int Count(Expression<Func<T, bool>> @where);
 
         /// <summary>
         /// 删除多个实体
@@ -1583,7 +2188,7 @@ namespace IBLL
         /// <param name="sql"></param>
         /// <param name="parameters"></param>
         void ExecuteSql(string sql, params SqlParameter[] parameters);
-        
+
         /// <summary>
         /// 批量添加实体
         /// </summary>
