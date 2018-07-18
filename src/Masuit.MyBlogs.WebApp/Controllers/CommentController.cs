@@ -94,7 +94,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     {
                         //通知博主和上层所有关联的评论访客
                         var pid = CommentBll.GetParentCommentIdByChildId(com.Id);
-                        emails.AddRange(CommentBll.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>() { com.Email }));
+                        emails.AddRange(CommentBll.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Distinct());
+                        emails.Remove(com.Email);
                         string link = Url.Action("Details", "Post", new
                         {
                             id = com.PostId,

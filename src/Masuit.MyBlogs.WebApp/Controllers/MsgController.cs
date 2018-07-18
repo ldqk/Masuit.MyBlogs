@@ -131,8 +131,9 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     {
                         //通知博主和上层所有关联的评论访客
                         var pid = LeaveMessageBll.GetParentMessageIdByChildId(msg2.Id);
-                        var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>() { msg2.Email }).ToList();
+                        var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Distinct().ToList();
                         emails.Add(email);
+                        emails.Remove(msg2.Email);
                         string link = Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Url.Scheme);
                         BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), string.Join(",", emails)));
                     }
