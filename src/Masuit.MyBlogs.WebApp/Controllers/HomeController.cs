@@ -162,7 +162,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         private async Task<IndexPageViewModel> GetIndexPageViewModelAsync(int page, int size, OrderBy orderBy, UserInfoOutputDto user)
         {
             IQueryable<PostOutputDto> postList = PostBll.LoadEntitiesNoTracking<PostOutputDto>(p => (p.Status == Status.Pended || user.IsAdmin));//准备文章的查询
-            var notices = NoticeBll.LoadPageEntitiesFromL2CacheNoTracking<DateTime, NoticeOutputDto>(1, 5, out int _, n => (n.Status == Status.Display || user.IsAdmin), n => n.PostDate, false).ToList();//加载前5条公告
+            var notices = NoticeBll.LoadPageEntitiesFromL2CacheNoTracking<DateTime, NoticeOutputDto>(1, 5, out int _, n => (n.Status == Status.Display || user.IsAdmin), n => n.ModifyDate, false).ToList();//加载前5条公告
             var cats = await CategoryBll.LoadEntitiesFromL2CacheNoTrackingAsync<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).ConfigureAwait(true);//加载分类目录
             var comments = CommentBll.LoadPageEntitiesFromL2CacheNoTracking<DateTime, CommentOutputDto>(1, 10, out int _, c => c.Status == Status.Pended && c.Post.Status == Status.Pended || user.IsAdmin, c => c.CommentDate, false).ToList();//加在新评论
             var start = DateTime.Today.AddDays(-7);
