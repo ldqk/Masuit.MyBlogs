@@ -48,10 +48,10 @@
                             {
                                 <div class="border padding-10">
                                     <div class="search-result">
-                                        <h2 class="size20"><a href="@Url.Action("Details","Post",new{id=p.Id,kw= ViewBag.Keyword })" target="_blank">@MvcHtmlString.Create(p.Title)</a>
+                                        <h2 class="size20"><a href="@Url.Action("Details","Post",new{id=p.Id})" target="_blank">@MvcHtmlString.Create(p.Title)</a>
                                         </h2>
                                         <label class="label label-info">@MvcHtmlString.Create(p.Author)</label>
-                                        @Html.ActionLink(Request.Url.Scheme+"://"+Request.Url.Authority+"/"+p.Id, "Details", "Post", new {id = p.Id,kw= ViewBag.Keyword }, new {@class = "search-link",target="_blank"})
+                                        @Html.ActionLink(Request.Url.Scheme+"://"+Request.Url.Authority+"/"+p.Id, "Details", "Post", new {id = p.Id}, new {@class = "search-link",target="_blank"})
                                         <p class="size14">@MvcHtmlString.Create(p.Content)</p>
                                     </div>
                                 </div>
@@ -91,8 +91,8 @@
                                 }
                                 else
                                 {
-                                    <li><a href="@Request.Url.AbsolutePath?wd=@Request["wd"]" aria-label="Previous">首页</a></li>
-                                    <li><a href="@Request.Url.AbsolutePath?page=@(Request["page"].ToInt32() - 1 <= 0 ? 1 : Request["page"].ToInt32() - 1)&wd=@Request["wd"]" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                                    <li><a href="@Request.Url.AbsolutePath?wd=@Url.Encode(Request["wd"])" aria-label="Previous">首页</a></li>
+                                    <li><a href="@Request.Url.AbsolutePath?page=@(Request["page"].ToInt32() - 1 <= 0 ? 1 : Request["page"].ToInt32() - 1)&wd=@Url.Encode(Request["wd"])" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
                                 }
                                 @if (pageStart > 1)
                                 {
@@ -106,7 +106,7 @@
                                     }
                                     else
                                     {
-                                        <li><a href="@Request.Url.AbsolutePath?page=@i&wd=@Request["wd"]">@i</a></li>
+                                        <li><a href="@Request.Url.AbsolutePath?page=@i&wd=@Url.Encode(Request["wd"])">@i</a></li>
                                     }
                                 }
                                 @if (pageEnd < pages)
@@ -120,8 +120,8 @@
                                 }
                                 else
                                 {
-                                    <li><a href="@Request.Url.AbsolutePath?page=@(current + 1)&wd=@Request["wd"]" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
-                                    <li><a href="@Request.Url.AbsolutePath?page=@pages&wd=@Request["wd"]" aria-label="Next">末页</a></li>
+                                    <li><a href="@Request.Url.AbsolutePath?page=@(current + 1)&wd=@Url.Encode(Request["wd"])" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+                                    <li><a href="@Request.Url.AbsolutePath?page=@pages&wd=@Url.Encode(Request["wd"])" aria-label="Next">末页</a></li>
                                 }
                             </ul>
                         }
