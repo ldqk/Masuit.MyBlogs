@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 #if !DEBUG
-using System.Threading.Tasks;
 #endif
 using System.Web.Mvc;
 using Common;
@@ -126,14 +125,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     {
                         //通知博主和上层所有关联的评论访客
                         var pid = LeaveMessageBll.GetParentMessageIdByChildId(msg2.Id);
-                        var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).ToList();
+                        var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Except(new List<string>() { msg2.Email }).ToList();
                         emails.Add(email);
-                        emails = emails.Distinct().Except(new List<string>() { msg2.Email }).ToList();
-                        Parallel.ForEach(emails, e =>
-                        {
-                            string link = Url.Action("Index", "Msg", new { cid = msg2.Id, email = e }, "http");
-                            BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), e));
-                        });
+                        string link = Url.Action("Index", "Msg", new { cid = msg2.Id }, "http");
+                        BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), string.Join(",", emails.Distinct())));
                     }
 #endif
                     return ResultData(null, true, "留言发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将会显示到列表中！");
@@ -154,11 +149,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var pid = msg.ParentId == 0 ? msg.Id : LeaveMessageBll.GetParentMessageIdByChildId(id);
             string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg.NickName).Replace("{{content}}", msg.Content);
             var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>() { msg.Email }).ToList();
-            Parallel.ForEach(emails, e =>
-            {
-                string link = Url.Action("Index", "Msg", new { cid = pid, email = e }, Request.Url.Scheme);
-                BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), e));
-            });
+            string link = Url.Action("Index", "Msg", new { cid = pid }, Request.Url.Scheme);
+            BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), string.Join(",", emails)));
 #endif
             return ResultData(null, b, b ? "审核通过！" : "审核失败！");
         }
