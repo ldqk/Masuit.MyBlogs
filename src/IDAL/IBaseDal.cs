@@ -2086,7 +2086,6 @@ namespace IDAL
         void ExecuteSql(string sql, params SqlParameter[] parameters);
 
         void Dispose(bool disposing);
-        void Dispose();
     }
 	
 	public partial interface IBroadcastDal :IBaseDal<Broadcast>{}

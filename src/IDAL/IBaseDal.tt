@@ -2095,7 +2095,6 @@ namespace IDAL
         void ExecuteSql(string sql, params SqlParameter[] parameters);
 
         void Dispose(bool disposing);
-        void Dispose();
     }
 <#
 foreach (EntityType entity in ItemCollection.GetItems<EntityType>().OrderBy(e => e.Name))

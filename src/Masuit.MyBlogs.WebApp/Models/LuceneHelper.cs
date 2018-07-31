@@ -42,13 +42,14 @@ namespace Masuit.MyBlogs.WebApp.Models
         public static string IndexPath { get; set; } = AppDomain.CurrentDomain.BaseDirectory + @"App_Data\lucenedir\";//设置Lucene索引目录
 
         public static object LockObj { get; } = new object();
+
         ///// <summary>
         ///// 分词API  //http://zhannei.baidu.com/api/customsearch/keywords?title=群主可撤回消息，QQ9.0去广告本地SVIP绿色精简优化版
         ///// http://api.pullword.com
         ///// </summary>
         //public static HttpClient ApiClient { get; set; } = new HttpClient() { BaseAddress = new Uri("http://api.pullword.com") };
 
-        #endregion
+        #endregion Config
 
         #region 创建索引
 
@@ -76,7 +77,7 @@ namespace Masuit.MyBlogs.WebApp.Models
                 LogManager.Debug("尝试删除索引文件夹失败！", e.Message);
             }
 
-            #endregion
+            #endregion 创建索引前尝试删除索引文件夹
 
             if (!Directory.Exists(dir))
             {
@@ -112,7 +113,7 @@ namespace Masuit.MyBlogs.WebApp.Models
             }
         }
 
-        #endregion
+        #endregion 创建索引
 
         #region 查询所有符合条件的内容
 
@@ -139,39 +140,46 @@ namespace Masuit.MyBlogs.WebApp.Models
                     {
                         return;
                     }
-                    FSDirectory directory = FSDirectory.Open(new DirectoryInfo(indexPath), new NoLockFactory());
-                    IndexReader reader = IndexReader.Open(directory, true);
-                    var searcher = new IndexSearcher(reader);
-                    QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_30, new[] { nameof(Post.Id), nameof(Post.Title), nameof(Post.Content), nameof(Post.Author), nameof(Post.Label), nameof(Post.Email), nameof(Post.Keyword) }, analyzer); //多个字段查询  
-                    Query query = parser.Parse(k);
-                    int n = 100000;
-                    TopDocs docs = searcher.Search(query, null, n);
-                    if (docs?.TotalHits != 0 && docs?.ScoreDocs != null)
+
+                    using (FSDirectory directory = FSDirectory.Open(new DirectoryInfo(indexPath), new NoLockFactory()))
                     {
-                        foreach (ScoreDoc sd in docs.ScoreDocs) //遍历搜索到的结果  
+                        using (var reader = IndexReader.Open(directory, true))
                         {
-                            Document doc = searcher.Doc(sd.Doc);
-                            if (result.Any(p => p.Id == doc.Get(nameof(Post.Id)).ToInt32()))
+                            using (var searcher = new IndexSearcher(reader))
                             {
-                                continue;
+                                QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_30, new[] { nameof(Post.Id), nameof(Post.Title), nameof(Post.Content), nameof(Post.Author), nameof(Post.Label), nameof(Post.Email), nameof(Post.Keyword) }, analyzer); //多个字段查询
+                                Query query = parser.Parse(k);
+                                int n = 100000;
+                                TopDocs docs = searcher.Search(query, null, n);
+                                if (docs?.TotalHits != 0 && docs?.ScoreDocs != null)
+                                {
+                                    foreach (ScoreDoc sd in docs.ScoreDocs) //遍历搜索到的结果
+                                    {
+                                        Document doc = searcher.Doc(sd.Doc);
+                                        if (result.Any(p => p.Id == doc.Get(nameof(Post.Id)).ToInt32()))
+                                        {
+                                            continue;
+                                        }
+                                        var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
+                                        var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = segment };
+                                        var content = doc.Get(nameof(Post.Content));
+                                        if (content.Length <= segment)
+                                        {
+                                            segment = content.Length;
+                                        }
+                                        result.Enqueue(new PostOutputDto()
+                                        {
+                                            Id = doc.Get(nameof(Post.Id)).ToInt32(),
+                                            Title = doc.Get(nameof(Post.Title)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Title))) : doc.Get(nameof(Post.Title)),
+                                            Content = content.ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, content) : content.Substring(0, segment),
+                                            Author = doc.Get(nameof(Post.Author)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Author))) : doc.Get(nameof(Post.Author)),
+                                            Label = doc.Get(nameof(Post.Label)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Label))) : doc.Get(nameof(Post.Label)),
+                                            Email = doc.Get(nameof(Post.Email)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Email))) : doc.Get(nameof(Post.Email)),
+                                            Keyword = doc.Get(nameof(Post.Keyword)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Keyword))) : doc.Get(nameof(Post.Keyword))
+                                        });
+                                    }
+                                }
                             }
-                            var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
-                            var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = segment };
-                            var content = doc.Get(nameof(Post.Content));
-                            if (content.Length <= segment)
-                            {
-                                segment = content.Length;
-                            }
-                            result.Enqueue(new PostOutputDto()
-                            {
-                                Id = doc.Get(nameof(Post.Id)).ToInt32(),
-                                Title = doc.Get(nameof(Post.Title)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Title))) : doc.Get(nameof(Post.Title)),
-                                Content = content.ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, content) : content.Substring(0, segment),
-                                Author = doc.Get(nameof(Post.Author)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Author))) : doc.Get(nameof(Post.Author)),
-                                Label = doc.Get(nameof(Post.Label)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Label))) : doc.Get(nameof(Post.Label)),
-                                Email = doc.Get(nameof(Post.Email)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Email))) : doc.Get(nameof(Post.Email)),
-                                Keyword = doc.Get(nameof(Post.Keyword)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Keyword))) : doc.Get(nameof(Post.Keyword))
-                            });
                         }
                     }
                 });
@@ -179,9 +187,9 @@ namespace Masuit.MyBlogs.WebApp.Models
             }
         }
 
-        #endregion
+        #endregion 查询所有符合条件的内容
 
-        #region 多字段分页查询数据 
+        #region 多字段分页查询数据
 
         /// <summary>
         /// 多字段分页查询数据
@@ -214,68 +222,76 @@ namespace Masuit.MyBlogs.WebApp.Models
                     {
                         return;
                     }
-                    FSDirectory directory = FSDirectory.Open(new DirectoryInfo(indexPath), new NoLockFactory());
-                    IndexReader reader = IndexReader.Open(directory, true);
-                    var searcher = new IndexSearcher(reader);
-                    var bq = new BooleanQuery();
-                    //if (flag != "")
-                    //{
-                    //    var qpflag = new QueryParser(Version.LUCENE_30, "flag", analyzer);
-                    //    Query qflag = qpflag.Parse(flag);
-                    //    bq.Add(qflag, Occur.MUST); //与运算  
-                    //}
-                    if (k != "")
+
+                    using (FSDirectory directory = FSDirectory.Open(new DirectoryInfo(indexPath), new NoLockFactory()))
                     {
-                        QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_30, new[] { nameof(Post.Id), nameof(Post.Title), nameof(Post.Content), nameof(Post.Author), nameof(Post.Label), nameof(Post.Email), nameof(Post.Keyword) }, analyzer); //多个字段查询
-                        try
+                        using (var reader = IndexReader.Open(directory, true))
                         {
-                            Query queryKeyword = parser.Parse(k);
-                            bq.Add(queryKeyword, Occur.MUST); //与运算  
-                        }
-                        catch
-                        {
-                            return;
-                        }
-                    }
-                    var collector = TopScoreDocCollector.Create(pageIndex * pageSize, true);
-                    searcher.Search(bq, collector);
-                    if (collector?.TotalHits == 0)
-                    {
-                        totalCount += 0;
-                    }
-                    else
-                    {
-                        int start = pageSize * (pageIndex - 1); //结束数  
-                        int limit = pageSize;
-                        ScoreDoc[] hits = collector?.TopDocs(start, limit).ScoreDocs;
-                        totalCount += collector?.TotalHits ?? 0;
-                        foreach (ScoreDoc sd in hits) //遍历搜索到的结果  
-                        {
-                            var doc = searcher.Doc(sd.Doc);
-                            if (result.Any(p => p.Id == doc.Get(nameof(Post.Id)).ToInt32()))
+                            using (var searcher = new IndexSearcher(reader))
                             {
-                                continue;
+                                var bq = new BooleanQuery();
+
+                                //if (flag != "")
+                                //{
+                                //    var qpflag = new QueryParser(Version.LUCENE_30, "flag", analyzer);
+                                //    Query qflag = qpflag.Parse(flag);
+                                //    bq.Add(qflag, Occur.MUST); //与运算
+                                //}
+                                if (k != "")
+                                {
+                                    QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_30, new[] { nameof(Post.Id), nameof(Post.Title), nameof(Post.Content), nameof(Post.Author), nameof(Post.Label), nameof(Post.Email), nameof(Post.Keyword) }, analyzer); //多个字段查询
+                                    try
+                                    {
+                                        Query queryKeyword = parser.Parse(k);
+                                        bq.Add(queryKeyword, Occur.MUST); //与运算
+                                    }
+                                    catch
+                                    {
+                                        return;
+                                    }
+                                }
+                                var collector = TopScoreDocCollector.Create(pageIndex * pageSize, true);
+                                searcher.Search(bq, collector);
+                                if (collector?.TotalHits == 0)
+                                {
+                                    totalCount += 0;
+                                }
+                                else
+                                {
+                                    int start = pageSize * (pageIndex - 1); //结束数
+                                    int limit = pageSize;
+                                    ScoreDoc[] hits = collector?.TopDocs(start, limit).ScoreDocs;
+                                    totalCount += collector?.TotalHits ?? 0;
+                                    foreach (ScoreDoc sd in hits) //遍历搜索到的结果
+                                    {
+                                        var doc = searcher.Doc(sd.Doc);
+                                        if (result.Any(p => p.Id == doc.Get(nameof(Post.Id)).ToInt32()))
+                                        {
+                                            continue;
+                                        }
+                                        var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
+                                        var highlighter = new Highlighter(simpleHtmlFormatter, new Segment())
+                                        {
+                                            FragmentSize = segment
+                                        };
+                                        var content = doc.Get(nameof(Post.Content));
+                                        if (content.Length <= segment)
+                                        {
+                                            segment = content.Length;
+                                        }
+                                        result.Enqueue(new PostOutputDto()
+                                        {
+                                            Id = doc.Get(nameof(Post.Id)).ToInt32(),
+                                            Title = doc.Get(nameof(Post.Title)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Title))) : doc.Get(nameof(Post.Title)),
+                                            Content = content.ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, content) : content.Substring(0, segment),
+                                            Author = doc.Get(nameof(Post.Author)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Author))) : doc.Get(nameof(Post.Author)),
+                                            Label = doc.Get(nameof(Post.Label)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Label))) : doc.Get(nameof(Post.Label)),
+                                            Email = doc.Get(nameof(Post.Email)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Email))) : doc.Get(nameof(Post.Email)),
+                                            Keyword = doc.Get(nameof(Post.Keyword)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Keyword))) : doc.Get(nameof(Post.Keyword))
+                                        });
+                                    }
+                                }
                             }
-                            var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
-                            var highlighter = new Highlighter(simpleHtmlFormatter, new Segment())
-                            {
-                                FragmentSize = segment
-                            };
-                            var content = doc.Get(nameof(Post.Content));
-                            if (content.Length <= segment)
-                            {
-                                segment = content.Length;
-                            }
-                            result.Enqueue(new PostOutputDto()
-                            {
-                                Id = doc.Get(nameof(Post.Id)).ToInt32(),
-                                Title = doc.Get(nameof(Post.Title)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Title))) : doc.Get(nameof(Post.Title)),
-                                Content = content.ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, content) : content.Substring(0, segment),
-                                Author = doc.Get(nameof(Post.Author)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Author))) : doc.Get(nameof(Post.Author)),
-                                Label = doc.Get(nameof(Post.Label)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Label))) : doc.Get(nameof(Post.Label)),
-                                Email = doc.Get(nameof(Post.Email)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Email))) : doc.Get(nameof(Post.Email)),
-                                Keyword = doc.Get(nameof(Post.Keyword)).ToLower().Contains(k.ToLower()) ? highlighter.GetBestFragment(k, doc.Get(nameof(Post.Keyword))) : doc.Get(nameof(Post.Keyword))
-                            });
                         }
                     }
                 });
@@ -327,7 +343,7 @@ namespace Masuit.MyBlogs.WebApp.Models
             return list.OrderByDescending(s => s.Length).ToList();
         }
 
-        #endregion
+        #endregion 多字段分页查询数据
 
         #region 删除索引
 
@@ -341,17 +357,19 @@ namespace Masuit.MyBlogs.WebApp.Models
                 throw new Exception("未设置索引文件夹路径，参数名：" + IndexPath);
             }
             string indexPath = IndexPath;
-            FSDirectory directory = FSDirectory.Open(new DirectoryInfo(indexPath), new NoLockFactory());
-            using (var writer = new IndexWriter(directory, new PanGuAnalyzer(), false, IndexWriter.MaxFieldLength.LIMITED))
+            using (FSDirectory directory = FSDirectory.Open(new DirectoryInfo(indexPath), new NoLockFactory()))
             {
-                writer.DeleteAll();
-                writer.Commit();
-                writer.Optimize();
-                return writer.HasDeletions();
+                using (var writer = new IndexWriter(directory, new PanGuAnalyzer(), false, IndexWriter.MaxFieldLength.LIMITED))
+                {
+                    writer.DeleteAll();
+                    writer.Commit();
+                    writer.Optimize();
+                    return writer.HasDeletions();
+                }
             }
         }
 
-        #endregion
+        #endregion 删除索引
 
         #region 文章的增量索引，全局刷新索引库
 
@@ -372,6 +390,7 @@ namespace Masuit.MyBlogs.WebApp.Models
                     var dataAll = AutofacConfig.Container.Resolve<IPostBll>().LoadEntities(p => p.Status == Status.Pended);
                     var addData = new List<Post>(); //数据库中新来的数据，要进索引库的
                     var updData = new List<Post>(); // 数据库中修改的数据，也要修改索引库的
+
                     //判断有无字典
                     if (Directory.Exists(IndexPath))
                     {
@@ -421,7 +440,7 @@ namespace Masuit.MyBlogs.WebApp.Models
             }
         }
 
-        #endregion
+        #endregion 文章的增量索引，全局刷新索引库
 
         #region 判断数据库中的某条数据是否已经索引了
 
@@ -445,7 +464,7 @@ namespace Masuit.MyBlogs.WebApp.Models
             return flag;
         }
 
-        #endregion
+        #endregion 判断数据库中的某条数据是否已经索引了
 
         #region 将实体对象转换成Lucene的文档对象
 
@@ -467,7 +486,7 @@ namespace Masuit.MyBlogs.WebApp.Models
             return doc;
         }
 
-        #endregion
+        #endregion 将实体对象转换成Lucene的文档对象
 
         #region 增量索引，批量添加索引库
 
@@ -488,7 +507,7 @@ namespace Masuit.MyBlogs.WebApp.Models
             }
         }
 
-        #endregion
+        #endregion 增量索引，批量添加索引库
 
         #region 增量索引 第一步去索引库删除数据
 
@@ -504,12 +523,13 @@ namespace Masuit.MyBlogs.WebApp.Models
                 foreach (Post item in resultList)
                 {
                     var term = new Term("id", item.Id.ToString().Trim());
+
                     //Query query = new TermQuery(term);
                     reader.DeleteDocuments(term);
                 }
             }
         }
 
-        #endregion
+        #endregion 增量索引 第一步去索引库删除数据
     }
 }
