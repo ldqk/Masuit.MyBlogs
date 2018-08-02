@@ -123,6 +123,9 @@
     padding-right: 40px;
     position: relative;
 }
+.main-timeline .content p{
+    max-width: 325px;
+}
 .main-timeline .year{
     display: block;
     padding: 10px;
