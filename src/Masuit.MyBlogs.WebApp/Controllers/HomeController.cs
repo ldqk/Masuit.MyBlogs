@@ -87,19 +87,19 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             switch (orderBy)
             {
                 case OrderBy.CommentCount:
-                    posts = await temp.ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).Cacheable().ToListAsync();
+                    posts = temp.ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 case OrderBy.PostDate:
-                    posts = await temp.ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).Cacheable().ToListAsync();
+                    posts = temp.ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 case OrderBy.ViewCount:
-                    posts = await temp.ThenByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).Cacheable().ToListAsync();
+                    posts = temp.ThenByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 case OrderBy.VoteCount:
-                    posts = await temp.ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).Cacheable().ToListAsync();
+                    posts = temp.ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 default:
-                    posts = await temp.ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).Cacheable().ToListAsync();
+                    posts = temp.ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();
                     break;
             }
             var viewModel = await GetIndexPageViewModelAsync(0, 0, orderBy, user).ConfigureAwait(true);
@@ -202,19 +202,19 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             switch (orderBy)//文章排序
             {
                 case OrderBy.CommentCount:
-                    posts = await postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).Cacheable().ToListAsync();
+                    posts = postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 case OrderBy.PostDate:
-                    posts = await postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).Cacheable().ToListAsync();
+                    posts = postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 case OrderBy.ViewCount:
-                    posts = await postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).Cacheable().ToListAsync();
+                    posts = postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 case OrderBy.VoteCount:
-                    posts = await postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).Cacheable().ToListAsync();
+                    posts = postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 default:
-                    posts = await postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).Cacheable().ToListAsync();
+                    posts = postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();
                     break;
             }
             return new IndexPageViewModel()
