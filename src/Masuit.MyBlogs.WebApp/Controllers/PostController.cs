@@ -272,9 +272,9 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     string link = Url.Action("Details", "Post", new { id = p.Id }, Request.Url?.Scheme ?? "http");
                     string content = System.IO.File.ReadAllText(Request.MapPath("/template/publish.html")).Replace("{{link}}", link).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", p.Title);
                     BackgroundJob.Enqueue(() => SendMail(GetSettings("Title") + "有访客投稿：", content, email));
-                    return ResultData(p, message: "文章发表成功，待站长审核通过以后将显示到列表中！");
+                    return ResultData(p.Mapper<PostOutputDto>(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
                 }
-                return ResultData(p, message: "文章发表成功！");
+                return ResultData(p.Mapper<PostOutputDto>(), message: "文章发表成功！");
             }
             return ResultData(null, false, "文章发表失败！");
         }
