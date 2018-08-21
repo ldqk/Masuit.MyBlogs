@@ -29,7 +29,7 @@ namespace Models.DTO
         /// <summary>
         /// 内容
         /// </summary>
-        [Required(ErrorMessage = "留言内容不能为空！"), SubmitCheck]
+        [Required(ErrorMessage = "留言内容不能为空！"), SubmitCheck(2, 500)]
         public string Content { get; set; }
 
         /// <summary>

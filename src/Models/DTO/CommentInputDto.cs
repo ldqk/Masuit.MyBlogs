@@ -33,12 +33,13 @@ namespace Models.DTO
         /// <summary>
         /// QQ或微信
         /// </summary>
+        [StringLength(32, ErrorMessage = "QQ或微信不合法")]
         public string QQorWechat { get; set; }
 
         /// <summary>
         /// 评论内容
         /// </summary>
-        [Required(ErrorMessage = "评论内容不能为空！"), SubmitCheck(3, 500)]
+        [Required(ErrorMessage = "评论内容不能为空！"), SubmitCheck(2, 500)]
         public string Content { get; set; }
 
         /// <summary>
