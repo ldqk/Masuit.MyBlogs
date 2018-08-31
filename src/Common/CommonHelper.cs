@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
-using EFSecondLevelCache;
 using Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.Media;
@@ -99,7 +98,7 @@ namespace Common
         {
             using (var db = new DataContext())
             {
-                return db.SystemSetting.Where(s => s.Name.Equals(key)).Cacheable().FirstOrDefault()?.Value;
+                return db.SystemSetting.FirstOrDefault(s => s.Name.Equals(key))?.Value;
             }
         }
 

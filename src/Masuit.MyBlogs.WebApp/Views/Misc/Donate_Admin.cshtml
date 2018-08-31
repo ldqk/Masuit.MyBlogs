@@ -121,6 +121,12 @@
         </p>
     </div>
 </div>
+<div class="container-fluid margin-bot10 margin-top10">
+    <p class="text-green size32 margin-bot10">
+        或者，你也可以支持一下我们的淘宝店铺：<a href="https://s.click.taobao.com/t?e=m%3D2%26s%3DYIbUCxulJ3gcQipKwQzePDAVflQIoZepLKpWJ%2Bin0XJRAdhuF14FMa7N6xi2QcXFxq3IhSJN6GQlfCNE0Wdq6XtP1cOahtZYrdRFwJ8cqHqs6R1%2FzVfiiCagbqoBMncPjN7%2FRdU5OLrGJe8N%2FwNpGw%3D%3D" target="_blank">品乐外设</a>，主打游戏级的耳机，机械键盘和鼠标。
+    </p>
+    <a href="https://s.click.taobao.com/t?e=m%3D2%26s%3DYIbUCxulJ3gcQipKwQzePDAVflQIoZepLKpWJ%2Bin0XJRAdhuF14FMa7N6xi2QcXFxq3IhSJN6GQlfCNE0Wdq6XtP1cOahtZYrdRFwJ8cqHqs6R1%2FzVfiiCagbqoBMncPjN7%2FRdU5OLrGJe8N%2FwNpGw%3D%3D" target="_blank"><img src="https://gdp.alicdn.com/imgextra/i2/2110967145/TB2HElEjgZC2uNjSZFnXXaxZpXa_!!2110967145.jpg" /></a>
+</div>
 <div class="container-fluid" ng-app="myApp" ng-controller="home as list">
     <div class="page-header margin-clear">
         <h2 class="size24" style="display: inline">
@@ -165,175 +171,175 @@
 <!--PC和WAP自适应版-->
 <div id="SOHUCS" sid="donate"></div>
 <script type="text/javascript">
-(function() {
-	var appid = 'cytsT3QgK';
-	var conf = 'prod_0358240040a6c9611add9de991099d42';
-	var width = window.innerWidth || document.documentElement.clientWidth;
-	if (width < 960) {
-		window.document.write(
-			'<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' +
-			appid + '&conf=' + conf + '"><\/script>');
-	} else {
-		var loadJs = function(d, a) {
-			var c = document.getElementsByTagName("head")[0] || document.head || document.documentElement;
-			var b = document.createElement("script");
-			b.setAttribute("type", "text/javascript");
-			b.setAttribute("charset", "UTF-8");
-			b.setAttribute("src", d);
-			if (typeof a === "function") {
-				if (window.attachEvent) {
-					b.onreadystatechange = function() {
-						var e = b.readyState;
-						if (e === "loaded" || e === "complete") {
-							b.onreadystatechange = null;
-							a()
-						}
-					}
-				} else {
-					b.onload = a
-				}
-			}
-			c.appendChild(b)
-		};
-		loadJs("https://changyan.sohu.com/upload/changyan.js", function() {
-			window.changyan.api.config({
-				appid: appid,
-				conf: conf
-			})
-		});
-	}
-})();
+    (function () {
+        var appid = 'cytsT3QgK';
+        var conf = 'prod_0358240040a6c9611add9de991099d42';
+        var width = window.innerWidth || document.documentElement.clientWidth;
+        if (width < 960) {
+            window.document.write(
+                '<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' +
+                appid + '&conf=' + conf + '"><\/script>');
+        } else {
+            var loadJs = function (d, a) {
+                var c = document.getElementsByTagName("head")[0] || document.head || document.documentElement;
+                var b = document.createElement("script");
+                b.setAttribute("type", "text/javascript");
+                b.setAttribute("charset", "UTF-8");
+                b.setAttribute("src", d);
+                if (typeof a === "function") {
+                    if (window.attachEvent) {
+                        b.onreadystatechange = function () {
+                            var e = b.readyState;
+                            if (e === "loaded" || e === "complete") {
+                                b.onreadystatechange = null;
+                                a()
+                            }
+                        }
+                    } else {
+                        b.onload = a
+                    }
+                }
+                c.appendChild(b)
+            };
+            loadJs("https://changyan.sohu.com/upload/changyan.js", function () {
+                window.changyan.api.config({
+                    appid: appid,
+                    conf: conf
+                })
+            });
+        }
+    })();
 </script>
 <script>
-angular.module('myApp', ["ngTable", "tm.pagination"]).controller("home", ["$scope", "$http", "NgTableParams",function ($scope, $http, NgTableParams) {
-    var self = this;
-    $scope.paginationConf = {
-        currentPage: 1,
-        itemsPerPage: 10,
-        pagesLength: 15,
-        perPageOptions: [10, 15, 20, 30, 50, 100],
-        rememberPerPage: 'perPageItems',
-        onChange: function () {
-            window.loading();
-            $http.post("/donate/getpagedata", {
-                page: $scope.paginationConf.currentPage,
-                size: $scope.paginationConf.itemsPerPage
-            }).then(function (res) {
-                $scope.paginationConf.totalItems = res.data.TotalCount;
-                $("div[ng-table-pagination]").remove();
-                self.tableParams = new NgTableParams({
-                    count: 50000
-                }, {
-                        filterDelay: 0,
-                        dataset: res.data.Data
+    angular.module('myApp', ["ngTable", "tm.pagination"]).controller("home", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
+        var self = this;
+        $scope.paginationConf = {
+            currentPage: 1,
+            itemsPerPage: 10,
+            pagesLength: 15,
+            perPageOptions: [10, 15, 20, 30, 50, 100],
+            rememberPerPage: 'perPageItems',
+            onChange: function () {
+                window.loading();
+                $http.post("/donate/getpagedata", {
+                    page: $scope.paginationConf.currentPage,
+                    size: $scope.paginationConf.itemsPerPage
+                }).then(function (res) {
+                    $scope.paginationConf.totalItems = res.data.TotalCount;
+                    $("div[ng-table-pagination]").remove();
+                    self.tableParams = new NgTableParams({
+                        count: 50000
+                    }, {
+                            filterDelay: 0,
+                            dataset: res.data.Data
+                        });
+                    window.loadingDone();
+                });
+            }
+        };
+        self.del = function (row) {
+            swal({
+                title: "确认删除这条捐赠记录吗？",
+                text: row.NickName,
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                showLoaderOnConfirm: true,
+                animation: true,
+                allowOutsideClick: false
+            }).then(function () {
+                $http.post("/donate/delete", {
+                    id: row.Id
+                }).then(function (res) {
+                    window.notie.alert({
+                        type: 1,
+                        text: res.data.Message,
+                        time: 4
                     });
-                window.loadingDone();
-            });
-        }
-    };
-    self.del = function (row) {
-        swal({
-            title: "确认删除这条捐赠记录吗？",
-            text: row.NickName,
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            showLoaderOnConfirm: true,
-            animation: true,
-            allowOutsideClick: false
-        }).then(function () {
-            $http.post("/donate/delete", {
-                id: row.Id
-            }).then(function (res) {
-                window.notie.alert({
-                    type: 1,
-                    text: res.data.Message,
-                    time: 4
-                });
-                _.remove(self.tableParams.settings().dataset, function (item) {
-                    return row === item;
-                });
-                self.tableParams.reload().then(function (data) {
-                    if (data.length === 0 && self.tableParams.total() > 0) {
-                        self.tableParams.page(self.tableParams.page() - 1);
-                        self.tableParams.reload();
-                    }
-                });
-            });
-        }, function () {
-        });
-    }
-    $scope.save = function (row) {
-        if (row == null) {
-            row = {
-                NickName: "",
-                DonateTime: "",
-                Amount: "",
-                Email: "",
-                EmailDisplay: "",
-                QQorWechat: "",
-                QQorWechatDisplay: "",
-                Via: ""
-            };
-        }
-        swal({
-            title: '添加捐赠记录',
-            html:
-                '<div class="input-group"><span class="input-group-addon">昵称： </span><input type="text" id="name" class="form-control input-lg" placeholder="请输入昵称" value="' + row.NickName + '"></div>' +
-                '<div class="input-group"><span class="input-group-addon">捐赠时间： </span><input id="date" type="text" class="form-control input-lg date datainp dateicon" readonly placeholder="请输入捐赠时间" value="' + row.DonateTime + '"></div>	' +
-                '<div class="input-group"><span class="input-group-addon">捐赠金额： </span><input id="amount" type="text" class="form-control input-lg" placeholder="请输入金额" value="' + row.Amount + '"></div>' +
-                '<div class="input-group"><span class="input-group-addon">捐赠方式： </span><input id="via" type="text" class="form-control input-lg" placeholder="请输入捐赠方式" value="' + row.Via + '"></div>' +
-                '<div class="input-group"><span class="input-group-addon">Email： </span><input type="email" id="email" class="form-control input-lg" placeholder="请输入Email" value="' + row.Email + '"></div>' +
-                '<div class="input-group"><span class="input-group-addon">QQ或微信： </span><input type="text" id="qq" class="form-control input-lg" placeholder="请输入QQ或微信" value="' + row.QQorWechat + '"></div>' +
-                '<div class="input-group"><span class="input-group-addon">显示Email： </span><input type="text" id="demail" class="form-control input-lg" placeholder="请输入显示Email" value="' + row.EmailDisplay + '"></div>' +
-                '<div class="input-group"><span class="input-group-addon">显示QQ或微信： </span><input type="text" id="dqq" class="form-control input-lg" placeholder="请输入显示QQ或微信" value="' + row.QQorWechatDisplay + '"></div>',
-            showCloseButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            showLoaderOnConfirm: true,
-            animation: true,
-            allowOutsideClick: false,
-            preConfirm: function () {
-                return new Promise(function (resolve, reject) {
-                    row.NickName = $("#name").val();
-                    row.DonateTime = $("#date").val();
-                    row.Amount = $("#amount").val();
-                    row.Via = $("#via").val();
-                    row.Email = $("#email").val();
-                    row.QQorWechat = $("#qq").val();
-                    row.EmailDisplay = $("#demail").val();
-                    row.QQorWechatDisplay = $("#dqq").val();
-                    $http.post("/donate/save", row).then(function (res) {
-                        if (res.data.Success) {
-                            resolve(res.data);
-                        } else {
-                            reject(res.data.Message);
+                    _.remove(self.tableParams.settings().dataset, function (item) {
+                        return row === item;
+                    });
+                    self.tableParams.reload().then(function (data) {
+                        if (data.length === 0 && self.tableParams.total() > 0) {
+                            self.tableParams.page(self.tableParams.page() - 1);
+                            self.tableParams.reload();
                         }
-                    }, function (error) {
-                        reject("服务请求失败！");
                     });
                 });
+            }, function () {
+            });
+        }
+        $scope.save = function (row) {
+            if (row == null) {
+                row = {
+                    NickName: "",
+                    DonateTime: "",
+                    Amount: "",
+                    Email: "",
+                    EmailDisplay: "",
+                    QQorWechat: "",
+                    QQorWechatDisplay: "",
+                    Via: ""
+                };
             }
-        }).then(function (result) {
-            if (result) {
-                if (result.Success) {
-                    swal(result.Message, "", "success");
-                    self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-                } else {
-                    swal(result.Message, "", "error");
+            swal({
+                title: '添加捐赠记录',
+                html:
+                    '<div class="input-group"><span class="input-group-addon">昵称： </span><input type="text" id="name" class="form-control input-lg" placeholder="请输入昵称" value="' + row.NickName + '"></div>' +
+                    '<div class="input-group"><span class="input-group-addon">捐赠时间： </span><input id="date" type="text" class="form-control input-lg date datainp dateicon" readonly placeholder="请输入捐赠时间" value="' + row.DonateTime + '"></div>	' +
+                    '<div class="input-group"><span class="input-group-addon">捐赠金额： </span><input id="amount" type="text" class="form-control input-lg" placeholder="请输入金额" value="' + row.Amount + '"></div>' +
+                    '<div class="input-group"><span class="input-group-addon">捐赠方式： </span><input id="via" type="text" class="form-control input-lg" placeholder="请输入捐赠方式" value="' + row.Via + '"></div>' +
+                    '<div class="input-group"><span class="input-group-addon">Email： </span><input type="email" id="email" class="form-control input-lg" placeholder="请输入Email" value="' + row.Email + '"></div>' +
+                    '<div class="input-group"><span class="input-group-addon">QQ或微信： </span><input type="text" id="qq" class="form-control input-lg" placeholder="请输入QQ或微信" value="' + row.QQorWechat + '"></div>' +
+                    '<div class="input-group"><span class="input-group-addon">显示Email： </span><input type="text" id="demail" class="form-control input-lg" placeholder="请输入显示Email" value="' + row.EmailDisplay + '"></div>' +
+                    '<div class="input-group"><span class="input-group-addon">显示QQ或微信： </span><input type="text" id="dqq" class="form-control input-lg" placeholder="请输入显示QQ或微信" value="' + row.QQorWechatDisplay + '"></div>',
+                showCloseButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                showLoaderOnConfirm: true,
+                animation: true,
+                allowOutsideClick: false,
+                preConfirm: function () {
+                    return new Promise(function (resolve, reject) {
+                        row.NickName = $("#name").val();
+                        row.DonateTime = $("#date").val();
+                        row.Amount = $("#amount").val();
+                        row.Via = $("#via").val();
+                        row.Email = $("#email").val();
+                        row.QQorWechat = $("#qq").val();
+                        row.EmailDisplay = $("#demail").val();
+                        row.QQorWechatDisplay = $("#dqq").val();
+                        $http.post("/donate/save", row).then(function (res) {
+                            if (res.data.Success) {
+                                resolve(res.data);
+                            } else {
+                                reject(res.data.Message);
+                            }
+                        }, function (error) {
+                            reject("服务请求失败！");
+                        });
+                    });
                 }
-            }
-        }).catch(swal.noop);
+            }).then(function (result) {
+                if (result) {
+                    if (result.Success) {
+                        swal(result.Message, "", "success");
+                        self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+                    } else {
+                        swal(result.Message, "", "error");
+                    }
+                }
+            }).catch(swal.noop);
 
-        $(".date").jeDate({
-            isinitVal: true,
-            format: "YYYY-MM-DD",
-            okfun: function (elem) {
-                $("#date").val(elem.val);
-            }
-        });
-    }
-}]);
+            $(".date").jeDate({
+                isinitVal: true,
+                format: "YYYY-MM-DD",
+                okfun: function (elem) {
+                    $("#date").val(elem.val);
+                }
+            });
+        }
+    }]);
 </script>
