@@ -53,12 +53,14 @@
         <table class="table table-bordered table-condensed table-responsive">
             <thead>
             <tr>
+                <th>序号</th>
                 <th>关键词</th>
                 <th>搜索次数</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="item in agg.month">
+                <td>{{$index+1}}</td>
                 <td><a ng-href="/s/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
                 <td>{{item.Count}}</td>
             </tr>
