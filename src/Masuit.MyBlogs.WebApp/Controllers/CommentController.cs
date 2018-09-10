@@ -63,7 +63,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 var emails = new List<string>();
                 var email = GetSettings("ReceiveEmail");//站长邮箱
                 emails.Add(email);
-                string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", com.NickName).Replace("{{content}}", com.Content);
+                string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{title}}", com.Post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", com.NickName).Replace("{{content}}", com.Content);
                 if (comment.Status == Status.Pended)
                 {
                     if (!com.IsMaster)

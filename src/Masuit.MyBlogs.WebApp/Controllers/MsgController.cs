@@ -108,7 +108,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             if (msg2 != null)
             {
                 var email = GetSettings("ReceiveEmail");
-                string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg2.NickName).Replace("{{content}}", msg2.Content);
+                string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{title}}", "网站留言板").Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg2.NickName).Replace("{{content}}", msg2.Content);
                 if (msg.Status == Status.Pended)
                 {
                     if (!msg2.IsMaster)

@@ -375,13 +375,15 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         {
             Post post = PostBll.GetById(id);
             post.Status = Status.Pended;
+            post.ModifyDate = DateTime.Now;
+            post.PostDate = DateTime.Now;
             bool b = PostBll.UpdateEntitySaved(post);
             var cast = BroadcastBll.LoadEntities(c => c.Status == Status.Subscribed).ToList();
             string link = Request.Url?.Scheme + "://" + Request.Url?.Authority + "/" + id;
             cast.ForEach(c =>
             {
                 var ts = DateTime.Now.GetTotalMilliseconds();
-                string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.PostDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new { c.Email, act = "cancel", validate = c.ValidateCode, timespan = ts, hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"]) }, Request.Url.Scheme));
+                string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new { c.Email, act = "cancel", validate = c.ValidateCode, timespan = ts, hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"]) }, Request.Url.Scheme));
                 BackgroundJob.Enqueue(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email));
             });
             HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
@@ -620,8 +622,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     cast.ForEach(c =>
                     {
                         var ts = DateTime.Now.GetTotalMilliseconds();
-                        string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.PostDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new { c.Email, act = "cancel", validate = c.ValidateCode, timespan = ts, hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"]) }, Request.Url.Scheme));
-                        BackgroundJob.Schedule(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email), (p.PostDate - DateTime.Now));
+                        string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new { c.Email, act = "cancel", validate = c.ValidateCode, timespan = ts, hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"]) }, Request.Url.Scheme));
+                        BackgroundJob.Schedule(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
                     });
                 }
 #endif
@@ -683,6 +685,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 if (timespan.HasValue && timespan.Value > DateTime.Now)
                 {
                     p.Status = Status.Schedule;
+                    p.PostDate = timespan.Value;
+                    p.ModifyDate = timespan.Value;
                     HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.PublishPost), args: p);
                     return ResultData(p.Mapper<PostOutputDto>(), message: schedule ? $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！" : "文章发表成功！");
                 }
@@ -696,8 +700,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 cast.ForEach(c =>
                 {
                     var ts = DateTime.Now.GetTotalMilliseconds();
-                    string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.PostDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new { c.Email, act = "cancel", validate = c.ValidateCode, timespan = ts, hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"]) }, Request.Url.Scheme));
-                    BackgroundJob.Schedule(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email), (p.PostDate - DateTime.Now));
+                    string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new { c.Email, act = "cancel", validate = c.ValidateCode, timespan = ts, hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"]) }, Request.Url.Scheme));
+                    BackgroundJob.Schedule(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
                 });
                 HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
                 return ResultData(null, true, "文章发表成功！");

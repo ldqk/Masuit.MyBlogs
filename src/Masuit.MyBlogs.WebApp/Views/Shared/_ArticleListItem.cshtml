@@ -49,7 +49,7 @@
             <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
                 <div class="small padding-bot10">
                     作者：<i class="icon-user-check"></i><strong class="label label-primary">@Model.Author</strong> <span class="text-muted">|
-                        发表时间：<i class="fa fa-clock-o"></i> @Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss") |
+                        发表时间：<i class="fa fa-clock-o"></i> @Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss") |
                         分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.CategoryName,"Category","Home",new{id=Model.CategoryId},null)
                     </span>
                 </div>
