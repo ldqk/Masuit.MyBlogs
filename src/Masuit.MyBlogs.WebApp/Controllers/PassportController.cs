@@ -21,6 +21,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
     {
         public IUserInfoBll UserInfoBll { get; set; }
         public ILoginRecordBll LoginRecordBll { get; set; }
+
         public PassportController(IUserInfoBll userInfoBll, ILoginRecordBll loginRecordBll)
         {
             UserInfoBll = userInfoBll;
@@ -29,7 +30,15 @@ namespace Masuit.MyBlogs.WebApp.Controllers
 
         public ActionResult ResultData(object data, bool isTrue = true, string message = "")
         {
-            return Content(JsonConvert.SerializeObject(new { Success = isTrue, Message = message, Data = data }, new JsonSerializerSettings { MissingMemberHandling = MissingMemberHandling.Ignore }), "application/json");
+            return Content(JsonConvert.SerializeObject(new
+            {
+                Success = isTrue,
+                Message = message,
+                Data = data
+            }, new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            }), "application/json");
         }
 
         public ActionResult Login()
@@ -91,7 +100,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     HttpCookie userCookie = new HttpCookie("username", Server.UrlEncode(username.Trim()));
                     Response.Cookies.Add(userCookie);
                     userCookie.Expires = DateTime.Now.AddDays(7);
-                    HttpCookie passCookie = new HttpCookie("password", password.Trim().DesEncrypt(ConfigurationManager.AppSettings["BaiduAK"])) { Expires = DateTime.Now.AddDays(7) };
+                    HttpCookie passCookie = new HttpCookie("password", password.Trim().DesEncrypt(ConfigurationManager.AppSettings["BaiduAK"]))
+                    {
+                        Expires = DateTime.Now.AddDays(7)
+                    };
                     Response.Cookies.Add(passCookie);
                 }
                 HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, Request.UserHostAddress, LoginType.Default);
@@ -112,7 +124,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         public ActionResult ValidateCode()
         {
             string code = Tools.Strings.ValidateCode.CreateValidateCode(6);
-            Session.SetByRedis("valid", code);//将验证码生成到Session中
+            Session.SetByRedis("valid", code); //将验证码生成到Session中
             System.Web.HttpContext.Current.CreateValidateGraphic(code);
             Response.ContentType = "image/jpeg";
             return File(Encoding.UTF8.GetBytes(code), "image/jpeg");

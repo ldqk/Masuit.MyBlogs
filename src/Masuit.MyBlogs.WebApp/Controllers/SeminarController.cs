@@ -65,7 +65,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             if (seminar.Id > 0)
             {
                 //更新
-                contain = SeminarBll.GetAll().Select(s => s.Title).Except(new List<string>() { SeminarBll.GetById(seminar.Id).Title }).Contains(seminar.Title);
+                contain = SeminarBll.GetAll().Select(s => s.Title).Except(new List<string>()
+                {
+                    SeminarBll.GetById(seminar.Id).Title
+                }).Contains(seminar.Title);
             }
             else
             {
@@ -118,6 +121,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             bool b = SeminarBll.UpdateEntitySaved(seminar);
             return ResultData(null, b, b ? $"已成功将【{post.Title}】添加到专题【{seminar.Title}】" : "添加失败！");
         }
+
         [Authority]
         public ActionResult RemovePost(int id, int pid)
         {
@@ -127,6 +131,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             bool b = SeminarBll.UpdateEntitySaved(seminar);
             return ResultData(null, b, b ? $"已成功将【{post.Title}】从专题【{seminar.Title}】移除" : "添加失败！");
         }
+
         #endregion
     }
 }

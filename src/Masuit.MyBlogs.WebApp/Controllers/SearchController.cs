@@ -122,7 +122,12 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 Keywords = g.FirstOrDefault().KeyWords,
                 Count = g.Count()
             }).ToList();
-            return ResultData(new { month, week, today });
+            return ResultData(new
+            {
+                month,
+                week,
+                today
+            });
         }
 
         [HttpPost, Authority]

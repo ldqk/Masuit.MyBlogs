@@ -22,11 +22,13 @@ namespace Masuit.MyBlogs.WebApp.Controllers
     public class SystemController : AdminController
     {
         public ISystemSettingBll SystemSettingBll { get; set; }
+
         public SystemController(IUserInfoBll userInfoBll, ISystemSettingBll systemSettingBll)
         {
             UserInfoBll = userInfoBll;
             SystemSettingBll = systemSettingBll;
         }
+
         public async Task<ActionResult> GetBaseInfo()
         {
             List<CpuInfo> cpuInfo = SystemInfo.GetCpuInfo();
@@ -35,7 +37,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var total = new StringBuilder();
             var free = new StringBuilder();
             var usage = new StringBuilder();
-            SystemInfo.DiskTotalSpace().ForEach(kv => { total.Append(kv.Key + kv.Value + " | "); });
+            SystemInfo.DiskTotalSpace().ForEach(kv =>
+            {
+                total.Append(kv.Key + kv.Value + " | ");
+            });
             SystemInfo.DiskFree().ForEach(kv => free.Append(kv.Key + kv.Value + " | "));
             SystemInfo.DiskUsage().ForEach(kv => usage.Append(kv.Key + kv.Value.ToString("P") + " | "));
             IList<string> mac = SystemInfo.GetMacAddress();
@@ -43,7 +48,25 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var span = DateTime.Now - CommonHelper.StartupTime;
             var boot = DateTime.Now - SystemInfo.BootTime();
 
-            return Content(await new { runningTime = $"{span.Days}天{span.Hours}小时{span.Minutes}分钟", bootTime = $"{boot.Days}天{boot.Hours}小时{boot.Minutes}分钟", cpuInfo, ramInfo, osVersion, diskInfo = new { total = total.ToString(), free = free.ToString(), usage = usage.ToString() }, netInfo = new { mac, ips } }.ToJsonStringAsync().ConfigureAwait(false), "application/json");
+            return Content(await new
+            {
+                runningTime = $"{span.Days}天{span.Hours}小时{span.Minutes}分钟",
+                bootTime = $"{boot.Days}天{boot.Hours}小时{boot.Minutes}分钟",
+                cpuInfo,
+                ramInfo,
+                osVersion,
+                diskInfo = new
+                {
+                    total = total.ToString(),
+                    free = free.ToString(),
+                    usage = usage.ToString()
+                },
+                netInfo = new
+                {
+                    mac,
+                    ips
+                }
+            }.ToJsonStringAsync().ConfigureAwait(false), "application/json");
         }
 
         public ActionResult GetHistoryList()
@@ -62,7 +85,11 @@ namespace Masuit.MyBlogs.WebApp.Controllers
 
         public ActionResult GetSettings()
         {
-            var list = SystemSettingBll.GetAll().Select(s => new { s.Name, s.Value }).ToList();
+            var list = SystemSettingBll.GetAll().Select(s => new
+            {
+                s.Name,
+                s.Value
+            }).ToList();
             return ResultData(list);
         }
 
@@ -92,7 +119,11 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var list = new List<object>();
             foreach (Enum e in array)
             {
-                list.Add(new { e, name = e.GetDisplay() });
+                list.Add(new
+                {
+                    e,
+                    name = e.GetDisplay()
+                });
             }
             return ResultData(list);
         }
@@ -119,6 +150,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 return ResultData(null, false, "邮件配置测试失败！错误信息：\r\n" + e.Message + "\r\n\r\n详细堆栈跟踪：\r\n" + e.StackTrace);
             }
         }
+
         public ActionResult PathTest(string path)
         {
             if (path.Equals("/") || path.Equals("\\") || string.IsNullOrWhiteSpace(path))

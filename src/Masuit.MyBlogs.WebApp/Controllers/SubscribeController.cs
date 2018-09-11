@@ -6,7 +6,6 @@ using System.Web.Mvc;
 using Hangfire;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
-using Masuit.Tools;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
@@ -107,6 +106,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             }
             return Content("您输入的邮箱没有订阅本站更新，或者已经取消订阅了");
         }
+
         public ActionResult Subscribe(string email, string act, string validate, double timespan, string hash)
         {
             var ts = DateTime.Now.GetTotalMilliseconds();
@@ -145,6 +145,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
 
 
         #region 管理端
+
         [Authority]
         public ActionResult Save(Broadcast model)
         {
@@ -190,6 +191,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }
+
         #endregion
     }
 }

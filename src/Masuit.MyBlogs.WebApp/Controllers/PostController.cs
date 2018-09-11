@@ -34,6 +34,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         private IPostAccessRecordBll PostAccessRecordBll { get; set; }
         public ICommentBll CommentBll { get; set; }
         public IPostHistoryVersionBll PostHistoryVersionBll { get; set; }
+
         public PostController(IPostBll postBll, ICategoryBll categoryBll, IBroadcastBll broadcastBll, ISeminarBll seminarBll, IPostAccessRecordBll postAccessRecordBll, ICommentBll commentBll, IPostHistoryVersionBll postHistoryVersionBll)
         {
             PostBll = postBll;
@@ -55,7 +56,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 if (Regex.Match(kw, BanRegex).Length > 0 || Regex.Match(kw, ModRegex).Length > 0)
                 {
                     ViewBag.Keyword = "";
-                    return RedirectToAction("Details", "Post", new { id });
+                    return RedirectToAction("Details", "Post", new
+                    {
+                        id
+                    });
                 }
             }
             Post post = PostBll.GetById(id);
@@ -149,7 +153,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var post = PostHistoryVersionBll.GetById(hid);
             if (post is null)
             {
-                return RedirectToAction("History", new { id });
+                return RedirectToAction("History", new
+                {
+                    id
+                });
             }
             ViewBag.Next = PostHistoryVersionBll.GetFirstEntityFromL2CacheNoTracking(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
             ViewBag.Prev = PostHistoryVersionBll.GetFirstEntityFromL2CacheNoTracking(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
@@ -269,7 +276,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 if (p.Status == Status.Pending)
                 {
                     var email = GetSettings("ReceiveEmail");
-                    string link = Url.Action("Details", "Post", new { id = p.Id }, Request.Url?.Scheme ?? "http");
+                    string link = Url.Action("Details", "Post", new
+                    {
+                        id = p.Id
+                    }, Request.Url?.Scheme ?? "http");
                     string content = System.IO.File.ReadAllText(Request.MapPath("/template/publish.html")).Replace("{{link}}", link).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", p.Title);
                     BackgroundJob.Enqueue(() => SendMail(GetSettings("Title") + "有访客投稿：", content, email));
                     return ResultData(p.Mapper<PostOutputDto>(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
@@ -297,7 +307,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         public ActionResult All()
         {
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
-            List<string> tags = PostBll.GetAll().Select(p => p.Label).ToList();//tag
+            List<string> tags = PostBll.GetAll().Select(p => p.Label).ToList(); //tag
             List<string> result = new List<string>();
             tags.ForEach(s =>
             {
@@ -312,7 +322,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 Count = c.Post.Count(p => p.Status == Status.Pended || user.IsAdmin)
-            }).ToList();//category
+            }).ToList(); //category
             ViewBag.seminars = SeminarBll.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
                 Id = c.Id,
@@ -383,7 +393,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             cast.ForEach(c =>
             {
                 var ts = DateTime.Now.GetTotalMilliseconds();
-                string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new { c.Email, act = "cancel", validate = c.ValidateCode, timespan = ts, hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"]) }, Request.Url.Scheme));
+                string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
+                {
+                    c.Email,
+                    act = "cancel",
+                    validate = c.ValidateCode,
+                    timespan = ts,
+                    hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"])
+                }, Request.Url.Scheme));
                 BackgroundJob.Enqueue(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email));
             });
             HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
@@ -475,7 +492,22 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <returns></returns>
         public ActionResult GetAllData()
         {
-            var plist = PostBll.LoadEntitiesNoTracking(p => p.Status != Status.Deleted).OrderBy(p => p.Status).ThenByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).Select(p => new { p.Id, p.Author, CategoryName = p.Category.Name, p.Email, p.IsFixedTop, p.Label, md = p.ModifyDate, pd = p.PostDate, p.Title, ViewCount = p.PostAccessRecord.Sum(r => r.ClickCount), p.VoteDownCount, p.VoteUpCount, stat = p.Status }).ToList();
+            var plist = PostBll.LoadEntitiesNoTracking(p => p.Status != Status.Deleted).OrderBy(p => p.Status).ThenByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).Select(p => new
+            {
+                p.Id,
+                p.Author,
+                CategoryName = p.Category.Name,
+                p.Email,
+                p.IsFixedTop,
+                p.Label,
+                md = p.ModifyDate,
+                pd = p.PostDate,
+                p.Title,
+                ViewCount = p.PostAccessRecord.Sum(r => r.ClickCount),
+                p.VoteDownCount,
+                p.VoteUpCount,
+                stat = p.Status
+            }).ToList();
             var list = new List<PostDataModel>();
             plist.ForEach(item =>
             {
@@ -525,7 +557,23 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     temp = order.ThenByDescending(p => p.ModifyDate);
                     break;
             }
-            var plist = temp.Skip((page - 1) * size).Take(size).Select(p => new { p.Id, p.Author, CategoryName = p.Category.Name, p.Email, p.IsFixedTop, p.Label, md = p.ModifyDate, pd = p.PostDate, p.Title, ViewCount = p.PostAccessRecord.Any() ? p.PostAccessRecord.Sum(r => r.ClickCount) : 1, p.VoteDownCount, p.VoteUpCount, stat = p.Status, ModifyCount = p.PostHistoryVersion.Count }).ToList();
+            var plist = temp.Skip((page - 1) * size).Take(size).Select(p => new
+            {
+                p.Id,
+                p.Author,
+                CategoryName = p.Category.Name,
+                p.Email,
+                p.IsFixedTop,
+                p.Label,
+                md = p.ModifyDate,
+                pd = p.PostDate,
+                p.Title,
+                ViewCount = p.PostAccessRecord.Any() ? p.PostAccessRecord.Sum(r => r.ClickCount) : 1,
+                p.VoteDownCount,
+                p.VoteUpCount,
+                stat = p.Status,
+                ModifyCount = p.PostHistoryVersion.Count
+            }).ToList();
             plist.ForEach(item =>
             {
                 PostDataModel model = item.MapTo<PostDataModel>();
@@ -552,7 +600,22 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 temp = PostBll.LoadPageEntitiesNoTracking(page, size, out total, p => p.Status == Status.Pending && (p.Title.Contains(search) || p.Author.Contains(search) || p.Email.Contains(search) || p.Label.Contains(search)), p => p.Id);
             }
-            var plist = temp.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).Select(p => new { p.Id, p.Author, CategoryName = p.Category.Name, p.Email, p.IsFixedTop, p.Label, md = p.ModifyDate, pd = p.PostDate, p.Title, ViewCount = p.PostAccessRecord.Any() ? p.PostAccessRecord.Sum(r => r.ClickCount) : 1, p.VoteDownCount, p.VoteUpCount, stat = p.Status }).ToList();
+            var plist = temp.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).Select(p => new
+            {
+                p.Id,
+                p.Author,
+                CategoryName = p.Category.Name,
+                p.Email,
+                p.IsFixedTop,
+                p.Label,
+                md = p.ModifyDate,
+                pd = p.PostDate,
+                p.Title,
+                ViewCount = p.PostAccessRecord.Any() ? p.PostAccessRecord.Sum(r => r.ClickCount) : 1,
+                p.VoteDownCount,
+                p.VoteUpCount,
+                stat = p.Status
+            }).ToList();
             var list = new List<PostDataModel>();
             plist.ForEach(item =>
             {
@@ -622,7 +685,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     cast.ForEach(c =>
                     {
                         var ts = DateTime.Now.GetTotalMilliseconds();
-                        string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new { c.Email, act = "cancel", validate = c.ValidateCode, timespan = ts, hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"]) }, Request.Url.Scheme));
+                        string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
+                        {
+                            c.Email,
+                            act = "cancel",
+                            validate = c.ValidateCode,
+                            timespan = ts,
+                            hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"])
+                        }, Request.Url.Scheme));
                         BackgroundJob.Schedule(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
                     });
                 }
@@ -636,7 +706,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         [Authority, ValidateInput(false), HttpPost]
         public ActionResult Write(PostInputDto post, string Seminars, DateTime? timespan, bool schedule = false)
         {
-            post.Content = ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/");//提取img标签，提取src属性并重新创建个只包含src属性的img标签
+            post.Content = ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/"); //提取img标签，提取src属性并重新创建个只包含src属性的img标签
             if (!CategoryBll.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
                 return ResultData(null, message: "请选择一个分类");
@@ -700,7 +770,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 cast.ForEach(c =>
                 {
                     var ts = DateTime.Now.GetTotalMilliseconds();
-                    string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new { c.Email, act = "cancel", validate = c.ValidateCode, timespan = ts, hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"]) }, Request.Url.Scheme));
+                    string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
+                    {
+                        c.Email,
+                        act = "cancel",
+                        validate = c.ValidateCode,
+                        timespan = ts,
+                        hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"])
+                    }, Request.Url.Scheme));
                     BackgroundJob.Schedule(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
                 });
                 HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
@@ -715,7 +792,13 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <returns></returns>
         public ActionResult GetTops()
         {
-            var list = PostBll.LoadEntitiesNoTracking<DateTime, PostOutputDto>(p => p.Status == Status.Pended && p.IsBanner, p => p.ModifyDate, false).Select(p => new { p.Id, p.Description, p.Title, p.ImageUrl }).ToList();
+            var list = PostBll.LoadEntitiesNoTracking<DateTime, PostOutputDto>(p => p.Status == Status.Pended && p.IsBanner, p => p.ModifyDate, false).Select(p => new
+            {
+                p.Id,
+                p.Description,
+                p.Title,
+                p.ImageUrl
+            }).ToList();
             return ResultData(list);
         }
 
@@ -725,7 +808,15 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <returns></returns>
         public ActionResult GetNotTops()
         {
-            var list = PostBll.LoadEntitiesNoTracking(p => p.Status == Status.Pended && !p.IsBanner).GroupBy(p => p.Category.Name).Select(g => new { text = g.Key, children = g.OrderBy(p => p.Title).Select(p => new { id = p.Id, text = p.Title }) }).ToList();
+            var list = PostBll.LoadEntitiesNoTracking(p => p.Status == Status.Pended && !p.IsBanner).GroupBy(p => p.Category.Name).Select(g => new
+            {
+                text = g.Key,
+                children = g.OrderBy(p => p.Title).Select(p => new
+                {
+                    id = p.Id,
+                    text = p.Title
+                })
+            }).ToList();
             return ResultData(list);
         }
 
@@ -758,6 +849,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             bool b = PostBll.UpdateEntitySaved(post);
             return ResultData(null, b, b ? "取消头图页成功" : "取消头图页失败！");
         }
+
         [Authority]
         public ActionResult AddSeminar(int id, int sid)
         {
@@ -767,6 +859,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             bool b = PostBll.UpdateEntitySaved(post);
             return ResultData(null, b, b ? $"已将文章【{post.Title}】添加到专题【{seminar.Title}】" : "添加失败");
         }
+
         [Authority]
         public ActionResult RemoveSeminar(int id, int sid)
         {
@@ -794,6 +887,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var token = RedisHelper.GetString("ArticleViewToken");
             return ResultData(token);
         }
+
         #endregion
     }
 }

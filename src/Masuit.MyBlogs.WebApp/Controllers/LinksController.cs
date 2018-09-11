@@ -31,7 +31,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         public async Task<ActionResult> Apply(Links links)
         {
             Uri uri = new Uri(links.Url);
-            using (HttpClient client = new HttpClient() { BaseAddress = uri })
+            using (HttpClient client = new HttpClient()
+            {
+                BaseAddress = uri
+            })
             {
                 client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
                 client.DefaultRequestHeaders.Referrer = Request.Url;
@@ -68,7 +71,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         public async Task<ActionResult> Check(string link)
         {
             Uri uri = new Uri(link);
-            using (var client = new HttpClient() { BaseAddress = uri })
+            using (var client = new HttpClient()
+            {
+                BaseAddress = uri
+            })
             {
                 client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
                 return await await client.GetAsync(uri.PathAndQuery).ContinueWith(async t =>

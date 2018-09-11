@@ -63,7 +63,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         {
             Category category = CategoryBll.GetById(id);
             Category moveCat = CategoryBll.GetById(cid);
-            category.Post.ForEach(p => { moveCat.Post.Add(p); });
+            category.Post.ForEach(p =>
+            {
+                moveCat.Post.Add(p);
+            });
             CategoryBll.UpdateEntity(moveCat);
             bool b = CategoryBll.DeleteByIdSaved(id);
             return ResultData(null, b, b ? "分类删除成功" : "分类删除失败");

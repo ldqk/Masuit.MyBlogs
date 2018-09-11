@@ -11,7 +11,6 @@ using Masuit.MyBlogs.WebApp.Models;
 using Masuit.Tools;
 using Masuit.Tools.Models;
 using Masuit.Tools.Net;
-using Masuit.Tools.Win32;
 using Models.Enum;
 using Newtonsoft.Json;
 
@@ -24,6 +23,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
     public class PublicController : ApiController
     {
         public IPostBll PostBll { get; set; }
+
         public PublicController(IPostBll postBll)
         {
             PostBll = postBll;
@@ -82,7 +82,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 PhysicsAddress address = await ip.GetPhysicsAddressInfo();
                 return address;
             }
-            HttpClient client = new HttpClient() { BaseAddress = new Uri("http://api.map.baidu.com") };
+            HttpClient client = new HttpClient()
+            {
+                BaseAddress = new Uri("http://api.map.baidu.com")
+            };
             string s = client.GetStringAsync($"/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={ConfigurationManager.AppSettings["BaiduAK"]}").Result;
             PhysicsAddress physicsAddress = JsonConvert.DeserializeObject<PhysicsAddress>(s);
             return physicsAddress;
@@ -93,7 +96,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// </summary>
         /// <param name="addr">详细地理信息</param>
         /// <returns></returns>
-
         [HttpPost, Route("tools/address")]
         public async Task<Location> Address(string addr)
         {
@@ -110,9 +112,19 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     return address.AddressResult.Location;
                 }
             }
-            HttpClient client = new HttpClient() { BaseAddress = new Uri("http://api.map.baidu.com") };
+            HttpClient client = new HttpClient()
+            {
+                BaseAddress = new Uri("http://api.map.baidu.com")
+            };
             string s = client.GetStringAsync($"/geocoder/v2/?output=json&address={addr}&ak={ConfigurationManager.AppSettings["BaiduAK"]}").Result;
-            var physicsAddress = JsonConvert.DeserializeAnonymousType(s, new { status = 0, result = new { location = new Location() } });
+            var physicsAddress = JsonConvert.DeserializeAnonymousType(s, new
+            {
+                status = 0,
+                result = new
+                {
+                    location = new Location()
+                }
+            });
             return physicsAddress.result.location;
         }
 

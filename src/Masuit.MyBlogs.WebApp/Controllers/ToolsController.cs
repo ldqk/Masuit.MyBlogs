@@ -48,10 +48,15 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 PhysicsAddress address = await ip.GetPhysicsAddressInfo();
                 return View(address);
             }
-            HttpClient client = new HttpClient() { BaseAddress = new Uri("http://api.map.baidu.com") };
-            string s = client.GetStringAsync($"/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={ConfigurationManager.AppSettings["BaiduAK"]}").Result;
-            PhysicsAddress physicsAddress = JsonConvert.DeserializeObject<PhysicsAddress>(s);
-            return View(physicsAddress);
+            using (HttpClient client = new HttpClient()
+            {
+                BaseAddress = new Uri("http://api.map.baidu.com")
+            })
+            {
+                var s = await client.GetStringAsync($"/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={ConfigurationManager.AppSettings["BaiduAK"]}");
+                PhysicsAddress physicsAddress = JsonConvert.DeserializeObject<PhysicsAddress>(s);
+                return View(physicsAddress);
+            }
         }
 
         [HttpGet, Route("addr")]
@@ -76,21 +81,26 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 }
             }
             ViewBag.Address = addr;
-            HttpClient client = new HttpClient() { BaseAddress = new Uri("http://api.map.baidu.com") };
-            string s = client.GetStringAsync($"/geocoder/v2/?output=json&address={addr}&ak={ConfigurationManager.AppSettings["BaiduAK"]}").Result;
-            var physicsAddress = JsonConvert.DeserializeAnonymousType(s, new
+            using (HttpClient client = new HttpClient()
             {
-                status = 0,
-                result = new
+                BaseAddress = new Uri("http://api.map.baidu.com")
+            })
+            {
+                var s = await client.GetStringAsync($"/geocoder/v2/?output=json&address={addr}&ak={ConfigurationManager.AppSettings["BaiduAK"]}");
+                var physicsAddress = JsonConvert.DeserializeAnonymousType(s, new
                 {
-                    location = new Location()
+                    status = 0,
+                    result = new
+                    {
+                        location = new Location()
+                    }
+                });
+                if (Request.HttpMethod.ToLower().Equals("get"))
+                {
+                    return View(physicsAddress.result.location);
                 }
-            });
-            if (Request.HttpMethod.ToLower().Equals("get"))
-            {
-                return View(physicsAddress.result.location);
+                return Json(physicsAddress.result.location);
             }
-            return Json(physicsAddress.result.location);
         }
 
         [Route("vip")]

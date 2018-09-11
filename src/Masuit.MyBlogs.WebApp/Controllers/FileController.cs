@@ -58,7 +58,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             switch (req.Action)
             {
                 case "list":
-                    string path = string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(req.Path) : prefix + req.Path;//Server.MapPath(req.Path);
+                    string path = string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(req.Path) : prefix + req.Path; //Server.MapPath(req.Path);
                     string[] dirs = Directory.GetDirectories(path);
                     string[] files = Directory.GetFiles(path);
                     dirs.ForEach(s =>
@@ -99,7 +99,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                             Directory.Delete(s, true);
                         }
                     });
-                    list.Add(new { success = "true" });
+                    list.Add(new
+                    {
+                        success = "true"
+                    });
                     break;
                 case "rename":
                 case "move":
@@ -131,7 +134,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                             }
                         });
                     }
-                    list.Add(new { success = "true" });
+                    list.Add(new
+                    {
+                        success = "true"
+                    });
                     break;
                 case "copy":
                     path = string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(req.Item) : prefix + req.Item;
@@ -147,25 +153,37 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                         //Server.MapPath(req.NewPath);
                         req.Items.ForEach(s => System.IO.File.Copy(string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(s) : prefix + s, !string.IsNullOrEmpty(req.SingleFilename) ? Path.Combine(newpath, req.SingleFilename) : Path.Combine(newpath, Path.GetFileName(s))));
                     }
-                    list.Add(new { success = "true" });
+                    list.Add(new
+                    {
+                        success = "true"
+                    });
                     break;
                 case "edit":
                     path = string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(req.Item) : prefix + req.Item;
                     //path = Server.MapPath(req.Item);
                     string content = req.Content;
                     System.IO.File.WriteAllText(path, content, Encoding.UTF8);
-                    list.Add(new { success = "true" });
+                    list.Add(new
+                    {
+                        success = "true"
+                    });
                     break;
                 case "getContent":
                     path = string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(req.Item) : prefix + req.Item;
                     //path = Server.MapPath(req.Item);
                     content = System.IO.File.ReadAllText(path, Encoding.UTF8);
-                    return Json(new { result = content }, JsonRequestBehavior.AllowGet);
+                    return Json(new
+                    {
+                        result = content
+                    }, JsonRequestBehavior.AllowGet);
                 case "createFolder":
                     string dir = string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(req.NewPath) : prefix + req.NewPath;
                     //string dir = Server.MapPath(req.NewPath);
                     var directoryInfo = Directory.CreateDirectory(dir);
-                    list.Add(new { success = directoryInfo.Exists.ToString() });
+                    list.Add(new
+                    {
+                        success = directoryInfo.Exists.ToString()
+                    });
                     break;
                 case "changePermissions":
                     break;
@@ -198,7 +216,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                                 dirname = Directory.GetParent(FileList[0]).FullName;
                             }
                             f.NameTransform = new ZipNameTransform(dirname); //通过这个名称格式化器，可以将里面的文件名进行一些处理。默认情况下，会自动根据文件的路径在zip中创建有关的文件夹。  
-                            FileList.ForEach(s => { f.Add(s); });
+                            FileList.ForEach(s =>
+                            {
+                                f.Add(s);
+                            });
                             f.CommitUpdate();
                             buffer = new byte[ms.Length];
                             ms.Position = 0;
@@ -206,13 +227,19 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                         }
                         fs.Write(buffer, 0, buffer.Length);
                     }
-                    list.Add(new { success = "true" });
+                    list.Add(new
+                    {
+                        success = "true"
+                    });
                     break;
                 case "extract":
                     string folder = Path.Combine(string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(req.Destination) : prefix + req.Destination, req.FolderName.Trim('/', '\\'));
                     string zip = string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(req.Item) : prefix + req.Item;
                     ClassZip.UnZip(zip, folder);
-                    list.Add(new { success = "true" });
+                    list.Add(new
+                    {
+                        success = "true"
+                    });
                     break;
                 default:
                     var httpfiles = Request.Files;
@@ -226,7 +253,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     }
                     break;
             }
-            return Json(new { result = list }, JsonRequestBehavior.AllowGet);
+            return Json(new
+            {
+                result = list
+            }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -268,11 +298,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                             dirname = Directory.GetParent(FileList[0]).FullName;
                         }
                         f.NameTransform = new ZipNameTransform(dirname); //通过这个名称格式化器，可以将里面的文件名进行一些处理。默认情况下，会自动根据文件的路径在zip中创建有关的文件夹。  
-                        FileList.ForEach(s => { f.Add(s); });
+                        FileList.ForEach(s =>
+                        {
+                            f.Add(s);
+                        });
                         f.CommitUpdate();
                         //buffer = new byte[ms.Length];
                         ms.Position = 0;
-                        buffer = ms.GetBuffer();//.Read(buffer, 0, buffer.Length);
+                        buffer = ms.GetBuffer(); //.Read(buffer, 0, buffer.Length);
                     }
                     return File(buffer, "application/octet-stream", Path.GetFileName(toFilename));
             }
@@ -298,6 +331,5 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 GetFilesRecurs(directory);
             }
         }
-
     }
 }

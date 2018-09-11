@@ -2,14 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-#if !DEBUG
-#endif
 using System.Web.Mvc;
 using Common;
 using Hangfire;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
-using Masuit.Tools;
 using Masuit.Tools.Html;
 using Masuit.Tools.Net;
 using Models.DTO;
@@ -22,9 +19,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
 {
     public class CommentController : BaseController
     {
-        private ICommentBll CommentBll { get; set; }
-        private IPostBll PostBll { get; set; }
-        public IInternalMessageBll MessageBll { get; set; }
+        private ICommentBll CommentBll { get; }
+        private IPostBll PostBll { get; }
+        private IInternalMessageBll MessageBll { get; }
+
         public CommentController(ICommentBll commentBll, IPostBll postBll, IInternalMessageBll messageBll)
         {
             CommentBll = commentBll;
@@ -61,34 +59,58 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             if (com != null)
             {
                 var emails = new List<string>();
-                var email = GetSettings("ReceiveEmail");//站长邮箱
+                var email = GetSettings("ReceiveEmail"); //站长邮箱
                 emails.Add(email);
                 string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{title}}", com.Post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", com.NickName).Replace("{{content}}", com.Content);
                 if (comment.Status == Status.Pended)
                 {
                     if (!com.IsMaster)
                     {
-                        MessageBll.AddEntitySaved(new InternalMessage() { Title = $"来自【{com.NickName}】的新文章评论", Content = com.Content, Link = Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, Request.Url.Scheme) + "#comment" });
+                        MessageBll.AddEntitySaved(new InternalMessage()
+                        {
+                            Title = $"来自【{com.NickName}】的新文章评论",
+                            Content = com.Content,
+                            Link = Url.Action("Details", "Post", new
+                            {
+                                id = com.PostId,
+                                cid = com.Id
+                            }, Request.Url.Scheme) + "#comment"
+                        });
                     }
 #if !DEBUG
                     if (com.ParentId == 0)
                     {
                         emails.Add(PostBll.GetById(com.PostId).Email);
                         //新评论，只通知博主和楼主
-                        BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, Request.Url.Scheme) + "#comment"), string.Join(",", emails.Distinct())));
+                        BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new
+                        {
+                            id = com.PostId,
+                            cid = com.Id
+                        }, Request.Url.Scheme) + "#comment"), string.Join(",", emails.Distinct())));
                     }
                     else
                     {
                         //通知博主和上层所有关联的评论访客
                         var pid = CommentBll.GetParentCommentIdByChildId(com.Id);
-                        emails = CommentBll.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Except(new List<string>() { com.Email }).Distinct().ToList();
-                        string link = Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, Request.Url.Scheme) + "#comment";
+                        emails = CommentBll.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Except(new List<string>()
+                        {
+                            com.Email
+                        }).Distinct().ToList();
+                        string link = Url.Action("Details", "Post", new
+                        {
+                            id = com.PostId,
+                            cid = com.Id
+                        }, Request.Url.Scheme) + "#comment";
                         BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")}文章评论回复：", content.Replace("{{link}}", link), string.Join(",", emails)));
                     }
 #endif
                     return ResultData(null, true, "评论发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将显示到评论列表中");
                 }
-                BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, Request.Url.Scheme) + "#comment") + "<p style='color:red;'>(待审核)</p>", string.Join(",", emails)));
+                BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new
+                {
+                    id = com.PostId,
+                    cid = com.Id
+                }, Request.Url.Scheme) + "#comment") + "<p style='color:red;'>(待审核)</p>", string.Join(",", emails)));
                 return ResultData(null, true, "评论成功，待站长审核通过以后将显示");
             }
             return ResultData(null, false, "评论失败");
@@ -125,7 +147,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 if (single.Any())
                 {
                     total = 1;
-                    return ResultData(new { total, parentTotal = total, page, size, rows = single.Mapper<IList<CommentViewModel>>() });
+                    return ResultData(new
+                    {
+                        total,
+                        parentTotal = total,
+                        page,
+                        size,
+                        rows = single.Mapper<IList<CommentViewModel>>()
+                    });
                 }
             }
             IList<Comment> parent = CommentBll.LoadPageEntities(page, size, out total, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Pended || user.IsAdmin), c => c.CommentDate, false).ToList();
@@ -138,7 +167,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var qlist = list.Where(c => (c.Status == Status.Pended || user.IsAdmin));
             if (total > 0)
             {
-                return ResultData(new { total, parentTotal = total, page, size, rows = qlist.Mapper<IList<CommentViewModel>>() });
+                return ResultData(new
+                {
+                    total,
+                    parentTotal = total,
+                    page,
+                    size,
+                    rows = qlist.Mapper<IList<CommentViewModel>>()
+                });
             }
             return ResultData(null, false, "没有评论");
         }
@@ -155,7 +191,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 if (single.Any())
                 {
                     total = 1;
-                    return ResultData(new { total, parentTotal = total, page, size, rows = single.Mapper<IList<CommentViewModel>>() });
+                    return ResultData(new
+                    {
+                        total,
+                        parentTotal = total,
+                        page,
+                        size,
+                        rows = single.Mapper<IList<CommentViewModel>>()
+                    });
                 }
             }
             IList<Comment> parent = CommentBll.LoadPageEntities(page, size, out total, c => c.ParentId == 0 && (c.Status == Status.Pended || user.IsAdmin), c => c.CommentDate, false).ToList();
@@ -168,7 +211,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var qlist = list.Where(c => (c.Status == Status.Pended || user.IsAdmin));
             if (total > 0)
             {
-                return ResultData(new { total, parentTotal = total, page, size, rows = qlist.Mapper<IList<CommentViewModel>>() });
+                return ResultData(new
+                {
+                    total,
+                    parentTotal = total,
+                    page,
+                    size,
+                    rows = qlist.Mapper<IList<CommentViewModel>>()
+                });
             }
             return ResultData(null, false, "没有评论");
         }
@@ -182,8 +232,15 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var pid = comment.ParentId == 0 ? comment.Id : CommentBll.GetParentCommentIdByChildId(id);
 #if !DEBUG
             string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", comment.NickName).Replace("{{content}}", comment.Content);
-            var emails = CommentBll.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>() { comment.Email }).ToList();
-            string link = Url.Action("Details", "Post", new { id = comment.PostId, cid = pid }, Request.Url.Scheme) + "#comment";
+            var emails = CommentBll.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>()
+            {
+                comment.Email
+            }).ToList();
+            string link = Url.Action("Details", "Post", new
+            {
+                id = comment.PostId,
+                cid = pid
+            }, Request.Url.Scheme) + "#comment";
             BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")}文章评论回复：", content.Replace("{{link}}", link), string.Join(",", emails)));
 #endif
             return ResultData(null, b, b ? "审核通过！" : "审核失败！");

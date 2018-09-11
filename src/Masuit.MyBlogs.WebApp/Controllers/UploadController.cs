@@ -19,7 +19,15 @@ namespace Masuit.MyBlogs.WebApp.Controllers
     {
         public ActionResult ResultData(object data, bool isTrue = true, string message = "")
         {
-            return Content(JsonConvert.SerializeObject(new { Success = isTrue, Message = message, Data = data }, new JsonSerializerSettings { MissingMemberHandling = MissingMemberHandling.Ignore }), "application/json", Encoding.UTF8);
+            return Content(JsonConvert.SerializeObject(new
+            {
+                Success = isTrue,
+                Message = message,
+                Data = data
+            }, new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            }), "application/json", Encoding.UTF8);
         }
 
         #region Word上传转码
@@ -108,6 +116,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 return ResultData(null, false, "转码失败！");
             }
         }
+
         #endregion
 
         [Route("download")]

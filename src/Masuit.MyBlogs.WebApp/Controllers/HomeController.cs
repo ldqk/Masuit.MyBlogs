@@ -24,6 +24,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         public ISearchDetailsBll SearchDetailsBll { get; set; }
         public INoticeBll NoticeBll { get; set; }
         public IPostAccessRecordBll PostAccessRecordBll { get; set; }
+
         public HomeController(IPostBll postBll, ICommentBll commentBll, ICategoryBll categoryBll, ISearchDetailsBll searchDetailsBll, INoticeBll noticeBll, IPostAccessRecordBll postAccessRecordBll)
         {
             CategoryBll = categoryBll;
@@ -43,7 +44,13 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         {
             ViewBag.Total = 0;
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
-            var tops = (await PostBll.LoadEntitiesFromL2CacheNoTrackingAsync<DateTime, PostOutputDto>(t => t.Status == Status.Pended && t.IsBanner, p => p.ModifyDate, false).ConfigureAwait(true)).Select(p => new { p.Title, p.Description, p.Id, p.ImageUrl }).ToList();
+            var tops = (await PostBll.LoadEntitiesFromL2CacheNoTrackingAsync<DateTime, PostOutputDto>(t => t.Status == Status.Pended && t.IsBanner, p => p.ModifyDate, false).ConfigureAwait(true)).Select(p => new
+            {
+                p.Title,
+                p.Description,
+                p.Id,
+                p.ImageUrl
+            }).ToList();
             var viewModel = await GetIndexPageViewModelAsync(1, 15, orderBy, user).ConfigureAwait(true);
             var banner = new List<PostOutputDto>();
             tops.ForEach(t =>
@@ -161,34 +168,34 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <returns></returns>
         private async Task<IndexPageViewModel> GetIndexPageViewModelAsync(int page, int size, OrderBy orderBy, UserInfoOutputDto user)
         {
-            IQueryable<PostOutputDto> postList = PostBll.LoadEntitiesNoTracking<PostOutputDto>(p => (p.Status == Status.Pended || user.IsAdmin));//准备文章的查询
-            var notices = NoticeBll.LoadPageEntitiesFromL2CacheNoTracking<DateTime, NoticeOutputDto>(1, 5, out int _, n => (n.Status == Status.Display || user.IsAdmin), n => n.ModifyDate, false).ToList();//加载前5条公告
-            var cats = await CategoryBll.LoadEntitiesFromL2CacheNoTrackingAsync<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).ConfigureAwait(true);//加载分类目录
-            var comments = CommentBll.LoadPageEntitiesFromL2CacheNoTracking<DateTime, CommentOutputDto>(1, 10, out int _, c => c.Status == Status.Pended && c.Post.Status == Status.Pended || user.IsAdmin, c => c.CommentDate, false).ToList();//加在新评论
+            IQueryable<PostOutputDto> postList = PostBll.LoadEntitiesNoTracking<PostOutputDto>(p => (p.Status == Status.Pended || user.IsAdmin)); //准备文章的查询
+            var notices = NoticeBll.LoadPageEntitiesFromL2CacheNoTracking<DateTime, NoticeOutputDto>(1, 5, out int _, n => (n.Status == Status.Display || user.IsAdmin), n => n.ModifyDate, false).ToList(); //加载前5条公告
+            var cats = await CategoryBll.LoadEntitiesFromL2CacheNoTrackingAsync<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).ConfigureAwait(true); //加载分类目录
+            var comments = CommentBll.LoadPageEntitiesFromL2CacheNoTracking<DateTime, CommentOutputDto>(1, 10, out int _, c => c.Status == Status.Pended && c.Post.Status == Status.Pended || user.IsAdmin, c => c.CommentDate, false).ToList(); //加在新评论
             var start = DateTime.Today.AddDays(-7);
             var hotSearches = await SearchDetailsBll.LoadEntitiesNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(10).Select(g => new KeywordsRankOutputDto()
             {
                 KeyWords = g.FirstOrDefault().KeyWords,
                 SearchCount = g.Count()
-            }).ToListAsync();//热词统计
-            var hot6Post = await (new Random().Next() % 2 == 0 ? postList.OrderByDescending(p => p.ViewCount) : postList.OrderByDescending(p => p.VoteUpCount)).Skip(0).Take(5).Cacheable().ToListAsync();//热门文章
-            var topPostWeek = await PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(week,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToListAsync();//文章周排行
-            var topPostMonth = await PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(month,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToListAsync();//文章月排行
-            var topPostYear = await PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(year,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToListAsync();//文章年度排行
-            var tags = new List<string>();//标签云
+            }).ToListAsync(); //热词统计
+            var hot6Post = await (new Random().Next() % 2 == 0 ? postList.OrderByDescending(p => p.ViewCount) : postList.OrderByDescending(p => p.VoteUpCount)).Skip(0).Take(5).Cacheable().ToListAsync(); //热门文章
+            var topPostWeek = await PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(week,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToListAsync(); //文章周排行
+            var topPostMonth = await PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(month,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToListAsync(); //文章月排行
+            var topPostYear = await PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(year,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToListAsync(); //文章年度排行
+            var tags = new List<string>(); //标签云
             var tagdic = new Dictionary<string, int>();
-            var newdic = new Dictionary<string, int>();//标签云最终结果
+            var newdic = new Dictionary<string, int>(); //标签云最终结果
             postList.Select(p => p.Label).ToList().ForEach(m =>
             {
                 if (!string.IsNullOrEmpty(m))
                 {
                     tags.AddRange(m.Split(',', '，'));
                 }
-            });//统计标签
+            }); //统计标签
             tags.GroupBy(s => s).ForEach(g =>
-              {
-                  tagdic.Add(g.Key, g.Count());
-              });//将标签分组
+            {
+                tagdic.Add(g.Key, g.Count());
+            }); //将标签分组
             if (tagdic.Any())
             {
                 int min = tagdic.Values.Min();
@@ -199,7 +206,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 });
             }
             IList<PostOutputDto> posts;
-            switch (orderBy)//文章排序
+            switch (orderBy) //文章排序
             {
                 case OrderBy.CommentCount:
                     posts = postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).ToList();

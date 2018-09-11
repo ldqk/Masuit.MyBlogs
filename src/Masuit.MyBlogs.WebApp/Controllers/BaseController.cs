@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web.Mvc;
-using Common;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
 using Masuit.Tools.Net;
@@ -29,10 +28,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         public IMenuBll MenuBll { get; set; }
 
         public ILinksBll LinksBll { get; set; }
-        public IInterviewBll InterviewBll { get; set; }
 
         public IContactsBll ContactsBll { get; set; }
         public RedisHelper RedisHelper { get; set; }
+
         /// <summary>
         /// 响应数据
         /// </summary>
@@ -53,7 +52,9 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 code
             }, new JsonSerializerSettings
             {
-                MissingMemberHandling = MissingMemberHandling.Ignore
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }), "application/json", Encoding.UTF8);
         }
 
@@ -66,7 +67,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <returns></returns>
         public ContentResult PageResult(object data, int pageCount, int total)
         {
-            return Content(JsonConvert.SerializeObject(new PageDataModel(data, pageCount, total), new JsonSerializerSettings { MissingMemberHandling = MissingMemberHandling.Ignore }), "application/json", Encoding.UTF8);
+            return Content(JsonConvert.SerializeObject(new PageDataModel(data, pageCount, total), new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            }), "application/json", Encoding.UTF8);
         }
 
         /// <summary>创建 JsonResult 对象，该对象使用指定 JSON 请求行为将指定对象序列化为 JavaScript 对象表示法 (JSON) 格式。</summary>
@@ -75,7 +79,15 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <param name="behavior">JSON 请求行为。</param>
         protected new JsonResult Json(object data, JsonRequestBehavior behavior)
         {
-            return new JsonResult() { Data = data, ContentType = "application/json", ContentEncoding = Encoding.UTF8, JsonRequestBehavior = behavior, MaxJsonLength = Int32.MaxValue, RecursionLimit = Int32.MaxValue };
+            return new JsonResult()
+            {
+                Data = data,
+                ContentType = "application/json",
+                ContentEncoding = Encoding.UTF8,
+                JsonRequestBehavior = behavior,
+                MaxJsonLength = Int32.MaxValue,
+                RecursionLimit = Int32.MaxValue
+            };
         }
 
         /// <summary>在调用操作方法前调用。</summary>
@@ -83,14 +95,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
-            if (filterContext.HttpContext.Request.HttpMethod.Equals("GET", StringComparison.InvariantCultureIgnoreCase))//get方式的多半是页面
+            if (filterContext.HttpContext.Request.HttpMethod.Equals("GET", StringComparison.InvariantCultureIgnoreCase)) //get方式的多半是页面
             {
                 UserInfoOutputDto user = filterContext.HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
 #if DEBUG
                 user = UserInfoBll.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
                 Session.SetByRedis(SessionKey.UserInfo, user);
 #endif
-                if (user == null && Request.Cookies.Count > 2)//执行自动登录
+                if (user == null && Request.Cookies.Count > 2) //执行自动登录
                 {
                     string name = CookieHelper.GetCookieValue("username");
                     string pwd = CookieHelper.GetCookieValue("password")?.DesDecrypt(ConfigurationManager.AppSettings["BaiduAK"]);
@@ -129,14 +141,17 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 filterContext.Result = ResultData(null, false, "该URL仅支持Get请求方式", false, HttpStatusCode.MethodNotAllowed);
                 return;
             }
+
             #region 准备页面数据模型
-            ViewBag.menus = MenuBll.LoadEntitiesFromL2CacheNoTracking<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList();//菜单
-            PageFootViewModel model = new PageFootViewModel//页脚
+
+            ViewBag.menus = MenuBll.LoadEntitiesFromL2CacheNoTracking<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
+            PageFootViewModel model = new PageFootViewModel //页脚
             {
                 Links = LinksBll.LoadPageEntitiesFromCacheNoTracking<int, LinksOutputDto>(1, 40, out int _, l => l.Status == Status.Available, l => l.Id, false, 1).ToList(),
                 Contacts = ContactsBll.LoadEntitiesFromL2CacheNoTracking<int, ContactsOutputDto>(l => l.Status == Status.Available, l => l.Id, false).ToList()
             };
             ViewBag.Footer = model;
+
             #endregion
         }
     }

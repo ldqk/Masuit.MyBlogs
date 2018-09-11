@@ -19,6 +19,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
     {
         public IIssueBll IssueBll { get; set; }
         public IInternalMessageBll MessageBll { get; set; }
+
         public BugController(IIssueBll issueBll, IInternalMessageBll messageBll)
         {
             IssueBll = issueBll;
@@ -84,7 +85,12 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             Issue bug = IssueBll.AddEntitySaved(issue);
             if (bug != null)
             {
-                MessageBll.AddEntitySaved(new InternalMessage() { Title = $"来自【{issue.Name}({issue.Email})】的bug问题反馈", Content = bug.Description, Link = Url.Action("Index") });
+                MessageBll.AddEntitySaved(new InternalMessage()
+                {
+                    Title = $"来自【{issue.Name}({issue.Email})】的bug问题反馈",
+                    Content = bug.Description,
+                    Link = Url.Action("Index")
+                });
                 string content = System.IO.File.ReadAllText(Request.MapPath("/template/bugreport.html")).Replace("{{name}}", bug.Name).Replace("{{email}}", bug.Email).Replace("{{title}}", bug.Title).Replace("{{desc}}", bug.Description).Replace("{{link}}", bug.Link).Replace("{{date}}", bug.SubmitTime.ToString("yyyy-MM-dd HH:mm:ss"));
                 BackgroundJob.Enqueue(() => CommonHelper.SendMail("bug提交通知", content, "admin@masuit.com"));
                 return ResultData(issue, true, "问题提交成功，感谢您的反馈！");

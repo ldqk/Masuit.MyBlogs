@@ -34,7 +34,9 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 Data = data
             }, new JsonSerializerSettings
             {
-                MissingMemberHandling = MissingMemberHandling.Ignore
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }), "application/json", Encoding.UTF8);
         }
 
@@ -47,7 +49,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <returns></returns>
         public ActionResult PageResult(object data, int pageCount, int total)
         {
-            return Content(JsonConvert.SerializeObject(new PageDataModel(data, pageCount, total), new JsonSerializerSettings { MissingMemberHandling = MissingMemberHandling.Ignore }), "application/json", Encoding.UTF8);
+            return Content(JsonConvert.SerializeObject(new PageDataModel(data, pageCount, total), new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            }), "application/json", Encoding.UTF8);
         }
 
         /// <summary>创建 JsonResult 对象，该对象使用指定 JSON 请求行为将指定对象序列化为 JavaScript 对象表示法 (JSON) 格式。</summary>
