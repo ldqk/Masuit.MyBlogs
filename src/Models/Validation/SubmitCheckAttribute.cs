@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Masuit.Tools.Html;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Text.RegularExpressions;
-using Masuit.Tools.Html;
 
 namespace Models.Validation
 {
@@ -14,7 +14,7 @@ namespace Models.Validation
         private bool checkLength;
         private bool checkContent;
         private int MaxLength { get; set; } = 500;
-        private int MinLength { get; set; } = 10;
+        private int MinLength { get; set; } = 2;
 
         /// <summary>
         /// 检查提交的内容

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web.Mvc;
-using Common;
+﻿using Common;
 using Hangfire;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
@@ -13,6 +8,11 @@ using Models.DTO;
 using Models.Entity;
 using Models.Enum;
 using Models.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web.Mvc;
 using static Common.CommonHelper;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
@@ -41,6 +41,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
             comment.Content = comment.Content.Trim().Replace("<p><br></p>", string.Empty);
 
+            if (Session.GetByRedis<string>("comment").Equals(comment.Content))
+            {
+                return ResultData(null, false, "您刚才已经在这篇文章发表过一次评论了，换一篇文章吧，或者换一下评论内容吧！");
+            }
             if (Regex.Match(comment.Content, ModRegex).Length <= 0)
             {
                 comment.Status = Status.Pended;
@@ -63,6 +67,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             Comment com = CommentBll.AddEntitySaved(comment.Mapper<Comment>());
             if (com != null)
             {
+                Session.SetByRedis("comment", comment.Content);
                 var emails = new List<string>();
                 var email = GetSettings("ReceiveEmail"); //站长邮箱
                 emails.Add(email);
