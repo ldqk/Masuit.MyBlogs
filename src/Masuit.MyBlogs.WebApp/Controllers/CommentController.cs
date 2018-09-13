@@ -33,6 +33,11 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         [HttpPost, ValidateAntiForgeryToken, ValidateInput(false)]
         public ActionResult Put(CommentInputDto comment)
         {
+            Post post = PostBll.GetById(comment.PostId);
+            if (post is null)
+            {
+                return ResultData(null, false, "评论失败，文章不存在！");
+            }
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
             comment.Content = comment.Content.Trim().Replace("<p><br></p>", string.Empty);
 
@@ -61,7 +66,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 var emails = new List<string>();
                 var email = GetSettings("ReceiveEmail"); //站长邮箱
                 emails.Add(email);
-                string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{title}}", com.Post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", com.NickName).Replace("{{content}}", com.Content);
+                string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{title}}", post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", com.NickName).Replace("{{content}}", com.Content);
                 if (comment.Status == Status.Pended)
                 {
                     if (!com.IsMaster)

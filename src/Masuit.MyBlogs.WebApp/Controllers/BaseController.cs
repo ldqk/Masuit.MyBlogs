@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web.Mvc;
+using Common;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
 using Masuit.Tools.Net;
