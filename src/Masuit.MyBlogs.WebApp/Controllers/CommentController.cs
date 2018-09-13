@@ -41,7 +41,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
             comment.Content = comment.Content.Trim().Replace("<p><br></p>", string.Empty);
 
-            if (Session.GetByRedis<string>("comment").Equals(comment.Content))
+            if (comment.Content.RemoveHtml().Trim().Equals(Session.GetByRedis<string>("comment" + comment.PostId)))
             {
                 return ResultData(null, false, "您刚才已经在这篇文章发表过一次评论了，换一篇文章吧，或者换一下评论内容吧！");
             }
@@ -67,7 +67,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             Comment com = CommentBll.AddEntitySaved(comment.Mapper<Comment>());
             if (com != null)
             {
-                Session.SetByRedis("comment", comment.Content);
+                Session.SetByRedis("comment" + comment.PostId, comment.Content.RemoveHtml().Trim());
                 var emails = new List<string>();
                 var email = GetSettings("ReceiveEmail"); //站长邮箱
                 emails.Add(email);

@@ -82,12 +82,12 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         [HttpPost, ValidateAntiForgeryToken, ValidateInput(false)]
         public ActionResult Put(LeaveMessageInputDto msg)
         {
-            if (Session.GetByRedis<string>("msg").Equals(msg.Content))
+            UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+            msg.Content = msg.Content.Trim().Replace("<p><br></p>", string.Empty);
+            if (msg.Content.RemoveHtml().Trim().Equals(Session.GetByRedis<string>("msg")))
             {
                 return ResultData(null, false, "您刚才已经发表过一次留言了！");
             }
-            UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
-            msg.Content = msg.Content.Trim().Replace("<p><br></p>", string.Empty);
             if (Regex.Match(msg.Content, ModRegex).Length <= 0)
             {
                 msg.Status = Status.Pended;
@@ -111,7 +111,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             LeaveMessage msg2 = LeaveMessageBll.AddEntitySaved(msg.Mapper<LeaveMessage>());
             if (msg2 != null)
             {
-                Session.SetByRedis("msg", msg.Content);
+                Session.SetByRedis("msg", msg.Content.RemoveHtml().Trim());
                 var email = GetSettings("ReceiveEmail");
                 string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{title}}", "网站留言板").Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg2.NickName).Replace("{{content}}", msg2.Content);
                 if (msg.Status == Status.Pended)
