@@ -101,6 +101,16 @@
                 <button type="button" class="btn btn-info" ng-click="mailtest()">测试邮箱配置</button>
             </span>
         </div>
+        <div class="input-group">
+            <span class="input-group-addon el-switch">
+                <span>禁用邮箱订阅广播：</span>
+                <input type="checkbox" name="switch" ng-checked="Settings.DisabledEmailBroadcast=='true'">
+                <span class="el-switch-style" ng-click="DisabledEmailBroadcast()"></span>
+            </span>
+            <div class="fg-line">
+                <input type="text" class="form-control" ng-model="Settings.DisabledEmailBroadcastTip" placeholder="邮箱订阅提示语" ng-readonly="Settings.DisabledEmailBroadcast=='false'"/>
+            </div>
+        </div>
     </div>
     <div class="row">
         <h2>网站媒体设置</h2>

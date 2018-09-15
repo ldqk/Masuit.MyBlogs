@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web.Mvc;
-using AutoMapper;
+﻿using AutoMapper;
 using Common;
 using Hangfire;
 using IBLL;
@@ -21,6 +14,13 @@ using Models.DTO;
 using Models.Entity;
 using Models.Enum;
 using Models.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web.Mvc;
 using static Common.CommonHelper;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
@@ -678,7 +678,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             if (b)
             {
 #if !DEBUG
-                if (notify)
+                if (notify && "false" == GetSettings("DisabledEmailBroadcast"))
                 {
                     var cast = BroadcastBll.LoadEntities(c => c.Status == Status.Subscribed).ToList();
                     string link = Request.Url?.Scheme + "://" + Request.Url?.Authority + "/" + p.Id;
@@ -763,7 +763,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 return ResultData(null, false, "如果要定时发布，请选择正确的一个将来时间点！");
             }
             p = PostBll.AddEntitySaved(p);
-            if (p != null)
+            if (p != null && "false" == GetSettings("DisabledEmailBroadcast"))
             {
                 var cast = BroadcastBll.LoadEntities(c => c.Status == Status.Subscribed).ToList();
                 string link = Request.Url?.Scheme + "://" + Request.Url?.Authority + "/" + p.Id;
@@ -887,7 +887,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var token = RedisHelper.GetString("ArticleViewToken");
             return ResultData(token);
         }
-
         #endregion
     }
 }

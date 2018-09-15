@@ -207,7 +207,7 @@
                                 @for (int i = 1; i < count; i += 2)
                                 {
                                     <tr>
-                                        <td>@Html.ActionLink(posts[i - 1].Title, "Details", "Post", new { id = posts[i - 1].Id }, null)</td>
+                                        <td style="width: 50%">@Html.ActionLink(posts[i - 1].Title, "Details", "Post", new { id = posts[i - 1].Id }, null)</td>
                                         <td>@Html.ActionLink(posts[i].Title, "Details", "Post", new { id = posts[i].Id }, null)</td>
                                     </tr>
                                 }

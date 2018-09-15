@@ -37,6 +37,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Subscribe(string email)
         {
+            if (bool.TryParse(GetSettings("DisabledEmailBroadcast"), out var disabled) && disabled)
+            {
+                return ResultData(null, false, GetSettings("DisabledEmailBroadcastTip"));
+            }
             Broadcast entity = BroadcastBll.GetFirstEntity(b => b.Email.Equals(email, StringComparison.InvariantCultureIgnoreCase));
             var guid = Guid.NewGuid();
             if (entity != null)

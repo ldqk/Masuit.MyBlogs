@@ -22,5 +22,6 @@ namespace ModelCodeGenerate
         public int ParentId { get; set; }
         public int MenuType { get; set; }
         public int Status { get; set; }
+        public bool NewTab { get; set; }
     }
 }

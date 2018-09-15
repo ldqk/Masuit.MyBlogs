@@ -2211,6 +2211,8 @@ namespace IBLL
 	
 	public partial interface IDonateBll : IBaseBll<Donate>{}   
 	
+	public partial interface IFastShareBll : IBaseBll<FastShare>{}   
+	
 	public partial interface IInternalMessageBll : IBaseBll<InternalMessage>{}   
 	
 	public partial interface IInterviewBll : IBaseBll<Interview>{}   

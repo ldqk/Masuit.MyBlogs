@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using Common;
+﻿using Common;
 using EFSecondLevelCache;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
 using Masuit.Tools;
 using Masuit.Tools.Net;
 using Models.DTO;
+using Models.Entity;
 using Models.Enum;
 using Models.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -24,8 +25,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         public ISearchDetailsBll SearchDetailsBll { get; set; }
         public INoticeBll NoticeBll { get; set; }
         public IPostAccessRecordBll PostAccessRecordBll { get; set; }
-
-        public HomeController(IPostBll postBll, ICommentBll commentBll, ICategoryBll categoryBll, ISearchDetailsBll searchDetailsBll, INoticeBll noticeBll, IPostAccessRecordBll postAccessRecordBll)
+        public IFastShareBll FastShareBll { get; set; }
+        public HomeController(IPostBll postBll, ICommentBll commentBll, ICategoryBll categoryBll, ISearchDetailsBll searchDetailsBll, INoticeBll noticeBll, IPostAccessRecordBll postAccessRecordBll, IFastShareBll fastShareBll)
         {
             CategoryBll = categoryBll;
             PostBll = postBll;
@@ -33,6 +34,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             SearchDetailsBll = searchDetailsBll;
             NoticeBll = noticeBll;
             PostAccessRecordBll = postAccessRecordBll;
+            FastShareBll = fastShareBll;
         }
 
         /// <summary>
@@ -51,6 +53,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 p.Id,
                 p.ImageUrl
             }).ToList();
+            List<FastShare> fastShares = FastShareBll.GetAllFromL2CacheNoTracking().ToList();
+            ViewBag.FastShare = fastShares;
             var viewModel = await GetIndexPageViewModelAsync(1, 15, orderBy, user).ConfigureAwait(true);
             var banner = new List<PostOutputDto>();
             tops.ForEach(t =>

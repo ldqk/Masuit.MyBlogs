@@ -49,6 +49,7 @@ namespace ModelCodeGenerate
         public virtual DbSet<Seminar> Seminar { get; set; }
         public virtual DbSet<SystemSetting> SystemSetting { get; set; }
         public virtual DbSet<UserInfo> UserInfo { get; set; }
+        public virtual DbSet<FastShare> FastShares { get; set; }
     
         public virtual ObjectResult<sp_getChildrenCommentByParentId_Result> sp_getChildrenCommentByParentId(Nullable<int> parentId)
         {

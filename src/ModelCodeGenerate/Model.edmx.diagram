@@ -36,6 +36,7 @@
         <AssociationConnector Association="Model.FK_dbo_PostHistoryVersion_dbo_Post_PostId" />
         <AssociationConnector Association="Model.SeminarPost" />
         <AssociationConnector Association="Model.SeminarPostHistoryVersion" />
+        <EntityTypeShape EntityType="Model.FastShare" Width="1.5" PointX="0.75" PointY="12.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

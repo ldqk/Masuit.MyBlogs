@@ -20,5 +20,6 @@ namespace ModelCodeGenerate
         public System.DateTime PostDate { get; set; }
         public System.DateTime ModifyDate { get; set; }
         public int Status { get; set; }
+        public int ViewCount { get; set; }
     }
 }

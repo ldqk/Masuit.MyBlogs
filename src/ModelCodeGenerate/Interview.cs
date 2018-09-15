@@ -36,6 +36,7 @@ namespace ModelCodeGenerate
         public string OnlineSpan { get; set; }
         public System.Guid Uid { get; set; }
         public double OnlineSpanSeconds { get; set; }
+        public string Country { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<InterviewDetail> InterviewDetail { get; set; }

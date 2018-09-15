@@ -88,6 +88,15 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 					return $ocLazyLoad.load([cpath + "/post.js"]);
 				}]
 			}
+		}).state("share", {
+			url: "/post/share",
+			templateUrl: vpath + "/post/share.html",
+			controller: "share as list",
+			resolve: {
+				deps: ["$ocLazyLoad", function($ocLazyLoad) {
+					return $ocLazyLoad.load([cpath + "/post.js"]);
+				}]
+			}
 		}).state("menu", {
 			url: "/menu",
 			templateUrl: vpath + "/menu.html",

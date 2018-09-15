@@ -2098,6 +2098,8 @@ namespace IDAL
 	
 	public partial interface IDonateDal :IBaseDal<Donate>{}
 	
+	public partial interface IFastShareDal :IBaseDal<FastShare>{}
+	
 	public partial interface IInternalMessageDal :IBaseDal<InternalMessage>{}
 	
 	public partial interface IInterviewDal :IBaseDal<Interview>{}

@@ -19,5 +19,6 @@ namespace ModelCodeGenerate
         public string ValidateCode { get; set; }
         public int Status { get; set; }
         public System.DateTime UpdateTime { get; set; }
+        public int SubscribeType { get; set; }
     }
 }

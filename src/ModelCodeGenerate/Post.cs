@@ -42,6 +42,8 @@ namespace ModelCodeGenerate
         public bool IsBanner { get; set; }
         public string Description { get; set; }
         public string ImageUrl { get; set; }
+        public string ProtectContent { get; set; }
+        public string Keyword { get; set; }
     
         public virtual Category Category { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

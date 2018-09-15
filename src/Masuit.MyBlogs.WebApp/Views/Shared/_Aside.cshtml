@@ -10,7 +10,7 @@
         string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
     }
 <aside class="col-md-3 box-right">
-
+@if("false"==CommonHelper.GetSettings("DisabledEmailBroadcast")) {
     <section class="wow animated fadeIn">
         <article class="panel panel-primary">
             <div class="panel-heading">
@@ -29,6 +29,7 @@
             </div>
         </article>
     </section>
+}    
 @if(Model.Notices.Any()){
     <section class="wow animated fadeIn">
         <article class="panel panel-default">
@@ -187,7 +188,6 @@
                         <a class="tagc-@(new Random().StrictNext(100) % 10)">没有标签</a>
                     }
                 </div>
-
             </div>
         </article>
     </section>

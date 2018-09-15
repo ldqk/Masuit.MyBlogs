@@ -162,6 +162,13 @@
 			);
 		}).catch(swal.noop);
 	}
+	$scope.DisabledEmailBroadcast= function() {
+		if($scope.Settings.DisabledEmailBroadcast=="true") {
+			$scope.Settings.DisabledEmailBroadcast="false";
+		} else {
+			$scope.Settings.DisabledEmailBroadcast="true";
+		}
+	}
 }]);
 myApp.controller("log", ["$scope", "$http", function ($scope, $http) {
 	window.hub.disconnect();

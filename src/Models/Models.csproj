@@ -123,6 +123,7 @@
     <Compile Include="Validation\ComplexPassword.cs" />
     <Compile Include="Validation\SubmitCheckAttribute.cs" />
     <Compile Include="ViewModel\AnalysisModel.cs" />
+    <Compile Include="Entity\FastShare.cs" />
     <Compile Include="ViewModel\PostDataModel.cs" />
     <Compile Include="DTO\PostInputDto.cs" />
     <Compile Include="DTO\PostOutputDto.cs" />

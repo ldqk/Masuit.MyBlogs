@@ -765,7 +765,7 @@ myApp.controller("category", ["$scope", "$http", "NgTableParams", function ($sco
 	}
 	self.edit = function (row) {
 		swal({
-			title: '修改密码',
+			title: '修改分类',
 			html:
 			'<div class="input-group"><span class="input-group-addon">分类名称： </span><input id="name" type="text" class="form-control input-lg" autofocus placeholder="请输入新的分类名" value="'+row.Name+'"></div>' +
 			'<div class="input-group"><span class="input-group-addon">分类描述： </span><input id="desc" type="text" class="form-control input-lg" placeholder="请输入分类描述" value="'+row.Description+'"></div>',
@@ -928,4 +928,105 @@ myApp.controller("postpending", ["$scope", "$http", "NgTableParams", "$timeout",
 	}
 	$scope.loadingDone();
 
+}]);
+
+myApp.controller("share", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
+	window.hub.disconnect();
+	var self = this;
+	var shares = [];
+	self.data = {};
+	this.load = function() {
+		$scope.request("/share", null, function(res) {
+			self.tableParams = new NgTableParams({}, {
+				filterDelay: 0,
+				dataset: res.Data
+			});
+			shares = res.Data;
+		});
+	}
+	self.load();
+	$scope.closeAll = function() {
+		layer.closeAll();
+		setTimeout(function() {
+			$("#modal").css("display", "none");
+		}, 500);
+	}
+	$scope.submit = function (share) {
+		if (share.Id) {
+			//修改
+			$scope.request("/share/update", share, function (data) {
+				swal(data.Message, null, 'info');
+				$scope.share = {};
+				$scope.closeAll();
+				self.load();
+			});
+		}else {
+			$scope.request("/share/add", share, function (data) {
+				window.notie.alert({
+					type: 1,
+					text: data.Message,
+					time: 3
+				});
+				$scope.share = {};
+				$scope.closeAll();
+				self.load();
+			});
+		}
+	}
+	self.del = function(row) {
+		swal({
+			title: "确认删除这个分享吗？",
+			text: row.Title,
+			showCancelButton: true,
+			showCloseButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "确定",
+			cancelButtonText: "取消",
+			showLoaderOnConfirm: true,
+			animation: true,
+			allowOutsideClick: false
+		}).then(function() {
+			$scope.request("/share/remove", {
+				id: row.Id
+			}, function(data) {
+				window.notie.alert({
+					type: 1,
+					text: data.Message,
+					time: 4
+				});
+				self.load();
+			});
+		}, function() {
+		}).catch(swal.noop);
+	}
+	self.edit = function (row) {
+		layer.open({
+			type: 1,
+			zIndex: 20,
+			title: '修改快速分享',
+			area: (window.screen.width > 600 ? 600 : window.screen.width) + 'px',
+			content: $("#modal"),
+			success: function(layero, index) {
+				$scope.share = row;
+			},
+			end: function() {
+				$("#modal").css("display", "none");
+			}
+		});
+	}
+	self.add = function() {
+		layer.open({
+			type: 1,
+			zIndex: 20,
+			title: '添加快速分享',
+			area: (window.screen.width > 600 ? 600 : window.screen.width) + 'px',
+			content: $("#modal"),
+			success: function(layero, index) {
+				$scope.share = {};
+			},
+			end: function() {
+				$("#modal").css("display", "none");
+			}
+		});
+	}
 }]);

@@ -9,6 +9,7 @@ namespace DAL
 	public partial class CommentDal :BaseDal<Comment>,ICommentDal{}
 	public partial class ContactsDal :BaseDal<Contacts>,IContactsDal{}
 	public partial class DonateDal :BaseDal<Donate>,IDonateDal{}
+	public partial class FastShareDal :BaseDal<FastShare>,IFastShareDal{}
 	public partial class InternalMessageDal :BaseDal<InternalMessage>,IInternalMessageDal{}
 	public partial class InterviewDal :BaseDal<Interview>,IInterviewDal{}
 	public partial class InterviewDetailDal :BaseDal<InterviewDetail>,IInterviewDetailDal{}

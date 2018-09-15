@@ -1040,6 +1040,7 @@
     <Content Include="ng-views\views\contact.html" />
     <Content Include="ng-views\views\loginrecord.html" />
     <Content Include="ng-views\views\msg\msgs.html" />
+    <Content Include="ng-views\views\post\share.html" />
     <Content Include="ng-views\views\seminar.html" />
     <Content Include="ng-views\views\links.html" />
     <Content Include="ng-views\views\menu.html" />
@@ -1347,6 +1348,7 @@
     <Compile Include="Controllers\PublicController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\SeminarController.cs" />
+    <Compile Include="Controllers\ShareController.cs" />
     <Compile Include="Controllers\SubscribeController.cs" />
     <Compile Include="Controllers\SystemController.cs" />
     <Compile Include="Controllers\TestController.cs" />

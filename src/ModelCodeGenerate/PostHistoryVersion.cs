@@ -34,6 +34,7 @@ namespace ModelCodeGenerate
         public int VoteUpCount { get; set; }
         public int VoteDownCount { get; set; }
         public int Status { get; set; }
+        public string ProtectContent { get; set; }
     
         public virtual Category Category { get; set; }
         public virtual Post Post { get; set; }

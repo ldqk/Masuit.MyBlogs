@@ -1,10 +1,10 @@
+using EFSecondLevelCache;
+using Models.Entity;
+using Models.Migrations;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
-using EFSecondLevelCache;
-using Models.Entity;
-using Models.Migrations;
 using static System.Data.Entity.Core.Objects.ObjectContext;
 
 namespace Models.Application
@@ -45,6 +45,7 @@ namespace Models.Application
         public virtual DbSet<PostAccessRecord> PostAccessRecord { get; set; }
         public virtual DbSet<Issue> Issues { get; set; }
         public virtual DbSet<InternalMessage> InternalMessage { get; set; }
+        public virtual DbSet<FastShare> FastShare { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

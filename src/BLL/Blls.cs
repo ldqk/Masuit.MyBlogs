@@ -14,6 +14,8 @@ namespace BLL
 	
 	public partial class DonateBll :BaseBll<Donate>,IDonateBll{}   
 	
+	public partial class FastShareBll :BaseBll<FastShare>,IFastShareBll{}   
+	
 	public partial class InternalMessageBll :BaseBll<InternalMessage>,IInternalMessageBll{}   
 	
 	public partial class InterviewBll :BaseBll<Interview>,IInterviewBll{}   
