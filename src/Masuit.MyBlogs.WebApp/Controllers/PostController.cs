@@ -766,23 +766,26 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 return ResultData(null, false, "如果要定时发布，请选择正确的一个将来时间点！");
             }
             p = PostBll.AddEntitySaved(p);
-            if (p != null && "false" == GetSettings("DisabledEmailBroadcast"))
+            if (p != null)
             {
-                var cast = BroadcastBll.LoadEntities(c => c.Status == Status.Subscribed).ToList();
-                string link = Request.Url?.Scheme + "://" + Request.Url?.Authority + "/" + p.Id;
-                cast.ForEach(c =>
+                if ("false" == GetSettings("DisabledEmailBroadcast"))
                 {
-                    var ts = DateTime.Now.GetTotalMilliseconds();
-                    string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
+                    var cast = BroadcastBll.LoadEntities(c => c.Status == Status.Subscribed).ToList();
+                    string link = Request.Url?.Scheme + "://" + Request.Url?.Authority + "/" + p.Id;
+                    cast.ForEach(c =>
                     {
-                        c.Email,
-                        act = "cancel",
-                        validate = c.ValidateCode,
-                        timespan = ts,
-                        hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"])
-                    }, Request.Url.Scheme));
-                    BackgroundJob.Schedule(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
-                });
+                        var ts = DateTime.Now.GetTotalMilliseconds();
+                        string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
+                        {
+                            c.Email,
+                            act = "cancel",
+                            validate = c.ValidateCode,
+                            timespan = ts,
+                            hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"])
+                        }, Request.Url.Scheme));
+                        BackgroundJob.Schedule(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
+                    });
+                }
                 HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
                 return ResultData(null, true, "文章发表成功！");
             }
