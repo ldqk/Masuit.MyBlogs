@@ -1,10 +1,10 @@
+using Models.Entity;
+using Models.Enum;
+using Models.Validation;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Models.Entity;
-using Models.Enum;
-using Models.Validation;
 
 namespace Models.DTO
 {
@@ -96,5 +96,11 @@ namespace Models.DTO
         /// </summary>
         [StringLength(255, ErrorMessage = "标签最大允许255个字符")]
         public string Label { get; set; }
+
+        /// <summary>
+        /// 专题
+        /// </summary>
+        public string Seminars { get; set; }
+
     }
 }

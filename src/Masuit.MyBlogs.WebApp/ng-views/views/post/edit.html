@@ -49,7 +49,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-5 col-sm-3">
+        <div class="col-md-4 col-sm-3">
             <div class="input-group">
                 <span class="input-group-addon">
                     <label>选择专题：</label>
@@ -75,19 +75,32 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-2">
+        <div class="col-md-3 col-sm-2">
             <div class="pull-right">
                 <span class="checkboxWrapper theme4 smallCheckboxSize" ng-click="notify=!notify">
-                    <input type="checkbox" id="sample9" ng-model="notify">
-                    <label for="sample9">
+                    <input type="checkbox" id="notify" ng-model="notify">
+                    <label for="notify">
                         <i>
-                            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
+                            <svg version="1.1" id="Layer_notify" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
                             <circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" />
                             <path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534
 							S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" />
                         </svg>
                         </i>
                         是否广播
+                    </label>
+                </span>
+                <span class="checkboxWrapper theme4 smallCheckboxSize" ng-click="reserve=!reserve">
+                    <input type="checkbox" id="reserve" ng-model="reserve">
+                    <label for="reserve">
+                        <i>
+                            <svg version="1.1" id="Layer_reserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
+                            <circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" />
+                            <path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534
+							S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" />
+                        </svg>
+                        </i>
+                        保留历史版本
                     </label>
                 </span>
                 <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)">确认修改</button>

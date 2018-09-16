@@ -46,7 +46,10 @@
                                             @Html.ActionLink(s.Title, "Index", "Seminar", new { id = s.Id }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })<text> </text>
                                         }
                                     }
-                                        <button class="btn btn-danger btn-sm" id="del">删除此版本</button>
+                                        <div class="btn-group">
+                                            <button class="btn btn-danger btn-sm" id="del">删除此版本</button>
+                                            <button class="btn btn-info btn-sm" id="revert">还原到此版本</button>
+                                        </div>
                                     </div>
                                 </div>
                                 @{
@@ -192,6 +195,31 @@
                         time: 4
                     });
                     location.href="/@Model.PostId/history";
+                });
+            }, function () {
+            });
+        });
+        $("#revert").on("click", function (e) {
+            swal({
+                title: "确认还原到这个版本吗？",
+                text: '@Model.Title',
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                showLoaderOnConfirm: true,
+                animation: true,
+                allowOutsideClick: false
+            }).then(function () {
+                $.post("/post/revert", {
+                    id: @Model.Id
+                }, function (data) {
+                    window.notie.alert({
+                        type: 1,
+                        text: data.Message,
+                        time: 4
+                    });
+                    location.href="/@Model.PostId";
                 });
             }, function () {
             });

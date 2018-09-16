@@ -630,7 +630,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         }
 
         [HttpPost, Authority, ValidateInput(false)]
-        public ActionResult Edit(PostInputDto post, string Seminars, bool notify = true)
+        public ActionResult Edit(PostInputDto post, bool notify = true, bool reserve = true)
         {
             post.Content = ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/");
             if (!CategoryBll.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
@@ -661,12 +661,15 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             }
             post.ModifyDate = DateTime.Now;
             Post p = PostBll.GetById(post.Id);
-            var history = p.Mapper<PostHistoryVersion>();
-            p.PostHistoryVersion.Add(history);
-            Mapper.Map(post, p);
-            if (!string.IsNullOrEmpty(Seminars))
+            if (reserve)
             {
-                var tmp = Seminars.Split(',').Distinct();
+                var history = p.Mapper<PostHistoryVersion>();
+                p.PostHistoryVersion.Add(history);
+            }
+            Mapper.Map(post, p);
+            if (!string.IsNullOrEmpty(post.Seminars))
+            {
+                var tmp = post.Seminars.Split(',').Distinct();
                 p.Seminar.Clear();
                 tmp.ForEach(s =>
                 {
@@ -704,7 +707,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         }
 
         [Authority, ValidateInput(false), HttpPost]
-        public ActionResult Write(PostInputDto post, string Seminars, DateTime? timespan, bool schedule = false)
+        public ActionResult Write(PostInputDto post, DateTime? timespan, bool schedule = false)
         {
             post.Content = ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/"); //提取img标签，提取src属性并重新创建个只包含src属性的img标签
             if (!CategoryBll.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
@@ -736,9 +739,9 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             post.PostDate = DateTime.Now;
             post.ModifyDate = DateTime.Now;
             Post p = post.Mapper<Post>();
-            if (!string.IsNullOrEmpty(Seminars))
+            if (!string.IsNullOrEmpty(post.Seminars))
             {
-                var tmp = Seminars.Split(',').Distinct();
+                var tmp = post.Seminars.Split(',').Distinct();
                 tmp.ForEach(s =>
                 {
                     var id = s.ToInt32();
@@ -886,6 +889,25 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             }
             var token = RedisHelper.GetString("ArticleViewToken");
             return ResultData(token);
+        }
+
+        public ActionResult Revert(int id)
+        {
+            var history = PostHistoryVersionBll.GetById(id);
+            if (history != null)
+            {
+                PostHistoryVersionBll.AddEntity(history.Post.Mapper<PostHistoryVersion>());
+                history.Post.Category = history.Category;
+                history.Post.CategoryId = history.CategoryId;
+                history.Post.Content = history.Content;
+                history.Post.Title = history.Title;
+                history.Post.Label = history.Label;
+                history.Post.Seminar = history.Seminar;
+                history.Post.ModifyDate = history.ModifyDate;
+                bool b = PostHistoryVersionBll.UpdateEntitySaved(history);
+                return ResultData(null, b, b ? "回滚成功" : "回滚失败");
+            }
+            return ResultData(null, false, "版本不存在");
         }
         #endregion
     }

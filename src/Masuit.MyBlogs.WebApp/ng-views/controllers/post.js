@@ -355,6 +355,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 	$scope.id = $location.search()['id'];
 	$scope.loading();
 	$scope.notify = true;
+	$scope.reserve = true;
 	$scope.request("/post/get", {
 		id: $scope.id
 	}, function (data) {
@@ -519,6 +520,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 			return;
 		}
 		post.notify = $scope.notify;
+		post.reserve = $scope.reserve;
 		$http.post("/Post/edit", post).then(function (res) {
 			var data = res.data;
 			$scope.loadingDone();
