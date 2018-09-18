@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Masuit.Tools;
+﻿using Masuit.Tools;
+using System.ComponentModel.DataAnnotations;
 
 namespace Models.Validation
 {

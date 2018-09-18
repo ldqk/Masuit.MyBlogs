@@ -121,6 +121,7 @@
     <Compile Include="Enum\LoginType.cs" />
     <Compile Include="Enum\SubscribeType.cs" />
     <Compile Include="Validation\ComplexPassword.cs" />
+    <Compile Include="Validation\IsWebUrlAttribute.cs" />
     <Compile Include="Validation\SubmitCheckAttribute.cs" />
     <Compile Include="ViewModel\AnalysisModel.cs" />
     <Compile Include="Entity\FastShare.cs" />

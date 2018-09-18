@@ -139,6 +139,15 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 					return $ocLazyLoad.load([cpath + "/system.js"]);
 				}]
 			}
+		}).state("system-firewall", {
+			url: "/system/firewall",
+			templateUrl: vpath + "/system/firewall.html",
+			controller: "firewall as list",
+			resolve: {
+				deps: ["$ocLazyLoad", function($ocLazyLoad) {
+					return $ocLazyLoad.load([cpath + "/system.js"]);
+				}]
+			}
 		}).state("email", {
 			url: "/system/email",
 			templateUrl: vpath + "/system/email.html",

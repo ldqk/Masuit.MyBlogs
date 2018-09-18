@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Common;
@@ -9,6 +10,7 @@ using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Models;
 using Masuit.Tools.Net;
+using Masuit.Tools.NoSQL;
 using Models.DTO;
 using Models.Entity;
 using Models.Enum;
@@ -22,6 +24,7 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
         public ISystemSettingBll SystemSettingBll { get; set; }
         public IUserInfoBll UserInfoBll { get; set; }
         public IPostBll PostBll { get; set; }
+
         public HangfireBackJob(IInterviewBll bll, ISystemSettingBll systemSettingBll, IUserInfoBll userInfoBll, IPostBll postBll)
         {
             InterviewBll = bll;
@@ -29,6 +32,7 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
             UserInfoBll = userInfoBll;
             PostBll = postBll;
         }
+
         public void FlushInetAddress(Interview interview)
         {
             PhysicsAddress address = interview.IP.GetPhysicsAddressInfo().Result;
@@ -43,10 +47,31 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
                 {
                     interview.ReferenceAddress = string.Join("|", strs);
                 }
+                if ("true" == CommonHelper.GetSettings("EnableDenyArea"))
+                {
+                    CommonHelper.GetSettings("DenyArea")?.Split(',', '，').ForEach(area =>
+                    {
+                        if (interview.Address.Contains(area) || (interview.ReferenceAddress != null && interview.ReferenceAddress.Contains(area)))
+                        {
+                            CommonHelper.DenyAreaIP.AddOrUpdate(area, a => new HashSet<string>
+                            {
+                                interview.IP
+                            }, (s, list) =>
+                            {
+                                lock (list)
+                                {
+                                    list.Add(interview.IP);
+                                    return list;
+                                }
+                            });
+                            File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt"), CommonHelper.DenyAreaIP.ToJsonString());
+                        }
+                    });
+                }
             }
             interview.ISP = interview.IP.GetISP();
             Interview i = InterviewBll.AddEntitySaved(interview);
-            CommonHelper.InterviewCount = InterviewBll.GetAll().Count();//记录访问量
+            CommonHelper.InterviewCount = InterviewBll.GetAll().Count(); //记录访问量
         }
 
         public void FlushUnhandledAddress()
@@ -86,7 +111,14 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
             Interview view = InterviewBll.GetFirstEntityFromL2CacheNoTracking(i => i.IP.Equals(ip), i => i.ViewTime, false);
             string addr = view.Address;
             string prov = view.Province;
-            LoginRecord record = new LoginRecord() { IP = ip, LoginTime = DateTime.Now, LoginType = type, PhysicAddress = addr, Province = prov };
+            LoginRecord record = new LoginRecord()
+            {
+                IP = ip,
+                LoginTime = DateTime.Now,
+                LoginType = type,
+                PhysicAddress = addr,
+                Province = prov
+            };
             UserInfo u = UserInfoBll.GetByUsername(userInfo.Username);
             u.LoginRecord.Add(record);
             UserInfoBll.UpdateEntitySaved(u);
@@ -111,7 +143,7 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
 
         public void InterviewTrace(Guid uid, string url)
         {
-            for (int j = 0; j < 10; j++)//重试10次，找到这个访客
+            for (int j = 0; j < 10; j++) //重试10次，找到这个访客
             {
                 var view = InterviewBll.GetFirstEntity(i => i.Uid.Equals(uid));
                 if (view != null)
@@ -144,6 +176,7 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
                 Thread.Sleep(1000);
             }
         }
+
         public void FlushException(Exception ex)
         {
             LogManager.Error(ex);
@@ -158,8 +191,8 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
                                                                         SET @a=((SELECT count(1) from (SELECT interviewid FROM InterviewDetail GROUP BY interviewid HAVING count(1)=1) as t)*1.0)
                                                                         SET @b=(SELECT count(1) from (SELECT interviewid FROM InterviewDetail GROUP BY interviewid) as t)
                                                                         SET @b=case when @b=0 then 1 else @b end
-                                                                        SELECT @a Dap,@b [All],@a/@b Result").FirstOrDefault();//计算跳出率
-            var dapAgg = InterviewBll.SqlQuery<BounceRateAggregate>("SELECT CONVERT(datetime,t.tt) [Time],sum(CASE WHEN t.c=1 THEN 1 ELSE 0 END) as Dap,count(t.c) as [All],sum(CASE WHEN t.c=1 THEN 1 ELSE 0 END)*1.0/count(t.c) as Rate from (SELECT interviewid,convert(char(10),[Time],23) tt,count(InterviewId) c FROM [dbo].[InterviewDetail] GROUP BY convert(char(10),[Time],23),InterviewId) as t GROUP BY t.tt ORDER BY Time");//每日跳出率统计
+                                                                        SELECT @a Dap,@b [All],@a/@b Result").FirstOrDefault(); //计算跳出率
+            var dapAgg = InterviewBll.SqlQuery<BounceRateAggregate>("SELECT CONVERT(datetime,t.tt) [Time],sum(CASE WHEN t.c=1 THEN 1 ELSE 0 END) as Dap,count(t.c) as [All],sum(CASE WHEN t.c=1 THEN 1 ELSE 0 END)*1.0/count(t.c) as Rate from (SELECT interviewid,convert(char(10),[Time],23) tt,count(InterviewId) c FROM [dbo].[InterviewDetail] GROUP BY convert(char(10),[Time],23),InterviewId) as t GROUP BY t.tt ORDER BY Time"); //每日跳出率统计
 
             //今日统计
             var todaypv = all.Count(i => i.ViewTime >= DateTime.Today);
@@ -241,28 +274,67 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
                 {
                     name = g.Key;
                 }
-                client.Add(new { name, value = g.Count() });
-                region.Add(new dynamic[] { name, g.Count() });
+                client.Add(new
+                {
+                    name,
+                    value = g.Count()
+                });
+                region.Add(new dynamic[]
+                {
+                    name,
+                    g.Count()
+                });
             });
-            var browser = entities.GroupBy(i => i.BrowserType).OrderBy(g => g.Key).Select(g => new object[] { g.Key, g.Count() }).ToList();
-            var reduce = all.OrderBy(i => i.ViewTime).GroupBy(i => i.ViewTime.ToString("yyyy-MM-dd")).Select(g => new { g.Key, pv = g.Count(), uv = g.DistinctBy(i => i.IP).Count() }).ToList();//汇总统计
+            var browser = entities.GroupBy(i => i.BrowserType).OrderBy(g => g.Key).Select(g => new object[]
+            {
+                g.Key,
+                g.Count()
+            }).ToList();
+            var reduce = all.OrderBy(i => i.ViewTime).GroupBy(i => i.ViewTime.ToString("yyyy-MM-dd")).Select(g => new
+            {
+                g.Key,
+                pv = g.Count(),
+                uv = g.DistinctBy(i => i.IP).Count()
+            }).ToList(); //汇总统计
 
             //找出PV最高的一天
             var p = reduce.FirstOrDefault(e => e.pv == reduce.Max(a => a.pv));
-            var highpv = new { date = p.Key, p.pv, p.uv };
+            var highpv = new
+            {
+                date = p.Key,
+                p.pv,
+                p.uv
+            };
 
             //找出UV最高的一天
             var u = reduce.FirstOrDefault(e => e.uv == reduce.Max(a => a.uv));
-            var highuv = new { date = u.Key, u.pv, u.uv };
+            var highuv = new
+            {
+                date = u.Key,
+                u.pv,
+                u.uv
+            };
 
             //汇总统计
-            var pv = reduce.Select(g => new List<object> { g.Key.ToDateTime().GetTotalMilliseconds(), g.pv }).ToList();//每日PV
-            var uv = reduce.Select(g => new List<object> { g.Key.ToDateTime().GetTotalMilliseconds(), g.uv }).ToList();//每日UV
-            var iv = all.OrderBy(i => i.ViewTime).DistinctBy(e => e.IP).GroupBy(i => i.ViewTime.ToString("yyyy-MM-dd")).Select(g => new List<object> { g.Key.ToDateTime().GetTotalMilliseconds(), g.Count() }).ToList();//每日新增独立访客
+            var pv = reduce.Select(g => new List<object>
+            {
+                g.Key.ToDateTime().GetTotalMilliseconds(),
+                g.pv
+            }).ToList(); //每日PV
+            var uv = reduce.Select(g => new List<object>
+            {
+                g.Key.ToDateTime().GetTotalMilliseconds(),
+                g.uv
+            }).ToList(); //每日UV
+            var iv = all.OrderBy(i => i.ViewTime).DistinctBy(e => e.IP).GroupBy(i => i.ViewTime.ToString("yyyy-MM-dd")).Select(g => new List<object>
+            {
+                g.Key.ToDateTime().GetTotalMilliseconds(),
+                g.Count()
+            }).ToList(); //每日新增独立访客
 
             //访问时长统计
-            InterviewAnalysisDto maxSpanViewer = all.OrderByDescending(i => i.OnlineSpanSeconds).FirstOrDefault();//历史最久访客
-            InterviewAnalysisDto maxSpanViewerToday = all.Where(i => DateTime.Today == i.ViewTime.Date).OrderByDescending(i => i.OnlineSpanSeconds).FirstOrDefault();//今日最久访客
+            InterviewAnalysisDto maxSpanViewer = all.OrderByDescending(i => i.OnlineSpanSeconds).FirstOrDefault(); //历史最久访客
+            InterviewAnalysisDto maxSpanViewerToday = all.Where(i => DateTime.Today == i.ViewTime.Date).OrderByDescending(i => i.OnlineSpanSeconds).FirstOrDefault(); //今日最久访客
             double average = 0;
             double average2 = 0;
             if (all.Any(i => DateTime.Today == i.ViewTime.Date && i.OnlineSpanSeconds > 0))
@@ -270,8 +342,8 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
                 average = all.Where(i => i.OnlineSpanSeconds > 0).Average(i => i.OnlineSpanSeconds);
                 average2 = all.Where(i => DateTime.Today == i.ViewTime.Date && i.OnlineSpanSeconds > 0).Average(i => i.OnlineSpanSeconds);
             }
-            var averSpan = TimeSpan2String(TimeSpan.FromSeconds(average));//平均访问时长
-            var averSpanToday = TimeSpan2String(TimeSpan.FromSeconds(average2));//今日访问时长
+            var averSpan = TimeSpan2String(TimeSpan.FromSeconds(average)); //平均访问时长
+            var averSpanToday = TimeSpan2String(TimeSpan.FromSeconds(average2)); //今日访问时长
 
             BounceRateAggregate todayDap = dapAgg.LastOrDefault();
             return new AnalysisModel()
@@ -293,7 +365,11 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
                 Yearpv = yearpv,
                 Yearuv = yearuv,
                 BounceRate = $"{dap?.Dap}/{dap?.All}({dap?.Result:P})",
-                BounceRateAggregate = dapAgg.Select(a => new object[] { a.Time.GetTotalMilliseconds(), a.Rate * 100 }).ToList(),
+                BounceRateAggregate = dapAgg.Select(a => new object[]
+                {
+                    a.Time.GetTotalMilliseconds(),
+                    a.Rate * 100
+                }).ToList(),
                 BounceRateToday = $"{todayDap?.Dap}/{todayDap?.All}({todayDap?.Rate:P})",
                 OnlineSpanAggregate = new
                 {
@@ -334,6 +410,14 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
 
             averSpan += span.Seconds + "秒";
             return averSpan;
+        }
+
+        public static void InterceptLog(IpIntercepter s)
+        {
+            using (RedisHelper redisHelper = RedisHelper.GetInstance())
+            {
+                redisHelper.ListRightPush("intercept", s);
+            }
         }
     }
 }

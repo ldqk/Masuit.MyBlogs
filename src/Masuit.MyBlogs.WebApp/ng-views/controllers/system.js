@@ -109,11 +109,7 @@
 			to: $scope.Settings.ReceiveEmail
 		}).then(function(res) {
 			if (res.data.Success) {
-				swal(
-					res.data.Message,
-					'',
-					'success'
-				);
+				swal(res.data.Message,'','success');
 			} else {
 				swal({
 					input: 'textarea',
@@ -126,11 +122,7 @@
 				});
 			}
 		}, function() {
-			swal(
-				'服务请求失败',
-				'',
-				'error'
-			);
+			swal('服务请求失败','','error');
 		}).catch(swal.noop);
 	}
 	$scope.pathtest = function() {
@@ -138,11 +130,7 @@
 			path: $scope.Settings.PathRoot
 		}).then(function(res) {
 			if (res.data.Success) {
-				swal(
-					res.data.Message,
-					'',
-					'success'
-				);
+				swal(res.data.Message,'','success');
 			} else {
 				swal({
 					input: 'textarea',
@@ -155,11 +143,7 @@
 				});
 			}
 		}, function() {
-			swal(
-				'服务请求失败',
-				'',
-				'error'
-			);
+			swal('服务请求失败','','error');
 		}).catch(swal.noop);
 	}
 	$scope.DisabledEmailBroadcast= function() {
@@ -269,4 +253,149 @@ myApp.controller("file", ["$scope", "$http", function ($scope, $http) {
 }]);
 myApp.controller("task", ["$scope", "$http", function ($scope, $http) {
 	window.hub.disconnect();
+}]);
+myApp.controller("firewall", ["$scope", "$http","NgTableParams", function ($scope, $http,NgTableParams) {
+	window.hub.disconnect();
+	var self = this;
+	var data = [];
+	self.data = {};
+	$scope.request("/system/getsettings", null, function(data) {
+		var settings = {};
+		Enumerable.From(data.Data).Select(e => {
+			return {
+				name: e.Name,
+				value: e.Value
+			}
+		}).Distinct().ToArray().map(function(item, index, array) {
+			settings[item.name] = item.value;
+		});
+		$scope.Settings = settings;
+	});
+	this.load = function() {
+		$scope.request("/system/InterceptLog", null, function(res) {
+			self.tableParams = new NgTableParams({}, {
+				filterDelay: 0,
+				dataset: res.Data
+			});
+			data = res.Data;
+			console.log(data);
+		});
+	}
+	self.load();
+	this.clear= function() {
+		swal({
+			title: '确定清空拦截日志吗？',
+			type: 'warning',
+			showCancelButton: true,
+			showCloseButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: '确定',
+			cancelButtonText: '取消',
+			preConfirm: function() {
+				return new Promise(function (resolve) {
+					$scope.request("/system/ClearInterceptLog", null, function (res) {
+						resolve(res.Message);
+					});
+				});
+			}
+		}).then(function (msg) {
+			swal(msg,'','success');
+		}).catch(swal.noop);
+	}
+	$scope.EnableDenyAreaPolicy= function() {
+		if($scope.Settings.EnableDenyArea=="true") {
+			$scope.Settings.EnableDenyArea="false";
+		} else {
+			$scope.Settings.EnableDenyArea="true";
+		}
+	}
+	$scope.getIPBlackList= function() {
+		$scope.request("/system/IpBlackList",null, function (data) {
+			swal({
+				input: 'textarea',
+				showCloseButton: true,
+				width: 1000,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "确定",
+				cancelButtonText: "取消",
+				inputValue: data.Data,
+				inputClass:"height700",
+				showLoaderOnConfirm: true,
+				preConfirm: function(value) {
+					return new Promise(function (resolve) {
+						$scope.request("/system/SetIpBlackList", { content: value }, function (res) {
+							resolve(res.Message);
+						});
+					});
+				}
+			}).then(function (msg) {
+				swal("更新成功",'','success');
+			}).catch(swal.noop);
+		});
+	}
+	$scope.getIPWhiteList= function() {
+		$scope.request("/system/IpWhiteList",null, function (data) {
+			swal({
+				input: 'textarea',
+				showCloseButton: true,
+				width: 1000,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "确定",
+				cancelButtonText: "取消",
+				inputValue: data.Data,
+				inputClass:"height700",
+				showLoaderOnConfirm: true,
+				preConfirm: function(value) {
+					return new Promise(function (resolve) {
+						$scope.request("/system/SetIpWhiteList", { content: value }, function (res) {
+							resolve(res.Message);
+						});
+					});
+				}
+			}).then(function (msg) {
+				swal("更新成功",'','success');
+			}).catch(swal.noop);
+		});
+	}
+	$scope.save = function() {
+		swal({
+			title: '确认保存吗？',
+			type: 'warning',
+			showCloseButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "确定",
+			cancelButtonText: "取消",
+			showLoaderOnConfirm: true,
+			animation: true,
+			allowOutsideClick: false,
+			preConfirm: function() {
+				return new Promise(function(resolve, reject) {
+					var result = [];
+					for (var key in $scope.Settings) {
+						if ($scope.Settings.hasOwnProperty(key)) {
+							result.push({
+								Name: key,
+								Value: $scope.Settings[key]
+							});
+						}
+					}
+					$http.post("/system/save", {
+						sets: JSON.stringify(result)
+					}, {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}).then(function(res) {
+						resolve(res.data);
+					}, function() {
+						reject("请求服务器失败！");
+					});
+				});
+			}
+		}).then(function(data) {
+			swal({
+				type: data.Success ? "success" : "error",
+				text: data.Message
+			});
+		}).catch(swal.noop);
+	}
 }]);

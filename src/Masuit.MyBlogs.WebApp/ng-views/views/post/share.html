@@ -1,0 +1,61 @@
+﻿<div>
+    <div class="btn-group">
+        <button class="btn btn-default waves-effect" ng-click="list.add()">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+        <button class="btn btn-info waves-effect" ng-click="list.load()">
+            <span class="glyphicon glyphicon-refresh"></span>
+        </button>
+    </div>
+    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
+            <td title="'标题'" filter="{Title: 'text'}" sortable="'Title'">
+                <a ng-href="{{row.Link}}" target="_blank">{{row.Title}}</a>
+            </td>
+            <td title="'排序'" sortable="'Sort'">
+                {{row.Sort}}
+            </td>
+            <td title="'操作'">
+                <div class="btn-group">
+                    <button class="btn btn-success btn-sm waves-effect" ng-click="list.edit(row)">修改</button>
+                    <button class="btn btn-danger btn-sm waves-effect" ng-click="list.del(row)">删除</button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="modal" class="modal">
+    <div class="container-fluid" style="margin: 15px 0;">
+        <form class="bgm-white">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    标题：
+                </span>
+                <div class="fg-line">
+                    <input type="text" class="form-control" id="share-name" ng-model="share.Title" />
+                </div>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    URL：
+                </span>
+                <div class="fg-line">
+                    <input type="text" class="form-control" id="share-url" ng-model="share.Link" />
+                </div>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    排序号：
+                </span>
+                <div class="fg-line">
+                    <input type="number" class="form-control" id="share-sort" ng-model="share.Sort" />
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-info waves-effect" ng-click="submit(share)">确认</button>
+                <button type="button" class="btn btn-danger waves-effect" ng-click="closeAll()">取消</button>
+            </div>
+        </form>
+    </div>
+</div>

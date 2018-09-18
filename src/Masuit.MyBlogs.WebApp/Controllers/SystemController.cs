@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,10 +8,12 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using Common;
 using IBLL;
+using Masuit.MyBlogs.WebApp.Models.Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.Hardware;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Models;
+using Masuit.Tools.NoSQL;
 using Masuit.Tools.Systems;
 using Masuit.Tools.Win32;
 using Models.Entity;
@@ -22,11 +25,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
     public class SystemController : AdminController
     {
         public ISystemSettingBll SystemSettingBll { get; set; }
-
-        public SystemController(IUserInfoBll userInfoBll, ISystemSettingBll systemSettingBll)
+        public RedisHelper RedisHelper { get; set; }
+        public IInterviewBll InterviewBll { get; set; }
+        public SystemController(IUserInfoBll userInfoBll, ISystemSettingBll systemSettingBll, RedisHelper redisHelper, IInterviewBll interviewBll)
         {
             UserInfoBll = userInfoBll;
             SystemSettingBll = systemSettingBll;
+            RedisHelper = redisHelper;
+            InterviewBll = interviewBll;
         }
 
         public async Task<ActionResult> GetBaseInfo()
@@ -103,7 +109,22 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         [ValidateInput(false)]
         public ActionResult Save(string sets)
         {
-            bool b = SystemSettingBll.AddOrUpdateSaved(s => s.Name, JsonConvert.DeserializeObject<List<SystemSetting>>(sets).ToArray()) > 0;
+            SystemSetting[] settings = JsonConvert.DeserializeObject<List<SystemSetting>>(sets).ToArray();
+            ConcurrentDictionary<string, HashSet<string>> dic = new ConcurrentDictionary<string, HashSet<string>>();
+            settings.FirstOrDefault(s => s.Name.Equals("DenyArea"))?.Value.Split(',', '，').ForEach(area =>
+            {
+                if (CommonHelper.DenyAreaIP.TryGetValue(area, out var hs))
+                {
+                    dic[area] = hs;
+                }
+                else
+                {
+                    dic[area] = new HashSet<string>();
+                }
+            });
+            CommonHelper.DenyAreaIP = dic;
+            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt"), CommonHelper.DenyAreaIP.ToJsonString());
+            bool b = SystemSettingBll.AddOrUpdateSaved(s => s.Name, settings) > 0;
             return ResultData(null, b, b ? "设置保存成功！" : "设置保存失败！");
         }
 
@@ -168,5 +189,65 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 return ResultData(null, false, "路径格式不正确！错误信息：\r\n" + e.Message + "\r\n\r\n详细堆栈跟踪：\r\n" + e.StackTrace);
             }
         }
+        #region 网站防火墙
+
+        public ActionResult IpBlackList()
+        {
+            return ResultData(CommonHelper.DenyIP);
+        }
+
+        public ActionResult IpWhiteList()
+        {
+            return ResultData(System.IO.File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt")));
+        }
+
+        /// <summary>
+        /// 设置IP黑名单
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public ActionResult SetIpBlackList(string content)
+        {
+            CommonHelper.DenyIP = content;
+            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"), CommonHelper.DenyIP);
+            return ResultData(null);
+        }
+
+        /// <summary>
+        /// 设置IP白名单
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public ActionResult SetIpWhiteList(string content)
+        {
+            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), content);
+            return ResultData(null);
+        }
+
+        public ActionResult InterceptLog()
+        {
+            List<IpIntercepter> list = RedisHelper.ListRange<IpIntercepter>("intercept");
+            if (list.Any())
+            {
+                string ips = string.Join(",", list.Select(i => i.IP).Distinct());
+                DateTime start = list.Min(i => i.Time).AddDays(-1);
+                Dictionary<string, string> dic = InterviewBll.LoadEntities(i => ips.Contains(i.IP) && i.ViewTime >= start).Select(i => new { i.IP, i.Address }).AsEnumerable().DistinctBy(a => a.IP).ToDictionary(a => a.IP, a => a.Address);
+                foreach (var item in list)
+                {
+                    if (dic.ContainsKey(item.IP))
+                    {
+                        item.Address = dic[item.IP];
+                    }
+                }
+            }
+            return ResultData(list);
+        }
+
+        public ActionResult ClearInterceptLog()
+        {
+            bool b = RedisHelper.DeleteKey("intercept");
+            return ResultData(null, b, b ? "拦截日志清除成功！" : "拦截日志清除失败！");
+        }
+        #endregion
     }
 }

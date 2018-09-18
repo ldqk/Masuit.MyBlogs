@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
+using EFSecondLevelCache;
 using Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.Media;
@@ -16,6 +17,7 @@ using Masuit.Tools.Net;
 using Masuit.Tools.NoSQL;
 using Masuit.Tools.Security;
 using Models.Application;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Common
@@ -36,9 +38,25 @@ namespace Common
         public static string ModRegex { get; set; } = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "mod.txt"));
 
         /// <summary>
-        /// 禁止IP
+        /// 全局禁止IP
         /// </summary>
         public static string DenyIP { get; set; } = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"));
+
+        /// <summary>
+        /// 按地区禁用ip
+        /// </summary>
+        public static ConcurrentDictionary<string, HashSet<string>> DenyAreaIP { get; set; } = JsonConvert.DeserializeObject<ConcurrentDictionary<string, HashSet<string>>>(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt")));
+
+        /// <summary>
+        /// ip白名单
+        /// </summary>
+        public static IEnumerable<string> IPWhiteList
+        {
+            get => File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt")).Split(',', '，');
+            set
+            {
+            }
+        }
 
         /// <summary>
         /// 每IP错误的次数统计
@@ -98,7 +116,7 @@ namespace Common
         {
             using (var db = new DataContext())
             {
-                return db.SystemSetting.FirstOrDefault(s => s.Name.Equals(key))?.Value;
+                return db.SystemSetting.Cacheable().FirstOrDefault(s => s.Name.Equals(key))?.Value;
             }
         }
 

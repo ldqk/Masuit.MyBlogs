@@ -246,6 +246,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\ban.txt" />
+    <Content Include="App_Data\whitelist.txt" />
+    <Content Include="App_Data\denyareaip.txt" />
     <Content Include="App_Data\denyip.txt" />
     <Content Include="App_Data\mod.txt" />
     <Content Include="Assets\banner\bootstrap-touch-slider.css" />
@@ -1062,6 +1064,7 @@
     <Content Include="Assets\semantic\themes\default\assets\fonts\icons.woff" />
     <Content Include="Assets\semantic\themes\default\assets\fonts\icons.woff2" />
     <Content Include="ng-views\views\subscribe.html" />
+    <Content Include="ng-views\views\system\firewall.html" />
     <Content Include="ng-views\views\system\task.html" />
     <Content Include="ng-views\views\system\file.html" />
     <Content Include="ng-views\views\system\home.html" />
@@ -1368,6 +1371,7 @@
     <Compile Include="Models\FileRequest.cs" />
     <Compile Include="Models\Hangfire\HangfireBackJob.cs" />
     <Compile Include="Models\Hangfire\IHangfireBackJob.cs" />
+    <Compile Include="Models\Hangfire\IpIntercepter.cs" />
     <Compile Include="Models\LuceneHelper.cs" />
     <Compile Include="Models\MyActionFilterAttribute.cs" />
     <Compile Include="Models\MyExceptionFilterAttribute.cs" />

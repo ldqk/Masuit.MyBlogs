@@ -7,6 +7,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using Autofac;
 using Common;
+using Hangfire;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models.Hangfire;
 using Masuit.Tools;
@@ -101,9 +102,15 @@ namespace Masuit.MyBlogs.WebApp
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
 #if !DEBUG
-            if (Request.UserHostAddress == null || CommonHelper.DenyIP.Contains(Request.UserHostAddress))
+            if (Request.UserHostAddress == null || CommonHelper.DenyAreaIP.SelectMany(x => x.Value).Union(CommonHelper.DenyIP.Split(',')).Except(CommonHelper.IPWhiteList).Contains(Request.UserHostAddress))
             {
                 Response.Write($"检测到您的IP（{Request.UserHostAddress}）异常，已被本站禁止访问，如有疑问，请联系站长！");
+                BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
+                {
+                    IP = Request.UserHostAddress,
+                    RequestUrl = Request.Url.ToString(),
+                    Time = DateTime.Now
+                }));
                 Response.End();
                 return;
             }
