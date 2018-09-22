@@ -29,19 +29,19 @@
                 </div>
                 <div class="col-md-6 text-right">
                     <div class="btn-group">
-                        <button class="btn btn-info" ng-click="getAreaIPBlackList()" ng-disabled="Settings.EnableDenyArea=='false'" type="button">查看地区IP黑名单</button>
+                        <button class="btn btn-info" ng-click="getAreaIPBlackList()" ng-if="Settings.EnableDenyArea=='true'" type="button">查看地区IP黑名单</button>
                         <button class="btn btn-danger" ng-click="getIPBlackList()" type="button">编辑全局IP黑名单</button>
                         <button class="btn btn-success" ng-click="getIPRangeBlackList()" type="button">编辑IP地址段黑名单</button>
                         <button class="btn btn-primary" ng-click="getIPWhiteList()" type="button">编辑IP白名单</button>
                     </div>
                 </div>
             </div>
-            <div class="input-group">
+            <div class="input-group" ng-if="Settings.EnableDenyArea=='true'">
                 <span class="el-switch input-group-addon">
                     <span>受限制的地区：</span>
                 </span>
                 <div class="fg-line">
-                    <textarea class="form-control" ng-model="Settings.DenyArea" ng-readonly="Settings.EnableDenyArea=='false'" placeholder="禁止访问的地区，逗号分隔" rows="3" type="text"></textarea>
+                    <textarea class="form-control" ng-model="Settings.DenyArea" placeholder="禁止访问的地区，逗号分隔" rows="3" type="text"></textarea>
                 </div>
                 <span class="input-group-btn">
                     <button class="btn btn-primary" ng-click="save()" type="button">保存配置</button>
