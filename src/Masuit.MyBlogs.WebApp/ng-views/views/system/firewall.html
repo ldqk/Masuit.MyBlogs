@@ -36,12 +36,12 @@
                     </div>
                 </div>
             </div>
-            <div class="input-group" ng-if="Settings.EnableDenyArea=='true'">
+            <div class="input-group">
                 <span class="el-switch input-group-addon">
                     <span>受限制的地区：</span>
                 </span>
                 <div class="fg-line">
-                    <textarea class="form-control" ng-model="Settings.DenyArea" placeholder="禁止访问的地区，逗号分隔" rows="3" type="text"></textarea>
+                    <textarea class="form-control" ng-model="Settings.DenyArea" ng-readonly="Settings.EnableDenyArea=='false'" placeholder="禁止访问的地区，逗号分隔" rows="3" type="text"></textarea>
                 </div>
                 <span class="input-group-btn">
                     <button class="btn btn-primary" ng-click="save()" type="button">保存配置</button>
