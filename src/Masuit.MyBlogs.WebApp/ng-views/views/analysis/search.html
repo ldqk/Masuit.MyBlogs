@@ -35,6 +35,7 @@
             </td>
             <td title="'客户端IP'" filter="{IP: 'text'}" sortable="'IP'">
                 <a ng-href="/tools/ip?ip={{row.IP}}" target="_blank" style="font-size: 20px;" data-microtip="查看{{row.IP}}的详细信息" data-microtip-position="bottom">{{row.IP}}</a>
+                <button class="badge btn btn-primary pull-right" ng-click="addToBlackList(row.IP)">黑名单</button>
             </td>
             <td title="'操作'" style="width: 185px;">
                 <button class="btn btn-danger btn-sm waves-effect" ng-click="list.del(row)">

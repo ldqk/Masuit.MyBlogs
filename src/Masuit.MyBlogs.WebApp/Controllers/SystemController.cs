@@ -234,7 +234,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     var strs = line.Split(' ');
                     CommonHelper.DenyIPRange[strs[0]] = strs[1];
                 }
-                catch (IndexOutOfRangeException e)
+                catch (IndexOutOfRangeException)
                 {
                 }
             }
@@ -310,19 +310,39 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <returns></returns>
         public ActionResult AddToWhiteList(string ip)
         {
-            string ips = System.IO.File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"));
-            List<string> list = ips.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
-            list.Add(ip);
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), string.Join(",", list.Distinct()), Encoding.UTF8);
-            foreach (var kv in CommonHelper.DenyAreaIP)
+            if (ip.MatchInetAddress())
             {
-                foreach (string item in list)
+                string ips = System.IO.File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"));
+                List<string> list = ips.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+                list.Add(ip);
+                System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), string.Join(",", list.Distinct()), Encoding.UTF8);
+                foreach (var kv in CommonHelper.DenyAreaIP)
                 {
-                    CommonHelper.DenyAreaIP[kv.Key].Remove(item);
+                    foreach (string item in list)
+                    {
+                        CommonHelper.DenyAreaIP[kv.Key].Remove(item);
+                    }
                 }
+                System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt"), CommonHelper.DenyAreaIP.ToJsonString(), Encoding.UTF8);
+                return ResultData(null);
             }
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt"), CommonHelper.DenyAreaIP.ToJsonString(), Encoding.UTF8);
-            return ResultData(null);
+            return ResultData(null, false);
+        }
+
+        /// <summary>
+        /// 将IP添加到白名单
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <returns></returns>
+        public ActionResult AddToBlackList(string ip)
+        {
+            if (ip.MatchInetAddress())
+            {
+                CommonHelper.DenyIP += "," + ip;
+                System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
+                return ResultData(null);
+            }
+            return ResultData(null, false);
         }
         #endregion
     }

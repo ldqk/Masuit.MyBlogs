@@ -71,8 +71,9 @@
     </div>
     <table ng-table="list.tableParams" id="interview" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'IP'" filter="{IP: 'text'}" sortable="'IP'">
+            <td title="'IP'" filter="{IP: 'text'}" sortable="'IP'" style="width: 250px">
                 <a ng-href="/tools/ip?ip={{row.IP}}" target="_blank" style="font-size: 20px;" data-microtip="查看{{row.IP}}的详细信息" data-microtip-position="bottom">{{row.IP}}</a>
+                <button class="badge btn btn-primary pull-right" ng-click="addToBlackList(row.IP)">黑名单</button>
             </td>
             <td title="'用户代理'" filter="{UserAgent: 'text'}" sortable="'UserAgent'" ng-if="UserAgent">
                 {{row.UserAgent}}
