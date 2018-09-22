@@ -301,6 +301,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			}
 		}).then(function (msg) {
 			swal(msg,'','success');
+			self.load();
 		}).catch(swal.noop);
 	}
 	$scope.EnableDenyAreaPolicy= function() {
