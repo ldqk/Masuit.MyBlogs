@@ -1,4 +1,9 @@
-﻿using Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web.Mvc;
+using Common;
 using EFSecondLevelCache;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
@@ -8,12 +13,6 @@ using Models.DTO;
 using Models.Entity;
 using Models.Enum;
 using Models.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web.Mvc;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -42,20 +41,20 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// </summary>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        public async Task<ActionResult> Index(OrderBy orderBy = OrderBy.ModifyDate)
+        public ActionResult Index(OrderBy orderBy = OrderBy.ModifyDate)
         {
             ViewBag.Total = 0;
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
-            var tops = (await PostBll.LoadEntitiesFromL2CacheNoTrackingAsync<DateTime, PostOutputDto>(t => t.Status == Status.Pended && t.IsBanner, p => p.ModifyDate, false).ConfigureAwait(true)).Select(p => new
+            var tops = PostBll.LoadEntitiesFromL2CacheNoTracking<DateTime, PostOutputDto>(t => t.Status == Status.Pended && t.IsBanner, p => p.ModifyDate, false).Select(p => new
             {
                 p.Title,
                 p.Description,
                 p.Id,
                 p.ImageUrl
             }).ToList();
-            List<FastShare> fastShares = FastShareBll.GetAllFromL2CacheNoTracking().ToList();
+            List<FastShare> fastShares = FastShareBll.GetAllFromL2CacheNoTracking(s => s.Sort).ToList();
             ViewBag.FastShare = fastShares;
-            var viewModel = await GetIndexPageViewModelAsync(1, 15, orderBy, user).ConfigureAwait(true);
+            var viewModel = GetIndexPageViewModel(1, 15, orderBy, user);
             var banner = new List<PostOutputDto>();
             tops.ForEach(t =>
             {
@@ -73,11 +72,11 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <param name="orderBy"></param>
         /// <returns></returns>
         [Route("p/{page:int?}/{size:int?}/{orderBy:int?}")]
-        public async Task<ActionResult> Post(int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
+        public ActionResult Post(int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
-            ViewBag.Total = (await PostBll.LoadEntitiesFromL2CacheNoTrackingAsync<PostOutputDto>(p => p.Status == Status.Pended || user.IsAdmin && !p.IsFixedTop).ConfigureAwait(true)).Count();
-            var viewModel = await GetIndexPageViewModelAsync(page, size, orderBy, user).ConfigureAwait(true);
+            ViewBag.Total = (PostBll.LoadEntitiesFromL2CacheNoTracking<PostOutputDto>(p => p.Status == Status.Pended || user.IsAdmin && !p.IsFixedTop)).Count();
+            var viewModel = GetIndexPageViewModel(page, size, orderBy, user);
             return View(viewModel);
         }
 
@@ -90,7 +89,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <param name="orderBy"></param>
         /// <returns></returns>
         [Route("tag/{id}/{page:int?}/{size:int?}/{orderBy:int?}")]
-        public async Task<ActionResult> Tag(string id, int page = 1, int size = 10, OrderBy orderBy = OrderBy.ModifyDate)
+        public ActionResult Tag(string id, int page = 1, int size = 10, OrderBy orderBy = OrderBy.ModifyDate)
         {
             IList<PostOutputDto> posts;
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
@@ -113,7 +112,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     posts = temp.ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();
                     break;
             }
-            var viewModel = await GetIndexPageViewModelAsync(0, 0, orderBy, user).ConfigureAwait(true);
+            var viewModel = GetIndexPageViewModel(0, 0, orderBy, user);
             ViewBag.Total = posts.Count;
             ViewBag.Tag = id;
             viewModel.Posts = posts;
@@ -154,7 +153,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     posts = posts.ThenByDescending(p => p.ModifyDate);
                     break;
             }
-            var viewModel = await GetIndexPageViewModelAsync(0, 0, orderBy, user).ConfigureAwait(true);
+            var viewModel = GetIndexPageViewModel(0, 0, orderBy, user);
             ViewBag.Total = posts.Count();
             ViewBag.CategoryName = cat.Name;
             ViewBag.Desc = cat.Description;
@@ -170,22 +169,22 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <param name="orderBy"></param>
         /// <param name="user"></param>
         /// <returns></returns>
-        private async Task<IndexPageViewModel> GetIndexPageViewModelAsync(int page, int size, OrderBy orderBy, UserInfoOutputDto user)
+        private IndexPageViewModel GetIndexPageViewModel(int page, int size, OrderBy orderBy, UserInfoOutputDto user)
         {
             IQueryable<PostOutputDto> postList = PostBll.LoadEntitiesNoTracking<PostOutputDto>(p => (p.Status == Status.Pended || user.IsAdmin)); //准备文章的查询
             var notices = NoticeBll.LoadPageEntitiesFromL2CacheNoTracking<DateTime, NoticeOutputDto>(1, 5, out int _, n => (n.Status == Status.Display || user.IsAdmin), n => n.ModifyDate, false).ToList(); //加载前5条公告
-            var cats = await CategoryBll.LoadEntitiesFromL2CacheNoTrackingAsync<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).ConfigureAwait(true); //加载分类目录
+            var cats = CategoryBll.LoadEntitiesFromL2CacheNoTracking<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name); //加载分类目录
             var comments = CommentBll.LoadPageEntitiesFromL2CacheNoTracking<DateTime, CommentOutputDto>(1, 10, out int _, c => c.Status == Status.Pended && c.Post.Status == Status.Pended || user.IsAdmin, c => c.CommentDate, false).ToList(); //加在新评论
             var start = DateTime.Today.AddDays(-7);
-            var hotSearches = await SearchDetailsBll.LoadEntitiesNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(10).Select(g => new KeywordsRankOutputDto()
+            var hotSearches = SearchDetailsBll.LoadEntitiesNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(10).Select(g => new KeywordsRankOutputDto()
             {
                 KeyWords = g.FirstOrDefault().KeyWords,
                 SearchCount = g.Count()
-            }).ToListAsync(); //热词统计
-            var hot6Post = await (new Random().Next() % 2 == 0 ? postList.OrderByDescending(p => p.ViewCount) : postList.OrderByDescending(p => p.VoteUpCount)).Skip(0).Take(5).Cacheable().ToListAsync(); //热门文章
-            var topPostWeek = await PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(week,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToListAsync(); //文章周排行
-            var topPostMonth = await PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(month,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToListAsync(); //文章月排行
-            var topPostYear = await PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(year,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToListAsync(); //文章年度排行
+            }).ToList(); //热词统计
+            var hot6Post = (new Random().Next() % 2 == 0 ? postList.OrderByDescending(p => p.ViewCount) : postList.OrderByDescending(p => p.VoteUpCount)).Skip(0).Take(5).Cacheable().ToList(); //热门文章
+            var topPostWeek = PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(week,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章周排行
+            var topPostMonth = PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(month,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章月排行
+            var topPostYear = PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(year,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章年度排行
             var tags = new List<string>(); //标签云
             var tagdic = new Dictionary<string, int>();
             var newdic = new Dictionary<string, int>(); //标签云最终结果

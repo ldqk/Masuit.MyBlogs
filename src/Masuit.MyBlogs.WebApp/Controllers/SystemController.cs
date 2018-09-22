@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using Common;
+﻿using Common;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models.Hangfire;
 using Masuit.Tools;
@@ -19,6 +11,14 @@ using Masuit.Tools.Win32;
 using Models.Entity;
 using Models.Enum;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -123,7 +123,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 }
             });
             CommonHelper.DenyAreaIP = dic;
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt"), CommonHelper.DenyAreaIP.ToJsonString());
+            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt"), CommonHelper.DenyAreaIP.ToJsonString(), Encoding.UTF8);
             bool b = SystemSettingBll.AddOrUpdateSaved(s => s.Name, settings) > 0;
             return ResultData(null, b, b ? "设置保存成功！" : "设置保存失败！");
         }
@@ -191,11 +191,60 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         }
         #region 网站防火墙
 
+        /// <summary>
+        /// 获取全局IP黑名单
+        /// </summary>
+        /// <returns></returns>
         public ActionResult IpBlackList()
         {
             return ResultData(CommonHelper.DenyIP);
         }
 
+        /// <summary>
+        /// 获取地区IP黑名单
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult AreaIPBlackList()
+        {
+            return ResultData(CommonHelper.DenyAreaIP);
+        }
+
+        /// <summary>
+        /// 获取IP地址段黑名单
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetIPRangeBlackList()
+        {
+            return ResultData(System.IO.File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "DenyIPRange.txt")));
+        }
+
+        /// <summary>
+        /// 设置IP地址段黑名单
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult SetIPRangeBlackList(string content)
+        {
+            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "DenyIPRange.txt"), content, Encoding.UTF8);
+            CommonHelper.DenyIPRange.Clear();
+            var lines = System.IO.File.ReadAllLines(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "DenyIPRange.txt")).Where(s => s.Split(' ').Length > 2);
+            foreach (var line in lines)
+            {
+                try
+                {
+                    var strs = line.Split(' ');
+                    CommonHelper.DenyIPRange[strs[0]] = strs[1];
+                }
+                catch (IndexOutOfRangeException e)
+                {
+                }
+            }
+            return ResultData(null);
+        }
+
+        /// <summary>
+        /// 全局IP白名单
+        /// </summary>
+        /// <returns></returns>
         public ActionResult IpWhiteList()
         {
             return ResultData(System.IO.File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt")));
@@ -209,7 +258,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         public ActionResult SetIpBlackList(string content)
         {
             CommonHelper.DenyIP = content;
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"), CommonHelper.DenyIP);
+            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
             return ResultData(null);
         }
 
@@ -220,7 +269,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <returns></returns>
         public ActionResult SetIpWhiteList(string content)
         {
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), content);
+            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), content, Encoding.UTF8);
+            CommonHelper.IPWhiteList = content.Split(',', '，');
             return ResultData(null);
         }
 
@@ -243,10 +293,36 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             return ResultData(list);
         }
 
+        /// <summary>
+        /// 清除拦截日志
+        /// </summary>
+        /// <returns></returns>
         public ActionResult ClearInterceptLog()
         {
             bool b = RedisHelper.DeleteKey("intercept");
             return ResultData(null, b, b ? "拦截日志清除成功！" : "拦截日志清除失败！");
+        }
+
+        /// <summary>
+        /// 将IP添加到白名单
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <returns></returns>
+        public ActionResult AddToWhiteList(string ip)
+        {
+            string ips = System.IO.File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"));
+            List<string> list = ips.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+            list.Add(ip);
+            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), string.Join(",", list.Distinct()), Encoding.UTF8);
+            foreach (var kv in CommonHelper.DenyAreaIP)
+            {
+                foreach (string item in list)
+                {
+                    CommonHelper.DenyAreaIP[kv.Key].Remove(item);
+                }
+            }
+            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt"), CommonHelper.DenyAreaIP.ToJsonString(), Encoding.UTF8);
+            return ResultData(null);
         }
         #endregion
     }

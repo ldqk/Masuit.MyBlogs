@@ -416,7 +416,7 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
         {
             using (RedisHelper redisHelper = RedisHelper.GetInstance())
             {
-                redisHelper.ListRightPush("intercept", s);
+                redisHelper.ListLeftPush("intercept", s);
             }
         }
     }

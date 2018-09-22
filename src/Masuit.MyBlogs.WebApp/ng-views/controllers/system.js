@@ -254,7 +254,7 @@ myApp.controller("file", ["$scope", "$http", function ($scope, $http) {
 myApp.controller("task", ["$scope", "$http", function ($scope, $http) {
 	window.hub.disconnect();
 }]);
-myApp.controller("firewall", ["$scope", "$http","NgTableParams", function ($scope, $http,NgTableParams) {
+myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", function ($scope, $http,NgTableParams,$timeout) {
 	window.hub.disconnect();
 	var self = this;
 	var data = [];
@@ -313,6 +313,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams", function ($scop
 	$scope.getIPBlackList= function() {
 		$scope.request("/system/IpBlackList",null, function (data) {
 			swal({
+				title:"编辑全局IP黑名单",
 				input: 'textarea',
 				showCloseButton: true,
 				width: 1000,
@@ -337,6 +338,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams", function ($scop
 	$scope.getIPWhiteList= function() {
 		$scope.request("/system/IpWhiteList",null, function (data) {
 			swal({
+				title:"编辑全局IP白名单",
 				input: 'textarea',
 				showCloseButton: true,
 				width: 1000,
@@ -349,6 +351,62 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams", function ($scop
 				preConfirm: function(value) {
 					return new Promise(function (resolve) {
 						$scope.request("/system/SetIpWhiteList", { content: value }, function (res) {
+							resolve(res.Message);
+						});
+					});
+				}
+			}).then(function (msg) {
+				swal("更新成功",'','success');
+			}).catch(swal.noop);
+		});
+	}
+	$scope.getAreaIPBlackList= function() {
+		$scope.request("/system/AreaIPBlackList",null, function (data) {
+			layer.open({
+				type: 1,
+				zIndex: 20,
+				title: '查看地区IP黑名单',
+				area: (window.screen.width > 360 ? 360 : window.screen.width) + 'px',// '340px'], //宽高
+				content: $("#modal"),
+				success: function(layero, index) {
+					$('.ui.dropdown.region').dropdown({
+						onChange: function (value) {
+							$scope.AreaIPs = $scope.AreaIPBlackList[value];
+							$scope.AreaIPsCopy = $scope.AreaIPBlackList[value];
+						},
+						message: {
+							maxSelections: '最多选择 {maxCount} 项',
+							noResults: '无搜索结果！'
+						}
+					});
+					$scope.AreaIPBlackList = data.Data;
+					$scope.Areas = Object.keys(data.Data);
+					$timeout(function () {
+						$('.ui.dropdown.region').dropdown("set selected", [$scope.Areas[0]]);
+					}, 100);
+				},
+				end: function() {
+					$("#modal").css("display", "none");
+				}
+			});
+		});
+	}
+	$scope.getIPRangeBlackList= function() {
+		$scope.request("/system/GetIPRangeBlackList",null, function (data) {
+			swal({
+				title:"编辑IP地址段黑名单",
+				input: 'textarea',
+				showCloseButton: true,
+				width: 1000,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "确定",
+				cancelButtonText: "取消",
+				inputValue: data.Data,
+				inputClass:"height700",
+				showLoaderOnConfirm: true,
+				preConfirm: function(value) {
+					return new Promise(function (resolve) {
+						$scope.request("/system/SetIPRangeBlackList", { content: value }, function (res) {
 							resolve(res.Message);
 						});
 					});
@@ -397,5 +455,19 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams", function ($scop
 				text: data.Message
 			});
 		}).catch(swal.noop);
+	}
+	$scope.addToWhiteList= function(ip) {
+		$scope.request("/system/AddToWhiteList", {ip}, function (data) {
+			if(data.Success) {
+				$scope.AreaIPs.remove(ip);
+			}
+		});
+	}
+	$scope.searchIP= function(ip) {
+		if (ip) {
+			$scope.AreaIPs = _.filter($scope.AreaIPsCopy, i => i.indexOf(ip) > -1);
+		} else {
+			$scope.AreaIPs =$scope.AreaIPsCopy;
+		}
 	}
 }]);

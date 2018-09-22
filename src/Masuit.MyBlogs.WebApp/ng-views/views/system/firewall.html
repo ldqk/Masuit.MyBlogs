@@ -1,4 +1,17 @@
-﻿<div class="card">
+﻿<style>
+    .height700 {
+        width: 500px;
+        height: 700px;
+        min-height: 700px;
+        overflow: paged-y-controls;
+    }
+
+    .iplist {
+        height: 500px;
+        overflow-y: auto;
+    }
+</style>
+<div class="card">
     <div class="card-header">
         <h2>防火墙策略配置</h2>
     </div>
@@ -9,27 +22,29 @@
                     <div class="input-group">
                         <span class="input-group-addon">启用地区限制访问策略：</span>
                         <span class="el-switch">
-                            <input type="checkbox" name="switch" ng-checked="Settings.EnableDenyArea=='true'">
+                            <input name="switch" ng-checked="Settings.EnableDenyArea=='true'" type="checkbox">
                             <span class="el-switch-style" ng-click="EnableDenyAreaPolicy()"></span>
                         </span>
                     </div>
                 </div>
                 <div class="col-md-6 text-right">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-info" ng-click="getIPBlackList()">查看IP黑名单</button>
-                        <button type="button" class="btn btn-primary" ng-click="getIPWhiteList()">查看IP白名单</button>
+                        <button class="btn btn-info" ng-click="getAreaIPBlackList()" ng-disabled="Settings.EnableDenyArea=='false'" type="button">查看地区IP黑名单</button>
+                        <button class="btn btn-danger" ng-click="getIPBlackList()" type="button">编辑全局IP黑名单</button>
+                        <button class="btn btn-success" ng-click="getIPRangeBlackList()" type="button">编辑IP地址段黑名单</button>
+                        <button class="btn btn-primary" ng-click="getIPWhiteList()" type="button">编辑IP白名单</button>
                     </div>
                 </div>
             </div>
             <div class="input-group">
-                <span class="input-group-addon el-switch">
+                <span class="el-switch input-group-addon">
                     <span>受限制的地区：</span>
                 </span>
                 <div class="fg-line">
-                    <textarea type="text" rows="3" class="form-control" ng-model="Settings.DenyArea" placeholder="禁止访问的地区，逗号分隔" ng-readonly="Settings.EnableDenyArea=='false'"></textarea>
+                    <textarea class="form-control" ng-model="Settings.DenyArea" ng-readonly="Settings.EnableDenyArea=='false'" placeholder="禁止访问的地区，逗号分隔" rows="3" type="text"></textarea>
                 </div>
                 <span class="input-group-btn">
-                    <button type="button" class="btn btn-primary" ng-click="save()">保存配置</button>
+                    <button class="btn btn-primary" ng-click="save()" type="button">保存配置</button>
                 </span>
             </div>
         </div>
@@ -42,20 +57,50 @@
     <button class="btn btn-default waves-effect" ng-click="list.clear()">
         <span class="icon icon-bin"></span>
     </button>
-    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
-        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'IP'" filter="{IP: 'text'}" sortable="'IP'">
-                <a ng-href="/tools/ip?ip={{row.IP}}" target="_blank" style="font-size: 20px;" data-microtip="查看{{row.IP}}的详细信息" data-microtip-position="bottom">{{row.IP}}</a>
+    <table class="table table-bordered table-condensed table-hover" disable-filter="list.isAdding" ng-form="list.tableForm" ng-table="list.tableParams" tracked-table="list.tableTracker">
+        <tr ng-form="rowForm" ng-repeat="row in $data" tracked-table-row="row">
+            <td filter="{IP: 'text'}" sortable="'IP'" title="'IP'">
+                <a data-microtip="查看{{row.IP}}的详细信息" data-microtip-position="bottom" ng-href="/tools/ip?ip={{row.IP}}" style="font-size: 20px;" target="_blank">{{row.IP}}</a>
             </td>
-            <td title="'请求URL'" filter="{RequestUrl: 'text'}" sortable="'RequestUrl'">
-                {{row.RequestUrl}}
+            <td filter="{RequestUrl: 'text'}" sortable="'RequestUrl'" title="'请求URL'">
+                <a ng-href="{{row.RequestUrl}}" target="_blank">{{row.RequestUrl}}</a>
             </td>
-            <td title="'地理位置'" filter="{Address: 'text'}" sortable="'Address'">
+            <td filter="{Address: 'text'}" sortable="'Address'" title="'地理位置'">
                 {{row.Address}}
             </td>
-            <td title="'拦截时间'" sortable="'Time'">
+            <td sortable="'Time'" title="'拦截时间'">
                 {{row.Time|date:'yyyy-MM-dd HH:mm:ss'}}
             </td>
         </tr>
     </table>
+</div>
+<div class="modal" id="modal">
+    <div class="container-fluid" style="margin: 15px 0;">
+        <div class="input-group">
+            <span class="input-group-addon">限制地区：</span>
+            <div class="dropdown fluid region search selection ui">
+                <input id="region" name="region" type="hidden">
+                <i class="dropdown icon"></i>
+                <div class="default text">请选择地区</div>
+                <div class="menu">
+                    <div class="item" data-value="{{item}}" ng-repeat="item in Areas track by $index">{{item}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon">搜索 IP ：</span>
+            <div class="fg-line">
+                <input class="form-control" placeholder="114.114.114.114" type="text" ng-model="ip" ng-change="searchIP(ip)"/>
+            </div>
+        </div>
+        <div ng-if="AreaIPs.length<=0" class="text-center">
+            <p class="text-danger size18">暂无记录</p>
+        </div>
+        <ul class="iplist list-group">
+            <li class="list-group-item" ng-repeat="item in AreaIPs track by $index">
+                <a ng-href="/tools/ip?ip={{item}}" target="_blank" data-microtip="查看{{item}}的详细信息" data-microtip-position="bottom">{{item}}</a>
+                <button class="badge btn btn-primary" ng-click="addToWhiteList(item)">添加到白名单</button>
+            </li>
+        </ul>
+    </div>
 </div>

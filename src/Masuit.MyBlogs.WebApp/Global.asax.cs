@@ -102,7 +102,7 @@ namespace Masuit.MyBlogs.WebApp
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
 #if !DEBUG
-            if (Request.UserHostAddress == null || CommonHelper.DenyAreaIP.SelectMany(x => x.Value).Union(CommonHelper.DenyIP.Split(',')).Except(CommonHelper.IPWhiteList).Contains(Request.UserHostAddress))
+            if (Request.UserHostAddress != null && Request.UserHostAddress.IsDenyIpAddress())
             {
                 Response.Write($"检测到您的IP（{Request.UserHostAddress}）异常，已被本站禁止访问，如有疑问，请联系站长！");
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()

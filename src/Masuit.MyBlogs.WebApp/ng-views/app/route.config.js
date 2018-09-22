@@ -145,7 +145,10 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 			controller: "firewall as list",
 			resolve: {
 				deps: ["$ocLazyLoad", function($ocLazyLoad) {
-					return $ocLazyLoad.load([cpath + "/system.js"]);
+					return $ocLazyLoad.load([{
+							files: ["/Assets/semantic/semantic.css","https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.js"],
+							cache: true
+						},cpath + "/system.js"]);
 				}]
 			}
 		}).state("email", {

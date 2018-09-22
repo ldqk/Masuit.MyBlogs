@@ -114,6 +114,7 @@ namespace Masuit.MyBlogs.WebApp
                      {
                          client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
                          client.DefaultRequestHeaders.Referrer = new Uri("https://masuit.com");
+                         client.Timeout = TimeSpan.FromHours(10);
                          client.GetAsync(uri.PathAndQuery).ContinueWith(async t =>
                          {
                              if (t.IsCanceled || t.IsFaulted)

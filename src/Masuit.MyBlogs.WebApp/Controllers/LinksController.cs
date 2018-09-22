@@ -33,7 +33,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             Uri uri = new Uri(links.Url);
             using (HttpClient client = new HttpClient()
             {
-                BaseAddress = uri
+                BaseAddress = uri,
+                Timeout = TimeSpan.FromSeconds(10)
             })
             {
                 client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
@@ -73,7 +74,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             Uri uri = new Uri(link);
             using (var client = new HttpClient()
             {
-                BaseAddress = uri
+                BaseAddress = uri,
+                Timeout = TimeSpan.FromSeconds(10)
             })
             {
                 client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));

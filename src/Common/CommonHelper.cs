@@ -27,36 +27,52 @@ namespace Common
     /// </summary>
     public static class CommonHelper
     {
+        static CommonHelper()
+        {
+            BanRegex = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "ban.txt"));
+            ModRegex = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "mod.txt"));
+            DenyIP = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"));
+            DenyAreaIP = JsonConvert.DeserializeObject<ConcurrentDictionary<string, HashSet<string>>>(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt")));
+            string[] lines = File.ReadAllLines(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "DenyIPRange.txt"));
+            DenyIPRange = new Dictionary<string, string>();
+            foreach (string line in lines)
+            {
+                try
+                {
+                    var strs = line.Split(' ');
+                    DenyIPRange[strs[0]] = strs[1];
+                }
+                catch (IndexOutOfRangeException e)
+                {
+                }
+            }
+            IPWhiteList = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt")).Split(',', '，');
+        }
+
         /// <summary>
         /// 敏感词
         /// </summary>
-        public static string BanRegex { get; set; } = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "ban.txt"));
+        public static string BanRegex { get; set; }
 
         /// <summary>
         /// 审核词
         /// </summary>
-        public static string ModRegex { get; set; } = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "mod.txt"));
+        public static string ModRegex { get; set; }
 
         /// <summary>
         /// 全局禁止IP
         /// </summary>
-        public static string DenyIP { get; set; } = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"));
+        public static string DenyIP { get; set; }
 
         /// <summary>
         /// 按地区禁用ip
         /// </summary>
-        public static ConcurrentDictionary<string, HashSet<string>> DenyAreaIP { get; set; } = JsonConvert.DeserializeObject<ConcurrentDictionary<string, HashSet<string>>>(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt")));
+        public static ConcurrentDictionary<string, HashSet<string>> DenyAreaIP { get; set; }
 
         /// <summary>
         /// ip白名单
         /// </summary>
-        public static IEnumerable<string> IPWhiteList
-        {
-            get => File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt")).Split(',', '，');
-            set
-            {
-            }
-        }
+        public static IEnumerable<string> IPWhiteList { get; set; }
 
         /// <summary>
         /// 每IP错误的次数统计
@@ -99,6 +115,8 @@ namespace Common
             }
         }
 
+        public static Dictionary<string, string> DenyIPRange { get; set; }
+
         /// <summary>
         /// 类型映射
         /// </summary>
@@ -118,6 +136,20 @@ namespace Common
             {
                 return db.SystemSetting.Cacheable().FirstOrDefault(s => s.Name.Equals(key))?.Value;
             }
+        }
+
+        /// <summary>
+        /// 判断IP地址是否被黑名单
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <returns></returns>
+        public static bool IsDenyIpAddress(this string ip)
+        {
+            if (IPWhiteList.Contains(ip))
+            {
+                return false;
+            }
+            return DenyAreaIP.SelectMany(x => x.Value).Union(DenyIP.Split(',')).Contains(ip) || DenyIPRange.Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
         }
 
         #region 性能历史数据
@@ -185,7 +217,13 @@ namespace Common
                 return ("", false);
             }
 
-            string[] apis = { "https://zs.mtkan.cc/upload.php", "https://tu.zsczys.com/Zs_UP.php?type=multipart", "https://api.yum6.cn/sinaimg.php?type=multipart", "http://180.165.190.225:672/v1/upload" };
+            string[] apis =
+            {
+                "https://zs.mtkan.cc/upload.php",
+                "https://tu.zsczys.com/Zs_UP.php?type=multipart",
+                "https://api.yum6.cn/sinaimg.php?type=multipart",
+                "http://180.165.190.225:672/v1/upload"
+            };
             int index = 0;
             string url = String.Empty;
             bool success = false;
@@ -204,14 +242,20 @@ namespace Common
                                 FileName = "".MDString() + ext,
                                 Name = "file"
                             };
-                            using (var content = new MultipartFormDataContent { bc })
+                            using (var content = new MultipartFormDataContent
+                            {
+                                bc
+                            })
                             {
                                 var code = httpClient.PostAsync(apis[index], content).ContinueWith(t =>
                                 {
                                     if (t.IsCanceled || t.IsFaulted)
                                     {
                                         //Console.WriteLine("发送请求出错了" + t.Exception.Message);
-                                        t.Exception.InnerExceptions.ForEach(e => { Console.WriteLine("发送请求出错了：" + e); });
+                                        t.Exception.InnerExceptions.ForEach(e =>
+                                        {
+                                            Console.WriteLine("发送请求出错了：" + e);
+                                        });
                                         return 0;
                                     }
 
@@ -336,15 +380,25 @@ namespace Common
                     {
                         using (var bc = new StreamContent(stream))
                         {
-                            bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "".CreateShortToken() + ext, Name = "smfile" };
-                            using (var content = new MultipartFormDataContent { bc })
+                            bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                            {
+                                FileName = "".CreateShortToken() + ext,
+                                Name = "smfile"
+                            };
+                            using (var content = new MultipartFormDataContent
+                            {
+                                bc
+                            })
                             {
                                 var code = httpClient.PostAsync("https://sm.ms/api/upload?inajax=1&ssl=1", content).ContinueWith(t =>
                                 {
                                     if (t.IsCanceled || t.IsFaulted)
                                     {
                                         //Console.WriteLine("发送请求出错了" + t.Exception);
-                                        t.Exception.InnerExceptions.ForEach(e => { Console.WriteLine("发送请求出错了：" + e); });
+                                        t.Exception.InnerExceptions.ForEach(e =>
+                                        {
+                                            Console.WriteLine("发送请求出错了：" + e);
+                                        });
                                         return 0;
                                     }
 
@@ -397,15 +451,25 @@ namespace Common
                     {
                         using (var bc = new StreamContent(stream))
                         {
-                            bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "".CreateShortToken() + ext, Name = "uploaded_file[]" };
-                            using (var content = new MultipartFormDataContent { bc })
+                            bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                            {
+                                FileName = "".CreateShortToken() + ext,
+                                Name = "uploaded_file[]"
+                            };
+                            using (var content = new MultipartFormDataContent
+                            {
+                                bc
+                            })
                             {
                                 var code = httpClient.PostAsync("https://upload.cc/image_upload", content).ContinueWith(t =>
                                 {
                                     if (t.IsCanceled || t.IsFaulted)
                                     {
                                         //Console.WriteLine("发送请求出错了" + t.Exception);
-                                        t.Exception.InnerExceptions.ForEach(e => { Console.WriteLine("发送请求出错了：" + e); });
+                                        t.Exception.InnerExceptions.ForEach(e =>
+                                        {
+                                            Console.WriteLine("发送请求出错了：" + e);
+                                        });
                                         return 0;
                                     }
 
@@ -461,15 +525,25 @@ namespace Common
                     {
                         using (var bc = new StreamContent(stream))
                         {
-                            bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "".CreateShortToken() + ext, Name = "img" };
-                            using (var content = new MultipartFormDataContent { bc })
+                            bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                            {
+                                FileName = "".CreateShortToken() + ext,
+                                Name = "img"
+                            };
+                            using (var content = new MultipartFormDataContent
+                            {
+                                bc
+                            })
                             {
                                 var code = httpClient.PostAsync("http://upload.otar.im/api/upload/imgur", content).ContinueWith(t =>
                                 {
                                     if (t.IsCanceled || t.IsFaulted)
                                     {
                                         //Console.WriteLine("发送请求出错了" + t.Exception);
-                                        t.Exception.InnerExceptions.ForEach(e => { Console.WriteLine("发送请求出错了：" + e); });
+                                        t.Exception.InnerExceptions.ForEach(e =>
+                                        {
+                                            Console.WriteLine("发送请求出错了：" + e);
+                                        });
                                         return 0;
                                     }
 
