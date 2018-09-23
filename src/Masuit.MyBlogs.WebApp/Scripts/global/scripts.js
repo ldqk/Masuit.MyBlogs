@@ -132,7 +132,7 @@ $(function() {
 	} else {
 		nav.css("background-color", "transparent");
 	}
-	window.onscroll = function() {
+	document.onscroll = function() {
 		if (document.documentElement.scrollTop || document.body.scrollTop > 10) {
 			nav.css({
 				"background-color": "white",

@@ -278,7 +278,6 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 				dataset: res.Data
 			});
 			data = res.Data;
-			console.log(data);
 		});
 	}
 	self.load();
