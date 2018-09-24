@@ -10,7 +10,7 @@
     <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
             <td title="'名称'" filter="{Name: 'text'}" sortable="'Name'" ng-switch="row.isEditing" ng-class="Name.$dirty ? 'bg-warning' : ''" ng-form="Name" tracked-table-cell>
-                <span ng-switch-default>{{row.Name}}</span>
+                <a ng-href="https://www.baidu.com/s?wd={{row.Name}}" target="_blank"><span ng-switch-default>{{row.Name}}</span></a>
                 <div ng-class="Name.$invalid && Name.$dirty ? 'has-error' : ''" ng-switch-when="true">
                     <div class="fg-line">
                         <input type="text" name="name" ng-model="row.Name" class="form-control input-sm" required />
