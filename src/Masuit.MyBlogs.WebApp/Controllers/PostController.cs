@@ -173,6 +173,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var main = PostBll.GetById(id).Mapper<PostHistoryVersion>();
             var left = v1 <= 0 ? main : PostHistoryVersionBll.GetById(v1);
             var right = v2 <= 0 ? main : PostHistoryVersionBll.GetById(v2);
+            HtmlDiff.HtmlDiff diffHelper = new HtmlDiff.HtmlDiff(right.Content, left.Content);
+            string diffOutput = diffHelper.Build();
+            right.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);
+            left.Content = Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty);
             return View(new[] { main, left, right });
         }
 
