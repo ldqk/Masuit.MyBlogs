@@ -184,16 +184,16 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
 
         private AnalysisModel Analysis(bool uniq = false)
         {
-            var all = InterviewBll.SqlQuery<InterviewAnalysisDto>("select ip,BrowserType,Province,ViewTime,OnlineSpanSeconds from Interview ORDER BY ViewTime desc").ToList();
-            var unique = InterviewBll.SqlQuery<InterviewAnalysisDto>("select ip,BrowserType,Province,ViewTime,OnlineSpanSeconds from Interview where Id in(select max(Id) from Interview group by ip ) ORDER BY ViewTime desc").ToList();
+            var all = InterviewBll.SqlQuery<InterviewAnalysisDto>("select id,ip,BrowserType,Province,ViewTime,OnlineSpanSeconds from Interview ORDER BY ViewTime desc").ToList();
+            //var unique = InterviewBll.SqlQuery<InterviewAnalysisDto>("select ip,BrowserType,Province,ViewTime,OnlineSpanSeconds from Interview where Id in(select max(Id) from Interview group by ip ) ORDER BY ViewTime desc").ToList();
+            var unique = all.GroupBy(i => i.IP).Select(g => g.LastOrDefault()).ToList();
             var entities = uniq ? unique : all;
             var dap = InterviewBll.SqlQuery<BounceRate>(@"DECLARE @a float DECLARE @b int
                                                                         SET @a=((SELECT count(1) from (SELECT interviewid FROM InterviewDetail GROUP BY interviewid HAVING count(1)=1) as t)*1.0)
                                                                         SET @b=(SELECT count(1) from (SELECT interviewid FROM InterviewDetail GROUP BY interviewid) as t)
                                                                         SET @b=case when @b=0 then 1 else @b end
                                                                         SELECT @a Dap,@b [All],@a/@b Result").FirstOrDefault(); //计算跳出率
-            var dapAgg = InterviewBll.SqlQuery<BounceRateAggregate>("SELECT CONVERT(datetime,t.tt) [Time],sum(CASE WHEN t.c=1 THEN 1 ELSE 0 END) as Dap,count(t.c) as [All],sum(CASE WHEN t.c=1 THEN 1 ELSE 0 END)*1.0/count(t.c) as Rate from (SELECT interviewid,convert(char(10),[Time],23) tt,count(InterviewId) c FROM [dbo].[InterviewDetail] GROUP BY convert(char(10),[Time],23),InterviewId) as t GROUP BY t.tt ORDER BY Time"); //每日跳出率统计
-
+            var dapAgg = InterviewBll.SqlQuery<BounceRateAggregate>("SELECT CONVERT(datetime,t.tt) [Time],sum(CASE WHEN t.c=1 THEN 1 ELSE 0 END) as Dap,count(t.c) as [All],sum(CASE WHEN t.c=1 THEN 1 ELSE 0 END)*1.0/count(t.c) as Rate from (SELECT interviewid,convert(char(10),[Time],23) tt,count(InterviewId) c FROM [dbo].[InterviewDetail] GROUP BY convert(char(10),[Time],23),InterviewId) as t GROUP BY t.tt ORDER BY Time").ToList(); //每日跳出率统计
             //今日统计
             var todaypv = all.Count(i => i.ViewTime >= DateTime.Today);
             var todayuv = unique.Count(i => i.ViewTime >= DateTime.Today);
@@ -215,82 +215,82 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
             var region = new List<object>();
 
             //省份和世界地区统计
-            entities.GroupBy(i => i.Province).OrderBy(g => Guid.NewGuid()).ForEach(g =>
-            {
-                if (string.IsNullOrEmpty(g.Key))
-                {
-                    return;
-                }
-                string name;
-                if (g.Key.Contains("新疆"))
-                {
-                    name = "新疆";
-                }
-                else if (g.Key.Contains("广西"))
-                {
-                    name = "广西";
-                }
-                else if (g.Key.Contains("西藏"))
-                {
-                    name = "西藏";
-                }
-                else if (g.Key.Contains("香港"))
-                {
-                    name = "香港";
-                }
-                else if (g.Key.Contains("澳门"))
-                {
-                    name = "澳门";
-                }
-                else if (g.Key.Contains("内蒙古"))
-                {
-                    name = "内蒙古";
-                }
-                else if (g.Key.Contains("宁夏"))
-                {
-                    name = "宁夏";
-                }
-                else if (g.Key.Contains("海南"))
-                {
-                    name = "海南";
-                }
-                else if (g.Key.Contains("台湾"))
-                {
-                    name = "台湾";
-                }
-                else if (g.Key.Contains("省"))
-                {
-                    name = g.Key.Replace("省", "");
-                }
-                else if (g.Key.Contains("市"))
-                {
-                    name = g.Key.Replace("市", "");
-                }
-                else if (g.Key.Contains("XX"))
-                {
-                    return;
-                }
-                else
-                {
-                    name = g.Key;
-                }
-                client.Add(new
-                {
-                    name,
-                    value = g.Count()
-                });
-                region.Add(new dynamic[]
-                {
+            entities.Where(i => i.Province != "XX").GroupBy(i => i.Province).OrderBy(g => Guid.NewGuid()).ForEach(g =>
+              {
+                  if (string.IsNullOrEmpty(g.Key))
+                  {
+                      return;
+                  }
+                  string name;
+                  if (g.Key.Contains("新疆"))
+                  {
+                      name = "新疆";
+                  }
+                  else if (g.Key.Contains("广西"))
+                  {
+                      name = "广西";
+                  }
+                  else if (g.Key.Contains("西藏"))
+                  {
+                      name = "西藏";
+                  }
+                  else if (g.Key.Contains("香港"))
+                  {
+                      name = "香港";
+                  }
+                  else if (g.Key.Contains("澳门"))
+                  {
+                      name = "澳门";
+                  }
+                  else if (g.Key.Contains("内蒙古"))
+                  {
+                      name = "内蒙古";
+                  }
+                  else if (g.Key.Contains("宁夏"))
+                  {
+                      name = "宁夏";
+                  }
+                  else if (g.Key.Contains("海南"))
+                  {
+                      name = "海南";
+                  }
+                  else if (g.Key.Contains("台湾"))
+                  {
+                      name = "台湾";
+                  }
+                  else if (g.Key.Contains("省"))
+                  {
+                      name = g.Key.Replace("省", "");
+                  }
+                  else if (g.Key.Contains("市"))
+                  {
+                      name = g.Key.Replace("市", "");
+                  }
+                  else if (g.Key.Contains("XX"))
+                  {
+                      return;
+                  }
+                  else
+                  {
+                      name = g.Key;
+                  }
+                  client.Add(new
+                  {
+                      name,
+                      value = g.Count()
+                  });
+                  region.Add(new dynamic[]
+                  {
                     name,
                     g.Count()
-                });
-            });
+                  });
+              });
             var browser = entities.GroupBy(i => i.BrowserType).OrderBy(g => g.Key).Select(g => new object[]
             {
                 g.Key,
                 g.Count()
             }).ToList();
-            var reduce = all.OrderBy(i => i.ViewTime).GroupBy(i => i.ViewTime.ToString("yyyy-MM-dd")).Select(g => new
+            var reduce = all.OrderBy(i => i.ViewTime).GroupBy(i => i.ViewTime.Date).Select(g => new
             {
                 g.Key,
                 pv = g.Count(),
@@ -318,17 +318,17 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
             //汇总统计
             var pv = reduce.Select(g => new List<object>
             {
-                g.Key.ToDateTime().GetTotalMilliseconds(),
+                g.Key.GetTotalMilliseconds(),
                 g.pv
             }).ToList(); //每日PV
             var uv = reduce.Select(g => new List<object>
             {
-                g.Key.ToDateTime().GetTotalMilliseconds(),
+                g.Key.GetTotalMilliseconds(),
                 g.uv
             }).ToList(); //每日UV
-            var iv = all.OrderBy(i => i.ViewTime).DistinctBy(e => e.IP).GroupBy(i => i.ViewTime.ToString("yyyy-MM-dd")).Select(g => new List<object>
+            var iv = all.OrderBy(i => i.ViewTime).DistinctBy(e => e.IP).GroupBy(i => i.ViewTime.Date).Select(g => new List<object>
             {
-                g.Key.ToDateTime().GetTotalMilliseconds(),
+                g.Key.GetTotalMilliseconds(),
                 g.Count()
             }).ToList(); //每日新增独立访客
 

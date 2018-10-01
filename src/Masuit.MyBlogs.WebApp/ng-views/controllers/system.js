@@ -314,6 +314,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 		$scope.request("/system/IpBlackList",null, function (data) {
 			swal({
 				title:"编辑全局IP黑名单",
+				text:"多个IP之间用英文逗号分隔",
 				input: 'textarea',
 				showCloseButton: true,
 				width: 1000,
@@ -339,6 +340,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 		$scope.request("/system/IpWhiteList",null, function (data) {
 			swal({
 				title:"编辑全局IP白名单",
+				text:"多个IP之间用英文逗号分隔",
 				input: 'textarea',
 				showCloseButton: true,
 				width: 1000,
@@ -395,6 +397,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 		$scope.request("/system/GetIPRangeBlackList",null, function (data) {
 			swal({
 				title:"编辑IP地址段黑名单",
+				text:"每行一条地址段，起始地址和结束地址用空格分隔开，其余信息也用空格分隔开",
 				input: 'textarea',
 				showCloseButton: true,
 				width: 1000,

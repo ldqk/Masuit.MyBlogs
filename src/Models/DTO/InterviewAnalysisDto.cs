@@ -7,6 +7,8 @@ namespace Models.DTO
     /// </summary>
     public class InterviewAnalysisDto
     {
+        public long Id { get; set; }
+
         /// <summary>
         /// IP地址
         /// </summary>

@@ -130,10 +130,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     {
                         //通知博主和上层所有关联的评论访客
                         var pid = LeaveMessageBll.GetParentMessageIdByChildId(msg2.Id);
-                        var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Except(new List<string>() { msg2.Email }).ToList();
+                        var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).ToList();
                         emails.Add(email);
                         string link = Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Url.Scheme);
-                        BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), string.Join(",", emails.Distinct())));
+                        BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), string.Join(",", emails.Distinct().Except(new[] { msg2.Email }))));
                     }
 #endif
                     return ResultData(null, true, "留言发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将会显示到列表中！");

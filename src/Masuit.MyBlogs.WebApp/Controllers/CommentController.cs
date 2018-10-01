@@ -1,4 +1,9 @@
-﻿using Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web.Mvc;
+using Common;
 using Hangfire;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
@@ -8,11 +13,6 @@ using Models.DTO;
 using Models.Entity;
 using Models.Enum;
 using Models.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web.Mvc;
 using static Common.CommonHelper;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
@@ -238,13 +238,15 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         {
             Comment comment = CommentBll.GetById(id);
             comment.Status = Status.Pended;
+            Post post = PostBll.GetById(comment.PostId);
             bool b = CommentBll.UpdateEntitySaved(comment);
             var pid = comment.ParentId == 0 ? comment.Id : CommentBll.GetParentCommentIdByChildId(id);
 #if !DEBUG
-            string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", comment.NickName).Replace("{{content}}", comment.Content);
+            string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{title}}", post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", comment.NickName).Replace("{{content}}", comment.Content);
             var emails = CommentBll.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>()
             {
-                comment.Email
+                comment.Email,
+                GetSettings("ReceiveEmail")
             }).ToList();
             string link = Url.Action("Details", "Post", new
             {

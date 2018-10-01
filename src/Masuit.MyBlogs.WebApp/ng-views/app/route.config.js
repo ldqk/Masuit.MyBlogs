@@ -24,7 +24,7 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 			resolve: {
 				deps: ["$ocLazyLoad", function($ocLazyLoad) {
 					return $ocLazyLoad.load([{
-						files: ["/Assets/semantic/semantic.css","https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.js"],
+						files: ["/Assets/semantic/semantic.css","https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"],
 						cache: true
 					},cpath + "/post.js"]);
 				}]
@@ -39,7 +39,7 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 						files: ["/Assets/semantic/semantic.css"],
 						cache: true
 					}, {
-						files: ["https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.js"],
+						files: ["https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"],
 						cache: true
 					},cpath + "/post.js"]);
 				}]
@@ -51,7 +51,7 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 			resolve: {
 				deps: ["$ocLazyLoad", function($ocLazyLoad) {
 					return $ocLazyLoad.load([{
-							files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.js","/Assets/semantic/semantic.css","https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.js"],
+							files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.js","/Assets/semantic/semantic.css","https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"],
 							cache: true
 						},
 						cpath + "/post.js"]);
@@ -64,7 +64,7 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 			resolve: {
 				deps: ["$ocLazyLoad", function($ocLazyLoad) {
 					return $ocLazyLoad.load([{
-							files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.js","/Assets/semantic/semantic.css","https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.js"],
+							files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.js","/Assets/semantic/semantic.css","https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"],
 							cache: true
 						},
 						cpath + "/post.js"]);
@@ -104,7 +104,7 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 			resolve: {
 				deps: ["$ocLazyLoad", function($ocLazyLoad) {
 					return $ocLazyLoad.load([{
-						files: ["https://cdn.bootcss.com/angular-ui-tree/2.22.6/angular-ui-tree.css","/Assets/checkbox/checkbox.min.css"],
+						files: ["https://cdnjs.cloudflare.com/ajax/libs/angular-ui-tree/2.22.6/angular-ui-tree.css","/Assets/checkbox/checkbox.min.css"],
 						cache: true
 					}, cpath + "/menu.js"]);
 				}]
@@ -146,7 +146,7 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 			resolve: {
 				deps: ["$ocLazyLoad", function($ocLazyLoad) {
 					return $ocLazyLoad.load([{
-							files: ["/Assets/semantic/semantic.css","https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.js"],
+							files: ["/Assets/semantic/semantic.css","https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"],
 							cache: true
 						},cpath + "/system.js"]);
 				}]
@@ -212,7 +212,7 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 			resolve: {
 				deps: ["$ocLazyLoad", function($ocLazyLoad) {
 					return $ocLazyLoad.load([{
-						files: ["/assets/jedate/jedate.min.css", "/Assets/semantic/semantic.css", "/assets/jedate/jquery.jedate.min.js", "/Scripts/boost.js", "https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.js", "https://img.hcharts.cn/highcharts/modules/data.js", "https://img.hcharts.cn/highcharts/modules/drilldown.js"],
+						files: ["/assets/jedate/jedate.min.css", "/Assets/semantic/semantic.css", "/assets/jedate/jquery.jedate.min.js", "/Scripts/boost.js", "https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js", "https://img.hcharts.cn/highcharts/modules/data.js", "https://img.hcharts.cn/highcharts/modules/drilldown.js"],
 						cache: true
 					},cpath + "/analysis.js"]);
 				}]
@@ -224,7 +224,7 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 			resolve: {
 				deps: ["$ocLazyLoad", function($ocLazyLoad) {
 					return $ocLazyLoad.load([{
-						files: ["/assets/jedate/jedate.min.css","/Assets/semantic/semantic.css",  "/assets/jedate/jquery.jedate.min.js","/Scripts/boost.js","https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.js"],
+						files: ["/assets/jedate/jedate.min.css","/Assets/semantic/semantic.css",  "/assets/jedate/jquery.jedate.min.js","/Scripts/boost.js","https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"],
 						cache: true
 					},cpath + "/analysis.js"]);
 				}]
