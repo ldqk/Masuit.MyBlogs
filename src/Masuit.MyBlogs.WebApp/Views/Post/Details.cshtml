@@ -16,6 +16,9 @@
 <link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
 <script src="~/Assets/layui/layui.all.js"></script>
 <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
+<link href="~/Assets/share/share.css" rel="stylesheet" />
+<script src="~/Assets/share/jquery.qrcode.min.js"></script>
+<script src="~/Assets/share/jquery.share.min.js"></script>
 <div class="container">
     <ol class="cd-breadcrumb triangle">
         <li>@Html.ActionLink("首页", "Index", "Home")</li>
@@ -122,6 +125,8 @@
                                 </div>
                             }
                         </article>
+                        <h3>分享到：</h3>
+                        <div class="social-share"></div>
                         <div id="cyReward" role="cylabs" data-use="reward"></div>
                     </section>
                 </main>

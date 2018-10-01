@@ -457,6 +457,15 @@
     </Content>
     <Content Include="Assets\semantic\themes\default\assets\fonts\icons.svg" />
     <Content Include="Assets\semantic\themes\default\assets\images\flags.png" />
+    <Content Include="Assets\share\jquery.qrcode.min.js" />
+    <Content Include="Assets\share\jquery.share.js" />
+    <Content Include="Assets\share\jquery.share.min.js">
+      <DependentUpon>jquery.share.js</DependentUpon>
+    </Content>
+    <Content Include="Assets\share\share.css" />
+    <Content Include="Assets\share\share.min.css">
+      <DependentUpon>share.css</DependentUpon>
+    </Content>
     <Content Include="Assets\tippy\tippy.css" />
     <Content Include="Assets\tippy\tippy.js" />
     <Content Include="Assets\UEditor\third-party\SyntaxHighlighter\scripts\bundle.js" />
@@ -1095,6 +1104,7 @@
       <DependentUpon>post-all.js</DependentUpon>
     </Content>
     <Content Include="Scripts\apps\canvas.bg.js" />
+    <Content Include="Assets\share\fonts\iconfont.woff" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
