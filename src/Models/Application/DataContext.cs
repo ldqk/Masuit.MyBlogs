@@ -74,6 +74,7 @@ namespace Models.Application
             modelBuilder.Entity<SearchDetails>().Property(e => e.KeyWords).IsUnicode(true);
             modelBuilder.Entity<SearchDetails>().Property(e => e.SearchTime).HasPrecision(0);
             modelBuilder.Entity<UserInfo>().HasMany(e => e.LoginRecord).WithRequired(e => e.UserInfo).WillCascadeOnDelete(true);
+            modelBuilder.Entity<Links>().HasIndex(g => g.Url).IsUnique();
         }
 
         //ÖØÐ´ SaveChanges

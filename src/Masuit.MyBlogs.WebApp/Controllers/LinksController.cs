@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Common;
 using Masuit.MyBlogs.WebApp.Models;
+using Masuit.Tools;
 using Masuit.Tools.Net;
 using Models.DTO;
 using Models.Entity;
@@ -30,6 +31,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
 
         public async Task<ActionResult> Apply(Links links)
         {
+            if (!links.Url.MatchUrl())
+            {
+                return ResultData(null, false, "添加失败！链接非法！");
+            }
+            if (LinksBll.Any(l => l.Url.Equals(links.Url)))
+            {
+                return ResultData(null, false, "添加失败！检测到您的网站已经是本站的友情链接了！");
+            }
             Uri uri = new Uri(links.Url);
             using (HttpClient client = new HttpClient()
             {
