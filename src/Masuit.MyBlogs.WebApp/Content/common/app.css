@@ -99,7 +99,7 @@ body {
     position: fixed;
     right: 0;
     /*top: 83%;*/
-    bottom: 0px;
+    bottom: 20px;
     width: 105px;
     z-index: 11;
 }
