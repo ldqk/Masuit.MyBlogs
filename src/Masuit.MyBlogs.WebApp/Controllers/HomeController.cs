@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using AutoMapper.QueryableExtensions;
 using Common;
 using EFSecondLevelCache;
 using IBLL;
@@ -75,7 +76,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         public ActionResult Post(int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
-            ViewBag.Total = (PostBll.LoadEntitiesFromL2CacheNoTracking<PostOutputDto>(p => p.Status == Status.Pended || user.IsAdmin && !p.IsFixedTop)).Count();
+            ViewBag.Total = PostBll.LoadEntitiesFromL2CacheNoTracking<PostOutputDto>(p => p.Status == Status.Pended || user.IsAdmin && !p.IsFixedTop).Count(p => !p.IsFixedTop);
             var viewModel = GetIndexPageViewModel(page, size, orderBy, user);
             return View(viewModel);
         }
@@ -212,20 +213,24 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             switch (orderBy) //文章排序
             {
                 case OrderBy.CommentCount:
-                    posts = postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 case OrderBy.PostDate:
-                    posts = postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 case OrderBy.ViewCount:
-                    posts = postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 case OrderBy.VoteCount:
-                    posts = postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 default:
-                    posts = postList.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();
                     break;
+            }
+            if (page == 1)
+            {
+                posts = postList.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).AsEnumerable().Union(posts).ToList();
             }
             return new IndexPageViewModel()
             {
