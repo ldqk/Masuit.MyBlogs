@@ -62,6 +62,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     });
                 }
             }
+
             Post post = PostBll.GetById(id);
             if (post != null)
             {
@@ -74,10 +75,12 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 {
                     return View("Details_Admin", post);
                 }
+
                 if (post.Status != Status.Pended)
                 {
                     return RedirectToAction("Post", "Home");
                 }
+
                 if (string.IsNullOrEmpty(Session.GetByRedis<string>("post" + id)))
                 {
                     //post.ViewCount++;
@@ -94,19 +97,37 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                             AccessTime = DateTime.Today
                         });
                     }
+
                     PostBll.UpdateEntitySaved(post);
                     Session.SetByRedis("post" + id, id.ToString());
                 }
+
                 foreach (var s in list)
                 {
-                    if (s.Contains(new[] { @"\?", @"\*", @"\+", @"\-", @"\[", @"\]", @"\{", @"\}", @"\(", @"\)", "�" }))
+                    if (s.Contains(new[]
+                    {
+                        @"\?",
+                        @"\*",
+                        @"\+",
+                        @"\-",
+                        @"\[",
+                        @"\]",
+                        @"\{",
+                        @"\}",
+                        @"\(",
+                        @"\)",
+                        "�"
+                    }))
                     {
                         continue;
                     }
+
                     post.Content = Regex.IsMatch(s, @"^\p{P}.*") ? post.Content.Replace(s, $"<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>{s}</span>") : Regex.Replace(post.Content, s, $"<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>{s}</span>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
                 }
+
                 return View(post);
             }
+
             return RedirectToAction("Index", "Error");
         }
 
@@ -137,6 +158,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 ViewBag.PageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
                 return View(list);
             }
+
             return Redirect(Request.UrlReferrer?.ToString() ?? "/error");
         }
 
@@ -158,12 +180,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     id
                 });
             }
+
             ViewBag.Next = PostHistoryVersionBll.GetFirstEntityFromL2CacheNoTracking(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
             ViewBag.Prev = PostHistoryVersionBll.GetFirstEntityFromL2CacheNoTracking(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
             if (user.IsAdmin)
             {
                 return View("HistoryVersion_Admin", post);
             }
+
             return View(post);
         }
 
@@ -177,7 +201,12 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             string diffOutput = diffHelper.Build();
             right.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);
             left.Content = Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty);
-            return View(new[] { main, left, right });
+            return View(new[]
+            {
+                main,
+                left,
+                right
+            });
         }
 
         public ActionResult VoteDown(int id)
@@ -187,6 +216,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
+
             if (post != null)
             {
                 Session["post-vote" + id] = id;
@@ -195,6 +225,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 bool b = PostBll.SaveChanges() > 0;
                 return ResultData(null, b, b ? "投票成功！" : "投票失败！");
             }
+
             return ResultData(null, false, "非法操作");
         }
 
@@ -205,6 +236,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
+
             if (post != null)
             {
                 Session["post-vote" + id] = id;
@@ -212,6 +244,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 bool b = PostBll.UpdateEntitySaved(post);
                 return ResultData(null, b, b ? "投票成功！" : "投票失败！");
             }
+
             return ResultData(null, false, "非法操作");
         }
 
@@ -232,6 +265,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 return View("Publish_Admin", result.Distinct().OrderBy(s => s));
             }
+
             return View(result.Distinct().OrderBy(s => s));
         }
 
@@ -243,6 +277,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 return ResultData(null, message: "请选择一个分类");
             }
+
             if (string.IsNullOrEmpty(post.Label?.Trim()))
             {
                 post.Label = null;
@@ -256,6 +291,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 post.Label = post.Label.Replace("，", ",");
             }
+
             post.Status = Status.Pending;
             post.PostDate = DateTime.Now;
             post.ModifyDate = DateTime.Now;
@@ -267,6 +303,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 post.Content = ReplaceImgSrc(Regex.Replace(post.Content.HtmlSantinizerStandard(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/");
             }
+
             ViewBag.CategoryId = new SelectList(CategoryBll.LoadEntitiesNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
             Post p = post.Mapper<Post>();
             p.PostAccessRecord.Add(new PostAccessRecord()
@@ -288,8 +325,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     BackgroundJob.Enqueue(() => SendMail(GetSettings("Title") + "有访客投稿：", content, email));
                     return ResultData(p.Mapper<PostOutputDto>(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
                 }
+
                 return ResultData(p.Mapper<PostOutputDto>(), message: "文章发表成功！");
             }
+
             return ResultData(null, false, "文章发表失败！");
         }
 
@@ -343,12 +382,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 return ResultData(null, false, "请输入文章访问密码！");
             }
+
             var s = RedisHelper.GetString("ArticleViewToken");
             if (token.Equals(s))
             {
                 Session.SetByRedis("ArticleViewToken", token);
                 return ResultData(null);
             }
+
             return ResultData(null, false, "文章访问密码不正确！");
         }
 
@@ -365,7 +406,15 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 var s = RedisHelper.GetString("ArticleViewToken");
                 Session.SetByRedis("ArticleViewToken", s);
                 return ResultData(null);
+                //if(!RedisHelper.KeyExists("ArticleViewToken"))
+                //{
+                //    RedisHelper.SetString("ArticleViewToken", string.Empty.CreateShortToken(6));
+                //}
+                //var token = RedisHelper.GetString("ArticleViewToken");
+                //SendMail("懒得勤快的博客_文章验证码", "文章验证码：" + token, email);
+                //return ResultData(null,true,"文章验证码已经发送至您的邮箱，请注意查收");
             }
+
             return ResultData(null, false, "您目前没有权限访问这篇文章的加密部分，请联系站长开通这篇文章的访问权限！");
         }
 
@@ -381,6 +430,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 return ResultData(null, true, post.IsFixedTop ? "置顶成功！" : "取消置顶成功！");
             }
+
             return ResultData(null, false, "操作失败！");
         }
 
@@ -392,21 +442,25 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             post.ModifyDate = DateTime.Now;
             post.PostDate = DateTime.Now;
             bool b = PostBll.UpdateEntitySaved(post);
-            var cast = BroadcastBll.LoadEntities(c => c.Status == Status.Subscribed).ToList();
-            string link = Request.Url?.Scheme + "://" + Request.Url?.Authority + "/" + id;
-            cast.ForEach(c =>
+            if ("false" == GetSettings("DisabledEmailBroadcast"))
             {
-                var ts = DateTime.Now.GetTotalMilliseconds();
-                string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
+                var cast = BroadcastBll.LoadEntities(c => c.Status == Status.Subscribed).ToList();
+                string link = Request.Url?.Scheme + "://" + Request.Url?.Authority + "/" + id;
+                cast.ForEach(c =>
                 {
-                    c.Email,
-                    act = "cancel",
-                    validate = c.ValidateCode,
-                    timespan = ts,
-                    hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"])
-                }, Request.Url.Scheme));
-                BackgroundJob.Enqueue(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email));
-            });
+                    var ts = DateTime.Now.GetTotalMilliseconds();
+                    string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
+                    {
+                        c.Email,
+                        act = "cancel",
+                        validate = c.ValidateCode,
+                        timespan = ts,
+                        hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"])
+                    }, Request.Url.Scheme));
+                    BackgroundJob.Enqueue(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email));
+                });
+            }
+
             HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
             return ResultData(null, b, b ? "审核通过！" : "审核失败！");
         }
@@ -468,6 +522,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     }
                 }
             }
+
             bool b = PostBll.DeleteByIdSaved(id);
             HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
@@ -534,10 +589,12 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 page = 1;
             }
+
             if (size < 1)
             {
                 page = 10;
             }
+
             var list = new List<PostDataModel>();
             IOrderedQueryable<Post> temp;
             var query = string.IsNullOrEmpty(kw) ? PostBll.GetAllNoTracking() : PostBll.LoadEntitiesNoTracking(p => p.Title.Contains(kw) || p.Author.Contains(kw) || p.Email.Contains(kw) || p.Label.Contains(kw) || p.Content.Contains(kw));
@@ -561,6 +618,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     temp = order.ThenByDescending(p => p.ModifyDate);
                     break;
             }
+
             var plist = temp.Skip((page - 1) * size).Take(size).Select(p => new
             {
                 p.Id,
@@ -604,6 +662,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 temp = PostBll.LoadPageEntitiesNoTracking(page, size, out total, p => p.Status == Status.Pending && (p.Title.Contains(search) || p.Author.Contains(search) || p.Email.Contains(search) || p.Label.Contains(search)), p => p.Id);
             }
+
             var plist = temp.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).Select(p => new
             {
                 p.Id,
@@ -641,6 +700,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 return ResultData(null, message: "请选择一个分类");
             }
+
             if (string.IsNullOrEmpty(post.Label?.Trim()) || post.Label.Equals("null"))
             {
                 post.Label = null;
@@ -654,6 +714,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 post.Label = post.Label.Replace("，", ",");
             }
+
             if (!post.IsWordDocument)
             {
                 post.ResourceName = null;
@@ -663,13 +724,15 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 post.ProtectContent = null;
             }
-            post.ModifyDate = DateTime.Now;
+
             Post p = PostBll.GetById(post.Id);
             if (reserve)
             {
+                post.ModifyDate = DateTime.Now;
                 var history = p.Mapper<PostHistoryVersion>();
                 p.PostHistoryVersion.Add(history);
             }
+
             Mapper.Map(post, p);
             if (!string.IsNullOrEmpty(post.Seminars))
             {
@@ -685,21 +748,27 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             if (b)
             {
 #if !DEBUG
-                if (notify && "false" == GetSettings("DisabledEmailBroadcast"))
+                if(notify && "false" == GetSettings("DisabledEmailBroadcast"))
                 {
                     var cast = BroadcastBll.LoadEntities(c => c.Status == Status.Subscribed).ToList();
                     string link = Request.Url?.Scheme + "://" + Request.Url?.Authority + "/" + p.Id;
                     cast.ForEach(c =>
                     {
                         var ts = DateTime.Now.GetTotalMilliseconds();
-                        string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html")).Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
-                        {
-                            c.Email,
-                            act = "cancel",
-                            validate = c.ValidateCode,
-                            timespan = ts,
-                            hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"])
-                        }, Request.Url.Scheme));
+                        string content = System.IO.File.ReadAllText(Request.MapPath("/template/broadcast.html"))
+                            .Replace("{{link}}", link + "?email=" + c.Email)
+                            .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
+                            .Replace("{{title}}", post.Title)
+                            .Replace("{{author}}", post.Author)
+                            .Replace("{{content}}", post.Content.RemoveHtmlTag(150))
+                            .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
+                            {
+                                c.Email,
+                                act = "cancel",
+                                validate = c.ValidateCode,
+                                timespan = ts,
+                                hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(ConfigurationManager.AppSettings["BaiduAK"])
+                            }, Request.Url.Scheme));
                         BackgroundJob.Schedule(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
                     });
                 }
@@ -707,6 +776,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
                 return ResultData(p.Mapper<PostOutputDto>(), message: "文章修改成功！");
             }
+
             return ResultData(null, false, "文章修改失败！");
         }
 
@@ -718,6 +788,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 return ResultData(null, message: "请选择一个分类");
             }
+
             if (string.IsNullOrEmpty(post.Label?.Trim()) || post.Label.Equals("null"))
             {
                 post.Label = null;
@@ -731,14 +802,17 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 post.Label = post.Label.Replace("，", ",");
             }
+
             if (!post.IsWordDocument)
             {
                 post.ResourceName = null;
             }
+
             if (string.IsNullOrEmpty(post.ProtectContent) || post.ProtectContent.Equals("null", StringComparison.InvariantCultureIgnoreCase))
             {
                 post.ProtectContent = null;
             }
+
             post.Status = Status.Pended;
             post.PostDate = DateTime.Now;
             post.ModifyDate = DateTime.Now;
@@ -752,6 +826,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     p.Seminar.Add(SeminarBll.GetById(id));
                 });
             }
+
             p.PostAccessRecord.Add(new PostAccessRecord()
             {
                 AccessTime = DateTime.Today,
@@ -767,8 +842,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.PublishPost), args: p);
                     return ResultData(p.Mapper<PostOutputDto>(), message: schedule ? $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！" : "文章发表成功！");
                 }
+
                 return ResultData(null, false, "如果要定时发布，请选择正确的一个将来时间点！");
             }
+
             p = PostBll.AddEntitySaved(p);
             if (p != null)
             {
@@ -790,9 +867,11 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                         BackgroundJob.Schedule(() => SendMail(GetSettings("Title") + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
                     });
                 }
+
                 HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
                 return ResultData(null, true, "文章发表成功！");
             }
+
             return ResultData(null, false, "文章发表失败！");
         }
 
@@ -894,6 +973,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 RedisHelper.SetString("ArticleViewToken", string.Empty.CreateShortToken(6));
             }
+
             var token = RedisHelper.GetString("ArticleViewToken");
             return ResultData(token);
         }
@@ -914,8 +994,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 bool b = PostHistoryVersionBll.UpdateEntitySaved(history);
                 return ResultData(null, b, b ? "回滚成功" : "回滚失败");
             }
+
             return ResultData(null, false, "版本不存在");
         }
+
         #endregion
     }
 }

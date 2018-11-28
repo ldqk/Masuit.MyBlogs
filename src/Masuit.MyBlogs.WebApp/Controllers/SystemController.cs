@@ -8,6 +8,7 @@ using Masuit.Tools.Models;
 using Masuit.Tools.NoSQL;
 using Masuit.Tools.Systems;
 using Masuit.Tools.Win32;
+using Models.DTO;
 using Models.Entity;
 using Models.Enum;
 using Newtonsoft.Json;
@@ -26,13 +27,12 @@ namespace Masuit.MyBlogs.WebApp.Controllers
     {
         public ISystemSettingBll SystemSettingBll { get; set; }
         public RedisHelper RedisHelper { get; set; }
-        public IInterviewBll InterviewBll { get; set; }
-        public SystemController(IUserInfoBll userInfoBll, ISystemSettingBll systemSettingBll, RedisHelper redisHelper, IInterviewBll interviewBll)
+        //public IInterviewBll InterviewBll { get; set; }
+        public SystemController(IUserInfoBll userInfoBll, ISystemSettingBll systemSettingBll, RedisHelper redisHelper)
         {
             UserInfoBll = userInfoBll;
             SystemSettingBll = systemSettingBll;
             RedisHelper = redisHelper;
-            InterviewBll = interviewBll;
         }
 
         public async Task<ActionResult> GetBaseInfo()
@@ -280,8 +280,13 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             if (list.Any())
             {
                 string ips = string.Join(",", list.Select(i => i.IP).Distinct());
-                DateTime start = list.Min(i => i.Time).AddDays(-1);
-                Dictionary<string, string> dic = InterviewBll.LoadEntities(i => ips.Contains(i.IP) && i.ViewTime >= start).Select(i => new { i.IP, i.Address }).AsEnumerable().DistinctBy(a => a.IP).ToDictionary(a => a.IP, a => a.Address);
+                DateTime start = list.Min(i => i.Time).AddDays(-7);
+                var interviews = new List<Interview>();
+                for (int i = 7; i <= 0; i++)
+                {
+                    interviews.AddRange(RedisHelper.ListRange<Interview>($"Interview:{DateTime.Today.AddDays(i):yyyy:MM:dd}").Where(x => ips.Contains(x.IP) && x.ViewTime >= start));
+                }
+                Dictionary<string, string> dic = interviews.Select(i => new { i.IP, i.Address }).AsEnumerable().DistinctBy(a => a.IP).ToDictionary(a => a.IP, a => a.Address);
                 foreach (var item in list)
                 {
                     if (dic.ContainsKey(item.IP))
@@ -290,7 +295,11 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     }
                 }
             }
-            return ResultData(list);
+            return ResultData(new
+            {
+                interceptCount = RedisHelper.GetString("interceptCount"),
+                list
+            });
         }
 
         /// <summary>

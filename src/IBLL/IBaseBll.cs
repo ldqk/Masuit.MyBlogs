@@ -2215,10 +2215,6 @@ namespace IBLL
 	
 	public partial interface IInternalMessageBll : IBaseBll<InternalMessage>{}   
 	
-	public partial interface IInterviewBll : IBaseBll<Interview>{}   
-	
-	public partial interface IInterviewDetailBll : IBaseBll<InterviewDetail>{}   
-	
 	public partial interface IIssueBll : IBaseBll<Issue>{}   
 	
 	public partial interface ILeaveMessageBll : IBaseBll<LeaveMessage>{}   

@@ -62,12 +62,6 @@
     <Compile Include="InternalMessage.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
-    <Compile Include="Interview.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
-    <Compile Include="InterviewDetail.cs">
-      <DependentUpon>Model.tt</DependentUpon>
-    </Compile>
     <Compile Include="Issue.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>

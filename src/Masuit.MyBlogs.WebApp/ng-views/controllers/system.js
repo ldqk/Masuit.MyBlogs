@@ -275,9 +275,10 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 		$scope.request("/system/InterceptLog", null, function(res) {
 			self.tableParams = new NgTableParams({}, {
 				filterDelay: 0,
-				dataset: res.Data
+				dataset: res.Data.list
 			});
-			data = res.Data;
+			data = res.Data.list;
+			$scope.interceptCount=res.Data.interceptCount;
 		});
 	}
 	self.load();

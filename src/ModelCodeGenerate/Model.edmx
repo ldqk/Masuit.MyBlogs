@@ -91,37 +91,6 @@
           <Property Name="Read" Type="bit" Nullable="false" />
           <Property Name="Status" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="Interview">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="IP" Type="nvarchar(max)" />
-          <Property Name="UserAgent" Type="nvarchar(max)" />
-          <Property Name="OperatingSystem" Type="nvarchar(max)" />
-          <Property Name="BrowserType" Type="nvarchar(max)" />
-          <Property Name="ViewTime" Type="datetime" Nullable="false" />
-          <Property Name="FromUrl" Type="nvarchar(max)" />
-          <Property Name="Province" Type="nvarchar(max)" />
-          <Property Name="ISP" Type="nvarchar(max)" />
-          <Property Name="HttpMethod" Type="nvarchar(max)" />
-          <Property Name="Address" Type="nvarchar(max)" />
-          <Property Name="ReferenceAddress" Type="nvarchar(max)" />
-          <Property Name="LandPage" Type="nvarchar(max)" />
-          <Property Name="OnlineSpan" Type="nvarchar(max)" />
-          <Property Name="Uid" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="OnlineSpanSeconds" Type="float" Nullable="false" />
-          <Property Name="Country" Type="nvarchar(max)" />
-        </EntityType>
-        <EntityType Name="InterviewDetail">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Url" Type="nvarchar(max)" />
-          <Property Name="Time" Type="datetime" Nullable="false" />
-          <Property Name="InterviewId" Type="bigint" Nullable="false" />
-        </EntityType>
         <EntityType Name="Issue">
           <Key>
             <PropertyRef Name="Id" />
@@ -357,20 +326,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_dbo_InterviewDetail_dbo_Interview_InterviewId">
-          <End Role="Interview" Type="Self.Interview" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="InterviewDetail" Type="Self.InterviewDetail" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Interview">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="InterviewDetail">
-              <PropertyRef Name="InterviewId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId">
           <End Role="UserInfo" Type="Self.UserInfo" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -498,8 +453,6 @@
           <EntitySet Name="Donate" EntityType="Self.Donate" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FastShares" EntityType="Self.FastShares" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="InternalMessage" EntityType="Self.InternalMessage" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Interview" EntityType="Self.Interview" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="InterviewDetail" EntityType="Self.InterviewDetail" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Issue" EntityType="Self.Issue" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LeaveMessage" EntityType="Self.LeaveMessage" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Links" EntityType="Self.Links" Schema="dbo" store:Type="Tables" />
@@ -523,10 +476,6 @@
           <AssociationSet Name="FK__Post__CategoryId__3A4CA8FD" Association="Self.FK__Post__CategoryId__3A4CA8FD">
             <End Role="Category" EntitySet="Category" />
             <End Role="Post" EntitySet="Post" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_InterviewDetail_dbo_Interview_InterviewId" Association="Self.FK_dbo_InterviewDetail_dbo_Interview_InterviewId">
-            <End Role="Interview" EntitySet="Interview" />
-            <End Role="InterviewDetail" EntitySet="InterviewDetail" />
           </AssociationSet>
           <AssociationSet Name="FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId" Association="Self.FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId">
             <End Role="UserInfo" EntitySet="UserInfo" />
@@ -581,8 +530,6 @@
           <EntitySet Name="Contacts" EntityType="Model.Contacts" />
           <EntitySet Name="Donate" EntityType="Model.Donate" />
           <EntitySet Name="InternalMessage" EntityType="Model.InternalMessage" />
-          <EntitySet Name="Interview" EntityType="Model.Interview" />
-          <EntitySet Name="InterviewDetail" EntityType="Model.InterviewDetail" />
           <EntitySet Name="Issue" EntityType="Model.Issue" />
           <EntitySet Name="LeaveMessage" EntityType="Model.LeaveMessage" />
           <EntitySet Name="Links" EntityType="Model.Links" />
@@ -608,10 +555,6 @@
           <AssociationSet Name="FK__Comment__PostId__395884C4" Association="Model.FK__Comment__PostId__395884C4">
             <End Role="Post" EntitySet="Post" />
             <End Role="Comment" EntitySet="Comment" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_InterviewDetail_dbo_Interview_InterviewId" Association="Model.FK_dbo_InterviewDetail_dbo_Interview_InterviewId">
-            <End Role="Interview" EntitySet="Interview" />
-            <End Role="InterviewDetail" EntitySet="InterviewDetail" />
           </AssociationSet>
           <AssociationSet Name="FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId" Association="Model.FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId">
             <End Role="UserInfo" EntitySet="UserInfo" />
@@ -748,39 +691,6 @@
           <Property Name="Time" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="Read" Type="Boolean" Nullable="false" />
           <Property Name="Status" Type="Int32" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Interview">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="IP" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="UserAgent" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="OperatingSystem" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="BrowserType" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="ViewTime" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="FromUrl" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Province" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="ISP" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="HttpMethod" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Address" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="ReferenceAddress" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="LandPage" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="OnlineSpan" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Uid" Type="Guid" Nullable="false" />
-          <Property Name="OnlineSpanSeconds" Type="Double" Nullable="false" />
-          <NavigationProperty Name="InterviewDetail" Relationship="Model.FK_dbo_InterviewDetail_dbo_Interview_InterviewId" FromRole="Interview" ToRole="InterviewDetail" />
-          <Property Name="Country" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="InterviewDetail">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Url" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Time" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="InterviewId" Type="Int64" Nullable="false" />
-          <NavigationProperty Name="Interview" Relationship="Model.FK_dbo_InterviewDetail_dbo_Interview_InterviewId" FromRole="InterviewDetail" ToRole="Interview" />
         </EntityType>
         <EntityType Name="Issue">
           <Key>
@@ -1029,20 +939,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_dbo_InterviewDetail_dbo_Interview_InterviewId">
-          <End Type="Model.Interview" Role="Interview" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="Model.InterviewDetail" Role="InterviewDetail" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Interview">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="InterviewDetail">
-              <PropertyRef Name="InterviewId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId">
           <End Type="Model.UserInfo" Role="UserInfo" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -1236,39 +1132,6 @@
                 <ScalarProperty Name="Link" ColumnName="Link" />
                 <ScalarProperty Name="Content" ColumnName="Content" />
                 <ScalarProperty Name="Title" ColumnName="Title" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Interview">
-            <EntityTypeMapping TypeName="Model.Interview">
-              <MappingFragment StoreEntitySet="Interview">
-                <ScalarProperty Name="Country" ColumnName="Country" />
-                <ScalarProperty Name="OnlineSpanSeconds" ColumnName="OnlineSpanSeconds" />
-                <ScalarProperty Name="Uid" ColumnName="Uid" />
-                <ScalarProperty Name="OnlineSpan" ColumnName="OnlineSpan" />
-                <ScalarProperty Name="LandPage" ColumnName="LandPage" />
-                <ScalarProperty Name="ReferenceAddress" ColumnName="ReferenceAddress" />
-                <ScalarProperty Name="Address" ColumnName="Address" />
-                <ScalarProperty Name="HttpMethod" ColumnName="HttpMethod" />
-                <ScalarProperty Name="ISP" ColumnName="ISP" />
-                <ScalarProperty Name="Province" ColumnName="Province" />
-                <ScalarProperty Name="FromUrl" ColumnName="FromUrl" />
-                <ScalarProperty Name="ViewTime" ColumnName="ViewTime" />
-                <ScalarProperty Name="BrowserType" ColumnName="BrowserType" />
-                <ScalarProperty Name="OperatingSystem" ColumnName="OperatingSystem" />
-                <ScalarProperty Name="UserAgent" ColumnName="UserAgent" />
-                <ScalarProperty Name="IP" ColumnName="IP" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="InterviewDetail">
-            <EntityTypeMapping TypeName="Model.InterviewDetail">
-              <MappingFragment StoreEntitySet="InterviewDetail">
-                <ScalarProperty Name="InterviewId" ColumnName="InterviewId" />
-                <ScalarProperty Name="Time" ColumnName="Time" />
-                <ScalarProperty Name="Url" ColumnName="Url" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

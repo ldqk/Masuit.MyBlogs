@@ -165,4 +165,13 @@
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 		});
 	}
+
+	$scope.toggleRecommend = function(row) {
+		$scope.request("/links/ToggleRecommend", {
+			id:row.Id,
+			state:row.Recommend
+		}, function (data) {
+			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+		});
+	}
 }]);

@@ -33,8 +33,6 @@ namespace ModelCodeGenerate
         public virtual DbSet<Contacts> Contacts { get; set; }
         public virtual DbSet<Donate> Donate { get; set; }
         public virtual DbSet<InternalMessage> InternalMessage { get; set; }
-        public virtual DbSet<Interview> Interview { get; set; }
-        public virtual DbSet<InterviewDetail> InterviewDetail { get; set; }
         public virtual DbSet<Issue> Issue { get; set; }
         public virtual DbSet<LeaveMessage> LeaveMessage { get; set; }
         public virtual DbSet<Links> Links { get; set; }

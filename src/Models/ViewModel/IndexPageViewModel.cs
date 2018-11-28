@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Models.DTO;
+using System.Collections.Generic;
 using System.Linq;
-using Models.DTO;
 
 namespace Models.ViewModel
 {
@@ -29,10 +29,10 @@ namespace Models.ViewModel
         /// </summary>
         public IDictionary<string, int> Tags { get; set; }
 
-        /// <summary>
-        /// 新评论列表
-        /// </summary>
-        public IList<CommentOutputDto> Comments { get; set; }
+        ///// <summary>
+        ///// 新评论列表
+        ///// </summary>
+        //public IList<CommentOutputDto> Comments { get; set; }
 
         /// <summary>
         /// 近期热搜

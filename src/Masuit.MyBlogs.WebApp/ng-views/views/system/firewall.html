@@ -57,6 +57,7 @@
     <button class="btn btn-default waves-effect" ng-click="list.clear()">
         <span class="icon icon-bin"></span>
     </button>
+    <span class="text-right">累计拦截{{interceptCount}}次。</span>
     <table class="table table-bordered table-condensed table-hover" disable-filter="list.isAdding" ng-form="list.tableForm" ng-table="list.tableParams" tracked-table="list.tableTracker">
         <tr ng-form="rowForm" ng-repeat="row in $data" tracked-table-row="row">
             <td filter="{IP: 'text'}" sortable="'IP'" title="'IP'">

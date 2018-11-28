@@ -106,7 +106,7 @@
                 <a ng-href="/tools/addr?addr={{row.Address}}" target="_blank" data-microtip="在地图上查看详细地理信息" data-microtip-position="bottom">{{row.ReferenceAddress}}</a>
             </td>
             <td title="'在线时长'" filter="{OnlineSpan: 'text'}" sortable="'OnlineSpan'">
-                <a href="javascript:void(0)" ng-click="details(row.Id)">{{row.OnlineSpan}}</a>
+                <a href="javascript:void(0)" ng-click="details(row)">{{row.OnlineSpan}}</a>
             </td>
         </tr>
     </table>

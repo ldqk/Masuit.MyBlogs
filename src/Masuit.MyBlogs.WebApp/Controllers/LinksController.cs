@@ -1,4 +1,10 @@
 ﻿using Common;
+using Masuit.MyBlogs.WebApp.Models;
+using Masuit.Tools;
+using Masuit.Tools.Net;
+using Models.DTO;
+using Models.Entity;
+using Models.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,12 +12,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Masuit.MyBlogs.WebApp.Models;
-using Masuit.Tools;
-using Masuit.Tools.Net;
-using Models.DTO;
-using Models.Entity;
-using Models.Enum;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -21,7 +21,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         public ActionResult Index()
         {
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
-            List<LinksOutputDto> list = LinksBll.LoadEntitiesNoTracking<LinksOutputDto>(l => l.Status == Status.Available).ToList();
+            List<LinksOutputDto> list = LinksBll.LoadEntitiesNoTracking<object, LinksOutputDto>(l => l.Status == Status.Available, l => new { l.Recommend, l.Id }, false).ToList();
             if (user != null && user.IsAdmin)
             {
                 return View("Index_Admin", list);
@@ -35,7 +35,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 return ResultData(null, false, "添加失败！链接非法！");
             }
-            if (LinksBll.Any(l => l.Url.Equals(links.Url)))
+            var host = new Uri(links.Url).Host;
+            if (LinksBll.Any(l => l.Url.Contains(host)))
             {
                 return ResultData(null, false, "添加失败！检测到您的网站已经是本站的友情链接了！");
             }
@@ -130,7 +131,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         [Authority]
         public ActionResult GetPageData(int page = 1, int size = 10)
         {
-            List<Links> list = LinksBll.GetAll().OrderBy(p => p.Status).ThenByDescending(l => l.Id).Skip((page - 1) * size).Take(size).ToList();
+            List<Links> list = LinksBll.GetAll().OrderBy(p => p.Status).ThenByDescending(l => new { l.Recommend, l.Id }).Skip((page - 1) * size).Take(size).ToList();
             var total = LinksBll.GetAll().Count();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
@@ -147,6 +148,21 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         {
             Links link = LinksBll.GetById(id);
             link.Except = !state;
+            bool b = LinksBll.UpdateEntitySaved(link);
+            return ResultData(null, b, b ? "切换成功！" : "切换失败！");
+        }
+
+        /// <summary>
+        /// 切换友情链接的推荐状态
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult ToggleRecommend(int id, bool state)
+        {
+            Links link = LinksBll.GetById(id);
+            link.Recommend = !state;
             bool b = LinksBll.UpdateEntitySaved(link);
             return ResultData(null, b, b ? "切换成功！" : "切换失败！");
         }

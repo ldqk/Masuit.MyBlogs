@@ -2102,10 +2102,6 @@ namespace IDAL
 	
 	public partial interface IInternalMessageDal :IBaseDal<InternalMessage>{}
 	
-	public partial interface IInterviewDal :IBaseDal<Interview>{}
-	
-	public partial interface IInterviewDetailDal :IBaseDal<InterviewDetail>{}
-	
 	public partial interface IIssueDal :IBaseDal<Issue>{}
 	
 	public partial interface ILeaveMessageDal :IBaseDal<LeaveMessage>{}

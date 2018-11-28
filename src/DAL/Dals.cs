@@ -11,8 +11,6 @@ namespace DAL
 	public partial class DonateDal :BaseDal<Donate>,IDonateDal{}
 	public partial class FastShareDal :BaseDal<FastShare>,IFastShareDal{}
 	public partial class InternalMessageDal :BaseDal<InternalMessage>,IInternalMessageDal{}
-	public partial class InterviewDal :BaseDal<Interview>,IInterviewDal{}
-	public partial class InterviewDetailDal :BaseDal<InterviewDetail>,IInterviewDetailDal{}
 	public partial class IssueDal :BaseDal<Issue>,IIssueDal{}
 	public partial class LeaveMessageDal :BaseDal<LeaveMessage>,ILeaveMessageDal{}
 	public partial class LinksDal :BaseDal<Links>,ILinksDal{}

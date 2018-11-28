@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using Models.DTO;
 using Models.Entity;
 using Models.ViewModel;
+using System.Linq;
 
 namespace Common
 {
@@ -41,7 +41,7 @@ namespace Common
                 m.CreateMap<ContactsInputDto, ContactsOutputDto>();
                 m.CreateMap<ContactsOutputDto, ContactsInputDto>();
 
-                m.CreateMap<Interview, InterviewOutputDto>();
+                //m.CreateMap<Interview, InterviewOutputDto>();
 
                 m.CreateMap<LeaveMessage, LeaveMessageInputDto>();
                 m.CreateMap<LeaveMessageInputDto, LeaveMessage>();

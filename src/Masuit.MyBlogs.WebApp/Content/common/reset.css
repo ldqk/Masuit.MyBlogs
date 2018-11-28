@@ -45,3 +45,6 @@ table {
 .notie-container {
     z-index: 2147483647 !important;
 }
+.layui-layer-content {
+    max-height: 60vh;
+}

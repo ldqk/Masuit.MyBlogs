@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using AutoMapper.QueryableExtensions;
-using Common;
+﻿using Common;
 using EFSecondLevelCache;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
@@ -14,6 +8,11 @@ using Models.DTO;
 using Models.Entity;
 using Models.Enum;
 using Models.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -90,7 +89,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <param name="orderBy"></param>
         /// <returns></returns>
         [Route("tag/{id}/{page:int?}/{size:int?}/{orderBy:int?}")]
-        public ActionResult Tag(string id, int page = 1, int size = 10, OrderBy orderBy = OrderBy.ModifyDate)
+        public ActionResult Tag(string id, int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {
             IList<PostOutputDto> posts;
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
@@ -98,23 +97,23 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             switch (orderBy)
             {
                 case OrderBy.CommentCount:
-                    posts = temp.ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = temp.ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.PostDate:
-                    posts = temp.ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = temp.ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.ViewCount:
-                    posts = temp.ThenByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = temp.ThenByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.VoteCount:
-                    posts = temp.ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = temp.ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 default:
-                    posts = temp.ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = temp.ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
             }
             var viewModel = GetIndexPageViewModel(0, 0, orderBy, user);
-            ViewBag.Total = posts.Count;
+            ViewBag.Total = temp.Count();
             ViewBag.Tag = id;
             viewModel.Posts = posts;
             return View(viewModel);
@@ -135,7 +134,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             var cat = await CategoryBll.GetByIdAsync(id).ConfigureAwait(true);
             if (cat is null) return RedirectToAction("Index", "Error");
-            var posts = cat.Post.Where(p => (p.Status == Status.Pended || user.IsAdmin)).OrderByDescending(p => p.IsFixedTop);
+            var posts = PostBll.LoadEntitiesNoTracking(p => p.CategoryId == cat.Id && (p.Status == Status.Pended || user.IsAdmin)).OrderByDescending(p => p.IsFixedTop);
+            ViewBag.Total = posts.Count();
             switch (orderBy)
             {
                 case OrderBy.CommentCount:
@@ -155,10 +155,9 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     break;
             }
             var viewModel = GetIndexPageViewModel(0, 0, orderBy, user);
-            ViewBag.Total = posts.Count();
             ViewBag.CategoryName = cat.Name;
             ViewBag.Desc = cat.Description;
-            viewModel.Posts = posts.Skip(size * (page - 1)).Take(size).ToList().Mapper<IList<PostOutputDto>>();
+            viewModel.Posts = posts.Skip(size * (page - 1)).Take(size).Cacheable().ToList().Mapper<IList<PostOutputDto>>();
             return View(viewModel);
         }
 
@@ -175,13 +174,12 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             IQueryable<PostOutputDto> postList = PostBll.LoadEntitiesNoTracking<PostOutputDto>(p => (p.Status == Status.Pended || user.IsAdmin)); //准备文章的查询
             var notices = NoticeBll.LoadPageEntitiesFromL2CacheNoTracking<DateTime, NoticeOutputDto>(1, 5, out int _, n => (n.Status == Status.Display || user.IsAdmin), n => n.ModifyDate, false).ToList(); //加载前5条公告
             var cats = CategoryBll.LoadEntitiesFromL2CacheNoTracking<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name); //加载分类目录
-            var comments = CommentBll.LoadPageEntitiesFromL2CacheNoTracking<DateTime, CommentOutputDto>(1, 10, out int _, c => c.Status == Status.Pended && c.Post.Status == Status.Pended || user.IsAdmin, c => c.CommentDate, false).ToList(); //加在新评论
             var start = DateTime.Today.AddDays(-7);
             var hotSearches = SearchDetailsBll.LoadEntitiesNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(10).Select(g => new KeywordsRankOutputDto()
             {
                 KeyWords = g.FirstOrDefault().KeyWords,
                 SearchCount = g.Count()
-            }).ToList(); //热词统计
+            }).Cacheable().ToList(); //热词统计
             var hot6Post = (new Random().Next() % 2 == 0 ? postList.OrderByDescending(p => p.ViewCount) : postList.OrderByDescending(p => p.VoteUpCount)).Skip(0).Take(5).Cacheable().ToList(); //热门文章
             var topPostWeek = PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(week,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章周排行
             var topPostMonth = PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(month,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章月排行
@@ -213,29 +211,28 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             switch (orderBy) //文章排序
             {
                 case OrderBy.CommentCount:
-                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.PostDate:
-                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.ViewCount:
-                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.VoteCount:
-                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 default:
-                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
             }
             if (page == 1)
             {
-                posts = postList.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).AsEnumerable().Union(posts).ToList();
+                posts = postList.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).Cacheable().AsEnumerable().Union(posts).ToList();
             }
             return new IndexPageViewModel()
             {
                 Categories = cats.ToList(),
-                Comments = comments,
                 HotSearch = hotSearches,
                 Notices = notices,
                 Posts = posts,

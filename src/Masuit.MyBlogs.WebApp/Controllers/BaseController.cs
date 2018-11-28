@@ -148,7 +148,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             ViewBag.menus = MenuBll.LoadEntitiesFromL2CacheNoTracking<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
             PageFootViewModel model = new PageFootViewModel //页脚
             {
-                Links = LinksBll.LoadPageEntitiesFromCacheNoTracking<int, LinksOutputDto>(1, 40, out int _, l => l.Status == Status.Available, l => l.Id, false, 1).ToList(),
+                Links = LinksBll.LoadPageEntitiesFromCacheNoTracking<object, LinksOutputDto>(1, 40, out int _, l => l.Status == Status.Available, l => new{l.Recommend,l.Id}, false, 1).ToList(),
                 Contacts = ContactsBll.LoadEntitiesFromL2CacheNoTracking<int, ContactsOutputDto>(l => l.Status == Status.Available, l => l.Id, false).ToList()
             };
             ViewBag.Footer = model;

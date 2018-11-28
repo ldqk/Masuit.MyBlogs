@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Models</RootNamespace>
     <AssemblyName>Models</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,13 +36,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AngleSharp, Version=0.9.9.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
-      <HintPath>..\packages\AngleSharp.0.9.10\lib\net45\AngleSharp.dll</HintPath>
+      <HintPath>..\packages\AngleSharp.0.9.11\lib\net45\AngleSharp.dll</HintPath>
     </Reference>
-    <Reference Include="AutoMapper, Version=7.0.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.7.0.1\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=8.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.8.0.0\lib\net461\AutoMapper.dll</HintPath>
     </Reference>
-    <Reference Include="AutoMapper.EF6, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.EF6.1.1.1\lib\net45\AutoMapper.EF6.dll</HintPath>
+    <Reference Include="AutoMapper.EF6, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.EF6.2.0.0\lib\net461\AutoMapper.EF6.dll</HintPath>
     </Reference>
     <Reference Include="DelegateDecompiler, Version=1.0.0.0, Culture=neutral, PublicKeyToken=93b26a10a04705bd, processorArchitecture=MSIL">
       <HintPath>..\packages\DelegateDecompiler.0.24.0\lib\net45\DelegateDecompiler.dll</HintPath>
@@ -59,17 +60,17 @@
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="HtmlSanitizer, Version=3.0.0.0, Culture=neutral, PublicKeyToken=61c49a1a9e79cc28, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlSanitizer.4.0.187\lib\net45\HtmlSanitizer.dll</HintPath>
+      <HintPath>..\packages\HtmlSanitizer.4.0.199\lib\net45\HtmlSanitizer.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=1.0.0.999, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.1.0.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Reflection, Version=1.1.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>..\packages\Mono.Reflection.1.1.0.0\lib\Mono.Reflection.dll</HintPath>
+      <HintPath>..\packages\Mono.Reflection.Core.1.1.1\lib\net45\Mono.Reflection.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="StackExchange.Redis, Version=1.2.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StackExchange.Redis.1.2.6\lib\net45\StackExchange.Redis.dll</HintPath>
@@ -95,7 +96,8 @@
     <Compile Include="DTO\ContactsInputDto.cs" />
     <Compile Include="DTO\ContactsOutputDto.cs" />
     <Compile Include="DTO\InterviewAnalysisDto.cs" />
-    <Compile Include="DTO\InterviewOutputDto.cs" />
+    <Compile Include="DTO\InterviewDetail.cs" />
+    <Compile Include="DTO\Interview.cs" />
     <Compile Include="DTO\KeywordsRankOutputDto.cs" />
     <Compile Include="DTO\LeaveMessageInputDto.cs" />
     <Compile Include="DTO\LeaveMessageOutputDto.cs" />
@@ -111,7 +113,6 @@
     <Compile Include="DTO\SeminarInputDto.cs" />
     <Compile Include="DTO\SeminarOutputDto.cs" />
     <Compile Include="Entity\Donate.cs" />
-    <Compile Include="Entity\InterviewDetail.cs" />
     <Compile Include="Entity\Issue.cs" />
     <Compile Include="Entity\LoginRecord.cs" />
     <Compile Include="Entity\InternalMessage.cs" />
@@ -138,7 +139,6 @@
     <Compile Include="Entity\Category.cs" />
     <Compile Include="Entity\Comment.cs" />
     <Compile Include="Entity\Contacts.cs" />
-    <Compile Include="Entity\Interview.cs" />
     <Compile Include="Entity\LeaveMessage.cs" />
     <Compile Include="Entity\Links.cs" />
     <Compile Include="Entity\Menu.cs" />

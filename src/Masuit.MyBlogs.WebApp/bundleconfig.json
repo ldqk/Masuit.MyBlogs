@@ -3,327 +3,435 @@
     "outputFileName": "Assets/UEditor/ueditor.config.front.min.js",
     "inputFiles": [
       "Assets/UEditor/ueditor.config.front.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/UEditor/ueditor.config.admin.min.js",
     "inputFiles": [
       "Assets/UEditor/ueditor.config.admin.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "dashboard/ng-view/controllers/mainController.min.js",
     "inputFiles": [
       "dashboard/ng-view/controllers/mainController.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "dashboard/ng-view/controllers/dashboard.min.js",
     "inputFiles": [
       "dashboard/ng-view/controllers/dashboard.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "dashboard/ng-view/app/app.config.min.js",
     "inputFiles": [
       "dashboard/ng-view/app/app.config.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "dashboard/ng-view/app/route.config.min.js",
     "inputFiles": [
       "dashboard/ng-view/app/route.config.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "dashboard/ng-view/views/dashboard.min.html",
     "inputFiles": [
       "dashboard/ng-view/views/dashboard.html"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "dashboard/controllers/home.min.js",
     "inputFiles": [
       "dashboard/controllers/home.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "dashboard/app/route.config.min.js",
     "inputFiles": [
       "dashboard/app/route.config.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "dashboard/app/app.config.min.js",
     "inputFiles": [
       "dashboard/app/app.config.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "dashboard/views/dashboard.min.html",
     "inputFiles": [
       "dashboard/views/dashboard.html"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "dashboard/css/app.min.css",
     "inputFiles": [
       "dashboard/css/app.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "dashboard/app/template.min.js",
     "inputFiles": [
       "dashboard/app/template.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/app/angular-ueditor.min.js",
     "inputFiles": [
       "ng-views/app/angular-ueditor.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/app/form.min.js",
     "inputFiles": [
       "ng-views/app/form.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/dropify/dropify.min.css",
     "inputFiles": [
       "Assets/dropify/dropify.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/dropify/dropify.min.js",
     "inputFiles": [
       "Assets/dropify/dropify.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/comment.min.js",
     "inputFiles": [
       "ng-views/controllers/comment.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/main.min.js",
     "inputFiles": [
       "ng-views/controllers/main.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/menu.min.js",
     "inputFiles": [
       "ng-views/controllers/menu.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/system.min.js",
     "inputFiles": [
       "ng-views/controllers/system.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/post.min.js",
     "inputFiles": [
       "ng-views/controllers/post.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/semantic/semantic.min.css",
     "inputFiles": [
       "Assets/semantic/semantic.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/semantic/semantic.min.js",
     "inputFiles": [
       "Assets/semantic/semantic.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/layui/css/layui.min.css",
     "inputFiles": [
       "Assets/layui/css/layui.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "fonts/icomoon.min.css",
     "inputFiles": [
       "fonts/icomoon.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "fonts/iconSelector.min.js",
     "inputFiles": [
       "fonts/iconSelector.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/layui/layui.min.js",
     "inputFiles": [
       "Assets/layui/layui.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/jquery.page/jquery.page.min.css",
     "inputFiles": [
       "Assets/jquery.page/jquery.page.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/jquery.page/jquery.page.min.js",
     "inputFiles": [
       "Assets/jquery.page/jquery.page.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/misc.min.js",
     "inputFiles": [
       "ng-views/controllers/misc.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/msg.min.js",
     "inputFiles": [
       "ng-views/controllers/msg.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/notice.min.js",
     "inputFiles": [
       "ng-views/controllers/notice.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/links.min.js",
     "inputFiles": [
       "ng-views/controllers/links.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/contact.min.js",
     "inputFiles": [
       "ng-views/controllers/contact.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/analysis.min.js",
     "inputFiles": [
       "ng-views/controllers/analysis.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/template/loading.min.html",
     "inputFiles": [
       "ng-views/template/loading.html"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Scripts/tm.pagination.min.js",
     "inputFiles": [
       "Scripts/tm.pagination.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/css/app.min.css",
     "inputFiles": [
       "ng-views/css/app.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/UEditor/ueditor.all.min.js",
     "inputFiles": [
       "Assets/UEditor/ueditor.all.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/UEditor/ueditor.parse.min.js",
     "inputFiles": [
       "Assets/UEditor/ueditor.parse.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Scripts/global/article.min.js",
     "inputFiles": [
       "Scripts/global/article.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Scripts/global/leavemsg.min.js",
     "inputFiles": [
       "Scripts/global/leavemsg.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Content/common/post-all.min.css",
     "inputFiles": [
       "Content/common/post-all.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Scripts/global/post-all.min.js",
     "inputFiles": [
       "Scripts/global/post-all.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/jedate/jedate.min.css",
     "inputFiles": [
       "Assets/jedate/jedate.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/jedate/jquery.jedate.min.js",
     "inputFiles": [
       "Assets/jedate/jquery.jedate.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/select3/select3-full.min.js",
     "inputFiles": [
       "Assets/select3/select3-full.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/modal/custombox.min.js",
     "inputFiles": [
       "Assets/modal/custombox.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/modal/custombox.min.css",
     "inputFiles": [
       "Assets/modal/custombox.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/modal/bundle.css",
     "inputFiles": [
       "Assets/modal/demo.css",
       "Assets/modal/custombox.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/select3/bundle.css",
     "inputFiles": [
       "Assets/select3/select3.css",
       "Assets/select3/stylesheet.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/fileupload/filestyle.min.css",
     "inputFiles": [
       "Assets/fileupload/filestyle.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Content/common/loading.min.css",
     "inputFiles": [
       "Content/common/loading.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Content/common/app.css",
@@ -335,7 +443,9 @@
       "Content/common/loading.css",
       "Content/common/post-all.css",
       "Content/common/reset.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.js",
@@ -367,108 +477,160 @@
       "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushVb.js",
       "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shBrushXml.js",
       "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shLegacy.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js",
     "inputFiles": [
       "Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css",
     "inputFiles": [
       "Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/controllers/dashboard.min.js",
     "inputFiles": [
       "ng-views/controllers/dashboard.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/css/waves.min.css",
     "inputFiles": [
       "ng-views/css/waves.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/css/waves.min.js",
     "inputFiles": [
       "ng-views/css/waves.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Scripts/publish/publish.min.js",
     "inputFiles": [
       "Scripts/publish/publish.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Scripts/apps/app.bug.min.js",
     "inputFiles": [
       "Scripts/apps/app.bug.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/directory/script.min.js",
     "inputFiles": [
       "Assets/directory/script.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/directory/style.min.css",
     "inputFiles": [
       "Assets/directory/style.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/banner/bootstrap-touch-slider.min.css",
     "inputFiles": [
       "Assets/banner/bootstrap-touch-slider.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/banner/bootstrap-touch-slider.min.js",
     "inputFiles": [
       "Assets/banner/bootstrap-touch-slider.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/jquery.tocify/jquery.tocify.min.css",
     "inputFiles": [
       "Assets/jquery.tocify/jquery.tocify.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/jquery.tocify/jquery.tocify.min.js",
     "inputFiles": [
       "Assets/jquery.tocify/jquery.tocify.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/nav/js/main.min.js",
     "inputFiles": [
       "Assets/nav/js/main.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Scripts/apps/canvas.bg.min.js",
     "inputFiles": [
       "Scripts/apps/canvas.bg.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "Assets/checkbox/checkbox.min.css",
     "inputFiles": [
       "Assets/checkbox/checkbox.css"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   },
   {
     "outputFileName": "ng-views/app/route.config.min.js",
     "inputFiles": [
       "ng-views/app/route.config.js"
-    ]
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
+  },
+  {
+    "outputFileName": "Assets/share/share.min.css",
+    "inputFiles": [
+      "Assets/share/share.css"
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
+  },
+  {
+    "outputFileName": "Assets/share/jquery.share.min.js",
+    "inputFiles": [
+      "Assets/share/jquery.share.js"
+    ],
+    "sourceMap": false,
+    "sourceMapRootPath": null
   }
 ]

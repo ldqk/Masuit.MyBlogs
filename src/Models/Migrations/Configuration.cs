@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Data.Entity.Migrations;
-using System.Data.SqlClient;
-using System.Linq;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Security;
 using Masuit.Tools.Win32;
 using Models.Application;
 using Models.Entity;
 using Models.Enum;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity.Migrations;
+using System.Data.SqlClient;
+using System.Linq;
 
 namespace Models.Migrations
 {
@@ -154,7 +154,7 @@ namespace Models.Migrations
 
                     #endregion
                 }
-                catch (SqlException e)
+                catch (SqlException)
                 {
                 }
                 IList<SystemSetting> ssList = new List<SystemSetting>
@@ -270,19 +270,19 @@ namespace Models.Migrations
                 });
             }
 
-            if (!context.Interview.Any())
-            {
-                context.Interview.Add(new Interview()
-                {
-                    IP = "114.114.114.114",
-                    UserAgent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3205.2 Safari/537.36",
-                    OperatingSystem = "WinNT",
-                    BrowserType = "Chrome63",
-                    ViewTime = DateTime.Now,
-                    FromUrl = "http://member.webweb.com/cp/domainbind.asp",
-                    HttpMethod = "GET"
-                });
-            }
+            //if (!context.Interview.Any())
+            //{
+            //    context.Interview.Add(new Interview()
+            //    {
+            //        IP = "114.114.114.114",
+            //        UserAgent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3205.2 Safari/537.36",
+            //        OperatingSystem = "WinNT",
+            //        BrowserType = "Chrome63",
+            //        ViewTime = DateTime.Now,
+            //        FromUrl = "http://member.webweb.com/cp/domainbind.asp",
+            //        HttpMethod = "GET"
+            //    });
+            //}
             #endregion
 
             context.SaveChanges();

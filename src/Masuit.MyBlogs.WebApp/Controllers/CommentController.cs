@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web.Mvc;
-using Common;
+﻿using Common;
 using Hangfire;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
@@ -13,6 +8,11 @@ using Models.DTO;
 using Models.Entity;
 using Models.Enum;
 using Models.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web.Mvc;
 using static Common.CommonHelper;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
@@ -92,11 +92,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     {
                         emails.Add(PostBll.GetById(com.PostId).Email);
                         //新评论，只通知博主和楼主
-                        BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new
+                        foreach (var s in emails)
                         {
-                            id = com.PostId,
-                            cid = com.Id
-                        }, Request.Url.Scheme) + "#comment"), string.Join(",", emails.Distinct())));
+                            BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new
+                            {
+                                id = com.PostId,
+                                cid = com.Id
+                            }, Request.Url.Scheme) + "#comment"), s));
+                        }
                     }
                     else
                     {
@@ -111,16 +114,23 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                             id = com.PostId,
                             cid = com.Id
                         }, Request.Url.Scheme) + "#comment";
-                        BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")}文章评论回复：", content.Replace("{{link}}", link), string.Join(",", emails)));
+                        foreach (var s in emails)
+                        {
+                            BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")}文章评论回复：", content.Replace("{{link}}", link), s));
+                        }
                     }
 #endif
                     return ResultData(null, true, "评论发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将显示到评论列表中");
                 }
-                BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new
+                foreach (var s in emails)
                 {
-                    id = com.PostId,
-                    cid = com.Id
-                }, Request.Url.Scheme) + "#comment") + "<p style='color:red;'>(待审核)</p>", string.Join(",", emails)));
+
+                    BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new
+                    {
+                        id = com.PostId,
+                        cid = com.Id
+                    }, Request.Url.Scheme) + "#comment") + "<p style='color:red;'>(待审核)</p>", s));
+                }
                 return ResultData(null, true, "评论成功，待站长审核通过以后将显示");
             }
             return ResultData(null, false, "评论失败");
@@ -253,7 +263,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 id = comment.PostId,
                 cid = pid
             }, Request.Url.Scheme) + "#comment";
-            BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")}文章评论回复：", content.Replace("{{link}}", link), string.Join(",", emails)));
+            foreach (var email in emails)
+            {
+                BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")}文章评论回复：", content.Replace("{{link}}", link), email));
+            }
 #endif
             return ResultData(null, b, b ? "审核通过！" : "审核失败！");
         }

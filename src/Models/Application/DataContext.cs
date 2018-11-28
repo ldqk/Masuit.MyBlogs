@@ -27,8 +27,8 @@ namespace Models.Application
         public virtual DbSet<Category> Category { get; set; }
         public virtual DbSet<Comment> Comment { get; set; }
         public virtual DbSet<Contacts> Contacts { get; set; }
-        public virtual DbSet<Interview> Interview { get; set; }
-        public virtual DbSet<InterviewDetail> InterviewDetails { get; set; }
+        //public virtual DbSet<Interview> Interview { get; set; }
+        //public virtual DbSet<InterviewDetail> InterviewDetails { get; set; }
         public virtual DbSet<LeaveMessage> LeaveMessage { get; set; }
         public virtual DbSet<Links> Links { get; set; }
         public virtual DbSet<Menu> Menu { get; set; }
@@ -53,10 +53,10 @@ namespace Models.Application
             modelBuilder.Entity<Category>().HasMany(e => e.PostHistoryVersion).WithRequired(e => e.Category).WillCascadeOnDelete(false);
             modelBuilder.Entity<Contacts>().Property(e => e.Title).IsUnicode(true);
             modelBuilder.Entity<Contacts>().Property(e => e.Url).IsUnicode(true);
-            modelBuilder.Entity<Interview>().Property(e => e.IP).IsUnicode(true);
-            modelBuilder.Entity<Interview>().Property(e => e.UserAgent).IsUnicode(true);
-            modelBuilder.Entity<Interview>().Property(e => e.OperatingSystem).IsUnicode(true);
-            modelBuilder.Entity<Interview>().Property(e => e.BrowserType).IsUnicode(true);
+            //modelBuilder.Entity<Interview>().Property(e => e.IP).IsUnicode(true);
+            //modelBuilder.Entity<Interview>().Property(e => e.UserAgent).IsUnicode(true);
+            //modelBuilder.Entity<Interview>().Property(e => e.OperatingSystem).IsUnicode(true);
+            //modelBuilder.Entity<Interview>().Property(e => e.BrowserType).IsUnicode(true);
             modelBuilder.Entity<LeaveMessage>().Property(e => e.PostDate).HasPrecision(0);
             modelBuilder.Entity<Misc>().Property(e => e.PostDate).HasPrecision(0);
             modelBuilder.Entity<Misc>().Property(e => e.ModifyDate).HasPrecision(0);
@@ -121,15 +121,15 @@ namespace Models.Application
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<LeaveMessage>("sp_getChildrenLeaveMsgByParentId", parentIdParameter);
         }
 
-        /// <summary>
-        /// 获取最近天数的访客记录
-        /// </summary>
-        /// <param name="recent">天数</param>
-        /// <returns></returns>
-        public virtual ObjectResult<Interview> sp_getInterviewsCurrentMonthDetailsByDays(int? recent)
-        {
-            var recentParameter = recent.HasValue ? new ObjectParameter("recent", recent) : new ObjectParameter("recent", typeof(int));
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Interview>("sp_getInterviewsCurrentMonthDetailsByDays", recentParameter);
-        }
+        ///// <summary>
+        ///// 获取最近天数的访客记录
+        ///// </summary>
+        ///// <param name="recent">天数</param>
+        ///// <returns></returns>
+        //public virtual ObjectResult<Interview> sp_getInterviewsCurrentMonthDetailsByDays(int? recent)
+        //{
+        //    var recentParameter = recent.HasValue ? new ObjectParameter("recent", recent) : new ObjectParameter("recent", typeof(int));
+        //    return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Interview>("sp_getInterviewsCurrentMonthDetailsByDays", recentParameter);
+        //}
     }
 }

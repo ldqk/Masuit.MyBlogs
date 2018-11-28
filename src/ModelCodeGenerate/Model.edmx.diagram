@@ -11,8 +11,6 @@
         <EntityTypeShape EntityType="Model.Contacts" Width="1.5" PointX="2.75" PointY="0.75" />
         <EntityTypeShape EntityType="Model.Donate" Width="1.5" PointX="7.75" PointY="11.75" />
         <EntityTypeShape EntityType="Model.InternalMessage" Width="1.5" PointX="4.75" PointY="0.75" />
-        <EntityTypeShape EntityType="Model.Interview" Width="1.5" PointX="10.75" PointY="11" />
-        <EntityTypeShape EntityType="Model.InterviewDetail" Width="1.5" PointX="13" PointY="12.375" />
         <EntityTypeShape EntityType="Model.Issue" Width="1.5" PointX="12.75" PointY="0.75" />
         <EntityTypeShape EntityType="Model.LeaveMessage" Width="1.5" PointX="12.75" PointY="5.75" />
         <EntityTypeShape EntityType="Model.Links" Width="1.5" PointX="14.75" PointY="0.75" />
@@ -30,7 +28,6 @@
         <AssociationConnector Association="Model.FK__Post__CategoryId__3A4CA8FD" />
         <AssociationConnector Association="Model.FK_dbo_PostHistoryVersion_dbo_Category_CategoryId" />
         <AssociationConnector Association="Model.FK__Comment__PostId__395884C4" />
-        <AssociationConnector Association="Model.FK_dbo_InterviewDetail_dbo_Interview_InterviewId" />
         <AssociationConnector Association="Model.FK_dbo_LoginRecords_dbo_UserInfo_UserInfoId" />
         <AssociationConnector Association="Model.FK_dbo_PostAccessRecords_dbo_Post_PostId" />
         <AssociationConnector Association="Model.FK_dbo_PostHistoryVersion_dbo_Post_PostId" />

@@ -27,7 +27,7 @@
                                 <div class="input-group">
                                     <input type="text" placeholder="您想要搜个啥？" id="search" name="wd" value="@ViewBag.Keyword" class="form-control input-lg">
                                     <div class="input-group-btn">
-                                        <button type="button" class="sr-only btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                                        <button type="button" class="sr-only btn btn-default dropdown-toggle" data-toggle="dropdown" style="display: none"><span class="caret"></span></button>
                                         <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
                                         <button class="btn btn-lg btn-primary" type="submit">搜索</button>
                                         <a class="baidu btn btn-lg btn-info">百度一下</a>
@@ -132,8 +132,7 @@
     </div>
 </div>
 <script>
-
-	$(".baidu").on("click", function(e) {
+    $(".baidu").on("click", function(e) {
 		window.location.href = `https://www.baidu.com/s?wd=${$("#search").val().trim()}&si=@Request.Url.Host&ct=2097152`;
 	});
 </script>

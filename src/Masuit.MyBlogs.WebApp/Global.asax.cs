@@ -5,19 +5,17 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using Autofac;
 using Common;
 using Hangfire;
-using IBLL;
 using Masuit.MyBlogs.WebApp.Models.Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Net;
 using Masuit.Tools.NoSQL;
+using Models.DTO;
 #if DEBUG
 using Masuit.Tools.Win32;
 #endif
-using Models.Entity;
 using Z.EntityFramework.Extensions;
 
 namespace Masuit.MyBlogs.WebApp
@@ -128,7 +126,7 @@ namespace Masuit.MyBlogs.WebApp
             {
                 var times = RedisHelper.StringIncrement("Frequency:" + Request.UserHostAddress + ":" + Request.UserAgent);
                 RedisHelper.Expire("Frequency:" + Request.UserHostAddress + ":" + Request.UserAgent, TimeSpan.FromMinutes(1));
-                if (times > 200)
+                if (times > 300)
                 {
                     Response.Write($"检测到您的IP（{Request.UserHostAddress}）访问过于频繁，已被本站暂时禁止访问，如有疑问，请联系站长！");
                     Response.End();
@@ -167,29 +165,35 @@ namespace Masuit.MyBlogs.WebApp
         protected void Session_End(object sender, EventArgs e)
         {
             var uid = Session.Get<Guid>("currentOnline");
-            IInterviewBll interviewBll = AutofacConfig.Container.Resolve<IInterviewBll>();
-            Interview interview = interviewBll.GetFirstEntity(i => i.Uid.Equals(uid));
-            var interviewDetails = interview.InterviewDetails;
-            TimeSpan ts = DateTime.Now - interviewDetails.FirstOrDefault().Time;
-            if (ts.TotalMinutes > 20)
+            //IInterviewBll interviewBll = AutofacConfig.Container.Resolve<IInterviewBll>();
+            var interview = RedisHelper.ListRange<Interview>($"Interview:{DateTime.Today:yyyy:MM:dd}").Union(RedisHelper.ListRange<Interview>($"Interview:{DateTime.Today.AddDays(-1):yyyy:MM:dd}")).FirstOrDefault(i => i.Uid.Equals(uid));
+            if (interview != null)
             {
-                ts = ts - TimeSpan.FromMinutes(20);
-            }
-            string len = string.Empty;
-            if (ts.Hours > 0)
-            {
-                len += $"{ts.Hours}小时";
-            }
+                RedisHelper.RemoveList($"Interview:{DateTime.Today:yyyy:MM:dd}", interview);
+                if (interview.InterviewDetails.Any())
+                {
+                    var interviewDetails = interview.InterviewDetails;
+                    var ts = DateTime.Now - interviewDetails.FirstOrDefault().Time;
+                    if (ts.TotalMinutes > 20)
+                    {
+                        ts = ts - TimeSpan.FromMinutes(20);
+                    }
+                    var len = string.Empty;
+                    if (ts.Hours > 0)
+                    {
+                        len += $"{ts.Hours}小时";
+                    }
 
-            if (ts.Minutes > 0)
-            {
-                len += $"{ts.Minutes}分钟";
+                    if (ts.Minutes > 0)
+                    {
+                        len += $"{ts.Minutes}分钟";
+                    }
+                    len += $"{ts.Seconds}.{ts.Milliseconds}秒";
+                    interview.OnlineSpan = len;
+                    interview.OnlineSpanSeconds = ts.TotalSeconds;
+                }
+                RedisHelper.ListRightPush($"Interview:{DateTime.Today:yyyy:MM:dd}", interview);
             }
-            len += $"{ts.Seconds}.{ts.Milliseconds}秒";
-            interview.OnlineSpan = len;
-            interview.OnlineSpanSeconds = ts.TotalSeconds;
-            interviewBll.UpdateEntitySaved(interview);
-
         }
 
         protected void Application_End(object sender, EventArgs e)

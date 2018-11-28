@@ -3,8 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
-using Common;
-using Hangfire;
 
 namespace Masuit.MyBlogs.WebApp.Models.UEditor
 {
@@ -100,12 +98,12 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
                             bytes = ms.ToArray();
                         }
                         File.WriteAllBytes(savePath, bytes);
-                        var (url, success) = CommonHelper.UploadImage(savePath);
-                        if (success)
-                        {
-                            ServerUrl = url;
-                            BackgroundJob.Enqueue(() => File.Delete(savePath));
-                        }
+                        //var (url, success) = CommonHelper.UploadImage(savePath);
+                        //if (success)
+                        //{
+                        //    ServerUrl = url;
+                        //    BackgroundJob.Enqueue(() => File.Delete(savePath));
+                        //}
                     }
                     State = "SUCCESS";
                 }

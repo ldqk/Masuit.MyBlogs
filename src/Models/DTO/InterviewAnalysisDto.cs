@@ -24,10 +24,10 @@ namespace Models.DTO
         /// </summary>
         public DateTime ViewTime { get; set; }
 
-        /// <summary>
-        /// 国家
-        /// </summary>
-        public string Country { get; set; }
+        ///// <summary>
+        ///// 国家
+        ///// </summary>
+        //public string Country { get; set; }
 
         /// <summary>
         /// 省
@@ -39,5 +39,20 @@ namespace Models.DTO
         /// </summary>
         public double OnlineSpanSeconds { get; set; }
 
+    }
+
+    public class KeyCount
+    {
+        public string Key { get; set; }
+        public int Count { get; set; }
+        public int UniqueCount { get; set; }
+
+    }
+    public class ViewCount
+    {
+        public string ViewTime { get; set; }
+        public int PageView { get; set; }
+        public int UniqueView { get; set; }
+        public int IncView { get; set; }
     }
 }

@@ -1,21 +1,21 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using Common;
-using IBLL;
+﻿using Common;
+using Masuit.Tools;
+using Masuit.Tools.NoSQL;
 using Models.DTO;
-using Models.Entity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
     public class InterviewController : AdminController
     {
-        public IInterviewBll InterviewBll { get; set; }
-
-        public InterviewController(IInterviewBll interviewBll)
+        //public IInterviewBll InterviewBll { get; set; }
+        public RedisHelper RedisHelper { get; set; }
+        public InterviewController(RedisHelper redisHelper)
         {
-            InterviewBll = interviewBll;
+            RedisHelper = redisHelper;
         }
 
         /// <summary>
@@ -28,14 +28,18 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             return ResultData(model);
         }
 
-        public async Task<ActionResult> Get(int? days)
+        public ActionResult Get(int? days)
         {
             var time = DateTime.Now;
             if (days != null)
             {
                 time = time.AddDays(-days.Value);
             }
-            var list = await InterviewBll.LoadEntitiesNoTrackingAsync(i => i.ViewTime <= time, i => i.ViewTime, false);
+            var list = new List<Interview>();
+            for (var i = time; i < DateTime.Now; i = i.AddDays(1))
+            {
+                list.AddRange(RedisHelper.ListRange<Interview>($"Interview:{i:yyyy:MM:dd}").Where(x => x.ViewTime >= time).OrderByDescending(x => x.ViewTime));
+            }
             return ResultData(list);
         }
 
@@ -64,36 +68,49 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             int total;
             if (distinct)
             {
-                var temp = string.IsNullOrEmpty(search) ? InterviewBll.SqlQuery<InterviewOutputDto>($"select Id,IP,UserAgent,OperatingSystem,BrowserType,ViewTime,FromUrl,Province,ISP,HttpMethod,Address,ReferenceAddress,LandPage,OnlineSpan from Interview where Id in(select max(Id) from Interview where ViewTime>='{start:yyyy-MM-dd}' and ViewTime<='{end:yyyy-MM-dd HH:mm:ss}' group by ip) ORDER BY ViewTime desc offset {(page - 1) * size} row fetch next {size} rows only") : InterviewBll.SqlQuery<InterviewOutputDto>($"select Id,IP,UserAgent,OperatingSystem,BrowserType,ViewTime,FromUrl,Province,ISP,HttpMethod,Address,ReferenceAddress,LandPage,OnlineSpan from Interview where Id in(select max(Id) from Interview  where ViewTime>='{start:yyyy-MM-dd}' and ViewTime<='{end:yyyy-MM-dd HH:mm:ss}' and (ip like '%{search}%' or Address like '%{search}%' or Province like '%{search}%' or ReferenceAddress like '%{search}%' or OperatingSystem like '%{search}%' or BrowserType like '%{search}%' or FromUrl like '%{search}%' or HttpMethod like '%{search}%' or ISP like '%{search}%' or UserAgent like '%{search}%') group by ip) ORDER BY ViewTime desc offset {(page - 1) * size} row fetch next {size} rows only");
-                total = string.IsNullOrEmpty(search) ? InterviewBll.SqlQuery<int>($"SELECT count(1) from (SELECT DISTINCT ip from interview where ViewTime>='{start:yyyy-MM-dd}' and ViewTime<='{end:yyyy-MM-dd HH:mm:ss}') t").FirstOrDefault() : InterviewBll.SqlQuery<int>($"SELECT count(1) from (SELECT DISTINCT ip from interview where ViewTime>='{start:yyyy-MM-dd}' and ViewTime<='{end:yyyy-MM-dd HH:mm:ss}' and (ip like '%{search}%' or Address like '%{search}%' or Province like '%{search}%' or ReferenceAddress like '%{search}%' or OperatingSystem like '%{search}%' or BrowserType like '%{search}%' or FromUrl like '%{search}%' or HttpMethod like '%{search}%' or ISP like '%{search}%' or UserAgent like '%{search}%')) t").FirstOrDefault();
+                List<Interview> temp = new List<Interview>();
+                for (var i = start.Value; i < end; i = i.AddDays(1))
+                {
+                    var @where = string.IsNullOrEmpty(search) ? (Func<Interview, bool>)(x => x.ViewTime > start) : x => x.ViewTime > start && (x.IP.Contains(search) || x.Address.Contains(search) || x.Province.Contains(search) || x.ReferenceAddress.Contains(search) || x.OperatingSystem.Contains(search) || x.FromUrl.Contains(search) || x.UserAgent.Contains(search));
+                    var query = RedisHelper.ListRange<Interview>($"Interview:{i:yyyy:MM:dd}").Where(where).DistinctBy(x => x.IP);
+                    temp.AddRange(query);
+                }
+                total = temp.Count;
                 var pages = Math.Ceiling(total * 1.0 / size).ToInt32();
-                return PageResult(temp, pages, total);
+                return PageResult(temp.OrderByDescending(i => i.ViewTime).Skip((page - 1) * size).Take(size), pages, total);
             }
-            var list = string.IsNullOrEmpty(search) ? InterviewBll.LoadPageEntitiesNoTracking<DateTime, InterviewOutputDto>(page, size, out total, i => i.ViewTime >= start && i.ViewTime <= end, i => i.ViewTime, false).ToList() : InterviewBll.LoadPageEntitiesNoTracking<DateTime, InterviewOutputDto>(page, size, out total, i => i.ViewTime >= start && i.ViewTime <= end && (i.IP.Contains(search) || i.Address.Contains(search) || i.Province.Contains(search) || i.ReferenceAddress.Contains(search) || i.OperatingSystem.Contains(search) || i.BrowserType.Contains(search) || i.FromUrl.Contains(search) || i.HttpMethod.Contains(search) || i.ISP.Contains(search) || i.UserAgent.Contains(search)), i => i.ViewTime, false).ToList();
+            List<Interview> list = new List<Interview>();
+            for (var i = start.Value; i < end; i = i.AddDays(1))
+            {
+                var @where = string.IsNullOrEmpty(search) ? (Func<Interview, bool>)(x => x.ViewTime > start) : x => x.ViewTime > start && (x.IP.Contains(search) || x.Address.Contains(search) || x.Province.Contains(search) || x.ReferenceAddress.Contains(search) || x.OperatingSystem.Contains(search) || x.FromUrl.Contains(search) || x.UserAgent.Contains(search));
+                var query = RedisHelper.ListRange<Interview>($"Interview:{i:yyyy:MM:dd}").Where(where);
+                list.AddRange(query);
+            }
+            total = list.Count;
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            return PageResult(list.Skip((page - 1) * size).Take(size), pageCount, total);
         }
 
         [AllowAnonymous]
         public ActionResult GetViewCount()
         {
-            int count = InterviewBll.GetAll().Count();
+            var count = RedisHelper.GetString<double>("Interview:ViewCount");
             return ResultData(count);
         }
 
-        [HttpPost]
-        public ActionResult InterviewDetails(long id)
-        {
-            Interview interview = InterviewBll.GetById(id);
-            return ResultData(new
-            {
-                interview = interview.Mapper<InterviewOutputDto>(),
-                details = interview.InterviewDetails.Select(i => new
-                {
-                    i.Url,
-                    i.Time
-                })
-            });
-        }
+        //[HttpPost]
+        //public ActionResult InterviewDetails(long id)
+        //{
+        //    Interview interview = InterviewBll.GetById(id);
+        //    return ResultData(new
+        //    {
+        //        interview = interview.Mapper<InterviewOutputDto>(),
+        //        details = interview.InterviewDetails.Select(i => new
+        //        {
+        //            i.Url,
+        //            i.Time
+        //        })
+        //    });
+        //}
     }
 }

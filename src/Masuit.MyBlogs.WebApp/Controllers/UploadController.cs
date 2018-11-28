@@ -1,17 +1,16 @@
-﻿using System;
+﻿using Common;
+using Masuit.Tools;
+using Masuit.Tools.Html;
+using Masuit.Tools.Logging;
+using Masuit.Tools.Media;
+using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
-using Common;
-using Hangfire;
-using Masuit.Tools;
-using Masuit.Tools.Html;
-using Masuit.Tools.Logging;
-using Masuit.Tools.Media;
-using Newtonsoft.Json;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -59,17 +58,17 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     DocumentConvert.Doc2Html(docPath, htmlDir);
                     string htmlfile = Path.Combine(htmlDir, "index.html");
                     string html = System.IO.File.ReadAllText(htmlfile).ReplaceHtmlImgSource("/upload/" + resourceName).ClearHtml().HtmlSantinizerStandard();
-                    MatchCollection matches = Regex.Matches(html, "<img.+?src=\"(.+?)\".+?>");
-                    foreach (Match m in matches)
-                    {
-                        string src = m.Groups[1].Value;
-                        var (url, success) = CommonHelper.UploadImage(Server.MapPath(src));
-                        if (success)
-                        {
-                            html = html.Replace(src, url);
-                            BackgroundJob.Enqueue(() => System.IO.File.Delete(Server.MapPath(src)));
-                        }
-                    }
+                    //MatchCollection matches = Regex.Matches(html, "<img.+?src=\"(.+?)\".+?>");
+                    //foreach (Match m in matches)
+                    //{
+                    //    string src = m.Groups[1].Value;
+                    //    var (url, success) = CommonHelper.UploadImage(Server.MapPath(src));
+                    //    if (success)
+                    //    {
+                    //        html = html.Replace(src, url);
+                    //        BackgroundJob.Enqueue(() => System.IO.File.Delete(Server.MapPath(src)));
+                    //    }
+                    //}
                     ThreadPool.QueueUserWorkItem(state => System.IO.File.Delete(htmlfile));
                     if (html.Length < 10)
                     {
@@ -96,19 +95,19 @@ namespace Masuit.MyBlogs.WebApp.Controllers
 
         public ActionResult DecodeDataUri(string data)
         {
-            var dir = Environment.GetEnvironmentVariable("temp");
+            var dir = "/upload/images";
             var filename = string.Empty.CreateShortToken(9) + ".jpg";
             string path = Path.Combine(dir, filename);
             try
             {
-                data.SaveDataUriAsImageFile().Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
-                var (url, success) = CommonHelper.UploadImage(path);
-                BackgroundJob.Enqueue(() => System.IO.File.Delete(path));
-                if (success)
-                {
-                    return ResultData(url);
-                }
-                return ResultData(null, false, "图片上传失败！");
+                data.SaveDataUriAsImageFile().Save(Server.MapPath(path), System.Drawing.Imaging.ImageFormat.Jpeg);
+                //var (url, success) = CommonHelper.UploadImage(path);
+                //BackgroundJob.Enqueue(() => System.IO.File.Delete(path));
+                //if (success)
+                //{
+                return ResultData(path);
+                //}
+                //return ResultData(null, false, "图片上传失败！");
             }
             catch (Exception e)
             {
@@ -124,7 +123,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         public ActionResult Download(string path)
         {
             if (string.IsNullOrEmpty(path)) return Content("null");
-            var file = Path.Combine(Server.MapPath("/upload"), path.Trim('/', '\\'));
+            var file = Path.Combine(Server.MapPath("/upload"), path.Trim('.', '/', '\\'));
             if (System.IO.File.Exists(file))
             {
                 return File(System.IO.File.OpenRead(file), "application/octet-stream", Path.GetFileName(file));

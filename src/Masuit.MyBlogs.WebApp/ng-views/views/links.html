@@ -33,6 +33,12 @@
                     <span class="el-switch-style" ng-click="toggleWhite(row)"></span>
                 </label>
             </td>
+            <td title="'是否推荐'">
+                <label class="el-switch">
+                    <input type="checkbox" name="switch" ng-checked="row.Recommend">
+                    <span class="el-switch-style" ng-click="toggleRecommend(row)"></span>
+                </label>
+            </td>
             <td title="'是否可用'">
                 <label class="el-switch">
                     <input type="checkbox" name="switch" ng-checked="row.Status==1">

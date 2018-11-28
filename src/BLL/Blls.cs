@@ -18,10 +18,6 @@ namespace BLL
 	
 	public partial class InternalMessageBll :BaseBll<InternalMessage>,IInternalMessageBll{}   
 	
-	public partial class InterviewBll :BaseBll<Interview>,IInterviewBll{}   
-	
-	public partial class InterviewDetailBll :BaseBll<InterviewDetail>,IInterviewDetailBll{}   
-	
 	public partial class IssueBll :BaseBll<Issue>,IIssueBll{}   
 	
 	public partial class LeaveMessageBll :BaseBll<LeaveMessage>,ILeaveMessageBll{}   

@@ -133,7 +133,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                         var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).ToList();
                         emails.Add(email);
                         string link = Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Url.Scheme);
-                        BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), string.Join(",", emails.Distinct().Except(new[] { msg2.Email }))));
+                        foreach (var s in emails.Distinct().Except(new[] { msg2.Email }))
+                        {
+                            BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), s));
+                        }
                     }
 #endif
                     return ResultData(null, true, "留言发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将会显示到列表中！");
@@ -155,7 +158,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             string content = System.IO.File.ReadAllText(Request.MapPath("/template/notify.html")).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg.NickName).Replace("{{content}}", msg.Content);
             var emails = LeaveMessageBll.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>() { msg.Email }).ToList();
             string link = Url.Action("Index", "Msg", new { cid = pid }, Request.Url.Scheme);
-            BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), string.Join(",", emails)));
+            foreach (var s in emails)
+            {
+                BackgroundJob.Enqueue(() => SendMail($"{Request.Url.Authority}{GetSettings("Title")} 留言回复：", content.Replace("{{link}}", link), string.Join(",", s)));
+            }
 #endif
             return ResultData(null, b, b ? "审核通过！" : "审核失败！");
         }

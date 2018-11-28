@@ -1,7 +1,7 @@
-﻿using System;
-using Models.DTO;
+﻿using Models.DTO;
 using Models.Entity;
 using Models.Enum;
+using System;
 
 namespace Masuit.MyBlogs.WebApp.Models.Hangfire
 {
@@ -9,7 +9,7 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
     {
         void FlushException(Exception ex);
         void FlushInetAddress(Interview interview);
-        void FlushUnhandledAddress();
+        //void FlushUnhandledAddress();
         void UpdateLucene();
         void ResetLucene();
         void LoginRecord(UserInfoOutputDto userInfo, string ip, LoginType type);

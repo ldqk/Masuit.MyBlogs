@@ -516,7 +516,7 @@
 			});
 		}
 		$scope.analysis();
-		$scope.details = function(id) {
+		$scope.details = function(data) {
 			layer.open({
 				type:1,
 				zIndex:20,
@@ -525,20 +525,14 @@
 				area:document.body.clientWidth * 0.8 + "px",
 				content:$("#modal"),
 				success:function(layero, index) {
-					$scope.request("/interview/InterviewDetails", {
-						id
-					}, function(data) {
-						if(data.Success) {
-							$scope.viewer = data.Data.interview;
-							$scope.viewdetails = data.Data.details;
+							$scope.viewer = data;
+							$scope.viewdetails = data.InterviewDetails;
 							self.ViewDetails = new NgTableParams({
 								count:10
 							}, {
 								filterDelay:0,
-								dataset:data.Data.details
+								dataset:data.InterviewDetails
 							});
-						}
-					});
 				},
 				end:function() {
 					$("#modal").css("display", "none");

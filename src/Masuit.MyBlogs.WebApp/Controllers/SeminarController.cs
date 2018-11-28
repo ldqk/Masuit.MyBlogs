@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using Common;
+﻿using Common;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
 using Masuit.Tools.Net;
 using Models.DTO;
 using Models.Entity;
 using Models.Enum;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -49,7 +49,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     posts = temp.ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();
                     break;
             }
-            ViewBag.Total = posts.Count;
+            ViewBag.Total = temp.Count();
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;

@@ -2,8 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Web;
-using Common;
-using Hangfire;
 
 namespace Masuit.MyBlogs.WebApp.Models.UEditor
 {
@@ -73,23 +71,23 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
                     Directory.CreateDirectory(Path.GetDirectoryName(localPath));
                 }
                 File.WriteAllBytes(localPath, uploadFileBytes);
-                if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(localPath)))
-                {
-                    var (url, success) = CommonHelper.UploadImage(localPath);
-                    if (success)
-                    {
-                        Result.Url = url;
-                        BackgroundJob.Enqueue(() => File.Delete(localPath));
-                    }
-                    else
-                    {
-                        Result.Url = savePath;
-                    }
-                }
-                else
-                {
-                    Result.Url = savePath;
-                }
+                //if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(localPath)))
+                //{
+                //    var (url, success) = CommonHelper.UploadImage(localPath);
+                //    if (success)
+                //    {
+                //        Result.Url = url;
+                //        BackgroundJob.Enqueue(() => File.Delete(localPath));
+                //    }
+                //    else
+                //    {
+                //        Result.Url = savePath;
+                //    }
+                //}
+                //else
+                //{
+                Result.Url = savePath;
+                //}
                 Result.State = UploadState.Success;
             }
             catch (Exception e)

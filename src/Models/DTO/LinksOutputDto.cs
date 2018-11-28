@@ -19,5 +19,10 @@
         /// 是否检测白名单
         /// </summary>
         public bool Except { get; set; }
+
+        /// <summary>
+        /// 是否是推荐站点
+        /// </summary>
+        public bool Recommend { get; set; }
     }
 }
