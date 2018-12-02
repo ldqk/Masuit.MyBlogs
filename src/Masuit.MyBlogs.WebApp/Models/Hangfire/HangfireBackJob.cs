@@ -78,26 +78,6 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
             RedisHelper.StringIncrement("Interview:ViewCount");
         }
 
-        //public void FlushUnhandledAddress()
-        //{
-        //    var list = InterviewBll.LoadEntities(i => string.IsNullOrEmpty(i.Address)).AsEnumerable();
-        //    list.ForEach(i =>
-        //    {
-        //        PhysicsAddress addr = i.IP.GetPhysicsAddressInfo().Result;
-        //        if (addr?.Status == 0)
-        //        {
-        //            i.Address = $"{addr.AddressResult.FormattedAddress} {addr.AddressResult.AddressComponent.Direction}{addr.AddressResult.AddressComponent.Distance}米";
-        //            i.Province = addr.AddressResult.AddressComponent.Province;
-        //            IList<string> strs = new List<string>();
-        //            addr.AddressResult.Pois.ForEach(s => strs.Add($"{s.AddressDetail} {s.Direction}{s.Distance}米"));
-        //            i.ReferenceAddress = string.Join("|", strs);
-        //        }
-        //        i.ISP = i.IP.GetISP();
-        //        InterviewBll.UpdateEntitySaved(i);
-        //    });
-        //    InterviewBll.DeleteEntitySaved(i => i.IP.Contains(":") || i.IP.Equals("127.0.0.1"));
-        //}
-
         public void UpdateLucene()
         {
             LuceneHelper.CreateIndex(PostBll.LoadEntitiesNoTracking(p => p.Status == Status.Pended));
@@ -196,7 +176,7 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
             using (RedisHelper redisHelper = RedisHelper.GetInstance())
             {
                 list = redisHelper.ListRange<Interview>($"Interview:{DateTime.Today:yyyy:MM:dd}");
-                for (int i = -70; i < 0; i++)
+                for (int i = -60; i < 0; i++)
                 {
                     list.AddRange(redisHelper.ListRange<Interview>($"Interview:{DateTime.Today.AddDays(i):yyyy:MM:dd}"));
                 }
@@ -235,14 +215,14 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
             int monthpv = list.Count(i => i.ViewTime >= monthStart);
             int monthuv = list.DistinctBy(i => i.IP).Count(i => i.ViewTime >= monthStart);
 
-            //YTD统计
-            var yearStart = new DateTime(DateTime.Now.Year, 1, 1);
-            int yearpv = list.Count(i => i.ViewTime >= yearStart);
-            int yearuv = list.DistinctBy(i => i.IP).Count(i => i.ViewTime >= yearStart);
+            ////YTD统计
+            //var yearStart = new DateTime(DateTime.Now.Year, 1, 1);
+            //int yearpv = list.Count(i => i.ViewTime >= yearStart);
+            //int yearuv = list.DistinctBy(i => i.IP).Count(i => i.ViewTime >= yearStart);
 
-            //完全统计
-            int totalpv = list.Count();
-            int totaluv = list.DistinctBy(i => i.IP).Count();
+            ////完全统计
+            //int totalpv = list.Count();
+            //int totaluv = list.DistinctBy(i => i.IP).Count();
 
             var allClient = new List<object>();
             var uniClient = new List<object>();
@@ -394,23 +374,23 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
                 g.iv
             }).ToList();  //每日新增独立访客
 
-            //访问时长统计
-            InterviewAnalysisDto maxSpanViewer = list.OrderByDescending(i => i.OnlineSpanSeconds).Select(i => new InterviewAnalysisDto
-            {
-                ViewTime = i.ViewTime,
-                IP = i.IP,
-                BrowserType = i.BrowserType,
-                Province = i.Province,
-                OnlineSpanSeconds = i.OnlineSpanSeconds
-            }).FirstOrDefault(); //历史最久访客
-            InterviewAnalysisDto maxSpanViewerToday = list.Where(i => i.ViewTime >= DateTime.Today).OrderByDescending(i => i.OnlineSpanSeconds).Select(i => new InterviewAnalysisDto
-            {
-                ViewTime = i.ViewTime,
-                IP = i.IP,
-                BrowserType = i.BrowserType,
-                Province = i.Province,
-                OnlineSpanSeconds = i.OnlineSpanSeconds
-            }).FirstOrDefault(); //今日最久访客
+            ////访问时长统计
+            //InterviewAnalysisDto maxSpanViewer = list.OrderByDescending(i => i.OnlineSpanSeconds).Select(i => new InterviewAnalysisDto
+            //{
+            //    ViewTime = i.ViewTime,
+            //    IP = i.IP,
+            //    BrowserType = i.BrowserType,
+            //    Province = i.Province,
+            //    OnlineSpanSeconds = i.OnlineSpanSeconds
+            //}).FirstOrDefault(); //历史最久访客
+            //InterviewAnalysisDto maxSpanViewerToday = list.Where(i => i.ViewTime >= DateTime.Today).OrderByDescending(i => i.OnlineSpanSeconds).Select(i => new InterviewAnalysisDto
+            //{
+            //    ViewTime = i.ViewTime,
+            //    IP = i.IP,
+            //    BrowserType = i.BrowserType,
+            //    Province = i.Province,
+            //    OnlineSpanSeconds = i.OnlineSpanSeconds
+            //}).FirstOrDefault(); //今日最久访客
 
             double average = 0;
             double average2 = 0;
@@ -436,11 +416,11 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
                 Pv = pv,
                 Todaypv = todaypv,
                 Todayuv = todayuv,
-                Totalpv = totalpv,
-                Totaluv = totaluv,
+                //Totalpv = totalpv,
+                //Totaluv = totaluv,
                 Uv = uv,
-                Yearpv = yearpv,
-                Yearuv = yearuv,
+                //Yearpv = yearpv,
+                //Yearuv = yearuv,
                 BounceRate = $"{dap?.Dap}/{dap?.All}({dap?.Result:P})",
                 BounceRateAggregate = dapAgg.Select(a => new object[]
                 {
@@ -450,23 +430,23 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
                 BounceRateToday = $"{todayDap?.Dap}/{todayDap?.All}({todayDap?.Rate:P})",
                 OnlineSpanAggregate = new
                 {
-                    maxSpanViewerToday = new
-                    {
-                        maxSpanViewerToday?.IP,
-                        maxSpanViewerToday?.BrowserType,
-                        maxSpanViewerToday?.Province,
-                        maxSpanViewerToday?.ViewTime,
-                        OnlineSpanSeconds = TimeSpan2String(TimeSpan.FromSeconds(maxSpanViewerToday?.OnlineSpanSeconds ?? 0))
-                    },
+                    //maxSpanViewerToday = new
+                    //{
+                    //    maxSpanViewerToday?.IP,
+                    //    maxSpanViewerToday?.BrowserType,
+                    //    maxSpanViewerToday?.Province,
+                    //    maxSpanViewerToday?.ViewTime,
+                    //    OnlineSpanSeconds = TimeSpan2String(TimeSpan.FromSeconds(maxSpanViewerToday?.OnlineSpanSeconds ?? 0))
+                    //},
                     averSpanToday,
-                    maxSpanViewer = new
-                    {
-                        maxSpanViewer?.IP,
-                        maxSpanViewer?.BrowserType,
-                        maxSpanViewer?.Province,
-                        maxSpanViewer?.ViewTime,
-                        OnlineSpanSeconds = TimeSpan2String(TimeSpan.FromSeconds(maxSpanViewer?.OnlineSpanSeconds ?? 0))
-                    },
+                    //maxSpanViewer = new
+                    //{
+                    //    maxSpanViewer?.IP,
+                    //    maxSpanViewer?.BrowserType,
+                    //    maxSpanViewer?.Province,
+                    //    maxSpanViewer?.ViewTime,
+                    //    OnlineSpanSeconds = TimeSpan2String(TimeSpan.FromSeconds(maxSpanViewer?.OnlineSpanSeconds ?? 0))
+                    //},
                     averSpan,
                 }
             };
