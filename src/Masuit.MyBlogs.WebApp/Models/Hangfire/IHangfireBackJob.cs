@@ -16,5 +16,6 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
         void PublishPost(Post p);
         void AggregateInterviews();
         void InterviewTrace(Guid uid, string url);
+        void RecordPostVisit(int pid);
     }
 }

@@ -125,26 +125,9 @@ namespace Common
         }
 
         /// <summary>
-        /// 网站运营开始时间
+        /// 平均访问量
         /// </summary>
-        public static int RunningDays
-        {
-            get
-            {
-                try
-                {
-                    using (var redisHelper = RedisHelper.GetInstance())
-                    {
-                        int days = redisHelper.GetServer().Keys(0, "Interview:20*").Count();
-                        return days;
-                    }
-                }
-                catch
-                {
-                    return 1;
-                }
-            }
-        }
+        public static double AverageCount { get; set; }
 
         /// <summary>
         /// 网站启动时间

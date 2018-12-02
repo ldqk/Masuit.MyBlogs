@@ -170,6 +170,26 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
             LogManager.Error(ex);
         }
 
+        public void RecordPostVisit(int pid)
+        {
+            Post post = PostBll.GetById(pid);
+            var record = post.PostAccessRecord.FirstOrDefault(r => r.AccessTime == DateTime.Today);
+            if (record != null)
+            {
+                record.ClickCount += 1;
+            }
+            else
+            {
+                post.PostAccessRecord.Add(new PostAccessRecord
+                {
+                    ClickCount = 1,
+                    AccessTime = DateTime.Today
+                });
+            }
+
+            PostBll.UpdateEntitySaved(post);
+        }
+
         private (AnalysisModel, AnalysisModel) Analysis()
         {
             List<Interview> list;
@@ -186,6 +206,7 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
             {
                 return (null, null);
             }
+            CommonHelper.AverageCount = list.Count * 1.0 / list.GroupBy(i => i.ViewTime.Date).Count();
             var dap = list.Select(i =>
             {
                 var (a, d) = (list.GroupBy(g => g.Uid).Count(), list.Count(g => g.InterviewDetails.Count == 1));

@@ -49,20 +49,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         [Route("{id:int}/{kw}"), Route("{id:int}")]
         public ActionResult Details(int id, string kw)
         {
-            List<string> list = new List<string>();
-            if (!string.IsNullOrEmpty(kw))
-            {
-                list = LuceneHelper.CutKeywords(kw);
-                if (Regex.Match(kw, BanRegex).Length > 0 || Regex.Match(kw, ModRegex).Length > 0)
-                {
-                    ViewBag.Keyword = "";
-                    return RedirectToAction("Details", "Post", new
-                    {
-                        id
-                    });
-                }
-            }
-
             Post post = PostBll.GetById(id);
             if (post != null)
             {
@@ -83,48 +69,9 @@ namespace Masuit.MyBlogs.WebApp.Controllers
 
                 if (string.IsNullOrEmpty(Session.GetByRedis<string>("post" + id)))
                 {
-                    //post.ViewCount++;
-                    var record = post.PostAccessRecord.FirstOrDefault(r => r.AccessTime == DateTime.Today);
-                    if (record != null)
-                    {
-                        record.ClickCount += 1;
-                    }
-                    else
-                    {
-                        post.PostAccessRecord.Add(new PostAccessRecord
-                        {
-                            ClickCount = 1,
-                            AccessTime = DateTime.Today
-                        });
-                    }
-
-                    PostBll.UpdateEntitySaved(post);
+                    HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.RecordPostVisit), args: id);
                     Session.SetByRedis("post" + id, id.ToString());
                 }
-
-                foreach (var s in list)
-                {
-                    if (s.Contains(new[]
-                    {
-                        @"\?",
-                        @"\*",
-                        @"\+",
-                        @"\-",
-                        @"\[",
-                        @"\]",
-                        @"\{",
-                        @"\}",
-                        @"\(",
-                        @"\)",
-                        "�"
-                    }))
-                    {
-                        continue;
-                    }
-
-                    post.Content = Regex.IsMatch(s, @"^\p{P}.*") ? post.Content.Replace(s, $"<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>{s}</span>") : Regex.Replace(post.Content, s, $"<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>{s}</span>", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline);
-                }
-
                 return View(post);
             }
 
@@ -406,13 +353,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 var s = RedisHelper.GetString("ArticleViewToken");
                 Session.SetByRedis("ArticleViewToken", s);
                 return ResultData(null);
-                //if(!RedisHelper.KeyExists("ArticleViewToken"))
-                //{
-                //    RedisHelper.SetString("ArticleViewToken", string.Empty.CreateShortToken(6));
-                //}
-                //var token = RedisHelper.GetString("ArticleViewToken");
-                //SendMail("懒得勤快的博客_文章验证码", "文章验证码：" + token, email);
-                //return ResultData(null,true,"文章验证码已经发送至您的邮箱，请注意查收");
             }
 
             return ResultData(null, false, "您目前没有权限访问这篇文章的加密部分，请联系站长开通这篇文章的访问权限！");
@@ -748,7 +688,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             if (b)
             {
 #if !DEBUG
-                if(notify && "false" == GetSettings("DisabledEmailBroadcast"))
+                if (notify && "false" == GetSettings("DisabledEmailBroadcast"))
                 {
                     var cast = BroadcastBll.LoadEntities(c => c.Status == Status.Subscribed).ToList();
                     string link = Request.Url?.Scheme + "://" + Request.Url?.Authority + "/" + p.Id;
