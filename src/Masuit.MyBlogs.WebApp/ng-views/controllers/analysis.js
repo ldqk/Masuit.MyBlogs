@@ -342,18 +342,7 @@
 							type:'month',
 							count:3,
 							text:'3个月'
-						}, {
-							type:'month',
-							count:6,
-							text:'6个月'
-						}, {
-							type:'ytd',
-							text:'YTD'
-						}, {
-							type:'year',
-							count:1,
-							text:'1年'
-						}, {
+						},{
 							type:'all',
 							count:1,
 							text:"所有"

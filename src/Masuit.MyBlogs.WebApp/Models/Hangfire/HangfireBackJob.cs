@@ -74,7 +74,7 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
             }
             interview.ISP = interview.IP.GetISP();
             RedisHelper.ListRightPush($"Interview:{DateTime.Today:yyyy:MM:dd}", interview);
-            //CommonHelper.InterviewCount = InterviewBll.GetAll().Count(); //记录访问量
+            RedisHelper.Expire($"Interview:{DateTime.Today:yyyy:MM:dd}", TimeSpan.FromDays(30));
             RedisHelper.StringIncrement("Interview:ViewCount");
         }
 

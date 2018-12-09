@@ -938,6 +938,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             return ResultData(null, false, "版本不存在");
         }
 
+        [HttpPost]
+        public ActionResult Analyse(int id)
+        {
+            var list = PostBll.GetById(id).PostAccessRecord.OrderBy(r => r.AccessTime).GroupBy(r => r.AccessTime.Date).Select(r => new[] { r.Key.GetTotalMilliseconds(), r.Sum(p => p.ClickCount) }).ToList();
+            var high = list.OrderByDescending(n => n[1]).FirstOrDefault();
+            var average = list.Average(d => d[1]);
+            return ResultData(new { list, aver = average, high = high[1], highDate = DateTime.Parse("1970-01-01").AddMilliseconds(high[0]) });
+        }
         #endregion
     }
 }

@@ -1,4 +1,9 @@
-﻿<div>
+﻿<style>
+    .page-list {
+        display: flex;
+    }
+</style>
+<div>
     <div class="pull-left">
         <h4>
             文章密码：
@@ -86,6 +91,9 @@
             </td>
             <td title="'操作'" style="width: 185px;">
                 <div class="btn-group">
+                    <button class="btn btn-info btn-sm waves-effect" ng-click="list.analyse(row)">
+                        <i class="icon-chart"></i>
+                    </button>
                     <button class="btn btn-default btn-sm waves-effect" ng-click="list.pass(row)" ng-if="row.Status=='审核中'">
                         <i class="icon-checkmark"></i>
                     </button>
@@ -109,4 +117,33 @@
         </tr>
     </table>
     <tm-pagination conf="paginationConf"></tm-pagination>
+</div>
+<div id="modal" class="modal">
+    <div class="container-fluid m-t-10 m-b-10">
+        <div class="row m-l-30 m-r-30">
+            <div class="col-sm-4 col-md-2">
+                <div class="mini-charts-item bgm-cyan">
+                    <div class="clearfix">
+                        <div class="chart stats-bar" data-sparkline-bar></div>
+                        <div class="count">
+                            <small>历史最高({{postAnalyse.highDate|date:'yyyy-MM-dd'}})</small>
+                            <h2>{{postAnalyse.high}}次</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 col-md-2">
+                <div class="mini-charts-item bgm-amber">
+                    <div class="clearfix">
+                        <div class="chart stats-bar" data-sparkline-bar></div>
+                        <div class="count">
+                            <small>每日平均</small>
+                            <h2>{{postAnalyse.aver|number:2}}次</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="chart" style="height: 500px;"></div>
+    </div>
 </div>

@@ -176,6 +176,141 @@
 		}, 500);
 	}
 	$scope.loadingDone();
+
+	self.analyse= function(row) {
+		$http.post("/post/analyse", {
+				id:row.Id
+			}).then(function(res) {
+				var data = res.data.Data;
+				if(!res.data.Success) {
+					window.notie.alert({
+						type:3,
+						text:res.data.Message,
+						time:4
+					});
+					return;
+				}
+				$scope.postAnalyse=data;
+				layer.open({
+					type:1,
+					zIndex:20,
+					title:'文章《'+row.Title+'》访客数据可视化',
+					offset:window.screen.height * 0.1 + "px",
+					area:document.body.clientWidth * 0.7 + "px",
+					content:$("#modal"),
+					success:function(layero, index) {
+						$('#chart').highcharts('StockChart', {
+							credits:{
+								enabled:false
+							},
+							boost:{
+								useGPUTranslations:true
+							},
+							rangeSelector:{
+								buttons:[{
+									type:'day',
+									count:7,
+									text:'1周'
+								}, {
+									type:'day',
+									count:15,
+									text:'半个月'
+								}, {
+									type:'month',
+									count:1,
+									text:'1个月'
+								}, {
+									type:'month',
+									count:3,
+									text:'3个月'
+								},{
+									type:'all',
+									count:1,
+									text:"所有"
+								}],
+								selected:3,
+								inputEnabled:false
+							},
+							tooltip:{
+								dateTimeLabelFormats:{
+									millisecond:'%H:%M:%S.%L',
+									second:'%H:%M:%S',
+									minute:'%H:%M',
+									hour:'%H:%M',
+									day:'%Y-%m-%d',
+									week:'%m-%d',
+									month:'%Y-%m',
+									year:'%Y'
+								},
+								formatter:function() {
+									return '时间点：<b>' + Highcharts.dateFormat("%Y-%m-%d", this.points[0].x) + '</b><br/>' +
+											'<span style="color:' + Highcharts.getOptions().colors[0] + '">访问量：<b>' +
+											this.points[0].y+'次</b></span><br/>';
+								},
+								crosshairs:true,
+								shared:true
+							},
+							scrollbar:{
+								enabled:false
+							},
+							//title:{
+							//	text:'访客记录走势图'
+							//},
+							xAxis:{
+								type:'datetime',
+								dateTimeLabelFormats:{
+									millisecond:'%H:%M:%S.%L',
+									second:'%H:%M:%S',
+									minute:'%H:%M',
+									hour:'%H:%M',
+									day:'%m-%d',
+									week:'%m-%d',
+									month:'%Y-%m',
+									year:'%Y'
+								}
+							},
+							yAxis:[
+								{
+									title:{
+										text:'访问量'
+									},
+									min:0,
+									opposite:false
+								}
+							],
+							plotOptions:{
+								series:{
+									showInNavigator:true,
+									marker:{
+										enabled:false
+									}
+								}
+							},
+							series:[{
+								name:'访问量',
+								data:data.list,
+								type:'areaspline',
+								fillColor:{
+									linearGradient:{
+										x1:0,
+										y1:0,
+										x2:0,
+										y2:1
+									},
+									stops:[
+										[0, Highcharts.getOptions().colors[0]],
+										[1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+									]
+								}
+							}]
+						});
+					},
+					end:function() {
+						$("#modal").css("display", "none");
+					}
+				});
+		});
+	}
 }]);
 myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, $http, $timeout) {
 	window.hub.disconnect();

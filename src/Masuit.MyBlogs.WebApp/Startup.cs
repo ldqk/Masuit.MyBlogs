@@ -1,6 +1,4 @@
-﻿using System.Configuration;
-using System.Web;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Dashboard;
 using Masuit.MyBlogs.WebApp;
 using Masuit.MyBlogs.WebApp.Models;
@@ -9,6 +7,8 @@ using Microsoft.Owin;
 using Microsoft.Owin.Cors;
 using Models.DTO;
 using Owin;
+using System.Configuration;
+using System.Web;
 
 [assembly: OwinStartup(typeof(Startup))]
 

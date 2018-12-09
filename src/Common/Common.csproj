@@ -33,7 +33,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aspose.Words, Version=17.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Aspose.Words, Version=18.11.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libs\Aspose.Words.dll</HintPath>
     </Reference>
@@ -83,7 +83,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AggregatedCounter.cs" />
-    <Compile Include="AsposeLicense.cs" />
     <Compile Include="Assemblies.cs" />
     <Compile Include="CommonHelper.cs" />
     <Compile Include="DocumentConvert.cs" />
