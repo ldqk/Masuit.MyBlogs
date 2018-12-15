@@ -1,14 +1,15 @@
-﻿using System.Reflection;
-using System.Web.Mvc;
-using Autofac;
+﻿using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
-using Common;
+using BLL;
+using DAL;
 using Hangfire;
 using Masuit.MyBlogs.WebApp.Models.Hangfire;
 using Masuit.Tools.NoSQL;
 using Microsoft.AspNet.SignalR;
 using Models.Application;
+using System.Reflection;
+using System.Web.Mvc;
 using GlobalConfiguration = System.Web.Http.GlobalConfiguration;
 
 namespace Masuit.MyBlogs.WebApp
@@ -35,8 +36,8 @@ namespace Masuit.MyBlogs.WebApp
 
             //3.0 告诉autofac注册所有的Bll，创建类的实例，以该类的接口实现实例存储
             builder.RegisterType<DataContext>().OnRelease(db => db.Dispose()).InstancePerLifetimeScope();
-            builder.RegisterAssemblyTypes(Assemblies.RepositoryAssembly).AsSelf().AsImplementedInterfaces().PropertiesAutowired().InstancePerLifetimeScope();
-            builder.RegisterAssemblyTypes(Assemblies.ServiceAssembly).AsSelf().AsImplementedInterfaces().PropertiesAutowired().InstancePerLifetimeScope();
+            builder.RegisterAssemblyTypes(typeof(PostDal).Assembly).AsSelf().AsImplementedInterfaces().PropertiesAutowired().InstancePerLifetimeScope();
+            builder.RegisterAssemblyTypes(typeof(PostBll).Assembly).AsSelf().AsImplementedInterfaces().PropertiesAutowired().InstancePerLifetimeScope();
             builder.RegisterType<RedisHelper>().OnRelease(db => db.Dispose()).InstancePerLifetimeScope();
             builder.RegisterType<BackgroundJobClient>().SingleInstance();//指定生命周期为单例
             builder.RegisterType<HangfireBackJob>().As<IHangfireBackJob>().PropertiesAutowired(PropertyWiringOptions.PreserveSetValues).InstancePerDependency();

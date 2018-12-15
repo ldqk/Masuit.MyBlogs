@@ -199,37 +199,14 @@
 					area:document.body.clientWidth * 0.7 + "px",
 					content:$("#modal"),
 					success:function(layero, index) {
-						$('#chart').highcharts('StockChart', {
+						$('#chart').highcharts({chart: {
+								zoomType: 'x'
+							},
 							credits:{
 								enabled:false
 							},
 							boost:{
 								useGPUTranslations:true
-							},
-							rangeSelector:{
-								buttons:[{
-									type:'day',
-									count:7,
-									text:'1周'
-								}, {
-									type:'day',
-									count:15,
-									text:'半个月'
-								}, {
-									type:'month',
-									count:1,
-									text:'1个月'
-								}, {
-									type:'month',
-									count:3,
-									text:'3个月'
-								},{
-									type:'all',
-									count:1,
-									text:"所有"
-								}],
-								selected:3,
-								inputEnabled:false
 							},
 							tooltip:{
 								dateTimeLabelFormats:{
@@ -253,9 +230,12 @@
 							scrollbar:{
 								enabled:false
 							},
-							//title:{
-							//	text:'访客记录走势图'
-							//},
+							title:{
+								text:''
+							},
+							legend: {
+								enabled: false // 关闭图例
+							},
 							xAxis:{
 								type:'datetime',
 								dateTimeLabelFormats:{
@@ -264,7 +244,7 @@
 									minute:'%H:%M',
 									hour:'%H:%M',
 									day:'%m-%d',
-									week:'%m-%d',
+									week:'%Y-%m-%d',
 									month:'%Y-%m',
 									year:'%Y'
 								}

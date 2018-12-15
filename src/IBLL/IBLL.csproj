@@ -51,10 +51,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>IBaseBll.tt</DependentUpon>
     </Compile>
+    <Compile Include="ICategoryBll.cs" />
     <Compile Include="ICommentBll.cs" />
     <Compile Include="ILeaveMessageBll.cs" />
     <Compile Include="IMenuBll.cs" />
-    <Compile Include="IPostBll.cs" />
     <Compile Include="IUserInfoBll.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -69,10 +69,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Blls.tt</DependentUpon>
     </Compile>
+    <Compile Include="CategoryBll.cs" />
     <Compile Include="CommentBll.cs" />
     <Compile Include="LeaveMessageBll.cs" />
     <Compile Include="MenuBll.cs" />
-    <Compile Include="PostBll.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInfoBll.cs" />
   </ItemGroup>
@@ -84,10 +84,6 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{138F01FA-B23F-4ACA-93DB-D899BB244A1A}</Project>
       <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Factory\Factory.csproj">
-      <Project>{1363B3D8-457C-4A8C-BAD4-228BC9141A4C}</Project>
-      <Name>Factory</Name>
     </ProjectReference>
     <ProjectReference Include="..\IBLL\IBLL.csproj">
       <Project>{939493b4-a47c-43e2-99e3-92459cd0eb1e}</Project>

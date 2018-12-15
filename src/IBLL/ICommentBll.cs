@@ -1,5 +1,5 @@
-﻿using System.Data.Entity.Infrastructure;
-using Models.Entity;
+﻿using Models.Entity;
+using System.Data.Entity.Infrastructure;
 
 namespace IBLL
 {

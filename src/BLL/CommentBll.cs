@@ -1,8 +1,8 @@
-﻿using System.Data.Entity.Infrastructure;
-using System.Linq;
-using Masuit.Tools.Net;
+﻿using Masuit.Tools.Net;
 using Models.Application;
 using Models.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
 
 namespace BLL
 {

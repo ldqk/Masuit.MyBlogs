@@ -1264,6 +1264,89 @@
       <DependentUpon>tm.pagination.js</DependentUpon>
     </Content>
     <Content Include="Scripts\wow.js" />
+    <Content Include="static\api\css\imgshare.css" />
+    <Content Include="static\api\css\like.css" />
+    <Content Include="static\api\css\select_share.css" />
+    <Content Include="static\api\css\share_popup.css" />
+    <Content Include="static\api\css\share_style0_16.css" />
+    <Content Include="static\api\css\share_style0_24.css" />
+    <Content Include="static\api\css\share_style0_32.css" />
+    <Content Include="static\api\css\share_style1_16.css" />
+    <Content Include="static\api\css\share_style1_24.css" />
+    <Content Include="static\api\css\share_style1_32.css" />
+    <Content Include="static\api\css\share_style2.css" />
+    <Content Include="static\api\css\share_style2_16.css" />
+    <Content Include="static\api\css\share_style2_24.css" />
+    <Content Include="static\api\css\share_style2_32.css" />
+    <Content Include="static\api\css\share_style4.css" />
+    <Content Include="static\api\css\slide_share.css" />
+    <Content Include="static\api\css\weixin_popup.css" />
+    <Content Include="static\api\img\share\icons_0_16.png" />
+    <Content Include="static\api\img\share\icons_0_24.png" />
+    <Content Include="static\api\img\share\icons_0_32.png" />
+    <Content Include="static\api\img\share\icons_1_16.png" />
+    <Content Include="static\api\img\share\icons_1_24.png" />
+    <Content Include="static\api\img\share\icons_1_32.png" />
+    <Content Include="static\api\img\share\icons_2_16.png" />
+    <Content Include="static\api\img\share\icons_2_24.png" />
+    <Content Include="static\api\img\share\icons_2_32.png" />
+    <Content Include="static\api\img\share\l0.gif" />
+    <Content Include="static\api\img\share\l1.gif" />
+    <Content Include="static\api\img\share\l2.gif" />
+    <Content Include="static\api\img\share\l3.gif" />
+    <Content Include="static\api\img\share\l4.gif" />
+    <Content Include="static\api\img\share\l5.gif" />
+    <Content Include="static\api\img\share\l6.gif" />
+    <Content Include="static\api\img\share\l7.gif" />
+    <Content Include="static\api\img\share\l8.gif" />
+    <Content Include="static\api\img\share\pop_c.gif" />
+    <Content Include="static\api\img\share\r0.gif" />
+    <Content Include="static\api\img\share\r1.gif" />
+    <Content Include="static\api\img\share\r2.gif" />
+    <Content Include="static\api\img\share\r3.gif" />
+    <Content Include="static\api\img\share\r4.gif" />
+    <Content Include="static\api\img\share\r5.gif" />
+    <Content Include="static\api\img\share\r6.gif" />
+    <Content Include="static\api\img\share\r7.gif" />
+    <Content Include="static\api\img\share\r8.gif" />
+    <Content Include="static\api\img\share\sc.png" />
+    <Content Include="static\api\img\share\selectshare_close.png" />
+    <Content Include="static\api\img\share\share-search-icon.png" />
+    <Content Include="static\api\js\base\class.js" />
+    <Content Include="static\api\js\base\tangram.js" />
+    <Content Include="static\api\js\component\animate.js" />
+    <Content Include="static\api\js\component\anticheat.js" />
+    <Content Include="static\api\js\component\comm_tools.js" />
+    <Content Include="static\api\js\component\partners.js" />
+    <Content Include="static\api\js\component\pop_base.js" />
+    <Content Include="static\api\js\component\pop_dialog.js" />
+    <Content Include="static\api\js\component\pop_popup.js" />
+    <Content Include="static\api\js\component\pop_popup_slide.js" />
+    <Content Include="static\api\js\component\qrcode.js" />
+    <Content Include="static\api\js\conf\const.js" />
+    <Content Include="static\api\js\conf\define.js" />
+    <Content Include="static\api\js\share.js" />
+    <Content Include="static\api\js\share\api_base.js" />
+    <Content Include="static\api\js\share\combine_api.js" />
+    <Content Include="static\api\js\share\image_api.js" />
+    <Content Include="static\api\js\share\likeshare.js" />
+    <Content Include="static\api\js\share\like_api.js" />
+    <Content Include="static\api\js\share\select_api.js" />
+    <Content Include="static\api\js\share\share_api.js" />
+    <Content Include="static\api\js\share\slide_api.js" />
+    <Content Include="static\api\js\start\router.js" />
+    <Content Include="static\api\js\trans\data.js" />
+    <Content Include="static\api\js\trans\logger.js" />
+    <Content Include="static\api\js\trans\trans.js" />
+    <Content Include="static\api\js\trans\trans_bdxc.js" />
+    <Content Include="static\api\js\trans\trans_bdysc.js" />
+    <Content Include="static\api\js\trans\trans_weixin.js" />
+    <Content Include="static\api\js\view\image_view.js" />
+    <Content Include="static\api\js\view\like_view.js" />
+    <Content Include="static\api\js\view\select_view.js" />
+    <Content Include="static\api\js\view\share_view.js" />
+    <Content Include="static\api\js\view\slide_view.js" />
+    <Content Include="static\api\js\view\view_base.js" />
     <Content Include="template\broadcast.html" />
     <Content Include="template\bugfeed.html" />
     <Content Include="template\bugreport.html" />
@@ -1440,10 +1523,6 @@
     <ProjectReference Include="..\DAL\DAL.csproj">
       <Project>{f1a452f8-2757-4130-aecd-4cdcb675419f}</Project>
       <Name>DAL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Factory\Factory.csproj">
-      <Project>{1363b3d8-457c-4a8c-bad4-228bc9141a4c}</Project>
-      <Name>Factory</Name>
     </ProjectReference>
     <ProjectReference Include="..\IBLL\IBLL.csproj">
       <Project>{939493b4-a47c-43e2-99e3-92459cd0eb1e}</Project>

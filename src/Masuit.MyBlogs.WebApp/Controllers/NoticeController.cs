@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web.Mvc;
-using Common;
+﻿using Common;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
 using Masuit.Tools;
@@ -13,6 +7,12 @@ using Masuit.Tools.Net;
 using Models.DTO;
 using Models.Entity;
 using Models.Enum;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web.Mvc;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -80,16 +80,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 return ResultData(null, false, "公告已经被删除！");
             }
 
-            var mc = post.Content.MatchImgTags();
-            foreach (Match m in mc)
+            var srcs = post.Content.MatchImgSrcs();
+            foreach (var path in srcs)
             {
-                string path = m.Groups[3].Value;
                 if (path.StartsWith("/"))
                 {
-                    path = Path.Combine(Server.MapPath("/"), path);
                     try
                     {
-                        System.IO.File.Delete(path);
+                        System.IO.File.Delete(Path.Combine(Server.MapPath("/"), path));
                     }
                     catch
                     {

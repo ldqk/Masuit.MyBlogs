@@ -1,4 +1,5 @@
 ﻿using Common;
+using Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
@@ -101,13 +102,13 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             try
             {
                 data.SaveDataUriAsImageFile().Save(Server.MapPath(path), System.Drawing.Imaging.ImageFormat.Jpeg);
-                //var (url, success) = CommonHelper.UploadImage(path);
-                //BackgroundJob.Enqueue(() => System.IO.File.Delete(path));
-                //if (success)
-                //{
-                return ResultData(path);
-                //}
-                //return ResultData(null, false, "图片上传失败！");
+                var (url, success) = CommonHelper.UploadImage(path);
+                BackgroundJob.Enqueue(() => System.IO.File.Delete(path));
+                if (success)
+                {
+                    return ResultData(path);
+                }
+                return ResultData(null, false, "图片上传失败！");
             }
             catch (Exception e)
             {

@@ -86,7 +86,7 @@ namespace Masuit.MyBlogs.WebApp
                     DELETE FROM [HangFire].[AggregatedCounter] WHERE ExpireAt is not null;
                     UPDATE [HangFire].[AggregatedCounter] SET [Value] = (select count(1) from [HangFire].[Job] WHERE StateName<>'Succeeded' and StateName<>'Deleted')-1 WHERE [Key] = 'stats:succeeded'; 
                     UPDATE [HangFire].[AggregatedCounter] SET [Value] = 0 WHERE [Key] = 'stats:deleted'");
-                DateTime time = DateTime.Now.AddMonths(2);
+                DateTime time = DateTime.Now.AddMonths(-2);
                 db.SearchDetails.Where(s => s.SearchTime < time).DeleteFromQuery();
             }
         }

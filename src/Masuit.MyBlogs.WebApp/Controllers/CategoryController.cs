@@ -1,20 +1,22 @@
-﻿using System.Linq;
-using System.Web.Mvc;
-using Common;
+﻿using Common;
 using IBLL;
 using Models.DTO;
 using Models.Entity;
 using Models.Enum;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
     public class CategoryController : BaseController
     {
         public ICategoryBll CategoryBll { get; set; }
+        private IPostBll _postBll;
 
-        public CategoryController(ICategoryBll categoryBll)
+        public CategoryController(ICategoryBll categoryBll, IPostBll postBll)
         {
             CategoryBll = categoryBll;
+            _postBll = postBll;
         }
 
         public ActionResult GetCategories()
@@ -61,14 +63,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
 
         public ActionResult Delete(int id, int cid = 1)
         {
-            Category category = CategoryBll.GetById(id);
-            Category moveCat = CategoryBll.GetById(cid);
-            category.Post.ForEach(p =>
-            {
-                moveCat.Post.Add(p);
-            });
-            CategoryBll.UpdateEntity(moveCat);
-            bool b = CategoryBll.DeleteByIdSaved(id);
+            bool b = CategoryBll.Delete(id, cid);
             return ResultData(null, b, b ? "分类删除成功" : "分类删除失败");
         }
     }

@@ -92,7 +92,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     {
                         emails.Add(PostBll.GetById(com.PostId).Email);
                         //新评论，只通知博主和楼主
-                        foreach (var s in emails)
+                        foreach (var s in emails.Distinct())
                         {
                             BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new
                             {
@@ -122,7 +122,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
 #endif
                     return ResultData(null, true, "评论发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将显示到评论列表中");
                 }
-                foreach (var s in emails)
+                foreach (var s in emails.Distinct())
                 {
 
                     BackgroundJob.Enqueue(() => SendMail(Request.Url.Authority + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new

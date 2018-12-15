@@ -446,16 +446,14 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 }
             }
 
-            var mc = post.Content.MatchImgTags();
-            foreach (Match m in mc)
+            var srcs = post.Content.MatchImgSrcs();
+            foreach (var path in srcs)
             {
-                string path = m.Groups[3].Value;
                 if (path.StartsWith("/"))
                 {
-                    path = Path.Combine(Server.MapPath("/"), path);
                     try
                     {
-                        System.IO.File.Delete(path);
+                        System.IO.File.Delete(Path.Combine(Server.MapPath("/"), path));
                     }
                     catch (IOException)
                     {

@@ -318,37 +318,20 @@
 						series:drilldown
 					}
 				});
-				$('#alldata').highcharts('StockChart', {
+				$('#alldata').highcharts({
+					chart: {
+						zoomType: 'x'
+					},
+					subtitle: {
+						text: document.ontouchstart === undefined ?
+						'鼠标拖动可以进行缩放' : '手势操作进行缩放'
+					},
+
 					credits:{
 						enabled:false
 					},
 					boost:{
 						useGPUTranslations:true
-					},
-					rangeSelector:{
-						buttons:[{
-							type:'day',
-							count:7,
-							text:'1周'
-						}, {
-							type:'day',
-							count:15,
-							text:'半个月'
-						}, {
-							type:'month',
-							count:1,
-							text:'1个月'
-						}, {
-							type:'month',
-							count:3,
-							text:'3个月'
-						},{
-							type:'all',
-							count:1,
-							text:"所有"
-						}],
-						selected:2,
-						inputEnabled:false
 					},
 					tooltip:{
 						dateTimeLabelFormats:{

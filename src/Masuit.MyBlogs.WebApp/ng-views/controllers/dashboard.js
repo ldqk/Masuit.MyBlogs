@@ -107,8 +107,13 @@
 		}
 	}
 	$.post("/system/GetHistoryList", null, function(data) {
-		$('#cpu').highcharts('StockChart', {
+		$('#cpu').highcharts({
+			subtitle: {
+				text: document.ontouchstart === undefined ?
+				'鼠标拖动可以进行缩放' : '手势操作进行缩放'
+			},
 			chart: {
+				zoomType: 'x',
 				backgroundColor: 'transparent',
 				animation: Highcharts.svg,
 				events: {
@@ -148,43 +153,6 @@
 				floating: true,
 				x: -50,
 				y: 0
-			},
-			rangeSelector: {
-				buttons: [{
-					type: 'minute',
-					count: 5,
-					text: '5分钟'
-				}, {
-					type: 'minute',
-					count: 15,
-					text: '15分钟'
-				}, {
-					type: 'minute',
-					count: 30,
-					text: '半小时'
-				}, {
-					type: 'hour',
-					count: 1,
-					text: '1小时'
-				}, {
-					type: 'hour',
-					count: 3,
-					text: '3小时'
-				}, {
-					type: 'hour',
-					count: 6,
-					text: '6小时'
-				}, {
-					type: 'hour',
-					count: 12,
-					text: '12小时'
-				}, {
-					type: 'all',
-					count: 1,
-					text: "所有"
-				}],
-				selected: 1,
-				inputEnabled: false
 			},
 			title: {
 				text: '资源使用率'
@@ -287,8 +255,13 @@
 				},
 			}]
 		});
-		$('#io').highcharts('StockChart', {
+		$('#io').highcharts({
+			subtitle: {
+				text: document.ontouchstart === undefined ?
+				'鼠标拖动可以进行缩放' : '手势操作进行缩放'
+			},
 			chart: {
+				zoomType: 'x',
 				backgroundColor: 'transparent',
 				animation: Highcharts.svg,
 				events: {
@@ -330,43 +303,6 @@
 				floating: true,
 				x: -50,
 				y: 0
-			},
-			rangeSelector: {
-				buttons: [{
-					type: 'minute',
-					count: 5,
-					text: '5分钟'
-				}, {
-					type: 'minute',
-					count: 15,
-					text: '15分钟'
-				}, {
-					type: 'minute',
-					count: 30,
-					text: '半小时'
-				}, {
-					type: 'hour',
-					count: 1,
-					text: '1小时'
-				}, {
-					type: 'hour',
-					count: 3,
-					text: '3小时'
-				}, {
-					type: 'hour',
-					count: 6,
-					text: '6小时'
-				}, {
-					type: 'hour',
-					count: 12,
-					text: '12小时'
-				}, {
-					type: 'all',
-					count: 1,
-					text: "所有"
-				}],
-				selected: 1,
-				inputEnabled: false
 			},
 			title: {
 				text: '网络状态 和 磁盘I/O'
