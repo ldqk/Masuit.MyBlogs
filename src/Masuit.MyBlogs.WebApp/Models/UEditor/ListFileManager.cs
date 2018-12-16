@@ -20,55 +20,52 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
             PathNotFound
         }
 
-        private int Start;
-        private int Size;
-        private int Total;
-        private ResultState State;
-        private String PathToList;
-        private String[] FileList;
-        private String[] SearchExtensions;
+        private int _start;
+        private int _size;
+        private int _total;
+        private ResultState _state;
+        private readonly string _pathToList;
+        private string[] _fileList;
+        private readonly string[] _searchExtensions;
 
-        public ListFileManager(HttpContext context, string pathToList, string[] searchExtensions)
-            : base(context)
+        public ListFileManager(HttpContext context, string pathToList, string[] searchExtensions) : base(context)
         {
-            this.SearchExtensions = searchExtensions.Select(x => x.ToLower()).ToArray();
-            this.PathToList = pathToList;
+            _searchExtensions = searchExtensions.Select(x => x.ToLower()).ToArray();
+            _pathToList = pathToList;
         }
 
         public override void Process()
         {
             try
             {
-                Start = String.IsNullOrEmpty(Request["start"]) ? 0 : Convert.ToInt32(Request["start"]);
-                Size = String.IsNullOrEmpty(Request["size"]) ? Config.GetInt("imageManagerListSize") : Convert.ToInt32(Request["size"]);
+                _start = string.IsNullOrEmpty(Request["start"]) ? 0 : Convert.ToInt32(Request["start"]);
+                _size = string.IsNullOrEmpty(Request["size"]) ? UeditorConfig.GetInt("imageManagerListSize") : Convert.ToInt32(Request["size"]);
             }
             catch (FormatException)
             {
-                State = ResultState.InvalidParam;
+                _state = ResultState.InvalidParam;
                 WriteResult();
                 return;
             }
-            var buildingList = new List<String>();
+            var buildingList = new List<string>();
             try
             {
-                var localPath = Server.MapPath(PathToList);
-                buildingList.AddRange(Directory.GetFiles(localPath, "*", SearchOption.AllDirectories)
-                    .Where(x => SearchExtensions.Contains(Path.GetExtension(x).ToLower()))
-                    .Select(x => PathToList + x.Substring(localPath.Length).Replace("\\", "/")));
-                Total = buildingList.Count;
-                FileList = buildingList.OrderBy(x => x).Skip(Start).Take(Size).ToArray();
+                var localPath = Server.MapPath(_pathToList);
+                buildingList.AddRange(Directory.GetFiles(localPath, "*", SearchOption.AllDirectories).Where(x => _searchExtensions.Contains(Path.GetExtension(x).ToLower())).Select(x => _pathToList + x.Substring(localPath.Length).Replace("\\", "/")));
+                _total = buildingList.Count;
+                _fileList = buildingList.OrderBy(x => x).Skip(_start).Take(_size).ToArray();
             }
             catch (UnauthorizedAccessException)
             {
-                State = ResultState.AuthorizError;
+                _state = ResultState.AuthorizError;
             }
             catch (DirectoryNotFoundException)
             {
-                State = ResultState.PathNotFound;
+                _state = ResultState.PathNotFound;
             }
             catch (IOException)
             {
-                State = ResultState.IOError;
+                _state = ResultState.IOError;
             }
             finally
             {
@@ -81,16 +78,19 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
             WriteJson(new
             {
                 state = GetStateString(),
-                list = FileList?.Select(x => new { url = x }),
-                start = Start,
-                size = Size,
-                total = Total
+                list = _fileList?.Select(x => new
+                {
+                    url = x
+                }),
+                start = _start,
+                size = _size,
+                total = _total
             });
         }
 
         private string GetStateString()
         {
-            switch (State)
+            switch (_state)
             {
                 case ResultState.Success:
                     return "SUCCESS";

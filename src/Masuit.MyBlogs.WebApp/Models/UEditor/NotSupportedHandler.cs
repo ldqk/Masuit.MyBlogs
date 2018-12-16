@@ -7,8 +7,7 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
     /// </summary>
     public class NotSupportedHandler : Handler
     {
-        public NotSupportedHandler(HttpContext context)
-            : base(context)
+        public NotSupportedHandler(HttpContext context) : base(context)
         {
         }
 

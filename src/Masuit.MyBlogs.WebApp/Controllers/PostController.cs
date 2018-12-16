@@ -552,6 +552,9 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 case OrderBy.VoteCount:
                     temp = order.ThenByDescending(p => p.VoteUpCount);
                     break;
+                case OrderBy.AverageViewCount:
+                    temp = order.ThenByDescending(p => p.PostAccessRecord.Average(r => r.ClickCount));
+                    break;
                 default:
                     temp = order.ThenByDescending(p => p.ModifyDate);
                     break;

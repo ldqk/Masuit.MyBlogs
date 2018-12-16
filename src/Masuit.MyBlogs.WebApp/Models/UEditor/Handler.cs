@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Web;
-using Newtonsoft.Json;
 
 namespace Masuit.MyBlogs.WebApp.Models.UEditor
 {
@@ -9,7 +9,7 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
     /// </summary>
     public abstract class Handler
     {
-        public Handler(HttpContext context)
+        protected Handler(HttpContext context)
         {
             this.Request = context.Request;
             this.Response = context.Response;
@@ -31,7 +31,7 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
             else
             {
                 Response.AddHeader("Content-Type", "application/javascript");
-                Response.Write(String.Format("{0}({1});", jsonpCallback, json));
+                Response.Write($"{jsonpCallback}({json});");
             }
             Response.End();
         }

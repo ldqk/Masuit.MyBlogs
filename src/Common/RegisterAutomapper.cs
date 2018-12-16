@@ -84,7 +84,7 @@ namespace Common
                 m.CreateMap<Post, PostInputDto>();
                 m.CreateMap<Post, PostHistoryVersion>().ForMember(v => v.PostId, e => e.MapFrom(p => p.Id));
                 m.CreateMap<PostInputDto, Post>();
-                m.CreateMap<Post, PostOutputDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ForMember(p => p.ViewCount, e => e.MapFrom(p => p.PostAccessRecord.Any() ? p.PostAccessRecord.Sum(r => r.ClickCount) : 1));
+                m.CreateMap<Post, PostOutputDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ForMember(p => p.ViewCount, e => e.MapFrom(p => p.PostAccessRecord.Any() ? p.PostAccessRecord.Sum(r => r.ClickCount) : 0)).ForMember(p => p.AverageViewCount, e => e.MapFrom(p => p.PostAccessRecord.Any() ? p.PostAccessRecord.Average(r => r.ClickCount) : 0));
                 m.CreateMap<PostOutputDto, Post>();
                 m.CreateMap<PostInputDto, PostOutputDto>();
                 m.CreateMap<PostHistoryVersion, PostOutputDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name));

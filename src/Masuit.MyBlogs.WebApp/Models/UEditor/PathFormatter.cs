@@ -23,7 +23,7 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
             string filename = Path.GetFileNameWithoutExtension(originFileName);
 
             pathFormat = pathFormat.Replace("{filename}", filename);
-            pathFormat = new Regex(@"\{rand(\:?)(\d+)\}", RegexOptions.Compiled).Replace(pathFormat, new MatchEvaluator(match =>
+            pathFormat = new Regex(@"\{rand(\:?)(\d+)\}", RegexOptions.Compiled).Replace(pathFormat, match =>
             {
                 var digit = 6;
                 if (match.Groups.Count > 2)
@@ -32,7 +32,7 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
                 }
                 var rand = new Random();
                 return rand.Next((int)Math.Pow(10, digit), (int)Math.Pow(10, digit + 1)).ToString();
-            }));
+            });
 
             pathFormat = pathFormat.Replace("{time}", DateTime.Now.Ticks.ToString());
             pathFormat = pathFormat.Replace("{yyyy}", DateTime.Now.Year.ToString());

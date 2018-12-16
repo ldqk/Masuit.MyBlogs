@@ -13,17 +13,19 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
         public UploadConfig UploadConfig { get; }
         public UploadResult Result { get; }
 
-        public UploadHandler(HttpContext context, UploadConfig config)
-            : base(context)
+        public UploadHandler(HttpContext context, UploadConfig config) : base(context)
         {
-            this.UploadConfig = config;
-            this.Result = new UploadResult() { State = UploadState.Unknown };
+            UploadConfig = config;
+            Result = new UploadResult()
+            {
+                State = UploadState.Unknown
+            };
         }
 
         public override void Process()
         {
-            byte[] uploadFileBytes = null;
-            string uploadFileName = null;
+            byte[] uploadFileBytes;
+            string uploadFileName;
 
             if (UploadConfig.Base64)
             {
@@ -103,7 +105,7 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
 
         private void WriteResult()
         {
-            this.WriteJson(new
+            WriteJson(new
             {
                 state = GetStateMessage(Result.State),
                 url = Result.Url,

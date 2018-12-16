@@ -11,9 +11,9 @@ using Models.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using EntityFramework.Caching;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -109,6 +109,9 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 case OrderBy.VoteCount:
                     posts = temp.ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).ToList();
                     break;
+                case OrderBy.AverageViewCount:
+                    posts = temp.ThenByDescending(p => p.AverageViewCount).Skip(size * (page - 1)).Take(size).ToList();
+                    break;
                 default:
                     posts = temp.ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();
                     break;
@@ -151,6 +154,9 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 case OrderBy.VoteCount:
                     posts = posts.ThenByDescending(p => p.VoteUpCount);
                     break;
+                case OrderBy.AverageViewCount:
+                    posts = posts.ThenByDescending(p => p.PostAccessRecord.Average(r => r.ClickCount));
+                    break;
                 default:
                     posts = posts.ThenByDescending(p => p.ModifyDate);
                     break;
@@ -181,7 +187,20 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 KeyWords = g.FirstOrDefault().KeyWords,
                 SearchCount = g.Count()
             }).Cacheable().ToList(); //热词统计
-            var hot6Post = (new Random().Next() % 2 == 0 ? postList.OrderByDescending(p => p.ViewCount) : postList.OrderByDescending(p => p.VoteUpCount)).Skip(0).Take(5).Cacheable().ToList(); //热门文章
+            Expression<Func<PostOutputDto, double>> order = p => p.ViewCount;
+            switch (new Random().Next() % 3)
+            {
+                case 0:
+                    order = p => p.ViewCount;
+                    break;
+                case 1:
+                    order = p => p.VoteUpCount;
+                    break;
+                case 2:
+                    order = p => p.AverageViewCount;
+                    break;
+            }
+            var hot6Post = postList.OrderByDescending(order).Skip(0).Take(5).Cacheable().ToList(); //热门文章
             var topPostWeek = PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(week,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章周排行
             var topPostMonth = PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(month,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章月排行
             var topPostYear = PostBll.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(year,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章年度排行
@@ -222,6 +241,9 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     break;
                 case OrderBy.VoteCount:
                     posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).ToList();
+                    break;
+                case OrderBy.AverageViewCount:
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.AverageViewCount).Skip(size * (page - 1)).Take(size).ToList();
                     break;
                 default:
                     posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();

@@ -1,9 +1,13 @@
 ﻿using Common;
 using Hangfire;
+using Masuit.MyBlogs.WebApp.Models;
+using Masuit.MyBlogs.WebApp.Models.UEditor;
 using Masuit.Tools;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Media;
+using Masuit.Tools.Net;
+using Models.DTO;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -130,6 +134,79 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 return File(System.IO.File.OpenRead(file), "application/octet-stream", Path.GetFileName(file));
             }
             return Content("null");
+        }
+
+        /// <summary>
+        /// UEditor文件上传处理
+        /// </summary>
+        /// <returns></returns>
+        [Route("fileuploader")]
+        public ActionResult UeditorFileUploader()
+        {
+            UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            var context = System.Web.HttpContext.Current;
+            Handler action = new NotSupportedHandler(context);
+            switch (Request["action"])//通用
+            {
+                case "config":
+                    action = new ConfigHandler(context);
+                    break;
+                case "uploadimage":
+                    action = new UploadHandler(context, new UploadConfig()
+                    {
+                        AllowExtensions = UeditorConfig.GetStringList("imageAllowFiles"),
+                        PathFormat = UeditorConfig.GetString("imagePathFormat"),
+                        SizeLimit = UeditorConfig.GetInt("imageMaxSize"),
+                        UploadFieldName = UeditorConfig.GetString("imageFieldName")
+                    });
+                    break;
+                case "uploadscrawl":
+                    action = new UploadHandler(context, new UploadConfig()
+                    {
+                        AllowExtensions = new[] { ".png" },
+                        PathFormat = UeditorConfig.GetString("scrawlPathFormat"),
+                        SizeLimit = UeditorConfig.GetInt("scrawlMaxSize"),
+                        UploadFieldName = UeditorConfig.GetString("scrawlFieldName"),
+                        Base64 = true,
+                        Base64Filename = "scrawl.png"
+                    });
+                    break;
+                case "catchimage":
+                    action = new CrawlerHandler(context);
+                    break;
+            }
+            if (user.IsAdmin)
+            {
+                switch (Request["action"])//管理员用
+                {
+                    //case "uploadvideo":
+                    //    action = new UploadHandler(context, new UploadConfig()
+                    //    {
+                    //        AllowExtensions = UeditorConfig.GetStringList("videoAllowFiles"),
+                    //        PathFormat = UeditorConfig.GetString("videoPathFormat"),
+                    //        SizeLimit = UeditorConfig.GetInt("videoMaxSize"),
+                    //        UploadFieldName = UeditorConfig.GetString("videoFieldName")
+                    //    });
+                    //    break;
+                    case "uploadfile":
+                        action = new UploadHandler(context, new UploadConfig()
+                        {
+                            AllowExtensions = UeditorConfig.GetStringList("fileAllowFiles"),
+                            PathFormat = UeditorConfig.GetString("filePathFormat"),
+                            SizeLimit = UeditorConfig.GetInt("fileMaxSize"),
+                            UploadFieldName = UeditorConfig.GetString("fileFieldName")
+                        });
+                        break;
+                        //case "listimage":
+                        //    action = new ListFileManager(context, UeditorConfig.GetString("imageManagerListPath"), UeditorConfig.GetStringList("imageManagerAllowFiles"));
+                        //    break;
+                        //case "listfile":
+                        //    action = new ListFileManager(context, UeditorConfig.GetString("fileManagerListPath"), UeditorConfig.GetStringList("fileManagerAllowFiles"));
+                        //    break;
+                }
+            }
+            action.Process();
+            return Content("");
         }
     }
 }

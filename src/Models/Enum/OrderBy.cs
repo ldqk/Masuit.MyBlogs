@@ -29,5 +29,10 @@
         /// 按投票数
         /// </summary>
         VoteCount,
+
+        /// <summary>
+        /// 每日平均访问量
+        /// </summary>
+        AverageViewCount,
     }
 }

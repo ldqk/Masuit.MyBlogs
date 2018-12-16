@@ -13,7 +13,7 @@ namespace Masuit.MyBlogs.WebApp.Models.UEditor
 
         public override void Process()
         {
-            WriteJson(Config.Items);
+            WriteJson(UeditorConfig.Items);
         }
     }
 }

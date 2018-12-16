@@ -251,8 +251,8 @@
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Z.EntityFramework.Extensions, Version=3.16.15.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Z.EntityFramework.Extensions.3.16.15\lib\net45\Z.EntityFramework.Extensions.dll</HintPath>
+    <Reference Include="Z.EntityFramework.Extensions, Version=3.16.16.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z.EntityFramework.Extensions.3.16.16\lib\net45\Z.EntityFramework.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Z.ExtensionMethods, Version=2.1.0.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
       <HintPath>..\packages\Z.ExtensionMethods.2.1.0\lib\net45\Z.ExtensionMethods.dll</HintPath>
@@ -1167,11 +1167,6 @@
     <Content Include="App_Data\config.json" />
     <Content Include="Dict\Dict.dct" />
     <None Include="bundleconfig.json" />
-    <None Include="compilerconfig.json" />
-    <None Include="compilerconfig.json.defaults">
-      <DependentUpon>compilerconfig.json</DependentUpon>
-    </None>
-    <Content Include="fileuploader.ashx" />
     <Content Include="fonts\icomoon.eot" />
     <Content Include="fonts\icomoon.ttf" />
     <Content Include="fonts\icomoon.woff" />
@@ -1364,7 +1359,6 @@
     <Content Include="Views\Error\ServiceUnavailable.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Post\Publish.cshtml" />
-    <Content Include="upload.ashx" />
     <Content Include="Views\Shared\_Pagination.cshtml" />
     <Content Include="Views\Post\Details.cshtml" />
     <Content Include="Views\Msg\Index.cshtml" />
@@ -1466,9 +1460,6 @@
     <Compile Include="Controllers\ToolsController.cs" />
     <Compile Include="Controllers\UploadController.cs" />
     <Compile Include="Controllers\UserController.cs" />
-    <Compile Include="fileuploader.ashx.cs">
-      <DependentUpon>fileuploader.ashx</DependentUpon>
-    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -1488,7 +1479,7 @@
     <Compile Include="Models\RssResult.cs" />
     <Compile Include="Models\SessionKey.cs" />
     <Compile Include="Models\TagCloudViewModel.cs" />
-    <Compile Include="Models\UEditor\Config.cs" />
+    <Compile Include="Models\UEditor\UeditorConfig.cs" />
     <Compile Include="Models\UEditor\ConfigHandler.cs" />
     <Compile Include="Models\UEditor\CrawlerHandler.cs" />
     <Compile Include="Models\UEditor\Handler.cs" />
@@ -1499,9 +1490,6 @@
     <Compile Include="Models\WebApiExceptionFilterAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="upload.ashx.cs">
-      <DependentUpon>upload.ashx</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

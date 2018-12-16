@@ -122,5 +122,11 @@ namespace Models.DTO
         /// 所属专题名
         /// </summary>
         public string Seminars { get; set; }
+
+        /// <summary>
+        /// 每日平均访问量
+        /// </summary>
+        public double AverageViewCount { get; set; }
+
     }
 }
