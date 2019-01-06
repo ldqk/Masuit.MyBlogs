@@ -1,5 +1,4 @@
 ﻿using Common;
-using ICSharpCode.SharpZipLib.Zip;
 using Masuit.MyBlogs.WebApp.Models;
 using Masuit.Tools.Files;
 using Masuit.Tools.Logging;
@@ -189,44 +188,8 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     break;
                 case "compress":
                     string filename = Path.Combine(string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(req.Destination) : prefix + req.Destination, Path.GetFileNameWithoutExtension(req.CompressedFilename) + ".zip");
-                    using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                    {
-                        List<string> items = req.Items;
-                        MemoryStream ms = new MemoryStream();
-                        byte[] buffer;
-                        using (ZipFile f = ZipFile.Create(ms))
-                        {
-                            f.BeginUpdate();
-                            string dirname = null;
-                            items.ForEach(s =>
-                            {
-                                s = string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(s) : prefix + s;
-                                if (Directory.Exists(s))
-                                {
-                                    GetFilesRecurs(s);
-                                }
-                                else
-                                {
-                                    FileList.Add(s);
-                                    dirname = Path.GetDirectoryName(s);
-                                }
-                            });
-                            if (string.IsNullOrEmpty(dirname))
-                            {
-                                dirname = Directory.GetParent(FileList[0]).FullName;
-                            }
-                            f.NameTransform = new ZipNameTransform(dirname); //通过这个名称格式化器，可以将里面的文件名进行一些处理。默认情况下，会自动根据文件的路径在zip中创建有关的文件夹。  
-                            FileList.ForEach(s =>
-                            {
-                                f.Add(s);
-                            });
-                            f.CommitUpdate();
-                            buffer = new byte[ms.Length];
-                            ms.Position = 0;
-                            ms.Read(buffer, 0, buffer.Length);
-                        }
-                        fs.Write(buffer, 0, buffer.Length);
-                    }
+                    SevenZipCompressor.Zip(req.Items.Select(s => string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(s) : prefix + s).ToList(), filename);
+
                     list.Add(new
                     {
                         success = "true"
@@ -274,62 +237,10 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     }
                     break;
                 case "downloadMultiple":
-                    MemoryStream ms = new MemoryStream();
-                    byte[] buffer;
-                    using (ZipFile f = ZipFile.Create(ms))
-                    {
-                        f.BeginUpdate();
-                        string dirname = null;
-                        items.ForEach(s =>
-                        {
-                            s = string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(s) : prefix + s;
-                            if (Directory.Exists(s))
-                            {
-                                GetFilesRecurs(s);
-                            }
-                            else
-                            {
-                                FileList.Add(s);
-                                dirname = Path.GetDirectoryName(s);
-                            }
-                        });
-                        if (string.IsNullOrEmpty(dirname))
-                        {
-                            dirname = Directory.GetParent(FileList[0]).FullName;
-                        }
-                        f.NameTransform = new ZipNameTransform(dirname); //通过这个名称格式化器，可以将里面的文件名进行一些处理。默认情况下，会自动根据文件的路径在zip中创建有关的文件夹。  
-                        FileList.ForEach(s =>
-                        {
-                            f.Add(s);
-                        });
-                        f.CommitUpdate();
-                        //buffer = new byte[ms.Length];
-                        ms.Position = 0;
-                        buffer = ms.GetBuffer(); //.Read(buffer, 0, buffer.Length);
-                    }
+                    byte[] buffer = SevenZipCompressor.ZipStream(items.Select(s => string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(s) : prefix + s).ToList()).ToArray();
                     return File(buffer, "application/octet-stream", Path.GetFileName(toFilename));
             }
             return Content("null");
-        }
-
-        /// <summary>
-        /// 递归目标文件夹中的所有文件和文件夹
-        /// </summary>
-        /// <param name="path"></param>
-        private void GetFilesRecurs(string path)
-        {
-            //Console.WriteLine("文件夹" + path);
-            //遍历目标文件夹的所有文件
-            foreach (string fileName in Directory.GetFiles(path))
-            {
-                FileList.Add(fileName);
-            }
-
-            //遍历目标文件夹的所有文件夹
-            foreach (string directory in Directory.GetDirectories(path))
-            {
-                GetFilesRecurs(directory);
-            }
         }
     }
 }
