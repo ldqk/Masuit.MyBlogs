@@ -60,7 +60,7 @@
             <div class="media-body">
                 <article class="panel" ng-class="{true:'panel-success',false:'panel-danger'}[item.Status=='已处理']">
                     <header class="panel-heading">
-                        {{item.Name}}({{item.Email}})提交问题：{{item.Title}}【级别：{{item.Level}}】
+                        {{item.Name}}提交问题：{{item.Title}}【级别：{{item.Level}}】
                         <a ng-href="/bug/{{item.Id}}" class="label" ng-class="{true:'label-success',false:'label-danger'}[item.Status=='已处理']">查看详情</a>
                         <a class="label label-success" ng-if="user.IsAdmin&&item.Status=='待处理'" ng-click="handle(item.Id)">处理完成</a>
                         <a class="label label-info" ng-if="user.IsAdmin" ng-click="delete(item.Id)">删除</a>

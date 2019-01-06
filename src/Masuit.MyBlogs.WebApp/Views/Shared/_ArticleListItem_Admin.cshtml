@@ -47,7 +47,7 @@
             <div class="col-sm-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
                 <div class="small padding-bot10">
                     作者：<i class="icon-user-check"></i><strong class="label label-primary">@Model.Author</strong> <span class="text-muted">|
-                        发表时间：<i class="fa fa-clock-o"></i> @Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss") |
+                        发表时间：<i class="fa fa-clock-o"></i> @Model.ModifyDate.ToString("yyyy-MM-dd HH:mm") |
                         分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.CategoryName,"Category","Home",new{id=Model.CategoryId},null)
                     </span>
                 </div>
@@ -72,7 +72,6 @@
                     <i class="fa fa-comments-o"></i>@Model.Comment.Count 评论 |
                     <i class="fa fa-eye"></i>@Model.ViewCount 浏览 |
                     <i class="icon-thumbsup"></i>@Model.VoteUpCount 支持 |
-                    <i class="icon-thumbsdown"></i>@Model.VoteDownCount 反对 |
                     <span class="text-danger"><i class="icon-recycle"></i>状态：@Model.Status.GetDisplay()</span>
                 </div>
             </div>

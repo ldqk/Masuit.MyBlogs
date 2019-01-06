@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Masuit.Tools.Mapping;
 
 namespace Masuit.MyBlogs.WebApp.Models.Hangfire
 {
@@ -38,6 +39,9 @@ namespace Masuit.MyBlogs.WebApp.Models.Hangfire
 
         public void FlushInetAddress(Interview interview)
         {
+#if DEBUG
+            interview.IP = "114.144.114.114";
+#endif
             PhysicsAddress address = interview.IP.GetPhysicsAddressInfo().Result;
             if (address?.Status == 0)
             {

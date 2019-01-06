@@ -29,7 +29,7 @@
                     <input type="checkbox" name="vers" id="0"/>
                 </td>
                 <td>
-                    @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null) (最新版本)
+                    @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null) <span class="text-red">(最新版本)</span>
                 </td>
                 <td>
                     @Html.ActionLink(post.CategoryName, "Category", "Home", new { id = post.CategoryId }, null)

@@ -86,7 +86,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("{id:int}/history"), Route("{id:int}/history/{page:int}/{size:int}")]
-        public ActionResult History(int id, int page = 1, int size = 10)
+        public ActionResult History(int id, int page = 1, int size = 20)
         {
             var p = PostBll.GetById(id).Mapper<PostOutputDto>();
             if (p != null)

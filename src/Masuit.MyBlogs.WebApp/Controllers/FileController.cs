@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Web.Mvc;
-using Common;
+﻿using Common;
 using ICSharpCode.SharpZipLib.Zip;
 using Masuit.MyBlogs.WebApp.Models;
 using Masuit.Tools.Files;
 using Masuit.Tools.Logging;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Web.Mvc;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -235,7 +235,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 case "extract":
                     string folder = Path.Combine(string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(req.Destination) : prefix + req.Destination, req.FolderName.Trim('/', '\\'));
                     string zip = string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(req.Item) : prefix + req.Item;
-                    ClassZip.UnZip(zip, folder);
+                    SevenZipCompressor.Extract(zip, folder);
                     list.Add(new
                     {
                         success = "true"

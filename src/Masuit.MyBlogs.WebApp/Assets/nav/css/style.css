@@ -5,7 +5,9 @@
 }
 
 @media only screen and (max-width: 1169px) { body.nav-on-left.overflow-hidden { overflow: hidden; } }
-
+.header {
+    overflow: hidden;
+}
 .header a {
     /*width: 600px;*/
     text-decoration: none !important;
@@ -92,6 +94,7 @@ Main components
     right: 0;
     height: 50px;
     background: #ffffff;
+
     z-index: 3;
 }
 

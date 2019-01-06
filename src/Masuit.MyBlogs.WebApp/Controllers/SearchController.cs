@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Common;
+using IBLL;
+using Masuit.MyBlogs.WebApp.Models;
+using Masuit.MyBlogs.WebApp.Models.Hangfire;
+using Masuit.Tools.NoSQL;
+using Models.DTO;
+using Models.Entity;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -6,13 +13,7 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Common;
-using IBLL;
-using Masuit.MyBlogs.WebApp.Models;
-using Masuit.MyBlogs.WebApp.Models.Hangfire;
-using Masuit.Tools.NoSQL;
-using Models.DTO;
-using Models.Entity;
+using KeywordsRankOutputDto = Models.DTO.KeywordsRankOutputDto;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -38,48 +39,52 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 //ViewBag.Wd = "";
                 return RedirectToAction("Search");
             }
-            var hotSearches = new List<KeywordsRankOutputDto>();
-            ViewBag.hotSearches = hotSearches;
+            var start = DateTime.Today.AddDays(-7);
             using (RedisHelper redisHelper = RedisHelper.GetInstance())
             {
                 string key = Request.UserHostAddress + Request.UserAgent;
                 if (redisHelper.KeyExists(key) && !redisHelper.GetString(key).Equals(wd))
                 {
+                    var hotSearches = (await SearchDetailsBll.LoadEntitiesFromCacheNoTrackingAsync(s => s.SearchTime > start, s => s.SearchTime, false)).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()
+                    {
+                        KeyWords = g.FirstOrDefault()?.KeyWords,
+                        SearchCount = g.Count()
+                    }).ToList();
+                    ViewBag.hotSearches = hotSearches;
                     ViewBag.ErrorMsg = "10秒内只能搜索1次！";
                     return View(nul);
                 }
-                redisHelper.SetString(key, wd, TimeSpan.FromSeconds(10));
-            }
-            wd = wd.Trim().Replace("+", " ");
-            var sw = new Stopwatch();
-            if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
-            {
-                if (page == 1)
+                wd = wd.Trim().Replace("+", " ");
+                var sw = new Stopwatch();
+                if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
                 {
-                    SearchDetailsBll.AddEntity(new SearchDetails()
+                    if (page == 1)
                     {
-                        KeyWords = wd,
-                        SearchTime = DateTime.Now,
-                        IP = Request.UserHostAddress
-                    });
+                        SearchDetailsBll.AddEntity(new SearchDetails()
+                        {
+                            KeyWords = wd,
+                            SearchTime = DateTime.Now,
+                            IP = Request.UserHostAddress
+                        });
+                    }
+                    sw.Start();
+                    var query = LuceneHelper.Search(wd).ToList();
+                    var posts = query.Skip((page - 1) * size).Take(size).ToList();
+                    sw.Stop();
+                    ViewBag.Elapsed = sw.Elapsed.TotalMilliseconds;
+                    ViewBag.Total = query.Count;
+                    SearchDetailsBll.SaveChanges();
+                    redisHelper.SetString(key, wd, TimeSpan.FromSeconds(10));
+                    ViewBag.hotSearches = new List<KeywordsRankOutputDto>();
+                    return View(posts);
                 }
-                sw.Start();
-                var query = LuceneHelper.Search(wd).ToList();
-                var posts = query.Skip((page - 1) * size).Take(size).ToList();
-                sw.Stop();
-                ViewBag.Elapsed = sw.Elapsed.TotalMilliseconds;
-                ViewBag.Total = query.Count;
-                SearchDetailsBll.SaveChanges();
-                return View(posts);
+                ViewBag.hotSearches = (await SearchDetailsBll.LoadEntitiesFromCacheNoTrackingAsync(s => s.SearchTime > start, s => s.SearchTime, false)).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()
+                {
+                    KeyWords = g.FirstOrDefault()?.KeyWords,
+                    SearchCount = g.Count()
+                }).ToList();
+                return View(nul);
             }
-            var start = DateTime.Today.AddDays(-7);
-            hotSearches = (await SearchDetailsBll.LoadEntitiesFromCacheNoTrackingAsync(s => s.SearchTime > start, s => s.SearchTime, false).ConfigureAwait(true)).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()
-            {
-                KeyWords = g.FirstOrDefault()?.KeyWords,
-                SearchCount = g.Count()
-            }).ToList();
-            ViewBag.hotSearches = hotSearches;
-            return View(nul);
         }
 
         [Authority]

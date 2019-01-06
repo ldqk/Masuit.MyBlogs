@@ -30,7 +30,11 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             IList<Post> posts;
             UserInfoOutputDto user = Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             var s = SeminarBll.GetById(id);
-            var temp = s.Post.Where(p => p.Status == Status.Pended || user.IsAdmin).OrderByDescending(p => p.IsFixedTop);
+            if (s is null)
+            {
+                return RedirectToAction("Index", "Error");
+            }
+            var temp = PostBll.LoadEntities(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Pended || user.IsAdmin).OrderByDescending(p => p.IsFixedTop);
             switch (orderBy)
             {
                 case OrderBy.CommentCount:

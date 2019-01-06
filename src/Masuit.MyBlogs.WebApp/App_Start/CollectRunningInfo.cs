@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading;
-using Hangfire;
+﻿using Hangfire;
 using Masuit.MyBlogs.WebApp.Hubs;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Hardware;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Win32;
+using System;
+using System.Threading;
 using static Common.CommonHelper;
 
 namespace Masuit.MyBlogs.WebApp
@@ -54,19 +54,6 @@ namespace Masuit.MyBlogs.WebApp
                         HistoryIOWrite.Add(new object[] { time, write });
                         HistoryNetReceive.Add(new object[] { time, up });
                         HistoryNetSend.Add(new object[] { time, down });
-                        if (HistoryCpuLoad.Count > 720)
-                        {
-                            HistoryCpuLoad.RemoveAt(0);
-                            HistoryMemoryUsage.RemoveAt(0);
-                            HistoryCpuTemp.RemoveAt(0);
-                        }
-                        if (HistoryIORead.Count > 720)
-                        {
-                            HistoryIORead.RemoveAt(0);
-                            HistoryIOWrite.RemoveAt(0);
-                            HistoryNetReceive.RemoveAt(0);
-                            HistoryNetSend.RemoveAt(0);
-                        }
                     }
                 }
                 catch (Exception e)

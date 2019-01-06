@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web.Mvc;
-using Common;
+﻿using Common;
 using Hangfire;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
@@ -12,6 +7,11 @@ using Masuit.Tools.Systems;
 using Models.DTO;
 using Models.Entity;
 using Models.Enum;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web.Mvc;
 
 namespace Masuit.MyBlogs.WebApp.Controllers
 {
@@ -42,7 +42,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 i.Id,
                 i.Name,
-                i.Email,
+                //i.Email,
                 i.Title,
                 i.Link,
                 i.Description,
@@ -80,7 +80,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
         [HttpPost, ValidateInput(false)]
         public ActionResult Submit(Issue issue)
         {
-            issue.Description = Regex.Replace(issue.Description, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>");
+            issue.Description = CommonHelper.ReplaceImgSrc(Regex.Replace(issue.Description, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/"); ;
             issue.IPAddress = Request.UserHostAddress;
             Issue bug = IssueBll.AddEntitySaved(issue);
             if (bug != null)
