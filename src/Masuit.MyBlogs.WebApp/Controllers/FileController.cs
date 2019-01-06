@@ -234,12 +234,12 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     //Server.MapPath(path);
                     if (System.IO.File.Exists(file))
                     {
-                        return this.ResumePhysicalFile(file, "application/octet-stream", Path.GetFileName(file));
+                        return this.ResumePhysicalFile(file, Path.GetFileName(file));
                     }
                     break;
                 case "downloadMultiple":
                     byte[] buffer = SevenZipCompressor.ZipStream(items.Select(s => string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? Server.MapPath(s) : prefix + s).ToList()).ToArray();
-                    return File(buffer, "application/octet-stream", Path.GetFileName(toFilename));
+                    return this.ResumeFile(buffer, Path.GetFileName(toFilename));
             }
             return Content("null");
         }

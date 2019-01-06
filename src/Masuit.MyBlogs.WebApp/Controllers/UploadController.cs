@@ -132,7 +132,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var file = Path.Combine(Server.MapPath("/upload"), path.Trim('.', '/', '\\'));
             if (System.IO.File.Exists(file))
             {
-                return this.ResumePhysicalFile(file, "application/octet-stream", Path.GetFileName(file));
+                return this.ResumePhysicalFile(file, Path.GetFileName(file));
             }
             return Content("null");
         }
