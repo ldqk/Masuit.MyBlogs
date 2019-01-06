@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.WebApp.Models;
 using Masuit.Tools.Files;
 using Masuit.Tools.Logging;
+using Masuit.Tools.Mvc;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -233,7 +234,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     //Server.MapPath(path);
                     if (System.IO.File.Exists(file))
                     {
-                        return File(System.IO.File.OpenRead(file), "application/octet-stream", Path.GetFileName(file));
+                        return this.ResumePhysicalFile(file, "application/octet-stream", Path.GetFileName(file));
                     }
                     break;
                 case "downloadMultiple":

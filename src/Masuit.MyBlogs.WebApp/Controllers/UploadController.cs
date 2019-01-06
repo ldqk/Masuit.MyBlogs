@@ -6,6 +6,7 @@ using Masuit.Tools;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Media;
+using Masuit.Tools.Mvc;
 using Masuit.Tools.Net;
 using Models.DTO;
 using Newtonsoft.Json;
@@ -131,7 +132,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var file = Path.Combine(Server.MapPath("/upload"), path.Trim('.', '/', '\\'));
             if (System.IO.File.Exists(file))
             {
-                return File(System.IO.File.OpenRead(file), "application/octet-stream", Path.GetFileName(file));
+                return this.ResumePhysicalFile(file, "application/octet-stream", Path.GetFileName(file));
             }
             return Content("null");
         }
