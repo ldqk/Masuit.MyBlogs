@@ -34,7 +34,7 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             {
                 return RedirectToAction("Index", "Error");
             }
-            var temp = PostBll.LoadEntities(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Pended || user.IsAdmin).OrderByDescending(p => p.IsFixedTop);
+            var temp = PostBll.LoadEntities(p => p.Seminar.Any(x => x.Id == id) && (p.Status == Status.Pended || user.IsAdmin)).OrderByDescending(p => p.IsFixedTop);
             switch (orderBy)
             {
                 case OrderBy.CommentCount:
