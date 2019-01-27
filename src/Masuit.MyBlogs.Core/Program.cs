@@ -25,7 +25,7 @@ namespace Masuit.MyBlogs.Core
             var config = builder.Build();
 #if DEBUG
             var port = config["port"] ?? Environment.GetEnvironmentVariable("port") ?? "5000";
-            var sslport = config["sslport"] ?? Environment.GetEnvironmentVariable("sslport") ?? "5001"; 
+            var sslport = config["sslport"] ?? Environment.GetEnvironmentVariable("sslport") ?? "5001";
 #else
             var port = config["port"] ?? Environment.GetEnvironmentVariable("port") ?? "80";
             var sslport = config["sslport"] ?? Environment.GetEnvironmentVariable("sslport") ?? "443";
@@ -35,7 +35,7 @@ namespace Masuit.MyBlogs.Core
                 opt.ListenAnyIP(port.ToInt32());
                 opt.ListenAnyIP(sslport.ToInt32(), s =>
                 {
-                    s.UseHttps(AppContext.BaseDirectory + config["cert"], "cEHlnUGu");
+                    s.UseHttps(AppContext.BaseDirectory + config["cert:path"], config["cert:password"]);
                 });
                 opt.Limits.MaxRequestBodySize = null;
             }).UseIISIntegration().UseStartup<Startup>();

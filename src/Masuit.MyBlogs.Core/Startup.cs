@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.WebEncoders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
@@ -124,7 +125,11 @@ namespace Masuit.MyBlogs.Core
                 //opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddControllersAsServices();
-            services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All)); //解决razor视图中中文被编码的问题
+
+            services.Configure<WebEncoderOptions>(options =>
+            {
+                options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
+            });//解决razor视图中中文被编码的问题
 
             ContainerBuilder builder = new ContainerBuilder();
             builder.Populate(services);
