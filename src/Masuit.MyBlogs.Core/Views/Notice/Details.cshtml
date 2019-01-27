@@ -1,0 +1,118 @@
+﻿@using System.Text.RegularExpressions
+@using Common
+@using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.MyBlogs.Core.Models.ViewModel
+@using Masuit.Tools.Core.Net
+@model Masuit.MyBlogs.Core.Models.Entity.Notice
+@{
+    ViewBag.Title = Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Random r = new Random();
+}
+<style>
+    .bg-title {
+        height: 400px;
+        position: relative;
+        background: url(/Content/images/@(r.Next(1, 9)).jpg) no-repeat center;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+    .header-content {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .header-content .divider {
+        width: inherit;
+        height: 20px;
+        margin-top: 20px;
+        border-top: 3px solid rebeccapurple;
+    }
+</style>
+<ol class="cd-breadcrumb triangle">
+    <li>@Html.ActionLink("首页", "Index", "Home")</li>
+    <li>@Html.ActionLink("公告列表", "Index", "Notice")</li>
+    <li class="current"><em>@ViewBag.Title</em></li>
+</ol>
+<div class="bg-title">
+    <div class="header-content text-center">
+        <h1 class="size48">
+            @Model.Title
+        </h1>
+        <div class="divider"></div>
+        <p class="size24">
+            发布于：@Model.PostDate.ToString("yyyy-MM-dd") | 修改于：@Model.ModifyDate.ToString("yyyy-MM-dd") | 浏览人数：@Model.ViewCount
+        </p>
+    </div>
+</div>
+<div class="container">
+    <div class="wrapper-content article">
+        <div class="ibox">
+            <div class="ibox-content">
+                <section class="wow fadeInUp">
+                    <div class="btn-group">
+                        @Html.ActionLink("<<返回公告列表页", "Index", "Notice", null, new { @class = "btn btn-info" })
+                        @{
+                            UserInfoOutputDto user = Context.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+                            if (user.IsAdmin)
+                            {
+                                <a class="btn btn-primary" href="/dashboard#/notice/index?id=@Model.Id" target="_blank">修改</a>
+                            }
+                        }
+                    </div>
+                </section>
+                <hr class="margin-top10 marginbot10" />
+                <main>
+                    <section>
+                        <article class="article" id="article">
+                            @Html.Raw(Regex.Replace(Model.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.SystemSettings["Title"]}' title='{CommonHelper.SystemSettings["Title"]}'/>"))
+                        </article>
+                    </section>
+                </main>
+                <!--PC和WAP自适应版-->
+                <div id="SOHUCS" sid="about/@Model.Id"></div>
+                <script type="text/javascript">
+                    (function () {
+                        var appid = 'cytsT3QgK';
+                        var conf = 'prod_0358240040a6c9611add9de991099d42';
+                        var width = window.innerWidth || document.documentElement.clientWidth;
+                        if (width < 960) {
+                            window.document.write(
+                                '<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' +
+                                appid + '&conf=' + conf + '"><\/script>');
+                        } else {
+                            var loadJs = function (d, a) {
+                                var c = document.getElementsByTagName("head")[0] || document.head || document.documentElement;
+                                var b = document.createElement("script");
+                                b.setAttribute("type", "text/javascript");
+                                b.setAttribute("charset", "UTF-8");
+                                b.setAttribute("src", d);
+                                if (typeof a === "function") {
+                                    if (window.attachEvent) {
+                                        b.onreadystatechange = function () {
+                                            var e = b.readyState;
+                                            if (e === "loaded" || e === "complete") {
+                                                b.onreadystatechange = null;
+                                                a()
+                                            }
+                                        }
+                                    } else {
+                                        b.onload = a
+                                    }
+                                }
+                                c.appendChild(b)
+                            };
+                            loadJs("https://changyan.sohu.com/upload/changyan.js", function () {
+                                window.changyan.api.config({
+                                    appid: appid,
+                                    conf: conf
+                                })
+                            });
+                        }
+                    })();
+                </script>
+            </div>
+        </div>
+    </div>
+</div>

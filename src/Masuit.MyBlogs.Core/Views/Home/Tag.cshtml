@@ -1,0 +1,18 @@
+﻿@using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.MyBlogs.Core.Models.ViewModel
+@using Masuit.Tools.Core.Net
+@model IndexPageViewModel
+@{
+    ViewBag.Title = "标签_" + ViewBag.Tag;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container">
+    <ol class="cd-breadcrumb triangle">
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li class="current"><em>@ViewBag.Title</em></li>
+    </ol>
+</div>
+@{
+    UserInfoOutputDto user = Context.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+    await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
+}

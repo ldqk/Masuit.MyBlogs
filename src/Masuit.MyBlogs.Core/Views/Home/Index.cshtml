@@ -1,0 +1,136 @@
+﻿@using Common
+@using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.MyBlogs.Core.Models.Entity
+@using Masuit.MyBlogs.Core.Models.ViewModel
+@using Masuit.Tools.Core.Net
+@using Masuit.Tools.Win32
+@model Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel
+@{
+    ViewBag.Title = "首页";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<FastShare> shares = ViewBag.FastShare;
+}
+<style>
+    marquee p, marquee br, marquee div, marquee h1, marquee h2, marquee h3, marquee h4 {
+        display: inline !important;
+    }
+</style>
+<link href="~/Assets/banner/bootstrap-touch-slider.min.css" rel="stylesheet" />
+@if (Model.Banner.Any())
+{
+    <div id="bootstrap-touch-slider" class="carousel bs-slider fade  control-round indicators-line" data-ride="carousel" data-pause="hover" data-interval="5000">
+        <ol class="carousel-indicators">
+            @for (int i = 0; i < Model.Banner.Count; i++)
+            {
+                if (i == 0)
+                {
+                    <li data-target="#bootstrap-touch-slider" data-slide-to="@i" class="active"></li>
+                }
+                else
+                {
+                    <li data-target="#bootstrap-touch-slider" data-slide-to="@i"></li>
+                }
+            }
+        </ol>
+        <div class="carousel-inner" role="listbox">
+            @for (int i = 0; i < Model.Banner.Count; i++)
+            {
+                var p = Model.Banner[i];
+                string[] style = { "slide_style_left", "slide_style_center", "slide_style_right" };
+                string[] ani = { "zoomInRight", "flipInX", "fadeInLeft", "lightSpeedIn", "fadeInUp", "zoomInLeft", "fadeInRight" };
+                Random r = new Random();
+                <div class="item @(i == 0 ? "active" : "")" class="img-responsive" style="max-height: 700px;">
+                    <img src="@p.ImageUrl" alt="@p.Title" class="slide-image" title="@CommonHelper.SystemSettings["Title"]" />
+                    <div class="bs-slider-overlay"></div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="slide-text @style[r.StrictNext(style.Length)]">
+                                <h2 data-animation="animated @ani[r.StrictNext(ani.Length)]">@p.Title</h2>
+                                <p data-animation="animated @ani[r.StrictNext(ani.Length)]">@p.Description</p>
+                                <a href="/@p.Id" target="_blank" class="btn btn-default" data-animation="animated @ani[r.StrictNext(ani.Length)]">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <a class="left carousel-control" href="#bootstrap-touch-slider" role="button" data-slide="prev">
+            <span class="fa fa-angle-left" aria-hidden="true"></span>
+            <span class="sr-only">上一个</span>
+        </a>
+        <a class="right carousel-control" href="#bootstrap-touch-slider" role="button" data-slide="next">
+            <span class="fa fa-angle-right" aria-hidden="true"></span>
+            <span class="sr-only">下一个</span>
+        </a>
+    </div>
+}
+<br />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.18/jquery.touchSwipe.min.js"></script>
+<script src="~/Assets/banner/bootstrap-touch-slider.min.js"></script>
+@if (Model.Notices.Any())
+{
+    <div class="container notice">
+        <a href="/n/@(Model.Notices.FirstOrDefault()?.Id)">
+            <h3 class="size18 text-red text-center">网站最新公告</h3>
+        </a>
+        @Html.Raw(Model.Notices.FirstOrDefault()?.Content.Replace("img src=", $"img title='{CommonHelper.SystemSettings["Title"]}' alt='{CommonHelper.SystemSettings["Title"]}' data-original="))
+    </div>
+}
+@if (shares.Any())
+{
+    <div class="container padding-clear">
+        <div class="panel panel-info">
+            <div class="panel-heading">⚡快速分享🉐　投递/寻其他网站收费资源，可到 @Html.ActionLink("投稿", "Publish", "Post") 进行投稿。</div>
+            <div class="panel-body padding-clear" style="max-height: 200px;overflow-y: auto">
+                <table class="table table-bordered margin-clear">
+                    @for (int i = 1; i < shares.Count + 1; i += 2)
+                    {
+                        if (i < shares.Count)
+                        {
+                            <tr>
+                                @if (string.IsNullOrEmpty(shares[i - 1].Link))
+                                {
+                                    <td style="width: 50%">▸ @shares[i - 1].Title</td>
+                                }
+                                else
+                                {
+                                    <td style="width: 50%">▸ <a href="@shares[i - 1].Link" target="_blank">@shares[i - 1].Title</a></td>
+                                }
+                                @if (string.IsNullOrEmpty(shares[i].Link))
+                                {
+                                    <td style="width: 50%">▸ @shares[i].Title</td>
+                                }
+                                else
+                                {
+                                    <td style="width: 50%">▸ <a href="@shares[i].Link" target="_blank">@shares[i].Title</a></td>
+                                }
+                            </tr>
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(shares[i - 1].Link))
+                            {
+                                <tr>
+                                    <td colspan="2">▸ @shares[i - 1].Title</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="2">▸ <a href="@shares[i - 1].Link" target="_blank">@shares[i - 1].Title</a></td>
+                                </tr>
+                            }
+                        }
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+}
+@{
+    UserInfoOutputDto user = Context.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+    await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
+}
+<script type="text/javascript">
+    $('#bootstrap-touch-slider').bsTouchSlider();
+</script>

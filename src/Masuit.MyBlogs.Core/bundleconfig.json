@@ -1,0 +1,8 @@
+[
+  {
+    "outputFileName": "wwwroot/ng-views/app/app.config.min.js",
+    "inputFiles": [
+      "wwwroot/ng-views/app/app.config.js"
+    ]
+  }
+]

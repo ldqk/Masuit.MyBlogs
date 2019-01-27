@@ -1,0 +1,146 @@
+﻿@{
+    ViewBag.Title = "留言板";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string cid = 0 + Context.Request.Query["cid"];
+}
+<link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
+<script src="~/Assets/layui/layui.all.js"></script>
+<div class="container min-height780">
+    <ol class="cd-breadcrumb triangle">
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li class="current">
+            <em>@ViewBag.Title</em>
+        </li>
+    </ol>
+    <form class="form-horizontal animated pulse" id="msg-form" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="OperatingSystem" id="OperatingSystem" />
+        <input type="hidden" name="Browser" id="Browser" />
+        <div class="row">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <label for="name">昵称：</label>
+                    </span>
+                    <input type="text" class="form-control" name="NickName" id="name" required placeholder="昵称">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <label for="email">邮箱：</label>
+                    </span>
+                    <input type="email" class="form-control" name="Email" id="email" required placeholder="留下您的真实邮箱，以方便接收回复">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <label for="chat">QQ/微信：</label>
+                    </span>
+                    <input type="text" class="form-control" name="QQorWechat" id="chat" placeholder="QQ或微信(可选)">
+                </div>
+            </div>
+        </div>
+        <div class="form-group overlay animated fadeInDown" style="margin-bottom: 0px !important;">
+            <textarea class="layui-textarea" id="layedit" name="Content" style="height: 200px"></textarea>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-12">
+                <button type="submit" class="btn btn-info btn-lg">
+                    发表留言
+                </button>
+            </div>
+        </div>
+    </form>
+    <ul class="wow media-list"></ul>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div id="pageToolbar"></div>
+        </div>
+    </div>
+</div>
+<div style="position: fixed; left: -20000px; bottom: -20000px;">
+    <div id="reply" class="container-fluid">
+        <form class="form-horizontal" id="reply-form" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="OperatingSystem" id="OperatingSystem2" />
+            <input type="hidden" name="Browser" id="Browser2" />
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label for="name">昵称：</label>
+                </span>
+                <input type="text" class="form-control" name="NickName" id="name2" required placeholder="昵称">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label for="email">邮箱：</label>
+                </span>
+                <input type="email" class="form-control" name="Email" id="email2" required placeholder="留下您的真实邮箱，以方便接收回复">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label for="chat">QQ/微信：</label>
+                </span>
+                <input type="text" class="form-control animated pulse" name="QQorWechat" id="chat2" placeholder="QQ或微信(可选)">
+            </div>
+            <input type="hidden" value="" id="uid" name="ParentId" />
+            <div class="form-group overlay">
+                <textarea class="layui-textarea" id="layedit2" name="Content" style="height: 80px"></textarea>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-info btn-lg">
+                            提交回复
+                        </button>
+                        <button type="button" class="btn-cancel btn btn-danger btn-lg">
+                            取消回复
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="~/Scripts/global/leavemsg.min.js"></script>
+<script>
+	window.onload = function() {
+        loading();
+		$('#pageToolbar').Paging({ //异步加载评论
+			pagesize: 10,
+			count: @ViewBag.TotalCount,
+			toolbar: true,
+			callback: function(page, size, count) {
+				$.post("/msg/getmsgs", {
+					page: page,
+					size: size
+                }, (data) => {
+                    data = data.Data;
+                    if (data) {
+                        document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
+                        bindReplyBtn();
+					}
+				});
+			}
+		});
+        loadingDone();
+	};
+
+	/**
+   * 获取留言
+   */
+    function getmsgs() {
+        $.post("/msg/getmsgs", {
+            page: 1,
+            size: 10,
+            cid:@cid
+        }, (data) => {
+            data = data.Data;
+			if (data) {
+                document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
+                bindReplyBtn();
+			}
+        });
+    }
+</script>

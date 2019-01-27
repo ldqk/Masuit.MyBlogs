@@ -1,0 +1,9 @@
+﻿@model Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel
+<div class="container">
+    <div class="row" id="list">
+        @{
+            await Html.RenderPartialAsync("_ArticleListPartial", Model);
+            await Html.RenderPartialAsync("_Aside", Model);
+        }
+    </div>
+</div>

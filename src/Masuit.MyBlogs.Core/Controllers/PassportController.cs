@@ -1,0 +1,204 @@
+﻿using Common;
+using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Configs;
+using Masuit.MyBlogs.Core.Extensions.Hangfire;
+using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+using Masuit.MyBlogs.Core.Models.DTO;
+using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools;
+using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
+using Masuit.Tools.Core.Net;
+using Masuit.Tools.Security;
+using Masuit.Tools.Strings;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Web;
+
+namespace Masuit.MyBlogs.Core.Controllers
+{
+    /// <summary>
+    /// 登录授权
+    /// </summary>
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public class PassportController : Controller
+    {
+        /// <summary>
+        /// 用户
+        /// </summary>
+        public IUserInfoService UserInfoService { get; set; }
+        /// <summary>
+        /// 登录记录
+        /// </summary>
+        public ILoginRecordService LoginRecordService { get; set; }
+
+        /// <summary>
+        /// 登录授权
+        /// </summary>
+        /// <param name="userInfoService"></param>
+        /// <param name="loginRecordService"></param>
+        public PassportController(IUserInfoService userInfoService, ILoginRecordService loginRecordService)
+        {
+            UserInfoService = userInfoService;
+            LoginRecordService = loginRecordService;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="isTrue"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public ActionResult ResultData(object data, bool isTrue = true, string message = "")
+        {
+            return Json(new
+            {
+                Success = isTrue,
+                Message = message,
+                Data = data
+            });
+        }
+
+        /// <summary>
+        /// 登录页
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult Login()
+        {
+            string from = Request.Query["from"];
+            if (!string.IsNullOrEmpty(from))
+            {
+                from = HttpUtility.UrlDecode(from);
+                Response.Cookies.Append("refer", from);
+            }
+            if (HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) != null)
+            {
+                if (string.IsNullOrEmpty(from))
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                return Redirect(from);
+            }
+            if (Request.Cookies.Count > 2)
+            {
+                string name = Request.Cookies["username"];
+                string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.BaiduAK);
+                var userInfo = UserInfoService.Login(name, pwd);
+                if (userInfo != null)
+                {
+                    Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                    Response.Cookies.Append("password", pwd, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                    HttpContext.Session.SetByRedis(SessionKey.UserInfo, userInfo);
+                    HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, HttpContext.Connection.RemoteIpAddress.ToString(), LoginType.Default);
+                    if (string.IsNullOrEmpty(from))
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    return Redirect(from);
+                }
+            }
+            return View();
+        }
+
+        /// <summary>
+        /// 登陆检查
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <param name="valid"></param>
+        /// <param name="remem"></param>
+        /// <returns></returns>
+        [HttpPost, ValidateAntiForgeryToken]
+        public ActionResult Login(string username, string password, string valid, string remem)
+        {
+            string validSession = HttpContext.Session.GetByRedis<string>("valid") ?? String.Empty; //将验证码从Session中取出来，用于登录验证比较
+            if (String.IsNullOrEmpty(validSession) || !valid.Trim().Equals(validSession, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return ResultData(null, false, "验证码错误");
+            }
+            HttpContext.Session.RemoveByRedis("valid"); //验证成功就销毁验证码Session，非常重要
+            if (String.IsNullOrEmpty(username.Trim()) || String.IsNullOrEmpty(password.Trim()))
+            {
+                return ResultData(null, false, "用户名或密码不能为空");
+            }
+            var userInfo = UserInfoService.Login(username, password);
+            if (userInfo != null)
+            {
+                HttpContext.Session.SetByRedis(SessionKey.UserInfo, userInfo);
+                if (remem.Trim().Contains(new[] { "on", "true" })) //是否记住登录
+                {
+                    Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()));
+                    Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.BaiduAK), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                }
+                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, HttpContext.Connection.RemoteIpAddress.ToString(), LoginType.Default);
+                string refer = Request.Cookies["refer"];
+                if (string.IsNullOrEmpty(refer))
+                {
+                    return ResultData(null, true, "/");
+                }
+                return ResultData(null, true, refer);
+            }
+            return ResultData(null, false, "用户名或密码错误");
+        }
+
+        /// <summary>
+        /// 生成验证码
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult ValidateCode()
+        {
+            string code = Tools.Strings.ValidateCode.CreateValidateCode(6);
+            HttpContext.Session.SetByRedis("valid", code); //将验证码生成到Session中
+            var buffer = HttpContext.CreateValidateGraphic(code);
+            return this.ResumeFile(buffer, "image/jpeg");
+        }
+
+        /// <summary>
+        /// 检查验证码
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult CheckValidateCode(string code)
+        {
+            string validSession = HttpContext.Session.GetByRedis<string>("valid");
+            if (String.IsNullOrEmpty(validSession) || !code.Trim().Equals(validSession, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return ResultData(null, false, "验证码错误");
+            }
+            return ResultData(null, false, "验证码正确");
+        }
+
+        /// <summary>
+        /// 获取用户信息
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetUserInfo()
+        {
+            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+#if DEBUG
+            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
+#endif
+            return ResultData(user);
+        }
+
+        /// <summary>
+        /// 注销登录
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult Logout()
+        {
+            HttpContext.Session.RemoveByRedis(SessionKey.UserInfo);
+            Response.Cookies.Delete("username");
+            Response.Cookies.Delete("password");
+            HttpContext.Session.Clear();
+            if (Request.Method.ToLower().Equals("get"))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            return ResultData(null, message: "注销成功！");
+        }
+    }
+}

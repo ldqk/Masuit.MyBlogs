@@ -1,0 +1,22 @@
+﻿<div>
+    <button class="btn btn-default waves-effect" ng-click="list.add()">
+        <span class="glyphicon glyphicon-plus"></span>
+    </button>
+    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
+            <td title="'分类名称'" filter="{Name: 'text'}" sortable="'Name'">
+                <a ng-href="/cat/{{row.Id}}" target="_blank">{{row.Name}}</a>
+            </td>
+            <td title="'分类描述'" filter="{Description: 'text'}" sortable="'Description'">
+                {{row.Description}}
+            </td>
+            <td title="'文章数'" sortable="'TotalPostCount'">
+                {{row.TotalPostCount}}
+            </td>
+            <td title="'操作'">
+                <button class="btn btn-danger btn-sm waves-effect" ng-click="list.del(row)">删除</button>
+                <button class="btn btn-success btn-sm waves-effect" ng-click="list.edit(row)">修改</button>
+            </td>
+        </tr>
+    </table>
+</div>

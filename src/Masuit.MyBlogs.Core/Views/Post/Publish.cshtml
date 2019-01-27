@@ -1,0 +1,91 @@
+﻿@model IEnumerable<string>
+@using Masuit.MyBlogs.Core.Models.Entity
+@using Masuit.Tools.Win32
+@{
+    ViewBag.Title = "投稿";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string[] colors = {"success", "info", "warning", "danger", "default"};
+    List<Category> cats = ViewBag.Category;
+}
+<link href="~/Assets/fileupload/filestyle.css" rel="stylesheet" />
+<link href="~/Assets/semantic/semantic.min.css" rel="stylesheet" />
+<div class="container">
+    <ol class="cd-breadcrumb triangle">
+        <li>@Html.ActionLink("首页","Index","Home")</li>
+        <li class="current"><em>@ViewBag.Title</em></li>
+    </ol>
+    <hr/>
+    <form class="form-group" id="article-form" method="post" onsubmit="return false">
+        @*文章表单*@
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="IsWordDocument" id="IsWordDocument" value="false"/>
+        <input type="hidden" name="ResourceName" id="ResourceName"/>
+        <div class="input-group">
+            <span class="input-group-addon size18"><label for="article">文章标题：</label></span>
+            <input type="text" id="article" class="form-control input-lg" name="Title" required placeholder="请输入文章标题">
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-@colors[new Random().StrictNext() % 5] btn-lg show-fileup"><i class="icon-upload4 size18"></i>上传word文档</button>
+            </span>
+        </div>
+        <!-- 加载编辑器的容器 -->
+        <div class="form-group overlay animated bounceInDown">
+            <textarea id="editor" style="height: calc(100vh - 350px);" class="ueditor" name="Content" type="text/plain"></textarea>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-6">
+                <div class="input-group">
+                    <span class="input-group-addon">分类：</span>
+                    <div class="ui fluid search selection dropdown category">
+                        <input name="CategoryId" type="hidden" id="CategoryId">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">选择分类</div>
+                        <div class="menu">
+                            @foreach (var s in cats)
+                            {
+                                <div class="item" data-value="@s.Id">@s.Name</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="input-group">
+                    <span class="input-group-addon"><label for="Author">作者：</label></span>
+                    <input type="text" class="form-control" id="Author" name="Author" required placeholder="投稿人真名或网名(非常重要)">
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="input-group">
+                    <span class="input-group-addon"><label for="Email">邮箱：</label></span>
+                    <input type="email" class="form-control" id="Email" name="Email" required placeholder="您的电子邮箱(非常重要)">
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-6">
+                <div class="input-group">
+                    <span class="input-group-addon"><label for="Label">标签：</label></span>
+                    <div class="ui fluid multiple search selection dropdown tags">
+                        <input name="Label" type="hidden" id="Label">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">标签(选择或输入新标签)</div>
+                        <div class="menu">
+                            @foreach (var s in Model)
+                            {
+                                <div class="item" data-value="@s">@s</div>
+                            }
+                        </div>
+                    </div>
+                    <span class="input-group-btn">
+                        <button type="button" id="submit" class="btn btn-info">
+                            <i class="icon-rocket2"></i>
+                            马上投递
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
+<script src="~/Assets/UEditor/ueditor.config.front.min.js"></script>
+<script src="https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"></script>
+<script src="~/Scripts/publish/publish.min.js"></script>

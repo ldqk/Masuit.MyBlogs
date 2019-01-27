@@ -1,0 +1,110 @@
+﻿@using AngleSharp.Network.Default
+@using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.MyBlogs.Core.Models.ViewModel
+@using Masuit.Tools.Core.Net
+@model IList<Masuit.MyBlogs.Core.Models.DTO.PostOutputDto>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Random r = new Random();
+    UserInfoOutputDto user = Context.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+}
+<style>
+    .bg-title {
+        height: 50vh;
+        max-height: 400px;
+        position: relative;
+        background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
+        background-size:cover;
+        background-attachment: fixed;
+            margin-bottom: 10px;
+    }
+    .header-content {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+    }
+    .header-content .divider {
+        width: inherit;
+        height: 20px;
+        margin-top: 20px;
+        border-top: 3px solid rebeccapurple;
+    }
+</style>
+<div class="container">
+    <ol class="cd-breadcrumb triangle">
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li class="current"><em>专题_@ViewBag.Title</em></li>
+    </ol>
+</div>
+<div class="bg-title">
+    <div class="header-content text-center">
+        <h1 class="size48">
+            @ViewBag.Title
+        </h1>
+        <div class="divider"></div>
+        <p class="size24">
+            @ViewBag.SubTitle
+        </p>
+    </div>
+</div>
+<div class="container">
+    <div class="ibox">
+        <div class="ibox-content">
+            <div>
+                <h3 class="size20">
+                    专题描述：
+                </h3>
+            </div>
+            <p>
+                @ViewBag.Desc
+            </p>
+        </div>
+    </div>
+    <div class="wrapper-content  animated bounceInUp blog">
+        @if (Model.Any())
+        {
+            <div class="orderby">
+                <div class="row">
+                    <div class="col-md-offset-10 col-md-2">
+                        <div class="btn-group pull-right">
+                            @Html.ActionLink("所有专题", "All", "Post", null, new { @class = "btn btn-info" })
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                排序方式<span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="@Context.Request.Path">最后修改日期</a>
+                                </li>
+                                <li>
+                                    <a href="@Context.Request.Path?orderby=0">最后发表日期</a>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                                <li>
+                                    <a href="@Context.Request.Path?orderby=3">评论最多</a>
+                                </li>
+                                <li>
+                                    <a href="@Context.Request.Path?orderby=2">访问量最多</a>
+                                </li>
+                                <li>
+                                    <a href="@Context.Request.Path?orderby=4">支持最多</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            foreach (PostOutputDto post in Model)
+            {
+                await Html.RenderPartialAsync(user.IsAdmin ? "_ArticleListItem_Admin" : "_ArticleListItem", post);
+            }
+        }
+        else
+        {
+            <h3>Oops！抱歉~本专题没有收录相关的文章或资源！如果您有相关的结果，您可以 @Html.ActionLink("点击这里", "Publish", "Post", null, new { @class = "btn btn-info btn-lg" }) 投稿哦！</h3>
+        }
+        <div class="col-md-12 text-center">
+            @{ await Html.RenderPartialAsync("_Pagination"); }
+        </div>
+    </div>
+</div>

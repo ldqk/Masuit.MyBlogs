@@ -1,0 +1,497 @@
+﻿@using System.Web
+@using AngleSharp.Network.Default
+@using Common
+@using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.MyBlogs.Core.Models.Entity
+@using Masuit.MyBlogs.Core.Models.Enum
+@using Masuit.MyBlogs.Core.Models.ViewModel
+@using Masuit.Tools.Core.Net
+@using Masuit.Tools.Systems
+@using Masuit.Tools.Win32
+@model Masuit.MyBlogs.Core.Models.Entity.Post
+@{
+    ViewBag.Title = Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
+    UserInfoOutputDto user = Context.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+    string cid = 0 + Context.Request.Query["cid"];
+}
+<style>
+    #gooey-h {
+        position: fixed;
+        bottom: 250px;
+        right: 0px;
+        z-index: 3;
+    }
+</style>
+<link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
+<link href="~/Assets/gooey/gooey.min.css" rel="stylesheet" />
+<link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
+<script src="~/Assets/layui/layui.all.js"></script>
+<script src="~/Assets/gooey/gooey.min.js"></script>
+<link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
+<link href="~/Assets/share/share.css" rel="stylesheet" />
+<script src="~/Assets/share/jquery.qrcode.min.js"></script>
+<script src="~/Assets/share/jquery.share.min.js"></script>
+<div class="container">
+    <ol class="cd-breadcrumb triangle">
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li>@Html.ActionLink("文章列表", "Post", "Home")</li>
+        <li class="current"><em>@ViewBag.Title</em></li>
+    </ol>
+    <div class="wrapper-content article">
+        <div class="ibox">
+            <div class="ibox-content animated fadeIn">
+                <main>
+                    <section>
+                        <header class="page-header">
+                            <div class="text-center">
+                                <a>
+                                    <h2 class="padding-bot10">
+                                        @Model.Title
+                                    </h2>
+                                </a>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7">
+                                    <div class="padding-bot10">
+                                        发表于<span class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
+                                        <span class="label label-@colors[new Random().StrictNext() % colors.Length]">@Model.Author</span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                    </div>
+                                </div>
+                                @{
+                                    if (!string.IsNullOrEmpty(Model.Label))
+                                    {
+                                        <div class="pull-right margin-right20">
+                                            <div>
+                                                @foreach (string s in Model.Label.Split(',', '，', ' '))
+                                                {
+                                                    if (!string.IsNullOrEmpty(s))
+                                                    {
+                                                        <a href="/tag/@HttpUtility.UrlEncode(s)">
+                                                            <span class="label label-@colors[new Random().StrictNext() % colors.Length]">@s</span>
+                                                        </a>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 line-height24">
+                                    分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] }) | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.PostAccessRecord.Sum(r => r.ClickCount)</span>℃ | 状态：@Model.Status.GetDisplay()
+                                    @if (Model.Seminar.Any())
+                                    {
+                                        <span> | 所属专题：</span>
+                                        var seminars = Model.Seminar;
+                                        foreach (var s in seminars)
+                                        {
+                                            @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })<text> </text>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </header>
+                        <article class="article" id="article">
+                            @Html.Raw(Model.Content)
+                            @if (!string.IsNullOrEmpty(Model.ProtectContent))
+                            {
+                                <div class="row protected">
+                                    @Html.Raw(Model.ProtectContent)
+                                </div>
+                            }
+                        </article>
+                        <h3>分享到：</h3>
+                        <div class="social-share"></div>
+                        <div id="cyReward" role="cylabs" data-use="reward"></div>
+                    </section>
+                </main>
+                <section class="wow fadeIn row padding-top40 padding-bot20">
+                    <div class="col-xs-6">
+                        <div class="btn-group">
+                            <button type="button" id="voteup" class="btn btn-success btn-lg">
+                                <i class="icon-thumbsup"></i><span>@Model.VoteUpCount</span>
+                            </button>
+                            <button type="button" id="votedown" class="btn btn-danger btn-lg">
+                                <i class="icon-thumbsdown"></i><span>@Model.VoteDownCount</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 text-right">
+                        <div class="btn-group">
+                            <button type="button" id="donate" class="btn btn-@colors[new Random().StrictNext() % colors.Length] btn-lg">
+                                <i class="icon-coin-yen"></i><span>支持站长</span>
+                            </button>
+                            @if (Model.IsWordDocument)
+                            {
+                                <a class="btn btn-@colors[new Random().StrictNext() % colors.Length] btn-lg" href="~/upload/@(Model.ResourceName)" target="_blank"><i class="icon-download4"></i>下载为Word文档</a>
+                            }
+                        </div>
+                    </div>
+                </section>
+                @if (Model.PostHistoryVersion.Any())
+                {
+                    <section class="wow margintop20 animated fadeIn">
+                        <h3>文章历史版本：</h3>
+                        <p>
+                            修改次数：@Model.PostHistoryVersion.Count 次
+                            @Html.ActionLink("查看历史版本", "History", "Post", new { id = Model.Id }, null)
+                        </p>
+                    </section>
+                }
+                <section class="wow padding-bot20 animated fadeIn">
+                    <h3>版权声明：</h3>
+                    <p class="text-danger size16">
+                        本文仅用于学习、研究和交流目的，欢迎非商业性质转载。本文链接：<a href="@(Context.Request.Host+Context.Request.Path)">@(Context.Request.Host + Context.Request.Path)</a>。
+                        @Html.Raw(CommonHelper.SystemSettings["Disclaimer"])
+                    </p>
+                </section>
+                <section class="wow row size16 animated fadeIn">
+                    <div class="col-xs-6">
+                        上一篇：
+                        @{
+                            Post prev = ViewBag.Prev;
+                            if (prev != null)
+                            {
+                                @Html.ActionLink(prev.Title, "Details", "Post", new { id = prev.Id }, null)
+                            }
+                            else
+                            {
+                                <a>没有了</a>
+                            }
+                        }
+                    </div>
+                    <div class="col-xs-6 text-right">
+                        下一篇：
+                        @{
+                            Post next = ViewBag.Next;
+                            if (next != null)
+                            {
+                                @Html.ActionLink(next.Title, "Details", "Post", new { id = next.Id }, null)
+                            }
+                            else
+                            {
+                                <a>没有了</a>
+                            }
+                        }
+                    </div>
+                </section>
+                @{
+                    var posts = Model.Category.Post.Where(p => p.Status == Status.Pended && p.Id != Model.Id).OrderBy(p => Guid.NewGuid()).ToList();
+                    int count = posts.Count >= 10 ? 10 : posts.Count;
+                    if (posts.Any())
+                    {
+                        <section class="wow margintop20 animated fadeIn">
+                            <h3>相关推荐：</h3>
+                            <table class="table table-condensed size16">
+                                @for (int i = 1; i < count; i += 2)
+                                {
+                                    <tr>
+                                        <td>@Html.ActionLink(posts[i - 1].Title, "Details", "Post", new { id = posts[i - 1].Id }, null)</td>
+                                        <td>@Html.ActionLink(posts[i].Title, "Details", "Post", new { id = posts[i].Id }, null)</td>
+                                    </tr>
+                                }
+                            </table>
+                        </section>
+                    }
+                }
+                <hr>
+                <section class="wow row animated fadeIn">
+                    <div class="col-lg-12">
+                        <h3>评论区：</h3>
+                        <form class="form-horizontal animated pulse" id="comment" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="PostId" value="@Model.Id" />
+                            <input type="hidden" id="OperatingSystem" name="OperatingSystem" />
+                            <input type="hidden" name="Browser" id="Browser" />
+                            <input type="hidden" value="@user.NickName" class="form-control" name="NickName" id="name">
+                            <input type="hidden" value="@user.Email" class="form-control" name="Email" id="email">
+                            <input type="hidden" value="@user.QQorWechat" class="form-control" name="QQorWechat" id="chat">
+                            <div class="form-group overlay animated fadeInDown" style="margin-bottom: 0px !important;">
+                                <textarea class="layui-textarea" id="layedit" name="Content" style="height: 100px"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-xs-12">
+                                    <button type="submit" class="btn btn-info btn-lg">提交</button>
+                                </div>
+                            </div>
+                        </form>
+                        <ul class="wow media-list"></ul>
+                        @if (Model.Comment.Any(c => c.Status == Status.Pended))
+                        {
+                            <div class="row">
+                                <div class="col-md-12 text-center">
+                                    <div id="pageToolbar"></div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <h4>还没有评论哦，赶紧来写评论吧</h4>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="position: absolute; left: -20000px; bottom: 0;">
+    <div id="reply" class="container-fluid">
+        <form class="form-horizontal" id="reply-form" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="PostId" id="postId" value="@Model.Id" />
+            <input type="hidden" name="OperatingSystem" id="OperatingSystem2" />
+            <input type="hidden" name="Browser" id="Browser2" />
+            <input type="hidden" value="@user.NickName" class="form-control" name="NickName" id="name2">
+            <input type="hidden" value="@user.Email" class="form-control" name="Email" id="email2">
+            <input type="hidden" value="@user.QQorWechat" class="form-control" name="QQorWechat" id="chat2">
+            <input type="hidden" value="" id="uid" name="ParentId" />
+            <div class="form-group overlay animated fadeInDown">
+                <textarea class="layui-textarea" id="layedit2" name="Content" style="height: 80px"></textarea>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-info btn-lg">
+                            提交回复
+                        </button>
+                        <button type="button" class="btn-cancel btn btn-danger btn-lg">
+                            取消回复
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<nav id="gooey-h" style="max-height: 100px;">
+    <input type="checkbox" class="menu-open" name="menu-open2" id="menu-open2" />
+    <label class="open-button" for="menu-open2">
+        <span class="burger burger-1"></span>
+        <span class="burger burger-2"></span>
+        <span class="burger burger-3"></span>
+    </label>
+    <a class="gooey-menu-item" id="pin"> <i class="icon icon-pushpin"></i></a>
+    @{
+        if (Model.Status == Status.Pending)
+        {
+            <a class="gooey-menu-item" id="pass"> <i class="icon icon-checkmark"></i></a>
+        }
+    }
+    <a href="/dashboard#/post/edit?id=@Model.Id" class="gooey-menu-item" target="_blank"> <i class="icon icon-pencil"></i></a>
+    <a class="gooey-menu-item" id="del"> <i class="icon icon-bin"></i></a>
+</nav>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
+<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
+@*<script src="~/Assets/directory/script.min.js"></script>*@
+@*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js"></script>*@
+<script src="~/Assets/jquery.tocify/jquery.tocify.js"></script>
+<script src="~/Scripts/global/article.js"></script>
+<script>
+
+	function getcomments() {
+		$.post("/comment/getcomments", {
+			id: $("#postId").val(),
+			page: 1,
+			size: 10,
+			cid: @cid
+		}, (data) => {
+			data = data.Data;
+			document.querySelector(".media-list").innerHTML = loadParentComments(data);
+			bindReplyBtn();
+			commentVoteBind(); //评论投票
+		});
+    }
+	window.onload = function() {
+		loading();
+		//SyntaxHighlighter.all();
+		//SyntaxHighlighter.defaults['toolbar'] = false;
+		$('#pageToolbar').Paging({ //异步加载评论
+			pagesize: 10,
+			count: @Model.Comment.Count(c =>c.ParentId==0&& c.Status==Status.Pended),
+			toolbar: true,
+			callback: function(page, size, count) {
+				$.post("/comment/getcomments", {
+					id: @Model.Id,
+					page: page,
+					size: size
+				}, (data) => {
+					data = data.Data;
+					if (data) {
+						document.querySelector(".media-list").innerHTML = loadParentComments(data);
+						bindReplyBtn();
+						commentVoteBind(); //评论投票
+					}
+				});
+			}
+		});
+		$("#gooey-h").gooeymenu({
+			bgColor: "#681ddf",
+			contentColor: "white",
+			style: "circle",
+			horizontal: {
+				menuItemPosition: "glue"
+			},
+			vertical: {
+				menuItemPosition: "spaced",
+				direction: "up"
+			},
+			circle: {
+				radius: 85
+			},
+			margin: "small",
+			size: 80,
+			bounce: true,
+			bounceLength: "small",
+			transitionStep: 100,
+			hover: "#2d1d89"
+		});
+		$("#gooey-h").insertAfter($("body"));
+		$("#del").on("click", function (e) {
+			swal({
+				title: "确认删除这篇文章吗？",
+				text: '@Model.Title',
+				showCancelButton: true,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "确定",
+				cancelButtonText: "取消",
+				showLoaderOnConfirm: true,
+				animation: true,
+				allowOutsideClick: false
+			}).then(function () {
+				$.post("/post/delete", {
+					id: @Model.Id
+				}, function (data) {
+					window.notie.alert({
+						type: 1,
+						text: data.Message,
+						time: 4
+					});
+				});
+			}, function () {
+			});
+		});
+		$("#pass").on("click", function (e) {
+			$.post("/post/pass", { id:@Model.Id}, function (data) {
+				window.notie.alert({
+					type: 1,
+					text: data.Message,
+					time: 4
+				});
+			});
+		});
+		$("#pin").on("click", function (e) {
+			$.post("/post/Fixtop", {
+				id: @Model.Id
+			}, function (data) {
+				window.notie.alert({
+					type: 1,
+					text: data.Message,
+					time: 4
+				});
+			});
+		});
+		loadingDone();
+	};
+	//递归加载评论
+	//加载父楼层
+	function loadParentComments(data) {
+		loading();
+		var html = '';
+		if (data) {
+			var rows = Enumerable.From(data.rows).Where(c => c.ParentId === 0).ToArray();
+			var page = data.page;
+			var size = data.size;
+			var maxPage = Math.ceil(data.total / size);
+			page = page > maxPage ? maxPage : page;
+			page = page < 1 ? 1 : page;
+			var startfloor = data.parentTotal - (page - 1) * size;
+			for (let i = 0; i < rows.length; i++) {
+				html += `<li class="msg-list media animated fadeInRight" id='${rows[i].Id}'>
+                            <div class="media-body">
+                                <article class="panel panel-info">
+                                    <header class="panel-heading">${startfloor}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""}
+                                        <span class="pull-right" style="font-size: 10px;">${rows[i].Status == 4 ? `<a class="label label-success" onclick="pass(${rows[i].Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${rows[i].Id})">删除</a> | ${rows[i].CommentDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span></span>
+                                    </header>
+                                    <div class="panel-body">
+                                        ${rows[i].Content}
+                                        <span class="cmvote btn btn-sm btn-info" data-id="${rows[i].Id}">有用(<span>${rows[i].VoteCount}</span>)</span>
+                                        <a class="btn btn-sm btn-info" href="?uid=${rows[i].Id}">回复</a>
+                                        <div class="pull-right">
+                                            <span class="label label-success">${rows[i].Email}</span>
+                                            <span class="label label-warning">${rows[i].QQorWechat}</span>
+                                        </div>
+                                        ${loadComments(data.rows, Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.CommentDate).ToArray(), startfloor--)}
+                                    </div>
+                                </article>
+                            </div>
+                        </li>`;
+			}
+		}
+		loadingDone();
+		return html;
+	}
+
+	//加载子楼层
+	function loadComments(data, comments, root, depth = 0) {
+		var colors = ["info", "success", "primary", "warning", "danger"];
+		var floor = 1;
+		depth++;
+		var html = '';
+		Enumerable.From(comments).ForEach((item, index) => {
+			var color = colors[depth%5];
+			html += `<article id="${item.Id}" class="panel panel-${color}">
+                            <div class="panel-heading">
+                                ${depth}-${floor++}# ${item.IsMaster ?`<i class="icon icon-user"></i>`:""}${item.NickName}${item.IsMaster ?`(管理员)`:""}
+                                <span class="pull-right" style="font-size: 10px;">${item.Status == 4 ? `<a class="label label-success" onclick="pass(${item.Id})">通过</a> |`:""} <a class="label label-danger" onclick="del(${item.Id})">删除</a> | ${item.CommentDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span></span>
+                            </div>
+                            <div class="panel-body">
+                                ${item.Content}
+                                <span class="cmvote btn btn-sm btn-${color}" data-id="${item.Id}">有用(<span>${item.VoteCount}</span>)</span>
+                                <a class="btn btn-sm btn-${color}" href="?uid=${item.Id}">回复</a>
+                                <div class="pull-right">
+                                    <span class="label label-success">${item.Email}</span>
+                                    <span class="label label-primary">${item.QQorWechat}</span>
+                                </div>
+                                ${loadComments(data, Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.CommentDate), root, depth)}
+                            </div>
+                        </article>`;
+		});
+		return html;
+	}
+
+	function pass(id) {
+		$.post("/comment/pass", { id: id }, function (res) {
+			swal(res.Message, "", res.Success ? "success" : "error");
+			getcomments();
+		});
+	}
+	function del(id) {
+		swal({
+			title: '确定删除这条评论吗？',
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: '确定',
+			cancelButtonText: '取消',
+			preConfirm: function() {
+				return new Promise(function (resolve) {
+					$.post("/comment/delete", {
+						id: id
+					}, function (res) {
+						resolve(res);
+					});
+				});
+			},
+			allowOutsideClick: false
+		}).then(function(res) {
+			swal(res.Message, "", res.Success ? "success" : "error");
+			getcomments();
+		});
+
+	}
+
+</script>

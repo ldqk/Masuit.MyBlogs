@@ -1,0 +1,238 @@
+﻿@using System.Text.RegularExpressions
+@using System.Web
+@using Common
+@using Masuit.MyBlogs.Core.Models.Entity
+@using Masuit.Tools.Core.Net
+@using Masuit.Tools.Win32
+@model Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion
+@{
+    ViewBag.Title = Model.Post.Title+"于"+Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")+"的历史版本："+Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
+}
+<link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
+<link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
+<div class="container">
+    <ol class="cd-breadcrumb triangle">
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li>@Html.ActionLink("文章列表", "Post", "Home")</li>
+        <li>@Html.ActionLink(Model.Post.Title.Length>20?Model.Post.Title.Substring(0,20)+"...": Model.Post.Title, "Details", "Post",new{id=Model.PostId},null)</li>
+        <li>@Html.ActionLink("历史版本", "History", "Post",new{id=Model.PostId},null)</li>
+        <li class="current"><em>@(Model.Title.Length>40? Model.Title.Substring(0,40)+"...": Model.Title)</em></li>
+    </ol>
+    <div class="wrapper-content article">
+        <div class="ibox">
+            <div class="ibox-content animated fadeIn">
+                <main>
+                    <section>
+                        <header class="page-header">
+                            <div class="text-center">
+                                <a>
+                                    <h2 class="padding-bot10">
+                                        @Model.Title
+                                    </h2>
+                                </a>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-7">
+                                    <div class="padding-bot10">
+                                        修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> | 
+                                    原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })
+                                    @if (Model.Seminar.Any())
+                                    {
+                                        <span> | 原所属专题：</span>
+                                        var seminars = Model.Seminar;
+                                        foreach (var s in seminars)
+                                        {
+                                            @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })<text> </text>
+                                        }
+                                    }
+                                    </div>
+                                </div>
+                                @{
+                                    if (!string.IsNullOrEmpty(Model.Label))
+                                    {
+                                        <div class="pull-right margin-right20">
+                                            <div>
+                                                @foreach (string s in Model.Label.Split(',', '，', ' '))
+                                                {
+                                                    if (!string.IsNullOrEmpty(s))
+                                                    {
+                                                        <a href="/tag/@HttpUtility.UrlEncode(s)">
+                                                            <span class="label label-@colors[new Random().StrictNext() % colors.Length]">@s</span>
+                                                        </a>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </header>
+                        <article class="article" id="article">
+                            @Html.Raw(Regex.Replace(Model.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.SystemSettings["Title"]}' title='{CommonHelper.SystemSettings["Title"]}'/>"))
+                            @if(!string.IsNullOrEmpty(Model.ProtectContent)) {
+                            <div class="row protected">
+                                @if(string.IsNullOrEmpty(Context.Session.GetByRedis<string>("ArticleViewToken"))) {
+                                <p class="text-red text-center size24 margin-bot10">↓↓↓恭喜你发现镇站之宝，请注意，前方高能！非战斗人员请及时撤离，这不是演习！↓↓↓</p>
+                                <div class="col-md-6">
+                                    <span class="text-red">以下内容已经隐藏，请输入验证码后查看</span>
+                                    <span class="text-green">【完全免费，不收一分钱】</span>
+                                    <form action="/" method="post" class="form-inline" id="code-token">
+                                        <div class="input-group">
+                                            @Html.AntiForgeryToken()
+                                            <span class="input-group-addon">验证码：</span>
+                                            <input type="text" name="token" id="token" class="form-control" />
+                                            <span class="input-group-btn">
+                                                <button type="submit" class="btn btn-info">查看文章</button>
+                                            </span>
+                                        </div>
+                                    </form>
+                                    <p class="text-green">温馨提示：将本页面分享到您的社交平台上，如QQ或微信，并保证3h之内不会删除且获得10个以上的点赞或评论后，通过站长QQ私信获取文章访问密码，<span class="text-red">获取密码后本站所有加密文章将永久开放！</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="text-green">如果你曾经获取过密码，请输入您的邮箱后查看</span>
+                                    <form action="/" method="post" class="form-inline" id="email-token">
+                                        <div class="input-group">
+                                            @Html.AntiForgeryToken()
+                                            <span class="input-group-addon">邮箱：</span>
+                                            <input type="email" name="Email" id="email3" class="form-control" />
+                                            <span class="input-group-btn">
+                                                <button type="submit" class="btn btn-info">查看文章</button>
+                                            </span>
+                                        </div>
+                                    </form>
+                                    <p class="text-green">温馨提示：请确保您的邮箱已经通过站长的登记，如果您未使用邮箱登记，请先联系站长获取文章密码并登记邮箱即可！</p>
+                                </div>
+                                } else {
+                                <p class="text-red text-center size20">↓↓↓以下是文章加密部分↓↓↓</p>
+                                @Html.Raw(Regex.Replace(Model.ProtectContent, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.SystemSettings["Title"]}' title='{CommonHelper.SystemSettings["Title"]}'/>"))
+                                }
+                            </div>
+                            }
+                        </article>
+                        <div id="cyReward" role="cylabs" data-use="reward"></div>
+                    </section>
+                </main>
+                <hr />
+                <section class="wow fadeInUp row size16">
+                    <div class="col-xs-6">
+                        前一版本：
+                        @{
+                            PostHistoryVersion prev = ViewBag.Prev;
+                            if (prev != null)
+                            {
+                                @Html.ActionLink(prev.Title, "HistoryVersion", "Post", new { id = prev.PostId, hid = prev.Id }, null)
+                            }
+                            else
+                            {
+                                <a>没有了</a>
+                            }
+                        }
+                    </div>
+                    <div class="col-xs-6 text-right">
+                        下一版本：
+                        @{
+                            PostHistoryVersion next = ViewBag.Next;
+                            if (next != null)
+                            {
+                                @Html.ActionLink(next.Title, "HistoryVersion", "Post", new { id=next.PostId,hid = next.Id }, null)
+                            }
+                            else
+                            {
+                                <a>没有了</a>
+                            }
+                        }
+                    </div>
+                </section>
+                <!--PC和WAP自适应版-->
+                <div id="SOHUCS" sid="history-@Model.Id"></div>
+                <script type="text/javascript">
+	                (function() {
+		                var appid = 'cytsT3QgK';
+		                var conf = 'prod_0358240040a6c9611add9de991099d42';
+		                var width = window.innerWidth || document.documentElement.clientWidth;
+		                if (width < 960) {
+			                window.document.write(
+				                '<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' +
+				                appid + '&conf=' + conf + '"><\/script>');
+		                } else {
+			                var loadJs = function(d, a) {
+				                var c = document.getElementsByTagName("head")[0] || document.head || document.documentElement;
+				                var b = document.createElement("script");
+				                b.setAttribute("type", "text/javascript");
+				                b.setAttribute("charset", "UTF-8");
+				                b.setAttribute("src", d);
+				                if (typeof a === "function") {
+					                if (window.attachEvent) {
+						                b.onreadystatechange = function() {
+							                var e = b.readyState;
+							                if (e === "loaded" || e === "complete") {
+								                b.onreadystatechange = null;
+								                a()
+							                }
+						                }
+					                } else {
+						                b.onload = a
+					                }
+				                }
+				                c.appendChild(b)
+			                };
+			                loadJs("https://changyan.sohu.com/upload/changyan.js", function() {
+				                window.changyan.api.config({
+					                appid: appid,
+					                conf: conf
+				                })
+			                });
+		                }
+	                })();
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
+<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
+<script src="~/Assets/jquery.tocify/jquery.tocify.js"></script>
+<script>
+    $(function() {
+		$("#toc").show();
+        var toc = $("#toc").tocify({
+            selectors: ".ibox-content h3,.ibox-content h4,.ibox-content h5"
+        }).data("toc-tocify");
+	    $(".tocify>.close").on("click", function(e) {
+		    $(this).parent().hide();
+	    });		
+	    SyntaxHighlighter.all();
+	    SyntaxHighlighter.defaults['toolbar'] = false;
+	    $("#code-token").on("submit", function(e) {
+		    e.preventDefault();
+		    $.post("/post/CheckViewToken", $(this).serialize(), function(data) {
+			    if (data.Success) {
+				    window.location.reload();
+			    } else {
+				    window.notie.alert({
+					    type: 3,
+					    text: data.Message,
+					    time: 4
+				    });
+			    }
+		    });
+	    });
+	    $("#email-token").on("submit", function(e) {
+		    e.preventDefault();
+		    $.post("/post/getviewtoken", $(this).serialize(), function(data) {
+			    if (data.Success) {
+				    window.localStorage.setItem("email",$("#email3").val());
+				    window.location.reload();
+			    } else {
+				    window.notie.alert({
+					    type: 3,
+					    text: data.Message,
+					    time: 4
+				    });
+			    }
+		    });
+	    });
+	})
+</script>
