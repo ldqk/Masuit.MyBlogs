@@ -7,7 +7,6 @@ using Microsoft.Owin;
 using Microsoft.Owin.Cors;
 using Models.DTO;
 using Owin;
-using System.Configuration;
 using System.Web;
 
 [assembly: OwinStartup(typeof(Startup))]
@@ -20,7 +19,8 @@ namespace Masuit.MyBlogs.WebApp
         {
             //配置任务持久化到内存
             //GlobalConfiguration.Configuration.UseMemoryStorage();
-            GlobalConfiguration.Configuration.UseSqlServerStorage(ConfigurationManager.ConnectionStrings["DataContext"].ConnectionString);
+            //GlobalConfiguration.Configuration.UseSqlServerStorage(ConfigurationManager.ConnectionStrings["DataContext"].ConnectionString);
+            GlobalConfiguration.Configuration.UseRedisStorage();
 
             //启用dashboard
             app.UseHangfireServer(new BackgroundJobServerOptions { WorkerCount = 10 });
@@ -29,6 +29,7 @@ namespace Masuit.MyBlogs.WebApp
                 Authorization = new[] { new MyRestrictiveAuthorizationFilter() }
             }); //注册dashboard的路由地址
             app.UseCors(CorsOptions.AllowAll);
+            app.UseHangfireServer();
             app.MapSignalR();
         }
     }

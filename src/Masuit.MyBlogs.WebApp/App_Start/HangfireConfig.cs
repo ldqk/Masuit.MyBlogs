@@ -1,14 +1,11 @@
 ﻿using Common;
 using Hangfire;
-using Hangfire.Console;
-using Masuit.MyBlogs.WebApp.Models.Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.NoSQL;
 using Masuit.Tools.Win32;
 using Models.Application;
 using Models.Enum;
 using System;
-using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using System.Net.Http;
@@ -24,19 +21,8 @@ namespace Masuit.MyBlogs.WebApp
     {
         public static void Register()
         {
-            #region Hangfire配置
-
-            //GlobalConfiguration.Configuration.UseMemoryStorage();
-            GlobalConfiguration.Configuration.UseSqlServerStorage(ConfigurationManager.ConnectionStrings["DataContext"].ConnectionString).UseConsole();
-
-            #region 实现类注册
-
+            GlobalConfiguration.Configuration.UseRedisStorage();
             GlobalConfiguration.Configuration.UseAutofacActivator(AutofacConfig.Container);
-
-            #endregion
-
-            #region 服务启动
-
             Server = new BackgroundJobServer(new BackgroundJobServerOptions
             {
                 ServerName = $"{Environment.MachineName}", //服务器名称
@@ -46,16 +32,11 @@ namespace Masuit.MyBlogs.WebApp
                 //Queues = new[] { "masuit" } //队列名
             });
 
-            #endregion
-
-            #endregion
-
-            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene)); //更新文章索引
-            AggregateInterviews(); //访客统计
+            //AggregateInterviews(); //访客统计
             RecurringJob.AddOrUpdate(() => Windows.ClearMemorySilent(), Cron.Hourly); //每小时清理系统内存
             RecurringJob.AddOrUpdate(() => CheckLinks(), Cron.HourInterval(5)); //每5h检查友链
             RecurringJob.AddOrUpdate(() => EverydayJob(), Cron.Daily, TimeZoneInfo.Local); //每天的任务
-            RecurringJob.AddOrUpdate(() => AggregateInterviews(), Cron.Hourly(30)); //每半小时统计访客
+            //RecurringJob.AddOrUpdate(() => AggregateInterviews(), Cron.Hourly(30)); //每半小时统计访客
             using (RedisHelper redisHelper = RedisHelper.GetInstance())
             {
                 if (!redisHelper.KeyExists("ArticleViewToken"))
@@ -76,24 +57,13 @@ namespace Masuit.MyBlogs.WebApp
             using (RedisHelper redisHelper = RedisHelper.GetInstance())
             {
                 redisHelper.SetString("ArticleViewToken", string.Empty.CreateShortToken()); //更新加密文章的密码
+                redisHelper.StringIncrement("Interview:RunningDays");
             }
             using (DataContext db = new DataContext())
             {
-                //清理hangfire数据库
-                db.Database.ExecuteSqlCommand(@"DELETE FROM [HangFire].[Job] WHERE StateName='Succeeded' or StateName='Deleted';
-                    TRUNCATE TABLE [HangFire].[Counter];
-                    DELETE FROM [HangFire].[Hash] WHERE Field='Jobid';
-                    DELETE FROM [HangFire].[AggregatedCounter] WHERE ExpireAt is not null;
-                    UPDATE [HangFire].[AggregatedCounter] SET [Value] = (select count(1) from [HangFire].[Job] WHERE StateName<>'Succeeded' and StateName<>'Deleted')-1 WHERE [Key] = 'stats:succeeded'; 
-                    UPDATE [HangFire].[AggregatedCounter] SET [Value] = 0 WHERE [Key] = 'stats:deleted'");
                 DateTime time = DateTime.Now.AddMonths(-2);
                 db.SearchDetails.Where(s => s.SearchTime < time).DeleteFromQuery();
             }
-        }
-
-        public static void AggregateInterviews()
-        {
-            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.AggregateInterviews));
         }
 
         /// <summary>
@@ -107,34 +77,29 @@ namespace Masuit.MyBlogs.WebApp
                 Parallel.ForEach(links, link =>
                 {
                     Uri uri = new Uri(link.Url);
-                    using (HttpClient client = new HttpClient()
-                    {
-                        BaseAddress = uri
-                    })
+                    using (HttpClient client = new HttpClient())
                     {
                         client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
                         client.DefaultRequestHeaders.Referrer = new Uri("https://masuit.com");
                         client.Timeout = TimeSpan.FromHours(10);
-                        client.GetAsync(uri.PathAndQuery)
-                            .ContinueWith(async t =>
+                        client.GetAsync(uri).ContinueWith(async t =>
+                        {
+                            if (t.IsCanceled || t.IsFaulted)
                             {
-                                if (t.IsCanceled || t.IsFaulted)
-                                {
-                                    link.Status = Status.Unavailable;
-                                    return;
-                                }
-                                var res = await t;
-                                if (res.IsSuccessStatusCode)
-                                {
-                                    link.Status = !(await res.Content.ReadAsStringAsync()).Contains(CommonHelper.GetSettings("Domain")) ? Status.Unavailable : Status.Available;
-                                }
-                                else
-                                {
-                                    link.Status = Status.Unavailable;
-                                }
-                                db.Entry(link).State = EntityState.Modified;
-                            })
-                            .Wait();
+                                link.Status = Status.Unavailable;
+                                return;
+                            }
+                            var res = await t;
+                            if (res.IsSuccessStatusCode)
+                            {
+                                link.Status = !(await res.Content.ReadAsStringAsync()).Contains(CommonHelper.GetSettings("Domain")) ? Status.Unavailable : Status.Available;
+                            }
+                            else
+                            {
+                                link.Status = Status.Unavailable;
+                            }
+                            db.Entry(link).State = EntityState.Modified;
+                        }).Wait();
                     }
                 });
                 db.SaveChanges();

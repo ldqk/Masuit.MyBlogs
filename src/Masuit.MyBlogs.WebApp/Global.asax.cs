@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -10,11 +9,8 @@ using Hangfire;
 using Masuit.MyBlogs.WebApp.Models.Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.Logging;
-using Masuit.Tools.Net;
 using Masuit.Tools.NoSQL;
-using Models.DTO;
 #if DEBUG
-using Masuit.Tools.Win32;
 #endif
 using Z.EntityFramework.Extensions;
 
@@ -38,63 +34,8 @@ namespace Masuit.MyBlogs.WebApp
         }
         protected void Session_Start(object sender, EventArgs e)
         {
-            HttpRequest request = Request;
-            string ua = request.UserAgent;
-            string ip = request.UserHostAddress;
-#if DEBUG
-            Random r = new Random();
-            ip = $"{r.StrictNext(235)}.{r.StrictNext(255)}.{r.StrictNext(255)}.{r.StrictNext(255)}";
-#endif
-            Session.Set("landDate", DateTime.Now);
-            ip.MatchInetAddress(out bool success);
-            if (success)
-            {
-                Guid uid = Guid.NewGuid();
-                Session.Set("currentOnline", uid);
-                Task.Factory.StartNew(s =>
-                {
-                    HttpRequest req = s as HttpRequest;
-                    bool isNotSpider = ua != null && !ua.Contains(new[] { "DNSPod", "Baidu", "spider", "Python", "bot" });
-                    if (isNotSpider) //屏蔽百度云观测以及搜索引擎爬虫
-                    {
-                        string refer;
-                        try
-                        {
-                            refer = req.UrlReferrer?.AbsoluteUri ?? "直接输入网址";
-                        }
-                        catch (Exception)
-                        {
-                            refer = "直接输入网址";
-                        }
-                        string browserType = req.Browser.Type;
-                        if (browserType.Contains("Chrome1") || browserType.Contains("Chrome2") || browserType.Contains("Chrome3") || browserType.Equals("Chrome4") || browserType.Equals("Chrome7") || browserType.Equals("Chrome9") || browserType.Contains("Chrome40") || browserType.Contains("Chrome41") || browserType.Contains("Chrome42") || browserType.Contains("Chrome43"))
-                        {
-                            browserType = "Chrome43-";
-                        }
-                        else if (browserType.Contains("IE"))
-                        {
-                            browserType = "InternetExplorer" + req.Browser.Version;
-                        }
-                        else if (browserType.Equals("Safari6") || browserType.Equals("Safari5") || browserType.Equals("Safari4") || browserType.Equals("Safari"))
-                        {
-                            browserType = "Safari6-";
-                        }
-                        Interview interview = new Interview()
-                        {
-                            IP = ip,
-                            UserAgent = ua,
-                            BrowserType = browserType,
-                            OperatingSystem = req.Browser.Platform,
-                            ViewTime = DateTime.Now,
-                            FromUrl = refer,
-                            HttpMethod = req.HttpMethod,
-                            LandPage = req.Url.ToString(),
-                            Uid = uid
-                        };
-                        HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.FlushInetAddress), args: interview);
-                    }
-                }, request);
-            }
+            RedisHelper.StringIncrement("Interview:ViewCount");
+            return;
         }
 
         protected void Application_BeginRequest(object sender, EventArgs e)
@@ -164,36 +105,6 @@ namespace Masuit.MyBlogs.WebApp
 
         protected void Session_End(object sender, EventArgs e)
         {
-            var uid = Session.Get<Guid>("currentOnline");
-            //IInterviewBll interviewBll = AutofacConfig.Container.Resolve<IInterviewBll>();
-            var interview = RedisHelper.ListRange<Interview>($"Interview:{DateTime.Today:yyyy:MM:dd}").Union(RedisHelper.ListRange<Interview>($"Interview:{DateTime.Today.AddDays(-1):yyyy:MM:dd}")).FirstOrDefault(i => i.Uid.Equals(uid));
-            if (interview != null)
-            {
-                RedisHelper.RemoveList($"Interview:{DateTime.Today:yyyy:MM:dd}", interview);
-                if (interview.InterviewDetails.Any())
-                {
-                    var interviewDetails = interview.InterviewDetails;
-                    var ts = DateTime.Now - interviewDetails.FirstOrDefault().Time;
-                    if (ts.TotalMinutes > 20)
-                    {
-                        ts = ts - TimeSpan.FromMinutes(20);
-                    }
-                    var len = string.Empty;
-                    if (ts.Hours > 0)
-                    {
-                        len += $"{ts.Hours}小时";
-                    }
-
-                    if (ts.Minutes > 0)
-                    {
-                        len += $"{ts.Minutes}分钟";
-                    }
-                    len += $"{ts.Seconds}.{ts.Milliseconds}秒";
-                    interview.OnlineSpan = len;
-                    interview.OnlineSpanSeconds = ts.TotalSeconds;
-                }
-                RedisHelper.ListRightPush($"Interview:{DateTime.Today:yyyy:MM:dd}", interview);
-            }
         }
 
         protected void Application_End(object sender, EventArgs e)

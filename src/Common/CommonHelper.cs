@@ -16,7 +16,6 @@ using Masuit.Tools.Models;
 using Masuit.Tools.NoSQL;
 using Masuit.Tools.Security;
 using Models.Application;
-using Models.DTO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -99,15 +98,12 @@ namespace Common
                     return 1;
                 }
             }
-            set
-            {
-            }
         }
 
         /// <summary>
-        /// 访问量
+        /// 平均访问量
         /// </summary>
-        public static double Todaypv
+        public static double AverageCount
         {
             get
             {
@@ -115,7 +111,7 @@ namespace Common
                 {
                     using (var redisHelper = RedisHelper.GetInstance())
                     {
-                        return redisHelper.ListRange<Interview>($"Interview:{DateTime.Today:yyyy:MM:dd}").Count;
+                        return redisHelper.GetString<double>("Interview:ViewCount") / redisHelper.GetString<double>("Interview:RunningDays");
                     }
                 }
                 catch
@@ -123,15 +119,7 @@ namespace Common
                     return 1;
                 }
             }
-            set
-            {
-            }
         }
-
-        /// <summary>
-        /// 平均访问量
-        /// </summary>
-        public static double AverageCount { get; set; }
 
         /// <summary>
         /// 网站启动时间
@@ -139,26 +127,8 @@ namespace Common
         public static DateTime StartupTime { get; set; } = DateTime.Now;
 
         /// <summary>
-        /// 在线人数
+        /// IP黑名单地址段
         /// </summary>
-        public static int OnlineCount
-        {
-            get
-            {
-                try
-                {
-                    using (var redisHelper = RedisHelper.GetInstance(1))
-                    {
-                        return redisHelper.GetServer().Keys(1, "Session:*").Count();
-                    }
-                }
-                catch
-                {
-                    return 1;
-                }
-            }
-        }
-
         public static Dictionary<string, string> DenyIPRange { get; set; }
 
         /// <summary>

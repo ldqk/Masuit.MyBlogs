@@ -205,18 +205,6 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 					return $ocLazyLoad.load([cpath + "/msg.js"]);
 				}]
 			}
-		}).state("interview", {
-			url: "/interview",
-			templateUrl: vpath + "/analysis/interview.html",
-			controller: "interview as list",
-			resolve: {
-				deps: ["$ocLazyLoad", function($ocLazyLoad) {
-					return $ocLazyLoad.load([{
-						files: ["/assets/jedate/jedate.min.css", "/Assets/semantic/semantic.css", "/assets/jedate/jquery.jedate.min.js", "/Scripts/boost.js", "https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js", "https://img.hcharts.cn/highcharts/modules/data.js", "https://img.hcharts.cn/highcharts/modules/drilldown.js"],
-						cache: true
-					},cpath + "/analysis.js"]);
-				}]
-			}
 		}).state("search", {
 			url: "/search",
 			templateUrl: vpath + "/analysis/search.html",

@@ -1,7 +1,6 @@
 ﻿using Common;
 using IBLL;
 using Masuit.MyBlogs.WebApp.Models;
-using Masuit.MyBlogs.WebApp.Models.Hangfire;
 using Masuit.Tools.NoSQL;
 using Models.DTO;
 using Models.Entity;
@@ -20,10 +19,12 @@ namespace Masuit.MyBlogs.WebApp.Controllers
     public class SearchController : BaseController
     {
         public ISearchDetailsBll SearchDetailsBll { get; set; }
+        private readonly IPostBll _postBll;
 
-        public SearchController(ISearchDetailsBll searchDetailsBll)
+        public SearchController(ISearchDetailsBll searchDetailsBll, IPostBll postBll)
         {
             SearchDetailsBll = searchDetailsBll;
+            _postBll = postBll;
         }
 
         [Route("s/{wd?}/{page:int?}/{size:int?}"), OutputCache(VaryByParam = "wd", Duration = 60)]
@@ -55,7 +56,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     return View(nul);
                 }
                 wd = wd.Trim().Replace("+", " ");
-                var sw = new Stopwatch();
                 if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
                 {
                     if (page == 1)
@@ -67,14 +67,16 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                             IP = Request.UserHostAddress
                         });
                     }
-                    sw.Start();
-                    var query = LuceneHelper.Search(wd).ToList();
-                    var posts = query.Skip((page - 1) * size).Take(size).ToList();
-                    sw.Stop();
+                    string[] keywords = LuceneHelper.CutKeywords(wd).ToArray();
+                    Stopwatch sw = Stopwatch.StartNew();
+                    var posts = _postBll.SearchPage(page, size, out count, keywords, p => p.ModifyDate);
                     ViewBag.Elapsed = sw.Elapsed.TotalMilliseconds;
-                    ViewBag.Total = query.Count;
+                    ViewBag.Total = count;
                     SearchDetailsBll.SaveChanges();
-                    redisHelper.SetString(key, wd, TimeSpan.FromSeconds(10));
+                    if (count > 1)
+                    {
+                        redisHelper.SetString(key, wd, TimeSpan.FromSeconds(10));
+                    }
                     ViewBag.hotSearches = new List<KeywordsRankOutputDto>();
                     return View(posts);
                 }
@@ -85,13 +87,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 }).ToList();
                 return View(nul);
             }
-        }
-
-        [Authority]
-        public ActionResult ResetIndex()
-        {
-            string job = HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.ResetLucene));
-            return ResultData(job, true, "索引库重置成功！");
         }
 
         [Authority, HttpPost]

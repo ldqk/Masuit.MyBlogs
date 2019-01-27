@@ -401,7 +401,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                 });
             }
 
-            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
             return ResultData(null, b, b ? "审核通过！" : "审核失败！");
         }
 
@@ -411,7 +410,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var post = PostBll.GetById(id);
             post.Status = Status.Deleted;
             bool b = PostBll.UpdateEntitySaved(post);
-            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 
@@ -421,7 +419,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             var post = PostBll.GetById(id);
             post.Status = Status.Pended;
             bool b = PostBll.UpdateEntitySaved(post);
-            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
             return ResultData(null, b, b ? "恢复成功！" : "恢复失败！");
         }
 
@@ -462,7 +459,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
             }
 
             bool b = PostBll.DeleteByIdSaved(id);
-            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 
@@ -714,7 +710,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     });
                 }
 #endif
-                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
                 return ResultData(p.Mapper<PostOutputDto>(), message: "文章修改成功！");
             }
 
@@ -809,7 +804,6 @@ namespace Masuit.MyBlogs.WebApp.Controllers
                     });
                 }
 
-                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.UpdateLucene));
                 return ResultData(null, true, "文章发表成功！");
             }
 

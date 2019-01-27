@@ -102,13 +102,8 @@
         <li data-ui-sref-active="active">
             <a data-ui-sref-active="active" data-ui-sref="subscribe" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-swap-alt"></i>订阅管理</a>
         </li>
-
-        <li class="sub-menu" data-ng-class="{ 'active toggled': mactrl.$state.includes('pages') }">
-            <a href="" toggle-submenu><i class="zmdi zmdi-trending-up"></i>数据分析</a>
-            <ul>
-                <li><a data-ui-sref-active="active" data-ui-sref="interview" data-ng-click="mactrl.sidebarStat($event)">访客分析</a></li>
-                <li><a data-ui-sref-active="active" data-ui-sref="search" data-ng-click="mactrl.sidebarStat($event)">搜索记录分析</a></li>
-            </ul>
+        <li data-ui-sref-active="active">
+            <a data-ui-sref-active="active" data-ui-sref="search" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-trending-up"></i>搜索记录分析</a>
         </li>
 
         <li data-ui-sref-active="active">

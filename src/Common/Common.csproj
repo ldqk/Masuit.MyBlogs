@@ -82,7 +82,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AggregatedCounter.cs" />
     <Compile Include="CommonHelper.cs" />
     <Compile Include="DocumentConvert.cs" />
     <Compile Include="HangfireHelper.cs" />

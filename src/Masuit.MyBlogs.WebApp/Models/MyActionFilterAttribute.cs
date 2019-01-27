@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Masuit.Tools;
+using Masuit.Tools.Net;
+using System;
 using System.Configuration;
 using System.IO;
 using System.Security.Cryptography;
@@ -7,10 +9,6 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
-using Common;
-using Masuit.MyBlogs.WebApp.Models.Hangfire;
-using Masuit.Tools;
-using Masuit.Tools.Net;
 
 namespace Masuit.MyBlogs.WebApp.Models
 {
@@ -37,7 +35,6 @@ namespace Masuit.MyBlogs.WebApp.Models
                         uid = Guid.NewGuid();
                         filterContext.HttpContext.Session.Set("currentOnline", uid);
                     }
-                    HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.InterviewTrace), null, uid, req.Url.ToString().Replace(":80/", "/"));
                 }
             }
             catch

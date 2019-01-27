@@ -1,29 +1,56 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using AutoMapper.QueryableExtensions;
+using Masuit.Tools.Html;
 using Models.DTO;
 using Models.Entity;
-using Models.Enum;
+using NinjaNye.SearchExtensions;
+using PanGu;
+using PanGu.HighLight;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace BLL
 {
     public partial class PostBll
     {
-        public bool MoveToCategory(int pid, int cid)
+        public List<PostOutputDto> SearchPage<TOrder>(int page, int size, out int total, string[] keywords, Expression<Func<Post, TOrder>> orderBy)
         {
-            Post post = GetById(pid);
-            post.CategoryId = cid;
-            return UpdateEntitySaved(post);
-        }
-    }
-    public partial class MenuBll
-    {
-        /// <summary>
-        /// 获取菜单
-        /// </summary>
-        /// <returns></returns>
-        public IList<MenuOutputDto> GetMenus()
-        {
-            return BaseDal.LoadEntitiesFromCacheNoTracking<MenuOutputDto>(m => m.Status == Status.Available).ToList();
+            var query = GetAllNoTracking().Search().Containing(keywords);
+            total = query.Count();
+            var posts = query.OrderByDescending(orderBy).Skip((page - 1) * size).Take(size).ProjectTo<PostOutputDto>().ToList();
+            var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
+            var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
+
+            foreach (var p in posts)
+            {
+                p.Content = p.Content.RemoveHtml();
+                foreach (var s in keywords)
+                {
+                    string frag;
+                    if (p.Title.Contains(s) && !string.IsNullOrEmpty(frag = highlighter.GetBestFragment(s, p.Title)))
+                    {
+                        p.Title = frag;
+                        break;
+                    }
+                }
+                bool handled = false;
+                foreach (var s in keywords)
+                {
+                    string frag;
+                    if (p.Content.Contains(s) && !string.IsNullOrEmpty(frag = highlighter.GetBestFragment(s, p.Content)))
+                    {
+                        p.Content = frag;
+                        handled = true;
+                        break;
+                    }
+                }
+                if (p.Content.Length > 200 && !handled)
+                {
+                    p.Content = p.Content.Substring(0, 200);
+                }
+            }
+            return posts;
         }
     }
 }
