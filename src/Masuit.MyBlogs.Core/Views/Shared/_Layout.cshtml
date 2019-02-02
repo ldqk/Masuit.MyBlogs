@@ -19,7 +19,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    @*上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！*@
     <meta http-equiv="X-UA-Compatible" content="IE=8">
     <meta http-equiv="Expires" content="0">
     <meta http-equiv="Pragma" content="no-cache">
@@ -28,7 +27,6 @@
     <title>@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])</title>
     <meta name="keywords" content="@(CommonHelper.SystemSettings["Keyword"]+","+ViewBag.Keyword)" />
     <meta name="description" content="@(CommonHelper.SystemSettings["Description"]+","+ViewBag.Keyword)" />
-    @*导入css*@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.9/sweetalert2.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/notie/4.3.1/notie.min.css" rel="stylesheet">
@@ -37,22 +35,19 @@
     <link href="~/Content/bootstrap.min.css" rel="stylesheet">
     <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
     <link href="~/fonts/icomoon.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery.paging.css" rel="stylesheet" />
+    <link href="~/Content/common/reset.css" rel="stylesheet" />
+    <link href="~/Content/common/loading.css" rel="stylesheet" />
+    <link href="~/Content/common/style.css" rel="stylesheet" />
+    <link href="~/Content/common/articlestyle.css" rel="stylesheet" />
+    <link href="~/Content/common/leaderboard.css" rel="stylesheet" />
+    <link href="~/Content/microtip.min.css" rel="stylesheet" />
+    <link href="~/Assets/breadcrumb/style.css" rel="stylesheet" />
+    <link href="~/Assets/nav/css/style.css" rel="stylesheet" />
+    <link href="~/Assets/tab/styles.css" rel="stylesheet" />
+    <link href="~/Assets/tagcloud/css/tagcloud.css" />
+    <link href="~/Assets/tippy/tippy.css" rel="stylesheet" />
 
-    <link href="~/Content/jquery.paging.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/Content/common/reset.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/Content/common/loading.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/Content/common/style.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/Content/common/articlestyle.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/Content/common/leaderboard.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/Content/microtip.min.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/Assets/breadcrumb/style.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/Assets/nav/css/style.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/Assets/tab/styles.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/Assets/tagcloud/css/tagcloud.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/Assets/tippy/tippy.css" rel="stylesheet" asp-append-version="true" />
-    @*@RenderSection("styles")*@
-
-    @*导入Scripts*@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.5.0/bluebird.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
@@ -68,20 +63,18 @@
     <script src="~/Scripts/bootstrap.min.js"></script>
     <script src="~/Scripts/layer/layer.js"></script>
     <script src="~/Assets/layui/layui.min.js"></script>
-
-    <script src="~/Scripts/bootstrap-suggest.min.js" asp-append-version="true"></script>
-    <script src="~/Scripts/jquery.query.js" asp-append-version="true"></script>
-    <script src="~/Scripts/jquery.paging.js" asp-append-version="true"></script>
-    <script src="~/Scripts/ripplet.js" asp-append-version="true"></script>
-    <script src="~/Scripts/global/scripts.js" asp-append-version="true"></script>
-    <script src="~/Assets/tippy/tippy.js" asp-append-version="true"></script>
-    <script src="~/Assets/newsbox/jquery.bootstrap.newsbox.js" asp-append-version="true"></script>
-    <script src="~/Assets/tab/stopExecutionOnTimeout.js" asp-append-version="true"></script>
-    <script src="~/Assets/tab/init.js" asp-append-version="true"></script>
-    <script src="~/Assets/tagcloud/js/tagcloud.js" asp-append-version="true"></script>
-    <script src="~/Assets/scrolltop/js/scrolltop.js" asp-append-version="true"></script>
-    <script src="~/Assets/nav/js/main.js" asp-append-version="true"></script>
-    @*@RenderSection("scripts")*@
+    <script src="~/Scripts/bootstrap-suggest.min.js"></script>
+    <script src="~/Scripts/jquery.query.js"></script>
+    <script src="~/Scripts/jquery.paging.js"></script>
+    <script src="~/Scripts/ripplet.js"></script>
+    <script src="~/Scripts/global/scripts.js"></script>
+    <script src="~/Assets/tippy/tippy.js"></script>
+    <script src="~/Assets/newsbox/jquery.bootstrap.newsbox.js"></script>
+    <script src="~/Assets/tab/stopExecutionOnTimeout.js"></script>
+    <script src="~/Assets/tab/init.js"></script>
+    <script src="~/Assets/tagcloud/js/tagcloud.js"></script>
+    <script src="~/Assets/scrolltop/js/scrolltop.js"></script>
+    <script src="~/Assets/nav/js/main.js"></script>
 </head>
 <body>
     <div id="toc" style="display: none;">

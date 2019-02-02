@@ -5,6 +5,9 @@ using Common;
 using EFSecondLevelCache.Core;
 using Hangfire;
 using Hangfire.Dashboard;
+using Masuit.LuceneEFCore.SearchEngine;
+using Masuit.LuceneEFCore.SearchEngine.Extensions;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Controllers;
 using Masuit.MyBlogs.Core.Extensions;
@@ -15,6 +18,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Repository;
 using Masuit.MyBlogs.Core.Infrastructure.Services;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Builder;
@@ -22,20 +26,24 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.WebEncoders;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core
 {
@@ -99,18 +107,19 @@ namespace Masuit.MyBlogs.Core
             services.AddResponseCaching(); //注入响应缓存
             services.Configure<FormOptions>(options =>
             {
-                options.MultipartBodyLengthLimit = 2048000;
+                options.MultipartBodyLengthLimit = 104857600;// 100MB
             }); //配置请求长度
 
             services.AddSession(); //注入Session
             services.AddHangfire(x => x.UseRedisStorage(AppConfig.Redis)); //配置hangfire
 
-            services.AddSevenZipCompressor().AddResumeFileResult().AddDefaultRedisHelper(AppConfig.Redis); //配置7z和断点续传和Redis
+            services.AddSevenZipCompressor().AddResumeFileResult().AddDefaultRedisHelper(AppConfig.Redis).AddSearchEngine<DataContext>(new LuceneIndexerOptions() { Path = "lucene" });// 配置7z和断点续传和Redis和Lucene搜索引擎
+
             //配置EF二级缓存
             services.AddEFSecondLevelCache();
             // 配置EF二级缓存策略
             services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
-            services.AddSingleton(typeof(ICacheManagerConfiguration), new CacheManager.Core.ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10)).Build());
+            services.AddSingleton(new CacheManager.Core.ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10)).Build());
 
             services.AddWebSockets(opt => opt.ReceiveBufferSize = 4096 * 1024).AddSignalR();
 
@@ -124,12 +133,12 @@ namespace Masuit.MyBlogs.Core
                 opt.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 //opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddControllersAsServices();
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddControllersAsServices().AddViewComponentsAsServices().AddTagHelpersAsServices();
 
             services.Configure<WebEncoderOptions>(options =>
             {
                 options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
-            });//解决razor视图中中文被编码的问题
+            }); //解决razor视图中中文被编码的问题
 
             ContainerBuilder builder = new ContainerBuilder();
             builder.Populate(services);
@@ -153,8 +162,9 @@ namespace Masuit.MyBlogs.Core
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <param name="db"></param>
-        /// <param name="appLifetime"></param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, DataContext db, IApplicationLifetime appLifetime)
+        /// <param name="searchEngine"></param>
+        /// <param name="luceneIndexerOptions"></param>
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, DataContext db, ISearchEngine<DataContext> searchEngine, LuceneIndexerOptions luceneIndexerOptions)
         {
             if (env.IsDevelopment())
             {
@@ -166,15 +176,33 @@ namespace Masuit.MyBlogs.Core
                 app.UseHsts();
                 app.UseException();
             }
+
+            app.UseHttpsRedirection().UseStaticFiles(new StaticFileOptions //静态资源缓存策略
+            {
+                OnPrepareResponse = context =>
+                {
+                    context.Context.Response.Headers[HeaderNames.CacheControl] = "public,no-cache";
+                    context.Context.Response.Headers[HeaderNames.Expires] = DateTime.UtcNow.AddDays(7).ToString("R");
+                },
+                ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes)
+            }).UseCookiePolicy();
+
             app.UseFirewall(); //启用网站防火墙
             //db.Database.Migrate();
             CommonHelper.SystemSettings = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
+
+            string lucenePath = Path.Combine(env.ContentRootPath, luceneIndexerOptions.Path);
+            if (!Directory.Exists(lucenePath) || Directory.GetFiles(lucenePath).Length < 1)
+            {
+                Console.WriteLine("开始自动创建Lucene索引库...");
+                searchEngine.CreateIndex();
+                Console.WriteLine("索引库创建完成！");
+            }
 
             app.UseStaticHttpContext(); //注入静态HttpContext对象
             app.UseSession(); //注入Session
 
             app.UseEFSecondLevelCache(); //启动EF二级缓存
-            app.UseHttpsRedirection().UseStaticFiles().UseCookiePolicy();
             app.UseHangfireServer().UseHangfireDashboard("/taskcenter", new DashboardOptions()
             {
                 Authorization = new[]
@@ -192,14 +220,11 @@ namespace Masuit.MyBlogs.Core
             app.UseResponseCaching(); //启动Response缓存
             app.UseSwagger().UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint($"/swagger/v1/swagger.json", "懒得勤快的博客");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", CommonHelper.SystemSettings["Title"]);
             }); //配置swagger
             app.UseSignalR(hub => hub.MapHub<MyHub>("/hubs"));
             HangfireJobInit.Start(); //初始化定时任务
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(name: "default", template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseMvcWithDefaultRoute();
         }
     }
 

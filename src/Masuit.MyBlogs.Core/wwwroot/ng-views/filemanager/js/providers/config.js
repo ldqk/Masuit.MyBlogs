@@ -7,7 +7,7 @@
             defaultLang: 'zh_cn',
 
             listUrl: 'file/handle',
-            uploadUrl: 'file/handle',
+            uploadUrl: 'file/upload',
             renameUrl: 'file/handle',
             copyUrl: 'file/handle',
             moveUrl: 'file/handle',

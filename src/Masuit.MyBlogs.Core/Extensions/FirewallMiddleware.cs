@@ -31,11 +31,6 @@ namespace Masuit.MyBlogs.Core.Extensions
 
         public async Task Invoke(HttpContext context)
         {
-            context.Response.Headers.Add("Pragma", "no-cache");
-            context.Response.Headers.Add("Expires", "0");
-            context.Response.Headers[HeaderNames.Expires] = "0";
-            context.Response.Headers[HeaderNames.CacheControl] = "no-cache";
-
             string httpMethod = context.Request.Method;
             if (httpMethod.Equals("OPTIONS", StringComparison.InvariantCultureIgnoreCase) || httpMethod.Equals("HEAD", StringComparison.InvariantCultureIgnoreCase))
             {

@@ -71,6 +71,7 @@ namespace Masuit.MyBlogs.Core.Hubs
         {
             Task.Run(() =>
             {
+                int errorCount = 0;
                 while (true)
                 {
                     try
@@ -79,9 +80,14 @@ namespace Masuit.MyBlogs.Core.Hubs
                     }
                     catch (Exception e)
                     {
+                        if (errorCount > 20)
+                        {
+                            break;
+                        }
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(e);
+                        Console.WriteLine(e.Message);
                         Console.ForegroundColor = ConsoleColor.White;
+                        errorCount++;
                     }
                     Thread.Sleep(5000);
                 }
@@ -140,6 +146,7 @@ namespace Masuit.MyBlogs.Core.Hubs
             {
                 return;
             }
+            byte errCount = 0;
             while (Connections.Any(s => s.Key.Equals(Context.ConnectionId)))
             {
                 Connections[Context.ConnectionId] = true;
@@ -147,17 +154,21 @@ namespace Masuit.MyBlogs.Core.Hubs
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     await writer.WriteAsync(GetCurrentPerformanceCounter(), cancellationToken);
-                    await Task.Delay(delay, cancellationToken);
                 }
                 catch (Exception e)
                 {
-                    // ignored
-                    Console.WriteLine("出现错误:" + e.Message);
+                    if (errCount > 20)
+                    {
+                        break;
+                    }
+                    Console.WriteLine("WebSocket出现错误:" + e.Message);
+                    errCount++;
                 }
                 if (cancellationToken.IsCancellationRequested)
                 {
                     break;
                 }
+                await Task.Delay(delay, cancellationToken);
             }
             writer.TryComplete();
         }

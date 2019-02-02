@@ -1,13 +1,16 @@
 ﻿using Common;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Infrastructure.Application;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.Tools;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.NoSQL;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
@@ -24,16 +27,17 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public ISearchDetailsService SearchDetailsService { get; set; }
         private readonly IPostService _postService;
-
+        private readonly ISearchEngine<DataContext> _searchEngine;
         /// <summary>
         /// 站内搜索
         /// </summary>
         /// <param name="searchDetailsService"></param>
         /// <param name="postService"></param>
-        public SearchController(ISearchDetailsService searchDetailsService, IPostService postService)
+        public SearchController(ISearchDetailsService searchDetailsService, IPostService postService, ISearchEngine<DataContext> searchEngine)
         {
             SearchDetailsService = searchDetailsService;
             _postService = postService;
+            _searchEngine = searchEngine;
         }
 
         /// <summary>
@@ -47,9 +51,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Search(string wd = "", int page = 1, int size = 10)
         {
             var nul = new List<PostOutputDto>();
-            int count = 0;
             ViewBag.Elapsed = 0;
-            ViewBag.Total = count;
+            ViewBag.Total = 0;
             ViewBag.Keyword = wd;
             if (Regex.Match(wd, CommonHelper.BanRegex).Length > 0 || Regex.Match(wd, CommonHelper.ModRegex).Length > 0)
             {
@@ -64,7 +67,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     var hotSearches = SearchDetailsService.LoadEntitiesFromL2CacheNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()
                     {
-                        KeyWords = g.FirstOrDefault().KeyWords,
+                        KeyWords = g.First().KeyWords,
                         SearchCount = g.Count()
                     }).ToList();
                     ViewBag.hotSearches = hotSearches;
@@ -74,27 +77,26 @@ namespace Masuit.MyBlogs.Core.Controllers
                 wd = wd.Trim().Replace("+", " ");
                 if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
                 {
-                    if (page == 1)
+                    if (HttpContext.Session.TryGetValue("search:" + wd, out _))
                     {
-                        SearchDetailsService.AddEntity(new SearchDetails()
+                        SearchDetailsService.AddEntity(new SearchDetails
                         {
                             KeyWords = wd,
                             SearchTime = DateTime.Now,
                             IP = HttpContext.Connection.RemoteIpAddress.ToString()
                         });
+                        HttpContext.Session.Set("search:" + wd, wd);
                     }
-                    string[] keywords = LuceneHelper.CutKeywords(wd).ToArray();
-                    Stopwatch sw = Stopwatch.StartNew();
-                    var posts = _postService.SearchPage(page, size, out count, keywords, p => p.ModifyDate);
-                    ViewBag.Elapsed = sw.Elapsed.TotalMilliseconds;
-                    ViewBag.Total = count;
+                    var posts = _postService.SearchPage(page, size, wd);
+                    ViewBag.Elapsed = posts.Elapsed;
+                    ViewBag.Total = posts.Total;
                     SearchDetailsService.SaveChanges();
-                    if (count > 1)
+                    if (posts.Total > 1)
                     {
                         redisHelper.SetString(key, wd, TimeSpan.FromSeconds(10));
                     }
                     ViewBag.hotSearches = new List<KeywordsRankOutputDto>();
-                    return View(posts);
+                    return View(posts.Results);
                 }
                 ViewBag.hotSearches = SearchDetailsService.LoadEntitiesFromL2CacheNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()
                 {
@@ -119,7 +121,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 page = 1;
             }
-            var @where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.KeyWords.Contains(search);
+            var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.KeyWords.Contains(search);
             var list = SearchDetailsService.LoadPageEntities<DateTime, SearchDetailsOutputDto>(page, size, out int total, where, s => s.SearchTime, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
@@ -167,6 +169,17 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             bool b = SearchDetailsService.DeleteByIdSaved(id);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
+        }
+
+        /// <summary>
+        /// 创建索引
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Authority]
+        public IActionResult CreateIndex()
+        {
+            _searchEngine.CreateIndex(new List<string>() { nameof(Post) });
+            return ResultData(null, true, "索引库创建完成！");
         }
     }
 }

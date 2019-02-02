@@ -242,20 +242,32 @@ namespace Masuit.MyBlogs.Core.Controllers
                         success = "true"
                     });
                     break;
-                default:
-                    var httpfiles = Request.Form.Files;
-                    if (httpfiles.Count > 0)
+            }
+            return Json(new
+            {
+                result = list
+            });
+        }
+
+        /// <summary>
+        /// 上传文件
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult Upload(string destination)
+        {
+            List<object> list = new List<object>();
+            var prefix = CommonHelper.SystemSettings["PathRoot"].Trim('\\', '/');
+            if (Request.Form.Files.Count > 0)
+            {
+                foreach (var t in Request.Form.Files)
+                {
+                    string path = Path.Combine(string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? _hostingEnvironment.WebRootPath + (destination) : prefix + destination, t.FileName);
+                    using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                     {
-                        foreach (var t in httpfiles)
-                        {
-                            path = Path.Combine(string.IsNullOrEmpty(prefix) && !Directory.Exists(prefix) ? _hostingEnvironment.WebRootPath + (req.Destination) : prefix + req.Destination, t.FileName);
-                            using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                            {
-                                t.CopyTo(fs);
-                            }
-                        }
+                        t.CopyTo(fs);
                     }
-                    break;
+                }
             }
             return Json(new
             {

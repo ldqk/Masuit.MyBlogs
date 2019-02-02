@@ -324,29 +324,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
 
         /// <summary>
-        /// 获取第一条数据，优先从缓存读取
-        /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns>实体</returns>
-        public virtual T GetFirstEntityFromL2Cache(Expression<Func<T, bool>> @where)
-        {
-            return LoadEntitiesFromL2Cache(where).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 获取第一条数据，优先从缓存读取
-        /// </summary>
-        /// <typeparam name="TS">排序</typeparam>
-        /// <param name="where">查询条件</param>
-        /// <param name="orderby">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns>映射实体</returns>
-        public virtual T GetFirstEntityFromL2Cache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
-        {
-            return LoadEntitiesFromL2Cache(where, orderby, isAsc).FirstOrDefault();
-        }
-
-        /// <summary>
         /// 获取第一条数据
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -414,54 +391,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public virtual TDto GetFirstEntity<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
             return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).AsNoTracking().ProjectTo<TDto>().FirstOrDefault() : DataContext.Set<T>().Where(where).OrderByDescending(orderby).AsNoTracking().ProjectTo<TDto>().FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 获取第一条数据，优先从二级缓存读取（不跟踪实体）
-        /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns>实体</returns>
-        public virtual T GetFirstEntityFromL2CacheNoTracking(Expression<Func<T, bool>> @where)
-        {
-            return LoadEntitiesFromL2CacheNoTracking(where).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 获取第一条数据，优先从二级缓存读取（不跟踪实体）
-        /// </summary>
-        /// <typeparam name="TS">排序</typeparam>
-        /// <param name="where">查询条件</param>
-        /// <param name="orderby">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns>实体</returns>
-        public virtual T GetFirstEntityFromL2CacheNoTracking<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
-        {
-            return LoadEntitiesFromL2CacheNoTracking(where, orderby, isAsc).FirstOrDefault();
-        }
-
-
-        /// <summary>
-        /// 获取第一条被AutoMapper映射后的数据，优先从二级缓存读取（不跟踪实体）
-        /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns>实体</returns>
-        public virtual TDto GetFirstEntityFromL2Cache<TDto>(Expression<Func<T, bool>> @where) where TDto : class
-        {
-            return LoadEntitiesFromL2Cache<TDto>(where).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 获取第一条被AutoMapper映射后的数据，优先从二级缓存读取（不跟踪实体）
-        /// </summary>
-        /// <typeparam name="TS">排序</typeparam>
-        /// <typeparam name="TDto">映射实体</typeparam>
-        /// <param name="where">查询条件</param>
-        /// <param name="orderby">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns>映射实体</returns>
-        public virtual TDto GetFirstEntityFromL2Cache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
-        {
-            return LoadEntitiesFromL2Cache<TS, TDto>(where, orderby, isAsc).FirstOrDefault();
         }
 
         /// <summary>

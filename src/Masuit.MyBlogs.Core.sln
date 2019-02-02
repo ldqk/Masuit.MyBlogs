@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.Tools.Core", "..\Mas
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.MyBlogs.Core", "Masuit.MyBlogs.Core\Masuit.MyBlogs.Core.csproj", "{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.LuceneEFCore.SearchEngine", "..\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine.csproj", "{50501B4A-0AF3-4613-949D-9FE9D26F1B10}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50501B4A-0AF3-4613-949D-9FE9D26F1B10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50501B4A-0AF3-4613-949D-9FE9D26F1B10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50501B4A-0AF3-4613-949D-9FE9D26F1B10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50501B4A-0AF3-4613-949D-9FE9D26F1B10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

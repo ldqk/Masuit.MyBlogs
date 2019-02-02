@@ -3,11 +3,9 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.NoSQL;
 using Masuit.Tools.Systems;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
 using System.Linq;
@@ -119,6 +117,18 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             _redisHelper.StringIncrement("Interview:RunningDays");
             DateTime time = DateTime.Now.AddMonths(-1);
             _searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
+            foreach (var p in _postService.GetAll().AsParallel())
+            {
+                try
+                {
+                    p.AverageViewCount = p.PostAccessRecord.Average(r => r.ClickCount);
+                    p.TotalViewCount = p.PostAccessRecord.Sum(r => r.ClickCount);
+                    _postService.UpdateEntitySaved(p);
+                }
+                catch (Exception)
+                {
+                }
+            }
         }
 
         /// <summary>

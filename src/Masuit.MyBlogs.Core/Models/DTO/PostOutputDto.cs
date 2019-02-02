@@ -46,7 +46,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// <summary>
         /// 浏览次数
         /// </summary>
-        public int ViewCount { get; set; }
+        public int TotalViewCount { get; set; }
 
         /// <summary>
         /// 发表时间

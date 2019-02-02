@@ -137,7 +137,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     posts = temp.ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.ViewCount:
-                    posts = temp.ThenByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+                    posts = temp.ThenByDescending(p => p.TotalViewCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.VoteCount:
                     posts = temp.ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
@@ -220,7 +220,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 KeyWords = g.FirstOrDefault().KeyWords,
                 SearchCount = g.Count()
             }).Cacheable().ToList(); //热词统计
-            Expression<Func<PostOutputDto, double>> order = p => p.ViewCount;
+            Expression<Func<PostOutputDto, double>> order = p => p.TotalViewCount;
             switch (new Random().Next() % 3)
             {
                 case 1:
@@ -267,7 +267,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.ViewCount:
-                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.ViewCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.TotalViewCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.VoteCount:
                     posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();

@@ -87,8 +87,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Application
             //IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: true, reloadOnChange: true).Build();
             var conn = "Server=192.168.135.70;Database=matrixone_portfolio_test_db;Uid=portfolio;Pwd=portfolio@#$123;";
             var builder = new DbContextOptionsBuilder<DataContext>();
-            builder.UseMySql(conn);
-            //builder.UseSqlServer("Data Source=.;Initial Catalog=CoreTest;Integrated Security=True");
+            //builder.UseMySql(conn);
+            builder.UseSqlServer("Data Source=.;Initial Catalog=CoreTest;Integrated Security=True");
 
             return new DataContext(builder.Options);
         }

@@ -12,10 +12,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 404
         /// </summary>
         /// <returns></returns>
-        [Route("error")]
+        [Route("{*url}", Order = 99999)]
         public ActionResult Index()
         {
-            //Response.StatusCode = 404;
+            Response.StatusCode = 404;
             if (Request.Method.ToLower().Equals("get"))
             {
                 return View();
@@ -35,7 +35,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("ServiceUnavailable")]
         public ActionResult ServiceUnavailable()
         {
-            //Response.StatusCode = 503;
+            Response.StatusCode = 503;
             if (Request.Method.ToLower().Equals("get"))
             {
                 return View();

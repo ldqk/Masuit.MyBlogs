@@ -190,7 +190,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult Last()
         {
-            var notice = NoticeService.GetFirstEntityFromL2Cache(n => n.Status == Status.Display, n => n.ModifyDate, false);
+            var notice = NoticeService.GetFirstEntity(n => n.Status == Status.Display, n => n.ModifyDate, false);
             if (notice != null)
             {
                 if (HttpContext.Session.Get<object>("notice" + notice.Id) is null)

@@ -63,12 +63,6 @@
 			$scope.connectWebsocket();
 		}
 	});
-	$scope.ClearMemory = function() {
-		console.log("111");
-		$scope.request("/system/CollectMemory", null, function(res) {
-			swal(res.Message, "", "info");
-		});
-	}
 	$http.post("/system/GetBaseInfo", null).then(function(res) {
 		var data = res.data;
 		$scope.cpu = data.cpuInfo[0];

@@ -203,6 +203,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var b = SystemSettingService.SaveChanges() > 0;
+            CommonHelper.SystemSettings = SystemSettingService.GetAll().ToDictionary(s => s.Name, s => s.Value); //同步设置
             return ResultData(null, b, b ? "设置保存成功！" : "设置保存失败！");
         }
 

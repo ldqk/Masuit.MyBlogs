@@ -1,32 +1,35 @@
-﻿using AutoMapper.QueryableExtensions;
+﻿using Common;
+using Masuit.LuceneEFCore.SearchEngine;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+using Masuit.MyBlogs.Core.Infrastructure.Application;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.Tools.Html;
-using NinjaNye.SearchExtensions;
 using PanGu;
 using PanGu.HighLight;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
     public partial class PostService : BaseService<Post>, IPostService
     {
-        public List<PostOutputDto> SearchPage<TOrder>(int page, int size, out int total, string[] keywords, Expression<Func<Post, TOrder>> orderBy)
+        private readonly ILuceneIndexSearcher _searcher;
+        private readonly ISearchEngine<DataContext> _searchEngine;
+        public PostService(IPostRepository repository, ILuceneIndexSearcher searcher, ISearchEngine<DataContext> searchEngine) : base(repository)
         {
-            var query = GetAllNoTracking().Search().Containing(keywords);
-            total = query.Count();
-            var posts = query.OrderByDescending(orderBy).Skip((page - 1) * size).Take(size).ProjectTo<PostOutputDto>().ToList();
+            _searcher = searcher;
+            _searchEngine = searchEngine;
+        }
+        public SearchResult<PostOutputDto> SearchPage(int page, int size, string keyword)
+        {
+            var searchResult = _searchEngine.ScoredSearch<Post>(new SearchOptions(keyword, page, size, typeof(Post)));
+            var posts = searchResult.Results.Select(p => p.Entity.Mapper<PostOutputDto>()).ToList();
             var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
             var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
-
+            var keywords = _searcher.CutKeywords(keyword);
             foreach (var p in posts)
             {
-                p.Content = p.Content.RemoveHtml();
                 foreach (var s in keywords)
                 {
                     string frag;
@@ -52,11 +55,17 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                     p.Content = p.Content.Substring(0, 200);
                 }
             }
-            return posts;
+            return new SearchResult<PostOutputDto>()
+            {
+                Results = posts,
+                Elapsed = searchResult.Elapsed,
+                Total = searchResult.TotalHits
+            };
         }
 
-        public PostService(IBaseRepository<Post> repository) : base(repository)
+        public PostService(IBaseRepository<Post> repository, ISearchEngine<DataContext> searchEngine) : base(repository)
         {
+            _searchEngine = searchEngine;
         }
     }
 }
