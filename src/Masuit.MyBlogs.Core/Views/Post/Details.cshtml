@@ -13,13 +13,14 @@
     string cid = 0 + Context.Request.Query["cid"];
 }
 <link href="~/Assets/layui/css/layui.css" rel="stylesheet" />
-@*<link href="~/Assets/directory/style.min.css" rel="stylesheet" />*@
 <link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
 <script src="~/Assets/layui/layui.all.js"></script>
 <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
 <link href="~/Assets/share/share.css" rel="stylesheet" />
+<link href="~/Assets/highlight/css/highlight.css" rel="stylesheet" />
 <script src="~/Assets/share/jquery.qrcode.min.js"></script>
 <script src="~/Assets/share/jquery.share.min.js"></script>
+<script src="~/Assets/highlight/js/highlight.js"></script>
 <div class="container">
     <ol class="cd-breadcrumb triangle">
         <li>@Html.ActionLink("首页", "Index", "Home")</li>
@@ -335,6 +336,10 @@
 <script src="~/Scripts/global/article.min.js"></script>
 <script>
 	window.onload = function() {
+        var keywords = @Html.Raw(ViewData["keywords"] ?? "[]");
+        for (var i = 0; i < keywords.length; i++) {
+            $("#article").highlight(keywords[i]);
+        }
         loading();
 		$('#pageToolbar').Paging({ //异步加载评论
 			pagesize: 10,

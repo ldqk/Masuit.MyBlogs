@@ -1,5 +1,4 @@
 ﻿@using System.Web
-@using AngleSharp.Network.Default
 @using Common
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
@@ -30,6 +29,7 @@
 <script src="~/Assets/layui/layui.all.js"></script>
 <script src="~/Assets/gooey/gooey.min.js"></script>
 <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
+<link href="~/Assets/highlight/css/highlight.css" rel="stylesheet" />
 <link href="~/Assets/share/share.css" rel="stylesheet" />
 <script src="~/Assets/share/jquery.qrcode.min.js"></script>
 <script src="~/Assets/share/jquery.share.min.js"></script>
@@ -289,6 +289,7 @@
 @*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js"></script>*@
 <script src="~/Assets/jquery.tocify/jquery.tocify.js"></script>
 <script src="~/Scripts/global/article.js"></script>
+<script src="~/Assets/highlight/js/highlight.js"></script>
 <script>
 
 	function getcomments() {
@@ -305,6 +306,10 @@
 		});
     }
 	window.onload = function() {
+        var keywords = @Html.Raw(ViewData["keywords"] ?? "[]");
+        for (var i = 0; i < keywords.length; i++) {
+            $("#article").highlight(keywords[i]);
+        }
 		loading();
 		//SyntaxHighlighter.all();
 		//SyntaxHighlighter.defaults['toolbar'] = false;

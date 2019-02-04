@@ -44,6 +44,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISearchEngine<DataContext> _searchEngine;
         private readonly ILuceneIndexer _luceneIndexer;
+        private readonly ILuceneIndexSearcher _luceneIndexSearcher;
+
         /// <summary>
         /// 
         /// </summary>
@@ -60,7 +62,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="hostingEnvironment"></param>
         /// <param name="searchEngine"></param>
         /// <param name="luceneIndexer"></param>
-        public PostController(IPostService postService, ICategoryService categoryService, IBroadcastService broadcastService, ISeminarService seminarService, IPostHistoryVersionService postHistoryVersionService, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine, ILuceneIndexer luceneIndexer)
+        public PostController(IPostService postService, ICategoryService categoryService, IBroadcastService broadcastService, ISeminarService seminarService, IPostHistoryVersionService postHistoryVersionService, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine, ILuceneIndexer luceneIndexer, ILuceneIndexSearcher luceneIndexSearcher)
         {
             PostService = postService;
             CategoryService = categoryService;
@@ -70,6 +72,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             _hostingEnvironment = hostingEnvironment;
             _searchEngine = searchEngine;
             _luceneIndexer = luceneIndexer;
+            _luceneIndexSearcher = luceneIndexSearcher;
         }
 
         /// <summary>
@@ -89,6 +92,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 DateTime modifyDate = post.ModifyDate;
                 ViewBag.Next = PostService.GetFirstEntityNoTracking(p => p.ModifyDate > modifyDate && (p.Status == Status.Pended || user.IsAdmin), p => p.ModifyDate);
                 ViewBag.Prev = PostService.GetFirstEntityNoTracking(p => p.ModifyDate < modifyDate && (p.Status == Status.Pended || user.IsAdmin), p => p.ModifyDate, false);
+                if (!string.IsNullOrEmpty(kw))
+                {
+                    ViewData["keywords"] = _luceneIndexSearcher.CutKeywords(kw).ToJsonString();
+                }
                 if (user.IsAdmin)
                 {
                     return View("Details_Admin", post);
@@ -104,6 +111,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.RecordPostVisit), args: id);
                     HttpContext.Session.SetByRedis("post" + id, id.ToString());
                 }
+
                 return View(post);
             }
 

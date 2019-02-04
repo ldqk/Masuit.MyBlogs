@@ -424,3 +424,83 @@ Custom bottom spacer
     font-size: 16px;
     color: #2196F3;
 }
+
+#tagscloud {
+    min-width: 250px;
+    min-height: 200px;
+    max-width: 100vh;
+    position: relative;
+    font-size: 12px;
+    color: #333;
+    /*margin: 20px auto 0;*/
+    text-align: center;
+}
+
+    #tagscloud a {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        color: #333;
+        font-family: Arial;
+        text-decoration: none;
+        margin: 0 10px 15px 0;
+        text-align: center;
+        padding: 1px 5px;
+        display: inline-block;
+        border-radius: 3px;
+    }
+
+        #tagscloud a.tagc-0 {
+            background: #666;
+            color: #fff;
+        }
+
+        #tagscloud a.tagc-1 {
+            background: #a9a9a9;
+            color: #fff;
+        }
+
+        #tagscloud a.tagc-2 {
+            background: #F16E50;
+            color: #fff;
+        }
+
+        #tagscloud a.tagc-3 {
+            background: #6495ed;
+            color: #fff;
+        }
+
+        #tagscloud a.tagc-4 {
+            background: #da70d6;
+            color: #fff;
+        }
+
+        #tagscloud a.tagc-5 {
+            background: #006633;
+            color: #fff;
+        }
+
+        #tagscloud a.tagc-6 {
+            background: #d2691e;
+            color: #fff;
+        }
+
+        #tagscloud a.tagc-7 {
+            background: #ff00ff;
+            color: #fff;
+        }
+
+        #tagscloud a.tagc-8 {
+            background: #afeeee;
+            color: #fff;
+        }
+
+        #tagscloud a.tagc-9 {
+            background: #da70d6;
+            color: #fff;
+        }
+
+        #tagscloud a:hover {
+            color: #fff;
+            background: #0099ff;
+        }

@@ -53,7 +53,7 @@
                                 <div class="border padding-10">
                                     <div class="search-result">
                                         <h2 class="size20">
-                                            <a href="@Url.Action("Details","Post",new{id=p.Id})" target="_blank">@Html.Raw(p.Title)</a>
+                                            <a asp-controller="Post" asp-action="Details" asp-route-id="@p.Id" asp-route-kw="@ViewBag.Keyword" target="_blank">@Html.Raw(p.Title)</a>
                                         </h2>
                                         <label class="label label-info">@Html.Raw(p.Author)</label>
                                         @Html.ActionLink(Context.Request.Scheme + "://" + Context.Request.Host + "/" + p.Id, "Details", "Post", new { id = p.Id }, new { @class = "search-link", target = "_blank" })
