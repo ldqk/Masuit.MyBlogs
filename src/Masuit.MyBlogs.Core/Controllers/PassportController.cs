@@ -1,5 +1,4 @@
-﻿using Common;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -129,7 +128,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 HttpContext.Session.SetByRedis(SessionKey.UserInfo, userInfo);
                 if (remem.Trim().Contains(new[] { "on", "true" })) //是否记住登录
                 {
-                    Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()));
+                    Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                     Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.BaiduAK), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                 }
                 HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, HttpContext.Connection.RemoteIpAddress.ToString(), LoginType.Default);

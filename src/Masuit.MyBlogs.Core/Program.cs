@@ -21,13 +21,8 @@ namespace Masuit.MyBlogs.Core
         {
             var builder = new ConfigurationBuilder().AddCommandLine(args).SetBasePath(Directory.GetCurrentDirectory()).AddEnvironmentVariables().AddJsonFile("appsettings.json", true, true);
             var config = builder.Build();
-#if DEBUG
             var port = config["port"] ?? Environment.GetEnvironmentVariable("port") ?? "5000";
             var sslport = config["sslport"] ?? Environment.GetEnvironmentVariable("sslport") ?? "5001";
-#else
-            var port = config["port"] ?? Environment.GetEnvironmentVariable("port") ?? "80";
-            var sslport = config["sslport"] ?? Environment.GetEnvironmentVariable("sslport") ?? "443";
-#endif
             return WebHost.CreateDefaultBuilder(args).UseKestrel(opt =>
             {
                 opt.ListenAnyIP(port.ToInt32());
