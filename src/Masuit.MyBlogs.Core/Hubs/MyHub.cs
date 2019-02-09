@@ -65,7 +65,7 @@ namespace Masuit.MyBlogs.Core.Hubs
         /// <summary>
         /// 性能计数器缓存
         /// </summary>
-        public static ConcurrentLimitedQueue<PerformanceCounter> PerformanceCounter { get; set; } = new ConcurrentLimitedQueue<PerformanceCounter>(10000);
+        public static ConcurrentLimitedQueue<PerformanceCounter> PerformanceCounter { get; set; } = new ConcurrentLimitedQueue<PerformanceCounter>(2000);
 
         static MyHub()
         {

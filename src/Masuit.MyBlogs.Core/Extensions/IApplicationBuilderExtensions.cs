@@ -12,5 +12,9 @@ namespace Masuit.MyBlogs.Core.Extensions
         {
             return builder.UseMiddleware<ExceptionMiddleware>();
         }
+        public static IApplicationBuilder UseRequestIntercept(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<RequestInterceptMiddleware>();
+        }
     }
 }

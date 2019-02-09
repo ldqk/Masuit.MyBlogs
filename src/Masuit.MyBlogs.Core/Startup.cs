@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +53,11 @@ namespace Masuit.MyBlogs.Core
     /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// 依赖注入容器
+        /// </summary>
+        public static IServiceProvider AutofacContainer { get; set; }
+
         /// <summary>
         /// asp.net core核心配置
         /// </summary>
@@ -152,11 +158,6 @@ namespace Masuit.MyBlogs.Core
         }
 
         /// <summary>
-        /// 依赖注入容器
-        /// </summary>
-        public static IServiceProvider AutofacContainer { get; set; }
-
-        /// <summary>
         /// Configure
         /// </summary>
         /// <param name="app"></param>
@@ -175,6 +176,10 @@ namespace Masuit.MyBlogs.Core
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
                 app.UseException();
+                using (var fs = File.OpenText(Path.Combine(env.ContentRootPath, "App_Data", "rewrite.xml")))
+                {
+                    app.UseRewriter(new RewriteOptions().AddIISUrlRewrite(fs));
+                }
             }
 
             app.UseHttpsRedirection().UseStaticFiles(new StaticFileOptions //静态资源缓存策略
@@ -187,7 +192,7 @@ namespace Masuit.MyBlogs.Core
                 ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes)
             }).UseCookiePolicy();
 
-            app.UseFirewall(); //启用网站防火墙
+            app.UseFirewall().UseRequestIntercept(); //启用网站防火墙
             //db.Database.Migrate();
             CommonHelper.SystemSettings = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
 
