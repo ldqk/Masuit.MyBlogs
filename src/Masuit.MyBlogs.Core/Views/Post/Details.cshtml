@@ -10,7 +10,7 @@
     ViewBag.Title = Model.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
-    string cid = 0 + Context.Request.Query["cid"];
+    string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
 }
 <link href="~/Assets/layui/css/layui.css" rel="stylesheet" />
 <link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />

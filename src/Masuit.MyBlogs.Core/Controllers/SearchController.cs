@@ -83,7 +83,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         {
                             KeyWords = wd,
                             SearchTime = DateTime.Now,
-                            IP = HttpContext.Connection.RemoteIpAddress.ToString()
+                            IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString()
                         });
                         HttpContext.Session.Set("search:" + wd, wd);
                     }

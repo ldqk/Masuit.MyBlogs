@@ -116,7 +116,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         {
                             Expires = DateTime.Now.AddDays(7)
                         });
-                        Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions()
+                        Response.Cookies.Append("password", Request.Cookies["password"].DesEncrypt(AppConfig.BaiduAK), new CookieOptions()
                         {
                             Expires = DateTime.Now.AddDays(7)
                         });

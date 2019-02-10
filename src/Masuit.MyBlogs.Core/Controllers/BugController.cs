@@ -131,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Submit(Issue issue)
         {
             issue.Description = CommonHelper.ReplaceImgSrc(Regex.Replace(issue.Description, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/");
-            issue.IPAddress = HttpContext.Connection.RemoteIpAddress.ToString();
+            issue.IPAddress = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             Issue bug = IssueService.AddEntitySaved(issue);
             if (bug != null)
             {

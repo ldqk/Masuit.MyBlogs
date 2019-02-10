@@ -150,7 +150,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             msg.PostDate = DateTime.Now;
             msg.Content = Regex.Replace(msg.Content.HtmlSantinizerStandard().ConvertImgSrcToRelativePath(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>");
             msg.Browser = msg.Browser ?? Request.Headers[HeaderNames.UserAgent];
-            msg.IP = HttpContext.Connection.RemoteIpAddress.ToString();
+            msg.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             LeaveMessage msg2 = LeaveMessageService.AddEntitySaved(msg.Mapper<LeaveMessage>());
             if (msg2 != null)
             {

@@ -281,7 +281,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             if (page == 1)
             {
-                //posts = postList.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).AsEnumerable().Union(posts).ToList();
+                posts = postList.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).AsEnumerable().Union(posts).ToList();
             }
             return new IndexPageViewModel()
             {

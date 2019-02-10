@@ -176,11 +176,12 @@ namespace Masuit.MyBlogs.Core
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
                 app.UseException();
-                using (var fs = File.OpenText(Path.Combine(env.ContentRootPath, "App_Data", "rewrite.xml")))
-                {
-                    app.UseRewriter(new RewriteOptions().AddIISUrlRewrite(fs));
-                }
             }
+
+            app.UseRewriter(new RewriteOptions().AddRedirectToNonWww());
+            app.UseStaticHttpContext(); //注入静态HttpContext对象
+
+            app.UseSession(); //注入Session
 
             app.UseHttpsRedirection().UseStaticFiles(new StaticFileOptions //静态资源缓存策略
             {
@@ -203,9 +204,6 @@ namespace Masuit.MyBlogs.Core
                 searchEngine.CreateIndex();
                 Console.WriteLine("索引库创建完成！");
             }
-
-            app.UseStaticHttpContext(); //注入静态HttpContext对象
-            app.UseSession(); //注入Session
 
             app.UseEFSecondLevelCache(); //启动EF二级缓存
             app.UseHangfireServer().UseHangfireDashboard("/taskcenter", new DashboardOptions()

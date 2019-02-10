@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Web;
+using Common;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -88,9 +89,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 if (userInfo != null)
                 {
                     Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                    Response.Cookies.Append("password", pwd, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                    Response.Cookies.Append("password", pwd.DesEncrypt(AppConfig.BaiduAK), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                     HttpContext.Session.SetByRedis(SessionKey.UserInfo, userInfo);
-                    HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, HttpContext.Connection.RemoteIpAddress.ToString(), LoginType.Default);
+                    HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString(), LoginType.Default);
                     if (string.IsNullOrEmpty(from))
                     {
                         return RedirectToAction("Index", "Home");
@@ -131,7 +132,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                     Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.BaiduAK), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                 }
-                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, HttpContext.Connection.RemoteIpAddress.ToString(), LoginType.Default);
+                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString(), LoginType.Default);
                 string refer = Request.Cookies["refer"];
                 return ResultData(null, true, string.IsNullOrEmpty(refer) ? "/" : refer);
             }

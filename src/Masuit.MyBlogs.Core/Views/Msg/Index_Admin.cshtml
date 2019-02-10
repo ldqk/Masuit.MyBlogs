@@ -5,7 +5,7 @@
     ViewBag.Title = "留言板";
     Layout = "~/Views/Shared/_Layout.cshtml";
     UserInfoOutputDto user = Context.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
-    string cid = 0 + Context.Request.Query["cid"];
+    string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
 }
 <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
 <script src="~/Assets/layui/layui.all.js"></script>

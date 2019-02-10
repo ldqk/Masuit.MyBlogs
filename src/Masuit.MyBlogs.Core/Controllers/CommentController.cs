@@ -80,7 +80,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             comment.Content = Regex.Replace(comment.Content.HtmlSantinizerStandard().ConvertImgSrcToRelativePath(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>");
             comment.CommentDate = DateTime.Now;
             comment.Browser = comment.Browser ?? Request.Headers[HeaderNames.UserAgent];
-            comment.IP = HttpContext.Connection.RemoteIpAddress.ToString();
+            comment.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             Comment com = CommentService.AddEntitySaved(comment.Mapper<Comment>());
             if (com != null)
             {

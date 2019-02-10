@@ -33,7 +33,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             if (string.IsNullOrEmpty(ip))
             {
-                ip = HttpContext.Connection.RemoteIpAddress.ToString();
+                ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             }
             ViewBag.IP = ip;
             PhysicsAddress address = await ip.GetPhysicsAddressInfo();
@@ -55,7 +55,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             if (string.IsNullOrEmpty(lat) || string.IsNullOrEmpty(lng))
             {
-                var ip = HttpContext.Connection.RemoteIpAddress.ToString();
+                var ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 #if DEBUG
                 Random r = new Random();
                 ip = $"{r.StrictNext(210)}.{r.StrictNext(255)}.{r.StrictNext(255)}.{r.StrictNext(255)}";
@@ -84,7 +84,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             if (string.IsNullOrEmpty(addr))
             {
-                var ip = HttpContext.Connection.RemoteIpAddress.ToString();
+                var ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 #if DEBUG
                 Random r = new Random();
                 ip = $"{r.StrictNext(210)}.{r.StrictNext(255)}.{r.StrictNext(255)}.{r.StrictNext(255)}";

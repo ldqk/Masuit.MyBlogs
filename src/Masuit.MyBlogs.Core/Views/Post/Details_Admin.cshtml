@@ -13,13 +13,13 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
     UserInfoOutputDto user = Context.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
-    string cid = 0 + Context.Request.Query["cid"];
+    string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
 }
 <style>
     #gooey-h {
         position: fixed;
         bottom: 250px;
-        right: 0px;
+        right: 0;
         z-index: 3;
     }
 </style>

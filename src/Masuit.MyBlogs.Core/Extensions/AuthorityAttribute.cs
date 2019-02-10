@@ -38,7 +38,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     if (userInfo != null)
                     {
                         filterContext.HttpContext.Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                        filterContext.HttpContext.Response.Cookies.Append("password", pwd, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                        filterContext.HttpContext.Response.Cookies.Append("password", pwd.DesEncrypt(AppConfig.BaiduAK), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                         filterContext.HttpContext.Session.SetByRedis(SessionKey.UserInfo, userInfo);
                     }
                     else
