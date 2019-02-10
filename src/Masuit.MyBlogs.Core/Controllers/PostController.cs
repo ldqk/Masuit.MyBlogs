@@ -837,7 +837,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     cast.ForEach(c =>
                     {
                         var ts = DateTime.Now.GetTotalMilliseconds();
-                        string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + ("template/broadcast.html"))
+                        string content = System.IO.File.ReadAllText(Path.Combine(_hostingEnvironment.WebRootPath, "template", "broadcast.html"))
                             .Replace("{{link}}", link + "?email=" + c.Email)
                             .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                             .Replace("{{title}}", post.Title)

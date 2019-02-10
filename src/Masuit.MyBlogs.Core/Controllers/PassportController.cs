@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using Common;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -10,11 +11,11 @@ using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Web;
-using Common;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -33,15 +34,19 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public ILoginRecordService LoginRecordService { get; set; }
 
+        private readonly IHostingEnvironment _env;
+
         /// <summary>
         /// 登录授权
         /// </summary>
         /// <param name="userInfoService"></param>
         /// <param name="loginRecordService"></param>
-        public PassportController(IUserInfoService userInfoService, ILoginRecordService loginRecordService)
+        /// <param name="env"></param>
+        public PassportController(IUserInfoService userInfoService, ILoginRecordService loginRecordService, IHostingEnvironment env)
         {
             UserInfoService = userInfoService;
             LoginRecordService = loginRecordService;
+            _env = env;
         }
 
         /// <summary>
@@ -89,7 +94,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 if (userInfo != null)
                 {
                     Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                    Response.Cookies.Append("password", pwd.DesEncrypt(AppConfig.BaiduAK), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                    Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                     HttpContext.Session.SetByRedis(SessionKey.UserInfo, userInfo);
                     HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString(), LoginType.Default);
                     if (string.IsNullOrEmpty(from))
@@ -174,9 +179,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult GetUserInfo()
         {
             UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
-#if DEBUG
-            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
-#endif
+            if (_env.IsDevelopment())
+            {
+                user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
+            }
             return ResultData(user);
         }
 

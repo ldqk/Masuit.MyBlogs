@@ -112,11 +112,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                     var userInfo = UserInfoService.Login(name, pwd);
                     if (userInfo != null)
                     {
-                        Response.Cookies.Append("username", name, new CookieOptions()
+                        Response.Cookies.Append("username", name, new CookieOptions
                         {
                             Expires = DateTime.Now.AddDays(7)
                         });
-                        Response.Cookies.Append("password", Request.Cookies["password"].DesEncrypt(AppConfig.BaiduAK), new CookieOptions()
+                        Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions
                         {
                             Expires = DateTime.Now.AddDays(7)
                         });

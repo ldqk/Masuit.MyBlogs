@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.NoSQL;
 using Masuit.Tools.Systems;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.IO;
 using System.Linq;
@@ -24,8 +25,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         private readonly ILinksService _linksService;
         private readonly RedisHelper _redisHelper;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, RedisHelper redisHelper, IHttpClientFactory httpClientFactory)
+        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, RedisHelper redisHelper, IHttpClientFactory httpClientFactory, IHostingEnvironment hostingEnvironment)
         {
             _userInfoService = userInfoService;
             _postService = postService;
@@ -34,6 +36,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             _linksService = linksService;
             _redisHelper = redisHelper;
             _httpClientFactory = httpClientFactory;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public void LoginRecord(UserInfoOutputDto userInfo, string ip, LoginType type)
@@ -54,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 UserInfo u = _userInfoService.GetByUsername(userInfo.Username);
                 u.LoginRecord.Add(record);
                 _userInfoService.UpdateEntitySaved(u);
-                string content = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "template\\login.html").Replace("{{name}}", u.Username).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{ip}}", record.IP).Replace("{{address}}", record.PhysicAddress);
+                string content = File.ReadAllText(Path.Combine(_hostingEnvironment.WebRootPath, "template", "login.html")).Replace("{{name}}", u.Username).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{ip}}", record.IP).Replace("{{address}}", record.PhysicAddress);
                 CommonHelper.SendMail(_settingService.GetFirstEntity(s => s.Name.Equals("Title")).Value + "账号登录通知", content, _settingService.GetFirstEntity(s => s.Name.Equals("ReceiveEmail")).Value);
             }
         }

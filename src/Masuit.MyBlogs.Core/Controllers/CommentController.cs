@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -294,7 +295,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             bool b = CommentService.UpdateEntitySaved(comment);
             var pid = comment.ParentId == 0 ? comment.Id : CommentService.GetParentCommentIdByChildId(id);
 #if !DEBUG
-            string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + ("template/notify.html")).Replace("{{title}}", post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", comment.NickName).Replace("{{content}}", comment.Content);
+            string content = System.IO.File.ReadAllText(Path.Combine(_hostingEnvironment.WebRootPath, "template", "notify.html")).Replace("{{title}}", post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", comment.NickName).Replace("{{content}}", comment.Content);
             var emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>()
             {
                 comment.Email,
