@@ -114,6 +114,8 @@ namespace Masuit.MyBlogs.Core.Configs
                 m.CreateMap<SeminarOutputDto, Seminar>();
                 m.CreateMap<SeminarInputDto, SeminarOutputDto>();
                 m.CreateMap<SeminarOutputDto, SeminarInputDto>();
+
+                m.CreateMap<SeminarPost, SeminarPostHistoryVersion>().ForMember(s => s.PostHistoryVersionId, e => e.MapFrom(s => s.PostId)).ReverseMap();
             });
         }
     }
