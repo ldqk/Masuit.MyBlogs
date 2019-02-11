@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.MyBlogs.Core.Models.Enum;
 using PanGu;
 using PanGu.HighLight;
 using System.Linq;
@@ -14,17 +15,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
     public partial class PostService : BaseService<Post>, IPostService
     {
-        private readonly ILuceneIndexSearcher _searcher;
-        private readonly ISearchEngine<DataContext> _searchEngine;
-        public PostService(IPostRepository repository, ILuceneIndexSearcher searcher, ISearchEngine<DataContext> searchEngine) : base(repository)
+        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
-            _searcher = searcher;
-            _searchEngine = searchEngine;
         }
         public SearchResult<PostOutputDto> SearchPage(int page, int size, string keyword)
         {
             var searchResult = _searchEngine.ScoredSearch<Post>(new SearchOptions(keyword, page, size, typeof(Post)));
-            var posts = searchResult.Results.Select(p => p.Entity.Mapper<PostOutputDto>()).ToList();
+            var posts = searchResult.Results.Select(p => p.Entity.Mapper<PostOutputDto>()).Where(p => p.Status == Status.Pended).ToList();
             var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
             var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
             var keywords = _searcher.CutKeywords(keyword);
@@ -61,11 +58,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 Elapsed = searchResult.Elapsed,
                 Total = searchResult.TotalHits
             };
-        }
-
-        public PostService(IBaseRepository<Post> repository, ISearchEngine<DataContext> searchEngine) : base(repository)
-        {
-            _searchEngine = searchEngine;
         }
     }
 }

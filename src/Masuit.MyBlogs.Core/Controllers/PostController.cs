@@ -62,6 +62,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="hostingEnvironment"></param>
         /// <param name="searchEngine"></param>
         /// <param name="luceneIndexer"></param>
+        /// <param name="luceneIndexSearcher"></param>
         public PostController(IPostService postService, ICategoryService categoryService, IBroadcastService broadcastService, ISeminarService seminarService, IPostHistoryVersionService postHistoryVersionService, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine, ILuceneIndexer luceneIndexer, ILuceneIndexSearcher luceneIndexSearcher)
         {
             PostService = postService;

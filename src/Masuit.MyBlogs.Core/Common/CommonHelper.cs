@@ -499,6 +499,11 @@ namespace Common
             return (url, success);
         }
 
+        /// <summary>
+        /// 替换img标签的src属性
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
         public static string ReplaceImgSrc(string content)
         {
             var srcs = content.MatchImgSrcs();

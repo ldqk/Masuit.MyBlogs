@@ -1,9 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Masuit.MyBlogs.Core.Models.Entity;
+﻿using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Masuit.MyBlogs.Core.Models.Entity
 {
@@ -35,19 +35,19 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 问题标题
         /// </summary>
-        [Required(ErrorMessage = "标题不能为空！")]
+        [Required(ErrorMessage = "标题不能为空！"), LuceneIndex]
         public string Title { get; set; }
 
         /// <summary>
         /// 存在问题的页面链接
         /// </summary>
-        [Required(ErrorMessage = "链接不能为空！")]
+        [Required(ErrorMessage = "链接不能为空！"), LuceneIndex]
         public string Link { get; set; }
 
         /// <summary>
         /// 问题的详细描述
         /// </summary>
-        [Required(ErrorMessage = "问题描述不能为空！"), SubmitCheck(20, 5000)]
+        [Required(ErrorMessage = "问题描述不能为空！"), SubmitCheck(20, 5000), LuceneIndex(IsHtml = true)]
         public string Description { get; set; }
 
         /// <summary>

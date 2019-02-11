@@ -12,6 +12,9 @@ namespace Masuit.MyBlogs.Core.Configs
     /// </summary>
     public class HangfireJobInit
     {
+        /// <summary>
+        /// hangfire初始化
+        /// </summary>
         public static void Start()
         {
             RecurringJob.AddOrUpdate(() => CheckLinks(), Cron.HourInterval(5)); //每5h检查友链
@@ -25,11 +28,17 @@ namespace Masuit.MyBlogs.Core.Configs
             }
         }
 
+        /// <summary>
+        /// 检查友链
+        /// </summary>
         public static void CheckLinks()
         {
             HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.CheckLinks), "default");
         }
 
+        /// <summary>
+        /// 每日任务
+        /// </summary>
         public static void EverydayJob()
         {
             HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.EverydayJob), "default");

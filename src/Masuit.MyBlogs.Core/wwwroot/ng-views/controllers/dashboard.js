@@ -87,7 +87,7 @@
 	}
 	$scope.connectWebsocket();
 	$.post("/system/GetHistoryList", null, function(data) {
-		$('#cpu').highcharts({
+		Highcharts.stockChart("cpu",{
 			subtitle: {
 				text: document.ontouchstart === undefined ?
 				'鼠标拖动可以进行缩放' : '手势操作进行缩放'
@@ -162,6 +162,50 @@
 			scrollbar: {
 				enabled: false
 			},
+			rangeSelector : {
+				buttons: [{
+					type: 'minute',
+					count: 5,
+					text: '5分钟'
+				}, {
+					type: 'minute',
+					count: 15,
+					text: '15分钟'
+				}, {
+					type: 'minute',
+					count: 30,
+					text: '30分钟'
+				}, {
+					type: 'hour',
+					count: 1,
+					text: '1小时'
+				}, {
+					type: 'hour',
+					count: 2,
+					text: '2小时'
+				}, {
+					type: 'hour',
+					count: 5,
+					text: '5小时'
+				}, {
+					type: 'hour',
+					count: 12,
+					text: '12小时'
+				}, {
+					type: 'day',
+					count: 1,
+					text: '1天'
+				}, {
+					type: 'day',
+					count: 3,
+					text: '3天'
+				}, {
+					type: 'all',
+					text: 'All'
+				}],
+				inputEnabled: false,
+				selected : 1
+			},
 			tooltip: {
 				formatter: function() {
 					return '时间点：<b>' + Highcharts.dateFormat("%H:%M:%S", this.points[0].x) + '</b><br/>' +
@@ -235,7 +279,7 @@
 				},
 			}]
 		});
-		$('#io').highcharts({
+		Highcharts.stockChart("io",{
 			subtitle: {
 				text: document.ontouchstart === undefined ?
 				'鼠标拖动可以进行缩放' : '手势操作进行缩放'
@@ -286,6 +330,50 @@
 			},
 			title: {
 				text: '网络状态 和 磁盘I/O'
+			},
+			rangeSelector : {
+				buttons: [{
+					type: 'minute',
+					count: 5,
+					text: '5分钟'
+				}, {
+					type: 'minute',
+					count: 15,
+					text: '15分钟'
+				}, {
+					type: 'minute',
+					count: 30,
+					text: '30分钟'
+				}, {
+					type: 'hour',
+					count: 1,
+					text: '1小时'
+				}, {
+					type: 'hour',
+					count: 2,
+					text: '2小时'
+				}, {
+					type: 'hour',
+					count: 5,
+					text: '5小时'
+				}, {
+					type: 'hour',
+					count: 12,
+					text: '12小时'
+				}, {
+					type: 'day',
+					count: 1,
+					text: '1天'
+				}, {
+					type: 'day',
+					count: 3,
+					text: '3天'
+				}, {
+					type: 'all',
+					text: 'All'
+				}],
+				inputEnabled: false,
+				selected : 1
 			},
 			xAxis: {
 				type: 'datetime',

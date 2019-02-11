@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire
 {
+    /// <summary>
+    /// hangfire后台任务
+    /// </summary>
     public class HangfireBackJob : IHangfireBackJob
     {
         private readonly IUserInfoService _userInfoService;
@@ -27,6 +30,17 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHostingEnvironment _hostingEnvironment;
 
+        /// <summary>
+        /// hangfire后台任务
+        /// </summary>
+        /// <param name="userInfoService"></param>
+        /// <param name="postService"></param>
+        /// <param name="settingService"></param>
+        /// <param name="searchDetailsService"></param>
+        /// <param name="linksService"></param>
+        /// <param name="redisHelper"></param>
+        /// <param name="httpClientFactory"></param>
+        /// <param name="hostingEnvironment"></param>
         public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, RedisHelper redisHelper, IHttpClientFactory httpClientFactory, IHostingEnvironment hostingEnvironment)
         {
             _userInfoService = userInfoService;
@@ -39,6 +53,12 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             _hostingEnvironment = hostingEnvironment;
         }
 
+        /// <summary>
+        /// 登录记录
+        /// </summary>
+        /// <param name="userInfo"></param>
+        /// <param name="ip"></param>
+        /// <param name="type"></param>
         public void LoginRecord(UserInfoOutputDto userInfo, string ip, LoginType type)
         {
             var result = ip.GetPhysicsAddressInfo().Result;
@@ -62,6 +82,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             }
         }
 
+        /// <summary>
+        /// 文章定时发布
+        /// </summary>
+        /// <param name="p"></param>
         public void PublishPost(Post p)
         {
             p.Status = Status.Pended;
@@ -81,6 +105,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             }
         }
 
+        /// <summary>
+        /// 文章访问记录
+        /// </summary>
+        /// <param name="pid"></param>
         public void RecordPostVisit(int pid)
         {
             Post post = _postService.GetById(pid);
@@ -101,6 +129,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             _postService.UpdateEntitySaved(post);
         }
 
+        /// <summary>
+        /// 防火墙拦截日志
+        /// </summary>
+        /// <param name="s"></param>
         public static void InterceptLog(IpIntercepter s)
         {
             using (RedisHelper redisHelper = RedisHelper.GetInstance())

@@ -7,13 +7,27 @@ using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions
 {
+    /// <summary>
+    /// 异常拦截中间件
+    /// </summary>
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
+
+        /// <summary>
+        /// 异常拦截中间件
+        /// </summary>
+        /// <param name="next"></param>
         public ExceptionMiddleware(RequestDelegate next)
         {
             _next = next;
         }
+
+        /// <summary>
+        /// 执行调用
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public async Task Invoke(HttpContext context)
         {
             try

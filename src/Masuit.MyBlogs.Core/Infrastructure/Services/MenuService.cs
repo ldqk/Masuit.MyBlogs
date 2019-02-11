@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+using Masuit.MyBlogs.Core.Infrastructure.Application;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -18,7 +19,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             return SqlQuery<Menu>("exec sp_getChildrenMenusByParentId " + id);
         }
 
-        public MenuService(IBaseRepository<Menu> repository) : base(repository)
+        public MenuService(IBaseRepository<Menu> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }

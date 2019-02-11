@@ -29,6 +29,11 @@ namespace Masuit.MyBlogs.Core.Extensions
             _redisHelper = redisHelper;
         }
 
+        /// <summary>
+        /// 执行调用
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public async Task Invoke(HttpContext context)
         {
             string httpMethod = context.Request.Method;

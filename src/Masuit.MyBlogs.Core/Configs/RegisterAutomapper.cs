@@ -6,10 +6,15 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Configs
-
 {
+    /// <summary>
+    /// 注册automapper
+    /// </summary>
     public static class RegisterAutomapper
     {
+        /// <summary>
+        /// 初始化
+        /// </summary>
         public static void Excute()
         {
             Mapper.Initialize(m =>

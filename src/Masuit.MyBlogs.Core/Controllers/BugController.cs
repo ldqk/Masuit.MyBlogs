@@ -67,10 +67,19 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult PageData([FromBody]PageFilter filter)
         {
             UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
-            List<Issue> list = string.IsNullOrEmpty(filter.Kw) ? IssueService.LoadPageEntitiesFromL2CacheNoTracking(filter.Page, filter.Size, out int total, i => i.Level != BugLevel.Fatal || user.IsAdmin, i => i.SubmitTime, false).ToList() : IssueService.SearchPage(filter.Page, filter.Size, out total, new[]
+            List<Issue> list;
+            int total;
+            if (string.IsNullOrEmpty(filter.Kw))
             {
-                filter.Kw
-            }, i => (i.Level != BugLevel.Fatal || user.IsAdmin), i => i.SubmitTime, false).ToList();
+                list = IssueService.LoadPageEntitiesFromL2CacheNoTracking(filter.Page, filter.Size, out total, i => i.Status != Status.Handled || i.Level != BugLevel.Fatal || user.IsAdmin, i => i.SubmitTime, false).ToList();
+            }
+            else
+            {
+                var searchResult = IssueService.SearchPage(filter.Page, filter.Size, filter.Kw);
+                total = searchResult.Total;
+                list = searchResult.Results.Where(i => i.Status != Status.Handled || i.Level != BugLevel.Fatal || user.IsAdmin).ToList();
+            }
+
             var pageCount = Math.Ceiling(total * 1.0 / filter.Size).ToInt32();
             return PageResult(list.Select(i => new
             {

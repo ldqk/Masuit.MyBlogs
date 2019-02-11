@@ -1,4 +1,6 @@
-﻿using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
+﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+using Masuit.MyBlogs.Core.Infrastructure.Application;
+using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using System.Collections.Generic;
@@ -30,7 +32,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             return 0;
         }
 
-        public LeaveMessageService(IBaseRepository<LeaveMessage> repository) : base(repository)
+        public LeaveMessageService(IBaseRepository<LeaveMessage> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }

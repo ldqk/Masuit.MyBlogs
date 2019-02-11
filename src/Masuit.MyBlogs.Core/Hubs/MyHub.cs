@@ -65,7 +65,7 @@ namespace Masuit.MyBlogs.Core.Hubs
         /// <summary>
         /// 性能计数器缓存
         /// </summary>
-        public static ConcurrentLimitedQueue<PerformanceCounter> PerformanceCounter { get; set; } = new ConcurrentLimitedQueue<PerformanceCounter>(1000);
+        public static ConcurrentLimitedQueue<PerformanceCounter> PerformanceCounter { get; set; } = new ConcurrentLimitedQueue<PerformanceCounter>(5000);
 
         static MyHub()
         {
@@ -89,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Hubs
                         Console.ForegroundColor = ConsoleColor.White;
                         errorCount++;
                     }
-                    Thread.Sleep(5000);
+                    Thread.Sleep(1000);
                 }
             });
         }

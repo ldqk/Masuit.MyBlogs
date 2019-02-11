@@ -38,6 +38,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -201,7 +202,10 @@ namespace Masuit.MyBlogs.Core
             if (!Directory.Exists(lucenePath) || Directory.GetFiles(lucenePath).Length < 1)
             {
                 Console.WriteLine("开始自动创建Lucene索引库...");
-                searchEngine.CreateIndex();
+                searchEngine.CreateIndex(new List<string>()
+                {
+                    nameof(DataContext.Post),nameof(DataContext.Issues)
+                });
                 Console.WriteLine("索引库创建完成！");
             }
 

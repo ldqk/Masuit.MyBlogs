@@ -1,124 +1,141 @@
-﻿using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
+﻿using Masuit.LuceneEFCore.SearchEngine;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+using Masuit.MyBlogs.Core.Infrastructure.Application;
+using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.MyBlogs.Core.Models.Enum;
+using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
     public partial class BroadcastService : BaseService<Broadcast>, IBroadcastService
     {
-        public BroadcastService(IBaseRepository<Broadcast> repository) : base(repository)
+        public BroadcastService(IBaseRepository<Broadcast> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class ContactsService : BaseService<Contacts>, IContactsService
     {
-        public ContactsService(IBaseRepository<Contacts> repository) : base(repository)
+        public ContactsService(IBaseRepository<Contacts> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class DonateService : BaseService<Donate>, IDonateService
     {
-        public DonateService(IBaseRepository<Donate> repository) : base(repository)
+        public DonateService(IBaseRepository<Donate> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class FastShareService : BaseService<FastShare>, IFastShareService
     {
-        public FastShareService(IBaseRepository<FastShare> repository) : base(repository)
+        public FastShareService(IBaseRepository<FastShare> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class InternalMessageService : BaseService<InternalMessage>, IInternalMessageService
     {
-        public InternalMessageService(IBaseRepository<InternalMessage> repository) : base(repository)
+        public InternalMessageService(IBaseRepository<InternalMessage> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class IssueService : BaseService<Issue>, IIssueService
     {
-        public IssueService(IBaseRepository<Issue> repository) : base(repository)
+        public IssueService(IBaseRepository<Issue> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
+        }
+        public SearchResult<Issue> SearchPage(int page, int size, string keyword)
+        {
+            var searchResult = _searchEngine.ScoredSearch<Issue>(new SearchOptions(keyword, page, size, typeof(Issue)));
+            var posts = searchResult.Results.Select(p => p.Entity).Where(i => i.Status == Status.Handled).ToList();
+            return new SearchResult<Issue>()
+            {
+                Results = posts,
+                Elapsed = searchResult.Elapsed,
+                Total = searchResult.TotalHits
+            };
         }
     }
 
     public partial class LinksService : BaseService<Links>, ILinksService
     {
-        public LinksService(IBaseRepository<Links> repository) : base(repository)
+        public LinksService(IBaseRepository<Links> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class LoginRecordService : BaseService<LoginRecord>, ILoginRecordService
     {
-        public LoginRecordService(IBaseRepository<LoginRecord> repository) : base(repository)
+        public LoginRecordService(IBaseRepository<LoginRecord> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class MiscService : BaseService<Misc>, IMiscService
     {
-        public MiscService(IBaseRepository<Misc> repository) : base(repository)
+        public MiscService(IBaseRepository<Misc> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class NoticeService : BaseService<Notice>, INoticeService
     {
-        public NoticeService(IBaseRepository<Notice> repository) : base(repository)
+        public NoticeService(IBaseRepository<Notice> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class PostAccessRecordService : BaseService<PostAccessRecord>, IPostAccessRecordService
     {
-        public PostAccessRecordService(IBaseRepository<PostAccessRecord> repository) : base(repository)
+        public PostAccessRecordService(IBaseRepository<PostAccessRecord> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class PostHistoryVersionService : BaseService<PostHistoryVersion>, IPostHistoryVersionService
     {
-        public PostHistoryVersionService(IBaseRepository<PostHistoryVersion> repository) : base(repository)
+        public PostHistoryVersionService(IBaseRepository<PostHistoryVersion> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class SearchDetailsService : BaseService<SearchDetails>, ISearchDetailsService
     {
-        public SearchDetailsService(IBaseRepository<SearchDetails> repository) : base(repository)
+        public SearchDetailsService(IBaseRepository<SearchDetails> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class SeminarService : BaseService<Seminar>, ISeminarService
     {
-        public SeminarService(IBaseRepository<Seminar> repository) : base(repository)
+        public SeminarService(IBaseRepository<Seminar> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class SystemSettingService : BaseService<SystemSetting>, ISystemSettingService
     {
-        public SystemSettingService(IBaseRepository<SystemSetting> repository) : base(repository)
+        public SystemSettingService(IBaseRepository<SystemSetting> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class SeminarPostService : BaseService<SeminarPost>, ISeminarPostService
     {
-        public SeminarPostService(IBaseRepository<SeminarPost> repository) : base(repository)
+        public SeminarPostService(IBaseRepository<SeminarPost> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
 
     public partial class SeminarPostHistoryVersionService : BaseService<SeminarPostHistoryVersion>, ISeminarPostHistoryVersionService
     {
-        public SeminarPostHistoryVersionService(IBaseRepository<SeminarPostHistoryVersion> repository) : base(repository)
+        public SeminarPostHistoryVersionService(IBaseRepository<SeminarPostHistoryVersion> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }

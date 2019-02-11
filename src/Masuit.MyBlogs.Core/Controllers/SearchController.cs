@@ -28,11 +28,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ISearchDetailsService SearchDetailsService { get; set; }
         private readonly IPostService _postService;
         private readonly ISearchEngine<DataContext> _searchEngine;
+
         /// <summary>
         /// 站内搜索
         /// </summary>
         /// <param name="searchDetailsService"></param>
         /// <param name="postService"></param>
+        /// <param name="searchEngine"></param>
         public SearchController(ISearchDetailsService searchDetailsService, IPostService postService, ISearchEngine<DataContext> searchEngine)
         {
             SearchDetailsService = searchDetailsService;

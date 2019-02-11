@@ -9,7 +9,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
     /// </summary>
     public class BaseEntity : LuceneIndexableBaseEntity
     {
-        [DefaultValue(Status.Default)]
+        [DefaultValue(Status.Default), LuceneIndex]
         public Status Status { get; set; }
     }
 }

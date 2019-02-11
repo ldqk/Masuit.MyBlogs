@@ -14,6 +14,9 @@ using System.Web;
 
 namespace Masuit.MyBlogs.Core.Extensions
 {
+    /// <summary>
+    /// 授权验证过滤器
+    /// </summary>
     public class AuthorityAttribute : ActionFilterAttribute
     {
         /// <summary>在执行操作方法之前由 ASP.NET MVC 框架调用。</summary>

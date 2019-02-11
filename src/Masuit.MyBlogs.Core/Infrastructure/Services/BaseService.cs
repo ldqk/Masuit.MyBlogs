@@ -1,8 +1,8 @@
-﻿using AutoMapper.QueryableExtensions;
-using EFSecondLevelCache.Core;
+﻿using EFSecondLevelCache.Core;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+using Masuit.MyBlogs.Core.Infrastructure.Application;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
-using NinjaNye.SearchExtensions;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -19,10 +19,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
     public class BaseService<T> : IBaseService<T> where T : class, new()
     {
         public virtual IBaseRepository<T> BaseDal { get; set; }
-
-        public BaseService(IBaseRepository<T> repository)
+        protected readonly ISearchEngine<DataContext> _searchEngine;
+        protected readonly ILuceneIndexSearcher _searcher;
+        public BaseService(IBaseRepository<T> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher)
         {
             BaseDal = repository;
+            _searchEngine = searchEngine;
+            _searcher = searcher;
         }
 
         /// <summary>
@@ -529,244 +532,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public virtual IEnumerable<T> LoadPageEntitiesFromL2CacheNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return BaseDal.LoadPageEntitiesFromL2CacheNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc);
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <typeparam name="TDto"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<TDto> SearchPage<TOrder, TDto>(int page, int size, out int total, string[] keywords, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = GetAllNoTracking().Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).ProjectTo<TDto>().ToList();
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <typeparam name="TDto"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="where">其他条件</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<TDto> SearchPage<TOrder, TDto>(int page, int size, out int total, string[] keywords, Expression<Func<T, bool>> @where, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = LoadEntities(where).Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).ProjectTo<TDto>().ToList();
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<T> SearchPage<TOrder>(int page, int size, out int total, string[] keywords, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = GetAll().Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).ToList();
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="where">其他条件</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<T> SearchPage<TOrder>(int page, int size, out int total, string[] keywords, Expression<Func<T, bool>> @where, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = LoadEntities(where).Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).ToList();
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<T> SearchPageNotracking<TOrder>(int page, int size, out int total, string[] keywords, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = GetAllNoTracking().Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).ToList();
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="where">其他条件</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<T> SearchPageNotracking<TOrder>(int page, int size, out int total, string[] keywords, Expression<Func<T, bool>> @where, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = LoadEntitiesNoTracking(where).Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).ToList();
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <typeparam name="TDto"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<TDto> SearchPageFromCache<TOrder, TDto>(int page, int size, out int total, string[] keywords, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = GetAllNoTracking().Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).ProjectTo<TDto>().Cacheable().ToList();
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <typeparam name="TDto"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="where">其他条件</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<TDto> SearchPageFromCache<TOrder, TDto>(int page, int size, out int total, string[] keywords, Expression<Func<T, bool>> @where, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = LoadEntities(where).Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).ProjectTo<TDto>().Cacheable().ToList();
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<T> SearchPageFromCache<TOrder>(int page, int size, out int total, string[] keywords, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = GetAll().Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).Cacheable().ToList();
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="where">其他条件</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<T> SearchPageFromCache<TOrder>(int page, int size, out int total, string[] keywords, Expression<Func<T, bool>> @where, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = LoadEntities(where).Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).Cacheable().ToList();
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<T> SearchPageFromCacheNotracking<TOrder>(int page, int size, out int total, string[] keywords, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = GetAllNoTracking().Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).Cacheable().ToList();
-        }
-
-        /// <summary>
-        /// 搜索
-        /// </summary>
-        /// <typeparam name="TOrder"></typeparam>
-        /// <param name="page">第几页</param>
-        /// <param name="size">页大小</param>
-        /// <param name="total">总条数</param>
-        /// <param name="keywords">关键词</param>
-        /// <param name="where">其他条件</param>
-        /// <param name="orderBy">排序字段</param>
-        /// <param name="isAsc">升序排列？</param>
-        /// <returns></returns>
-        public List<T> SearchPageFromCacheNotracking<TOrder>(int page, int size, out int total, string[] keywords, Expression<Func<T, bool>> @where, Expression<Func<T, TOrder>> orderBy, bool isAsc = true)
-        {
-            var query = LoadEntitiesNoTracking(where).Search().Containing(keywords);
-            total = query.Count();
-            IOrderedQueryable<T> order = isAsc ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
-            return order.Skip((page - 1) * size).Take(size).Cacheable().ToList();
         }
 
         /// <summary>
