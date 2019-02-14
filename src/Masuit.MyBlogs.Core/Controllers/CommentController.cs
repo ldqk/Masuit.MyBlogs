@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -112,7 +113,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         //新评论，只通知博主和楼主
                         foreach (var s in emails.Distinct())
                         {
-                            BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new
+                            BackgroundJob.Enqueue(() => CommonHelper.SendMail(HttpUtility.UrlDecode(Request.Host + Request.Headers[HeaderNames.Referer]) + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new
                             {
                                 id = com.PostId,
                                 cid = com.Id
@@ -134,7 +135,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         }, Request.Scheme) + "#comment";
                         foreach (var s in emails)
                         {
-                            BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Replace("{{link}}", link), s));
+                            BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{HttpUtility.UrlDecode(Request.Host + Request.Headers[HeaderNames.Referer])}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Replace("{{link}}", link), s));
                         }
                     }
 #endif
@@ -142,8 +143,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
                 foreach (var s in emails.Distinct())
                 {
-
-                    BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + Request.Path + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new
+                    BackgroundJob.Enqueue(() => CommonHelper.SendMail(HttpUtility.UrlDecode(Request.Host + Request.Headers[HeaderNames.Referer]) + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new
                     {
                         id = com.PostId,
                         cid = com.Id

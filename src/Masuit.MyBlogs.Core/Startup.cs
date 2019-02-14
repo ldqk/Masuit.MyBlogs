@@ -5,6 +5,7 @@ using Common;
 using EFSecondLevelCache.Core;
 using Hangfire;
 using Hangfire.Dashboard;
+using JiebaNet.Segmenter;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Extensions;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
@@ -21,6 +22,7 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -179,6 +181,21 @@ namespace Masuit.MyBlogs.Core
                 app.UseException();
             }
 
+            #region 导词库
+
+            Console.WriteLine("正在导入自定义词库...");
+            double time = HiPerfTimer.Execute(() =>
+            {
+                var lines = File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomKeywords.txt"));
+                var segmenter = new JiebaSegmenter();
+                foreach (var word in lines)
+                {
+                    segmenter.AddWord(word);
+                }
+            });
+            Console.WriteLine($"导入自定义词库完成，耗时{time}s");
+            #endregion
+
             app.UseRewriter(new RewriteOptions().AddRedirectToNonWww());
             app.UseStaticHttpContext(); //注入静态HttpContext对象
 
@@ -201,7 +218,7 @@ namespace Masuit.MyBlogs.Core
             string lucenePath = Path.Combine(env.ContentRootPath, luceneIndexerOptions.Path);
             if (!Directory.Exists(lucenePath) || Directory.GetFiles(lucenePath).Length < 1)
             {
-                Console.WriteLine("开始自动创建Lucene索引库...");
+                Console.WriteLine("，索引库不存在，开始自动创建Lucene索引库...");
                 searchEngine.CreateIndex(new List<string>()
                 {
                     nameof(DataContext.Post),nameof(DataContext.Issues)

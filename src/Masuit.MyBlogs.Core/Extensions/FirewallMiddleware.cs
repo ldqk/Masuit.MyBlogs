@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Masuit.MyBlogs.Core.Extensions
 {
@@ -48,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
                 {
                     IP = context.Connection.RemoteIpAddress.MapToIPv4().ToString(),
-                    RequestUrl = context.Request.Scheme + "://" + context.Request.Host + context.Request.Path,
+                    RequestUrl = HttpUtility.UrlDecode(context.Request.Scheme + "://" + context.Request.Host + context.Request.Path),
                     Time = DateTime.Now
                 }));
                 return;

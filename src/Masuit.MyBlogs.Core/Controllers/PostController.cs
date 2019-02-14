@@ -156,7 +156,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="hid"></param>
         /// <returns></returns>
-        [Route("{id:int}/history/{hid:int}")]
+        [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "hid" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult HistoryVersion(int id, int hid)
         {
             UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
@@ -186,7 +186,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="v1"></param>
         /// <param name="v2"></param>
         /// <returns></returns>
-        [Route("{id:int}/history/{v1:int}-{v2:int}")]
+        [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "v1", "v2" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult CompareVersion(int id, int v1, int v2)
         {
             var main = PostService.GetById(id).Mapper<PostHistoryVersion>();
@@ -350,6 +350,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取标签
         /// </summary>
         /// <returns></returns>
+        [ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult GetTag()
         {
             List<string> list = PostService.GetAll().Select(p => p.Label).ToList();
@@ -368,7 +369,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 标签云
         /// </summary>
         /// <returns></returns>
-        [Route("all")]
+        [Route("all"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult All()
         {
             UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
@@ -619,7 +620,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 md = p.ModifyDate,
                 pd = p.PostDate,
                 p.Title,
-                ViewCount = p.PostAccessRecord.Sum(r => r.ClickCount),
+                ViewCount = p.TotalViewCount,
                 p.VoteDownCount,
                 p.VoteUpCount,
                 stat = p.Status
@@ -666,13 +667,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                     temp = order.ThenByDescending(p => p.PostDate);
                     break;
                 case OrderBy.ViewCount:
-                    temp = order.ThenByDescending(p => p.PostAccessRecord.Any() ? p.PostAccessRecord.Sum(r => r.ClickCount) : 1);
+                    temp = order.ThenByDescending(p => p.TotalViewCount);
                     break;
                 case OrderBy.VoteCount:
                     temp = order.ThenByDescending(p => p.VoteUpCount);
                     break;
                 case OrderBy.AverageViewCount:
-                    temp = order.ThenByDescending(p => p.PostAccessRecord.Average(r => r.ClickCount));
+                    temp = order.ThenByDescending(p => p.AverageViewCount);
                     break;
                 default:
                     temp = order.ThenByDescending(p => p.ModifyDate);
@@ -690,7 +691,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 md = p.ModifyDate,
                 pd = p.PostDate,
                 p.Title,
-                ViewCount = p.PostAccessRecord.Any() ? p.PostAccessRecord.Sum(r => r.ClickCount) : 1,
+                ViewCount = p.TotalViewCount,
                 p.VoteDownCount,
                 p.VoteUpCount,
                 stat = p.Status,
@@ -741,7 +742,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 md = p.ModifyDate,
                 pd = p.PostDate,
                 p.Title,
-                ViewCount = p.PostAccessRecord.Any() ? p.PostAccessRecord.Sum(r => r.ClickCount) : 1,
+                ViewCount = p.TotalViewCount,
                 p.VoteDownCount,
                 p.VoteUpCount,
                 stat = p.Status

@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -53,10 +54,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 留言板
         /// </summary>
         /// <returns></returns>
-        [ResponseCache(Duration = 10, VaryByQueryKeys = new[]
-        {
-            "cid"
-        }), Route("msg")]
+        [ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "cid" }, VaryByHeader = HeaderNames.Cookie), Route("msg")]
         public ActionResult Index()
         {
             UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
@@ -176,7 +174,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     if (msg.ParentId == 0)
                     {
                         //新评论，只通知博主
-                        BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言：", content.Replace("{{link}}", Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Scheme)), email));
+                        BackgroundJob.Enqueue(() => CommonHelper.SendMail(HttpUtility.UrlDecode(Request.Host + Request.Headers[HeaderNames.Referer]) + "|博客新留言：", content.Replace("{{link}}", Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Scheme)), email));
                     }
                     else
                     {
@@ -187,13 +185,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                         string link = Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Scheme);
                         foreach (var s in emails.Distinct().Except(new[] { msg2.Email }))
                         {
-                            BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Replace("{{link}}", link), s));
+                            BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{HttpUtility.UrlDecode(Request.Host + Request.Headers[HeaderNames.Referer])}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Replace("{{link}}", link), s));
                         }
                     }
 #endif
                     return ResultData(null, true, "留言发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将会显示到列表中！");
                 }
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言(待审核)：", content.Replace("{{link}}", Url.Action("Index", "Msg", new
+                BackgroundJob.Enqueue(() => CommonHelper.SendMail(HttpUtility.UrlDecode(Request.Host + Request.Headers[HeaderNames.Referer]) + "|博客新留言(待审核)：", content.Replace("{{link}}", Url.Action("Index", "Msg", new
                 {
                     cid = msg2.Id
                 }, Request.Scheme)) + "<p style='color:red;'>(待审核)</p>", email));

@@ -115,6 +115,13 @@
             <param name="file">文件名</param>
             <returns></returns>
         </member>
+        <member name="M:Common.CommonHelper.ReplaceImgSrc(System.String)">
+            <summary>
+            替换img标签的src属性
+            </summary>
+            <param name="content"></param>
+            <returns></returns>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Common.DocumentConvert">
             <summary>
             文档转换操作
@@ -184,9 +191,69 @@
             <param name="topMargin">上边距，默认10</param>
             <param name="bottomMargin">下边距，默认10</param>
         </member>
+        <member name="T:Masuit.MyBlogs.Core.Common.HangfireHelper">
+            <summary>
+            HangfireHelper
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.HangfireHelper.CreateJob(System.Type,System.String,System.String,System.Object[])">
+            <summary>
+            创建任务
+            </summary>
+            <param name="type">任务类</param>
+            <param name="method">调用方法</param>
+            <param name="queue">队列名</param>
+            <param name="args">调用参数</param>
+            <returns></returns>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Configs.AppConfig">
+            <summary>
+            应用程序配置
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Configs.AppConfig.ConnString">
+            <summary>
+            数据库连接字符串
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Configs.AppConfig.BaiduAK">
+            <summary>
+            百度AK
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Configs.AppConfig.Redis">
+            <summary>
+            Redis连接字符串
+            </summary>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Configs.HangfireJobInit">
             <summary>
             hangfire配置
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Configs.HangfireJobInit.Start">
+            <summary>
+            hangfire初始化
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Configs.HangfireJobInit.CheckLinks">
+            <summary>
+            检查友链
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Configs.HangfireJobInit.EverydayJob">
+            <summary>
+            每日任务
+            </summary>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Configs.RegisterAutomapper">
+            <summary>
+            注册automapper
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Configs.RegisterAutomapper.Excute">
+            <summary>
+            初始化
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.AdminController">
@@ -217,6 +284,19 @@
             <param name="pageCount">总页数</param>
             <param name="total">总条数</param>
             <returns></returns>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Controllers.AdminController.Stopwatch">
+            <summary>
+            性能计数器
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.AdminController.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
+            <summary>在调用操作方法前调用。</summary>
+            <param name="filterContext">有关当前请求和操作的信息。</param>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.AdminController.OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext)">
+            <summary>在调用操作方法后调用。</summary>
+            <param name="filterContext">有关当前请求和操作的信息。</param>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.BaseController">
             <summary>
@@ -268,6 +348,11 @@
             <param name="total">总条数</param>
             <returns></returns>
         </member>
+        <member name="P:Masuit.MyBlogs.Core.Controllers.BaseController.Stopwatch">
+            <summary>
+            性能计数器
+            </summary>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.BaseController.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
             <summary>在调用操作方法前调用。</summary>
             <param name="filterContext">有关当前请求和操作的信息。</param>
@@ -305,7 +390,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.PageData(Masuit.MyBlogs.Core.Models.RequestModel.PageFilter)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.PageData(Masuit.MyBlogs.Core.Models.RequestModels.PageFilter)">
             <summary>
             分页数据
             </summary>
@@ -319,12 +404,10 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.Handle(System.Int32,System.String)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.Handle(Masuit.MyBlogs.Core.Models.RequestModels.IssueHandleRequest)">
             <summary>
             处理
             </summary>
-            <param name="id">问题id</param>
-            <param name="text">处理意见</param>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.Submit(Masuit.MyBlogs.Core.Models.Entity.Issue)">
@@ -334,11 +417,11 @@
             <param name="issue"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.Delete(System.Int32)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.Delete(Masuit.MyBlogs.Core.Models.RequestModels.RequestModelBase)">
             <summary>
             删除问题
             </summary>
-            <param name="id">问题id</param>
+            <param name="req">问题id</param>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.GetBugLevels">
@@ -678,6 +761,12 @@
             操作文件
             </summary>
             <param name="req"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.FileController.Upload(System.String)">
+            <summary>
+            上传文件
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.FileController.Handle(System.String,System.String[],System.String)">
@@ -1207,12 +1296,13 @@
             登录记录
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PassportController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IUserInfoService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ILoginRecordService)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.PassportController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IUserInfoService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ILoginRecordService,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
             <summary>
             登录授权
             </summary>
             <param name="userInfoService"></param>
             <param name="loginRecordService"></param>
+            <param name="env"></param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.PassportController.ResultData(System.Object,System.Boolean,System.String)">
             <summary>
@@ -1274,7 +1364,7 @@
             
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ICategoryService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBroadcastService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISeminarService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostHistoryVersionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ICategoryService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBroadcastService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISeminarService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostHistoryVersionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext},Masuit.LuceneEFCore.SearchEngine.Interfaces.ILuceneIndexer,Masuit.LuceneEFCore.SearchEngine.Interfaces.ILuceneIndexSearcher)">
             <summary>
             文章管理
             </summary>
@@ -1284,6 +1374,9 @@
             <param name="seminarService"></param>
             <param name="postHistoryVersionService"></param>
             <param name="hostingEnvironment"></param>
+            <param name="searchEngine"></param>
+            <param name="luceneIndexer"></param>
+            <param name="luceneIndexSearcher"></param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.Details(System.Int32,System.String)">
             <summary>
@@ -1583,12 +1676,13 @@
             
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.SearchController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.SearchController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext})">
             <summary>
             站内搜索
             </summary>
             <param name="searchDetailsService"></param>
             <param name="postService"></param>
+            <param name="searchEngine"></param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.SearchController.Search(System.String,System.Int32,System.Int32)">
             <summary>
@@ -1619,6 +1713,12 @@
             删除搜索记录
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.SearchController.CreateIndex">
+            <summary>
+            创建索引
+            </summary>
             <returns></returns>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.SeminarController">
@@ -2119,9 +2219,32 @@
             <param name="path"></param>
             <returns></returns>
         </member>
+        <member name="T:Masuit.MyBlogs.Core.Extensions.AuthorityAttribute">
+            <summary>
+            授权验证过滤器
+            </summary>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Extensions.AuthorityAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
             <summary>在执行操作方法之前由 ASP.NET MVC 框架调用。</summary>
             <param name="filterContext">筛选器上下文。</param>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Extensions.ExceptionMiddleware">
+            <summary>
+            异常拦截中间件
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.ExceptionMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            异常拦截中间件
+            </summary>
+            <param name="next"></param>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.ExceptionMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            执行调用
+            </summary>
+            <param name="context"></param>
+            <returns></returns>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Extensions.FirewallMiddleware">
             <summary>
@@ -2135,6 +2258,57 @@
             <param name="next"></param>
             <param name="redisHelper"></param>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.FirewallMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            执行调用
+            </summary>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob">
+            <summary>
+            hangfire后台任务
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IUserInfoService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISystemSettingService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ILinksService,Masuit.Tools.NoSQL.RedisHelper,System.Net.Http.IHttpClientFactory,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            hangfire后台任务
+            </summary>
+            <param name="userInfoService"></param>
+            <param name="postService"></param>
+            <param name="settingService"></param>
+            <param name="searchDetailsService"></param>
+            <param name="linksService"></param>
+            <param name="redisHelper"></param>
+            <param name="httpClientFactory"></param>
+            <param name="hostingEnvironment"></param>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.LoginRecord(Masuit.MyBlogs.Core.Models.DTO.UserInfoOutputDto,System.String,Masuit.MyBlogs.Core.Models.Enum.LoginType)">
+            <summary>
+            登录记录
+            </summary>
+            <param name="userInfo"></param>
+            <param name="ip"></param>
+            <param name="type"></param>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.PublishPost(Masuit.MyBlogs.Core.Models.Entity.Post)">
+            <summary>
+            文章定时发布
+            </summary>
+            <param name="p"></param>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.RecordPostVisit(System.Int32)">
+            <summary>
+            文章访问记录
+            </summary>
+            <param name="pid"></param>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.InterceptLog(Masuit.MyBlogs.Core.Extensions.Hangfire.IpIntercepter)">
+            <summary>
+            防火墙拦截日志
+            </summary>
+            <param name="s"></param>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.EverydayJob">
             <summary>
             每天的任务
@@ -2143,6 +2317,41 @@
         <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.CheckLinks">
             <summary>
             检查友链
+            </summary>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob">
+            <summary>
+            hangfire后台任务
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob.LoginRecord(Masuit.MyBlogs.Core.Models.DTO.UserInfoOutputDto,System.String,Masuit.MyBlogs.Core.Models.Enum.LoginType)">
+            <summary>
+            登陆记录
+            </summary>
+            <param name="userInfo"></param>
+            <param name="ip"></param>
+            <param name="type"></param>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob.PublishPost(Masuit.MyBlogs.Core.Models.Entity.Post)">
+            <summary>
+            文章定时发表
+            </summary>
+            <param name="p"></param>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob.RecordPostVisit(System.Int32)">
+            <summary>
+            文章访问记录
+            </summary>
+            <param name="pid"></param>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob.EverydayJob">
+            <summary>
+            每日任务
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob.CheckLinks">
+            <summary>
+            友链检查
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Extensions.LuceneHelper">
@@ -2156,6 +2365,18 @@
             </summary>
             <param name="keyword"></param>
             <returns></returns>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Extensions.RequestInterceptMiddleware">
+            <summary>
+            请求拦截器
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.RequestInterceptMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Masuit.Tools.NoSQL.RedisHelper)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="next"></param>
+            <param name="redisHelper"></param>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Extensions.UEditor.ConfigHandler">
             <summary>
@@ -2551,23 +2772,6 @@
             <param name="isAsc">是否升序</param>
             <returns>实体</returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.GetFirstEntityFromL2Cache(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条数据，优先从缓存读取
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.GetFirstEntityFromL2Cache``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条数据，优先从缓存读取
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>映射实体</returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.GetFirstEntityAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
             <summary>
             获取第一条数据
@@ -2619,41 +2823,6 @@
             <param name="orderby">排序字段</param>
             <param name="isAsc">是否升序</param>
             <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.GetFirstEntityFromL2CacheNoTracking(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条数据，优先从二级缓存读取（不跟踪实体）
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.GetFirstEntityFromL2CacheNoTracking``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条数据，优先从二级缓存读取（不跟踪实体）
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.GetFirstEntityFromL2Cache``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条被AutoMapper映射后的数据，优先从二级缓存读取（不跟踪实体）
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.GetFirstEntityFromL2Cache``2(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条被AutoMapper映射后的数据，优先从二级缓存读取（不跟踪实体）
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <typeparam name="TDto">映射实体</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>映射实体</returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.GetFirstEntityNoTrackingAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
             <summary>
@@ -3141,41 +3310,6 @@
             <param name="isAsc">是否升序</param>
             <returns>映射实体</returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.GetFirstEntityFromL2Cache(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条数据，优先从缓存读取
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.GetFirstEntityFromL2Cache``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条数据，优先从缓存读取
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>映射实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.GetFirstEntityFromL2Cache``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条被AutoMapper映射后的数据，优先从缓存读取
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.GetFirstEntityFromL2Cache``2(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条被AutoMapper映射后的数据，优先从缓存读取
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <typeparam name="TDto">映射实体</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>映射实体</returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.GetFirstEntityAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
             <summary>
             获取第一条数据
@@ -3203,23 +3337,6 @@
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.GetFirstEntityNoTracking``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
             <summary>
             获取第一条数据（不跟踪实体）
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.GetFirstEntityFromL2CacheNoTracking(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条数据，优先从二级缓存读取（不跟踪实体）
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.GetFirstEntityFromL2CacheNoTracking``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条数据，优先从二级缓存读取（不跟踪实体）
             </summary>
             <typeparam name="TS">排序</typeparam>
             <param name="where">查询条件</param>
@@ -3719,41 +3836,6 @@
             <param name="isAsc">是否升序</param>
             <returns>映射实体</returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.GetFirstEntityFromL2Cache(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条数据，优先从缓存读取
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.GetFirstEntityFromL2Cache``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条数据，优先从缓存读取
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>映射实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.GetFirstEntityFromL2Cache``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条被AutoMapper映射后的数据，优先从缓存读取
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.GetFirstEntityFromL2Cache``2(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条被AutoMapper映射后的数据，优先从缓存读取
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <typeparam name="TDto">映射实体</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>映射实体</returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.GetFirstEntityAsync``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
             <summary>
             获取第一条数据
@@ -3781,23 +3863,6 @@
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.GetFirstEntityNoTracking``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
             <summary>
             获取第一条数据（不跟踪实体）
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.GetFirstEntityFromL2CacheNoTracking(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条数据，优先从二级缓存读取（不跟踪实体）
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.GetFirstEntityFromL2CacheNoTracking``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条数据，优先从二级缓存读取（不跟踪实体）
             </summary>
             <typeparam name="TS">排序</typeparam>
             <param name="where">查询条件</param>
@@ -3915,172 +3980,6 @@
             <param name="orderby">orderby Lambda条件表达式</param>
             <param name="isAsc">升序降序</param>
             <returns>还未执行的SQL语句</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPage``2(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <typeparam name="TDto"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPage``2(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <typeparam name="TDto"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPage``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPage``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPageNotracking``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPageNotracking``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPageFromCache``2(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <typeparam name="TDto"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPageFromCache``2(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <typeparam name="TDto"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPageFromCache``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPageFromCache``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPageFromCacheNotracking``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SearchPageFromCacheNotracking``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.DeleteById(System.Object)">
             <summary>
@@ -4584,41 +4483,6 @@
             <param name="isAsc">是否升序</param>
             <returns>映射实体</returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.GetFirstEntityFromL2Cache(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条数据，优先从缓存读取
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.GetFirstEntityFromL2Cache``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条数据，优先从缓存读取
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>映射实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.GetFirstEntityFromL2Cache``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条被AutoMapper映射后的数据，优先从缓存读取
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.GetFirstEntityFromL2Cache``2(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条被AutoMapper映射后的数据，优先从缓存读取
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <typeparam name="TDto">映射实体</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>映射实体</returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.GetFirstEntityAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
             <summary>
             获取第一条数据
@@ -4646,23 +4510,6 @@
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.GetFirstEntityNoTracking``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
             <summary>
             获取第一条数据（不跟踪实体）
-            </summary>
-            <typeparam name="TS">排序</typeparam>
-            <param name="where">查询条件</param>
-            <param name="orderby">排序字段</param>
-            <param name="isAsc">是否升序</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.GetFirstEntityFromL2CacheNoTracking(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
-            <summary>
-            获取第一条数据，优先从二级缓存读取（不跟踪实体）
-            </summary>
-            <param name="where">查询条件</param>
-            <returns>实体</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.GetFirstEntityFromL2CacheNoTracking``1(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            获取第一条数据，优先从二级缓存读取（不跟踪实体）
             </summary>
             <typeparam name="TS">排序</typeparam>
             <param name="where">查询条件</param>
@@ -4780,172 +4627,6 @@
             <param name="orderby">orderby Lambda条件表达式</param>
             <param name="isAsc">升序降序</param>
             <returns>还未执行的SQL语句</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPage``2(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <typeparam name="TDto"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPage``2(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <typeparam name="TDto"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPage``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPage``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPageNotracking``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPageNotracking``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPageFromCache``2(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <typeparam name="TDto"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPageFromCache``2(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <typeparam name="TDto"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPageFromCache``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPageFromCache``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPageFromCacheNotracking``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SearchPageFromCacheNotracking``1(System.Int32,System.Int32,System.Int32@,System.String[],System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
-            <summary>
-            搜索
-            </summary>
-            <typeparam name="TOrder"></typeparam>
-            <param name="page">第几页</param>
-            <param name="size">页大小</param>
-            <param name="total">总条数</param>
-            <param name="keywords">关键词</param>
-            <param name="where">其他条件</param>
-            <param name="orderBy">排序字段</param>
-            <param name="isAsc">升序排列？</param>
-            <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.DeleteById(System.Object)">
             <summary>
@@ -6057,7 +5738,7 @@
             分类id
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.ViewCount">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.TotalViewCount">
             <summary>
             浏览次数
             </summary>
@@ -6315,11 +5996,6 @@
         <member name="T:Masuit.MyBlogs.Core.Models.Entity.BaseEntity">
             <summary>
             基类型
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.BaseEntity.Id">
-            <summary>
-            主键
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Models.Entity.Broadcast">
@@ -6887,6 +6563,16 @@
             图片地址
             </summary>
         </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.AverageViewCount">
+            <summary>
+            每日平均访问量
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.TotalViewCount">
+            <summary>
+            总访问量
+            </summary>
+        </member>
         <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.Category">
             <summary>
             分类
@@ -7252,24 +6938,44 @@
             订阅类型
             </summary>
         </member>
-        <member name="T:Masuit.MyBlogs.Core.Models.RequestModel.PageFilter">
+        <member name="T:Masuit.MyBlogs.Core.Models.RequestModels.IssueHandleRequest">
+            <summary>
+            bug处理
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.RequestModels.IssueHandleRequest.Text">
+            <summary>
+            处理意见
+            </summary>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Models.RequestModels.PageFilter">
             <summary>
             分页筛选
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.RequestModel.PageFilter.Page">
+        <member name="P:Masuit.MyBlogs.Core.Models.RequestModels.PageFilter.Page">
             <summary>
             第几页
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.RequestModel.PageFilter.Size">
+        <member name="P:Masuit.MyBlogs.Core.Models.RequestModels.PageFilter.Size">
             <summary>
             页大小
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.RequestModel.PageFilter.Kw">
+        <member name="P:Masuit.MyBlogs.Core.Models.RequestModels.PageFilter.Kw">
             <summary>
             关键词
+            </summary>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Models.RequestModels.RequestModelBase">
+            <summary>
+            请求模型
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.RequestModels.RequestModelBase.Id">
+            <summary>
+            id
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Models.Validation.IsEmailAttribute">
@@ -7802,6 +7508,11 @@
             asp.net core核心配置
             </summary>
         </member>
+        <member name="P:Masuit.MyBlogs.Core.Startup.AutofacContainer">
+            <summary>
+            依赖注入容器
+            </summary>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             asp.net core核心配置
@@ -7815,19 +7526,15 @@
             <param name="services"></param>
             <returns></returns>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Startup.AutofacContainer">
-            <summary>
-            依赖注入容器
-            </summary>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.MyBlogs.Core.Infrastructure.Application.DataContext,Microsoft.AspNetCore.Hosting.IApplicationLifetime)">
+        <member name="M:Masuit.MyBlogs.Core.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.MyBlogs.Core.Infrastructure.Application.DataContext,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext},Masuit.LuceneEFCore.SearchEngine.LuceneIndexerOptions)">
             <summary>
             Configure
             </summary>
             <param name="app"></param>
             <param name="env"></param>
             <param name="db"></param>
-            <param name="appLifetime"></param>
+            <param name="searchEngine"></param>
+            <param name="luceneIndexerOptions"></param>
         </member>
         <member name="T:Masuit.MyBlogs.Core.MyRestrictiveAuthorizationFilter">
             <summary>

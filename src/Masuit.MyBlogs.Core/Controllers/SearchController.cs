@@ -9,6 +9,7 @@ using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.NoSQL;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,13 +50,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Route("s/{wd?}/{page:int?}/{size:int?}"), ResponseCache(VaryByQueryKeys = new[] { "wd", "page", "size" }, Duration = 60)]
+        [Route("s/{wd?}/{page:int?}/{size:int?}"), ResponseCache(VaryByQueryKeys = new[] { "wd", "page", "size" }, VaryByHeader = HeaderNames.Cookie, Duration = 60)]
         public ActionResult Search(string wd = "", int page = 1, int size = 10)
         {
             var nul = new List<PostOutputDto>();
             ViewBag.Elapsed = 0;
             ViewBag.Total = 0;
-            ViewBag.Keyword = wd;
+            ViewBag.Keyword = wd ?? "";
             if (Regex.Match(wd, CommonHelper.BanRegex).Length > 0 || Regex.Match(wd, CommonHelper.ModRegex).Length > 0)
             {
                 //ViewBag.Wd = "";
@@ -116,7 +117,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="search"></param>
         /// <returns></returns>
-        [Authority, HttpPost]
+        [Authority, HttpPost, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "search" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult SearchList(int page = 1, int size = 10, string search = "")
         {
             if (page <= 0)
@@ -133,7 +134,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 热词
         /// </summary>
         /// <returns></returns>
-        [Authority, HttpPost]
+        [Authority, HttpPost, ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult HotKey()
         {
             var start = DateTime.Today.AddMonths(-1);

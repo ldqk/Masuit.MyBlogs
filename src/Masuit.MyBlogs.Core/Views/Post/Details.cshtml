@@ -169,7 +169,7 @@
                 <section class="wow padding-bot20 animated fadeIn">
                     <h3>版权声明：</h3>
                     <p class="text-danger size16">
-                        本文仅用于学习、研究和交流目的，欢迎非商业性质转载。本文链接：<a href="@(Context.Request.Host+Context.Request.Path)">@(Context.Request.Host + Context.Request.Path)</a>。
+                        本文仅用于学习、研究和交流目的，欢迎非商业性质转载。本文链接：<a href="@(Context.Request.Host+Context.Request.Path)">@(HttpUtility.UrlDecode(Context.Request.Host + Context.Request.Path))</a>。
                         @Html.Raw(CommonHelper.SystemSettings["Disclaimer"])
                     </p>
                 </section>

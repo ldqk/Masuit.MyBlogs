@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Masuit.MyBlogs.Core.Extensions
 {
@@ -36,13 +38,13 @@ namespace Masuit.MyBlogs.Core.Extensions
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                var err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{context.Request.Scheme}://{context.Request.Host}{context.Request.Path.Value}，客户端用户代理：{context.Request.Headers["User-Agent"]}，客户端IP：{context.Connection.RemoteIpAddress}\t{ex.InnerException?.Message}\t";
+                var err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}，请求参数：{HttpUtility.UrlDecode(context.Request.Body.ToByteArray(), Encoding.UTF8)}，客户端用户代理：{context.Request.Headers["User-Agent"]}，客户端IP：{context.Connection.RemoteIpAddress}\t{ex.InnerException?.Message}\t";
                 LogManager.Error(err, ex);
                 await RedirectError(context);
             }
             catch (DbUpdateException ex)
             {
-                var err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{context.Request.Scheme}://{context.Request.Host}{context.Request.Path.Value}，客户端用户代理：{context.Request.Headers["User-Agent"]}，客户端IP：{context.Connection.RemoteIpAddress}\t{ex?.InnerException?.Message}\t";
+                var err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}，请求参数：{HttpUtility.UrlDecode(context.Request.Body.ToByteArray(), Encoding.UTF8)}，客户端用户代理：{context.Request.Headers["User-Agent"]}，客户端IP：{context.Connection.RemoteIpAddress}\t{ex?.InnerException?.Message}\t";
                 LogManager.Error(err, ex);
                 await RedirectError(context);
             }
@@ -51,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 LogManager.Debug("↓↓↓" + ex.Message + "↓↓↓");
                 ex.Handle(e =>
                 {
-                    LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，\n请求路径：{context.Request.Scheme}://{context.Request.Host}{context.Request.Path.Value}，客户端用户代理：{context.Request.Headers["User-Agent"]}，客户端IP：{context.Connection.RemoteIpAddress}\t", e);
+                    LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，\n请求路径：{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}，请求参数：{HttpUtility.UrlDecode(context.Request.Body.ToByteArray(), Encoding.UTF8)}，客户端用户代理：{context.Request.Headers["User-Agent"]}，客户端IP：{context.Connection.RemoteIpAddress}\t", e);
                     return true;
                 });
                 await RedirectError(context);
@@ -59,7 +61,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             catch (Exception ex)
             {
                 //LogManager.Error(ex);
-                LogManager.Error($"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{context.Request.Scheme}://{context.Request.Host}{context.Request.Path.Value}，客户端用户代理：{context.Request.Headers["User-Agent"]}，客户端IP：{context.Connection.RemoteIpAddress}\t", ex);
+                LogManager.Error($"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}，请求参数：{HttpUtility.UrlDecode(context.Request.Body.ToByteArray(), Encoding.UTF8)}，客户端用户代理：{context.Request.Headers["User-Agent"]}，客户端IP：{context.Connection.RemoteIpAddress}\t", ex);
                 await RedirectError(context);
             }
         }

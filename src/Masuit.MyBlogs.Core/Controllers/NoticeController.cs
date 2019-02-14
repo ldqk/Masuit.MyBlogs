@@ -10,6 +10,7 @@ using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Route("notice")]
+        [Route("notice"), ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "page", "size", "id" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index(int page = 1, int size = 10, int id = 0)
         {
             UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
@@ -78,7 +79,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Route("n/{id:int}")]
+        [Route("n/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Details(int id)
         {
             Notice notice = NoticeService.GetById(id);
@@ -188,6 +189,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 最近一条公告
         /// </summary>
         /// <returns></returns>
+        [ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Last()
         {
             var notice = NoticeService.GetFirstEntity(n => n.Status == Status.Display, n => n.ModifyDate, false);

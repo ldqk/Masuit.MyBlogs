@@ -2,6 +2,7 @@
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Quartz;
 using Quartz.Spi;
@@ -28,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="ip"></param>
         /// <returns></returns>
-        [HttpGet, Route("ip/{ip?}")]
+        [HttpGet, Route("ip/{ip?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "ip" }, VaryByHeader = HeaderNames.Cookie)]
         public async Task<ActionResult> GetIpInfo(string ip)
         {
             if (string.IsNullOrEmpty(ip))
@@ -50,7 +51,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="lat"></param>
         /// <param name="lng"></param>
         /// <returns></returns>
-        [HttpGet, Route("pos")]
+        [HttpGet, Route("pos"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "lat", "lng" }, VaryByHeader = HeaderNames.Cookie)]
         public async Task<ActionResult> Position(string lat, string lng)
         {
             if (string.IsNullOrEmpty(lat) || string.IsNullOrEmpty(lng))
@@ -79,7 +80,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="addr"></param>
         /// <returns></returns>
-        [HttpGet, Route("addr")]
+        [HttpGet, Route("addr"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "addr" }, VaryByHeader = HeaderNames.Cookie)]
         public async Task<ActionResult> Address(string addr)
         {
             if (string.IsNullOrEmpty(addr))
@@ -127,7 +128,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// corn表达式生成
         /// </summary>
         /// <returns></returns>
-        [HttpGet("cron")]
+        [HttpGet("cron"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Cron()
         {
             return View();
@@ -138,7 +139,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="cron"></param>
         /// <returns></returns>
-        [HttpPost("cron")]
+        [HttpPost("cron"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "cron" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Cron(string cron)
         {
             //时间表达式

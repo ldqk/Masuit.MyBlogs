@@ -5,11 +5,13 @@ using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+
 #if DEBUG
 using Masuit.Tools.Win32; 
 #endif
@@ -39,7 +41,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取文章列表
         /// </summary>
         /// <returns></returns>
-        [HttpGet, HttpPost, Route("subscribe/post")]
+        [HttpGet, HttpPost, Route("subscribe/post"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public IActionResult Post()
         {
             var list = PostService.LoadPageEntitiesNoTracking(1, 10, out int _, p => p.Status == Status.Pended, p => p.ModifyDate, false).Select(p => new
@@ -75,7 +77,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="lat">纬度</param>
         /// <param name="lng">经度</param>
         /// <returns></returns>
-        [HttpPost("tools/position")]
+        [HttpPost("tools/position"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "lat", "lng" }, VaryByHeader = HeaderNames.Cookie)]
         public async Task<PhysicsAddress> Position(string lat, string lng)
         {
             if (string.IsNullOrEmpty(lat) || string.IsNullOrEmpty(lng))
@@ -102,7 +104,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="addr">详细地理信息</param>
         /// <returns></returns>
-        [HttpPost("tools/address")]
+        [HttpPost("tools/address"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "addr" }, VaryByHeader = HeaderNames.Cookie)]
         public async Task<Location> Address(string addr)
         {
             if (string.IsNullOrEmpty(addr))
@@ -139,7 +141,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="ip"></param>
         /// <returns></returns>
-        [HttpPost("tools/ipinfo")]
+        [HttpPost("tools/ipinfo"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "ip" }, VaryByHeader = HeaderNames.Cookie)]
         public async Task<PhysicsAddress> GetIpInfo(string ip)
         {
             if (string.IsNullOrEmpty(ip))

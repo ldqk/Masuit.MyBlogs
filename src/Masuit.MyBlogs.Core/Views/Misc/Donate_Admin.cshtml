@@ -33,8 +33,8 @@
     }
 </style>
 <link href="~/Assets/jedate/jedate.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.9/angular.min.js"></script>
+<script src="https://cdn.bootcss.com/lodash.js/3.10.1/lodash.min.js"></script>
+<script src="https://cdn.bootcss.com/angular.js/1.7.7/angular.min.js"></script>
 <script src="~/Scripts/tm.pagination.js"></script>
 <script src="~/Scripts/ng-table.min.js"></script>
 <script src="~/Assets/jedate/jquery.jedate.min.js"></script>
@@ -202,7 +202,23 @@
     })();
 </script>
 <script>
-    angular.module('myApp', ["ngTable", "tm.pagination"]).controller("home", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
+    var app = angular.module('myApp', ["ngTable", "tm.pagination"]);
+    app.config(["$httpProvider", function ($httpProvider) {
+        $httpProvider.defaults.transformRequest = function (obj) {
+            var str = [];
+            for (var p in obj) {
+                if (obj.hasOwnProperty(p)) {
+                    str.push(window.encodeURIComponent(p) + "=" + window.encodeURIComponent(obj[p]));
+                }
+            }
+            return str.join("&");
+        };
+
+        $httpProvider.defaults.headers.post = {
+            'Content-Type': 'application/x-www-form-urlencoded; charser=UTF-8'
+        }
+    }]);
+    app.controller("home", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
         var self = this;
         $scope.paginationConf = {
             currentPage: 1,

@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 控制面板
         /// </summary>
         /// <returns></returns>
-        [Route("dashboard")]
+        [Route("dashboard"), ResponseCache(Duration = 60, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index()
         {
             return View();
@@ -132,7 +133,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 资源管理器
         /// </summary>
         /// <returns></returns>
-        [Route("filemanager")]
+        [Route("filemanager"), ResponseCache(Duration = 60, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult FileManager()
         {
             return View();

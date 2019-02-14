@@ -1,8 +1,12 @@
 ﻿using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
+using System;
+using System.Diagnostics;
 using System.Text;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -55,6 +59,31 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 MissingMemberHandling = MissingMemberHandling.Ignore
             }), "application/json", Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// 性能计数器
+        /// </summary>
+        private Stopwatch Stopwatch { get; set; } = new Stopwatch();
+
+        /// <summary>在调用操作方法前调用。</summary>
+        /// <param name="filterContext">有关当前请求和操作的信息。</param>
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            Stopwatch.Start();
+            base.OnActionExecuting(filterContext);
+        }
+
+        /// <summary>在调用操作方法后调用。</summary>
+        /// <param name="filterContext">有关当前请求和操作的信息。</param>
+        public override void OnActionExecuted(ActionExecutedContext filterContext)
+        {
+            base.OnActionExecuted(filterContext);
+            if (Stopwatch.Elapsed > TimeSpan.FromSeconds(5))
+            {
+                var req = filterContext.HttpContext.Request;
+                LogManager.Info($"执行请求{req.Host}耗时{Stopwatch.ElapsedMilliseconds}ms，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{filterContext.HttpContext.Connection.RemoteIpAddress.MapToIPv4()}");
+            }
         }
     }
 }

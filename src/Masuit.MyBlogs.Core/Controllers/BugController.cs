@@ -5,7 +5,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.MyBlogs.Core.Models.RequestModel;
+using Masuit.MyBlogs.Core.Models.RequestModels;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Systems;
@@ -115,18 +115,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 处理
         /// </summary>
-        /// <param name="id">问题id</param>
-        /// <param name="text">处理意见</param>
         /// <returns></returns>
-        [Authority]
-        public ActionResult Handle(int id, string text)
+        [Authority,]
+        public ActionResult Handle([FromBody]IssueHandleRequest req)
         {
-            Issue issue = IssueService.GetById(id);
+            Issue issue = IssueService.GetById(req.Id);
             issue.Status = Status.Handled;
             issue.HandleTime = DateTime.Now;
-            issue.Msg = text;
+            issue.Msg = req.Text;
             bool b = IssueService.UpdateEntitySaved(issue);
-            string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/bugfeed.html").Replace("{{title}}", issue.Title).Replace("{{link}}", issue.Link).Replace("{{text}}", text).Replace("{{date}}", issue.HandleTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+            string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/bugfeed.html").Replace("{{title}}", issue.Title).Replace("{{link}}", issue.Link).Replace("{{text}}", req.Text).Replace("{{date}}", issue.HandleTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
             BackgroundJob.Enqueue(() => CommonHelper.SendMail("bug提交反馈通知", content, issue.Email));
             return ResultData(null, b, b ? "问题处理成功！" : "处理失败！");
         }
@@ -137,7 +135,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="issue"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult Submit(Issue issue)
+        public ActionResult Submit([FromBody]Issue issue)
         {
             issue.Description = CommonHelper.ReplaceImgSrc(Regex.Replace(issue.Description, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/");
             issue.IPAddress = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
@@ -160,12 +158,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 删除问题
         /// </summary>
-        /// <param name="id">问题id</param>
+        /// <param name="req">问题id</param>
         /// <returns></returns>
         [Authority]
-        public ActionResult Delete(int id)
+        public ActionResult Delete([FromBody]RequestModelBase req)
         {
-            bool b = IssueService.DeleteByIdSaved(id);
+            bool b = IssueService.DeleteByIdSaved(req.Id);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 

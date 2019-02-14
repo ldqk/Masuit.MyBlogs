@@ -4,6 +4,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Logging;
 using Masuit.Tools.NoSQL;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
@@ -12,9 +13,11 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
+
 #if DEBUG
 using Common;
 #endif
@@ -93,10 +96,16 @@ namespace Masuit.MyBlogs.Core.Controllers
             }), "application/json", Encoding.UTF8);
         }
 
+        /// <summary>
+        /// 性能计数器
+        /// </summary>
+        private Stopwatch Stopwatch { get; set; } = new Stopwatch();
+
         /// <summary>在调用操作方法前调用。</summary>
         /// <param name="filterContext">有关当前请求和操作的信息。</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            Stopwatch.Start();
             base.OnActionExecuting(filterContext);
             if (filterContext.HttpContext.Request.Method.Equals("GET", StringComparison.InvariantCultureIgnoreCase)) //get方式的多半是页面
             {
@@ -162,6 +171,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Footer = model;
 
             #endregion
+
+            if (Stopwatch.Elapsed > TimeSpan.FromSeconds(5))
+            {
+                var req = filterContext.HttpContext.Request;
+                LogManager.Info($"执行请求{req.Host}耗时{Stopwatch.ElapsedMilliseconds}ms，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{filterContext.HttpContext.Connection.RemoteIpAddress.MapToIPv4()}");
+            }
         }
     }
 }

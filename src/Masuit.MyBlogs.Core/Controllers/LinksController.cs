@@ -64,7 +64,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             })
             {
                 client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-                client.DefaultRequestHeaders.Referrer = new Uri(Request.Host.Host);
+                client.DefaultRequestHeaders.Referrer = new Uri(Request.Scheme + "://" + Request.Host.ToString());
                 return await await client.GetAsync(uri.PathAndQuery).ContinueWith(async t =>
                 {
                     if (t.IsFaulted || t.IsCanceled)

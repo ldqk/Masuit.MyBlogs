@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -12,7 +13,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 404
         /// </summary>
         /// <returns></returns>
-        [Route("{*url}", Order = 99999)]
+        [Route("{*url}", Order = 99999), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index()
         {
             Response.StatusCode = 404;
@@ -32,7 +33,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 503
         /// </summary>
         /// <returns></returns>
-        [Route("ServiceUnavailable")]
+        [Route("ServiceUnavailable"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult ServiceUnavailable()
         {
             Response.StatusCode = 503;

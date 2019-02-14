@@ -1,6 +1,7 @@
 ﻿using Common;
 using EFSecondLevelCache.Core;
 using Hangfire;
+using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
@@ -10,11 +11,10 @@ using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using Masuit.MyBlogs.Core.Configs;
 using WilderMinds.RssSyndication;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -53,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// RSS订阅
         /// </summary>
         /// <returns></returns>
-        [Route("rss")]
+        [Route("rss"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public IActionResult Rss()
         {
             var time = DateTime.Now.AddDays(-1);

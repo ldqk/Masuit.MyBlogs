@@ -182,13 +182,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                     posts = posts.ThenByDescending(p => p.PostDate);
                     break;
                 case OrderBy.ViewCount:
-                    posts = posts.ThenByDescending(p => p.PostAccessRecord.Sum(r => r.ClickCount));
+                    posts = posts.ThenByDescending(p => p.TotalViewCount);
                     break;
                 case OrderBy.VoteCount:
                     posts = posts.ThenByDescending(p => p.VoteUpCount);
                     break;
                 case OrderBy.AverageViewCount:
-                    posts = posts.ThenByDescending(p => p.PostAccessRecord.Average(r => r.ClickCount));
+                    posts = posts.ThenByDescending(p => p.AverageViewCount);
                     break;
                 default:
                     posts = posts.ThenByDescending(p => p.ModifyDate);

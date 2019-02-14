@@ -89,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Hubs
                         Console.ForegroundColor = ConsoleColor.White;
                         errorCount++;
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(3000);
                 }
             });
         }
