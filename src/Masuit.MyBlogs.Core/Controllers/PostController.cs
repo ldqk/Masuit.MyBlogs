@@ -82,7 +82,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="kw"></param>
         /// <returns></returns>
-        [Route("{id:int}/{kw}"), Route("{id:int}")]
+        [Route("{id:int}/{kw}"), Route("{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "kw" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Details(int id, string kw)
         {
             Post post = PostService.GetById(id);
@@ -126,7 +126,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Route("{id:int}/history"), Route("{id:int}/history/{page:int}/{size:int}")]
+        [Route("{id:int}/history"), Route("{id:int}/history/{page:int}/{size:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult History(int id, int page = 1, int size = 20)
         {
             var p = PostService.GetById(id).Mapper<PostOutputDto>();
@@ -426,7 +426,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "email" })]
         public ActionResult GetViewToken(string email)
         {
             if (string.IsNullOrEmpty(email) && !email.MatchEmail())

@@ -7,6 +7,7 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 友情链接页
         /// </summary>
         /// <returns></returns>
-        [Route("links")]
+        [Route("links"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index()
         {
             UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);

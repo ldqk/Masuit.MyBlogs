@@ -5,7 +5,6 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -33,7 +32,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取所有分类
         /// </summary>
         /// <returns></returns>
-        [ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
+        [ResponseCache(Duration = 600)]
         public ActionResult GetCategories()
         {
             var list = CategoryService.LoadEntities<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).Cacheable().ToList();
@@ -45,6 +44,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" })]
         public ActionResult Get(int id)
         {
             var model = CategoryService.GetById(id);

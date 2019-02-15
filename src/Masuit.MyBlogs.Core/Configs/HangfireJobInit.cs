@@ -10,7 +10,7 @@ namespace Masuit.MyBlogs.Core.Configs
     /// <summary>
     /// hangfire配置
     /// </summary>
-    public class HangfireJobInit
+    public static class HangfireJobInit
     {
         /// <summary>
         /// hangfire初始化
@@ -19,6 +19,7 @@ namespace Masuit.MyBlogs.Core.Configs
         {
             RecurringJob.AddOrUpdate(() => CheckLinks(), Cron.HourInterval(5)); //每5h检查友链
             RecurringJob.AddOrUpdate(() => EverydayJob(), Cron.Daily, TimeZoneInfo.Local); //每天的任务
+            RecurringJob.AddOrUpdate(() => EveryweekJob(), Cron.Weekly(DayOfWeek.Monday, 3), TimeZoneInfo.Local); //每周的任务
             using (RedisHelper redisHelper = RedisHelper.GetInstance())
             {
                 if (!redisHelper.KeyExists("ArticleViewToken"))
@@ -42,6 +43,14 @@ namespace Masuit.MyBlogs.Core.Configs
         public static void EverydayJob()
         {
             HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.EverydayJob), "default");
+        }
+
+        /// <summary>
+        /// 每周任务
+        /// </summary>
+        public static void EveryweekJob()
+        {
+            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.CreateLiceneIndex), "default");
         }
     }
 }

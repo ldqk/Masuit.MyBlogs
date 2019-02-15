@@ -11,6 +11,7 @@ using Masuit.Tools.Core.Net;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// bug首页
         /// </summary>
         /// <returns></returns>
-        [Route("bug")]
+        [Route("bug"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index()
         {
             return View();
@@ -101,7 +102,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Route("bug/{id:int}")]
+        [Route("bug/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Datails(int id)
         {
             Issue issue = IssueService.GetById(id);
@@ -171,6 +172,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取问题级别
         /// </summary>
         /// <returns></returns>
+        [ResponseCache(Duration = 600)]
         public ActionResult GetBugLevels()
         {
             List<object> list = new List<object>();

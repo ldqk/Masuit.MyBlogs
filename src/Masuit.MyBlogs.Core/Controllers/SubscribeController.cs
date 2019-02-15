@@ -1,6 +1,7 @@
 ﻿using Common;
 using EFSecondLevelCache.Core;
 using Hangfire;
+using Masuit.LuceneEFCore.SearchEngine.Extensions;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -66,7 +67,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Name = p.Author,
                     Email = p.Email
                 },
-                Body = p.Content,
+                Body = p.Content.RemoveHtmlTag(),
                 Categories = new List<string>()
                 {
                     p.Category.Name
@@ -80,7 +81,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 Title = CommonHelper.SystemSettings["Title"],
                 Description = CommonHelper.SystemSettings["Description"],
-                Link = new Uri(scheme + "://" + host + "/rss"),
+                Link = new Uri(scheme + "://" + host),
                 Copyright = "(c) 2019"
             };
             feed.Items.AddRange(posts.ToArray());

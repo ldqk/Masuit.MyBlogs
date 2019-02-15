@@ -38,5 +38,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// 友链检查
         /// </summary>
         void CheckLinks();
+
+        /// <summary>
+        /// 重建Lucene索引库
+        /// </summary>
+        void CreateLiceneIndex();
     }
 }

@@ -8,6 +8,7 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,6 +76,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="orderBy"></param>
         /// <returns></returns>
+        [ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "orderBy" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index(OrderBy orderBy = OrderBy.ModifyDate)
         {
             ViewBag.Total = 0;
@@ -105,7 +107,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        [Route("p/{page:int?}/{size:int?}/{orderBy:int?}")]
+        [Route("p/{page:int?}/{size:int?}/{orderBy:int?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Post(int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {
             UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
@@ -122,7 +124,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        [Route("tag/{id}/{page:int?}/{size:int?}/{orderBy:int?}")]
+        [Route("tag/{id}/{page:int?}/{size:int?}/{orderBy:int?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Tag(string id, int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {
             IList<PostOutputDto> posts;
@@ -164,7 +166,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        [Route("cat/{id:int}")]
+        [Route("cat/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = HeaderNames.Cookie)]
         [Route("cat/{id:int}/{page:int?}/{size:int?}/{orderBy:int?}")]
         public async Task<ActionResult> Category(int id, int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {

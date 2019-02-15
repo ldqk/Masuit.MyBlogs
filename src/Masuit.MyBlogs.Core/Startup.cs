@@ -181,6 +181,7 @@ namespace Masuit.MyBlogs.Core
                 app.UseException();
             }
 
+            //db.Database.Migrate();
             #region 导词库
 
             Console.WriteLine("正在导入自定义词库...");
@@ -196,7 +197,18 @@ namespace Masuit.MyBlogs.Core
             Console.WriteLine($"导入自定义词库完成，耗时{time}s");
             #endregion
 
-            app.UseRewriter(new RewriteOptions().AddRedirectToNonWww());
+            string lucenePath = Path.Combine(env.ContentRootPath, luceneIndexerOptions.Path);
+            if (!Directory.Exists(lucenePath) || Directory.GetFiles(lucenePath).Length < 1)
+            {
+                Console.WriteLine("，索引库不存在，开始自动创建Lucene索引库...");
+                searchEngine.CreateIndex(new List<string>()
+                {
+                    nameof(DataContext.Post),nameof(DataContext.Issues)
+                });
+                Console.WriteLine("索引库创建完成！");
+            }
+
+            app.UseRewriter(new RewriteOptions().AddRedirectToNonWww());// URL重写
             app.UseStaticHttpContext(); //注入静态HttpContext对象
 
             app.UseSession(); //注入Session
@@ -212,19 +224,7 @@ namespace Masuit.MyBlogs.Core
             }).UseCookiePolicy();
 
             app.UseFirewall().UseRequestIntercept(); //启用网站防火墙
-            //db.Database.Migrate();
             CommonHelper.SystemSettings = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
-
-            string lucenePath = Path.Combine(env.ContentRootPath, luceneIndexerOptions.Path);
-            if (!Directory.Exists(lucenePath) || Directory.GetFiles(lucenePath).Length < 1)
-            {
-                Console.WriteLine("，索引库不存在，开始自动创建Lucene索引库...");
-                searchEngine.CreateIndex(new List<string>()
-                {
-                    nameof(DataContext.Post),nameof(DataContext.Issues)
-                });
-                Console.WriteLine("索引库创建完成！");
-            }
 
             app.UseEFSecondLevelCache(); //启动EF二级缓存
             app.UseHangfireServer().UseHangfireDashboard("/taskcenter", new DashboardOptions()

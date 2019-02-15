@@ -173,16 +173,5 @@ namespace Masuit.MyBlogs.Core.Controllers
             bool b = SearchDetailsService.DeleteByIdSaved(id);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
-
-        /// <summary>
-        /// 创建索引
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet, Authority]
-        public IActionResult CreateIndex()
-        {
-            _searchEngine.CreateIndex(new List<string>() { nameof(Post) });
-            return ResultData(null, true, "索引库创建完成！");
-        }
     }
 }

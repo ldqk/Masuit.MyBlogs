@@ -9,6 +9,7 @@ using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.IO;
 using System.Linq;
@@ -51,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Route("misc/{id:int}")]
+        [Route("misc/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index(int id)
         {
             Misc misc = MiscService.GetById(id);
@@ -103,7 +104,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 关于
         /// </summary>
         /// <returns></returns>
-        [Route("about")]
+        [Route("about"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult About()
         {
             return View();
@@ -113,7 +114,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 声明
         /// </summary>
         /// <returns></returns>
-        [Route("disclaimer")]
+        [Route("disclaimer"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Disclaimer()
         {
             return View();

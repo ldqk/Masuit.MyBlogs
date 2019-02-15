@@ -54,7 +54,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 留言板
         /// </summary>
         /// <returns></returns>
-        [ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "cid" }, VaryByHeader = HeaderNames.Cookie), Route("msg")]
+        [ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie), Route("msg")]
         public ActionResult Index()
         {
             UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();

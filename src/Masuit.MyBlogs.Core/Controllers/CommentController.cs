@@ -29,6 +29,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         private IPostService PostService { get; }
         private IInternalMessageService MessageService { get; }
         private readonly IHostingEnvironment _hostingEnvironment;
+
         /// <summary>
         /// 评论管理
         /// </summary>

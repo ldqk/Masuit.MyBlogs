@@ -1,4 +1,6 @@
 ﻿using Common;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+using Masuit.MyBlogs.Core.Infrastructure.Application;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
@@ -8,6 +10,7 @@ using Masuit.Tools.NoSQL;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -29,6 +32,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         private readonly RedisHelper _redisHelper;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ISearchEngine<DataContext> _searchEngine;
 
         /// <summary>
         /// hangfire后台任务
@@ -41,7 +45,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="redisHelper"></param>
         /// <param name="httpClientFactory"></param>
         /// <param name="hostingEnvironment"></param>
-        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, RedisHelper redisHelper, IHttpClientFactory httpClientFactory, IHostingEnvironment hostingEnvironment)
+        /// <param name="searchEngine"></param>
+        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, RedisHelper redisHelper, IHttpClientFactory httpClientFactory, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine)
         {
             _userInfoService = userInfoService;
             _postService = postService;
@@ -51,6 +56,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             _redisHelper = redisHelper;
             _httpClientFactory = httpClientFactory;
             _hostingEnvironment = hostingEnvironment;
+            _searchEngine = searchEngine;
         }
 
         /// <summary>
@@ -199,6 +205,17 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 }).Wait();
             });
             _linksService.SaveChanges();
+        }
+
+        /// <summary>
+        /// 重建Lucene索引库
+        /// </summary>
+        public void CreateLiceneIndex()
+        {
+            _searchEngine.CreateIndex(new List<string>()
+            {
+                nameof(DataContext.Post),nameof(DataContext.Issues),
+            });
         }
     }
 }
