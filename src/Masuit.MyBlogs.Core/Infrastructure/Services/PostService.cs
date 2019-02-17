@@ -9,7 +9,10 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using PanGu;
 using PanGu.HighLight;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
@@ -62,33 +65,158 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 统一保存的方法
-        /// </summary>
-        /// <returns>受影响的行数</returns>
-        public override int SaveChanges()
-        {
-            return _searchEngine.SaveChanges();
-        }
-
-        /// <summary>
-        /// 统一保存数据
-        /// </summary>
-        /// <returns>受影响的行数</returns>
-        public override Task<int> SaveChangesAsync()
-        {
-            return _searchEngine.SaveChangesAsync();
-        }
-
-        /// <summary>
         /// 添加实体并保存
         /// </summary>
         /// <param name="t">需要添加的实体</param>
         /// <returns>添加成功</returns>
         public override Post AddEntitySaved(Post t)
         {
-            var p = base.AddEntity(t);
-            bool b = _searchEngine.SaveChanges() > 0;
-            return b ? p : default(Post);
+            t = base.AddEntity(t);
+            _searchEngine.SaveChanges(t.Status == Status.Pended);
+            return t;
+        }
+
+        /// <summary>
+        /// 添加实体并保存（异步）
+        /// </summary>
+        /// <param name="t">需要添加的实体</param>
+        /// <returns>添加成功</returns>
+        public override Task<int> AddEntitySavedAsync(Post t)
+        {
+            base.AddEntity(t);
+            return _searchEngine.SaveChangesAsync(t.Status == Status.Pended);
+        }
+
+        /// <summary>
+        /// 根据ID删除实体并保存
+        /// </summary>
+        /// <param name="id">实体id</param>
+        /// <returns>删除成功</returns>
+        public override bool DeleteByIdSaved(object id)
+        {
+            base.DeleteById(id);
+            return _searchEngine.SaveChanges() > 0;
+        }
+
+        /// <summary>
+        /// 删除多个实体并保存
+        /// </summary>
+        /// <param name="list">实体集合</param>
+        /// <returns>删除成功</returns>
+        public override bool DeleteEntitiesSaved(IEnumerable<Post> list)
+        {
+            base.DeleteEntities(list);
+            return _searchEngine.SaveChanges() > 0;
+        }
+
+        /// <summary>
+        /// 根据ID删除实体并保存（异步）
+        /// </summary>
+        /// <param name="id">实体id</param>
+        /// <returns>删除成功</returns>
+        public override Task<int> DeleteByIdSavedAsync(object id)
+        {
+            base.DeleteById(id);
+            return _searchEngine.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// 删除多个实体并保存（异步）
+        /// </summary>
+        /// <param name="list">实体集合</param>
+        /// <returns>删除成功</returns>
+        public override Task<int> DeleteEntitiesSavedAsync(IEnumerable<Post> list)
+        {
+            base.DeleteEntities(list);
+            return _searchEngine.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// 根据条件删除实体
+        /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <returns>删除成功</returns>
+        public override int DeleteEntitySaved(Expression<Func<Post, bool>> @where)
+        {
+            base.DeleteEntity(@where);
+            return _searchEngine.SaveChanges();
+        }
+
+        /// <summary>
+        /// 删除实体并保存
+        /// </summary>
+        /// <param name="t">需要删除的实体</param>
+        /// <returns>删除成功</returns>
+        public override bool DeleteEntitySaved(Post t)
+        {
+            base.DeleteEntity(t);
+            return _searchEngine.SaveChanges() > 0;
+        }
+
+        /// <summary>
+        /// 根据条件删除实体
+        /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <returns>删除成功</returns>
+        public override Task<int> DeleteEntitySavedAsync(Expression<Func<Post, bool>> @where)
+        {
+            base.DeleteEntity(@where);
+            return _searchEngine.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// 删除实体并保存（异步）
+        /// </summary>
+        /// <param name="t">需要删除的实体</param>
+        /// <returns>删除成功</returns>
+        public override Task<int> DeleteEntitySavedAsync(Post t)
+        {
+            base.DeleteEntity(t);
+            return _searchEngine.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// 更新实体并保存
+        /// </summary>
+        /// <param name="t">更新后的实体</param>
+        /// <returns>更新成功</returns>
+        public override bool UpdateEntitySaved(Post t)
+        {
+            base.UpdateEntity(t);
+            return _searchEngine.SaveChanges() > 0;
+        }
+
+        /// <summary>
+        /// 更新多个实体并保存
+        /// </summary>
+        /// <param name="list">实体集合</param>
+        /// <returns>更新成功</returns>
+        public override bool UpdateEntitiesSaved(IEnumerable<Post> list)
+        {
+            base.UpdateEntities(list);
+            return _searchEngine.SaveChanges() > 0;
+        }
+
+        /// <summary>
+        /// 更新多个实体并保存（异步）
+        /// </summary>
+        /// <param name="list">实体集合</param>
+        /// <returns>更新成功</returns>
+        public override Task<int> UpdateEntitiesSavedAsync(IEnumerable<Post> list)
+        {
+            base.UpdateEntities(list);
+            return _searchEngine.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// 更新实体并保存（异步）
+        /// </summary>
+        /// <param name="t">更新后的实体</param>
+        /// <returns>更新成功</returns>
+        public override Task<int> UpdateEntitySavedAsync(Post t)
+        {
+            base.UpdateEntity(t);
+            return _searchEngine.SaveChangesAsync();
         }
     }
 }

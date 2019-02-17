@@ -45,6 +45,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="issueService"></param>
         /// <param name="messageService"></param>
         /// <param name="hostingEnvironment"></param>
+        /// <param name="searchEngine"></param>
         public BugController(IIssueService issueService, IInternalMessageService messageService, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine)
         {
             IssueService = issueService;

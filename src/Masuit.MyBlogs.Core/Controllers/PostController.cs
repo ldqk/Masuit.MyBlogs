@@ -43,8 +43,6 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISearchEngine<DataContext> _searchEngine;
-        private readonly ILuceneIndexer _luceneIndexer;
-        private readonly ILuceneIndexSearcher _luceneIndexSearcher;
 
         /// <summary>
         /// 
@@ -61,9 +59,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="postHistoryVersionService"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="searchEngine"></param>
-        /// <param name="luceneIndexer"></param>
-        /// <param name="luceneIndexSearcher"></param>
-        public PostController(IPostService postService, ICategoryService categoryService, IBroadcastService broadcastService, ISeminarService seminarService, IPostHistoryVersionService postHistoryVersionService, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine, ILuceneIndexer luceneIndexer, ILuceneIndexSearcher luceneIndexSearcher)
+        public PostController(IPostService postService, ICategoryService categoryService, IBroadcastService broadcastService, ISeminarService seminarService, IPostHistoryVersionService postHistoryVersionService, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine)
         {
             PostService = postService;
             CategoryService = categoryService;
@@ -72,8 +68,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             PostHistoryVersionService = postHistoryVersionService;
             _hostingEnvironment = hostingEnvironment;
             _searchEngine = searchEngine;
-            _luceneIndexer = luceneIndexer;
-            _luceneIndexSearcher = luceneIndexSearcher;
         }
 
         /// <summary>
@@ -95,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ViewBag.Prev = PostService.GetFirstEntityNoTracking(p => p.ModifyDate < modifyDate && (p.Status == Status.Pended || user.IsAdmin), p => p.ModifyDate, false);
                 if (!string.IsNullOrEmpty(kw))
                 {
-                    ViewData["keywords"] = _luceneIndexSearcher.CutKeywords(kw).ToJsonString();
+                    ViewData["keywords"] = post.Content.Contains(kw) ? $"['{kw}']" : _searchEngine.LuceneIndexSearcher.CutKeywords(kw).ToJsonString();
                 }
                 if (user.IsAdmin)
                 {
@@ -221,8 +215,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 HttpContext.Session.Set("post-vote" + id, id);
                 ++post.VoteDownCount;
-                PostService.UpdateEntity(post);
-                bool b = PostService.SaveChanges() > 0;
+                bool b = PostService.UpdateEntitySaved(post);
                 return ResultData(null, b, b ? "投票成功！" : "投票失败！");
             }
 
@@ -477,8 +470,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.Status = Status.Pended;
             post.ModifyDate = DateTime.Now;
             post.PostDate = DateTime.Now;
-            PostService.UpdateEntity(post);
-            bool b = _searchEngine.SaveChanges() > 0;
+            bool b = PostService.UpdateEntitySaved(post);
             if (!b)
             {
                 return ResultData(null, false, "审核失败！");
@@ -515,8 +507,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var post = PostService.GetById(id);
             post.Status = Status.Deleted;
-            PostService.UpdateEntity(post);
-            bool b = _searchEngine.SaveChanges() > 0;
+            bool b = PostService.UpdateEntitySaved(post);
+            _searchEngine.LuceneIndexer.Delete(post);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 
@@ -530,8 +522,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var post = PostService.GetById(id);
             post.Status = Status.Pended;
-            PostService.UpdateEntity(post);
-            bool b = _searchEngine.SaveChanges() > 0;
+            bool b = PostService.UpdateEntitySaved(post);
             return ResultData(null, b, b ? "恢复成功！" : "恢复失败！");
         }
 
@@ -576,8 +567,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            PostService.DeleteById(id);
-            bool b = _searchEngine.SaveChanges() > 0;
+            bool b = PostService.DeleteByIdSaved(id);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 
@@ -827,8 +817,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 });
             }
 
-            PostService.UpdateEntity(p);
-            bool b = _searchEngine.SaveChanges() > 0;
+            bool b = PostService.UpdateEntitySaved(p);
             if (b)
             {
 #if !DEBUG
@@ -943,8 +932,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "如果要定时发布，请选择正确的一个将来时间点！");
             }
 
-            PostService.AddEntity(p);
-            bool b = _searchEngine.SaveChanges() > 0;
+            bool b = PostService.AddEntitySaved(p) != null;
             if (b)
             {
                 if ("false" == CommonHelper.SystemSettings["DisabledEmailBroadcast"])
