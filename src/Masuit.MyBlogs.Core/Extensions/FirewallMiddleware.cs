@@ -43,8 +43,14 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 
+            if (context.Request.Path.ToString().Contains(new[] { "error", "serviceunavailable" }))
+            {
+                return;
+            }
+
             if (context.Connection.RemoteIpAddress.MapToIPv4().ToString().IsDenyIpAddress())
             {
+                context.Response.StatusCode = 403;
                 await context.Response.WriteAsync($"检测到您的IP（{context.Connection.RemoteIpAddress.MapToIPv4()}）异常，已被本站禁止访问，如有疑问，请联系站长！");
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
                 {

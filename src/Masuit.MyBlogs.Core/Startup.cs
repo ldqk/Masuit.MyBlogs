@@ -8,7 +8,6 @@ using Hangfire.Dashboard;
 using JiebaNet.Segmenter;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Extensions;
-using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Controllers;
 using Masuit.MyBlogs.Core.Extensions;
@@ -40,7 +39,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -166,9 +164,9 @@ namespace Masuit.MyBlogs.Core
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <param name="db"></param>
-        /// <param name="searchEngine"></param>
+        /// <param name="hangfire"></param>
         /// <param name="luceneIndexerOptions"></param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, DataContext db, ISearchEngine<DataContext> searchEngine, LuceneIndexerOptions luceneIndexerOptions)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, DataContext db, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
             if (env.IsDevelopment())
             {
@@ -201,10 +199,7 @@ namespace Masuit.MyBlogs.Core
             if (!Directory.Exists(lucenePath) || Directory.GetFiles(lucenePath).Length < 1)
             {
                 Console.WriteLine("，索引库不存在，开始自动创建Lucene索引库...");
-                searchEngine.CreateIndex(new List<string>()
-                {
-                    nameof(DataContext.Post),nameof(DataContext.Issues)
-                });
+                hangfire.CreateLuceneIndex();
                 Console.WriteLine("索引库创建完成！");
             }
 

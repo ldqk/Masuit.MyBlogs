@@ -1,6 +1,8 @@
 ﻿using Common;
 using Hangfire;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Infrastructure.Application;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
@@ -27,14 +29,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// IssueService
         /// </summary>
-        public IIssueService IssueService { get; set; }
+        private IIssueService IssueService { get; set; }
 
         /// <summary>
         /// MessageService
         /// </summary>
-        public IInternalMessageService MessageService { get; set; }
+        private IInternalMessageService MessageService { get; set; }
 
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ISearchEngine<DataContext> _searchEngine;
 
         /// <summary>
         /// bug反馈
@@ -42,11 +45,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="issueService"></param>
         /// <param name="messageService"></param>
         /// <param name="hostingEnvironment"></param>
-        public BugController(IIssueService issueService, IInternalMessageService messageService, IHostingEnvironment hostingEnvironment)
+        public BugController(IIssueService issueService, IInternalMessageService messageService, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine)
         {
             IssueService = issueService;
             MessageService = messageService;
             _hostingEnvironment = hostingEnvironment;
+            _searchEngine = searchEngine;
         }
 
         /// <summary>
@@ -72,13 +76,13 @@ namespace Masuit.MyBlogs.Core.Controllers
             int total;
             if (string.IsNullOrEmpty(filter.Kw))
             {
-                list = IssueService.LoadPageEntitiesFromL2CacheNoTracking(filter.Page, filter.Size, out total, i => i.Status != Status.Handled || i.Level != BugLevel.Fatal || user.IsAdmin, i => i.SubmitTime, false).ToList();
+                list = IssueService.LoadPageEntitiesFromL2CacheNoTracking(filter.Page, filter.Size, out total, i => i.Status != Status.Handled && i.Level != BugLevel.Fatal || user.IsAdmin, i => i.SubmitTime, false).ToList();
             }
             else
             {
                 var searchResult = IssueService.SearchPage(filter.Page, filter.Size, filter.Kw);
                 total = searchResult.Total;
-                list = searchResult.Results.Where(i => i.Status != Status.Handled || i.Level != BugLevel.Fatal || user.IsAdmin).ToList();
+                list = searchResult.Results;
             }
 
             var pageCount = Math.Ceiling(total * 1.0 / filter.Size).ToInt32();
@@ -124,7 +128,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             issue.Status = Status.Handled;
             issue.HandleTime = DateTime.Now;
             issue.Msg = req.Text;
-            bool b = IssueService.UpdateEntitySaved(issue);
+            IssueService.UpdateEntity(issue);
+            bool b = _searchEngine.SaveChanges() > 0;
             string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/bugfeed.html").Replace("{{title}}", issue.Title).Replace("{{link}}", issue.Link).Replace("{{text}}", req.Text).Replace("{{date}}", issue.HandleTime.Value.ToString("yyyy-MM-dd HH:mm:ss"));
             BackgroundJob.Enqueue(() => CommonHelper.SendMail("bug提交反馈通知", content, issue.Email));
             return ResultData(null, b, b ? "问题处理成功！" : "处理失败！");
@@ -140,16 +145,17 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             issue.Description = CommonHelper.ReplaceImgSrc(Regex.Replace(issue.Description, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/");
             issue.IPAddress = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
-            Issue bug = IssueService.AddEntitySaved(issue);
-            if (bug != null)
+            IssueService.AddEntity(issue);
+            bool b = _searchEngine.SaveChanges(issue.Level < BugLevel.Fatal) > 0;
+            if (b)
             {
                 MessageService.AddEntitySaved(new InternalMessage()
                 {
                     Title = $"来自【{issue.Name}({issue.Email})】的bug问题反馈",
-                    Content = bug.Description,
+                    Content = issue.Description,
                     Link = Url.Action("Index")
                 });
-                string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/bugreport.html").Replace("{{name}}", bug.Name).Replace("{{email}}", bug.Email).Replace("{{title}}", bug.Title).Replace("{{desc}}", bug.Description).Replace("{{link}}", bug.Link).Replace("{{date}}", bug.SubmitTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/bugreport.html").Replace("{{name}}", issue.Name).Replace("{{email}}", issue.Email).Replace("{{title}}", issue.Title).Replace("{{desc}}", issue.Description).Replace("{{link}}", issue.Link).Replace("{{date}}", issue.SubmitTime.ToString("yyyy-MM-dd HH:mm:ss"));
                 BackgroundJob.Enqueue(() => CommonHelper.SendMail("bug提交通知", content, "admin@masuit.com"));
                 return ResultData(issue, true, "问题提交成功，感谢您的反馈！");
             }

@@ -477,12 +477,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.Status = Status.Pended;
             post.ModifyDate = DateTime.Now;
             post.PostDate = DateTime.Now;
-            bool b = PostService.UpdateEntitySaved(post);
+            PostService.UpdateEntity(post);
+            bool b = _searchEngine.SaveChanges() > 0;
             if (!b)
             {
                 return ResultData(null, false, "审核失败！");
             }
-            _luceneIndexer.Add(post);
             if ("false" == CommonHelper.SystemSettings["DisabledEmailBroadcast"])
             {
                 var cast = BroadcastService.LoadEntities(c => c.Status == Status.Subscribed).ToList();

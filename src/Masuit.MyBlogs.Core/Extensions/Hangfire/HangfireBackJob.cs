@@ -1,4 +1,5 @@
 ﻿using Common;
+using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Application;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -210,12 +211,18 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <summary>
         /// 重建Lucene索引库
         /// </summary>
-        public void CreateLiceneIndex()
+        public void CreateLuceneIndex()
         {
             _searchEngine.CreateIndex(new List<string>()
             {
                 nameof(DataContext.Post),nameof(DataContext.Issues),
             });
+            var list1 = _searchEngine.Context.Issues.Where(i => i.Status != Status.Handled && i.Level != BugLevel.Fatal).ToList();
+            var list2 = _searchEngine.Context.Post.Where(i => i.Status != Status.Pended).ToList();
+            var list = new List<LuceneIndexableBaseEntity>();
+            list.AddRange(list1);
+            list.AddRange(list2);
+            _searchEngine.LuceneIndexer.Delete(list);
         }
     }
 }

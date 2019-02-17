@@ -50,7 +50,7 @@ namespace Masuit.MyBlogs.Core.Configs
         /// </summary>
         public static void EveryweekJob()
         {
-            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.CreateLiceneIndex), "default");
+            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.CreateLuceneIndex), "default");
         }
     }
 }

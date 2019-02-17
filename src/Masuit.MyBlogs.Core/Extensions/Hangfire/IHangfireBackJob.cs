@@ -42,6 +42,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <summary>
         /// 重建Lucene索引库
         /// </summary>
-        void CreateLiceneIndex();
+        void CreateLuceneIndex();
     }
 }

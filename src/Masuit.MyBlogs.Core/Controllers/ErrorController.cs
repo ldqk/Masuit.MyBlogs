@@ -12,7 +12,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 404
         /// </summary>
         /// <returns></returns>
-        [Route("{*url}", Order = 99999), ResponseCache(Duration = 600)]
+        [Route("{*url}", Order = 99999), ResponseCache(Duration = 36000)]
         public ActionResult Index()
         {
             Response.StatusCode = 404;
@@ -32,7 +32,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 503
         /// </summary>
         /// <returns></returns>
-        [Route("ServiceUnavailable"), ResponseCache(Duration = 600)]
+        [Route("ServiceUnavailable"), ResponseCache(Duration = 36000)]
         public ActionResult ServiceUnavailable()
         {
             Response.StatusCode = 503;

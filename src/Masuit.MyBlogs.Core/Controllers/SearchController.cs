@@ -50,7 +50,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Route("s/{wd?}/{page:int?}/{size:int?}"), ResponseCache(VaryByQueryKeys = new[] { "wd", "page", "size" }, VaryByHeader = HeaderNames.Cookie, Duration = 60)]
+        [Route("s/{wd?}/{page:int?}/{size:int?}"), ResponseCache(VaryByQueryKeys = new[] { "wd", "page", "size" }, VaryByHeader = HeaderNames.Cookie, Duration = 600)]
         public ActionResult Search(string wd = "", int page = 1, int size = 10)
         {
             var nul = new List<PostOutputDto>();

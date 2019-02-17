@@ -10,6 +10,7 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using PanGu;
 using PanGu.HighLight;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -58,6 +59,36 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 Elapsed = searchResult.Elapsed,
                 Total = searchResult.TotalHits
             };
+        }
+
+        /// <summary>
+        /// 统一保存的方法
+        /// </summary>
+        /// <returns>受影响的行数</returns>
+        public override int SaveChanges()
+        {
+            return _searchEngine.SaveChanges();
+        }
+
+        /// <summary>
+        /// 统一保存数据
+        /// </summary>
+        /// <returns>受影响的行数</returns>
+        public override Task<int> SaveChangesAsync()
+        {
+            return _searchEngine.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// 添加实体并保存
+        /// </summary>
+        /// <param name="t">需要添加的实体</param>
+        /// <returns>添加成功</returns>
+        public override Post AddEntitySaved(Post t)
+        {
+            var p = base.AddEntity(t);
+            bool b = _searchEngine.SaveChanges() > 0;
+            return b ? p : default(Post);
         }
     }
 }
