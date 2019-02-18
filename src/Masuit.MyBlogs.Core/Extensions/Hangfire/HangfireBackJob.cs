@@ -7,6 +7,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Core.NoSQL;
 using Masuit.Tools.NoSQL;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
@@ -43,18 +44,18 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="settingService"></param>
         /// <param name="searchDetailsService"></param>
         /// <param name="linksService"></param>
-        /// <param name="redisHelper"></param>
+        /// <param name="redis"></param>
         /// <param name="httpClientFactory"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="searchEngine"></param>
-        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, RedisHelper redisHelper, IHttpClientFactory httpClientFactory, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine)
+        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, RedisHelperFactory redis, IHttpClientFactory httpClientFactory, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine)
         {
             _userInfoService = userInfoService;
             _postService = postService;
             _settingService = settingService;
             _searchDetailsService = searchDetailsService;
             _linksService = linksService;
-            _redisHelper = redisHelper;
+            _redisHelper = redis.CreateDefault();
             _httpClientFactory = httpClientFactory;
             _hostingEnvironment = hostingEnvironment;
             _searchEngine = searchEngine;
@@ -133,7 +134,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 });
             }
 
-            _postService.UpdateEntitySaved(post);
+            _postService.UpdateEntity(post);
+            _postService.SaveChanges();
         }
 
         /// <summary>
@@ -165,7 +167,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 {
                     p.AverageViewCount = p.PostAccessRecord.Average(r => r.ClickCount);
                     p.TotalViewCount = p.PostAccessRecord.Sum(r => r.ClickCount);
-                    _postService.UpdateEntitySaved(p);
+                    _postService.UpdateEntity(p);
+                    _postService.SaveChanges();
                 }
                 catch (Exception)
                 {

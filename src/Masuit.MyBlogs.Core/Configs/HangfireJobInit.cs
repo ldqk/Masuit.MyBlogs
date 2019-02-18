@@ -1,8 +1,6 @@
 ﻿using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using Masuit.Tools;
-using Masuit.Tools.NoSQL;
 using System;
 
 namespace Masuit.MyBlogs.Core.Configs
@@ -18,15 +16,8 @@ namespace Masuit.MyBlogs.Core.Configs
         public static void Start()
         {
             RecurringJob.AddOrUpdate(() => CheckLinks(), Cron.HourInterval(5)); //每5h检查友链
-            RecurringJob.AddOrUpdate(() => EverydayJob(), Cron.Daily, TimeZoneInfo.Local); //每天的任务
-            RecurringJob.AddOrUpdate(() => EveryweekJob(), Cron.Weekly(DayOfWeek.Monday, 3), TimeZoneInfo.Local); //每周的任务
-            using (RedisHelper redisHelper = RedisHelper.GetInstance())
-            {
-                if (!redisHelper.KeyExists("ArticleViewToken"))
-                {
-                    redisHelper.SetString("ArticleViewToken", string.Empty.CreateShortToken()); //更新加密文章的密码
-                }
-            }
+            RecurringJob.AddOrUpdate(() => EverydayJob(), Cron.Daily(5), TimeZoneInfo.Local); //每天的任务
+            RecurringJob.AddOrUpdate(() => EveryweekJob(), Cron.Weekly(DayOfWeek.Monday, 5), TimeZoneInfo.Local); //每周的任务
         }
 
         /// <summary>

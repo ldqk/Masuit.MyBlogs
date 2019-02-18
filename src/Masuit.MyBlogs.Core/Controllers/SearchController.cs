@@ -56,10 +56,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             var nul = new List<PostOutputDto>();
             ViewBag.Elapsed = 0;
             ViewBag.Total = 0;
-            ViewBag.Keyword = wd ?? "";
-            if (Regex.Match(wd, CommonHelper.BanRegex).Length > 0 || Regex.Match(wd, CommonHelper.ModRegex).Length > 0)
+            ViewBag.Keyword = wd;
+            if (Regex.Match(wd ?? "", CommonHelper.BanRegex + "|" + CommonHelper.ModRegex).Length > 0)
             {
-                //ViewBag.Wd = "";
                 return RedirectToAction("Search");
             }
             var start = DateTime.Today.AddDays(-7);

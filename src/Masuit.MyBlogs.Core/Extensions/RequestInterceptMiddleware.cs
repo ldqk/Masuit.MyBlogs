@@ -26,9 +26,9 @@ namespace Masuit.MyBlogs.Core.Extensions
 
         public async Task Invoke(HttpContext context)
         {
-            if (!context.Session.TryGetValue(context.Connection.Id, out _))
+            if (!context.Session.TryGetValue("session", out _))
             {
-                context.Session.Set(context.Connection.Id, context.Connection.Id);
+                context.Session.Set("session", 0);
                 _redisHelper.StringIncrement("Interview:ViewCount");
             }
             await _next.Invoke(context);

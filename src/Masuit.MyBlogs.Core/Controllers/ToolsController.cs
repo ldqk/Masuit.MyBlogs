@@ -91,7 +91,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ip = $"{r.StrictNext(210)}.{r.StrictNext(255)}.{r.StrictNext(255)}.{r.StrictNext(255)}";
 #endif
                 PhysicsAddress address = await ip.GetPhysicsAddressInfo();
-                if (address.Status == 0)
+                if (address?.Status == 0)
                 {
                     ViewBag.Address = address.AddressResult.FormattedAddress;
                     if (Request.Method.ToLower().Equals("get"))

@@ -141,7 +141,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return View(list);
             }
 
-            return Redirect(Request.Headers[HeaderNames.Referer].ToString());
+            return RedirectToAction("Details", "Post", new { id });
         }
 
         /// <summary>
@@ -186,6 +186,10 @@ namespace Masuit.MyBlogs.Core.Controllers
             var main = PostService.GetById(id).Mapper<PostHistoryVersion>();
             var left = v1 <= 0 ? main : PostHistoryVersionService.GetById(v1);
             var right = v2 <= 0 ? main : PostHistoryVersionService.GetById(v2);
+            if (left is null || right is null)
+            {
+                return RedirectToAction("History", "Post", new { id });
+            }
             HtmlDiff.HtmlDiff diffHelper = new HtmlDiff.HtmlDiff(right.Content, left.Content);
             string diffOutput = diffHelper.Build();
             right.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);

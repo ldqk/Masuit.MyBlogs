@@ -45,6 +45,7 @@ namespace Masuit.MyBlogs.Core.Extensions
 
             if (context.Request.Path.ToString().Contains(new[] { "error", "serviceunavailable" }))
             {
+                await _next.Invoke(context);
                 return;
             }
 
@@ -60,15 +61,14 @@ namespace Masuit.MyBlogs.Core.Extensions
                 }));
                 return;
             }
-            bool isSpider = context.Request.Headers[HeaderNames.UserAgent].ToString().Contains(new[]
+
+            bool isSpider = context.Request.Headers[HeaderNames.UserAgent].ToString().Contains(new[] { "DNSPod", "Baidu", "spider", "Python", "bot" });
+            if (isSpider)
             {
-                "DNSPod",
-                "Baidu",
-                "spider",
-                "Python",
-                "bot"
-            });
-            if (isSpider) return;
+                await _next.Invoke(context);
+                return;
+            }
+
             var times = _redisHelper.StringIncrement("Frequency:" + context.Connection.Id);
             _redisHelper.Expire("Frequency:" + context.Connection.Id, TimeSpan.FromMinutes(1));
             if (times > 300)

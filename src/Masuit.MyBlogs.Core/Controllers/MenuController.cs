@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetMenus()
         {
-            var menus = MenuService.GetAll(m => m.Sort).ToList();
+            var menus = MenuService.GetAll(m => m.ParentId).ThenBy(m => m.Sort).ToList();
             return ResultData(menus);
         }
 
