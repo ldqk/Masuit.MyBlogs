@@ -79,7 +79,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 wd = wd.Trim().Replace("+", " ");
                 if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
                 {
-                    if (!HttpContext.Session.TryGetValue("search:" + wd, out _))
+                    if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !HttpContext.Request.IsRobot())
                     {
                         SearchDetailsService.AddEntity(new SearchDetails
                         {

@@ -101,7 +101,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     return RedirectToAction("Post", "Home");
                 }
 
-                if (string.IsNullOrEmpty(HttpContext.Session.GetByRedis<string>("post" + id)))
+                if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.GetByRedis<string>("post" + id)))
                 {
                     HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.RecordPostVisit), args: id);
                     HttpContext.Session.SetByRedis("post" + id, id.ToString());

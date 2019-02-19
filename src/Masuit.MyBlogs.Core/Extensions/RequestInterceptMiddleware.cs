@@ -1,4 +1,5 @@
-﻿using Masuit.Tools.Core.Net;
+﻿using Common;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.NoSQL;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace Masuit.MyBlogs.Core.Extensions
 
         public async Task Invoke(HttpContext context)
         {
-            if (!context.Session.TryGetValue("session", out _))
+            if (!context.Session.TryGetValue("session", out _) && !context.Request.IsRobot())
             {
                 context.Session.Set("session", 0);
                 _redisHelper.StringIncrement("Interview:ViewCount");

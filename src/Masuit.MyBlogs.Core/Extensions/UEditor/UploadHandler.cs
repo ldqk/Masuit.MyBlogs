@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Common;
+using Hangfire;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
 using System.Linq;
@@ -71,23 +73,23 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     Directory.CreateDirectory(Path.GetDirectoryName(localPath));
                 }
                 File.WriteAllBytes(localPath, uploadFileBytes);
-                //if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(localPath)))
-                //{
-                //    var (url, success) = CommonHelper.UploadImage(localPath);
-                //    if (success)
-                //    {
-                //        Result.Url = url;
-                //        BackgroundJob.Enqueue(() => File.Delete(localPath));
-                //    }
-                //    else
-                //    {
-                //        Result.Url = savePath;
-                //    }
-                //}
-                //else
-                //{
-                Result.Url = savePath;
-                //}
+                if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(localPath)))
+                {
+                    var (url, success) = CommonHelper.UploadImage(localPath);
+                    if (success)
+                    {
+                        Result.Url = url;
+                        BackgroundJob.Enqueue(() => File.Delete(localPath));
+                    }
+                    else
+                    {
+                        Result.Url = savePath;
+                    }
+                }
+                else
+                {
+                    Result.Url = savePath;
+                }
                 Result.State = UploadState.Success;
             }
             catch (Exception e)

@@ -4,7 +4,6 @@ using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.NoSQL;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Threading.Tasks;
 using System.Web;
@@ -62,8 +61,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 
-            bool isSpider = context.Request.Headers[HeaderNames.UserAgent].ToString().Contains(new[] { "DNSPod", "Baidu", "spider", "Python", "bot" });
-            if (isSpider)
+            if (context.Request.IsRobot())
             {
                 await _next.Invoke(context);
                 return;

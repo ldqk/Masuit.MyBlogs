@@ -15,8 +15,11 @@ using Masuit.Tools.Models;
 #endif
 using Masuit.Tools.NoSQL;
 using Masuit.Tools.Security;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ContentDispositionHeaderValue = System.Net.Http.Headers.ContentDispositionHeaderValue;
 
 namespace Common
 {
@@ -298,8 +301,8 @@ namespace Common
                                     index++;
                                     if (index == apis.Length)
                                     {
-                                        Console.WriteLine("所有上传接口都挂掉了，重试sm.ms图床");
-                                        return UploadImageFallback(file);
+                                        Console.WriteLine("所有上传接口都挂掉了，重试人民网图床");
+                                        return UploadPeople(file);
                                     }
 
                                     Console.WriteLine("正在准备重试图片上传接口：" + apis[index]);
@@ -314,6 +317,57 @@ namespace Common
             }
 
             return (url.Replace("/thumb150/", "/large/"), success);
+        }
+        /// <summary>
+        /// 上传图片到人民网图床
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static (string url, bool success) UploadPeople(string file)
+        {
+            bool success = false;
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Chrome/72.0.3626.96"));
+                using (var stream = File.OpenRead(file))
+                {
+                    using (var sc = new StreamContent(stream))
+                    {
+                        using (var mc = new MultipartFormDataContent
+                        {
+                            { sc, "Filedata", Path.GetFileName(file) },
+                            {new StringContent("."+Path.GetExtension(file)),"filetype"}
+                        })
+                        {
+                            var str = httpClient.PostAsync("http://bbs1.people.com.cn/postImageUpload.do", mc).ContinueWith(t =>
+                            {
+                                if (t.IsCompletedSuccessfully)
+                                {
+                                    var res = t.Result;
+                                    if (res.IsSuccessStatusCode)
+                                    {
+                                        string result = res.Content.ReadAsStringAsync().Result;
+                                        string url = "http://bbs1.people.com.cn" + (string)JObject.Parse(result)["imageUrl"];
+                                        if (url.EndsWith(Path.GetExtension(file)))
+                                        {
+                                            success = true;
+                                            return url;
+                                        }
+                                    }
+                                }
+
+                                return "";
+                            }).Result;
+                            if (!success)
+                            {
+                                Console.WriteLine("人民网图床上传接口都挂掉了，重试sm.ms图床");
+                                return UploadImageFallback(file);
+                            }
+                            return (str, success);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -379,7 +433,7 @@ namespace Common
         }
 
         /// <summary>
-        /// 上传图片到百度图床
+        /// 上传图片到新浪图床
         /// </summary>
         /// <param name="file">文件名</param>
         /// <returns></returns>
@@ -444,7 +498,7 @@ namespace Common
         }
 
         /// <summary>
-        /// 上传图片到百度图床
+        /// 上传图片到新浪图床
         /// </summary>
         /// <param name="file">文件名</param>
         /// <returns></returns>
@@ -511,7 +565,7 @@ namespace Common
             {
                 if (!src.StartsWith("http"))
                 {
-                    var path = Path.Combine(AppContext.BaseDirectory, src.Replace("/", @"\").Substring(1));
+                    var path = Path.Combine(AppContext.BaseDirectory + "wwwroot", src.Replace("/", @"\").Substring(1));
                     if (File.Exists(path))
                     {
                         var (url, success) = UploadImage(path);
@@ -524,6 +578,16 @@ namespace Common
                 }
             }
             return content;
+        }
+
+        /// <summary>
+        /// 是否是机器人访问
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        public static bool IsRobot(this HttpRequest req)
+        {
+            return req.Headers[HeaderNames.UserAgent].ToString().Contains(new[] { "DNSPod", "Baidu", "spider", "Python", "bot" });
         }
     }
 }

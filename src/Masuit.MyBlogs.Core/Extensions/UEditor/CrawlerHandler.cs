@@ -1,4 +1,6 @@
-﻿using Masuit.Tools;
+﻿using Common;
+using Hangfire;
+using Masuit.Tools;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
@@ -49,9 +51,6 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
         public string ServerUrl { get; set; }
         public string State { get; set; }
 
-        //private HttpServerUtility Server { get; set; }
-
-
         public Crawler(string sourceUrl)
         {
             SourceUrl = sourceUrl;
@@ -92,12 +91,12 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                             stream.CopyTo(ms);
                             File.WriteAllBytes(savePath, ms.GetBuffer());
                         }
-                        //var (url, success) = CommonHelper.UploadImage(savePath);
-                        //if (success)
-                        //{
-                        //    ServerUrl = url;
-                        //    BackgroundJob.Enqueue(() => File.Delete(savePath));
-                        //}
+                        var (url, success) = CommonHelper.UploadImage(savePath);
+                        if (success)
+                        {
+                            ServerUrl = url;
+                            BackgroundJob.Enqueue(() => File.Delete(savePath));
+                        }
                     }
                     State = "SUCCESS";
                 }
