@@ -42,6 +42,12 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 
+            if (context.Request.IsRobot())
+            {
+                //await _next.Invoke(context);
+                return;
+            }
+
             if (context.Request.Path.ToString().Contains(new[] { "error", "serviceunavailable" }))
             {
                 await _next.Invoke(context);
@@ -58,12 +64,6 @@ namespace Masuit.MyBlogs.Core.Extensions
                     RequestUrl = HttpUtility.UrlDecode(context.Request.Scheme + "://" + context.Request.Host + context.Request.Path),
                     Time = DateTime.Now
                 }));
-                return;
-            }
-
-            if (context.Request.IsRobot())
-            {
-                await _next.Invoke(context);
                 return;
             }
 

@@ -219,7 +219,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 HttpContext.Session.Set("post-vote" + id, id);
                 ++post.VoteDownCount;
-                bool b = PostService.UpdateEntitySaved(post);
+                PostService.UpdateEntity(post);
+                var b = PostService.SaveChanges() > 0;
                 return ResultData(null, b, b ? "投票成功！" : "投票失败！");
             }
 
@@ -243,7 +244,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 HttpContext.Session.Set("post-vote" + id, id);
                 ++post.VoteUpCount;
-                bool b = PostService.UpdateEntitySaved(post);
+                PostService.UpdateEntity(post);
+                var b = PostService.SaveChanges() > 0;
                 return ResultData(null, b, b ? "投票成功！" : "投票失败！");
             }
 
