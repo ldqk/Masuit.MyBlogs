@@ -860,7 +860,8 @@ myApp.controller("category", ["$scope", "$http", "NgTableParams", function ($sco
 					});
 				} else {
 					$scope.request("/category/delete", {
-						id: row.Id
+						id: row.Id,
+						cid:result
 					}, function(data) {
 						swal({
 							type: 'success',

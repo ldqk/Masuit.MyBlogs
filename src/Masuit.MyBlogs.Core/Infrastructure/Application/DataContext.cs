@@ -25,8 +25,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Application
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Category>().HasMany(e => e.Post).WithOne(e => e.Category).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Category>().HasMany(e => e.PostHistoryVersion).WithOne(e => e.Category).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Contacts>().Property(e => e.Title).IsUnicode();
-            modelBuilder.Entity<Contacts>().Property(e => e.Url).IsUnicode();
             modelBuilder.Entity<Post>().Property(e => e.Email).IsUnicode();
             modelBuilder.Entity<Post>().Property(e => e.Label).IsUnicode();
             modelBuilder.Entity<Post>().HasMany(e => e.Comment).WithOne(e => e.Post).OnDelete(DeleteBehavior.Cascade);
@@ -55,7 +53,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Application
         public virtual DbSet<Broadcast> Broadcast { get; set; }
         public virtual DbSet<Category> Category { get; set; }
         public virtual DbSet<Comment> Comment { get; set; }
-        public virtual DbSet<Contacts> Contacts { get; set; }
         public virtual DbSet<LeaveMessage> LeaveMessage { get; set; }
         public virtual DbSet<Links> Links { get; set; }
         public virtual DbSet<Menu> Menu { get; set; }

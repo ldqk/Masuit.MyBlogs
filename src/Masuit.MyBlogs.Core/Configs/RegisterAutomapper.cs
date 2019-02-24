@@ -41,13 +41,6 @@ namespace Masuit.MyBlogs.Core.Configs
                 m.CreateMap<CommentOutputDto, CommentInputDto>();
                 m.CreateMap<Comment, CommentViewModel>().ForMember(c => c.CommentDate, e => e.MapFrom(c => c.CommentDate.ToString("yyyy-MM-dd HH:mm:ss")));
 
-                m.CreateMap<Contacts, ContactsInputDto>();
-                m.CreateMap<ContactsInputDto, Contacts>();
-                m.CreateMap<Contacts, ContactsOutputDto>();
-                m.CreateMap<ContactsOutputDto, Contacts>();
-                m.CreateMap<ContactsInputDto, ContactsOutputDto>();
-                m.CreateMap<ContactsOutputDto, ContactsInputDto>();
-
                 m.CreateMap<LeaveMessage, LeaveMessageInputDto>();
                 m.CreateMap<LeaveMessageInputDto, LeaveMessage>();
                 m.CreateMap<LeaveMessage, LeaveMessageOutputDto>();

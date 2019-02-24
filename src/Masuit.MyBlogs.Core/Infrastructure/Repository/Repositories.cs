@@ -23,12 +23,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
         }
     }
-    public partial class ContactsRepository : BaseRepository<Contacts>, IContactsRepository
-    {
-        public ContactsRepository(DataContext dbContext, IDbConnection connection) : base(dbContext, connection)
-        {
-        }
-    }
     public partial class DonateRepository : BaseRepository<Donate>, IDonateRepository
     {
         public DonateRepository(DataContext dbContext, IDbConnection connection) : base(dbContext, connection)

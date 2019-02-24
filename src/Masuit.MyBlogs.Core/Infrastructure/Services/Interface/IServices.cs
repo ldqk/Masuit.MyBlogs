@@ -5,8 +5,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 {
     public partial interface IBroadcastService : IBaseService<Broadcast> { }
 
-    public partial interface IContactsService : IBaseService<Contacts> { }
-
     public partial interface IDonateService : IBaseService<Donate> { }
 
     public partial interface IFastShareService : IBaseService<FastShare> { }

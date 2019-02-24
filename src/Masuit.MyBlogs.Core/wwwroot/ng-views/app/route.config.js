@@ -268,15 +268,6 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 					return $ocLazyLoad.load([cpath + "/links.js"]);
 				}]
 			}
-		}).state("contact", {
-			url: "/contact",
-			templateUrl: vpath + "/contact.html",
-			controller: "contact as list",
-			resolve: {
-				deps: ["$ocLazyLoad", function($ocLazyLoad) {
-					return $ocLazyLoad.load([cpath + "/contact.js"]);
-				}]
-			}
 		}).state("seminar", {
 			url: "/seminar",
 			templateUrl: vpath + "/seminar.html",

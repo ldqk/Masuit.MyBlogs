@@ -44,11 +44,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ILinksService LinksService { get; set; }
 
         /// <summary>
-        /// ContactsService
-        /// </summary>
-        public IContactsService ContactsService { get; set; }
-
-        /// <summary>
         /// RedisHelper
         /// </summary>
         public RedisHelper RedisHelper { get; set; }
@@ -157,8 +152,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.menus = MenuService.LoadEntitiesFromL2Cache<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
             PageFootViewModel model = new PageFootViewModel //页脚
             {
-                Links = LinksService.LoadPageEntitiesFromL2Cache<bool, LinksOutputDto>(1, 40, out int _, l => l.Status == Status.Available, l => l.Recommend, false).ToList(),
-                Contacts = ContactsService.LoadEntitiesFromL2Cache<int, ContactsOutputDto>(l => l.Status == Status.Available, l => l.Id, false).ToList()
+                Links = LinksService.LoadPageEntitiesFromL2Cache<bool, LinksOutputDto>(1, 40, out int _, l => l.Status == Status.Available, l => l.Recommend, false).ToList()
             };
             ViewBag.Footer = model;
 

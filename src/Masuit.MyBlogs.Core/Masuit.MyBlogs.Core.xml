@@ -94,6 +94,13 @@
             <param name="file">文件名</param>
             <returns></returns>
         </member>
+        <member name="M:Common.CommonHelper.UploadPeople(System.String)">
+            <summary>
+            上传图片到人民网图床
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
         <member name="M:Common.CommonHelper.UploadImageFallback(System.String)">
             <summary>
             上传图片到sm图床
@@ -103,14 +110,14 @@
         </member>
         <member name="M:Common.CommonHelper.UploadImageFallback2(System.String)">
             <summary>
-            上传图片到百度图床
+            上传图片到新浪图床
             </summary>
             <param name="file">文件名</param>
             <returns></returns>
         </member>
         <member name="M:Common.CommonHelper.UploadImageFallback3(System.String)">
             <summary>
-            上传图片到百度图床
+            上传图片到新浪图床
             </summary>
             <param name="file">文件名</param>
             <returns></returns>
@@ -120,6 +127,13 @@
             替换img标签的src属性
             </summary>
             <param name="content"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Common.CommonHelper.IsRobot(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            是否是机器人访问
+            </summary>
+            <param name="req"></param>
             <returns></returns>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Common.DocumentConvert">
@@ -244,6 +258,11 @@
         <member name="M:Masuit.MyBlogs.Core.Configs.HangfireJobInit.EverydayJob">
             <summary>
             每日任务
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Configs.HangfireJobInit.EveryweekJob">
+            <summary>
+            每周任务
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Configs.RegisterAutomapper">
@@ -376,13 +395,14 @@
             MessageService
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IIssueService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IInternalMessageService,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IIssueService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IInternalMessageService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext})">
             <summary>
             bug反馈
             </summary>
             <param name="issueService"></param>
             <param name="messageService"></param>
             <param name="hostingEnvironment"></param>
+            <param name="searchEngine"></param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.Index">
             <summary>
@@ -1364,7 +1384,7 @@
             
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ICategoryService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBroadcastService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISeminarService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostHistoryVersionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext},Masuit.LuceneEFCore.SearchEngine.Interfaces.ILuceneIndexer,Masuit.LuceneEFCore.SearchEngine.Interfaces.ILuceneIndexSearcher)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ICategoryService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBroadcastService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISeminarService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostHistoryVersionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext})">
             <summary>
             文章管理
             </summary>
@@ -1375,8 +1395,6 @@
             <param name="postHistoryVersionService"></param>
             <param name="hostingEnvironment"></param>
             <param name="searchEngine"></param>
-            <param name="luceneIndexer"></param>
-            <param name="luceneIndexSearcher"></param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.Details(System.Int32,System.String)">
             <summary>
@@ -1713,12 +1731,6 @@
             删除搜索记录
             </summary>
             <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.SearchController.CreateIndex">
-            <summary>
-            创建索引
-            </summary>
             <returns></returns>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.SeminarController">
@@ -2270,7 +2282,7 @@
             hangfire后台任务
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IUserInfoService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISystemSettingService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ILinksService,Masuit.Tools.NoSQL.RedisHelper,System.Net.Http.IHttpClientFactory,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IUserInfoService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISystemSettingService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ILinksService,Masuit.Tools.Core.NoSQL.RedisHelperFactory,System.Net.Http.IHttpClientFactory,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext})">
             <summary>
             hangfire后台任务
             </summary>
@@ -2279,9 +2291,10 @@
             <param name="settingService"></param>
             <param name="searchDetailsService"></param>
             <param name="linksService"></param>
-            <param name="redisHelper"></param>
+            <param name="redis"></param>
             <param name="httpClientFactory"></param>
             <param name="hostingEnvironment"></param>
+            <param name="searchEngine"></param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.LoginRecord(Masuit.MyBlogs.Core.Models.DTO.UserInfoOutputDto,System.String,Masuit.MyBlogs.Core.Models.Enum.LoginType)">
             <summary>
@@ -2319,6 +2332,11 @@
             检查友链
             </summary>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.CreateLuceneIndex">
+            <summary>
+            重建Lucene索引库
+            </summary>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob">
             <summary>
             hangfire后台任务
@@ -2352,6 +2370,11 @@
         <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob.CheckLinks">
             <summary>
             友链检查
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob.CreateLuceneIndex">
+            <summary>
+            重建Lucene索引库
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Extensions.LuceneHelper">
@@ -4988,6 +5011,104 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.AddEntitySaved(Masuit.MyBlogs.Core.Models.Entity.Post)">
+            <summary>
+            添加实体并保存
+            </summary>
+            <param name="t">需要添加的实体</param>
+            <returns>添加成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.AddEntitySavedAsync(Masuit.MyBlogs.Core.Models.Entity.Post)">
+            <summary>
+            添加实体并保存（异步）
+            </summary>
+            <param name="t">需要添加的实体</param>
+            <returns>添加成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.DeleteByIdSaved(System.Object)">
+            <summary>
+            根据ID删除实体并保存
+            </summary>
+            <param name="id">实体id</param>
+            <returns>删除成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.DeleteEntitiesSaved(System.Collections.Generic.IEnumerable{Masuit.MyBlogs.Core.Models.Entity.Post})">
+            <summary>
+            删除多个实体并保存
+            </summary>
+            <param name="list">实体集合</param>
+            <returns>删除成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.DeleteByIdSavedAsync(System.Object)">
+            <summary>
+            根据ID删除实体并保存（异步）
+            </summary>
+            <param name="id">实体id</param>
+            <returns>删除成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.DeleteEntitiesSavedAsync(System.Collections.Generic.IEnumerable{Masuit.MyBlogs.Core.Models.Entity.Post})">
+            <summary>
+            删除多个实体并保存（异步）
+            </summary>
+            <param name="list">实体集合</param>
+            <returns>删除成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.DeleteEntitySaved(System.Linq.Expressions.Expression{System.Func{Masuit.MyBlogs.Core.Models.Entity.Post,System.Boolean}})">
+            <summary>
+            根据条件删除实体
+            </summary>
+            <param name="where">查询条件</param>
+            <returns>删除成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.DeleteEntitySaved(Masuit.MyBlogs.Core.Models.Entity.Post)">
+            <summary>
+            删除实体并保存
+            </summary>
+            <param name="t">需要删除的实体</param>
+            <returns>删除成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.DeleteEntitySavedAsync(System.Linq.Expressions.Expression{System.Func{Masuit.MyBlogs.Core.Models.Entity.Post,System.Boolean}})">
+            <summary>
+            根据条件删除实体
+            </summary>
+            <param name="where">查询条件</param>
+            <returns>删除成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.DeleteEntitySavedAsync(Masuit.MyBlogs.Core.Models.Entity.Post)">
+            <summary>
+            删除实体并保存（异步）
+            </summary>
+            <param name="t">需要删除的实体</param>
+            <returns>删除成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.UpdateEntitySaved(Masuit.MyBlogs.Core.Models.Entity.Post)">
+            <summary>
+            更新实体并保存
+            </summary>
+            <param name="t">更新后的实体</param>
+            <returns>更新成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.UpdateEntitiesSaved(System.Collections.Generic.IEnumerable{Masuit.MyBlogs.Core.Models.Entity.Post})">
+            <summary>
+            更新多个实体并保存
+            </summary>
+            <param name="list">实体集合</param>
+            <returns>更新成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.UpdateEntitiesSavedAsync(System.Collections.Generic.IEnumerable{Masuit.MyBlogs.Core.Models.Entity.Post})">
+            <summary>
+            更新多个实体并保存（异步）
+            </summary>
+            <param name="list">实体集合</param>
+            <returns>更新成功</returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.PostService.UpdateEntitySavedAsync(Masuit.MyBlogs.Core.Models.Entity.Post)">
+            <summary>
+            更新实体并保存（异步）
+            </summary>
+            <param name="t">更新后的实体</param>
+            <returns>更新成功</returns>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Models.DTO.BaseDto">
             <summary>
             DTO基类
@@ -7526,14 +7647,14 @@
             <param name="services"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.MyBlogs.Core.Infrastructure.Application.DataContext,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext},Masuit.LuceneEFCore.SearchEngine.LuceneIndexerOptions)">
+        <member name="M:Masuit.MyBlogs.Core.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.MyBlogs.Core.Infrastructure.Application.DataContext,Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob,Masuit.LuceneEFCore.SearchEngine.LuceneIndexerOptions)">
             <summary>
             Configure
             </summary>
             <param name="app"></param>
             <param name="env"></param>
             <param name="db"></param>
-            <param name="searchEngine"></param>
+            <param name="hangfire"></param>
             <param name="luceneIndexerOptions"></param>
         </member>
         <member name="T:Masuit.MyBlogs.Core.MyRestrictiveAuthorizationFilter">

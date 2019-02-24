@@ -292,16 +292,6 @@
                         }
                         <a asp-controller="Links" asp-action="Index">更多链接>></a>
                     </section>
-                    <section>
-                        联系站长：
-                        @{
-                            var contacts = footer.Contacts;
-                            foreach (ContactsOutputDto c in contacts)
-                            {
-                                <a href="@c.Url" target="_blank">@c.Title</a><span> | </span>
-                            }
-                        }
-                    </section>
                     <section class="copy">
                         @Html.Raw(CommonHelper.SystemSettings["Copyright"])
                     </section>

@@ -17,13 +17,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
     }
 
-    public partial class ContactsService : BaseService<Contacts>, IContactsService
-    {
-        public ContactsService(IBaseRepository<Contacts> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
-        {
-        }
-    }
-
     public partial class DonateService : BaseService<Donate>, IDonateService
     {
         public DonateService(IBaseRepository<Donate> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)

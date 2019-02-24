@@ -540,8 +540,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
 
     public partial interface ICommentRepository : IBaseRepository<Comment> { }
 
-    public partial interface IContactsRepository : IBaseRepository<Contacts> { }
-
     public partial interface IDonateRepository : IBaseRepository<Donate> { }
 
     public partial interface IFastShareRepository : IBaseRepository<FastShare> { }
