@@ -14,7 +14,7 @@ namespace Masuit.MyBlogs.Core.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.1-servicing-10028").HasAnnotation("Relational:MaxIdentifierLength", 128).HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034").HasAnnotation("Relational:MaxIdentifierLength", 128).HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Broadcast", b =>
             {
@@ -87,21 +87,6 @@ namespace Masuit.MyBlogs.Core.Migrations
                 b.HasIndex("PostId");
 
                 b.ToTable("Comment");
-            });
-
-            modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Contacts", b =>
-            {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                b.Property<int>("Status");
-
-                b.Property<string>("Title").IsRequired().IsUnicode(true);
-
-                b.Property<string>("Url").IsRequired().IsUnicode(true);
-
-                b.HasKey("Id");
-
-                b.ToTable("Contacts");
             });
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Donate", b =>

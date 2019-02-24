@@ -32,17 +32,6 @@ namespace Masuit.MyBlogs.Core.Migrations
                 table.PrimaryKey("PK_Category", x => x.Id);
             });
 
-            migrationBuilder.CreateTable(name: "Contacts", columns: table => new
-            {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                Status = table.Column<int>(nullable: false),
-                Title = table.Column<string>(nullable: false),
-                Url = table.Column<string>(nullable: false)
-            }, constraints: table =>
-            {
-                table.PrimaryKey("PK_Contacts", x => x.Id);
-            });
-
             migrationBuilder.CreateTable(name: "Donate", columns: table => new
             {
                 Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
@@ -388,8 +377,6 @@ namespace Masuit.MyBlogs.Core.Migrations
             migrationBuilder.DropTable(name: "Broadcast");
 
             migrationBuilder.DropTable(name: "Comment");
-
-            migrationBuilder.DropTable(name: "Contacts");
 
             migrationBuilder.DropTable(name: "Donate");
 
