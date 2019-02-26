@@ -5,9 +5,6 @@ using Masuit.MyBlogs.Core.Infrastructure.Application;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.Tools;
-using Masuit.Tools.Core.Net;
-using Masuit.Tools.NoSQL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -62,51 +59,49 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return RedirectToAction("Search");
             }
             var start = DateTime.Today.AddDays(-7);
-            using (RedisHelper redisHelper = RedisHelper.GetInstance())
+            string key = HttpContext.Connection.Id;
+            if (RedisHelper.Exists(key) && !RedisHelper.Get(key).Equals(wd))
             {
-                string key = HttpContext.Connection.Id;
-                if (redisHelper.KeyExists(key) && !redisHelper.GetString(key).Equals(wd))
+                var hotSearches = SearchDetailsService.LoadEntitiesFromL2CacheNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()
                 {
-                    var hotSearches = SearchDetailsService.LoadEntitiesFromL2CacheNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()
-                    {
-                        KeyWords = g.First().KeyWords,
-                        SearchCount = g.Count()
-                    }).ToList();
-                    ViewBag.hotSearches = hotSearches;
-                    ViewBag.ErrorMsg = "10秒内只能搜索1次！";
-                    return View(nul);
-                }
-                wd = wd.Trim().Replace("+", " ");
-                if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
-                {
-                    if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !HttpContext.Request.IsRobot())
-                    {
-                        SearchDetailsService.AddEntity(new SearchDetails
-                        {
-                            KeyWords = wd,
-                            SearchTime = DateTime.Now,
-                            IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString()
-                        });
-                        HttpContext.Session.Set("search:" + wd, wd);
-                    }
-                    var posts = _postService.SearchPage(page, size, wd);
-                    ViewBag.Elapsed = posts.Elapsed;
-                    ViewBag.Total = posts.Total;
-                    SearchDetailsService.SaveChanges();
-                    if (posts.Total > 1)
-                    {
-                        redisHelper.SetString(key, wd, TimeSpan.FromSeconds(10));
-                    }
-                    ViewBag.hotSearches = new List<KeywordsRankOutputDto>();
-                    return View(posts.Results);
-                }
-                ViewBag.hotSearches = SearchDetailsService.LoadEntitiesFromL2CacheNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()
-                {
-                    KeyWords = g.FirstOrDefault().KeyWords,
+                    KeyWords = g.First().KeyWords,
                     SearchCount = g.Count()
                 }).ToList();
+                ViewBag.hotSearches = hotSearches;
+                ViewBag.ErrorMsg = "10秒内只能搜索1次！";
                 return View(nul);
             }
+            wd = wd.Trim().Replace("+", " ");
+            if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
+            {
+                if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !HttpContext.Request.IsRobot())
+                {
+                    SearchDetailsService.AddEntity(new SearchDetails
+                    {
+                        KeyWords = wd,
+                        SearchTime = DateTime.Now,
+                        IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString()
+                    });
+                    HttpContext.Session.Set("search:" + wd, wd.ToByteArray());
+                }
+                var posts = _postService.SearchPage(page, size, wd);
+                ViewBag.Elapsed = posts.Elapsed;
+                ViewBag.Total = posts.Total;
+                SearchDetailsService.SaveChanges();
+                if (posts.Total > 1)
+                {
+                    RedisHelper.Set(key, wd);
+                    RedisHelper.Expire(key, TimeSpan.FromSeconds(10));
+                }
+                ViewBag.hotSearches = new List<KeywordsRankOutputDto>();
+                return View(posts.Results);
+            }
+            ViewBag.hotSearches = SearchDetailsService.LoadEntitiesFromL2CacheNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()
+            {
+                KeyWords = g.FirstOrDefault().KeyWords,
+                SearchCount = g.Count()
+            }).ToList();
+            return View(nul);
         }
 
         /// <summary>

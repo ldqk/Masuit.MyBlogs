@@ -1,6 +1,5 @@
 ﻿using Common;
 using Masuit.Tools.Core.Net;
-using Masuit.Tools.NoSQL;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
@@ -12,17 +11,14 @@ namespace Masuit.MyBlogs.Core.Extensions
     public class RequestInterceptMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly RedisHelper _redisHelper;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="next"></param>
-        /// <param name="redisHelper"></param>
-        public RequestInterceptMiddleware(RequestDelegate next, RedisHelper redisHelper)
+        public RequestInterceptMiddleware(RequestDelegate next)
         {
             _next = next;
-            _redisHelper = redisHelper;
         }
 
         public async Task Invoke(HttpContext context)
@@ -30,7 +26,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             if (!context.Session.TryGetValue("session", out _) && !context.Request.IsRobot())
             {
                 context.Session.Set("session", 0);
-                _redisHelper.StringIncrement("Interview:ViewCount");
+                RedisHelper.IncrBy("Interview:ViewCount");
             }
             await _next.Invoke(context);
         }

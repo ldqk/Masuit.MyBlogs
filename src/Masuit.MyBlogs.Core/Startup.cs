@@ -2,6 +2,7 @@
 using Autofac.Extensions.DependencyInjection;
 using CacheManager.Core;
 using Common;
+using CSRedis;
 using EFSecondLevelCache.Core;
 using Hangfire;
 using Hangfire.Dashboard;
@@ -20,7 +21,6 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.AspNetCore;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +31,8 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Redis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.WebEncoders;
@@ -120,7 +122,9 @@ namespace Masuit.MyBlogs.Core
             services.AddSession(); //注入Session
             services.AddHangfire(x => x.UseRedisStorage(AppConfig.Redis)); //配置hangfire
 
-            services.AddSevenZipCompressor().AddResumeFileResult().AddDefaultRedisHelper(AppConfig.Redis).AddSearchEngine<DataContext>(new LuceneIndexerOptions() { Path = "lucene" });// 配置7z和断点续传和Redis和Lucene搜索引擎
+            services.AddSevenZipCompressor().AddResumeFileResult().AddSearchEngine<DataContext>(new LuceneIndexerOptions() { Path = "lucene" });// 配置7z和断点续传和Redis和Lucene搜索引擎
+            RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
+            services.AddSingleton<IDistributedCache>(new CSRedisCache(RedisHelper.Instance));
 
             //配置EF二级缓存
             services.AddEFSecondLevelCache();

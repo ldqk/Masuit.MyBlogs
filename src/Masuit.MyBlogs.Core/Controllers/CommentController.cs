@@ -6,7 +6,6 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
+using Microsoft.AspNetCore.Http;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -164,7 +164,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult CommentVote(int id)
         {
             Comment cm = CommentService.GetFirstEntity(c => c.Id == id && c.Status == Status.Pended);
-            if (HttpContext.Session.Get<object>("cm" + id) != null)
+            if (HttpContext.Session.Get("cm" + id) != null)
             {
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
@@ -172,7 +172,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 cm.VoteCount++;
                 CommentService.UpdateEntity(cm);
-                HttpContext.Session.Set("cm" + id, id);
+                HttpContext.Session.Set("cm" + id, id.GetBytes());
                 bool b = CommentService.SaveChanges() > 0;
                 return ResultData(null, b, b ? "投票成功" : "投票失败");
             }

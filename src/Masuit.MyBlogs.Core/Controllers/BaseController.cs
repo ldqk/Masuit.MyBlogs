@@ -1,10 +1,9 @@
 ﻿using Masuit.MyBlogs.Core.Configs;
+using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools.Core.Net;
-using Masuit.Tools.NoSQL;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,11 +41,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// LinksService
         /// </summary>
         public ILinksService LinksService { get; set; }
-
-        /// <summary>
-        /// RedisHelper
-        /// </summary>
-        public RedisHelper RedisHelper { get; set; }
 
         /// <summary>
         /// 响应数据

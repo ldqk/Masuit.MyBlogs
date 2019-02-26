@@ -14,7 +14,6 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Html;
 using Masuit.Tools.Security;
@@ -28,6 +27,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -210,14 +210,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult VoteDown(int id)
         {
             Post post = PostService.GetById(id);
-            if (HttpContext.Session.Get<object>("post-vote" + id) != null)
+            if (HttpContext.Session.Get("post-vote" + id) != null)
             {
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
 
             if (post != null)
             {
-                HttpContext.Session.Set("post-vote" + id, id);
+                HttpContext.Session.Set("post-vote" + id, id.GetBytes());
                 ++post.VoteDownCount;
                 PostService.UpdateEntity(post);
                 var b = PostService.SaveChanges() > 0;
@@ -235,14 +235,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult VoteUp(int id)
         {
             Post post = PostService.GetById(id);
-            if (HttpContext.Session.Get<object>("post-vote" + id) != null)
+            if (HttpContext.Session.Get("post-vote" + id) != null)
             {
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
 
             if (post != null)
             {
-                HttpContext.Session.Set("post-vote" + id, id);
+                HttpContext.Session.Set("post-vote" + id, id.GetBytes());
                 ++post.VoteUpCount;
                 PostService.UpdateEntity(post);
                 var b = PostService.SaveChanges() > 0;
@@ -410,7 +410,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "请输入文章访问密码！");
             }
 
-            var s = RedisHelper.GetString("ArticleViewToken");
+            var s = RedisHelper.Get("ArticleViewToken");
             if (token.Equals(s))
             {
                 HttpContext.Session.SetByRedis("ArticleViewToken", token);
@@ -435,7 +435,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (BroadcastService.Any(b => b.Email.Equals(email) && b.SubscribeType == SubscribeType.ArticleToken))
             {
-                var s = RedisHelper.GetString("ArticleViewToken");
+                var s = RedisHelper.Get("ArticleViewToken");
                 HttpContext.Session.SetByRedis("ArticleViewToken", s);
                 return ResultData(null);
             }
@@ -1093,12 +1093,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority, HttpPost]
         public ActionResult ViewToken()
         {
-            if (!RedisHelper.KeyExists("ArticleViewToken"))
+            if (!RedisHelper.Exists("ArticleViewToken"))
             {
-                RedisHelper.SetString("ArticleViewToken", string.Empty.CreateShortToken(6));
+                RedisHelper.Set("ArticleViewToken", string.Empty.CreateShortToken(6));
             }
 
-            var token = RedisHelper.GetString("ArticleViewToken");
+            var token = RedisHelper.Get("ArticleViewToken");
             return ResultData(token);
         }
 

@@ -8,7 +8,6 @@ using Masuit.Tools;
 using Masuit.Tools.Hardware;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Models;
-using Masuit.Tools.NoSQL;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,21 +32,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ISystemSettingService SystemSettingService { get; set; }
 
         /// <summary>
-        /// Redis
-        /// </summary>
-        public RedisHelper RedisHelper { get; set; }
-
-        /// <summary>
         /// 系统设置
         /// </summary>
         /// <param name="userInfoService"></param>
         /// <param name="systemSettingService"></param>
-        /// <param name="redisHelper"></param>
-        public SystemController(IUserInfoService userInfoService, ISystemSettingService systemSettingService, RedisHelper redisHelper)
+        public SystemController(IUserInfoService userInfoService, ISystemSettingService systemSettingService)
         {
             UserInfoService = userInfoService;
             SystemSettingService = systemSettingService;
-            RedisHelper = redisHelper;
         }
 
         /// <summary>
@@ -281,6 +273,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
         }
 
+        /// <summary>
+        /// 清空性能计数器缓存
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult ClearPerfCounter()
+        {
+            MyHub.PerformanceCounter.Clear();
+            return Ok();
+        }
         #region 网站防火墙
 
         /// <summary>
@@ -372,10 +373,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult InterceptLog()
         {
-            List<IpIntercepter> list = RedisHelper.ListRange<IpIntercepter>("intercept");
+            var list = RedisHelper.LRange<IpIntercepter>("intercept", 0, -1);
             return ResultData(new
             {
-                interceptCount = RedisHelper.GetString("interceptCount"),
+                interceptCount = RedisHelper.Get("interceptCount"),
                 list
             });
         }
@@ -386,7 +387,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult ClearInterceptLog()
         {
-            bool b = RedisHelper.DeleteKey("intercept");
+            bool b = RedisHelper.Del("intercept") > 0;
             return ResultData(null, b, b ? "拦截日志清除成功！" : "拦截日志清除失败！");
         }
 

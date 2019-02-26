@@ -13,7 +13,6 @@ using Masuit.Tools.Media;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Models;
 #endif
-using Masuit.Tools.NoSQL;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
@@ -94,10 +93,7 @@ namespace Common
             {
                 try
                 {
-                    using (var redisHelper = RedisHelper.GetInstance())
-                    {
-                        return redisHelper.GetString<double>("Interview:ViewCount");
-                    }
+                    return RedisHelper.Get<double>("Interview:ViewCount");
                 }
                 catch
                 {
@@ -115,10 +111,8 @@ namespace Common
             {
                 try
                 {
-                    using (var redisHelper = RedisHelper.GetInstance())
-                    {
-                        return redisHelper.GetString<double>("Interview:ViewCount") / redisHelper.GetString<double>("Interview:RunningDays");
-                    }
+                    return RedisHelper.Get<double>("Interview:ViewCount") / RedisHelper.Get<double>("Interview:RunningDays");
+
                 }
                 catch
                 {

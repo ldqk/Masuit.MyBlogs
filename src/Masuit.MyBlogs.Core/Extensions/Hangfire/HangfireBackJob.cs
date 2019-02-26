@@ -7,8 +7,6 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Core.Net;
-using Masuit.Tools.Core.NoSQL;
-using Masuit.Tools.NoSQL;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
 using System;
@@ -31,7 +29,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         private readonly ISystemSettingService _settingService;
         private readonly ISearchDetailsService _searchDetailsService;
         private readonly ILinksService _linksService;
-        private readonly RedisHelper _redisHelper;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISearchEngine<DataContext> _searchEngine;
@@ -44,18 +41,16 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="settingService"></param>
         /// <param name="searchDetailsService"></param>
         /// <param name="linksService"></param>
-        /// <param name="redis"></param>
         /// <param name="httpClientFactory"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="searchEngine"></param>
-        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, RedisHelperFactory redis, IHttpClientFactory httpClientFactory, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine)
+        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine)
         {
             _userInfoService = userInfoService;
             _postService = postService;
             _settingService = settingService;
             _searchDetailsService = searchDetailsService;
             _linksService = linksService;
-            _redisHelper = redis.CreateDefault();
             _httpClientFactory = httpClientFactory;
             _hostingEnvironment = hostingEnvironment;
             _searchEngine = searchEngine;
@@ -144,11 +139,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="s"></param>
         public static void InterceptLog(IpIntercepter s)
         {
-            using (RedisHelper redisHelper = RedisHelper.GetInstance())
-            {
-                redisHelper.StringIncrement("interceptCount");
-                redisHelper.ListLeftPush("intercept", s);
-            }
+            RedisHelper.IncrBy("interceptCount");
+            RedisHelper.LPush("intercept", s);
         }
 
         /// <summary>
@@ -157,8 +149,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void EverydayJob()
         {
             CommonHelper.IPErrorTimes.RemoveWhere(kv => kv.Value < 100); //将访客访问出错次数少于100的移开
-            _redisHelper.SetString("ArticleViewToken", SnowFlake.GetInstance().GetUniqueShortId(6)); //更新加密文章的密码
-            _redisHelper.StringIncrement("Interview:RunningDays");
+            RedisHelper.Set("ArticleViewToken", SnowFlake.GetInstance().GetUniqueShortId(6)); //更新加密文章的密码
+            RedisHelper.IncrBy("Interview:RunningDays");
             DateTime time = DateTime.Now.AddMonths(-1);
             _searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
             foreach (var p in _postService.GetAll().AsParallel())

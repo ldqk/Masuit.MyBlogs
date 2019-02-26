@@ -2,28 +2,28 @@
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
-@using Masuit.Tools.Core.Net
+@using Masuit.MyBlogs.Core.Extensions
 @using Masuit.Tools.Win32
 @{
     ViewBag.Title = "投稿";
     Layout = "~/Views/Shared/_Layout.cshtml";
     string[] colors = { "success", "info", "warning", "danger", "default" };
     UserInfoOutputDto user = Context.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
-    List<Category> cats= ViewBag.Category;
+    List<Category> cats = ViewBag.Category;
 }
 <link href="~/Assets/fileupload/filestyle.css" rel="stylesheet" />
 <link href="~/Assets/semantic/semantic.css" rel="stylesheet" />
 <div class="container">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页","Index","Home")</li>
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
         <li class="current"><em>@ViewBag.Title</em></li>
     </ol>
-    <hr/>
+    <hr />
     <form class="form-group" id="article-form" method="post" onsubmit="return false">
         @*文章表单*@
         @Html.AntiForgeryToken()
-        <input type="hidden" name="IsWordDocument" id="IsWordDocument" value="false"/>
-        <input type="hidden" name="ResourceName" id="ResourceName"/>
+        <input type="hidden" name="IsWordDocument" id="IsWordDocument" value="false" />
+        <input type="hidden" name="ResourceName" id="ResourceName" />
         <input type="hidden" class="form-control" id="Author" name="Author" value="@user.NickName">
         <input type="hidden" class="form-control" id="Email" name="Email" value="@user.Email">
         <div class="input-group">

@@ -6,7 +6,6 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Http;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -176,11 +176,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Get(int id)
         {
             Notice notice = NoticeService.GetById(id);
-            if (HttpContext.Session.Get<object>("notice" + id) is null)
+            if (HttpContext.Session.Get("notice" + id) is null)
             {
                 notice.ViewCount++;
                 NoticeService.UpdateEntitySaved(notice);
-                HttpContext.Session.Set("notice" + id, id);
+                HttpContext.Session.Set("notice" + id, id.GetBytes());
             }
             return ResultData(notice.MapTo<NoticeOutputDto>());
         }
@@ -195,11 +195,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             var notice = NoticeService.GetFirstEntity(n => n.Status == Status.Display, n => n.ModifyDate, false);
             if (notice != null)
             {
-                if (HttpContext.Session.Get<object>("notice" + notice.Id) is null)
+                if (HttpContext.Session.Get("notice" + notice.Id) is null)
                 {
                     notice.ViewCount++;
                     NoticeService.UpdateEntitySaved(notice);
-                    HttpContext.Session.Set("notice" + notice.Id, notice.Id);
+                    HttpContext.Session.Set("notice" + notice.Id, notice.Id.GetBytes());
                 }
                 return ResultData(notice.Mapper<NoticeOutputDto>());
             }
