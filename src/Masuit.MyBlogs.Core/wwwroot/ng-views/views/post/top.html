@@ -47,7 +47,7 @@
 </div>
 <div id="modal" class="modal">
     <div class="container-fluid" style="margin: 15px 0;">
-        <form class="card-body bgm-white">
+        <div class="card-body bgm-white">
             <div class="form-group" ng-show="isAdd">
                 <div class="input-group">
                     <label for="desc" class="input-group-addon control-label">选择文章：</label>
@@ -77,6 +77,21 @@
                         <button class="btn btn-success" ng-click="upload()">上传本地图片</button>
                     </span>
                 </div>
+                <form id="coverform" onsubmit="return false" enctype="multipart/form-data" ng-show="allowUpload">
+                    <div class="file-box">
+                        <div class="input-group">
+                            <span class="input-group-addon">上传封面图：</span>
+                            <div class="fg-line">
+                                <input type="text" name="file0" disabled class="form-control" placeholder="请选择一张图片" />
+                            </div>
+                            <span class="input-group-btn hidden">
+                                <a href="javascript:void(0);" class="btn btn-info ">浏览</a>
+                            </span>
+                            <input type="file" class="uploadFile" name="file" onchange="getFile(this, 'file0')" />
+                            <span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="uploadImage()"> 开始上传图片 </button></span>
+                        </div>
+                        </div>
+                </form>
             </div>
             <div class="form-group">
                 <div class="col-xs-12">
@@ -92,6 +107,6 @@
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>

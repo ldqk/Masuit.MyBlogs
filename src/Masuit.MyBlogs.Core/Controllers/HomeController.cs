@@ -133,7 +133,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             switch (orderBy)
             {
                 case OrderBy.CommentCount:
-                    posts = temp.ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+                    posts = temp.ThenByDescending(p => p.CommentCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.PostDate:
                     posts = temp.ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
@@ -263,7 +263,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             switch (orderBy) //文章排序
             {
                 case OrderBy.CommentCount:
-                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+                    posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.CommentCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.PostDate:
                     posts = postList.Where(p => !p.IsFixedTop).OrderByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).Cacheable().ToList();

@@ -164,3 +164,22 @@
         </div>
     </div>
 </div>
+<div style="position: absolute;left: -20000px">
+    <form id="setImageForm" onsubmit="return false" enctype="multipart/form-data">
+        <div class="file-box">
+            <div class="input-group">
+                <span class="input-group-addon">上传图片：</span>
+                <div class="fg-line">
+                    <input type="text" name="file0" disabled class="form-control" placeholder="请选择一张图片" />
+                </div>
+                <span class="input-group-btn hidden">
+                    <a href="javascript:void(0);" class="btn btn-info ">浏览</a>
+                </span>
+                <input type="file" class="uploadFile" name="file" onchange="getFile(this, 'file0')" />
+            </div>
+            <div class="m-l-15 m-b-10">
+                <button type="button" class="btn btn-primary" ng-click="uploadImage()"> 上传 </button>
+            </div>
+        </div>
+    </form>
+</div>

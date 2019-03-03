@@ -1,5 +1,4 @@
 ﻿using Common;
-using Hangfire;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -77,28 +76,31 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     return this;
                 }
                 ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), UeditorConfig.GetString("catcherPathFormat"));
-                var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
-                if (!Directory.Exists(Path.GetDirectoryName(savePath)))
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-                }
+
                 try
                 {
                     using (var stream = response.GetResponseStream())
                     {
-                        using (var ms = new MemoryStream())
-                        {
-                            stream.CopyTo(ms);
-                            File.WriteAllBytes(savePath, ms.GetBuffer());
-                        }
-                        var (url, success) = CommonHelper.UploadImage(savePath);
+                        var (url, success) = CommonHelper.UploadImage(stream, Path.GetExtension(ServerUrl));
                         if (success)
                         {
                             ServerUrl = url;
-                            BackgroundJob.Enqueue(() => File.Delete(savePath));
                         }
+                        else
+                        {
+                            var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
+                            if (!Directory.Exists(Path.GetDirectoryName(savePath)))
+                            {
+                                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+                            }
+                            using (var ms = new MemoryStream())
+                            {
+                                stream.CopyTo(ms);
+                                File.WriteAllBytes(savePath, ms.GetBuffer());
+                            }
+                        }
+                        State = "SUCCESS";
                     }
-                    State = "SUCCESS";
                 }
                 catch (Exception e)
                 {

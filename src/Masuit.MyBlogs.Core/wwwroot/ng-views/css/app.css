@@ -16243,3 +16243,6 @@ select.chosen {
 table.table >tbody > tr>td img {
     max-height: 80px;
 }
+.layui-layer-shade {
+    z-index: 6 !important;
+}

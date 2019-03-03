@@ -660,6 +660,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
 	window.hub.stop();
 	$scope.isAdd = true;
+	$scope.allowUpload=false;
 	$scope.loading();
 	$scope.post = {};
 	$scope.getdata = function() {
@@ -705,6 +706,7 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 		//});
 		$scope.post = {};
 		$scope.isAdd = true;
+		$scope.allowUpload=false;
 		layer.open({
 			type: 1,
 			zIndex: 20,
@@ -723,6 +725,7 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 	$scope.edit = function (item) {
 		$scope.post = item;
 		$scope.isAdd = false;
+		$scope.allowUpload=false;
 		layer.open({
 			type: 1,
 			zIndex: 20,
@@ -761,50 +764,24 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 			$scope.post.Description = "";
 		});
 	}
+	$scope.uploadImage = function() {
+		$scope.loading();
+        $("#coverform").ajaxSubmit({
+			url: "/Upload",
+			type: "post",
+			success: function(data) {
+				$scope.loadingDone();
+				document.getElementById("coverform").reset();
+				$scope.$apply(function () {
+			     　$scope.allowUpload=false;
+					$scope.post.ImageUrl = data.Data;
+			    });
+			}
+		});
+    };
+	
 	$scope.upload = function() {
-		swal({
-			title: '请选择一张图片',
-			input: 'file',
-			inputAttributes: {
-				accept: 'image/*'
-			}
-		}).then(function(file) {
-			if (file) {
-				var reader = new FileReader;
-				reader.onload = function (e) {
-					swal({
-						title: "上传预览",
-						text:"确认后将开始上传并应用设置！",
-						imageUrl: e.target.result,
-						showCancelButton: true,
-						confirmButtonColor: '#3085d6',
-						cancelButtonColor: '#d33',
-						confirmButtonText: '开始上传',
-						cancelButtonText: '取消',
-						showLoaderOnConfirm: true,
-						preConfirm: function () {
-							return new Promise(function (resolve, reject) {
-								$http.post("/upload/DecodeDataUri", {
-									data: e.target.result
-								}).then(function (res) {
-									var data = res.data;
-									if (data.Success) {
-										resolve(data.Data);
-									} else {
-										reject(data.Message);
-									}
-								}, function (error) {
-									reject("请求失败，错误码：" + error.status);
-								});
-							});
-						}
-					}).then(function (data) {
-						$scope.post.ImageUrl = data;
-					}).catch(swal.noop);
-				};
-				reader.readAsDataURL(file);
-			}
-		}).catch(swal.noop);
+		$scope.allowUpload=true;
 	}
 }]);
 myApp.controller("category", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {

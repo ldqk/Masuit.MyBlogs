@@ -87,39 +87,34 @@
             <param name="content">内容</param>
             <param name="tos">收件人</param>
         </member>
-        <member name="M:Common.CommonHelper.UploadImage(System.String)">
+        <member name="M:Common.CommonHelper.UploadImage(System.IO.Stream,System.String)">
             <summary>
             上传图片到新浪图床
             </summary>
-            <param name="file">文件名</param>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.UploadPeople(System.String)">
+        <member name="M:Common.CommonHelper.UploadPeople(System.IO.Stream,System.String)">
             <summary>
             上传图片到人民网图床
             </summary>
-            <param name="file"></param>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.UploadImageFallback(System.String)">
+        <member name="M:Common.CommonHelper.UploadImageFallback(System.IO.Stream,System.String)">
             <summary>
             上传图片到sm图床
             </summary>
-            <param name="file">文件名</param>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.UploadImageFallback2(System.String)">
+        <member name="M:Common.CommonHelper.UploadImageFallback2(System.IO.Stream,System.String)">
             <summary>
             上传图片到新浪图床
             </summary>
-            <param name="file">文件名</param>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.UploadImageFallback3(System.String)">
+        <member name="M:Common.CommonHelper.UploadImageFallback3(System.IO.Stream,System.String)">
             <summary>
             上传图片到新浪图床
             </summary>
-            <param name="file">文件名</param>
             <returns></returns>
         </member>
         <member name="M:Common.CommonHelper.ReplaceImgSrc(System.String)">
@@ -304,19 +299,6 @@
             <param name="total">总条数</param>
             <returns></returns>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Controllers.AdminController.Stopwatch">
-            <summary>
-            性能计数器
-            </summary>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.AdminController.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
-            <summary>在调用操作方法前调用。</summary>
-            <param name="filterContext">有关当前请求和操作的信息。</param>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.AdminController.OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext)">
-            <summary>在调用操作方法后调用。</summary>
-            <param name="filterContext">有关当前请求和操作的信息。</param>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.BaseController">
             <summary>
             基本父控制器
@@ -335,16 +317,6 @@
         <member name="P:Masuit.MyBlogs.Core.Controllers.BaseController.LinksService">
             <summary>
             LinksService
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Controllers.BaseController.ContactsService">
-            <summary>
-            ContactsService
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Controllers.BaseController.RedisHelper">
-            <summary>
-            RedisHelper
             </summary>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.BaseController.ResultData(System.Object,System.Boolean,System.String,System.Boolean,System.Net.HttpStatusCode)">
@@ -366,11 +338,6 @@
             <param name="pageCount">总页数</param>
             <param name="total">总条数</param>
             <returns></returns>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Controllers.BaseController.Stopwatch">
-            <summary>
-            性能计数器
-            </summary>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.BaseController.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
             <summary>在调用操作方法前调用。</summary>
@@ -566,51 +533,6 @@
             <summary>
             获取未审核的评论
             </summary>
-            <returns></returns>
-        </member>
-        <member name="T:Masuit.MyBlogs.Core.Controllers.ContactController">
-            <summary>
-            联系方式管理
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Controllers.ContactController.ContactService">
-            <summary>
-            ContactService
-            </summary>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.ContactController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IContactsService)">
-            <summary>
-            联系方式管理
-            </summary>
-            <param name="contactsService"></param>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.ContactController.Add(Masuit.MyBlogs.Core.Models.Entity.Contacts)">
-            <summary>
-            添加联系方式
-            </summary>
-            <param name="links"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.ContactController.Delete(System.Int32)">
-            <summary>
-            删除联系方式
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.ContactController.Edit(Masuit.MyBlogs.Core.Models.Entity.Contacts)">
-            <summary>
-            编辑联系方式
-            </summary>
-            <param name="model"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.ContactController.GetPageData(System.Int32,System.Int32)">
-            <summary>
-            分页数据
-            </summary>
-            <param name="page"></param>
-            <param name="size"></param>
             <returns></returns>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.DashboardController">
@@ -1961,18 +1883,12 @@
             系统设置
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Controllers.SystemController.RedisHelper">
-            <summary>
-            Redis
-            </summary>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.SystemController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IUserInfoService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISystemSettingService,Masuit.Tools.NoSQL.RedisHelper)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.SystemController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IUserInfoService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISystemSettingService)">
             <summary>
             系统设置
             </summary>
             <param name="userInfoService"></param>
             <param name="systemSettingService"></param>
-            <param name="redisHelper"></param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.SystemController.GetBaseInfo">
             <summary>
@@ -2028,6 +1944,12 @@
             路径测试
             </summary>
             <param name="path"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.SystemController.ClearPerfCounter">
+            <summary>
+            清空性能计数器缓存
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.SystemController.IpBlackList">
@@ -2166,13 +2088,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.UploadController.DecodeDataUri(System.String)">
-            <summary>
-            解码Base64图片
-            </summary>
-            <param name="data"></param>
-            <returns></returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.UploadController.Download(System.String)">
             <summary>
             文件下载
@@ -2184,6 +2099,13 @@
             <summary>
             UEditor文件上传处理
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.UploadController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            上传文件
+            </summary>
+            <param name="file"></param>
             <returns></returns>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.UserController">
@@ -2263,12 +2185,11 @@
             网站防火墙
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Extensions.FirewallMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Masuit.Tools.NoSQL.RedisHelper)">
+        <member name="M:Masuit.MyBlogs.Core.Extensions.FirewallMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate)">
             <summary>
             构造函数
             </summary>
             <param name="next"></param>
-            <param name="redisHelper"></param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Extensions.FirewallMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
@@ -2282,7 +2203,7 @@
             hangfire后台任务
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IUserInfoService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISystemSettingService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ILinksService,Masuit.Tools.Core.NoSQL.RedisHelperFactory,System.Net.Http.IHttpClientFactory,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext})">
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IUserInfoService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISystemSettingService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ILinksService,System.Net.Http.IHttpClientFactory,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext})">
             <summary>
             hangfire后台任务
             </summary>
@@ -2291,7 +2212,6 @@
             <param name="settingService"></param>
             <param name="searchDetailsService"></param>
             <param name="linksService"></param>
-            <param name="redis"></param>
             <param name="httpClientFactory"></param>
             <param name="hostingEnvironment"></param>
             <param name="searchEngine"></param>
@@ -2394,12 +2314,55 @@
             请求拦截器
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Extensions.RequestInterceptMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Masuit.Tools.NoSQL.RedisHelper)">
+        <member name="M:Masuit.MyBlogs.Core.Extensions.RequestInterceptMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate)">
             <summary>
             构造函数
             </summary>
             <param name="next"></param>
-            <param name="redisHelper"></param>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Extensions.SessionExt">
+            <summary>
+            session扩展
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.SessionExt.SetByRedis``1(Microsoft.AspNetCore.Http.ISession,System.String,``0,System.Int32)">
+            <summary>
+            将Session存到Redis，需要先在config中配置链接字符串，连接字符串在config配置文件中的ConnectionStrings节下配置，name固定为RedisHosts，值的格式：127.0.0.1:6379,allowadmin=true，若未正确配置，将按默认值“127.0.0.1:6379,allowadmin=true”进行操作，如：<br/>
+            &lt;connectionStrings&gt;<br/>
+                 &lt;add name = "RedisHosts" connectionString="127.0.0.1:6379,allowadmin=true"/&gt;<br/>
+            &lt;/connectionStrings&gt;
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="session"></param>
+            <param name="key">键</param>
+            <param name="obj">需要存的对象</param>
+            <param name="expire">过期时间，默认20分钟</param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.SessionExt.GetByRedis``1(Microsoft.AspNetCore.Http.ISession,System.String,System.Int32)">
+            <summary>
+            从Redis取Session
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="_"></param>
+            <param name="key">键</param>
+            <param name="expire">过期时间，默认20分钟</param>
+            <returns></returns> 
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.SessionExt.RemoveByRedis(Microsoft.AspNetCore.Http.ISession,System.String)">
+            <summary>
+            从Redis移除对应键的Session
+            </summary>
+            <param name="session"></param>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.SessionExt.SessionCount(Microsoft.AspNetCore.Http.ISession)">
+            <summary>
+            Session个数
+            </summary>
+            <param name="session"></param>
+            <returns></returns>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Extensions.UEditor.ConfigHandler">
             <summary>
@@ -5334,36 +5297,6 @@
             反对数
             </summary>
         </member>
-        <member name="T:Masuit.MyBlogs.Core.Models.DTO.ContactsInputDto">
-            <summary>
-            联系方式输入模型
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.ContactsInputDto.Title">
-            <summary>
-            标题
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.ContactsInputDto.Url">
-            <summary>
-            URL
-            </summary>
-        </member>
-        <member name="T:Masuit.MyBlogs.Core.Models.DTO.ContactsOutputDto">
-            <summary>
-            联系方式输出模型
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.ContactsOutputDto.Title">
-            <summary>
-            标题
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.ContactsOutputDto.Url">
-            <summary>
-            URL
-            </summary>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Models.DTO.KeywordsRankOutputDto">
             <summary>
             搜索统计输出模型
@@ -5924,9 +5857,9 @@
             图片地址
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.Comment">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.CommentCount">
             <summary>
-            评论
+            评论数
             </summary>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.CategoryName">
@@ -6227,21 +6160,6 @@
         <member name="P:Masuit.MyBlogs.Core.Models.Entity.Comment.IP">
             <summary>
             提交人IP地址
-            </summary>
-        </member>
-        <member name="T:Masuit.MyBlogs.Core.Models.Entity.Contacts">
-            <summary>
-            联系方式
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Contacts.Title">
-            <summary>
-            标题
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Contacts.Url">
-            <summary>
-            URL
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Models.Entity.Donate">
@@ -7424,11 +7342,6 @@
             友情链接
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PageFootViewModel.Contacts">
-            <summary>
-            联系方式
-            </summary>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Models.ViewModel.PostDataModel">
             <summary>
             文章数据模型
@@ -7582,11 +7495,6 @@
         <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostViewModel.LastAccessTime">
             <summary>
             最后访问时间
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostViewModel.Comment">
-            <summary>
-            评论
             </summary>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostViewModel.CategoryName">

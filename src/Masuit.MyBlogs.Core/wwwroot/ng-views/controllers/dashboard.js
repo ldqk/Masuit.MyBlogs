@@ -85,6 +85,35 @@
 			$scope.isPush = true;
 		}
 	}
+	$scope.ClearPerfCounter = function () {
+		swal({
+			title: "清除性能计数器缓存",
+			text: "确定要清除性能计数器缓存吗？",
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "确定",
+			cancelButtonText: "取消",
+			showLoaderOnConfirm: true,
+			animation: true,
+			allowOutsideClick: false
+		}).then(function() {
+			$http.post("/system/ClearPerfCounter").then(function (res) {
+				window.notie.alert({
+					type: 1,
+					text: "性能计数器缓存清除完成！",
+					time: 4
+				});
+			}, function() {
+				window.notie.alert({
+					type:3,
+					text:'服务请求失败！',
+					time:4
+				});
+				$scope.loadingDone();
+			})
+		}, function() {
+		}).catch(swal.noop);
+	}
 	$scope.connectWebsocket();
 	$.post("/system/GetHistoryList", null, function(data) {
 		Highcharts.stockChart("cpu",{

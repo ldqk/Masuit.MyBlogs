@@ -1,15 +1,26 @@
-﻿<!--<style type="text/css">    
-    .lv-body {
-        max-height: 300px;
-        overflow: hidden;
-    }
-</style>-->
+﻿<div style="position: absolute; left: -20000px;">
+    <div id="upfile">
+        <form id="fileform" onsubmit="return false" enctype="multipart/form-data">
+            <h4 class="h4">上传新头像</h4>
+            <div class="file-box">
+                <div class="input-group">
+                    <input type="text" name="file0" disabled class="form-control" />
+                    <span class="input-group-btn">
+                        <a href="javascript:void(0);" class="btn btn-info">浏览</a>
+                    </span>
+                    <input type="file" class="uploadFile" name="file" onchange="getFile(this, 'file0')" />
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" ng-click="submit()"> 上传 </button>
+        </form>
+    </div>
+</div>
 <ul class="header-inner clearfix">
     <li id="menu-trigger" data-target="mainmenu" data-toggle-sidebar data-model-left="mactrl.sidebarToggle.left" data-ng-class="{ 'open': mactrl.sidebarToggle.left === true }">
         <div class="line-wrap">
             <div class="line top"></div>
             <div class="line center"></div>
-            <div class="line bottom"></div>  
+            <div class="line bottom"></div>
         </div>
     </li>
 
@@ -43,8 +54,8 @@
                 <a data-ui-sref="interview" data-microtip="访客分析" data-microtip-position="bottom"><i class="tm-icon zmdi zmdi-trending-up"></i></a>
             </li>
             <!--<li id="top-search">
-        <a href="" data-ng-click="mactrl.openSearch()"><i class="tm-icon zmdi zmdi-search"></i></a>
-    </li>-->
+                <a href="" data-ng-click="mactrl.openSearch()"><i class="tm-icon zmdi zmdi-search"></i></a>
+            </li>-->
 
             <li class="dropdown" uib-dropdown ng-if="Msgs.post.length>0">
                 <a uib-dropdown-toggle href="">

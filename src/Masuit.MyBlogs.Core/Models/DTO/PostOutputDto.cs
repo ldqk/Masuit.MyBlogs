@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
 {
@@ -8,10 +8,10 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     /// </summary>
     public class PostOutputDto : BaseDto
     {
-        public PostOutputDto()
-        {
-            Comment = new HashSet<CommentOutputDto>();
-        }
+        //public PostOutputDto()
+        //{
+        //    Comment = new HashSet<CommentOutputDto>();
+        //}
 
         /// <summary>
         /// 标题
@@ -101,6 +101,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// <summary>
         /// 描述
         /// </summary>
+        [StringLength(255, ErrorMessage = "描述文本不能超过255个字")]
         public string Description { get; set; }
 
         /// <summary>
@@ -108,10 +109,15 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// </summary>
         public string ImageUrl { get; set; }
 
+        ///// <summary>
+        ///// 评论
+        ///// </summary>
+        //public virtual ICollection<CommentOutputDto> Comment { get; set; }
+
         /// <summary>
-        /// 评论
+        /// 评论数
         /// </summary>
-        public virtual ICollection<CommentOutputDto> Comment { get; set; }
+        public int CommentCount { get; set; }
 
         /// <summary>
         /// 所属分类名

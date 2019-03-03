@@ -1,4 +1,4 @@
-﻿myApp.controller('main', ["$timeout", "$state", "$scope", "$http", function($timeout, $state, $scope, $http) {
+﻿myApp.controller('main', ["$timeout", "$state", "$scope", "$http",'Upload', function($timeout, $state, $scope, $http,Upload) {
 	window.hub = new signalR.HubConnectionBuilder().withUrl("/hubs").build();
 	$scope.post = {};
 	Waves.init();
@@ -362,82 +362,45 @@
 			}
 		}).catch(swal.noop);
 	}
-	$scope.changeAvatar = function() {
-		swal({
-			title:'请选择一张图片作为新头像',
-			input:'file',
-			showCloseButton:true,
-			confirmButtonColor:"#DD6B55",
-			confirmButtonText:"确定",
-			cancelButtonText:"取消",
-			showLoaderOnConfirm:true,
-			animation:true,
-			allowOutsideClick:false,
-			inputAttributes:{
-				accept:'image/*'
-			},
-			preConfirm:function(value) {
-				return new Promise(function(resolve, reject) {
-					if(value) {
-						var reader = new FileReader;
-						reader.onload = function(e) {
-							swal({
-								title:"上传预览",
-								text:"确认后将开始上传并应用设置！",
-								imageUrl:e.target.result,
-								showCancelButton:true,
-								confirmButtonColor:'#3085d6',
-								cancelButtonColor:'#d33',
-								confirmButtonText:'开始上传',
-								cancelButtonText:'取消',
-								showLoaderOnConfirm:true,
-								preConfirm:function() {
-									return new Promise(function(resolve) {
-										$http.post("/upload/DecodeDataUri", {
-											data:e.target.result
-										}).then(function(res) {
-											resolve(res.data);
-										});
-									});
-								}
-							}).then(function(data) {
-								if(data.Success) {
-									$http.post("/user/changeavatar", {
-										id:$scope.user.Id,
-										path:data.Data
-									}).then(function(res2) {
-										resolve([data, res2.data]);
-									}, function(error) {
-										reject("请求失败，错误码：" + error.status);
-									});
-								} else {
-									reject(data.Message);
-								}
-							}, function(error) {
-								reject("请求失败，错误码：" + error.status);
-							}).catch(swal.noop);
-						};
-						reader.readAsDataURL(value);
-					} else {
-						reject('请选择图片');
-					}
-				});
-			},
-			inputValidator:function(value) {
-				return new Promise(function(resolve, reject) {
-					if(value) {
-						resolve();
-					} else {
-						reject('请选择图片');
-					}
-				});
-			}
-		}).then(function(data) {
-			$scope.$apply(function() {
-				$scope.user.Avatar = data[0].Data;
+	$scope.submit = function() {
+		$scope.loading();
+        var form = new FormData(document.getElementById("fileform"));
+		$http({
+            url: "upload",
+            method: "post",
+            data: form,
+            transformRequest: angular.identity,
+            headers: {
+                'Content-Type': undefined
+            }
+        }).then(function(response) {
+            $http.post("/user/changeavatar", {
+				id:$scope.user.Id,
+				path:response.data.Data
+			}).then(function(res2) {
+				swal("头像修改成功", "", "success");
+				layer.closeAll();
+				$scope.loadingDone();
+			}, function(error) {
+				swal("头像修改失败", "请求失败，错误码：" + error.status, "error");
+				$scope.loadingDone();
 			});
-			swal(data[1].Message, "", "success");
-		}).catch(swal.noop);
+        }, function(response) {
+			swal("头像修改失败", "", "error");
+			$scope.loadingDone();
+        });
+    };
+	
+	$scope.changeAvatar = function() {
+		layui.use("layer", function() {
+		    var layer = layui.layer;
+		    layer.open({
+                type: 1,
+                title: '上传新头像',
+			    area: ['420px', '150px'], //宽高
+                content: $("#upfile")
+		    });
+	    });
 	}
 	$scope.changePassword = function() {
 		swal({
@@ -515,8 +478,7 @@
 }]);
 
 function getFile(obj, inputName) {
-	var file_name = $(obj).val();
-	console.log(file_name);
+	var file_name = $(obj)[0].files[0].name;
 	$("input[name='" + inputName + "']").val(file_name);
 }
 

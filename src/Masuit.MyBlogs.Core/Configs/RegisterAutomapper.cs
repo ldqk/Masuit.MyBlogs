@@ -82,7 +82,7 @@ namespace Masuit.MyBlogs.Core.Configs
                 m.CreateMap<Post, PostInputDto>();
                 m.CreateMap<Post, PostHistoryVersion>().ForMember(v => v.PostId, e => e.MapFrom(p => p.Id));
                 m.CreateMap<PostInputDto, Post>();
-                m.CreateMap<Post, PostOutputDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name));
+                m.CreateMap<Post, PostOutputDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ForMember(p => p.CommentCount, e => e.MapFrom(p => p.Comment.Count(c => c.Status == Status.Pended)));
                 m.CreateMap<PostOutputDto, Post>();
                 m.CreateMap<PostInputDto, PostOutputDto>();
                 m.CreateMap<PostHistoryVersion, PostOutputDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name));

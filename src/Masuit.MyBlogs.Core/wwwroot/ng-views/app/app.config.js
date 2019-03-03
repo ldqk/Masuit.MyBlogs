@@ -1,4 +1,4 @@
-﻿var myApp = angular.module('myApp', ["ui.router", "oc.lazyLoad", 'ngAnimate', 'ngResource', 'ui.bootstrap', 'angular-loading-bar', 'ng.ueditor', "ngTable", "tm.pagination", 'ui.tree', 'ui.bootstrap']);
+﻿var myApp = angular.module('myApp', ["ui.router", "oc.lazyLoad", 'ngAnimate', 'ngResource', 'ui.bootstrap', 'angular-loading-bar', 'ng.ueditor', "ngTable", "tm.pagination", 'ui.tree', 'ui.bootstrap','ngFileUpload']);
 myApp.config(["$provide", "$compileProvider", "$controllerProvider", "$filterProvider", "$httpProvider",function($provide, $compileProvider, $controllerProvider, $filterProvider, $httpProvider) {
 		myApp.controller = $controllerProvider.register;
 		myApp.directive = $compileProvider.directive;

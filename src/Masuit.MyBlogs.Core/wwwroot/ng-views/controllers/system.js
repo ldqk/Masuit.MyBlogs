@@ -12,53 +12,33 @@
 		});
 		$scope.Settings = settings;
 	});
-	$scope.setImage = function(property) {
-		swal({
-			title: '请选择一张图片',
-			input: 'file',
-			showCloseButton: true,
-			confirmButtonColor: "#DD6B55",
-			confirmButtonText: "确定",
-			cancelButtonText: "取消",
-			showLoaderOnConfirm: true,
-			animation: true,
-			allowOutsideClick: false,
-			inputAttributes: {
-				accept: 'image/*'
-			},
-			preConfirm: function(value) {
-				return new Promise(function(resolve) {
-					if (value) {
-						var reader = new FileReader;
-						reader.onload = function (e) {
-							$http.post("/upload/DecodeDataUri", {
-								data: e.target.result
-							}).then(function (res) {
-								resolve(res.data.Data);
-							}, function (error, status, result) {
-
-							});
-						};
-						reader.readAsDataURL(value);
-					} else {
-						reject('请选择图片');
-					}
-				});
-			},
-			inputValidator: function(value) {
-				return new Promise(function(resolve, reject) {
-					if (value) {
-						resolve();
-					} else {
-						reject('请选择图片');
-					}
-				});
+	$scope.uploadImage = function() {
+		$scope.loading();
+        $("#setImageForm").ajaxSubmit({
+			url: "/Upload",
+			type: "post",
+			success: function(data) {
+				$scope.loadingDone();
+				document.getElementById("setImageForm").reset();
+				$scope.$apply(function () {
+			     　$scope.Settings[$scope.property] = data.Data;
+			    });
+				layer.closeAll();
 			}
-		}).then(function(data) {
-			$scope.$apply(function() {
-				$scope.Settings[property] = data;
-			});
-		}).catch(swal.noop);
+		});
+    };
+	$scope.setImage = function(property) {
+		layer.open({
+			type: 1,
+			zIndex: 20,
+			title: '请选择一张图片',
+			area: '420px', //宽高
+			content: $("#setImageForm"),
+			cancel: function(index, layero) {
+				return true;
+			}
+		});
+		$scope.property=property;
 	}
 	$scope.save = function() {
 		swal({

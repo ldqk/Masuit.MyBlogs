@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Masuit.MyBlogs.Core.Models.Entity;
+﻿using Masuit.MyBlogs.Core.Models.Entity;
+using System;
 
 namespace Masuit.MyBlogs.Core.Models.ViewModel
 {
@@ -9,10 +8,10 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
     /// </summary>
     public class PostViewModel : BaseEntity
     {
-        public PostViewModel()
-        {
-            Comment = new HashSet<CommentViewModel>();
-        }
+        //public PostViewModel()
+        //{
+        //    Comment = new HashSet<CommentViewModel>();
+        //}
 
         /// <summary>
         /// 标题
@@ -89,10 +88,10 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// </summary>
         public DateTime LastAccessTime { get; set; }
 
-        /// <summary>
-        /// 评论
-        /// </summary>
-        public virtual ICollection<CommentViewModel> Comment { get; set; }
+        ///// <summary>
+        ///// 评论
+        ///// </summary>
+        //public virtual ICollection<CommentViewModel> Comment { get; set; }
 
         /// <summary>
         /// 所属分类名

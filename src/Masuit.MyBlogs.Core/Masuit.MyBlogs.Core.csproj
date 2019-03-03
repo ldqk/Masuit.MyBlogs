@@ -8,11 +8,12 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>D:\MyCode\Masuit.MyBlogs.Core\Masuit.MyBlogs.Core\Masuit.MyBlogs.Core.xml</DocumentationFile>
+    <DocumentationFile>.\Masuit.MyBlogs.Core.xml</DocumentationFile>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>D:\Private\Masuit.MyBlogs.Core\Masuit.MyBlogs.Core\Masuit.MyBlogs.Core.xml</DocumentationFile>
+    <DocumentationFile>.\Masuit.MyBlogs.Core.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -68,8 +69,8 @@
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="1.2.0" />
     <PackageReference Include="CacheManager.Serialization.Json" Version="1.2.0" />
-    <PackageReference Include="Caching.CSRedis" Version="3.0.36" />
-    <PackageReference Include="CSRedisCore" Version="3.0.39" />
+    <PackageReference Include="Caching.CSRedis" Version="3.0.40" />
+    <PackageReference Include="CSRedisCore" Version="3.0.40" />
     <PackageReference Include="Dapper" Version="1.50.7" />
     <PackageReference Include="EFSecondLevelCache.Core" Version="1.7.1" />
     <PackageReference Include="Hangfire" Version="1.6.22" />
@@ -84,7 +85,7 @@
     <PackageReference Include="Quartz" Version="3.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="WilderMinds.RssSyndication" Version="1.4.0" />
-    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="2.1.50" />
+    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="2.1.54" />
     <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="1.8.18" />
     <PackageReference Include="Z.ExtensionMethods" Version="2.1.1" />
   </ItemGroup>
@@ -129,9 +130,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="App_Data\whitelist.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Masuit.MyBlogs.Core.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

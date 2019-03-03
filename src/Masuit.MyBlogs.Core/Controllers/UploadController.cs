@@ -1,5 +1,4 @@
 ﻿using Common;
-using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.UEditor;
@@ -10,8 +9,9 @@ using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
-using Masuit.Tools.Media;
+using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -119,33 +119,32 @@ namespace Masuit.MyBlogs.Core.Controllers
             return ResultData(null, false, "请先选择您需要上传的文件!");
         }
 
-        /// <summary>
-        /// 解码Base64图片
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public ActionResult DecodeDataUri(string data)
-        {
-            var dir = "/upload/images";
-            var filename = string.Empty.CreateShortToken(9) + ".jpg";
-            string path = Path.Combine(dir, filename);
-            try
-            {
-                data.SaveDataUriAsImageFile().Save(_hostingEnvironment.WebRootPath + path, System.Drawing.Imaging.ImageFormat.Jpeg);
-                var (url, success) = CommonHelper.UploadImage(path);
-                BackgroundJob.Enqueue(() => System.IO.File.Delete(path));
-                if (success)
-                {
-                    return ResultData(url);
-                }
-                return ResultData(null, false, "图片上传失败！");
-            }
-            catch (Exception e)
-            {
-                LogManager.Error(e);
-                return ResultData(null, false, "转码失败！");
-            }
-        }
+        ///// <summary>
+        ///// 解码Base64图片
+        ///// </summary>
+        ///// <param name="data"></param>
+        ///// <returns></returns>
+        //public ActionResult DecodeDataUri(string data)
+        //{
+        //    var filename = string.Empty.CreateShortToken() + ".jpg";
+        //    string path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "images", filename);
+        //    try
+        //    {
+        //        data.SaveDataUriAsImageFile().Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
+        //        var (url, success) = CommonHelper.UploadImage(path);
+        //        BackgroundJob.Enqueue(() => System.IO.File.Delete(path));
+        //        if (success)
+        //        {
+        //            return ResultData(url);
+        //        }
+        //        return ResultData(null, false, "图片上传失败！");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        LogManager.Error(e);
+        //        return ResultData(null, false, "转码失败！");
+        //    }
+        //}
 
         #endregion
 
@@ -238,6 +237,56 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             string result = action.Process();
             return Content(result, ContentType.Json);
+        }
+
+        /// <summary>
+        /// 上传文件
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [HttpPost("upload"), ApiExplorerSettings(IgnoreApi = false)]
+        public ActionResult UploadFile(IFormFile file)
+        {
+            string path;
+            string filename = SnowFlake.GetInstance().GetUniqueId() + Path.GetExtension(file.FileName);
+            switch (file.ContentType)
+            {
+                case var _ when file.ContentType.StartsWith("image"):
+                    path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "images", filename);
+                    var (url, success) = CommonHelper.UploadImage(file.OpenReadStream(), Path.GetExtension(file.FileName));
+                    if (success)
+                    {
+                        return ResultData(url);
+                    }
+                    break;
+                case var _ when file.ContentType.StartsWith("audio") || file.ContentType.StartsWith("video"):
+                    path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "media", filename);
+                    break;
+                case var _ when file.ContentType.StartsWith("text") || (ContentType.Doc + "," + ContentType.Xls + "," + ContentType.Ppt + "," + ContentType.Pdf).Contains(file.ContentType):
+                    path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "docs", filename);
+                    break;
+                default:
+                    path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "files", filename);
+                    break;
+            }
+            try
+            {
+                var dir = Path.GetDirectoryName(path);
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+                using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                {
+                    file.CopyTo(fs);
+                }
+                return ResultData(path.Substring(_hostingEnvironment.WebRootPath.Length).Replace("\\", "/"));
+            }
+            catch (Exception e)
+            {
+                LogManager.Error(e);
+                return ResultData(null, false, "文件上传失败！");
+            }
         }
     }
 }
