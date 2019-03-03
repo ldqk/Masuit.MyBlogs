@@ -75,25 +75,6 @@ namespace Masuit.MyBlogs.Core.Migrations
                 table.PrimaryKey("PK_InternalMessage", x => x.Id);
             });
 
-            migrationBuilder.CreateTable(name: "Issue", columns: table => new
-            {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                Status = table.Column<int>(nullable: false),
-                Name = table.Column<string>(nullable: false),
-                Email = table.Column<string>(nullable: true),
-                Title = table.Column<string>(nullable: false),
-                Link = table.Column<string>(nullable: false),
-                Description = table.Column<string>(nullable: false),
-                Level = table.Column<int>(nullable: false),
-                SubmitTime = table.Column<DateTime>(nullable: false),
-                HandleTime = table.Column<DateTime>(nullable: true),
-                Msg = table.Column<string>(nullable: true),
-                IPAddress = table.Column<string>(nullable: true)
-            }, constraints: table =>
-            {
-                table.PrimaryKey("PK_Issue", x => x.Id);
-            });
-
             migrationBuilder.CreateTable(name: "LeaveMessage", columns: table => new
             {
                 Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
@@ -383,8 +364,6 @@ namespace Masuit.MyBlogs.Core.Migrations
             migrationBuilder.DropTable(name: "FastShare");
 
             migrationBuilder.DropTable(name: "InternalMessage");
-
-            migrationBuilder.DropTable(name: "Issue");
 
             migrationBuilder.DropTable(name: "LeaveMessage");
 

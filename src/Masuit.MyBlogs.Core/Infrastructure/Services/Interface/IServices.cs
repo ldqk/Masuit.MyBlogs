@@ -1,5 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Models.DTO;
-using Masuit.MyBlogs.Core.Models.Entity;
+﻿using Masuit.MyBlogs.Core.Models.Entity;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 {
@@ -10,11 +9,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
     public partial interface IFastShareService : IBaseService<FastShare> { }
 
     public partial interface IInternalMessageService : IBaseService<InternalMessage> { }
-
-    public partial interface IIssueService : IBaseService<Issue>
-    {
-        SearchResult<Issue> SearchPage(int page, int size, string keyword);
-    }
 
     public partial interface ILinksService : IBaseService<Links> { }
 

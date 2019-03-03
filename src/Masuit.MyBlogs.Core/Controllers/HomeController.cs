@@ -235,7 +235,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var hot6Post = postList.OrderByDescending(order).Skip(0).Take(5).Cacheable().ToList(); //热门文章
             var topPostWeek = PostService.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(week,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章周排行
             var topPostMonth = PostService.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(month,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章月排行
-            var topPostYear = PostService.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(year,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章年度排行
+            var topPostToday = PostService.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(day,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章今日排行
             var tags = new List<string>(); //标签云
             var tagdic = new Dictionary<string, int>();
             var newdic = new Dictionary<string, int>(); //标签云最终结果
@@ -295,7 +295,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Top6Post = hot6Post,
                 TopPostByMonth = topPostMonth,
                 TopPostByWeek = topPostWeek,
-                TopPostByYear = topPostYear,
+                TopPostByToday = topPostToday,
                 PostsQueryable = postList
             };
         }

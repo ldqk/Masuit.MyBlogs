@@ -210,13 +210,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         {
             _searchEngine.CreateIndex(new List<string>()
             {
-                nameof(DataContext.Post),nameof(DataContext.Issues),
+                nameof(DataContext.Post),
             });
-            var list1 = _searchEngine.Context.Issues.Where(i => i.Status != Status.Handled && i.Level != BugLevel.Fatal).ToList();
-            var list2 = _searchEngine.Context.Post.Where(i => i.Status != Status.Pended).ToList();
-            var list = new List<LuceneIndexableBaseEntity>();
-            list.AddRange(list1);
-            list.AddRange(list2);
+            var list = _searchEngine.Context.Post.Where(i => i.Status != Status.Pended).ToList();
             _searchEngine.LuceneIndexer.Delete(list);
         }
     }

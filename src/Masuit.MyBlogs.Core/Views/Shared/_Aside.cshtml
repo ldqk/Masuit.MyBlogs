@@ -80,13 +80,13 @@
                 <div class="border-bot"></div>
                 <ul>
                     <li class="active">
-                        <a href="#tab-1" tab-id="1" ripple="ripple" ripple-color="#FFF">周排行</a>
+                        <a href="#tab-1" tab-id="1" ripple="ripple" ripple-color="#FFF">今日排行</a>
                     </li>
                     <li>
-                        <a href="#tab-2" tab-id="2" ripple="ripple" ripple-color="#FFF">月排行</a>
+                        <a href="#tab-2" tab-id="2" ripple="ripple" ripple-color="#FFF">本周排行</a>
                     </li>
                     <li>
-                        <a class="hidden-md" href="#tab-3" tab-id="3" ripple="ripple" ripple-color="#FFF">年度排行</a>
+                        <a class="hidden-md" href="#tab-3" tab-id="3" ripple="ripple" ripple-color="#FFF">月排行</a>
                     </li>
                 </ul>
                 <!-- <nav class="tabs-nav">
@@ -96,7 +96,7 @@
             <div class="tabs-content" style="font-size: 14px">
                 <div tab-id="1" class="tab active">
                     <ul class="list-group text-center">
-                        @foreach (var post in Model.TopPostByWeek)
+                        @foreach (var post in Model.TopPostByToday)
                         {
                             <li class="list-group-item">
                                 @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null)
@@ -106,7 +106,7 @@
                 </div>
                 <div tab-id="2" class="tab">
                     <ul class="list-group text-center">
-                        @foreach (var post in Model.TopPostByMonth)
+                        @foreach (var post in Model.TopPostByWeek)
                         {
                             <li class="list-group-item">
                                 @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null)
@@ -116,7 +116,7 @@
                 </div>
                 <div tab-id="3" class="tab">
                     <ul class="list-group text-center">
-                        @foreach (var post in Model.TopPostByYear)
+                        @foreach (var post in Model.TopPostByMonth)
                         {
                             <li class="list-group-item">
                                 @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null)
@@ -163,6 +163,54 @@
 				C13.195,16.578,13.344,17.436,13.673,18.301z M12.5,14.276c-2.856,0-4.93-2.638-4.93-6.273V1.73h9.859v6.273
 				C17.43,11.638,15.357,14.276,12.5,14.276z M21.215,7.138h-1.452c-0.197,0-0.39,0.024-0.572,0.07v-2.06
 				c0-1.097,0.908-1.99,2.024-1.99c1.117,0,2.025,0.893,2.025,1.99C23.241,6.246,22.333,7.138,21.215,7.138z" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

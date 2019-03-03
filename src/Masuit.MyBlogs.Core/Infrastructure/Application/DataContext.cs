@@ -69,7 +69,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Application
         public virtual DbSet<SeminarPost> SeminarPosts { get; set; }
         public virtual DbSet<SeminarPostHistoryVersion> SeminarPostHistoryVersions { get; set; }
         public virtual DbSet<PostAccessRecord> PostAccessRecord { get; set; }
-        public virtual DbSet<Issue> Issues { get; set; }
         public virtual DbSet<InternalMessage> InternalMessage { get; set; }
         public virtual DbSet<FastShare> FastShare { get; set; }
 

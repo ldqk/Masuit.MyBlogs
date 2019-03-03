@@ -154,37 +154,6 @@ namespace Masuit.MyBlogs.Core.Migrations
                 b.ToTable("InternalMessage");
             });
 
-            modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Issue", b =>
-            {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                b.Property<string>("Description").IsRequired();
-
-                b.Property<string>("Email");
-
-                b.Property<DateTime?>("HandleTime");
-
-                b.Property<string>("IPAddress");
-
-                b.Property<int>("Level");
-
-                b.Property<string>("Link").IsRequired();
-
-                b.Property<string>("Msg");
-
-                b.Property<string>("Name").IsRequired();
-
-                b.Property<int>("Status");
-
-                b.Property<DateTime>("SubmitTime");
-
-                b.Property<string>("Title").IsRequired();
-
-                b.HasKey("Id");
-
-                b.ToTable("Issue");
-            });
-
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.LeaveMessage", b =>
             {
                 b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);

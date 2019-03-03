@@ -546,8 +546,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
 
     public partial interface IInternalMessageRepository : IBaseRepository<InternalMessage> { }
 
-    public partial interface IIssueRepository : IBaseRepository<Issue> { }
-
     public partial interface ILeaveMessageRepository : IBaseRepository<LeaveMessage> { }
 
     public partial interface ILinksRepository : IBaseRepository<Links> { }

@@ -52,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 文章年度排行
         /// </summary>
-        public List<SimplePostModel> TopPostByYear { get; set; }
+        public List<SimplePostModel> TopPostByToday { get; set; }
 
         /// <summary>
         /// 热门文章

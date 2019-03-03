@@ -347,76 +347,6 @@
             <summary>在调用操作方法后调用。</summary>
             <param name="filterContext">有关当前请求和操作的信息。</param>
         </member>
-        <member name="T:Masuit.MyBlogs.Core.Controllers.BugController">
-            <summary>
-            bug反馈
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Controllers.BugController.IssueService">
-            <summary>
-            IssueService
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Controllers.BugController.MessageService">
-            <summary>
-            MessageService
-            </summary>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IIssueService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IInternalMessageService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext})">
-            <summary>
-            bug反馈
-            </summary>
-            <param name="issueService"></param>
-            <param name="messageService"></param>
-            <param name="hostingEnvironment"></param>
-            <param name="searchEngine"></param>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.Index">
-            <summary>
-            bug首页
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.PageData(Masuit.MyBlogs.Core.Models.RequestModels.PageFilter)">
-            <summary>
-            分页数据
-            </summary>
-            <param name="filter"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.Datails(System.Int32)">
-            <summary>
-            问题详情
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.Handle(Masuit.MyBlogs.Core.Models.RequestModels.IssueHandleRequest)">
-            <summary>
-            处理
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.Submit(Masuit.MyBlogs.Core.Models.Entity.Issue)">
-            <summary>
-            提交问题
-            </summary>
-            <param name="issue"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.Delete(Masuit.MyBlogs.Core.Models.RequestModels.RequestModelBase)">
-            <summary>
-            删除问题
-            </summary>
-            <param name="req">问题id</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.BugController.GetBugLevels">
-            <summary>
-            获取问题级别
-            </summary>
-            <returns></returns>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.CategoryController">
             <summary>
             文章分类
@@ -6237,66 +6167,6 @@
             已读状态
             </summary>
         </member>
-        <member name="T:Masuit.MyBlogs.Core.Models.Entity.Issue">
-            <summary>
-            网站问题
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Issue.Name">
-            <summary>
-            提交人昵称
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Issue.Email">
-            <summary>
-            提交人邮箱
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Issue.Title">
-            <summary>
-            问题标题
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Issue.Link">
-            <summary>
-            存在问题的页面链接
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Issue.Description">
-            <summary>
-            问题的详细描述
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Issue.Level">
-            <summary>
-            问题严重级别
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Issue.SubmitTime">
-            <summary>
-            提交时间
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Issue.HandleTime">
-            <summary>
-            处理时间
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Issue.Msg">
-            <summary>
-            开发者回信
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Issue.IPAddress">
-            <summary>
-            提交人IP
-            </summary>
-        </member>
-        <member name="T:Masuit.MyBlogs.Core.Models.Entity.BugLevel">
-            <summary>
-            问题级别
-            </summary>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Models.Entity.LeaveMessage">
             <summary>
             留言板
@@ -7179,7 +7049,7 @@
             文章月排行
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel.TopPostByYear">
+        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel.TopPostByToday">
             <summary>
             文章年度排行
             </summary>

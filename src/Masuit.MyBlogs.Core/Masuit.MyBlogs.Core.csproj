@@ -29,8 +29,6 @@
 
   <ItemGroup>
     <None Include="bundleconfig.json" />
-    <None Include="Views\Bug\Datails.cshtml" />
-    <None Include="Views\Bug\Index.cshtml" />
     <None Include="Views\Shared\_Layout.cshtml" />
     <None Include="wwwroot\Assets\highlight\js\highlight.js" />
     <None Include="wwwroot\ng-views\controllers\analysis.js" />

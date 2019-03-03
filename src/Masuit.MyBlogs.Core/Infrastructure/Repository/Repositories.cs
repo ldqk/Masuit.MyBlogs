@@ -41,12 +41,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
         }
     }
-    public partial class IssueRepository : BaseRepository<Issue>, IIssueRepository
-    {
-        public IssueRepository(DataContext dbContext, IDbConnection connection) : base(dbContext, connection)
-        {
-        }
-    }
+
     public partial class LeaveMessageRepository : BaseRepository<LeaveMessage>, ILeaveMessageRepository
     {
         public LeaveMessageRepository(DataContext dbContext, IDbConnection connection) : base(dbContext, connection)
