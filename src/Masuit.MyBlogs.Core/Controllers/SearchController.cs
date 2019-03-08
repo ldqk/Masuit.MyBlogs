@@ -25,7 +25,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public ISearchDetailsService SearchDetailsService { get; set; }
         private readonly IPostService _postService;
-        private readonly ISearchEngine<DataContext> _searchEngine;
 
         /// <summary>
         /// 站内搜索
@@ -37,7 +36,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             SearchDetailsService = searchDetailsService;
             _postService = postService;
-            _searchEngine = searchEngine;
         }
 
         /// <summary>

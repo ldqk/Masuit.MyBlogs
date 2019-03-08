@@ -89,12 +89,19 @@
                                     @if (string.IsNullOrEmpty(Context.Session.GetByRedis<string>("ArticleViewToken")))
                                     {
                                         <p class="text-red text-center size24 margin-bot10">↓↓↓恭喜你发现镇站之宝，请注意，前方高能！非战斗人员请及时撤离，这不是演习！↓↓↓</p>
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <span class="text-red">以下内容已经隐藏，请输入验证码后查看</span>
                                             <span class="text-green">【完全免费，不收一分钱】</span>
                                             <form action="/" method="post" class="form-inline" id="code-token">
+                                                @Html.AntiForgeryToken()
                                                 <div class="input-group">
-                                                    @Html.AntiForgeryToken()
+                                                    <span class="input-group-addon">邮箱：</span>
+                                                    <input type="email" name="Email" id="email3" class="form-control" />
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-info getcode">获取验证码</button>
+                                                    </span>
+                                                </div>
+                                                <div class="input-group">
                                                     <span class="input-group-addon">验证码：</span>
                                                     <input type="text" name="token" id="token" class="form-control" />
                                                     <span class="input-group-btn">
@@ -102,21 +109,7 @@
                                                     </span>
                                                 </div>
                                             </form>
-                                            <p class="text-green">温馨提示：将本页面分享到您的社交平台上，如QQ或微信，并保证3天之内不会删除且获得30个以上的点赞或10有效评论后，通过站长QQ私信获取文章访问密码，<span class="text-red">获取密码后本站所有加密文章将永久开放！(该要求仅供参考，具体要求以博主规定的最新要求为准)</span></p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <span class="text-green">如果你曾经获取过密码，请输入您的邮箱后查看</span>
-                                            <form action="/" method="post" class="form-inline" id="email-token">
-                                                <div class="input-group">
-                                                    @Html.AntiForgeryToken()
-                                                    <span class="input-group-addon">邮箱：</span>
-                                                    <input type="email" name="Email" id="email3" class="form-control" />
-                                                    <span class="input-group-btn">
-                                                        <button type="submit" class="btn btn-info">查看文章</button>
-                                                    </span>
-                                                </div>
-                                            </form>
-                                            <p class="text-green">温馨提示：请确保您的邮箱已经通过站长的登记，如果您未使用邮箱登记，请先联系站长获取文章密码并登记邮箱即可！</p>
+                                            <p class="text-green">温馨提示：<span class="text-red">获取密码后本站所有加密文章将永久开放！请确保您的邮箱已经通过站长的登记，如果您未使用邮箱登记，请先联系站长获取文章密码并登记邮箱即可！</span></p>
                                         </div>
                                     }
                                     else

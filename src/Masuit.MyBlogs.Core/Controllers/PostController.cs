@@ -426,7 +426,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "email" })]
+        [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 120, VaryByQueryKeys = new[] { "email" })]
         public ActionResult GetViewToken(string email)
         {
             if (string.IsNullOrEmpty(email) && !email.MatchEmail())
@@ -434,10 +434,17 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "请输入正确的邮箱！");
             }
 
+            if (RedisHelper.Exists("code:" + email))
+            {
+                RedisHelper.Expire("code:" + email, 120);
+                return ResultData(null, false, "发送频率限制，请在2分钟后重新尝试发送邮件！请检查你的邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！");
+            }
+
             if (BroadcastService.Any(b => b.Email.Equals(email) && b.SubscribeType == SubscribeType.ArticleToken))
             {
                 var s = RedisHelper.Get("ArticleViewToken");
-                HttpContext.Session.SetByRedis("ArticleViewToken", s);
+                CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "博客文章验证码", $"{CommonHelper.SystemSettings["Domain"]}博客文章验证码是：<span style='color:red'>{s}</span>，有效期为24h，请按时使用！", email);
+                RedisHelper.Set("code:" + email, s, 120);
                 return ResultData(null);
             }
 

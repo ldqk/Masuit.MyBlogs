@@ -28,12 +28,29 @@
 			}
 		});
 	});
-	$("#email-token").on("submit", function(e) {
+	$(".getcode").on("click", function(e) {
 		e.preventDefault();
-		$.post("/post/getviewtoken", $(this).serialize(), function(data) {
+		$.post("/post/getviewtoken",
+			{
+				__RequestVerificationToken:$("[name=__RequestVerificationToken]").val(),
+				email:$("#email3").val()
+			}, function(data) {
 			if (data.Success) {
+				window.notie.alert({
+					type: 1,
+					text: "验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！",
+					time: 4
+				});
 				window.localStorage.setItem("email",$("#email3").val());
-				window.location.reload();
+				$(".getcode").attr('disabled',true);
+				var count=0;
+				var timer=setInterval(function() {
+					count++;
+					$(".getcode").text('重新发送('+(120-count)+')');
+					if (count>120) {
+						clearInterval(timer);
+					}
+				},1000);
 			} else {
 				window.notie.alert({
 					type: 3,

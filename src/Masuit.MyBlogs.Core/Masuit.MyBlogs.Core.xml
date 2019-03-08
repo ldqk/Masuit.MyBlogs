@@ -1236,7 +1236,7 @@
             
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ICategoryService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBroadcastService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISeminarService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostHistoryVersionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext})">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ICategoryService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBroadcastService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISeminarService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostHistoryVersionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.DataContext})">
             <summary>
             文章管理
             </summary>
@@ -1546,7 +1546,7 @@
             
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.SearchController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext})">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.SearchController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.DataContext})">
             <summary>
             站内搜索
             </summary>
@@ -2133,7 +2133,7 @@
             hangfire后台任务
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IUserInfoService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISystemSettingService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ILinksService,System.Net.Http.IHttpClientFactory,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.Application.DataContext})">
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IUserInfoService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISystemSettingService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ILinksService,System.Net.Http.IHttpClientFactory,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.DataContext})">
             <summary>
             hangfire后台任务
             </summary>
@@ -2462,7 +2462,7 @@
             <param name="cancellationToken"></param>
             <returns></returns>
         </member>
-        <member name="T:Masuit.MyBlogs.Core.Infrastructure.Application.DesignTimeDbContextFactory">
+        <member name="T:Masuit.MyBlogs.Core.Infrastructure.DesignTimeDbContextFactory">
             <summary>
             勿删，数据库迁移时powershell会执行该方法
             </summary>
@@ -7430,7 +7430,7 @@
             <param name="services"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.MyBlogs.Core.Infrastructure.Application.DataContext,Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob,Masuit.LuceneEFCore.SearchEngine.LuceneIndexerOptions)">
+        <member name="M:Masuit.MyBlogs.Core.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.MyBlogs.Core.Infrastructure.DataContext,Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob,Masuit.LuceneEFCore.SearchEngine.LuceneIndexerOptions)">
             <summary>
             Configure
             </summary>
