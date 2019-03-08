@@ -1,5 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Infrastructure.Application;
-using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
+﻿using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using System.Data;
 

@@ -141,6 +141,12 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public int TotalViewCount { get; set; }
 
         /// <summary>
+        /// 提交人IP地址
+        /// </summary>
+        public string IP { get; set; }
+
+
+        /// <summary>
         /// 分类
         /// </summary>
         public virtual Category Category { get; set; }

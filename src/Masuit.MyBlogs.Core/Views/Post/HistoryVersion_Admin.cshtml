@@ -3,7 +3,7 @@
 @using Masuit.Tools.Win32
 @model Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion
 @{
-    ViewBag.Title = Model.Post.Title+"于"+Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")+"的历史版本："+Model.Title;
+    ViewBag.Title = Model.Post.Title + "于" + Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss") + "的历史版本：" + Model.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
 }
@@ -13,9 +13,9 @@
     <ol class="cd-breadcrumb triangle">
         <li>@Html.ActionLink("首页", "Index", "Home")</li>
         <li>@Html.ActionLink("文章列表", "Post", "Home")</li>
-        <li>@Html.ActionLink(Model.Post.Title.Length>20?Model.Post.Title.Substring(0,20)+"...": Model.Post.Title, "Details", "Post",new{id=Model.PostId},null)</li>
-        <li>@Html.ActionLink("历史版本", "History", "Post",new{id=Model.PostId},null)</li>
-        <li class="current"><em>@(Model.Title.Length>40? Model.Title.Substring(0,40)+"...": Model.Title)</em></li>
+        <li>@Html.ActionLink(Model.Post.Title.Length > 20 ? Model.Post.Title.Substring(0, 20) + "..." : Model.Post.Title, "Details", "Post", new { id = Model.PostId }, null)</li>
+        <li>@Html.ActionLink("历史版本", "History", "Post", new { id = Model.PostId }, null)</li>
+        <li class="current"><em>@(Model.Title.Length > 40 ? Model.Title.Substring(0, 40) + "..." : Model.Title)</em></li>
     </ol>
     <div class="wrapper-content article">
         <div class="ibox">
@@ -33,17 +33,17 @@
                             <div class="row">
                                 <div class="col-sm-7">
                                     <div class="padding-bot10">
-                                        修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> | 
-                                    原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })
-                                    @if (Model.Seminar.Any())
-                                    {
-                                        <span> | 原所属专题：</span>
-                                        var seminars = Model.Seminar;
-                                        foreach (var s in seminars)
+                                        修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
+                                        原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })
+                                        @if (Model.Seminar.Any())
                                         {
-                                            @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })<text> </text>
+                                            <span> | 原所属专题：</span>
+                                            var seminars = Model.Seminar;
+                                            foreach (var s in seminars)
+                                            {
+                                                @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })<text> </text>
+                                            }
                                         }
-                                    }
                                         <div class="btn-group">
                                             <button class="btn btn-danger btn-sm" id="del">删除此版本</button>
                                             <button class="btn btn-info btn-sm" id="revert">还原到此版本</button>
@@ -72,10 +72,11 @@
                         </header>
                         <article class="article" id="article">
                             @Html.Raw(Model.Content)
-                            @if(!string.IsNullOrEmpty(Model.ProtectContent)) {
-                            <div class="row protected">
-                                @Html.Raw(Model.ProtectContent)
-                            </div>
+                            @if (!string.IsNullOrEmpty(Model.ProtectContent))
+                            {
+                                <div class="row protected">
+                                    @Html.Raw(Model.ProtectContent)
+                                </div>
                             }
                         </article>
                         <div id="cyReward" role="cylabs" data-use="reward"></div>
@@ -103,7 +104,7 @@
                             PostHistoryVersion next = ViewBag.Next;
                             if (next != null)
                             {
-                                @Html.ActionLink(next.Title, "HistoryVersion", "Post", new { id=next.PostId,hid = next.Id }, null)
+                                @Html.ActionLink(next.Title, "HistoryVersion", "Post", new { id = next.PostId, hid = next.Id }, null)
                             }
                             else
                             {
@@ -112,48 +113,6 @@
                         }
                     </div>
                 </section>
-                <!--PC和WAP自适应版-->
-                <div id="SOHUCS" sid="history-@Model.Id"></div>
-                <script type="text/javascript">
-	                (function() {
-		                var appid = 'cytsT3QgK';
-		                var conf = 'prod_0358240040a6c9611add9de991099d42';
-		                var width = window.innerWidth || document.documentElement.clientWidth;
-		                if (width < 960) {
-			                window.document.write(
-				                '<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' +
-				                appid + '&conf=' + conf + '"><\/script>');
-		                } else {
-			                var loadJs = function(d, a) {
-				                var c = document.getElementsByTagName("head")[0] || document.head || document.documentElement;
-				                var b = document.createElement("script");
-				                b.setAttribute("type", "text/javascript");
-				                b.setAttribute("charset", "UTF-8");
-				                b.setAttribute("src", d);
-				                if (typeof a === "function") {
-					                if (window.attachEvent) {
-						                b.onreadystatechange = function() {
-							                var e = b.readyState;
-							                if (e === "loaded" || e === "complete") {
-								                b.onreadystatechange = null;
-								                a()
-							                }
-						                }
-					                } else {
-						                b.onload = a
-					                }
-				                }
-				                c.appendChild(b)
-			                };
-			                loadJs("https://changyan.sohu.com/upload/changyan.js", function() {
-				                window.changyan.api.config({
-					                appid: appid,
-					                conf: conf
-				                })
-			                });
-		                }
-	                })();
-                </script>
             </div>
         </div>
     </div>
@@ -169,7 +128,7 @@
         }).data("toc-tocify");
 	    $(".tocify>.close").on("click", function(e) {
 		    $(this).parent().hide();
-	    });		
+	    });
 	    SyntaxHighlighter.all();
 	    SyntaxHighlighter.defaults['toolbar'] = false;
         $("#del").on("click", function (e) {

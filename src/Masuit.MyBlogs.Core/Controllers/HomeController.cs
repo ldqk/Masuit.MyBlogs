@@ -79,7 +79,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "orderBy" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index(OrderBy orderBy = OrderBy.ModifyDate)
         {
-            ViewBag.Total = 0;
+            //ViewBag.Total = 0;
             UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             var tops = PostService.LoadEntitiesFromL2CacheNoTracking(t => t.Status == Status.Pended && t.IsBanner, p => p.ModifyDate, false).Select(p => new
             {
@@ -214,6 +214,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         private IndexPageViewModel GetIndexPageViewModel(int page, int size, OrderBy orderBy, UserInfoOutputDto user)
         {
             IQueryable<PostOutputDto> postList = PostService.LoadEntities<PostOutputDto>(p => (p.Status == Status.Pended || user.IsAdmin)); //准备文章的查询
+            ViewBag.Total = postList.Count();
             var notices = NoticeService.LoadPageEntitiesFromL2Cache<DateTime, NoticeOutputDto>(1, 5, out int _, n => (n.Status == Status.Display || user.IsAdmin), n => n.ModifyDate, false).ToList(); //加载前5条公告
             var cats = CategoryService.LoadEntitiesFromL2Cache<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).ToList(); //加载分类目录
             var start = DateTime.Today.AddDays(-7);

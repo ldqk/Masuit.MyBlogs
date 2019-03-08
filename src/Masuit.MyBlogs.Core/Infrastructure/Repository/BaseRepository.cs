@@ -1,7 +1,6 @@
 ﻿using AutoMapper.QueryableExtensions;
 using Dapper;
 using EFSecondLevelCache.Core;
-using Masuit.MyBlogs.Core.Infrastructure.Application;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools.Systems;
 using Microsoft.EntityFrameworkCore;

@@ -1947,7 +1947,7 @@
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.SystemController.AddToBlackList(System.String)">
             <summary>
-            将IP添加到白名单
+            将IP添加到黑名单
             </summary>
             <param name="ip"></param>
             <returns></returns>
@@ -6480,6 +6480,11 @@
         <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.TotalViewCount">
             <summary>
             总访问量
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.IP">
+            <summary>
+            提交人IP地址
             </summary>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.Category">

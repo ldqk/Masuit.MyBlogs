@@ -225,7 +225,8 @@ namespace Masuit.MyBlogs.Core.Migrations
                 Description = table.Column<string>(maxLength: 255, nullable: true),
                 ImageUrl = table.Column<string>(maxLength: 255, nullable: true),
                 AverageViewCount = table.Column<double>(nullable: false),
-                TotalViewCount = table.Column<int>(nullable: false)
+                TotalViewCount = table.Column<int>(nullable: false),
+                IP = table.Column<string>(nullable: true)
             }, constraints: table =>
             {
                 table.PrimaryKey("PK_Post", x => x.Id);

@@ -112,7 +112,7 @@
                                             <span class="pull-right" style="font-size: 10px;">${rows[i].Status == 4 ? `<a class="label label-success" onclick="pass(${rows[i].Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${rows[i].Id})">删除</a> | ${rows[i].PostDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span></span>
                                         </header>
                                         <div class="panel-body">
-                                            ${rows[i].Content} <a class="btn btn-sm btn-info" href="?uid=${rows[i].Id}">回复</a>
+                                            ${rows[i].Content} <a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
                                             <div class="pull-right">
                                                 <span class="label label-success">${rows[i].Email}</span>
                                                 <span class="label label-primary">${rows[i].QQorWechat}</span>
@@ -143,7 +143,7 @@
                             </div>
                             <div class="panel-body">
                                 ${item.Content}
-                                <a class="btn btn-sm btn-${color}" href="?uid=${item.Id}">回复</a>
+                                <a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
                                 <div class="pull-right">
                                     <span class="label label-success">${item.Email}</span>
                                     <span class="label label-primary">${item.QQorWechat}</span>

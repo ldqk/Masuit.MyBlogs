@@ -363,7 +363,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult SetIpWhiteList(string content)
         {
             System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), content, Encoding.UTF8);
-            CommonHelper.IPWhiteList = content.Split(',', '，');
+            CommonHelper.IPWhiteList.Add(content);
             return ResultData(null);
         }
 
@@ -404,6 +404,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 List<string> list = ips.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
                 list.Add(ip);
                 System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), string.Join(",", list.Distinct()), Encoding.UTF8);
+                CommonHelper.IPWhiteList = list;
                 foreach (var kv in CommonHelper.DenyAreaIP)
                 {
                     foreach (string item in list)
@@ -418,7 +419,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
-        /// 将IP添加到白名单
+        /// 将IP添加到黑名单
         /// </summary>
         /// <param name="ip"></param>
         /// <returns></returns>
@@ -428,6 +429,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 CommonHelper.DenyIP += "," + ip;
                 System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
+                CommonHelper.IPWhiteList.Remove(ip);
+                System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), string.Join(",", CommonHelper.IPWhiteList.Distinct()), Encoding.UTF8);
                 return ResultData(null);
             }
             return ResultData(null, false);

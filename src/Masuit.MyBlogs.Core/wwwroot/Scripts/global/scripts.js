@@ -317,8 +317,8 @@ function loadParentComments(data) {
                                 </header>
                                 <div class="panel-body">
                                     ${rows[i].Content} 
-                                    <span class="cmvote btn btn-sm btn-info" data-id="${rows[i].Id}">有用(<span>${rows[i].VoteCount}</span>)</span>
-                                    <a class="btn btn-sm btn-info" href="?uid=${rows[i].Id}">回复</a>
+                                    <span class="cmvote label label-info" data-id="${rows[i].Id}"><i class="icon-thumbsup"></i>(<span>${rows[i].VoteCount}</span>)</span>
+                                    <a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
                                     ${loadComments(data.rows, Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.CommentDate).ToArray(), startfloor--)}
                                 </div>
                             </article>
@@ -345,8 +345,8 @@ function loadComments(data, comments, root, depth = 0) {
                         </div>
                         <div class="panel-body">
                             ${item.Content} 
-                            <span class="cmvote btn btn-sm btn-${color}" data-id="${item.Id}">有用(<span>${item.VoteCount}</span>)</span>
-                            <a class="btn btn-sm btn-${color}" href="?uid=${item.Id}">回复</a>
+                            <span class="cmvote label label-${color}" data-id="${item.Id}"><i class="icon-thumbsup"></i>(<span>${item.VoteCount}</span>)</span>
+                            <a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
                             ${loadComments(data, Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.CommentDate), root, depth)}
                         </div>
                     </article>`;
@@ -376,7 +376,7 @@ function loadParentMsgs(data) {
 									</header>
 									<div class="panel-body">
 										${rows[i].Content}
-										<a class="btn btn-sm btn-info" href="?uid=${rows[i].Id}">回复</a>
+										<a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
 										${loadMsgs(data.rows,Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.PostDate).ToArray(), startfloor--)}
 									</div>
 								</article>
@@ -403,7 +403,7 @@ function loadMsgs(data, msg, root, depth = 0) {
 						</div>
 						<div class="panel-body">
 							${item.Content}
-							<a class="btn btn-sm btn-${color}" href="?uid=${item.Id}">回复</a>
+							<a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
 							${loadMsgs(data,Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.PostDate),root, depth)}
 						</div>
 					</article>`;

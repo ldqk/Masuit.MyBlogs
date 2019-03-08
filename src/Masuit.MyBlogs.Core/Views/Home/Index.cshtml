@@ -4,11 +4,13 @@
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.MyBlogs.Core.Extensions
 @using Masuit.Tools.Win32
+@using Microsoft.AspNetCore.Http
 @model Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel
 @{
     ViewBag.Title = "首页";
     Layout = "~/Views/Shared/_Layout.cshtml";
     List<FastShare> shares = ViewBag.FastShare;
+    Context.Request.Path = new PathString("/p");
 }
 <style>
     marquee p, marquee br, marquee div, marquee h1, marquee h2, marquee h3, marquee h4 {

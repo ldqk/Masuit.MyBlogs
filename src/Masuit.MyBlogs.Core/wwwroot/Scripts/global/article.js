@@ -270,7 +270,8 @@ function commentVoteBind() {
 		}, (data) => {
 			if (data) {
 				if (data.Success) {
-                    $(this).children()[0].innerText = parseInt($(this).children()[0].innerText)+1;
+					console.log($(this).children("span.count"));
+                    $(this).children("span.count").text(parseInt($(this).children("span.count").text())+1);
 					$(this).addClass("disabled");
 					this.disabled = true;
 					window.notie.alert({

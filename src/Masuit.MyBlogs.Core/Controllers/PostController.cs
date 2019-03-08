@@ -7,7 +7,7 @@ using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using Masuit.MyBlogs.Core.Infrastructure.Application;
+using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
@@ -19,6 +19,7 @@ using Masuit.Tools.Html;
 using Masuit.Tools.Security;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Net.Http.Headers;
@@ -27,7 +28,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Http;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -319,6 +319,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             ViewBag.CategoryId = new SelectList(CategoryService.LoadEntitiesNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
             Post p = post.Mapper<Post>();
+            p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             p.PostAccessRecord.Add(new PostAccessRecord()
             {
                 AccessTime = DateTime.Today,
@@ -805,6 +806,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 p.PostHistoryVersion.Add(history);
             }
 
+            p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             Mapper.Map(post, p);
             if (!string.IsNullOrEmpty(post.Seminars))
             {
@@ -902,6 +904,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.PostDate = DateTime.Now;
             post.ModifyDate = DateTime.Now;
             Post p = post.Mapper<Post>();
+            p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             if (!string.IsNullOrEmpty(post.Seminars))
             {
                 var tmp = post.Seminars.Split(',').Distinct();

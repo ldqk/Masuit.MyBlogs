@@ -47,7 +47,7 @@ namespace Common
                 }
             }
 
-            IPWhiteList = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "whitelist.txt")).Split(',', '，');
+            IPWhiteList = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "whitelist.txt")).Split(',', '，').ToList();
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Common
         /// <summary>
         /// ip白名单
         /// </summary>
-        public static IEnumerable<string> IPWhiteList { get; set; }
+        public static List<string> IPWhiteList { get; set; }
 
         /// <summary>
         /// 每IP错误的次数统计

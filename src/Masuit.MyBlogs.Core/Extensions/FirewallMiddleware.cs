@@ -40,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Extensions
 
             if (context.Request.IsRobot())
             {
-                //await _next.Invoke(context);
+                await _next.Invoke(context);
                 return;
             }
 

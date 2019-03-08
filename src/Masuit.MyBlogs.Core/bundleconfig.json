@@ -4,5 +4,11 @@
     "inputFiles": [
       "wwwroot/ng-views/app/app.config.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/Scripts/global/article.min.js",
+    "inputFiles": [
+      "wwwroot/Scripts/global/article.js"
+    ]
   }
 ]

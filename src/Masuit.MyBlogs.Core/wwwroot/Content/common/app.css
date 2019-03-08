@@ -747,22 +747,6 @@ Custom bottom spacer
     font-size: 12px;
     margin-top: 5px
 }
-#cyReward {
-    margin-top: 10px;
-    position: relative;
-    text-align: center;
-}
-    #cyReward #cy-reward-pop {
-        top: auto !important;
-        margin-top: -500px !important
-    }
-.changyan-overlay-outer {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    opacity: 1;
-    transform: translate(-50%);
-}
 .protected {
     border: 1px dashed #F60;
     padding: 10px;

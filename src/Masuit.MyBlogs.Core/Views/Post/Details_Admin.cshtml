@@ -422,8 +422,8 @@
                                     </header>
                                     <div class="panel-body">
                                         ${rows[i].Content}
-                                        <span class="cmvote btn btn-sm btn-info" data-id="${rows[i].Id}">有用(<span>${rows[i].VoteCount}</span>)</span>
-                                        <a class="btn btn-sm btn-info" href="?uid=${rows[i].Id}">回复</a>
+                                        <span class="cmvote label label-info" data-id="${rows[i].Id}"><i class="icon-thumbsup"></i>(<span class="count">${rows[i].VoteCount}</span>)</span>
+                                        <a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
                                         <div class="pull-right">
                                             <span class="label label-success">${rows[i].Email}</span>
                                             <span class="label label-warning">${rows[i].QQorWechat}</span>
@@ -454,8 +454,8 @@
                             </div>
                             <div class="panel-body">
                                 ${item.Content}
-                                <span class="cmvote btn btn-sm btn-${color}" data-id="${item.Id}">有用(<span>${item.VoteCount}</span>)</span>
-                                <a class="btn btn-sm btn-${color}" href="?uid=${item.Id}">回复</a>
+                                <span class="cmvote label label-${color}" data-id="${item.Id}"><i class="icon-thumbsup"></i>(<span class="count">${item.VoteCount}</span>)</span>
+                                <a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
                                 <div class="pull-right">
                                     <span class="label label-success">${item.Email}</span>
                                     <span class="label label-primary">${item.QQorWechat}</span>
