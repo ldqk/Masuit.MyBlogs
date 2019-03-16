@@ -1,4 +1,5 @@
 ﻿using Common;
+using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.UEditor;
@@ -253,9 +254,19 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 case var _ when file.ContentType.StartsWith("image"):
                     path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "images", filename);
-                    var (url, success) = CommonHelper.UploadImage(file.OpenReadStream(), Path.GetExtension(file.FileName));
+                    var dir = Path.GetDirectoryName(path);
+                    if (!Directory.Exists(dir))
+                    {
+                        Directory.CreateDirectory(dir);
+                    }
+                    using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                    {
+                        file.CopyTo(fs);
+                    }
+                    var (url, success) = CommonHelper.UploadImage(path);
                     if (success)
                     {
+                        BackgroundJob.Enqueue(() => System.IO.File.Delete(path));
                         return ResultData(url);
                     }
                     break;

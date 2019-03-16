@@ -57,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return RedirectToAction("Search");
             }
             var start = DateTime.Today.AddDays(-7);
-            string key = HttpContext.Connection.Id;
+            string key = "Search:" + HttpContext.Session.Id;
             if (RedisHelper.Exists(key) && !RedisHelper.Get(key).Equals(wd))
             {
                 var hotSearches = SearchDetailsService.LoadEntitiesFromL2CacheNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()

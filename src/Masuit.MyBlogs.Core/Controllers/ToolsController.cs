@@ -1,16 +1,12 @@
 ﻿using Masuit.MyBlogs.Core.Configs;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
-using Quartz;
-using Quartz.Spi;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Masuit.Tools.Core.Net;
 
 #if DEBUG
 using Masuit.Tools.Win32;
@@ -122,40 +118,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
                 return Json(physicsAddress.result.location);
             }
-        }
-
-        /// <summary>
-        /// corn表达式生成
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("cron"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
-        public ActionResult Cron()
-        {
-            return View();
-        }
-
-        /// <summary>
-        /// corn表达式
-        /// </summary>
-        /// <param name="cron"></param>
-        /// <returns></returns>
-        [HttpPost("cron"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "cron" }, VaryByHeader = HeaderNames.Cookie)]
-        public ActionResult Cron(string cron)
-        {
-            //时间表达式
-            ITrigger trigger = TriggerBuilder.Create().WithCronSchedule(cron).Build();
-            var dates = TriggerUtils.ComputeFireTimes(trigger as IOperableTrigger, null, 5);
-            List<string> list = new List<string>();
-            foreach (DateTimeOffset dtf in dates)
-            {
-                list.Add(TimeZoneInfo.ConvertTimeFromUtc(dtf.DateTime, TimeZoneInfo.Local).ToString());
-            }
-            if (list.Any())
-            {
-                return ResultData(list);
-            }
-            list.Add($"{cron} 不是合法的cron表达式");
-            return ResultData(list);
         }
     }
 }

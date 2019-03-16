@@ -87,33 +87,33 @@
             <param name="content">内容</param>
             <param name="tos">收件人</param>
         </member>
-        <member name="M:Common.CommonHelper.UploadImage(System.IO.Stream,System.String)">
+        <member name="M:Common.CommonHelper.UploadImage(System.String)">
             <summary>
             上传图片到新浪图床
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.UploadPeople(System.IO.Stream,System.String)">
+        <member name="M:Common.CommonHelper.UploadPeople(System.String)">
             <summary>
             上传图片到人民网图床
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.UploadImageFallback(System.IO.Stream,System.String)">
+        <member name="M:Common.CommonHelper.UploadSmmsImage(System.String)">
             <summary>
             上传图片到sm图床
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.UploadImageFallback2(System.IO.Stream,System.String)">
+        <member name="M:Common.CommonHelper.UploadImageFallback(System.String)">
             <summary>
-            上传图片到新浪图床
+            上传图片到upload.cc图床
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.UploadImageFallback3(System.IO.Stream,System.String)">
+        <member name="M:Common.CommonHelper.UploadImageFallback2(System.String)">
             <summary>
-            上传图片到新浪图床
+            上传图片到upload.otar.im图床
             </summary>
             <returns></returns>
         </member>
@@ -628,17 +628,17 @@
             <param name="content"></param>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.FileController.Upload(System.String)">
+            <summary>
+            上传文件
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.FileController.Handle(Masuit.MyBlogs.Core.Models.ViewModel.FileRequest)">
             <summary>
             操作文件
             </summary>
             <param name="req"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.FileController.Upload(System.String)">
-            <summary>
-            上传文件
-            </summary>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.FileController.Handle(System.String,System.String[],System.String)">
@@ -1979,19 +1979,6 @@
             <param name="addr"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.ToolsController.Cron">
-            <summary>
-            corn表达式生成
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.ToolsController.Cron(System.String)">
-            <summary>
-            corn表达式
-            </summary>
-            <param name="cron"></param>
-            <returns></returns>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.UploadController">
             <summary>
             文件上传
@@ -2274,7 +2261,7 @@
             从Redis取Session
             </summary>
             <typeparam name="T"></typeparam>
-            <param name="_"></param>
+            <param name="session"></param>
             <param name="key">键</param>
             <param name="expire">过期时间，默认20分钟</param>
             <returns></returns> 

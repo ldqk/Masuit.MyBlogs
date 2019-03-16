@@ -215,6 +215,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     name = e.GetDisplay()
                 });
             }
+
             return ResultData(list);
         }
 
@@ -257,10 +258,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult PathTest(string path)
         {
-            if (path.Equals("/") || path.Equals("\\") || string.IsNullOrWhiteSpace(path))
+            if (!(path.EndsWith("/") || path.EndsWith("\\")))
+            {
+                return ResultData(null, false, "路径不存在");
+            }
+
+            if (path.Equals("/") || path.Equals("\\"))
             {
                 return ResultData(null, true, "根路径正确");
             }
+
             try
             {
                 bool b = Directory.Exists(path);
@@ -282,6 +289,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             MyHub.PerformanceCounter.Clear();
             return Ok();
         }
+
         #region 网站防火墙
 
         /// <summary>
@@ -331,6 +339,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                 }
             }
+
             return ResultData(null);
         }
 
@@ -412,9 +421,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                         CommonHelper.DenyAreaIP[kv.Key].Remove(item);
                     }
                 }
+
                 System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt"), CommonHelper.DenyAreaIP.ToJsonString(), Encoding.UTF8);
                 return ResultData(null);
             }
+
             return ResultData(null, false);
         }
 
@@ -433,6 +444,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), string.Join(",", CommonHelper.IPWhiteList.Distinct()), Encoding.UTF8);
                 return ResultData(null);
             }
+
             return ResultData(null, false);
         }
 

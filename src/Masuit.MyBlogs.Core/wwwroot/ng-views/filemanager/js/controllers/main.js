@@ -347,22 +347,18 @@
         $scope.getUrl = function(_item) {
             return $scope.apiMiddleware.getUrl(_item);
         };
-			$scope.changeroot= function(path) {
-				$http.post('/system/save', {
-					sets: JSON.stringify([{
-						Name: "PathRoot",
-						Value:path
-					}])
-				}, {
-					'Content-Type': 'application/x-www-form-urlencoded'
-				}).then(function(res) {
-					if (res.data.Success) {
-						$scope.fileNavigator.goTo(-1);
-					}
-				}, function() {
+		$scope.changeroot= function(path) {
+			$http.post('/system/save?sets='+JSON.stringify([{
+				Name: "PathRoot",
+				Value:path
+			}])).then(function(res) {
+				if (res.data.Success) {
+					$scope.fileNavigator.goTo(-1);
+				}
+			}, function() {
 
-				});
-			}
+			});
+		}
         var validateSamePath = function(item) {
             var selectedPath = $rootScope.selectedModalPath.join('');
             var selectedItemsPath = item && item.model.path.join('');

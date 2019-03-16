@@ -1,4 +1,5 @@
 ﻿using Common;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
@@ -25,66 +26,51 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
 
         public override string Process()
         {
-            byte[] uploadFileBytes;
-            string uploadFileName;
+            var file = Request.Form.Files[UploadConfig.UploadFieldName];
+            var uploadFileName = file.FileName;
 
-            if (UploadConfig.Base64)
+            if (!CheckFileType(uploadFileName))
             {
-                uploadFileName = UploadConfig.Base64Filename;
-                uploadFileBytes = Convert.FromBase64String(Request.Query[UploadConfig.UploadFieldName]);
+                Result.State = UploadState.TypeNotAllow;
+                return WriteResult();
             }
-            else
+            if (!CheckFileSize(file.Length))
             {
-                var file = Request.Form.Files[UploadConfig.UploadFieldName];
-                uploadFileName = file.FileName;
-
-                if (!CheckFileType(uploadFileName))
-                {
-                    Result.State = UploadState.TypeNotAllow;
-                    return WriteResult();
-                }
-                if (!CheckFileSize(file.Length))
-                {
-                    Result.State = UploadState.SizeLimitExceed;
-                    return WriteResult();
-                }
-
-                uploadFileBytes = new byte[file.Length];
-                try
-                {
-                    file.OpenReadStream().Read(uploadFileBytes, 0, (int)file.Length);
-                }
-                catch (Exception)
-                {
-                    Result.State = UploadState.NetworkError;
-                    return WriteResult();
-                }
+                Result.State = UploadState.SizeLimitExceed;
+                return WriteResult();
             }
 
+            var uploadFileBytes = new byte[file.Length];
+            try
+            {
+                file.OpenReadStream().Read(uploadFileBytes, 0, (int)file.Length);
+            }
+            catch (Exception)
+            {
+                Result.State = UploadState.NetworkError;
+                return WriteResult();
+            }
             Result.OriginFileName = uploadFileName;
-
             var savePath = PathFormatter.Format(uploadFileName, UploadConfig.PathFormat);
             var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
             try
             {
                 if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(uploadFileName)))
                 {
-                    using (MemoryStream ms = new MemoryStream(uploadFileBytes))
+                    if (!Directory.Exists(Path.GetDirectoryName(localPath)))
                     {
-                        var (url, success) = CommonHelper.UploadImage(ms, Path.GetExtension(uploadFileName));
-                        if (success)
-                        {
-                            Result.Url = url;
-                        }
-                        else
-                        {
-                            if (!Directory.Exists(Path.GetDirectoryName(localPath)))
-                            {
-                                Directory.CreateDirectory(Path.GetDirectoryName(localPath));
-                            }
-                            File.WriteAllBytes(localPath, uploadFileBytes);
-                            Result.Url = savePath;
-                        }
+                        Directory.CreateDirectory(Path.GetDirectoryName(localPath));
+                    }
+                    File.WriteAllBytes(localPath, file.OpenReadStream().ToByteArray());
+                    var (url, success) = CommonHelper.UploadImage(localPath);
+                    if (success)
+                    {
+                        BackgroundJob.Enqueue(() => File.Delete(localPath));
+                        Result.Url = url;
+                    }
+                    else
+                    {
+                        Result.Url = savePath;
                     }
                 }
                 else

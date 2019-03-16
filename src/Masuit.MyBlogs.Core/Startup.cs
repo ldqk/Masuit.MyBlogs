@@ -10,13 +10,10 @@ using JiebaNet.Segmenter;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Extensions;
 using Masuit.MyBlogs.Core.Configs;
-using Masuit.MyBlogs.Core.Controllers;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Hubs;
 using Masuit.MyBlogs.Core.Infrastructure;
-using Masuit.MyBlogs.Core.Infrastructure.Repository;
-using Masuit.MyBlogs.Core.Infrastructure.Services;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.Mime;
@@ -31,8 +28,6 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.Redis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.WebEncoders;
@@ -45,6 +40,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
@@ -124,7 +120,6 @@ namespace Masuit.MyBlogs.Core
 
             services.AddSevenZipCompressor().AddResumeFileResult().AddSearchEngine<DataContext>(new LuceneIndexerOptions() { Path = "lucene" });// 配置7z和断点续传和Redis和Lucene搜索引擎
             RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
-            services.AddSingleton<IDistributedCache>(new CSRedisCache(RedisHelper.Instance));
 
             //配置EF二级缓存
             services.AddEFSecondLevelCache();
@@ -153,9 +148,7 @@ namespace Masuit.MyBlogs.Core
 
             ContainerBuilder builder = new ContainerBuilder();
             builder.Populate(services);
-            builder.RegisterAssemblyTypes(typeof(BaseRepository<>).Assembly).AsImplementedInterfaces().Where(t => t.Name.EndsWith("Repository")).PropertiesAutowired().AsSelf().InstancePerDependency();
-            builder.RegisterAssemblyTypes(typeof(BaseService<>).Assembly).AsImplementedInterfaces().Where(t => t.Name.EndsWith("Service")).PropertiesAutowired().AsSelf().InstancePerDependency();
-            builder.RegisterAssemblyTypes(typeof(BaseController).Assembly).AsImplementedInterfaces().Where(t => t.Name.EndsWith("Controller")).PropertiesAutowired().AsSelf().InstancePerDependency(); //注册控制器为属性注入
+            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsImplementedInterfaces().Where(t => t.Name.EndsWith("Repository") || t.Name.EndsWith("Service") || t.Name.EndsWith("Controller")).PropertiesAutowired().AsSelf().InstancePerDependency(); //注册控制器为属性注入
             builder.RegisterType<BackgroundJobClient>().SingleInstance(); //指定生命周期为单例
             builder.RegisterType<HangfireBackJob>().As<IHangfireBackJob>().PropertiesAutowired(PropertyWiringOptions.PreserveSetValues).InstancePerDependency();
             AutofacContainer = new AutofacServiceProvider(builder.Build());

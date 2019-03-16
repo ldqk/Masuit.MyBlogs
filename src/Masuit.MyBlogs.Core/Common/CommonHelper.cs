@@ -12,8 +12,6 @@ using Masuit.Tools.Html;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Models;
 #endif
-using Masuit.Tools.Security;
-using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
@@ -84,6 +82,7 @@ namespace Common
         /// 系统设定
         /// </summary>
         public static Dictionary<string, string> SystemSettings { get; set; }
+
         /// <summary>
         /// 访问量
         /// </summary>
@@ -100,6 +99,7 @@ namespace Common
                     return 1;
                 }
             }
+            set => RedisHelper.IncrBy("Interview:ViewCount");
         }
 
         /// <summary>
@@ -112,7 +112,6 @@ namespace Common
                 try
                 {
                     return RedisHelper.Get<double>("Interview:ViewCount") / RedisHelper.Get<double>("Interview:RunningDays");
-
                 }
                 catch
                 {
@@ -181,32 +180,29 @@ namespace Common
         /// 上传图片到新浪图床
         /// </summary>
         /// <returns></returns>
-        public static (string, bool) UploadImage(Stream stream, string ext)
+        public static (string, bool) UploadImage(string file)
         {
-            string[] apis =
-            {
-                "https://tu.xiangkanju.com/Zs_UP.php?type=multipart",
-                "https://api.yum6.cn/sinaimg.php?type=multipart",
-            };
-            int index = 0;
+            string api = "https://api.yum6.cn/sinaimg.php?type=multipart";
             string url = string.Empty;
-            bool success = false;
-            for (int i = 0; i < apis.Length; i++)
+            using (HttpClient httpClient = new HttpClient())
             {
-                using (HttpClient httpClient = new HttpClient())
+                httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+                httpClient.DefaultRequestHeaders.Referrer = new Uri(api);
+                using (var fs = File.OpenRead(file))
                 {
-                    httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-                    httpClient.DefaultRequestHeaders.Referrer = new Uri(apis[i]);
-                    using (var bc = new StreamContent(stream))
+                    using (var bc = new StreamContent(fs))
                     {
                         bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                         {
-                            FileName = "".MDString() + ext,
+                            FileName = Path.GetFileName(file),
                             Name = "file"
                         };
-                        using (var content = new MultipartFormDataContent { bc })
+                        using (var content = new MultipartFormDataContent
                         {
-                            var code = httpClient.PostAsync(apis[index], content).ContinueWith(t =>
+                            bc
+                        })
+                        {
+                            var code = httpClient.PostAsync(api, content).ContinueWith(t =>
                             {
                                 if (t.IsCanceled || t.IsFaulted)
                                 {
@@ -220,30 +216,11 @@ namespace Common
                                     {
                                         string s = res.Content.ReadAsStringAsync().Result;
                                         var token = JObject.Parse(s);
-                                        switch (index)
+                                        s = (string)token["code"];
+                                        if (s.Equals("200"))
                                         {
-                                            case 0:
-                                                s = (string)token["code"];
-                                                if (s.Equals("200"))
-                                                {
-                                                    url = (string)token["pid"];
-                                                    return 1;
-                                                }
-
-                                                return 2;
-                                            case 1:
-                                                s = (string)token["code"];
-                                                if (s.Equals("200"))
-                                                {
-                                                    url = ((string)token["url"]).Replace("thumb150", "large");
-                                                    return 1;
-                                                }
-
-                                                return 2;
-                                        }
-                                        if (url.Length < 40)
-                                        {
-                                            return 2;
+                                            url = ((string)token["url"]).Replace("thumb150", "large");
+                                            return url.Length > 40 ? 1 : 2;
                                         }
                                     }
                                     catch
@@ -256,69 +233,65 @@ namespace Common
                             }).Result;
                             if (code == 1)
                             {
-                                success = true;
-                                break;
+                                var success = true;
+                                return (url.Replace("/thumb150/", "/large/"), success);
                             }
 
-                            index++;
-                            if (index == apis.Length)
-                            {
-                                Console.WriteLine("所有上传接口都挂掉了，重试人民网图床");
-                                return UploadPeople(stream, ext);
-                            }
-
-                            Console.WriteLine("正在准备重试图片上传接口：" + apis[index]);
+                            Console.WriteLine("https://api.yum6.cn 图床接口都挂掉了，重试人民网图床");
+                            return UploadPeople(file);
                         }
                     }
-
                 }
             }
-
-            return (url.Replace("/thumb150/", "/large/"), success);
         }
+
         /// <summary>
         /// 上传图片到人民网图床
         /// </summary>
         /// <returns></returns>
-        public static (string url, bool success) UploadPeople(Stream stream, string ext)
+        public static (string url, bool success) UploadPeople(string file)
         {
-            bool success = false;
+            var success = false;
             using (var httpClient = new HttpClient())
             {
                 httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Chrome/72.0.3626.96"));
-                using (var sc = new StreamContent(stream))
+                using (var fs = File.OpenRead(file))
                 {
-                    using (var mc = new MultipartFormDataContent
+                    using (var sc = new StreamContent(fs))
                     {
-                        { sc, "Filedata", SnowFlake.GetInstance().GetUniqueId()+ext },
-                        {new StringContent(ext),"filetype"}
-                    })
-                    {
-                        var str = httpClient.PostAsync("http://bbs1.people.com.cn/postImageUpload.do", mc).ContinueWith(t =>
+                        using (var mc = new MultipartFormDataContent
                         {
-                            if (t.IsCompletedSuccessfully)
+                            { sc, "Filedata", Path.GetFileName(file) },
+                            { new StringContent(Path.GetExtension(file)), "filetype" }
+                        })
+                        {
+                            var s = httpClient.PostAsync("http://bbs1.people.com.cn/postImageUpload.do", mc).ContinueWith(t =>
                             {
-                                var res = t.Result;
-                                if (res.IsSuccessStatusCode)
+                                if (t.IsCompletedSuccessfully)
                                 {
-                                    string result = res.Content.ReadAsStringAsync().Result;
-                                    string url = "http://bbs1.people.com.cn" + (string)JObject.Parse(result)["imageUrl"];
-                                    if (url.EndsWith(ext))
+                                    var res = t.Result;
+                                    if (res.IsSuccessStatusCode)
                                     {
-                                        success = true;
-                                        return url;
+                                        string result = res.Content.ReadAsStringAsync().Result;
+                                        string url = "http://bbs1.people.com.cn" + (string)JObject.Parse(result)["imageUrl"];
+                                        if (url.EndsWith(Path.GetExtension(file)))
+                                        {
+                                            success = true;
+                                            return url;
+                                        }
                                     }
                                 }
+
+                                return "";
+                            }).Result;
+                            if (!success)
+                            {
+                                Console.WriteLine("人民网图床上传接口都挂掉了，重试sm.ms图床");
+                                return UploadSmmsImage(file);
                             }
 
-                            return "";
-                        }).Result;
-                        if (!success)
-                        {
-                            Console.WriteLine("人民网图床上传接口都挂掉了，重试sm.ms图床");
-                            return UploadImageFallback(stream, ext);
+                            return (s, success);
                         }
-                        return (str, success);
                     }
                 }
             }
@@ -328,100 +301,49 @@ namespace Common
         /// 上传图片到sm图床
         /// </summary>
         /// <returns></returns>
-        private static (string, bool) UploadImageFallback(Stream stream, string ext)
+        private static (string, bool) UploadSmmsImage(string file)
         {
             string url = string.Empty;
             bool success = false;
-            using (HttpClient httpClient = new HttpClient())
+            using (var fs = File.OpenRead(file))
             {
-                httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-                using (var bc = new StreamContent(stream))
+                using (HttpClient httpClient = new HttpClient())
                 {
-                    bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                    httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+                    using (var bc = new StreamContent(fs))
                     {
-                        FileName = "".CreateShortToken() + ext,
-                        Name = "smfile"
-                    };
-                    using (var content = new MultipartFormDataContent { bc })
-                    {
-                        var code = httpClient.PostAsync("https://sm.ms/api/upload?inajax=1&ssl=1", content).ContinueWith(t =>
+                        bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                         {
-                            if (t.IsCanceled || t.IsFaulted)
-                            {
-                                return 0;
-                            }
-
-                            var res = t.Result;
-                            if (res.IsSuccessStatusCode)
-                            {
-                                string s = res.Content.ReadAsStringAsync().Result;
-                                var token = JObject.Parse(s);
-                                url = (string)token["data"]["url"];
-                                return 1;
-                            }
-
-                            return 2;
-                        }).Result;
-                        if (code == 1)
+                            FileName = Path.GetFileName(file),
+                            Name = "smfile"
+                        };
+                        using (var content = new MultipartFormDataContent
                         {
-                            success = true;
-                        }
-                    }
-                }
-            }
-
-            if (success)
-            {
-                return (url, success);
-            }
-
-            return UploadImageFallback2(stream, ext);
-        }
-
-        /// <summary>
-        /// 上传图片到新浪图床
-        /// </summary>
-        /// <returns></returns>
-        private static (string, bool) UploadImageFallback2(Stream stream, string ext)
-        {
-            string url = string.Empty;
-            bool success = false;
-            using (HttpClient httpClient = new HttpClient())
-            {
-                httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-                using (var bc = new StreamContent(stream))
-                {
-                    bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-                    {
-                        FileName = "".CreateShortToken() + ext,
-                        Name = "uploaded_file[]"
-                    };
-                    using (var content = new MultipartFormDataContent { bc })
-                    {
-                        var code = httpClient.PostAsync("https://upload.cc/image_upload", content).ContinueWith(t =>
+                            bc
+                        })
                         {
-                            if (t.IsCanceled || t.IsFaulted)
+                            var code = httpClient.PostAsync("https://sm.ms/api/upload?inajax=1&ssl=1", content).ContinueWith(t =>
                             {
-                                return 0;
-                            }
-
-                            var res = t.Result;
-                            if (res.IsSuccessStatusCode)
-                            {
-                                string s = res.Content.ReadAsStringAsync().Result;
-                                var token = JObject.Parse(s);
-                                if ((int)token["code"] == 100)
+                                if (t.IsCanceled || t.IsFaulted)
                                 {
-                                    url = "https://upload.cc/" + (string)token["success_image"][0]["url"];
+                                    return 0;
+                                }
+
+                                var res = t.Result;
+                                if (res.IsSuccessStatusCode)
+                                {
+                                    string s = res.Content.ReadAsStringAsync().Result;
+                                    var token = JObject.Parse(s);
+                                    url = (string)token["data"]["url"];
                                     return 1;
                                 }
-                            }
 
-                            return 2;
-                        }).Result;
-                        if (code == 1)
-                        {
-                            success = true;
+                                return 2;
+                            }).Result;
+                            if (code == 1)
+                            {
+                                success = true;
+                            }
                         }
                     }
                 }
@@ -432,55 +354,124 @@ namespace Common
                 return (url, success);
             }
 
-            return UploadImageFallback3(stream, ext);
+            return UploadImageFallback(file);
         }
 
         /// <summary>
-        /// 上传图片到新浪图床
+        /// 上传图片到upload.cc图床
         /// </summary>
         /// <returns></returns>
-        private static (string, bool) UploadImageFallback3(Stream stream, string ext)
+        private static (string, bool) UploadImageFallback(string file)
         {
             string url = string.Empty;
             bool success = false;
             using (HttpClient httpClient = new HttpClient())
             {
-                httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-                using (var bc = new StreamContent(stream))
+                using (var fs = File.OpenRead(file))
                 {
-                    bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                    httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+                    using (var bc = new StreamContent(fs))
                     {
-                        FileName = "".CreateShortToken() + ext,
-                        Name = "img"
-                    };
-                    using (var content = new MultipartFormDataContent { bc })
-                    {
-                        var code = httpClient.PostAsync("http://upload.otar.im/api/upload/imgur", content).ContinueWith(t =>
+                        bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                         {
-                            if (t.IsCanceled || t.IsFaulted)
-                            {
-                                return 0;
-                            }
-
-                            var res = t.Result;
-                            if (res.IsSuccessStatusCode)
-                            {
-                                string s = res.Content.ReadAsStringAsync().Result;
-                                var token = JObject.Parse(s);
-                                url = (string)token["url"];
-                                return 1;
-                            }
-
-                            return 2;
-                        }).Result;
-                        if (code == 1)
+                            FileName = Path.GetFileName(file),
+                            Name = "uploaded_file[]"
+                        };
+                        using (var content = new MultipartFormDataContent
                         {
-                            success = true;
+                            bc
+                        })
+                        {
+                            var code = httpClient.PostAsync("https://upload.cc/image_upload", content).ContinueWith(t =>
+                            {
+                                if (t.IsCanceled || t.IsFaulted)
+                                {
+                                    return 0;
+                                }
+
+                                var res = t.Result;
+                                if (res.IsSuccessStatusCode)
+                                {
+                                    string s = res.Content.ReadAsStringAsync().Result;
+                                    var token = JObject.Parse(s);
+                                    if ((int)token["code"] == 100)
+                                    {
+                                        url = "https://upload.cc/" + (string)token["success_image"][0]["url"];
+                                        return 1;
+                                    }
+                                }
+
+                                return 2;
+                            }).Result;
+                            if (code == 1)
+                            {
+                                success = true;
+                            }
                         }
                     }
                 }
-
             }
+
+            if (success)
+            {
+                return (url, success);
+            }
+
+            return UploadImageFallback2(file);
+        }
+
+        /// <summary>
+        /// 上传图片到upload.otar.im图床
+        /// </summary>
+        /// <returns></returns>
+        private static (string, bool) UploadImageFallback2(string file)
+        {
+            string url = string.Empty;
+            bool success = false;
+            using (var fs = File.OpenRead(file))
+            {
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+                    using (var bc = new StreamContent(fs))
+                    {
+                        bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                        {
+                            FileName = Path.GetFileName(file),
+                            Name = "img"
+                        };
+                        using (var content = new MultipartFormDataContent
+                        {
+                            bc
+                        })
+                        {
+                            var code = httpClient.PostAsync("http://upload.otar.im/api/upload/imgur", content).ContinueWith(t =>
+                            {
+                                if (t.IsCanceled || t.IsFaulted)
+                                {
+                                    return 0;
+                                }
+
+                                var res = t.Result;
+                                if (res.IsSuccessStatusCode)
+                                {
+                                    string s = res.Content.ReadAsStringAsync().Result;
+                                    var token = JObject.Parse(s);
+                                    url = (string)token["url"];
+                                    return 1;
+                                }
+
+                                return 2;
+                            }).Result;
+                            if (code == 1)
+                            {
+                                success = true;
+                            }
+                        }
+                    }
+                }
+            }
+
             return (url, success);
         }
 
@@ -499,18 +490,16 @@ namespace Common
                     var path = Path.Combine(AppContext.BaseDirectory + "wwwroot", src.Replace("/", @"\").Substring(1));
                     if (File.Exists(path))
                     {
-                        using (var fs = File.OpenRead(path))
+                        var (url, success) = UploadImage(path);
+                        if (success)
                         {
-                            var (url, success) = UploadImage(fs, Path.GetExtension(path));
-                            if (success)
-                            {
-                                content = content.Replace(src, url);
-                                BackgroundJob.Enqueue(() => File.Delete(path));
-                            }
+                            content = content.Replace(src, url);
+                            BackgroundJob.Enqueue(() => File.Delete(path));
                         }
                     }
                 }
             }
+
             return content;
         }
 
@@ -521,7 +510,14 @@ namespace Common
         /// <returns></returns>
         public static bool IsRobot(this HttpRequest req)
         {
-            return req.Headers[HeaderNames.UserAgent].ToString().Contains(new[] { "DNSPod", "Baidu", "spider", "Python", "bot" });
+            return req.Headers[HeaderNames.UserAgent].ToString().Contains(new[]
+            {
+                "DNSPod",
+                "Baidu",
+                "spider",
+                "Python",
+                "bot"
+            });
         }
     }
 }

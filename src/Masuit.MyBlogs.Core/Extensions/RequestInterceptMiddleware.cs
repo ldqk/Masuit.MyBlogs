@@ -26,7 +26,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             if (!context.Session.TryGetValue("session", out _) && !context.Request.IsRobot())
             {
                 context.Session.Set("session", 0);
-                RedisHelper.IncrBy("Interview:ViewCount");
+                CommonHelper.InterviewCount++;
             }
             await _next.Invoke(context);
         }

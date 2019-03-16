@@ -34,8 +34,8 @@ namespace Masuit.MyBlogs.Core.Extensions
 
             try
             {
-                RedisHelper.HSet("Session:" + HttpContext2.Current.Connection.Id, key, obj); //存储数据到缓存服务器，这里将字符串"my value"缓存，key 是"test"
-                RedisHelper.Expire("Session:" + HttpContext2.Current.Connection.Id, TimeSpan.FromMinutes(expire));
+                RedisHelper.HSet("Session:" + session.Id, key, obj); //存储数据到缓存服务器，这里将字符串"my value"缓存，key 是"test"
+                RedisHelper.Expire("Session:" + session.Id, TimeSpan.FromMinutes(expire));
             }
             catch
             {
@@ -47,27 +47,27 @@ namespace Masuit.MyBlogs.Core.Extensions
         /// 从Redis取Session
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="_"></param>
+        /// <param name="session"></param>
         /// <param name="key">键</param>
         /// <param name="expire">过期时间，默认20分钟</param>
         /// <returns></returns> 
-        public static T GetByRedis<T>(this ISession _, string key, int expire = 20) where T : class
+        public static T GetByRedis<T>(this ISession session, string key, int expire = 20) where T : class
         {
             if (HttpContext2.Current is null)
             {
                 throw new Exception("请确保此方法调用是在同步线程中执行！");
             }
             T obj = default(T);
-            if (_ != null)
+            if (session != null)
             {
-                obj = _.Get<T>(key);
+                obj = session.Get<T>(key);
             }
 
             if (obj == default(T))
             {
                 try
                 {
-                    var sessionKey = "Session:" + HttpContext2.Current.Connection.Id;
+                    var sessionKey = "Session:" + session.Id;
                     if (RedisHelper.Exists(sessionKey) && RedisHelper.HExists(sessionKey, key))
                     {
                         RedisHelper.Expire(sessionKey, TimeSpan.FromMinutes(expire));
@@ -102,7 +102,7 @@ namespace Masuit.MyBlogs.Core.Extensions
 
             try
             {
-                var sessionKey = "Session:" + HttpContext2.Current.Connection.Id;
+                var sessionKey = "Session:" + session.Id;
                 if (RedisHelper.Exists(sessionKey) && RedisHelper.HExists(sessionKey, key))
                 {
                     RedisHelper.HDel(sessionKey, key);

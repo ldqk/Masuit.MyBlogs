@@ -19,12 +19,12 @@
                     <span class="sortorder" ng-show="predicate[1] === 'model.date'" ng-class="{reverse:reverse}"></span>
                 </a>
             </th>
-            <th class="hidden-sm hidden-xs" ng-hide="config.hidePermissions">
+            <!--<th class="hidden-sm hidden-xs" ng-hide="config.hidePermissions">
                 <a href="" ng-click="order('model.permissions')">
                     {{"permissions" | translate}}
                     <span class="sortorder" ng-show="predicate[1] === 'model.permissions'" ng-class="{reverse:reverse}"></span>
                 </a>
-            </th>
+            </th>-->
         </tr>
     </thead>
     <tbody class="file-item">
@@ -59,9 +59,9 @@
             <td class="hidden-sm hidden-xs" ng-hide="config.hideDate">
                 {{item.model.date | formatDate }}
             </td>
-            <td class="hidden-sm hidden-xs" ng-hide="config.hidePermissions">
+            <!--<td class="hidden-sm hidden-xs" ng-hide="config.hidePermissions">
                 {{item.model.perms.toCode(item.model.type === 'dir'?'d':'-')}}
-            </td>
+            </td>-->
         </tr>
     </tbody>
 </table>

@@ -1105,7 +1105,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             if (!RedisHelper.Exists("ArticleViewToken"))
             {
-                RedisHelper.Set("ArticleViewToken", string.Empty.CreateShortToken(6));
+                RedisHelper.Set("ArticleViewToken", SnowFlake.GetInstance().GetUniqueShortId(6));
             }
 
             var token = RedisHelper.Get("ArticleViewToken");

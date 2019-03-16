@@ -1,4 +1,5 @@
 ﻿using Common;
+using Hangfire;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -81,23 +82,21 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 {
                     using (var stream = response.GetResponseStream())
                     {
-                        var (url, success) = CommonHelper.UploadImage(stream, Path.GetExtension(ServerUrl));
+                        var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
+                        if (!Directory.Exists(Path.GetDirectoryName(savePath)))
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+                        }
+                        using (var ms = new MemoryStream())
+                        {
+                            stream.CopyTo(ms);
+                            File.WriteAllBytes(savePath, ms.GetBuffer());
+                        }
+                        var (url, success) = CommonHelper.UploadImage(savePath);
                         if (success)
                         {
+                            BackgroundJob.Enqueue(() => File.Delete(savePath));
                             ServerUrl = url;
-                        }
-                        else
-                        {
-                            var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
-                            if (!Directory.Exists(Path.GetDirectoryName(savePath)))
-                            {
-                                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-                            }
-                            using (var ms = new MemoryStream())
-                            {
-                                stream.CopyTo(ms);
-                                File.WriteAllBytes(savePath, ms.GetBuffer());
-                            }
                         }
                         State = "SUCCESS";
                     }
