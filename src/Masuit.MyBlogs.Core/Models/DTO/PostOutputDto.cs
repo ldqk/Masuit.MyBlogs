@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
 {
@@ -92,22 +91,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 反对数
         /// </summary>
         public int VoteDownCount { get; set; }
-
-        /// <summary>
-        /// 是否是头图文章
-        /// </summary>
-        public bool IsBanner { get; set; }
-
-        /// <summary>
-        /// 描述
-        /// </summary>
-        [StringLength(255, ErrorMessage = "描述文本不能超过255个字")]
-        public string Description { get; set; }
-
-        /// <summary>
-        /// 图片地址
-        /// </summary>
-        public string ImageUrl { get; set; }
 
         ///// <summary>
         ///// 评论

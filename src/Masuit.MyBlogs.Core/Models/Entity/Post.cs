@@ -113,24 +113,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public int VoteDownCount { get; set; }
 
         /// <summary>
-        /// 是否是头图文章
-        /// </summary>
-        [Required]
-        [DefaultValue(false)]
-        public bool IsBanner { get; set; }
-        /// <summary>
-        /// 描述
-        /// </summary>
-        [StringLength(255)]
-        public string Description { get; set; }
-
-        /// <summary>
-        /// 图片地址
-        /// </summary>
-        [StringLength(255)]
-        public string ImageUrl { get; set; }
-
-        /// <summary>
         /// 每日平均访问量
         /// </summary>
         public double AverageViewCount { get; set; }

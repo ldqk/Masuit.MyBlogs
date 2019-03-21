@@ -3,7 +3,6 @@
 using Masuit.MyBlogs.Core.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 
 namespace Masuit.MyBlogs.Core.Migrations
@@ -14,11 +13,30 @@ namespace Masuit.MyBlogs.Core.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.2-servicing-10034").HasAnnotation("Relational:MaxIdentifierLength", 128).HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.3-servicing-35854").HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Banner", b =>
+            {
+                b.Property<int>("Id").ValueGeneratedOnAdd();
+
+                b.Property<string>("Description").IsRequired().HasMaxLength(255);
+
+                b.Property<string>("ImageUrl").IsRequired().HasMaxLength(255);
+
+                b.Property<int>("Status");
+
+                b.Property<string>("Title").IsRequired();
+
+                b.Property<string>("Url").IsRequired().HasMaxLength(255);
+
+                b.HasKey("Id");
+
+                b.ToTable("Banner");
+            });
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Broadcast", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Email");
 
@@ -37,7 +55,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Category", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Description");
 
@@ -52,7 +70,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Comment", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<int>("AgainstCount");
 
@@ -91,7 +109,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Donate", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Amount");
 
@@ -118,7 +136,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.FastShare", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Link");
 
@@ -135,7 +153,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.InternalMessage", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Content");
 
@@ -156,7 +174,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.LeaveMessage", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Browser").HasMaxLength(255);
 
@@ -187,7 +205,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Links", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<bool>("Except");
 
@@ -206,7 +224,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.LoginRecord", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("IP");
 
@@ -231,7 +249,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Menu", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Icon");
 
@@ -256,7 +274,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Misc", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Content").IsRequired();
 
@@ -275,7 +293,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Notice", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Content").IsRequired();
 
@@ -296,7 +314,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Post", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Author").IsRequired().HasMaxLength(24);
 
@@ -306,15 +324,9 @@ namespace Masuit.MyBlogs.Core.Migrations
 
                 b.Property<string>("Content").IsRequired();
 
-                b.Property<string>("Description").HasMaxLength(255);
-
                 b.Property<string>("Email").IsRequired().IsUnicode(true);
 
                 b.Property<string>("IP");
-
-                b.Property<string>("ImageUrl").HasMaxLength(255);
-
-                b.Property<bool>("IsBanner");
 
                 b.Property<bool>("IsFixedTop");
 
@@ -351,7 +363,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.PostAccessRecord", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<DateTime>("AccessTime");
 
@@ -370,7 +382,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<int>("CategoryId");
 
@@ -407,7 +419,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.SearchDetails", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("IP");
 
@@ -422,7 +434,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.Seminar", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Description").IsRequired();
 
@@ -465,7 +477,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.SystemSetting", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("Name").IsRequired();
 
@@ -480,7 +492,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             modelBuilder.Entity("Masuit.MyBlogs.Core.Models.Entity.UserInfo", b =>
             {
-                b.Property<int>("Id").ValueGeneratedOnAdd().HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                b.Property<int>("Id").ValueGeneratedOnAdd();
 
                 b.Property<string>("AccessToken");
 

@@ -6,15 +6,16 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Http;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -51,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("notice"), ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "page", "size", "id" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index(int page = 1, int size = 10, int id = 0)
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             List<NoticeOutputDto> list;
             int total;
             if (user != null && user.IsAdmin)

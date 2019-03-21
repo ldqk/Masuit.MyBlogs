@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -55,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index(int id, int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {
             IList<Post> posts;
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             var s = SeminarService.GetById(id);
             if (s is null)
             {

@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -56,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie), Route("msg")]
         public ActionResult Index()
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             ViewBag.TotalCount = LeaveMessageService.LoadEntitiesNoTracking(m => m.ParentId == 0 && m.Status == Status.Pended).Count();
             if (user.IsAdmin)
             {
@@ -74,7 +75,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetMsgs(int page = 1, int size = 10, int cid = 0)
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             int total;
             if (cid != 0)
             {
@@ -123,9 +124,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Put(LeaveMessageInputDto msg)
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             msg.Content = msg.Content.Trim().Replace("<p><br></p>", string.Empty);
-            if (msg.Content.RemoveHtml().Trim().Equals(HttpContext.Session.GetByRedis<string>("msg")))
+            if (msg.Content.RemoveHtml().Trim().Equals(HttpContext.Session.Get<string>("msg")))
             {
                 return ResultData(null, false, "您刚才已经发表过一次留言了！");
             }
@@ -152,7 +153,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             LeaveMessage msg2 = LeaveMessageService.AddEntitySaved(msg.Mapper<LeaveMessage>());
             if (msg2 != null)
             {
-                HttpContext.Session.SetByRedis("msg", msg.Content.RemoveHtml().Trim());
+                HttpContext.Session.Set("msg", msg.Content.RemoveHtml().Trim());
                 var email = CommonHelper.SystemSettings["ReceiveEmail"];
                 string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/notify.html").Replace("{{title}}", "网站留言板").Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg2.NickName).Replace("{{content}}", msg2.Content);
                 if (msg.Status == Status.Pended)

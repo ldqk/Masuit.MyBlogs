@@ -4,7 +4,7 @@
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
-@using Masuit.MyBlogs.Core.Extensions
+@using Masuit.Tools.Core.Net
 @using Masuit.Tools.Systems
 @using Masuit.Tools.Win32
 @model Masuit.MyBlogs.Core.Models.Entity.Post
@@ -12,7 +12,7 @@
     ViewBag.Title = Model.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
-    UserInfoOutputDto user = Context.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+    UserInfoOutputDto user = Context.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
     string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
 }
 <style>

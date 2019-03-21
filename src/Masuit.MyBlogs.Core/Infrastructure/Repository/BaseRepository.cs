@@ -1,13 +1,10 @@
 ﻿using AutoMapper.QueryableExtensions;
-using Dapper;
 using EFSecondLevelCache.Core;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools.Systems;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -22,11 +19,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
     public class BaseRepository<T> : Disposable, IBaseRepository<T> where T : class, new()
     {
         public virtual DataContext DataContext { get; set; }
-        public IDbConnection DbConnection { get; set; }
-        public BaseRepository(DataContext dbContext, IDbConnection connection)
+        public BaseRepository(DataContext dbContext)
         {
             DataContext = dbContext;
-            DbConnection = connection;
         }
 
         /// <summary>
@@ -128,7 +123,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual IEnumerable<T> GetAllFromL2CacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
+        public virtual EFCachedQueryable<T> GetAllFromL2CacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return GetAllNoTracking(orderby, isAsc).Cacheable();
         }
@@ -748,39 +743,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
             //}
             DataContext.BulkInsert(list);
             return list;
-        }
-
-        /// <summary>
-        /// 执行查询语句
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parameters">参数</param>
-        /// <returns>泛型集合</returns>
-        public virtual IQueryable<T> SqlQuery(string sql, params SqlParameter[] parameters)
-        {
-            return DataContext.Set<T>().FromSql(sql, parameters);
-        }
-
-        /// <summary>
-        /// 执行查询语句
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sql"></param>
-        /// <param name="parameters">参数</param>
-        public IEnumerable<TS> SqlQuery<TS>(string sql, object parameters)
-        {
-            var raw = DbConnection.Query<TS>(sql, parameters);
-            return raw;
-        }
-
-        /// <summary>
-        /// 执行DML语句
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parameters"></param>
-        public virtual void ExecuteSql(string sql, params SqlParameter[] parameters)
-        {
-            DataContext.Database.ExecuteSqlCommand(sql, parameters);
         }
 
         public override void Dispose(bool disposing)

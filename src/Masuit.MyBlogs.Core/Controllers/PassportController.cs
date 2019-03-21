@@ -1,7 +1,6 @@
 ﻿using Common;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
-using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -9,6 +8,7 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
@@ -78,7 +78,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 from = HttpUtility.UrlDecode(from);
                 Response.Cookies.Append("refer", from);
             }
-            if (HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) != null)
+            if (HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) != null)
             {
                 if (string.IsNullOrEmpty(from))
                 {
@@ -95,7 +95,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                     Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                    HttpContext.Session.SetByRedis(SessionKey.UserInfo, userInfo);
+                    HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
                     HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString(), LoginType.Default);
                     if (string.IsNullOrEmpty(from))
                     {
@@ -118,12 +118,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Login(string username, string password, string valid, string remem)
         {
-            string validSession = HttpContext.Session.GetByRedis<string>("valid") ?? string.Empty; //将验证码从Session中取出来，用于登录验证比较
+            string validSession = HttpContext.Session.Get<string>("valid") ?? string.Empty; //将验证码从Session中取出来，用于登录验证比较
             if (string.IsNullOrEmpty(validSession) || !valid.Trim().Equals(validSession, StringComparison.InvariantCultureIgnoreCase))
             {
                 return ResultData(null, false, "验证码错误");
             }
-            HttpContext.Session.RemoveByRedis("valid"); //验证成功就销毁验证码Session，非常重要
+            HttpContext.Session.Remove("valid"); //验证成功就销毁验证码Session，非常重要
             if (string.IsNullOrEmpty(username.Trim()) || string.IsNullOrEmpty(password.Trim()))
             {
                 return ResultData(null, false, "用户名或密码不能为空");
@@ -131,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var userInfo = UserInfoService.Login(username, password);
             if (userInfo != null)
             {
-                HttpContext.Session.SetByRedis(SessionKey.UserInfo, userInfo);
+                HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
                 if (remem.Trim().Contains(new[] { "on", "true" })) //是否记住登录
                 {
                     Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
@@ -151,7 +151,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult ValidateCode()
         {
             string code = Tools.Strings.ValidateCode.CreateValidateCode(6);
-            HttpContext.Session.SetByRedis("valid", code); //将验证码生成到Session中
+            HttpContext.Session.Set("valid", code); //将验证码生成到Session中
             var buffer = HttpContext.CreateValidateGraphic(code);
             return this.ResumeFile(buffer, "image/jpeg");
         }
@@ -164,7 +164,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost]
         public ActionResult CheckValidateCode(string code)
         {
-            string validSession = HttpContext.Session.GetByRedis<string>("valid");
+            string validSession = HttpContext.Session.Get<string>("valid");
             if (string.IsNullOrEmpty(validSession) || !code.Trim().Equals(validSession, StringComparison.InvariantCultureIgnoreCase))
             {
                 return ResultData(null, false, "验证码错误");
@@ -178,7 +178,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetUserInfo()
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             if (_env.IsDevelopment())
             {
                 user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
@@ -192,7 +192,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult Logout()
         {
-            HttpContext.Session.RemoveByRedis(SessionKey.UserInfo);
+            HttpContext.Session.Remove(SessionKey.UserInfo);
             Response.Cookies.Delete("username");
             Response.Cookies.Delete("password");
             HttpContext.Session.Clear();

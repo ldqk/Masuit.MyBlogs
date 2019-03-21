@@ -109,4 +109,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         {
         }
     }
+    public partial class BannerService : BaseService<Banner>, IBannerService
+    {
+        public BannerService(IBaseRepository<Banner> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
+        {
+        }
+    }
 }

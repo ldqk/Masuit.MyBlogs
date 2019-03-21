@@ -662,24 +662,17 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 	$scope.isAdd = true;
 	$scope.allowUpload=false;
 	$scope.loading();
-	$scope.post = {};
+	$scope.banner = {};
 	$scope.getdata = function() {
-		$scope.request("/post/gettops", null, function(data) {
-			$scope.tops = data.Data;
-		});
-		$scope.request("/post/getnottops", null, function(data) {
-			$('#post').select3({
-				allowClear: true,
-				items: data.Data,
-				placeholder: '请选择一篇文章'
-			});
+		$scope.request("/banner/get", null, function(data) {
+			$scope.banners = data.Data;
 		});
 	}
 	$scope.getdata();
-	$scope.remove = function(post) {
+	$scope.remove = function(banner) {
 		swal({
-			title: '确定取消头图页吗？',
-			text: post.Title,
+			title: '确定移除这个banner吗？',
+			text: banner.Title,
 			type: 'warning',
 			showCancelButton: true,
 			confirmButtonColor: '#3085d6',
@@ -689,9 +682,7 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 		}).then(function(isConfirm) {
 			if (isConfirm) {
 				$scope.loading();
-				$scope.request("/post/RemoveTop", {
-					id: post.Id
-				}, function(data) {
+				$scope.request("/banner/delete/"+banner.Id, null, function(data) {
 					swal(data.Message, null, 'success');
 					$scope.getdata();
 				});
@@ -699,12 +690,7 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 		}).catch(swal.noop);
 	}
 	$scope.add = function() {
-		//Custombox.open({
-		//	target: '#modal',
-		//	zIndex: 100,
-		//	height: 900
-		//});
-		$scope.post = {};
+		$scope.banner = {};
 		$scope.isAdd = true;
 		$scope.allowUpload=false;
 		layer.open({
@@ -712,7 +698,6 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 			zIndex: 20,
 			title: '设置头图页文章',
 			area: (window.screen.width > 650 ? 650 : window.screen.width) + 'px',// '340px'], //宽高
-			//area: ['650px', '300px'], //宽高
 			content: $("#modal"),
 			cancel: function(index, layero) {
 				setTimeout(function() {
@@ -723,7 +708,7 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 		});
 	}
 	$scope.edit = function (item) {
-		$scope.post = item;
+		$scope.banner = item;
 		$scope.isAdd = false;
 		$scope.allowUpload=false;
 		layer.open({
@@ -731,7 +716,6 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 			zIndex: 20,
 			title: '设置头图页文章',
 			area: (window.screen.width > 650 ? 650 : window.screen.width) + 'px',// '340px'], //宽高
-			//area: ['650px', '250px'], //宽高
 			content: $("#modal"),
 			cancel: function(index, layero) {
 				setTimeout(function() {
@@ -747,11 +731,11 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 			$("#modal").css("display", "none");
 		}, 500);
 	}
-	$scope.submit = function(post) {
+	$scope.submit = function(banner) {
 		if ($scope.isAdd) {
-			post.Id = $('#post').select3("val");
+			banner.Id = 0;
 		}
-		$scope.request("/post/AddTop", post, function(data) {
+		$scope.request("/banner/save", banner, function(data) {
 			//Custombox.close();
 			$scope.closeAll();
 			window.notie.alert({
@@ -760,8 +744,8 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 				time: 4
 			});
 			$scope.getdata();
-			$scope.post.ImageUrl = "";
-			$scope.post.Description = "";
+			$scope.banner.ImageUrl = "";
+			$scope.banner.Description = "";
 		});
 	}
 	$scope.uploadImage = function() {
@@ -774,7 +758,7 @@ myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", functio
 				document.getElementById("coverform").reset();
 				$scope.$apply(function () {
 			     　$scope.allowUpload=false;
-					$scope.post.ImageUrl = data.Data;
+					$scope.banner.ImageUrl = data.Data;
 			    });
 			}
 		});

@@ -8,9 +8,22 @@ namespace Masuit.MyBlogs.Core.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(name: "Banner", columns: table => new
+            {
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                Status = table.Column<int>(nullable: false),
+                Title = table.Column<string>(nullable: false),
+                Description = table.Column<string>(maxLength: 255, nullable: false),
+                Url = table.Column<string>(maxLength: 255, nullable: false),
+                ImageUrl = table.Column<string>(maxLength: 255, nullable: false)
+            }, constraints: table =>
+            {
+                table.PrimaryKey("PK_Banner", x => x.Id);
+            });
+
             migrationBuilder.CreateTable(name: "Broadcast", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Email = table.Column<string>(nullable: true),
                 ValidateCode = table.Column<string>(nullable: true),
@@ -23,7 +36,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "Category", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Name = table.Column<string>(maxLength: 64, nullable: false),
                 Description = table.Column<string>(nullable: true)
@@ -34,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "Donate", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 NickName = table.Column<string>(nullable: true),
                 Email = table.Column<string>(nullable: true),
@@ -51,7 +64,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "FastShare", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Title = table.Column<string>(nullable: true),
                 Link = table.Column<string>(nullable: true),
@@ -63,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "InternalMessage", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Title = table.Column<string>(nullable: true),
                 Content = table.Column<string>(nullable: true),
@@ -77,7 +90,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "LeaveMessage", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 NickName = table.Column<string>(nullable: false),
                 Content = table.Column<string>(nullable: false),
@@ -96,7 +109,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "Links", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Name = table.Column<string>(nullable: false),
                 Url = table.Column<string>(nullable: false),
@@ -109,7 +122,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "Menu", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Name = table.Column<string>(nullable: false),
                 Icon = table.Column<string>(nullable: true),
@@ -125,7 +138,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "Misc", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Title = table.Column<string>(nullable: false),
                 Content = table.Column<string>(nullable: false),
@@ -138,7 +151,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "Notice", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Title = table.Column<string>(nullable: false),
                 Content = table.Column<string>(nullable: false),
@@ -152,7 +165,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "SearchDetails", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 KeyWords = table.Column<string>(nullable: false),
                 SearchTime = table.Column<DateTime>(nullable: false),
                 IP = table.Column<string>(nullable: true)
@@ -163,7 +176,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "Seminar", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Title = table.Column<string>(nullable: false),
                 SubTitle = table.Column<string>(nullable: true),
@@ -175,7 +188,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "SystemSetting", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Name = table.Column<string>(nullable: false),
                 Value = table.Column<string>(nullable: false)
@@ -186,7 +199,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "UserInfo", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Username = table.Column<string>(nullable: false),
                 NickName = table.Column<string>(nullable: false),
@@ -204,7 +217,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "Post", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Title = table.Column<string>(nullable: false),
                 Author = table.Column<string>(maxLength: 24, nullable: false),
@@ -221,9 +234,6 @@ namespace Masuit.MyBlogs.Core.Migrations
                 Keyword = table.Column<string>(maxLength: 256, nullable: true),
                 VoteUpCount = table.Column<int>(nullable: false),
                 VoteDownCount = table.Column<int>(nullable: false),
-                IsBanner = table.Column<bool>(nullable: false),
-                Description = table.Column<string>(maxLength: 255, nullable: true),
-                ImageUrl = table.Column<string>(maxLength: 255, nullable: true),
                 AverageViewCount = table.Column<double>(nullable: false),
                 TotalViewCount = table.Column<int>(nullable: false),
                 IP = table.Column<string>(nullable: true)
@@ -235,7 +245,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "LoginRecord", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 IP = table.Column<string>(nullable: true),
                 LoginTime = table.Column<DateTime>(nullable: false),
@@ -251,7 +261,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "Comment", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 NickName = table.Column<string>(maxLength: 24, nullable: false),
                 Email = table.Column<string>(nullable: true),
@@ -274,7 +284,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "PostAccessRecord", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 PostId = table.Column<int>(nullable: false),
                 AccessTime = table.Column<DateTime>(nullable: false),
@@ -287,7 +297,7 @@ namespace Masuit.MyBlogs.Core.Migrations
 
             migrationBuilder.CreateTable(name: "PostHistoryVersion", columns: table => new
             {
-                Id = table.Column<int>(nullable: false).Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                Id = table.Column<int>(nullable: false).Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                 Status = table.Column<int>(nullable: false),
                 Title = table.Column<string>(maxLength: 64, nullable: false),
                 Content = table.Column<string>(nullable: false),
@@ -333,7 +343,7 @@ namespace Masuit.MyBlogs.Core.Migrations
                     x.Seminar_Id,
                     x.PostHistoryVersion_Id
                 });
-                table.ForeignKey(name: "FK_SeminarPostHistoryVersion_PostHistoryVersion_PostHistoryVersion_Id", column: x => x.PostHistoryVersion_Id, principalTable: "PostHistoryVersion", principalColumn: "Id", onDelete: ReferentialAction.Cascade);
+                table.ForeignKey(name: "FK_SeminarPostHistoryVersion_PostHistoryVersion_PostHistoryVers~", column: x => x.PostHistoryVersion_Id, principalTable: "PostHistoryVersion", principalColumn: "Id", onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(name: "FK_SeminarPostHistoryVersion_Seminar_Seminar_Id", column: x => x.Seminar_Id, principalTable: "Seminar", principalColumn: "Id", onDelete: ReferentialAction.Cascade);
             });
 
@@ -356,6 +366,8 @@ namespace Masuit.MyBlogs.Core.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(name: "Banner");
+
             migrationBuilder.DropTable(name: "Broadcast");
 
             migrationBuilder.DropTable(name: "Comment");

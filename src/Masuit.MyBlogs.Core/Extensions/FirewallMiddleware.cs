@@ -91,7 +91,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 if (t.IsCompletedSuccessfully)
                 {
                     var result = await t;
-                    if (result.Status == 0)
+                    if (result?.Status == 0)
                     {
                         foreach (var key in CommonHelper.DenyAreaIP.Keys)
                         {

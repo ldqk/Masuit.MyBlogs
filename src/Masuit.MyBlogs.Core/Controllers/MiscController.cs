@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -69,7 +70,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("donate")]
         public ActionResult Donate()
         {
-            var user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+            var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             if (user != null && user.IsAdmin)
             {
                 return View("Donate_Admin");

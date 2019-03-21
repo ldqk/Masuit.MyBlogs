@@ -1,4 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Models.DTO;
+using Masuit.MyBlogs.Core.Models.Entity;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -67,6 +68,6 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// banner文章
         /// </summary>
-        public List<PostOutputDto> Banner { get; set; }
+        public List<Banner> Banner { get; set; }
     }
 }

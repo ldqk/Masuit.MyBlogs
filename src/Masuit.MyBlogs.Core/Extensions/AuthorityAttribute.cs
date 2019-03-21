@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +28,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 #if !DEBUG
-            UserInfoOutputDto user = filterContext.HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+            UserInfoOutputDto user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             if (user == null || !user.IsAdmin)
             {
                 //先尝试自动登录
@@ -41,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     {
                         filterContext.HttpContext.Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                         filterContext.HttpContext.Response.Cookies.Append("password", filterContext.HttpContext.Request.Cookies["password"], new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                        filterContext.HttpContext.Session.SetByRedis(SessionKey.UserInfo, userInfo);
+                        filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
                     }
                     else
                     {

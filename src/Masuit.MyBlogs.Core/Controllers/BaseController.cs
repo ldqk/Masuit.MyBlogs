@@ -1,9 +1,9 @@
 ﻿using Masuit.MyBlogs.Core.Configs;
-using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -90,10 +90,10 @@ namespace Masuit.MyBlogs.Core.Controllers
             base.OnActionExecuting(filterContext);
             if (filterContext.HttpContext.Request.Method.Equals("GET", StringComparison.InvariantCultureIgnoreCase)) //get方式的多半是页面
             {
-                UserInfoOutputDto user = filterContext.HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+                UserInfoOutputDto user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
 #if DEBUG
                 user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
-                filterContext.HttpContext.Session.SetByRedis(SessionKey.UserInfo, user);
+                filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
 #endif
                 if (user == null && Request.Cookies.Count > 2) //执行自动登录
                 {
@@ -110,7 +110,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         {
                             Expires = DateTime.Now.AddDays(7)
                         });
-                        filterContext.HttpContext.Session.SetByRedis(SessionKey.UserInfo, userInfo);
+                        filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
                     }
                 }
             }

@@ -5,7 +5,7 @@
 }
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.ViewModel
-@using Masuit.MyBlogs.Core.Extensions
+@using Masuit.Tools.Core.Net
 @model IndexPageViewModel
 <div class="container">
     <ol class="cd-breadcrumb triangle">
@@ -14,6 +14,6 @@
     </ol>
 </div>
 @{
-    UserInfoOutputDto user = Context.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+    UserInfoOutputDto user = Context.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
     await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
 }

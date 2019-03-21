@@ -1,5 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Models.Entity;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 {
@@ -10,7 +10,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        IQueryable<Comment> GetSelfAndAllChildrenCommentsByParentId(int id);
+        List<Comment> GetSelfAndAllChildrenCommentsByParentId(int id);
 
         /// <summary>
         /// 根据无级子级找顶级父级评论

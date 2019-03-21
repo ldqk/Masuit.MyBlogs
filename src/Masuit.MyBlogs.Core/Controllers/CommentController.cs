@@ -6,8 +6,10 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -16,7 +18,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
-using Microsoft.AspNetCore.Http;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -58,10 +59,10 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, false, "评论失败，文章不存在！");
             }
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             comment.Content = comment.Content.Trim().Replace("<p><br></p>", string.Empty);
 
-            if (comment.Content.RemoveHtml().Trim().Equals(HttpContext.Session.GetByRedis<string>("comment" + comment.PostId)))
+            if (comment.Content.RemoveHtml().Trim().Equals(HttpContext.Session.Get<string>("comment" + comment.PostId)))
             {
                 return ResultData(null, false, "您刚才已经在这篇文章发表过一次评论了，换一篇文章吧，或者换一下评论内容吧！");
             }
@@ -87,7 +88,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Comment com = CommentService.AddEntitySaved(comment.Mapper<Comment>());
             if (com != null)
             {
-                HttpContext.Session.SetByRedis("comment" + comment.PostId, comment.Content.RemoveHtml().Trim());
+                HttpContext.Session.Set("comment" + comment.PostId, comment.Content.RemoveHtml().Trim());
                 var emails = new List<string>();
                 var email = CommonHelper.SystemSettings["ReceiveEmail"]; //站长邮箱
                 emails.Add(email);
@@ -190,7 +191,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost]
         public ActionResult GetComments(int? id, int page = 1, int size = 5, int cid = 0)
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             int total; //总条数，用于前台分页
             if (cid != 0)
             {
@@ -241,7 +242,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost]
         public ActionResult GetPageComments(int page = 1, int size = 5, int cid = 0)
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             int total; //总条数，用于前台分页
             if (cid != 0)
             {

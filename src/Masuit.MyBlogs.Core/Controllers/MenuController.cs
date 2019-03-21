@@ -72,7 +72,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
 
-
         /// <summary>
         /// 保持菜单
         /// </summary>

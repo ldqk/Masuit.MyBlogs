@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -28,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("links"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index()
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             List<LinksOutputDto> list = LinksService.LoadEntities<object, LinksOutputDto>(l => l.Status == Status.Available, l => l.Recommend, false).ToList();
             if (user != null && user.IsAdmin)
             {

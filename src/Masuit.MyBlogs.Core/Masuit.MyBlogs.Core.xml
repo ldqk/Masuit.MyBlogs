@@ -299,6 +299,40 @@
             <param name="total">总条数</param>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.AdminController.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
+            <summary>在调用操作方法前调用。</summary>
+            <param name="filterContext">有关当前请求和操作的信息。</param>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Controllers.BannerController">
+            <summary>
+            banner
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Controllers.BannerController.BannerService">
+            <summary>
+            bannerService
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.BannerController.Get">
+            <summary>
+            获取全部
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.BannerController.Save(Masuit.MyBlogs.Core.Models.Entity.Banner)">
+            <summary>
+            保存banner
+            </summary>
+            <param name="banner"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.BannerController.Delete(System.Int32)">
+            <summary>
+            删除banner
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.BaseController">
             <summary>
             基本父控制器
@@ -696,16 +730,10 @@
             快速分享
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.HomeController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ICategoryService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISearchDetailsService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.INoticeService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostAccessRecordService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IFastShareService)">
+        <member name="P:Masuit.MyBlogs.Core.Controllers.HomeController.BannerService">
             <summary>
-            首页
+            banner
             </summary>
-            <param name="postService"></param>
-            <param name="categoryService"></param>
-            <param name="searchDetailsService"></param>
-            <param name="noticeService"></param>
-            <param name="postAccessRecordService"></param>
-            <param name="fastShareService"></param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.HomeController.Index(Masuit.MyBlogs.Core.Models.Enum.OrderBy)">
             <summary>
@@ -1421,32 +1449,6 @@
             <param name="post"></param>
             <param name="timespan"></param>
             <param name="schedule"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.GetTops">
-            <summary>
-            获取头图文章
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.GetNotTops">
-            <summary>
-            获取非头图页文章
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.AddTop(Masuit.MyBlogs.Core.Models.DTO.PostOutputDto)">
-            <summary>
-            添加头图页
-            </summary>
-            <param name="p"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.RemoveTop(System.Int32)">
-            <summary>
-            取消头图页
-            </summary>
-            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.AddSeminar(System.Int32,System.Int32)">
@@ -2237,50 +2239,6 @@
             </summary>
             <param name="next"></param>
         </member>
-        <member name="T:Masuit.MyBlogs.Core.Extensions.SessionExt">
-            <summary>
-            session扩展
-            </summary>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Extensions.SessionExt.SetByRedis``1(Microsoft.AspNetCore.Http.ISession,System.String,``0,System.Int32)">
-            <summary>
-            将Session存到Redis，需要先在config中配置链接字符串，连接字符串在config配置文件中的ConnectionStrings节下配置，name固定为RedisHosts，值的格式：127.0.0.1:6379,allowadmin=true，若未正确配置，将按默认值“127.0.0.1:6379,allowadmin=true”进行操作，如：<br/>
-            &lt;connectionStrings&gt;<br/>
-                 &lt;add name = "RedisHosts" connectionString="127.0.0.1:6379,allowadmin=true"/&gt;<br/>
-            &lt;/connectionStrings&gt;
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="session"></param>
-            <param name="key">键</param>
-            <param name="obj">需要存的对象</param>
-            <param name="expire">过期时间，默认20分钟</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Extensions.SessionExt.GetByRedis``1(Microsoft.AspNetCore.Http.ISession,System.String,System.Int32)">
-            <summary>
-            从Redis取Session
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="session"></param>
-            <param name="key">键</param>
-            <param name="expire">过期时间，默认20分钟</param>
-            <returns></returns> 
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Extensions.SessionExt.RemoveByRedis(Microsoft.AspNetCore.Http.ISession,System.String)">
-            <summary>
-            从Redis移除对应键的Session
-            </summary>
-            <param name="session"></param>
-            <param name="key"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Extensions.SessionExt.SessionCount(Microsoft.AspNetCore.Http.ISession)">
-            <summary>
-            Session个数
-            </summary>
-            <param name="session"></param>
-            <returns></returns>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Extensions.UEditor.ConfigHandler">
             <summary>
             Config 的摘要说明
@@ -2956,29 +2914,6 @@
             <param name="list">实体集合</param>
             <returns>添加成功</returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.SqlQuery(System.String,System.Data.SqlClient.SqlParameter[])">
-            <summary>
-            执行查询语句
-            </summary>
-            <param name="sql"></param>
-            <param name="parameters">参数</param>
-            <returns>泛型集合</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.SqlQuery``1(System.String,System.Object)">
-            <summary>
-            执行查询语句
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="sql"></param>
-            <param name="parameters">参数</param>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.ExecuteSql(System.String,System.Data.SqlClient.SqlParameter[])">
-            <summary>
-            执行DML语句
-            </summary>
-            <param name="sql"></param>
-            <param name="parameters"></param>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.GetAll">
             <summary>
             获取所有实体
@@ -3475,29 +3410,6 @@
             </summary>
             <param name="list">实体集合</param>
             <returns>添加成功</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.SqlQuery(System.String,System.Data.SqlClient.SqlParameter[])">
-            <summary>
-            执行查询语句
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="sql"></param>
-            <param name="parameters">参数</param>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.SqlQuery``1(System.String,System.Object)">
-            <summary>
-            执行查询语句
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="sql"></param>
-            <param name="parameters">参数</param>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.ExecuteSql(System.String,System.Data.SqlClient.SqlParameter[])">
-            <summary>
-            执行DML语句
-            </summary>
-            <param name="sql"></param>
-            <param name="parameters"></param>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1">
             <summary>
@@ -4094,31 +4006,6 @@
             <param name="list">实体集合</param>
             <returns>添加成功</returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SqlQuery(System.String,System.Data.SqlClient.SqlParameter[])">
-            <summary>
-            执行查询语句
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="sql"></param>
-            <param name="parameters">参数</param>
-            <returns>泛型集合</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.SqlQuery``1(System.String,System.Object)">
-            <summary>
-            执行查询语句
-            </summary>
-            <typeparam name="TS"></typeparam>
-            <param name="sql"></param>
-            <param name="parameters">参数</param>
-            <returns>泛型集合</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.ExecuteSql(System.String,System.Data.SqlClient.SqlParameter[])">
-            <summary>
-            执行DML语句
-            </summary>
-            <param name="sql"></param>
-            <param name="parameters"></param>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.BulkInsert(System.Collections.Generic.IEnumerable{`0})">
             <summary>
             批量添加实体
@@ -4145,11 +4032,25 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.CommentService.GetSelfAndAllChildrenCommentsByParentId(Masuit.MyBlogs.Core.Models.Entity.Comment,System.Collections.Generic.List{Masuit.MyBlogs.Core.Models.Entity.Comment})">
+            <summary>
+            通过存储过程获得自己以及自己所有的子元素集合
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.CommentService.GetParentCommentIdByChildId(System.Int32)">
             <summary>
             根据无级子级找顶级父级评论id
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.CommentService.GetParentCommentIdByChildId(Masuit.MyBlogs.Core.Models.Entity.Comment)">
+            <summary>
+            根据无级子级找顶级父级评论id
+            </summary>
+            <param name="com"></param>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.GetAll">
@@ -4741,30 +4642,6 @@
             <param name="list">实体集合</param>
             <returns>添加成功</returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SqlQuery(System.String,System.Data.SqlClient.SqlParameter[])">
-            <summary>
-            执行查询语句
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="sql"></param>
-            <param name="parameters">参数</param>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.SqlQuery``1(System.String,System.Object)">
-            <summary>
-            执行查询语句
-            </summary>
-            <typeparam name="TS"></typeparam>
-            <param name="sql"></param>
-            <param name="parameters"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.ExecuteSql(System.String,System.Data.SqlClient.SqlParameter[])">
-            <summary>
-            执行DML语句
-            </summary>
-            <param name="sql"></param>
-            <param name="parameters"></param>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.BulkInsert(System.Collections.Generic.IEnumerable{`0})">
             <summary>
             批量添加实体
@@ -4877,6 +4754,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(Masuit.MyBlogs.Core.Models.Entity.LeaveMessage,System.Collections.Generic.List{Masuit.MyBlogs.Core.Models.Entity.LeaveMessage})">
+            <summary>
+            通过存储过程获得自己以及自己所有的子元素集合
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.LeaveMessageService.GetParentMessageIdByChildId(System.Int32)">
             <summary>
             根据无级子级找顶级父级留言id
@@ -4884,7 +4768,21 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.LeaveMessageService.GetParentMessageIdByChildId(Masuit.MyBlogs.Core.Models.Entity.LeaveMessage)">
+            <summary>
+            根据无级子级找顶级父级评论id
+            </summary>
+            <param name="m"></param>
+            <returns></returns>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.MenuService.GetChildrenMenusByParentId(System.Int32)">
+            <summary>
+            通过存储过程获得自己以及自己所有的子元素集合
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.MenuService.GetChildrenMenusByParentId(Masuit.MyBlogs.Core.Models.Entity.Menu,System.Collections.Generic.List{Masuit.MyBlogs.Core.Models.Entity.Menu})">
             <summary>
             通过存储过程获得自己以及自己所有的子元素集合
             </summary>
@@ -5759,21 +5657,6 @@
             反对数
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.IsBanner">
-            <summary>
-            是否是头图文章
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.Description">
-            <summary>
-            描述
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.ImageUrl">
-            <summary>
-            图片地址
-            </summary>
-        </member>
         <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.CommentCount">
             <summary>
             评论数
@@ -5962,6 +5845,31 @@
         <member name="P:Masuit.MyBlogs.Core.Models.DTO.UserInfoOutputDto.Avatar">
             <summary>
             用户头像
+            </summary>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Models.Entity.Banner">
+            <summary>
+            banner
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Banner.Title">
+            <summary>
+            标题
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Banner.Description">
+            <summary>
+            描述
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Banner.Url">
+            <summary>
+            banner指向地址
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Banner.ImageUrl">
+            <summary>
+            图片地址
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Models.Entity.BaseEntity">
@@ -6442,21 +6350,6 @@
         <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.VoteDownCount">
             <summary>
             反对数
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.IsBanner">
-            <summary>
-            是否是头图文章
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.Description">
-            <summary>
-            描述
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.ImageUrl">
-            <summary>
-            图片地址
             </summary>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.AverageViewCount">

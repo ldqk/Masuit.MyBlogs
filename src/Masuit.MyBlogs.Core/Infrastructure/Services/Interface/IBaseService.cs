@@ -1,7 +1,6 @@
 ﻿using EFSecondLevelCache.Core;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -82,7 +81,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IEnumerable<T> GetAllFromL2CacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true);
+        EFCachedQueryable<T> GetAllFromL2CacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true);
 
         /// <summary>
         /// 获取所有实体
@@ -597,29 +596,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <param name="list">实体集合</param>
         /// <returns>添加成功</returns>
         Task<IEnumerable<T>> AddEntitiesAsync(IList<T> list);
-
-        /// <summary>
-        /// 执行查询语句
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sql"></param>
-        /// <param name="parameters">参数</param>
-        IQueryable<T> SqlQuery(string sql, params SqlParameter[] parameters);
-
-        /// <summary>
-        /// 执行查询语句
-        /// </summary>
-        /// <typeparam name="TS"></typeparam>
-        /// <param name="sql"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
-        IEnumerable<TS> SqlQuery<TS>(string sql, object parameters = null);
-        /// <summary>
-        /// 执行DML语句
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parameters"></param>
-        void ExecuteSql(string sql, params SqlParameter[] parameters);
 
         /// <summary>
         /// 批量添加实体

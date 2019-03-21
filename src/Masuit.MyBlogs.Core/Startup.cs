@@ -6,6 +6,7 @@ using CSRedis;
 using EFSecondLevelCache.Core;
 using Hangfire;
 using Hangfire.Dashboard;
+using Hangfire.MemoryStorage;
 using JiebaNet.Segmenter;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Extensions;
@@ -18,6 +19,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.AspNetCore;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,8 +38,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
-using System.Data;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -82,9 +82,9 @@ namespace Masuit.MyBlogs.Core
             }); //配置Cookie策略
             services.AddDbContext<DataContext>(opt =>
             {
-                //opt.UseMySql(AppConfig.ConnString);
-                opt.UseSqlServer(AppConfig.ConnString);
-            }).AddTransient<IDbConnection>(p => new SqlConnection(AppConfig.ConnString)); //配置数据库
+                opt.UseMySql(AppConfig.ConnString);
+                //opt.UseSqlServer(AppConfig.ConnString);
+            }); //配置数据库
             services.AddCors(opt =>
             {
                 opt.AddDefaultPolicy(p =>
@@ -116,7 +116,8 @@ namespace Masuit.MyBlogs.Core
             }); //配置请求长度
 
             services.AddSession(); //注入Session
-            services.AddHangfire(x => x.UseRedisStorage(AppConfig.Redis)); //配置hangfire
+            //services.AddHangfire(x => x.UseRedisStorage(AppConfig.Redis)); //配置hangfire
+            services.AddHangfire(x => x.UseMemoryStorage()); //配置hangfire
 
             services.AddSevenZipCompressor().AddResumeFileResult().AddSearchEngine<DataContext>(new LuceneIndexerOptions() { Path = "lucene" });// 配置7z和断点续传和Redis和Lucene搜索引擎
             RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
@@ -259,7 +260,7 @@ namespace Masuit.MyBlogs.Core
 #if DEBUG
             return true;
 #endif
-            UserInfoOutputDto user = context.GetHttpContext().Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoOutputDto user = context.GetHttpContext().Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             return user.IsAdmin;
         }
     }

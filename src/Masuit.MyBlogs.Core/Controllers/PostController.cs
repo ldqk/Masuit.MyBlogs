@@ -14,6 +14,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Html;
 using Masuit.Tools.Security;
@@ -83,7 +84,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (post != null)
             {
                 ViewBag.Keyword = post.Keyword + "," + post.Label;
-                UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+                UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
                 DateTime modifyDate = post.ModifyDate;
                 ViewBag.Next = PostService.GetFirstEntityNoTracking(p => p.ModifyDate > modifyDate && (p.Status == Status.Pended || user.IsAdmin), p => p.ModifyDate);
                 ViewBag.Prev = PostService.GetFirstEntityNoTracking(p => p.ModifyDate < modifyDate && (p.Status == Status.Pended || user.IsAdmin), p => p.ModifyDate, false);
@@ -101,10 +102,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                     return RedirectToAction("Post", "Home");
                 }
 
-                if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.GetByRedis<string>("post" + id)))
+                if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
                 {
                     HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.RecordPostVisit), args: id);
-                    HttpContext.Session.SetByRedis("post" + id, id.ToString());
+                    HttpContext.Session.Set("post" + id, id.ToString());
                 }
 
                 return View(post);
@@ -153,7 +154,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "hid" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult HistoryVersion(int id, int hid)
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             var post = PostHistoryVersionService.GetById(hid);
             if (post is null)
             {
@@ -268,7 +269,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             });
             ViewBag.Category = CategoryService.LoadEntitiesNoTracking(c => c.Status == Status.Available).ToList();
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             if (user != null)
             {
                 return View("Publish_Admin", result.Distinct().OrderBy(s => s));
@@ -285,7 +286,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Publish(PostInputDto post)
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo);
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
                 return ResultData(null, message: "请选择一个分类");
@@ -372,7 +373,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("all"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult All()
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             List<string> tags = PostService.GetAll().Select(p => p.Label).ToList(); //tag
             List<string> result = new List<string>();
             tags.ForEach(s =>
@@ -414,7 +415,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var s = RedisHelper.Get("ArticleViewToken");
             if (token.Equals(s))
             {
-                HttpContext.Session.SetByRedis("ArticleViewToken", token);
+                HttpContext.Session.Set("ArticleViewToken", token);
                 return ResultData(null);
             }
 
@@ -974,70 +975,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             return ResultData(null, false, "文章发表失败！");
-        }
-
-        /// <summary>
-        /// 获取头图文章
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult GetTops()
-        {
-            var list = PostService.LoadEntities<DateTime, PostOutputDto>(p => p.Status == Status.Pended && p.IsBanner, p => p.ModifyDate, false).Select(p => new
-            {
-                p.Id,
-                p.Description,
-                p.Title,
-                p.ImageUrl
-            }).ToList();
-            return ResultData(list);
-        }
-
-        /// <summary>
-        /// 获取非头图页文章
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult GetNotTops()
-        {
-            var list = PostService.LoadEntitiesNoTracking(p => p.Status == Status.Pended && !p.IsBanner).GroupBy(p => p.Category.Name).Select(g => new
-            {
-                text = g.Key,
-                children = g.OrderBy(p => p.Title).Select(p => new
-                {
-                    id = p.Id,
-                    text = p.Title
-                })
-            }).ToList();
-            return ResultData(list);
-        }
-
-        /// <summary>
-        /// 添加头图页
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        [HttpPost, Authority]
-        public ActionResult AddTop(PostOutputDto p)
-        {
-            Post post = PostService.GetById(p.Id);
-            post.IsBanner = true;
-            post.Description = p.Description;
-            post.ImageUrl = p.ImageUrl;
-            bool b = PostService.UpdateEntitySaved(post);
-            return ResultData(null, b, b ? "添加头图页成功" : "添加头图页失败！");
-        }
-
-        /// <summary>
-        /// 取消头图页
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [Authority, HttpPost]
-        public ActionResult RemoveTop(int id)
-        {
-            Post post = PostService.GetById(id);
-            post.IsBanner = false;
-            bool b = PostService.UpdateEntitySaved(post);
-            return ResultData(null, b, b ? "取消头图页成功" : "取消头图页失败！");
         }
 
         /// <summary>

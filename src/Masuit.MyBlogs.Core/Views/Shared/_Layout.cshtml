@@ -3,12 +3,12 @@
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools
-@using Masuit.MyBlogs.Core.Extensions
+@using Masuit.Tools.Core.Net
 @using Masuit.Tools.Win32
 @{
     string[] colors = { "success", "info", "warning", "danger", "default" };
     IList<MenuOutputDto> menus = ViewBag.menus;
-    UserInfoOutputDto user = Context.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+    UserInfoOutputDto user = Context.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
     PageFootViewModel footer = ViewBag.Footer;
 }
 

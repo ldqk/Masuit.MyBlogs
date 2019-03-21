@@ -1,12 +1,12 @@
 ﻿using AutoMapper.QueryableExtensions;
 using EFSecondLevelCache.Core;
-using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -53,23 +53,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IFastShareService FastShareService { get; set; }
 
         /// <summary>
-        /// 首页
+        /// banner
         /// </summary>
-        /// <param name="postService"></param>
-        /// <param name="categoryService"></param>
-        /// <param name="searchDetailsService"></param>
-        /// <param name="noticeService"></param>
-        /// <param name="postAccessRecordService"></param>
-        /// <param name="fastShareService"></param>
-        public HomeController(IPostService postService, ICategoryService categoryService, ISearchDetailsService searchDetailsService, INoticeService noticeService, IPostAccessRecordService postAccessRecordService, IFastShareService fastShareService)
-        {
-            CategoryService = categoryService;
-            PostService = postService;
-            SearchDetailsService = searchDetailsService;
-            NoticeService = noticeService;
-            PostAccessRecordService = postAccessRecordService;
-            FastShareService = fastShareService;
-        }
+        public IBannerService BannerService { get; set; }
 
         /// <summary>
         /// 首页
@@ -80,23 +66,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index(OrderBy orderBy = OrderBy.ModifyDate)
         {
             //ViewBag.Total = 0;
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
-            var tops = PostService.LoadEntitiesFromL2CacheNoTracking(t => t.Status == Status.Pended && t.IsBanner, p => p.ModifyDate, false).Select(p => new
-            {
-                p.Title,
-                p.Description,
-                p.Id,
-                p.ImageUrl
-            }).ToList();
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            var banners = BannerService.GetAllFromL2CacheNoTracking(b => b.Id, false).ToList();
             List<FastShare> fastShares = FastShareService.GetAllFromL2CacheNoTracking(s => s.Sort).ToList();
             ViewBag.FastShare = fastShares;
             var viewModel = GetIndexPageViewModel(1, 15, orderBy, user);
-            var banner = new List<PostOutputDto>();
-            tops.ForEach(t =>
-            {
-                banner.Add(t.MapTo<PostOutputDto>());
-            });
-            viewModel.Banner = banner;
+            viewModel.Banner = banners;
             return View(viewModel);
         }
 
@@ -110,7 +85,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("p/{page:int?}/{size:int?}/{orderBy:int?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Post(int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             ViewBag.Total = PostService.LoadEntitiesFromL2Cache<PostOutputDto>(p => p.Status == Status.Pended || user.IsAdmin && !p.IsFixedTop).Count(p => !p.IsFixedTop);
             var viewModel = GetIndexPageViewModel(page, size, orderBy, user);
             return View(viewModel);
@@ -128,7 +103,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Tag(string id, int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {
             IList<PostOutputDto> posts;
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             var temp = PostService.LoadEntities<PostOutputDto>(p => p.Label.Contains(id) && (p.Status == Status.Pended || user.IsAdmin)).OrderByDescending(p => p.IsFixedTop);
             switch (orderBy)
             {
@@ -170,7 +145,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("cat/{id:int}/{page:int?}/{size:int?}/{orderBy:int?}")]
         public async Task<ActionResult> Category(int id, int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {
-            UserInfoOutputDto user = HttpContext.Session.GetByRedis<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             var cat = await CategoryService.GetByIdAsync(id).ConfigureAwait(true);
             if (cat is null) return RedirectToAction("Index", "Error");
             var posts = PostService.LoadEntitiesNoTracking(p => p.CategoryId == cat.Id && (p.Status == Status.Pended || user.IsAdmin)).OrderByDescending(p => p.IsFixedTop);
@@ -234,9 +209,23 @@ namespace Masuit.MyBlogs.Core.Controllers
                     break;
             }
             var hot6Post = postList.OrderByDescending(order).Skip(0).Take(5).Cacheable().ToList(); //热门文章
-            var topPostWeek = PostService.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(week,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章周排行
-            var topPostMonth = PostService.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(month,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章月排行
-            var topPostToday = PostService.SqlQuery<SimplePostModel>("SELECT [Id],[Title] from Post WHERE Id in (SELECT top 10 PostId FROM [dbo].[PostAccessRecord] where DATEDIFF(day,AccessTime,getdate())<=1 GROUP BY PostId ORDER BY sum(ClickCount) desc)").ToList(); //文章今日排行
+            var topPostToday = PostAccessRecordService.LoadPageEntitiesNoTracking(1, 10, out _, p => p.AccessTime > DateTime.Today, r => r.ClickCount, false).Select(r => new SimplePostModel()
+            {
+                Id = r.PostId,
+                Title = r.Post.Title
+            }).Cacheable().ToList();//文章今日排行
+            var week = DateTime.Today.AddDays(-7);
+            var topPostWeek = PostAccessRecordService.LoadPageEntitiesNoTracking(1, 10, out _, p => p.AccessTime > week, r => r.ClickCount, false).Select(r => new SimplePostModel()
+            {
+                Id = r.PostId,
+                Title = r.Post.Title
+            }).Cacheable().ToList(); //文章周排行
+            var month = DateTime.Today.AddMonths(-1);
+            var topPostMonth = PostAccessRecordService.LoadPageEntitiesNoTracking(1, 10, out _, p => p.AccessTime > month, r => r.ClickCount, false).Select(r => new SimplePostModel()
+            {
+                Id = r.PostId,
+                Title = r.Post.Title
+            }).Cacheable().ToList(); //文章月排行
             var tags = new List<string>(); //标签云
             var tagdic = new Dictionary<string, int>();
             var newdic = new Dictionary<string, int>(); //标签云最终结果

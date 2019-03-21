@@ -4,7 +4,6 @@ using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -20,6 +19,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public virtual IBaseRepository<T> BaseDal { get; set; }
         protected readonly ISearchEngine<DataContext> _searchEngine;
         protected readonly ILuceneIndexSearcher _searcher;
+
         public BaseService(IBaseRepository<T> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher)
         {
             BaseDal = repository;
@@ -126,7 +126,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual IEnumerable<T> GetAllFromL2CacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
+        public virtual EFCachedQueryable<T> GetAllFromL2CacheNoTracking<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return BaseDal.GetAllFromL2CacheNoTracking(orderby, isAsc);
         }
@@ -445,8 +445,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual IQueryable<T> LoadPageEntities<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby,
-            bool isAsc = true)
+        public virtual IQueryable<T> LoadPageEntities<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
             return BaseDal.LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc);
         }
@@ -850,40 +849,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             IEnumerable<T> entities = BaseDal.AddEntities(list);
             await SaveChangesAsync();
             return entities;
-        }
-
-        /// <summary>
-        /// 执行查询语句
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sql"></param>
-        /// <param name="parameters">参数</param>
-        /// <returns>泛型集合</returns>
-        public virtual IQueryable<T> SqlQuery(string sql, params SqlParameter[] parameters)
-        {
-            return BaseDal.SqlQuery(sql, parameters);
-        }
-
-        /// <summary>
-        /// 执行查询语句
-        /// </summary>
-        /// <typeparam name="TS"></typeparam>
-        /// <param name="sql"></param>
-        /// <param name="parameters">参数</param>
-        /// <returns>泛型集合</returns>
-        public virtual IEnumerable<TS> SqlQuery<TS>(string sql, object parameters = null)
-        {
-            return BaseDal.SqlQuery<TS>(sql, parameters);
-        }
-
-        /// <summary>
-        /// 执行DML语句
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parameters"></param>
-        public virtual void ExecuteSql(string sql, params SqlParameter[] parameters)
-        {
-            BaseDal.ExecuteSql(sql, parameters);
         }
 
         /// <summary>
