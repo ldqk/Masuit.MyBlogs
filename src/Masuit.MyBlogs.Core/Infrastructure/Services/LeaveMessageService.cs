@@ -67,7 +67,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         private int GetParentMessageIdByChildId(LeaveMessage m)
         {
-            LeaveMessage msg = GetFirstEntity(c => c.Id == m.ParentId);
+            LeaveMessage msg = GetFirstEntityNoTracking(c => c.Id == m.ParentId);
             if (msg != null)
             {
                 return GetParentMessageIdByChildId(msg);

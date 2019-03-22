@@ -347,7 +347,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IEnumerable<T> LoadPageEntitiesFromL2Cache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc);
+        EFCachedQueryable<T> LoadPageEntitiesFromL2Cache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc);
 
         /// <summary>
         /// 高效分页查询方法，优先从二级缓存读取，取出被AutoMapper映射后的数据集合
@@ -361,7 +361,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IEnumerable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc) where TDto : class;
+        EFCachedQueryable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc) where TDto : class;
 
         /// <summary>
         /// 高效分页查询方法（不跟踪实体）

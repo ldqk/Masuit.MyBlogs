@@ -469,7 +469,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual IEnumerable<T> LoadPageEntitiesFromL2Cache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
+        public virtual EFCachedQueryable<T> LoadPageEntitiesFromL2Cache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
         {
             return LoadPageEntities(pageIndex, pageSize, out totalCount, where, orderby, isAsc).Cacheable();
         }
@@ -547,7 +547,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual IEnumerable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
+        public virtual EFCachedQueryable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
             return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectTo<TDto>().Cacheable();
         }

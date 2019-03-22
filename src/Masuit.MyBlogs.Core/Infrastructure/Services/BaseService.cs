@@ -478,7 +478,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual IEnumerable<T> LoadPageEntitiesFromL2Cache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
+        public virtual EFCachedQueryable<T> LoadPageEntitiesFromL2Cache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return BaseDal.LoadPageEntitiesFromL2Cache(pageIndex, pageSize, out totalCount, where, orderby, isAsc);
         }
@@ -495,7 +495,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual IEnumerable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc) where TDto : class
+        public virtual EFCachedQueryable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc) where TDto : class
         {
             return BaseDal.LoadPageEntitiesFromL2Cache<TS, TDto>(pageIndex, pageSize, out totalCount, where, orderby, isAsc);
         }

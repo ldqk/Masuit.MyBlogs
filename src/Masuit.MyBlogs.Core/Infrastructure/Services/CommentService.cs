@@ -67,7 +67,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         private int GetParentCommentIdByChildId(Comment com)
         {
-            Comment comment = GetFirstEntity(c => c.Id == com.ParentId);
+            Comment comment = GetFirstEntityNoTracking(c => c.Id == com.ParentId);
             if (comment != null)
             {
                 return GetParentCommentIdByChildId(comment);
