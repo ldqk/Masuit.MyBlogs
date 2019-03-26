@@ -40,20 +40,20 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// </summary>
         public List<KeywordsRankOutputDto> HotSearch { get; set; }
 
-        /// <summary>
-        /// 文章周排行
-        /// </summary>
-        public List<SimplePostModel> TopPostByWeek { get; set; }
+        ///// <summary>
+        ///// 文章周排行
+        ///// </summary>
+        //public List<SimplePostModel> TopPostByWeek { get; set; }
 
-        /// <summary>
-        /// 文章月排行
-        /// </summary>
-        public List<SimplePostModel> TopPostByMonth { get; set; }
+        ///// <summary>
+        ///// 文章月排行
+        ///// </summary>
+        //public List<SimplePostModel> TopPostByMonth { get; set; }
 
-        /// <summary>
-        /// 文章年度排行
-        /// </summary>
-        public List<SimplePostModel> TopPostByToday { get; set; }
+        ///// <summary>
+        ///// 文章年度排行
+        ///// </summary>
+        //public List<SimplePostModel> TopPostByToday { get; set; }
 
         /// <summary>
         /// 热门文章

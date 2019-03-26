@@ -1,6 +1,5 @@
 ﻿@using Common
 @using Masuit.MyBlogs.Core.Models.DTO
-@using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.Tools.Html
 @using Masuit.Tools.Win32
 @model Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel
@@ -74,59 +73,56 @@
         </article>
     </section>
 
-    <section class="wow border animated fadeIn">
-        <div class="tabs">
-            <div class="tabs-header">
-                <div class="border-bot"></div>
-                <ul>
-                    <li class="active">
-                        <a href="#tab-1" tab-id="1" ripple="ripple" ripple-color="#FFF">今日排行</a>
-                    </li>
-                    <li>
-                        <a href="#tab-2" tab-id="2" ripple="ripple" ripple-color="#FFF">本周排行</a>
-                    </li>
-                    <li>
-                        <a class="hidden-md" href="#tab-3" tab-id="3" ripple="ripple" ripple-color="#FFF">月排行</a>
-                    </li>
-                </ul>
-                <!-- <nav class="tabs-nav">
-                    <i id="prev" ripple="ripple" ripple-color="#FFF" class="material-icons">&#xE314;</i><i id="next" ripple="ripple" ripple-color="#FFF" class="material-icons">&#xE315;</i>
-                </nav> -->
-            </div>
-            <div class="tabs-content" style="font-size: 14px">
-                <div tab-id="1" class="tab active">
-                    <ul class="list-group text-center">
-                        @foreach (var post in Model.TopPostByToday)
-                        {
-                            <li class="list-group-item">
-                                @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null)
-                            </li>
-                        }
+    @*<section class="wow border animated fadeIn">
+            <div class="tabs">
+                <div class="tabs-header">
+                    <div class="border-bot"></div>
+                    <ul>
+                        <li class="active">
+                            <a href="#tab-1" tab-id="1" ripple="ripple" ripple-color="#FFF">今日排行</a>
+                        </li>
+                        <li>
+                            <a href="#tab-2" tab-id="2" ripple="ripple" ripple-color="#FFF">本周排行</a>
+                        </li>
+                        <li>
+                            <a class="hidden-md" href="#tab-3" tab-id="3" ripple="ripple" ripple-color="#FFF">月排行</a>
+                        </li>
                     </ul>
                 </div>
-                <div tab-id="2" class="tab">
-                    <ul class="list-group text-center">
-                        @foreach (var post in Model.TopPostByWeek)
-                        {
-                            <li class="list-group-item">
-                                @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null)
-                            </li>
-                        }
-                    </ul>
-                </div>
-                <div tab-id="3" class="tab">
-                    <ul class="list-group text-center">
-                        @foreach (var post in Model.TopPostByMonth)
-                        {
-                            <li class="list-group-item">
-                                @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null)
-                            </li>
-                        }
-                    </ul>
+                <div class="tabs-content" style="font-size: 14px">
+                    <div tab-id="1" class="tab active">
+                        <ul class="list-group text-center">
+                            @foreach (var post in Model.TopPostByToday)
+                            {
+                                <li class="list-group-item">
+                                    @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null)
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div tab-id="2" class="tab">
+                        <ul class="list-group text-center">
+                            @foreach (var post in Model.TopPostByWeek)
+                            {
+                                <li class="list-group-item">
+                                    @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null)
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div tab-id="3" class="tab">
+                        <ul class="list-group text-center">
+                            @foreach (var post in Model.TopPostByMonth)
+                            {
+                                <li class="list-group-item">
+                                    @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null)
+                                </li>
+                            }
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>*@
 
     <section class="wow animated fadeIn">
         <div class="leaderboard-box">
@@ -163,62 +159,6 @@
 				C13.195,16.578,13.344,17.436,13.673,18.301z M12.5,14.276c-2.856,0-4.93-2.638-4.93-6.273V1.73h9.859v6.273
 				C17.43,11.638,15.357,14.276,12.5,14.276z M21.215,7.138h-1.452c-0.197,0-0.39,0.024-0.572,0.07v-2.06
 				c0-1.097,0.908-1.99,2.024-1.99c1.117,0,2.025,0.893,2.025,1.99C23.241,6.246,22.333,7.138,21.215,7.138z" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -277,38 +217,6 @@
             </div>
         </article>
     </section>
-
-    @*<section class="wow animated fadeIn">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <span class="glyphicon glyphicon-list-alt"></span><b> 最新评论</b>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <ul class="demo1" style="min-height: 240px;">
-                                @if (Model.Comments.Any())
-                                {
-                                    foreach (CommentOutputDto comment in Model.Comments)
-                                    {
-                                        <li class="news-item">
-                                            <span class="text-@colors[new Random().StrictNext(100) % colors.Length]">
-                                                @comment.NickName
-                                            </span>
-                                            说：<a href="@Url.Action("Details","Post", new {id = comment.PostId, cid = comment.Id})#comment" class="tippy-scale" title="查看详情">@comment.Content.RemoveHtmlTag(35)...</a>
-                                        </li>
-                                    }
-                                }
-                                else
-                                {
-                                    <li class="news-item">没有评论...</li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>*@
 
     <section class="wow animated fadeIn">
         <article class="panel panel-primary">

@@ -1059,9 +1059,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             var history = PostHistoryVersionService.GetById(id);
             if (history != null)
             {
-                var version = history.Post.Mapper<PostHistoryVersion>();
-                version.Id = 0;
-                PostHistoryVersionService.AddEntity(version);
+                //var version = history.Post.Mapper<PostHistoryVersion>();
+                //version.Id = 0;
+                //PostHistoryVersionService.AddEntity(version);
                 history.Post.Category = history.Category;
                 history.Post.CategoryId = history.CategoryId;
                 history.Post.Content = history.Content;
@@ -1080,6 +1080,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
                 history.Post.ModifyDate = history.ModifyDate;
                 bool b = PostHistoryVersionService.UpdateEntitySaved(history);
+                PostHistoryVersionService.DeleteByIdSaved(id);
                 return ResultData(null, b, b ? "回滚成功" : "回滚失败");
             }
 

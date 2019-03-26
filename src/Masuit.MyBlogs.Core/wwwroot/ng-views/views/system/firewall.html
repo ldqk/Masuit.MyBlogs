@@ -67,9 +67,6 @@
             <td filter="{RequestUrl: 'text'}" sortable="'RequestUrl'" title="'请求URL'">
                 <a ng-href="{{row.RequestUrl}}" target="_blank">{{row.RequestUrl}}</a>
             </td>
-            <td filter="{Address: 'text'}" sortable="'Address'" title="'地理位置'">
-                {{row.Address}}
-            </td>
             <td sortable="'Time'" title="'拦截时间'">
                 {{row.Time|date:'yyyy-MM-dd HH:mm:ss'}}
             </td>

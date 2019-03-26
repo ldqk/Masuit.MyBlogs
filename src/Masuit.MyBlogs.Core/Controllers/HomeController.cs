@@ -209,11 +209,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                     break;
             }
             var hot6Post = postList.OrderByDescending(order).Skip(0).Take(5).Cacheable().ToList(); //热门文章
-            var topPostToday = PostService.LoadPageEntitiesFromL2Cache<int, SimplePostModel>(1, 10, out _, p => p.Status == Status.Pended, p => p.PostAccessRecord.Where(r => r.AccessTime > DateTime.Today).Sum(r => r.ClickCount), false).ToList();//文章今日排行
-            var week = DateTime.Today.AddDays(-7);
-            var topPostWeek = PostService.LoadPageEntitiesFromL2Cache<int, SimplePostModel>(1, 10, out _, p => p.Status == Status.Pended, p => p.PostAccessRecord.Where(r => r.AccessTime > week).Sum(r => r.ClickCount), false).ToList(); //文章周排行
-            var month = DateTime.Today.AddMonths(-1);
-            var topPostMonth = PostService.LoadPageEntitiesFromL2Cache<int, SimplePostModel>(1, 10, out _, p => p.Status == Status.Pended, p => p.PostAccessRecord.Where(r => r.AccessTime > month).Sum(r => r.ClickCount), false).ToList(); //文章月排行
+            //var topPostToday = PostService.LoadPageEntitiesFromL2Cache<int, SimplePostModel>(1, 10, out _, p => p.Status == Status.Pended, p => p.PostAccessRecord.Where(r => r.AccessTime > DateTime.Today).Sum(r => r.ClickCount), false).ToList();//文章今日排行
+            //var week = DateTime.Today.AddDays(-7);
+            //var topPostWeek = PostService.LoadPageEntitiesFromL2Cache<int, SimplePostModel>(1, 10, out _, p => p.Status == Status.Pended, p => p.PostAccessRecord.Where(r => r.AccessTime > week).Sum(r => r.ClickCount), false).ToList(); //文章周排行
+            //var month = DateTime.Today.AddMonths(-1);
+            //var topPostMonth = PostService.LoadPageEntitiesFromL2Cache<int, SimplePostModel>(1, 10, out _, p => p.Status == Status.Pended, p => p.PostAccessRecord.Where(r => r.AccessTime > month).Sum(r => r.ClickCount), false).ToList(); //文章月排行
             var tags = new List<string>(); //标签云
             var tagdic = new Dictionary<string, int>();
             var newdic = new Dictionary<string, int>(); //标签云最终结果
@@ -271,9 +271,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Posts = posts,
                 Tags = newdic,
                 Top6Post = hot6Post,
-                TopPostByMonth = topPostMonth,
-                TopPostByWeek = topPostWeek,
-                TopPostByToday = topPostToday,
+                //TopPostByMonth = topPostMonth,
+                //TopPostByWeek = topPostWeek,
+                //TopPostByToday = topPostToday,
                 PostsQueryable = postList
             };
         }

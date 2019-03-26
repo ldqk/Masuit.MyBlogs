@@ -6924,21 +6924,6 @@
             近期热搜
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel.TopPostByWeek">
-            <summary>
-            文章周排行
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel.TopPostByMonth">
-            <summary>
-            文章月排行
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel.TopPostByToday">
-            <summary>
-            文章年度排行
-            </summary>
-        </member>
         <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel.Top6Post">
             <summary>
             热门文章
