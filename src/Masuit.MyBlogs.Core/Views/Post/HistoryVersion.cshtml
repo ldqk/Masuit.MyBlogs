@@ -37,14 +37,14 @@
                                 <div class="col-sm-7">
                                     <div class="padding-bot10">
                                         修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
-                                        原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })
+                                        原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })
                                         @if (Model.Seminar.Any())
                                         {
                                             <span> | 原所属专题：</span>
                                             var seminars = Model.Seminar;
                                             foreach (var s in seminars)
                                             {
-                                                @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })<text> </text>
+                                                @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })<text> </text>
                                             }
                                         }
                                     </div>
@@ -59,7 +59,7 @@
                                                     if (!string.IsNullOrEmpty(s))
                                                     {
                                                         <a href="/tag/@HttpUtility.UrlEncode(s)">
-                                                            <span class="label label-@colors[new Random().StrictNext() % colors.Length]">@s</span>
+                                                            <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
                                                         </a>
                                                     }
                                                 }

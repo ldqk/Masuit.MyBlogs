@@ -69,7 +69,7 @@
                     @foreach (string s in Model.Label.Split(',', '，'))
                     {
                         <a href="/tag/@HttpUtility.UrlEncode(s)" target="_blank">
-                            <span class="label label-@colors[new Random().StrictNext() % colors.Length]">@s</span>
+                            <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
                         </a>
                     }
                 </div>

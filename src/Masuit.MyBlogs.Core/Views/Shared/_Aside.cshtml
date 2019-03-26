@@ -183,12 +183,12 @@
                         var tags = Model.Tags.OrderBy(s => Guid.NewGuid()).Take(20);
                         foreach (KeyValuePair<string, int> s in tags)
                         {
-                            <a href="/tag/@s.Key" class="tagc-@(new Random().StrictNext(100) % 10)" style="font-size: @(s.Value)px; line-height: @(s.Value * 1.2)px;">@s.Key</a>
+                            <a href="/tag/@s.Key" class="tagc-@(new Random().Next(100) % 10)" style="font-size: @(s.Value)px; line-height: @(s.Value * 1.2)px;">@s.Key</a>
                         }
                     }
                     else
                     {
-                        <a class="tagc-@(new Random().StrictNext(100) % 10)">没有标签</a>
+                        <a class="tagc-@(new Random().Next(100) % 10)">没有标签</a>
                     }
                 </div>
             </div>
@@ -206,11 +206,11 @@
                     <a href="/s/@s.KeyWords">
                         @if (s.KeyWords.Length > 15)
                         {
-                            <span class="label label-@colors[new Random().StrictNext(100) % colors.Length]">@s.KeyWords.Substring(0, 15)... (@s.SearchCount)</span>
+                            <span class="label label-@colors[new Random().Next(100) % colors.Length]">@s.KeyWords.Substring(0, 15)... (@s.SearchCount)</span>
                         }
                         else
                         {
-                            <span class="label label-@colors[new Random().StrictNext(100) % colors.Length]">@s.KeyWords (@s.SearchCount)</span>
+                            <span class="label label-@colors[new Random().Next(100) % colors.Length]">@s.KeyWords (@s.SearchCount)</span>
                         }
                     </a>
                 }

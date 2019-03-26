@@ -44,7 +44,7 @@
                                 <div class="col-sm-7">
                                     <div class="padding-bot10">
                                         发表于<span class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
-                                        <span class="label label-@colors[new Random().StrictNext() % colors.Length]">@Model.Author</span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                        <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Author</span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
                                     </div>
                                 </div>
                                 @{
@@ -57,7 +57,7 @@
                                                     if (!string.IsNullOrEmpty(s))
                                                     {
                                                         <a href="/tag/@HttpUtility.UrlEncode(s)">
-                                                            <span class="label label-@colors[new Random().StrictNext() % colors.Length]">@s</span>
+                                                            <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
                                                         </a>
                                                     }
                                                 }
@@ -68,14 +68,14 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 line-height24">
-                                    分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] }) | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.PostAccessRecord.Sum(r => r.ClickCount)</span>℃
+                                    分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] }) | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.PostAccessRecord.Sum(r => r.ClickCount)</span>℃
                                     @if (Model.Seminar.Any())
                                     {
                                         <span> | 所属专题：</span>
                                         var seminars = Model.Seminar;
                                         foreach (var s in seminars)
                                         {
-                                            @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().StrictNext() % colors.Length] })<text> </text>
+                                            @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })<text> </text>
                                         }
                                     }
                                 </div>
@@ -138,12 +138,12 @@
                     </div>
                     <div class="col-xs-6 text-right">
                         <div class="btn-group">
-                            <button type="button" id="donate" class="btn btn-@colors[new Random().StrictNext() % colors.Length] btn-lg">
+                            <button type="button" id="donate" class="btn btn-@colors[new Random().Next() % colors.Length] btn-lg">
                                 <i class="icon-coin-yen"></i><span>支持站长</span>
                             </button>
                             @if (Model.IsWordDocument)
                             {
-                                <a class="btn btn-@colors[new Random().StrictNext() % colors.Length] btn-lg" href="~/upload/@(Model.ResourceName)" target="_blank"><i class="icon-download4"></i>下载为Word文档</a>
+                                <a class="btn btn-@colors[new Random().Next() % colors.Length] btn-lg" href="~/upload/@(Model.ResourceName)" target="_blank"><i class="icon-download4"></i>下载为Word文档</a>
                             }
                         </div>
                     </div>
