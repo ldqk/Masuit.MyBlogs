@@ -55,7 +55,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 var ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 #if DEBUG
                 Random r = new Random();
-                ip = $"{r.StrictNext(210)}.{r.StrictNext(255)}.{r.StrictNext(255)}.{r.StrictNext(255)}";
+                ip = $"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}";
 #endif
                 PhysicsAddress address = await ip.GetPhysicsAddressInfo();
                 return View(address);
@@ -84,7 +84,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 var ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 #if DEBUG
                 Random r = new Random();
-                ip = $"{r.StrictNext(210)}.{r.StrictNext(255)}.{r.StrictNext(255)}.{r.StrictNext(255)}";
+                ip = $"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}";
 #endif
                 PhysicsAddress address = await ip.GetPhysicsAddressInfo();
                 if (address?.Status == 0)
