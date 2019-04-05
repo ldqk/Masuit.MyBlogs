@@ -1494,50 +1494,6 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="T:Masuit.MyBlogs.Core.Controllers.PublicController">
-            <summary>
-            公共API
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Controllers.PublicController.PostService">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PublicController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService)">
-            <summary>
-            开放API
-            </summary>
-            <param name="postService"></param>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PublicController.Post">
-            <summary>
-            获取文章列表
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PublicController.Position(System.String,System.String)">
-            <summary>
-            根据经纬度获取详细地理信息
-            </summary>
-            <param name="lat">纬度</param>
-            <param name="lng">经度</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PublicController.Address(System.String)">
-            <summary>
-            根据详细地址获取经纬度
-            </summary>
-            <param name="addr">详细地理信息</param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PublicController.GetIpInfo(System.String)">
-            <summary>
-            获取ip地址详细地理信息
-            </summary>
-            <param name="ip"></param>
-            <returns></returns>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.SearchController">
             <summary>
             站内搜索

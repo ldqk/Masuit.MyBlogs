@@ -161,7 +161,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<T> LoadEntities(Expression<Func<T, bool>> @where)
         {
-            return Queryable.Where(DataContext.Set<T>(), @where);
+            return DataContext.Set<T>().Where(@where);
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IOrderedQueryable<T> LoadEntities<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? Queryable.Where(DataContext.Set<T>(), @where).OrderBy(orderby) : Queryable.Where(DataContext.Set<T>(), @where).OrderByDescending(orderby);
+            return isAsc ? DataContext.Set<T>().Where(@where).OrderBy(orderby) : DataContext.Set<T>().Where(@where).OrderByDescending(orderby);
         }
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体集合</returns>
         public virtual IEnumerable<T> LoadEntitiesFromL2CacheNoTracking(Expression<Func<T, bool>> @where)
         {
-            return Queryable.Where(DataContext.Set<T>(), @where).AsNoTracking().Cacheable();
+            return DataContext.Set<T>().Where(@where).AsNoTracking().Cacheable();
         }
 
         /// <summary>
@@ -443,7 +443,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<T> LoadPageEntities<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc)
         {
-            var temp = Queryable.Where(DataContext.Set<T>(), where);
+            var temp = DataContext.Set<T>().Where(where);
             totalCount = temp.Count();
             if (pageIndex * pageSize > totalCount)
             {
@@ -487,7 +487,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<T> LoadPageEntitiesNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            var temp = Queryable.Where(DataContext.Set<T>(), where).AsNoTracking();
+            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
             totalCount = temp.Count();
             if (pageIndex * pageSize > totalCount)
             {
@@ -563,6 +563,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
             if (t != null)
             {
                 DataContext.Entry(t).State = EntityState.Deleted;
+                DataContext.Remove(t);
                 return true;
             }
 
@@ -578,6 +579,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             DataContext.Entry(t).State = EntityState.Unchanged;
             DataContext.Entry(t).State = EntityState.Deleted;
+            DataContext.Remove(t);
             return true;
         }
 
@@ -598,7 +600,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>删除成功</returns>
         public virtual async Task<int> DeleteEntityAsync(Expression<Func<T, bool>> @where)
         {
-            return await Queryable.Where(DataContext.Set<T>(), @where).DeleteAsync().ConfigureAwait(true);
+            return await DataContext.Set<T>().Where(@where).DeleteAsync().ConfigureAwait(true);
         }
 
         /// <summary>
@@ -609,6 +611,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public virtual bool UpdateEntity(T t)
         {
             DataContext.Entry(t).State = EntityState.Modified;
+            DataContext.Update(t);
             return true;
         }
 
@@ -620,7 +623,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>更新成功</returns>
         public virtual int UpdateEntity(Expression<Func<T, bool>> @where, T t)
         {
-            return Queryable.Where(DataContext.Set<T>(), @where).Update(ts => t);
+            return DataContext.Set<T>().Where(@where).Update(ts => t);
         }
 
         /// <summary>
@@ -642,6 +645,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public virtual T AddEntity(T t)
         {
             DataContext.Entry(t).State = EntityState.Added;
+            DataContext.Add(t);
             return t;
         }
 

@@ -54,6 +54,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Put(CommentInputDto comment)
         {
+            if (Regex.Match(comment.Content, CommonHelper.BanRegex).Length > 0)
+            {
+                return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请注意改善您的言辞！");
+            }
+
             Post post = PostService.GetById(comment.PostId);
             if (post is null)
             {
@@ -66,10 +71,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, false, "您刚才已经在这篇文章发表过一次评论了，换一篇文章吧，或者换一下评论内容吧！");
             }
+
             if (Regex.Match(comment.Content, CommonHelper.ModRegex).Length <= 0)
             {
                 comment.Status = Status.Pended;
             }
+
             if (user != null)
             {
                 comment.NickName = user.NickName;
@@ -101,11 +108,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         {
                             Title = $"来自【{com.NickName}】的新文章评论",
                             Content = com.Content,
-                            Link = Url.Action("Details", "Post", new
-                            {
-                                id = com.PostId,
-                                cid = com.Id
-                            }, Request.Scheme) + "#comment"
+                            Link = Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, Request.Scheme) + "#comment"
                         });
                     }
 #if !DEBUG
@@ -115,26 +118,15 @@ namespace Masuit.MyBlogs.Core.Controllers
                         //新评论，只通知博主和楼主
                         foreach (var s in emails.Distinct())
                         {
-                            BackgroundJob.Enqueue(() => CommonHelper.SendMail(HttpUtility.UrlDecode(Request.Headers[HeaderNames.Referer]) + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new
-                            {
-                                id = com.PostId,
-                                cid = com.Id
-                            }, Request.Scheme) + "#comment"), s));
+                            BackgroundJob.Enqueue(() => CommonHelper.SendMail(HttpUtility.UrlDecode(Request.Headers[HeaderNames.Referer]) + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, Request.Scheme) + "#comment"), s));
                         }
                     }
                     else
                     {
                         //通知博主和上层所有关联的评论访客
                         var pid = CommentService.GetParentCommentIdByChildId(com.Id);
-                        emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Except(new List<string>()
-                        {
-                            com.Email
-                        }).Distinct().ToList();
-                        string link = Url.Action("Details", "Post", new
-                        {
-                            id = com.PostId,
-                            cid = com.Id
-                        }, Request.Scheme) + "#comment";
+                        emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Except(new List<string> { com.Email }).Distinct().ToList();
+                        string link = Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, Request.Scheme) + "#comment";
                         foreach (var s in emails)
                         {
                             BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{HttpUtility.UrlDecode(Request.Headers[HeaderNames.Referer])}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Replace("{{link}}", link), s));
@@ -145,11 +137,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
                 foreach (var s in emails.Distinct())
                 {
-                    BackgroundJob.Enqueue(() => CommonHelper.SendMail(HttpUtility.UrlDecode(Request.Headers[HeaderNames.Referer]) + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new
-                    {
-                        id = com.PostId,
-                        cid = com.Id
-                    }, Request.Scheme) + "#comment") + "<p style='color:red;'>(待审核)</p>", s));
+                    BackgroundJob.Enqueue(() => CommonHelper.SendMail(HttpUtility.UrlDecode(Request.Headers[HeaderNames.Referer]) + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, Request.Scheme) + "#comment") + "<p style='color:red;'>(待审核)</p>", s));
                 }
                 return ResultData(null, true, "评论成功，待站长审核通过以后将显示");
             }
@@ -298,11 +286,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var pid = comment.ParentId == 0 ? comment.Id : CommentService.GetParentCommentIdByChildId(id);
 #if !DEBUG
             string content = System.IO.File.ReadAllText(Path.Combine(_hostingEnvironment.WebRootPath, "template", "notify.html")).Replace("{{title}}", post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", comment.NickName).Replace("{{content}}", comment.Content);
-            var emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>()
-            {
-                comment.Email,
-                CommonHelper.SystemSettings["ReceiveEmail"]
-            }).ToList();
+            var emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string> { comment.Email, CommonHelper.SystemSettings["ReceiveEmail"] }).ToList();
             string link = Url.Action("Details", "Post", new
             {
                 id = comment.PostId,

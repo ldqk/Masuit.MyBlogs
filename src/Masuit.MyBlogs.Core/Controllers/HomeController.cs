@@ -67,7 +67,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             ViewBag.Total = PostService.Count(p => p.Status == Status.Pended);
             UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
-            var banners = BannerService.GetAllFromL2CacheNoTracking(b => Guid.NewGuid()).ToList();
+            var banners = BannerService.GetAllFromL2CacheNoTracking(b => new Random().Next()).ToList();
             List<FastShare> fastShares = FastShareService.GetAllFromL2CacheNoTracking(s => s.Sort).ToList();
             ViewBag.FastShare = fastShares;
             var viewModel = GetIndexPageViewModel(1, 15, orderBy, user);

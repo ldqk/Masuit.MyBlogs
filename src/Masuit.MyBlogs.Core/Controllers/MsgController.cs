@@ -124,6 +124,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult Put(LeaveMessageInputDto msg)
         {
+            if (Regex.Match(msg.Content, CommonHelper.BanRegex).Length > 0)
+            {
+                return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请注意改善您的言辞！");
+            }
+
             UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             msg.Content = msg.Content.Trim().Replace("<p><br></p>", string.Empty);
             if (msg.Content.RemoveHtml().Trim().Equals(HttpContext.Session.Get<string>("msg")))
@@ -164,10 +169,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         {
                             Title = $"来自【{msg2.NickName}】的新留言",
                             Content = msg2.Content,
-                            Link = Url.Action("Index", "Msg", new
-                            {
-                                cid = msg2.Id
-                            }, Request.Scheme)
+                            Link = Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Scheme)
                         });
                     }
 #if !DEBUG

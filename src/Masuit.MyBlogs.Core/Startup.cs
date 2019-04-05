@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
@@ -36,9 +37,9 @@ using Microsoft.Extensions.WebEncoders;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text.Encodings.Web;
@@ -96,30 +97,41 @@ namespace Masuit.MyBlogs.Core
                 });
             }); //配置跨域
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new Info
-                {
-                    Title = "API文档",
-                    Version = "v1"
-                });
-                c.DescribeAllEnumsAsStrings();
-                c.IncludeXmlComments(AppContext.BaseDirectory + "Masuit.MyBlogs.Core.xml");
-            }); //配置swagger
-
             services.AddHttpClient(); //注入HttpClient
             services.AddHttpContextAccessor(); //注入静态HttpContext
             services.AddResponseCaching(); //注入响应缓存
             services.Configure<FormOptions>(options =>
             {
-                options.MultipartBodyLengthLimit = 104857600;// 100MB
+                options.MultipartBodyLengthLimit = 104857600; // 100MB
             }); //配置请求长度
+
+            services.Configure<BrotliCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.Optimal;
+            });
+            services.Configure<GzipCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.Optimal;
+            });
+            services.AddResponseCompression(options =>
+            {
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+                options.Providers.Add<CustomCompressionProvider>();
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+                {
+                    "image/svg+xml"
+                });
+            });
 
             services.AddSession(); //注入Session
             //services.AddHangfire(x => x.UseRedisStorage(AppConfig.Redis)); //配置hangfire
             services.AddHangfire(x => x.UseMemoryStorage()); //配置hangfire
 
-            services.AddSevenZipCompressor().AddResumeFileResult().AddSearchEngine<DataContext>(new LuceneIndexerOptions() { Path = "lucene" });// 配置7z和断点续传和Redis和Lucene搜索引擎
+            services.AddSevenZipCompressor().AddResumeFileResult().AddSearchEngine<DataContext>(new LuceneIndexerOptions()
+            {
+                Path = "lucene"
+            }); // 配置7z和断点续传和Redis和Lucene搜索引擎
             RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
 
             //配置EF二级缓存
@@ -173,11 +185,12 @@ namespace Masuit.MyBlogs.Core
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
+                //app.UseHsts();
                 app.UseException();
             }
 
             //db.Database.Migrate();
+
             #region 导词库
 
             Console.WriteLine("正在导入自定义词库...");
@@ -191,6 +204,7 @@ namespace Masuit.MyBlogs.Core
                 }
             });
             Console.WriteLine($"导入自定义词库完成，耗时{time}s");
+
             #endregion
 
             string lucenePath = Path.Combine(env.ContentRootPath, luceneIndexerOptions.Path);
@@ -201,7 +215,8 @@ namespace Masuit.MyBlogs.Core
                 Console.WriteLine("索引库创建完成！");
             }
 
-            app.UseRewriter(new RewriteOptions().AddRedirectToNonWww());// URL重写
+            app.UseResponseCompression();
+            app.UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
             app.UseStaticHttpContext(); //注入静态HttpContext对象
 
             app.UseSession(); //注入Session
@@ -235,13 +250,21 @@ namespace Masuit.MyBlogs.Core
                 builder.AllowCredentials();
             }); //配置跨域
             app.UseResponseCaching(); //启动Response缓存
-            app.UseSwagger().UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", CommonHelper.SystemSettings["Title"]);
-            }); //配置swagger
             app.UseSignalR(hub => hub.MapHub<MyHub>("/hubs"));
             HangfireJobInit.Start(); //初始化定时任务
             app.UseMvcWithDefaultRoute();
+        }
+    }
+
+    public class CustomCompressionProvider : ICompressionProvider
+    {
+        public string EncodingName => "mycustomcompression";
+        public bool SupportsFlush => true;
+
+        public Stream CreateStream(Stream outputStream)
+        {
+            // Create a custom compression stream wrapper here
+            return outputStream;
         }
     }
 
