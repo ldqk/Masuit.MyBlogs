@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Rewrite;
+﻿using Microsoft.AspNetCore.Rewrite;
 using System;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core.Extensions
 {
@@ -18,12 +15,9 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 
-            if (Regex.IsMatch(currentHost.Host, @"(\w+\.)(.+\..+)", RegexOptions.Compiled))
+            if (req.Scheme.Equals("http"))
             {
-                string domain = Regex.Match(currentHost.Host, @"(\w+\.)(.+\..+)").Groups[2].Value;
-                var newHost = new HostString(domain);
-                var newUrl = new StringBuilder().Append("https://").Append(newHost).Append(req.PathBase).Append(req.Path).Append(req.QueryString);
-                context.HttpContext.Response.Redirect(newUrl.ToString());
+                context.HttpContext.Response.Redirect("https://" + currentHost.Host + req.PathBase + req.Path + req.QueryString);
                 context.Result = RuleResult.EndResponse;
             }
         }

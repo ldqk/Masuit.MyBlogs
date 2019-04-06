@@ -1,0 +1,5 @@
+不建议使用这个数据库，打开Startup.cs里的db.Database.Migrate();注释，项目运行时会自动创建空数据库，如果需要使用这个备份库，请使用navicat进行还原数据库。
+操作步骤：
+1.使用navicat创建数据库myblogs，指定字符集为utf8mb4；
+2.将备份文件复制到C:\Users\[用户名]\Documents\Navicat\MySQL\Servers\[navicat连接名]\myblogs下；
+3.使用navicat切到myblogs数据库，然后点备份，即可还原。
