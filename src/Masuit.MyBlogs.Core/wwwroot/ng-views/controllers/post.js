@@ -414,10 +414,10 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 		if (!post.Label) {
 			post.Label = null;
 		}
-		if (post.Title.trim().length <= 2 || post.Title.trim().length > 64) {
+		if (post.Title.trim().length <= 2 || post.Title.trim().length > 128) {
 			window.notie.alert({
 				type: 3,
-				text: '文章标题必须在2到64个字符以内！',
+				text: '文章标题必须在2到128个字符以内！',
 				time: 4
 			});
 			$scope.loadingDone();
@@ -597,10 +597,10 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 		if (!post.Label) {
 			post.Label = null;
 		}
-		if (post.Title.trim().length <= 2 || post.Title.trim().length > 64) {
+		if (post.Title.trim().length <= 2 || post.Title.trim().length > 128) {
 			window.notie.alert({
 				type: 3,
-				text: '文章标题必须在2到64个字符以内！',
+				text: '文章标题必须在2到128个字符以内！',
 				time: 4
 			});
 			$scope.loadingDone();

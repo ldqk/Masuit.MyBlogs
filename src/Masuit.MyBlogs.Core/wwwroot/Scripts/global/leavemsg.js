@@ -18,7 +18,7 @@
     $("#msg-form").on("submit", function(e) {
         e.preventDefault();
         layui.layedit.sync(1);
-        if ($("#name").val().trim().length <= 0 || $("#name").val().trim().length > 20) {
+        if ($("#name").val().trim().length <= 0 || $("#name").val().trim().length > 36) {
 	        window.notie.alert({
 		        type: 3,
 		        text: '再怎么你也应该留个合理的名字吧，非主流的我可不喜欢！',
@@ -84,7 +84,7 @@
     $("#reply-form").on("submit", function(e) {
         e.preventDefault();
         layui.layedit.sync(window.currentEditor);
-        if ($("#name2").val().trim().length <= 0 || $("#name").val().trim().length > 20) {
+        if ($("#name2").val().trim().length <= 0 || $("#name").val().trim().length > 36) {
 	        window.notie.alert({
 		        type: 3,
                 text: "亲，能留个正常点的名字不！",

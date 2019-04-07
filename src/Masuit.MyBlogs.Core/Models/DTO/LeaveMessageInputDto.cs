@@ -22,7 +22,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// <summary>
         /// 昵称
         /// </summary>
-        [Required(ErrorMessage = "昵称不能为空！"), MaxLength(24, ErrorMessage = "昵称最大支持24个字符"), MinLength(2, ErrorMessage = "昵称至少2个字")]
+        [Required(ErrorMessage = "昵称不能为空！"), MaxLength(36, ErrorMessage = "昵称最大支持36个字符"), MinLength(2, ErrorMessage = "昵称至少2个字")]
         public string NickName { get; set; }
 
         /// <summary>

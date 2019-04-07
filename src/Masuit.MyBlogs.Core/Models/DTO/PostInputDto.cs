@@ -24,13 +24,13 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// <summary>
         /// 标题
         /// </summary>
-        [Required(ErrorMessage = "文章标题不能为空！"), MaxLength(64, ErrorMessage = "文章标题最长支持64个字符！"), MinLength(4, ErrorMessage = "文章标题最少4个字符！")]
+        [Required(ErrorMessage = "文章标题不能为空！"), MaxLength(128, ErrorMessage = "文章标题最长支持128个字符！"), MinLength(4, ErrorMessage = "文章标题最少4个字符！")]
         public string Title { get; set; }
 
         /// <summary>
         /// 作者
         /// </summary>
-        [Required, MaxLength(24, ErrorMessage = "作者名最长支持24个字符！"), MinLength(2, ErrorMessage = "作者名最少2个字符！")]
+        [Required, MaxLength(36, ErrorMessage = "作者名最长支持36个字符！"), MinLength(2, ErrorMessage = "作者名最少2个字符！")]
         public string Author { get; set; }
 
         /// <summary>
