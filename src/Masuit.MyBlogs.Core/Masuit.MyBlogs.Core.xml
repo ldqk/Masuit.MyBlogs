@@ -87,33 +87,14 @@
             <param name="content">内容</param>
             <param name="tos">收件人</param>
         </member>
-        <member name="M:Common.CommonHelper.UploadImage(System.String)">
+        <member name="P:Common.CommonHelper.OssClient">
             <summary>
-            上传图片到新浪图床
+            OSS客户端
             </summary>
-            <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.UploadPeople(System.String)">
-            <summary>
-            上传图片到人民网图床
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Common.CommonHelper.UploadSmmsImage(System.String)">
+        <member name="M:Common.CommonHelper.UploadSmms(System.String)">
             <summary>
             上传图片到sm图床
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Common.CommonHelper.UploadImageFallback(System.String)">
-            <summary>
-            上传图片到upload.cc图床
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Common.CommonHelper.UploadImageFallback2(System.String)">
-            <summary>
-            上传图片到upload.otar.im图床
             </summary>
             <returns></returns>
         </member>
@@ -233,6 +214,11 @@
         <member name="P:Masuit.MyBlogs.Core.Configs.AppConfig.Redis">
             <summary>
             Redis连接字符串
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Configs.AppConfig.AliOssConfig">
+            <summary>
+            OSS配置
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Configs.HangfireJobInit">
@@ -1259,11 +1245,6 @@
             文章管理
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Controllers.PostController.PostHistoryVersionService">
-            <summary>
-            
-            </summary>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ICategoryService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBroadcastService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISeminarService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostHistoryVersionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.DataContext})">
             <summary>
             文章管理
@@ -1686,12 +1667,6 @@
             <param name="broadcastService"></param>
             <param name="postService"></param>
             <param name="hostingEnvironment"></param>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.SubscribeController.Rss">
-            <summary>
-            RSS订阅
-            </summary>
-            <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.SubscribeController.Subscribe(System.String)">
             <summary>

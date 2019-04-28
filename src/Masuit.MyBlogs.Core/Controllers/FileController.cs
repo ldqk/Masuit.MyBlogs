@@ -168,10 +168,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                     break;
                 case "rename":
                 case "move":
-                    path = Path.Combine(root, req.Item.TrimStart('\\', '/'));
-                    var newpath = Path.Combine(root, req.NewItemPath);
+                    string newpath;
                     if (!string.IsNullOrEmpty(req.Item))
                     {
+                        newpath = Path.Combine(root, req.NewItemPath?.TrimStart('\\', '/'));
+                        path = Path.Combine(root, req.Item.TrimStart('\\', '/'));
                         try
                         {
                             System.IO.File.Move(path, newpath);

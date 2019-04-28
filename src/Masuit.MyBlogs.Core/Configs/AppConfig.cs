@@ -19,5 +19,10 @@
         /// Redis连接字符串
         /// </summary>
         public static string Redis { get; set; }
+
+        /// <summary>
+        /// OSS配置
+        /// </summary>
+        public static AliOssConfig AliOssConfig { get; set; } = new AliOssConfig();
     }
 }

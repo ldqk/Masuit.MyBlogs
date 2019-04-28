@@ -1,7 +1,5 @@
 ﻿using Common;
-using EFSecondLevelCache.Core;
 using Hangfire;
-using Masuit.LuceneEFCore.SearchEngine.Extensions;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -12,11 +10,9 @@ using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WilderMinds.RssSyndication;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -48,45 +44,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             BroadcastService = broadcastService;
             PostService = postService;
             _hostingEnvironment = hostingEnvironment;
-        }
-
-        /// <summary>
-        /// RSS订阅
-        /// </summary>
-        /// <returns></returns>
-        [Route("rss"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
-        public IActionResult Rss()
-        {
-            var time = DateTime.Now.AddDays(-1);
-            string scheme = Request.Scheme;
-            var host = Request.Host;
-            var posts = PostService.LoadEntitiesNoTracking(p => p.Status == Status.Pended && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
-            {
-                Author = new Author()
-                {
-                    Name = p.Author,
-                    Email = p.Email
-                },
-                Body = p.Content.RemoveHtmlTag(),
-                Categories = new List<string>()
-                {
-                    p.Category.Name
-                },
-                Link = new Uri(scheme + "://" + host + "/" + p.Id),
-                PublishDate = p.ModifyDate,
-                Title = p.Title,
-                Permalink = scheme + "://" + host + "/" + p.Id
-            }).Cacheable().ToList();
-            var feed = new Feed()
-            {
-                Title = CommonHelper.SystemSettings["Title"],
-                Description = CommonHelper.SystemSettings["Description"],
-                Link = new Uri(scheme + "://" + host),
-                Copyright = "(c) 2019"
-            };
-            feed.Items.AddRange(posts.ToArray());
-            var rss = feed.Serialize();
-            return Content(rss);
         }
 
         /// <summary>

@@ -41,14 +41,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         private ICategoryService CategoryService { get; set; }
         private IBroadcastService BroadcastService { get; set; }
         private ISeminarService SeminarService { get; set; }
+        private IPostHistoryVersionService PostHistoryVersionService { get; set; }
 
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISearchEngine<DataContext> _searchEngine;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public IPostHistoryVersionService PostHistoryVersionService { get; set; }
 
         /// <summary>
         /// 文章管理
@@ -779,7 +775,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, Authority]
         public ActionResult Edit(PostInputDto post, bool notify = true, bool reserve = true)
         {
-            post.Content = CommonHelper.ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/");
+            post.Content = CommonHelper.ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"));
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
                 return ResultData(null, message: "请选择一个分类");
@@ -963,14 +959,19 @@ namespace Masuit.MyBlogs.Core.Controllers
                     cast.ForEach(c =>
                     {
                         var ts = DateTime.Now.GetTotalMilliseconds();
-                        string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/broadcast.html").Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
-                        {
-                            c.Email,
-                            act = "cancel",
-                            validate = c.ValidateCode,
-                            timespan = ts,
-                            hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
-                        }, Request.Scheme));
+                        string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/broadcast.html")
+                            .Replace("{{link}}", link + "?email=" + c.Email)
+                            .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
+                            .Replace("{{title}}", post.Title).Replace("{{author}}", post.Author)
+                            .Replace("{{content}}", post.Content.RemoveHtmlTag(150))
+                            .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
+                            {
+                                c.Email,
+                                act = "cancel",
+                                validate = c.ValidateCode,
+                                timespan = ts,
+                                hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
+                            }, Request.Scheme));
                         BackgroundJob.Schedule(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
                     });
                 }

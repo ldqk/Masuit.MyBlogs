@@ -67,7 +67,7 @@ namespace Masuit.MyBlogs.Core
             AppConfig.ConnString = configuration[nameof(AppConfig.ConnString)];
             AppConfig.BaiduAK = configuration[nameof(AppConfig.BaiduAK)];
             AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
-            //AppConfig.EnableViewCompress = Convert.ToBoolean(configuration[nameof(AppConfig.EnableViewCompress)]);
+            configuration.Bind("AliyunOSS", AppConfig.AliOssConfig);
         }
 
         /// <summary>
