@@ -15,9 +15,9 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 
-            if (req.Scheme.Equals("http"))
+            if (req.Scheme.Equals("http") || currentHost.Host.Contains("www."))
             {
-                context.HttpContext.Response.Redirect("https://" + currentHost.Host + req.PathBase + req.Path + req.QueryString);
+                context.HttpContext.Response.Redirect("https://" + currentHost.Host.Replace("www.", string.Empty) + req.PathBase + req.Path + req.QueryString);
                 context.Result = RuleResult.EndResponse;
             }
         }

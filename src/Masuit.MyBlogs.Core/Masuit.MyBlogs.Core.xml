@@ -92,7 +92,7 @@
             OSS客户端
             </summary>
         </member>
-        <member name="M:Common.CommonHelper.UploadSmms(System.String)">
+        <member name="M:Common.CommonHelper.UploadImage(System.String)">
             <summary>
             上传图片到sm图床
             </summary>
