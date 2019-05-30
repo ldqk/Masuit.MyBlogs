@@ -87,13 +87,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
     }
 
-    public partial class PostAccessRecordRepository : BaseRepository<PostAccessRecord>, IPostAccessRecordRepository
-    {
-        public PostAccessRecordRepository(DataContext dbContext) : base(dbContext)
-        {
-        }
-    }
-
     public partial class PostHistoryVersionRepository : BaseRepository<PostHistoryVersion>, IPostHistoryVersionRepository
     {
         public PostHistoryVersionRepository(DataContext dbContext) : base(dbContext)

@@ -1,5 +1,6 @@
-﻿using Common;
-using Hangfire;
+﻿using Hangfire;
+using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -58,7 +59,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
 
         public Crawler Fetch()
         {
-            if (!(SourceUrl.IsExternalAddress()))
+            if (!SourceUrl.IsExternalAddress() || SourceUrl.Contains(AppConfig.ImgbedDomains))
             {
                 State = "INVALID_URL";
                 return this;

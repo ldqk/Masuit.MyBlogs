@@ -1,5 +1,5 @@
-﻿using Common;
-using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -114,22 +114,13 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void RecordPostVisit(int pid)
         {
             Post post = _postService.GetById(pid);
-            var record = post.PostAccessRecord.FirstOrDefault(r => r.AccessTime == DateTime.Today);
-            if (record != null)
+            if (post != null)
             {
-                record.ClickCount += 1;
+                post.TotalViewCount += 1;
+                post.AverageViewCount = post.TotalViewCount / (DateTime.Now - post.PostDate).TotalDays;
+                _postService.UpdateEntity(post);
+                _postService.SaveChanges();
             }
-            else
-            {
-                post.PostAccessRecord.Add(new PostAccessRecord
-                {
-                    ClickCount = 1,
-                    AccessTime = DateTime.Today
-                });
-            }
-
-            _postService.UpdateEntity(post);
-            _postService.SaveChanges();
         }
 
         /// <summary>
@@ -152,19 +143,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             RedisHelper.IncrBy("Interview:RunningDays");
             DateTime time = DateTime.Now.AddMonths(-1);
             _searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
-            foreach (var p in _postService.GetAll().AsParallel())
-            {
-                try
-                {
-                    p.AverageViewCount = p.PostAccessRecord.Average(r => r.ClickCount);
-                    p.TotalViewCount = p.PostAccessRecord.Sum(r => r.ClickCount);
-                    _postService.UpdateEntity(p);
-                    _postService.SaveChanges();
-                }
-                catch (Exception)
-                {
-                }
-            }
         }
 
         /// <summary>
@@ -213,6 +191,33 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             });
             var list = _searchEngine.Context.Post.Where(i => i.Status != Status.Pended).ToList();
             _searchEngine.LuceneIndexer.Delete(list);
+        }
+
+        /// <summary>
+        /// 搜索统计
+        /// </summary>
+        public void StatisticsSearchKeywords()
+        {
+            var start = DateTime.Today.AddMonths(-1);
+            var temp = _searchDetailsService.LoadEntitiesNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).ToList();
+            var month = temp.GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(30).Select(g => new
+            {
+                Keywords = g.FirstOrDefault().KeyWords,
+                Count = g.Count()
+            }).ToList();
+            var week = temp.Where(s => s.SearchTime > DateTime.Today.AddDays(-7)).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(30).Select(g => new
+            {
+                Keywords = g.FirstOrDefault().KeyWords,
+                Count = g.Count()
+            }).ToList();
+            var today = temp.Where(s => s.SearchTime > DateTime.Today).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(30).Select(g => new
+            {
+                Keywords = g.FirstOrDefault().KeyWords,
+                Count = g.Count()
+            }).ToList();
+            RedisHelper.Set("SearchRank:Month", month);
+            RedisHelper.Set("SearchRank:Week", week);
+            RedisHelper.Set("SearchRank:Today", today);
         }
     }
 }

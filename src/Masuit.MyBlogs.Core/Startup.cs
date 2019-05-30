@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CacheManager.Core;
-using Common;
 using CSRedis;
 using EFSecondLevelCache.Core;
 using Hangfire;
@@ -10,6 +9,7 @@ using Hangfire.MemoryStorage;
 using JiebaNet.Segmenter;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Extensions;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
@@ -68,6 +68,7 @@ namespace Masuit.MyBlogs.Core
             AppConfig.BaiduAK = configuration[nameof(AppConfig.BaiduAK)];
             AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
             configuration.Bind("AliyunOSS", AppConfig.AliOssConfig);
+            configuration.Bind("ImgbedDomains", AppConfig.ImgbedDomains);
         }
 
         /// <summary>
@@ -216,25 +217,24 @@ namespace Masuit.MyBlogs.Core
             }
 
             app.UseResponseCompression();
-            app.UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
+            app.UseHttpsRedirection().UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
             app.UseStaticHttpContext(); //注入静态HttpContext对象
 
-            app.UseSession(); //注入Session
+            app.UseSession().UseCookiePolicy(); //注入Session
 
-            app.UseHttpsRedirection().UseStaticFiles(new StaticFileOptions //静态资源缓存策略
+            app.UseStaticFiles(new StaticFileOptions //静态资源缓存策略
             {
                 OnPrepareResponse = context =>
                 {
                     context.Context.Response.Headers[HeaderNames.CacheControl] = "public,no-cache";
                     context.Context.Response.Headers[HeaderNames.Expires] = DateTime.UtcNow.AddDays(7).ToString("R");
                 },
-                ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes)
-            }).UseCookiePolicy();
+                ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes),
+            });
 
             app.UseFirewall().UseRequestIntercept(); //启用网站防火墙
             CommonHelper.SystemSettings = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
 
-            app.UseEFSecondLevelCache(); //启动EF二级缓存
             app.UseHangfireServer().UseHangfireDashboard("/taskcenter", new DashboardOptions()
             {
                 Authorization = new[]

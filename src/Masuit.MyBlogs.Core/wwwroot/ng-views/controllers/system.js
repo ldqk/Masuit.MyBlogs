@@ -343,37 +343,6 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			}).catch(swal.noop);
 		});
 	}
-	$scope.getAreaIPBlackList= function() {
-		$scope.request("/system/AreaIPBlackList",null, function (data) {
-			layer.open({
-				type: 1,
-				zIndex: 20,
-				title: '查看地区IP黑名单',
-				area: (window.screen.width > 360 ? 360 : window.screen.width) + 'px',// '340px'], //宽高
-				content: $("#modal"),
-				success: function(layero, index) {
-					$('.ui.dropdown.region').dropdown({
-						onChange: function (value) {
-							$scope.AreaIPs = $scope.AreaIPBlackList[value];
-							$scope.AreaIPsCopy = $scope.AreaIPBlackList[value];
-						},
-						message: {
-							maxSelections: '最多选择 {maxCount} 项',
-							noResults: '无搜索结果！'
-						}
-					});
-					$scope.AreaIPBlackList = data.Data;
-					$scope.Areas = Object.keys(data.Data);
-					$timeout(function () {
-						$('.ui.dropdown.region').dropdown("set selected", [$scope.Areas[0]]);
-					}, 100);
-				},
-				end: function() {
-					$("#modal").css("display", "none");
-				}
-			});
-		});
-	}
 	$scope.getIPRangeBlackList= function() {
 		$scope.request("/system/GetIPRangeBlackList",null, function (data) {
 			swal({

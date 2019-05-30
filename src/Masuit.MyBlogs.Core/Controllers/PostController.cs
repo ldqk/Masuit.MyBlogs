@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Common;
 using EFSecondLevelCache.Core;
 using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
@@ -154,10 +153,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var post = PostHistoryVersionService.GetById(hid);
             if (post is null)
             {
-                return RedirectToAction("History", new
-                {
-                    id
-                });
+                return RedirectToAction("History", new { id });
             }
 
             ViewBag.Next = PostHistoryVersionService.GetFirstEntityNoTracking(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
@@ -191,12 +187,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string diffOutput = diffHelper.Build();
             right.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);
             left.Content = Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty);
-            return View(new[]
-            {
-                main,
-                left,
-                right
-            });
+            return View(new[] { main, left, right });
         }
 
         /// <summary>
@@ -321,22 +312,17 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.CategoryId = new SelectList(CategoryService.LoadEntitiesNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
             Post p = post.Mapper<Post>();
             p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
-            p.PostAccessRecord.Add(new PostAccessRecord()
-            {
-                AccessTime = DateTime.Today,
-                ClickCount = 0
-            });
             p = PostService.AddEntitySaved(p);
             if (p != null)
             {
                 if (p.Status == Status.Pending)
                 {
                     var email = CommonHelper.SystemSettings["ReceiveEmail"];
-                    string link = Url.Action("Details", "Post", new
-                    {
-                        id = p.Id
-                    }, Request.Scheme);
-                    string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/publish.html").Replace("{{link}}", link).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", p.Title);
+                    string link = Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme);
+                    string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/publish.html")
+                        .Replace("{{link}}", link)
+                        .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                        .Replace("{{title}}", p.Title);
                     BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, email));
                     return ResultData(p.Mapper<PostOutputDto>(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
                 }
@@ -384,7 +370,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             });
             ViewBag.tags = result.GroupBy(t => t).OrderByDescending(g => g.Count()).ThenBy(g => g.Key);
-            ViewBag.cats = CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel()
+            ViewBag.cats = CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
                 Id = c.Id,
                 Name = c.Name,
@@ -497,14 +483,20 @@ namespace Masuit.MyBlogs.Core.Controllers
                 cast.ForEach(c =>
                 {
                     var ts = DateTime.Now.GetTotalMilliseconds();
-                    string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/broadcast.html").Replace("{{link}}", link + "?email=" + c.Email).Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{title}}", post.Title).Replace("{{author}}", post.Author).Replace("{{content}}", post.Content.RemoveHtmlTag(150)).Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
-                    {
-                        c.Email,
-                        act = "cancel",
-                        validate = c.ValidateCode,
-                        timespan = ts,
-                        hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
-                    }, Request.Scheme));
+                    string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/broadcast.html")
+                        .Replace("{{link}}", link + "?email=" + c.Email)
+                        .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
+                        .Replace("{{title}}", post.Title)
+                        .Replace("{{author}}", post.Author)
+                        .Replace("{{content}}", post.Content.RemoveHtmlTag(150))
+                        .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
+                        {
+                            c.Email,
+                            act = "cancel",
+                            validate = c.ValidateCode,
+                            timespan = ts,
+                            hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
+                        }, Request.Scheme));
                     BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客有新文章发布了", content, c.Email));
                 });
             }
@@ -930,11 +922,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 });
             }
 
-            p.PostAccessRecord.Add(new PostAccessRecord()
-            {
-                AccessTime = DateTime.Today,
-                ClickCount = 0
-            });
             if (schedule)
             {
                 if (timespan.HasValue && timespan.Value > DateTime.Now)
@@ -1064,9 +1051,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             var history = PostHistoryVersionService.GetById(id);
             if (history != null)
             {
-                //var version = history.Post.Mapper<PostHistoryVersion>();
-                //version.Id = 0;
-                //PostHistoryVersionService.AddEntity(version);
                 history.Post.Category = history.Category;
                 history.Post.CategoryId = history.CategoryId;
                 history.Post.Content = history.Content;
@@ -1090,30 +1074,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             return ResultData(null, false, "版本不存在");
-        }
-
-        /// <summary>
-        /// 文章分析
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public ActionResult Analyse(int id)
-        {
-            var list = PostService.GetById(id).PostAccessRecord.OrderBy(r => r.AccessTime).GroupBy(r => r.AccessTime.Date).Select(r => new[]
-            {
-                r.Key.GetTotalMilliseconds(),
-                r.Sum(p => p.ClickCount)
-            }).ToList();
-            var high = list.OrderByDescending(n => n[1]).FirstOrDefault();
-            var average = list.Average(d => d[1]);
-            return ResultData(new
-            {
-                list,
-                aver = average,
-                high = high[1],
-                highDate = DateTime.Parse("1970-01-01").AddMilliseconds(high[0])
-            });
         }
 
         #endregion

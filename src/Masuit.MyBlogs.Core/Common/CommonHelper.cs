@@ -1,28 +1,26 @@
-﻿using System;
+﻿using Aliyun.OSS;
+using Hangfire;
+using IP2Region;
+using Masuit.MyBlogs.Core.Configs;
+using Masuit.Tools;
+using Masuit.Tools.Html;
+using Masuit.Tools.Systems;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Aliyun.OSS;
-using Hangfire;
-using Masuit.MyBlogs.Core.Configs;
-using Masuit.Tools;
-using Masuit.Tools.Html;
-using Masuit.Tools.Systems;
 #if !DEBUG
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Models;
 #endif
-using Microsoft.AspNetCore.Http;
-using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Polly;
-using ContentDispositionHeaderValue = System.Net.Http.Headers.ContentDispositionHeaderValue;
 
-namespace Common
+namespace Masuit.MyBlogs.Core.Common
 {
     /// <summary>
     /// 公共类库
@@ -34,7 +32,6 @@ namespace Common
             BanRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "ban.txt"));
             ModRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "mod.txt"));
             DenyIP = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "denyip.txt"));
-            DenyAreaIP = JsonConvert.DeserializeObject<ConcurrentDictionary<string, HashSet<string>>>(File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "denyareaip.txt")));
             string[] lines = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory + "App_Data", "DenyIPRange.txt"));
             DenyIPRange = new Dictionary<string, string>();
             foreach (string line in lines)
@@ -66,11 +63,6 @@ namespace Common
         /// 全局禁止IP
         /// </summary>
         public static string DenyIP { get; set; }
-
-        /// <summary>
-        /// 按地区禁用ip
-        /// </summary>
-        public static ConcurrentDictionary<string, HashSet<string>> DenyAreaIP { get; set; }
 
         /// <summary>
         /// ip白名单
@@ -146,7 +138,18 @@ namespace Common
                 return false;
             }
 
-            return DenyAreaIP.SelectMany(x => x.Value).Union(DenyIP.Split(',')).Contains(ip) || DenyIPRange.Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
+            bool denyed = DenyIP.Split(',').Contains(ip) || DenyIPRange.Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
+            if ("true" == SystemSettings["EnableDenyArea"])
+            {
+                using (DbSearcher searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db")))
+                {
+                    string[] region = searcher.MemorySearch(ip).Region.Split("|");
+                    string[] denyAreas = SystemSettings["DenyArea"].Split(',', '，');
+                    denyed = denyed || denyAreas.Intersect(region).Any();
+                }
+            }
+
+            return denyed;
         }
 
         /// <summary>
@@ -185,27 +188,34 @@ namespace Common
         /// </summary>
         public static OssClient OssClient { get; set; } = new OssClient(AppConfig.AliOssConfig.EndPoint, AppConfig.AliOssConfig.AccessKeyId, AppConfig.AliOssConfig.AccessKeySecret);
 
-        public static (string url, bool success) UploadOss(string file)
+        public static (string url, bool success) UploadImage(string file)
         {
             if (!AppConfig.AliOssConfig.Enabled)
             {
-                return ("", false);
+                return UploadSmms(file);
             }
 
             var objectName = DateTime.Now.ToString("yyyyMMdd") + "/" + SnowFlake.NewId + Path.GetExtension(file);
-            var policy = Policy<(string, bool)>.Handle<Exception>().Retry(3);
-            return policy.Execute(() =>
-             {
-                 OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, file);
-                 return (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true);
-             });
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, file);
+                    return (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true);
+                }
+                catch
+                {
+                }
+            }
+
+            return UploadSmms(file);
         }
 
         /// <summary>
         /// 上传图片到sm图床
         /// </summary>
         /// <returns></returns>
-        public static (string url, bool success) UploadImage(string file)
+        public static (string url, bool success) UploadSmms(string file)
         {
             string url = string.Empty;
             bool success = false;
@@ -216,7 +226,7 @@ namespace Common
                     httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
                     using (var bc = new StreamContent(fs))
                     {
-                        bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                        bc.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
                         {
                             FileName = Path.GetFileName(file),
                             Name = "smfile"
@@ -257,7 +267,7 @@ namespace Common
                 }
             }
 
-            return success ? (url, true) : UploadOss(file);
+            return (url, success);
         }
 
         /// <summary>

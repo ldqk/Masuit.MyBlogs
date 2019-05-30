@@ -132,7 +132,7 @@
 
 <div id="modal" class="modal">
     <div class="container-fluid" style="margin: 15px 0;">
-        <form class="bgm-white">
+        <div class="bgm-white">
             <div class="input-group">
                 <span class="input-group-addon">
                     菜单名：
@@ -179,10 +179,25 @@
                     <button class="btn btn-success" ng-click="upload()">上传本地图片</button>
                 </span>
             </div>
+            <form id="uploadform" onsubmit="return false" enctype="multipart/form-data" ng-show="allowUpload">
+                <div class="file-box">
+                    <div class="input-group">
+                        <span class="input-group-addon">上传图片：</span>
+                        <div class="fg-line">
+                            <input type="text" name="file0" disabled class="form-control" placeholder="请选择一张图片" />
+                        </div>
+                        <span class="input-group-btn hidden">
+                            <a href="javascript:void(0);" class="btn btn-info ">浏览</a>
+                        </span>
+                        <input type="file" class="uploadFile" name="file" onchange="getFile(this, 'file0')" />
+                        <span class="input-group-btn"><button type="button" class="btn btn-primary" ng-click="uploadImage()"> 开始上传图片 </button></span>
+                    </div>
+                </div>
+            </form>
             <div class="btn-group">
                 <button type="button" class="btn btn-info waves-effect" ng-click="submit(menu)">确认</button>
                 <button type="button" class="btn btn-danger waves-effect" ng-click="closeAll()">取消</button>
             </div>
-        </form>
+        </div>
     </div>
 </div>

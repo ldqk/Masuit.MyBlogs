@@ -24,7 +24,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
             Status = Status.Pending;
             IsWordDocument = false;
             Seminar = new HashSet<SeminarPost>();
-            PostAccessRecord = new HashSet<PostAccessRecord>();
         }
 
         /// <summary>
@@ -142,11 +141,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 专题
         /// </summary>
         public virtual ICollection<SeminarPost> Seminar { get; set; }
-
-        /// <summary>
-        /// 点击记录
-        /// </summary>
-        public virtual ICollection<PostAccessRecord> PostAccessRecord { get; set; }
 
         /// <summary>
         /// 文章历史版本

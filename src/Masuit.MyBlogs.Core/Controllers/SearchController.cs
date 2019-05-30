@@ -1,5 +1,5 @@
-﻿using Common;
-using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -45,7 +45,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Route("s/{wd?}/{page:int?}/{size:int?}"), ResponseCache(VaryByQueryKeys = new[] { "wd", "page", "size" }, VaryByHeader = HeaderNames.Cookie, Duration = 600)]
+        [Route("s/{wd?}/{page:int?}/{size:int?}"), ResponseCache(VaryByQueryKeys = new[] { "wd", "page", "size" }, VaryByHeader = HeaderNames.Cookie, Duration = 60)]
         public ActionResult Search(string wd = "", int page = 1, int size = 10)
         {
             var nul = new List<PostOutputDto>();
@@ -60,11 +60,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string key = "Search:" + HttpContext.Session.Id;
             if (RedisHelper.Exists(key) && !RedisHelper.Get(key).Equals(wd))
             {
-                var hotSearches = SearchDetailsService.LoadEntitiesFromL2CacheNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()
-                {
-                    KeyWords = g.First().KeyWords,
-                    SearchCount = g.Count()
-                }).ToList();
+                var hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week");
                 ViewBag.hotSearches = hotSearches;
                 ViewBag.ErrorMsg = "10秒内只能搜索1次！";
                 return View(nul);
@@ -94,16 +90,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ViewBag.hotSearches = new List<KeywordsRankOutputDto>();
                 return View(posts.Results);
             }
-            ViewBag.hotSearches = SearchDetailsService.LoadEntitiesFromL2CacheNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(7).Select(g => new KeywordsRankOutputDto()
-            {
-                KeyWords = g.FirstOrDefault().KeyWords,
-                SearchCount = g.Count()
-            }).ToList();
+            ViewBag.hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week");
             return View(nul);
         }
 
         /// <summary>
-        /// 关键词推荐
+        /// 关键词搜索记录
         /// </summary>
         /// <param name="page"></param>
         /// <param name="size"></param>
@@ -129,28 +121,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority, HttpPost, ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult HotKey()
         {
-            var start = DateTime.Today.AddMonths(-1);
-            var temp = SearchDetailsService.LoadEntitiesNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).ToList();
-            var month = temp.GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(30).Select(g => new
-            {
-                Keywords = g.FirstOrDefault().KeyWords,
-                Count = g.Count()
-            }).ToList();
-            var week = temp.Where(s => s.SearchTime > DateTime.Today.AddDays(-7)).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(30).Select(g => new
-            {
-                Keywords = g.FirstOrDefault().KeyWords,
-                Count = g.Count()
-            }).ToList();
-            var today = temp.Where(s => s.SearchTime > DateTime.Today).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(30).Select(g => new
-            {
-                Keywords = g.FirstOrDefault().KeyWords,
-                Count = g.Count()
-            }).ToList();
             return ResultData(new
             {
-                month,
-                week,
-                today
+                month = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Month"),
+                week = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week"),
+                today = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Today")
             });
         }
 

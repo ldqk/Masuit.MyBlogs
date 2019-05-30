@@ -30,30 +30,10 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// </summary>
         public IDictionary<string, int> Tags { get; set; }
 
-        ///// <summary>
-        ///// 新评论列表
-        ///// </summary>
-        //public IList<CommentOutputDto> Comments { get; set; }
-
         /// <summary>
         /// 近期热搜
         /// </summary>
         public List<KeywordsRankOutputDto> HotSearch { get; set; }
-
-        ///// <summary>
-        ///// 文章周排行
-        ///// </summary>
-        //public List<SimplePostModel> TopPostByWeek { get; set; }
-
-        ///// <summary>
-        ///// 文章月排行
-        ///// </summary>
-        //public List<SimplePostModel> TopPostByMonth { get; set; }
-
-        ///// <summary>
-        ///// 文章年度排行
-        ///// </summary>
-        //public List<SimplePostModel> TopPostByToday { get; set; }
 
         /// <summary>
         /// 热门文章

@@ -43,11 +43,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public INoticeService NoticeService { get; set; }
 
         /// <summary>
-        /// 文章访问统计
-        /// </summary>
-        public IPostAccessRecordService PostAccessRecordService { get; set; }
-
-        /// <summary>
         /// 快速分享
         /// </summary>
         public IFastShareService FastShareService { get; set; }
@@ -146,7 +141,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Category(int id, int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {
             UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
-            var cat = await CategoryService.GetByIdAsync(id).ConfigureAwait(true);
+            var cat = await CategoryService.GetByIdAsync(id);
             if (cat is null) return RedirectToAction("Index", "Error");
             var posts = PostService.LoadEntitiesNoTracking(p => p.CategoryId == cat.Id && (p.Status == Status.Pended || user.IsAdmin)).OrderByDescending(p => p.IsFixedTop);
             ViewBag.Total = posts.Count();
@@ -191,12 +186,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             IQueryable<PostOutputDto> postList = PostService.LoadEntities<PostOutputDto>(p => (p.Status == Status.Pended || user.IsAdmin)); //准备文章的查询
             var notices = NoticeService.LoadPageEntitiesFromL2Cache<DateTime, NoticeOutputDto>(1, 5, out int _, n => (n.Status == Status.Display || user.IsAdmin), n => n.ModifyDate, false).ToList(); //加载前5条公告
             var cats = CategoryService.LoadEntitiesFromL2Cache<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).ToList(); //加载分类目录
-            var start = DateTime.Today.AddDays(-7);
-            var hotSearches = SearchDetailsService.LoadEntitiesNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).GroupBy(s => s.KeyWords).OrderByDescending(g => g.Count()).Take(10).Select(g => new KeywordsRankOutputDto()
-            {
-                KeyWords = g.FirstOrDefault().KeyWords,
-                SearchCount = g.Count()
-            }).Cacheable().ToList(); //热词统计
+            var hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week").Take(10).ToList(); //热词统计
             Expression<Func<PostOutputDto, double>> order = p => p.TotalViewCount;
             switch (new Random().Next() % 3)
             {

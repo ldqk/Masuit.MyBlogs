@@ -177,7 +177,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns>还未执行的SQL语句</returns>
         IOrderedQueryable<T> IBaseService<T>.LoadEntities<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
         {
-            return null;
+            return BaseDal.LoadEntities(where, orderby, isAsc);
         }
 
         /// <summary>

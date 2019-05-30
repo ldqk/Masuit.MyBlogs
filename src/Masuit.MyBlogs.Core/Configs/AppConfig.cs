@@ -24,5 +24,10 @@
         /// OSS配置
         /// </summary>
         public static AliOssConfig AliOssConfig { get; set; } = new AliOssConfig();
+
+        /// <summary>
+        /// 图床域名
+        /// </summary>
+        public static string[] ImgbedDomains { get; set; } = { };
     }
 }

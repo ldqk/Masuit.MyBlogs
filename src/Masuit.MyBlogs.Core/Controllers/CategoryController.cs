@@ -1,5 +1,5 @@
-﻿using Common;
-using EFSecondLevelCache.Core;
+﻿using EFSecondLevelCache.Core;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;

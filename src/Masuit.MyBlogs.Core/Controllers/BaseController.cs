@@ -1,4 +1,7 @@
-﻿using Masuit.MyBlogs.Core.Configs;
+﻿using AutoMapper.QueryableExtensions;
+using EFSecondLevelCache.Core;
+using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -14,10 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
-
-#if DEBUG
-using Common;
-#endif
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -146,7 +145,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.menus = MenuService.LoadEntitiesFromL2Cache<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
             PageFootViewModel model = new PageFootViewModel //页脚
             {
-                Links = LinksService.LoadPageEntitiesFromL2Cache<bool, LinksOutputDto>(1, 40, out int _, l => l.Status == Status.Available, l => l.Recommend, false).ToList()
+                Links = LinksService.LoadEntities(l => l.Status == Status.Available, l => l.Recommend, false).ThenBy(l => new Random().Next()).Take(40).ProjectTo<LinksOutputDto>().Cacheable().ToList()
             };
             ViewBag.Footer = model;
 

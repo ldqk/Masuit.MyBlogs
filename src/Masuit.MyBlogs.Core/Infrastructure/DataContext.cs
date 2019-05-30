@@ -28,7 +28,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             modelBuilder.Entity<Post>().Property(e => e.Label).IsUnicode();
             modelBuilder.Entity<Post>().HasMany(e => e.Comment).WithOne(e => e.Post).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Post>().HasMany(e => e.PostHistoryVersion).WithOne(e => e.Post).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Post>().HasMany(e => e.PostAccessRecord).WithOne(e => e.Post).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Post>().HasMany(e => e.Seminar).WithOne(s => s.Post).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<PostHistoryVersion>().HasMany(e => e.Seminar).WithOne(s => s.PostHistoryVersion);
             modelBuilder.Entity<SearchDetails>().Property(e => e.KeyWords).IsUnicode();
@@ -76,7 +75,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure
         public virtual DbSet<Seminar> Seminar { get; set; }
         public virtual DbSet<SeminarPost> SeminarPosts { get; set; }
         public virtual DbSet<SeminarPostHistoryVersion> SeminarPostHistoryVersions { get; set; }
-        public virtual DbSet<PostAccessRecord> PostAccessRecord { get; set; }
         public virtual DbSet<InternalMessage> InternalMessage { get; set; }
         public virtual DbSet<FastShare> FastShare { get; set; }
         public virtual DbSet<Banner> Banner { get; set; }

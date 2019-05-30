@@ -1,5 +1,5 @@
-﻿using Common;
-using Hangfire;
+﻿using Hangfire;
+using Masuit.MyBlogs.Core.Common;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;

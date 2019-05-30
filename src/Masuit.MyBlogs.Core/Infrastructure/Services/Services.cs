@@ -61,13 +61,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
     }
 
-    public partial class PostAccessRecordService : BaseService<PostAccessRecord>, IPostAccessRecordService
-    {
-        public PostAccessRecordService(IBaseRepository<PostAccessRecord> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
-        {
-        }
-    }
-
     public partial class PostHistoryVersionService : BaseService<PostHistoryVersion>, IPostHistoryVersionService
     {
         public PostHistoryVersionService(IBaseRepository<PostHistoryVersion> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)

@@ -346,57 +346,23 @@
 			});
 		}
 	}
+	$scope.uploadImage = function() {
+		$scope.loading();
+        $("#uploadform").ajaxSubmit({
+			url: "/Upload",
+			type: "post",
+			success: function(data) {
+				$scope.loadingDone();
+				document.getElementById("uploadform").reset();
+				$scope.$apply(function () {
+			     　$scope.allowUpload=false;
+					$scope.menu.Icon = data.Data;
+			    });
+			}
+		});
+    };
 	$scope.upload = function() {
-		swal({
-			title: '请选择一张图片',
-			input: 'file',
-			showCancelButton: true,
-			showCloseButton: true,
-			confirmButtonColor: "#DD6B55",
-			confirmButtonText: "确定",
-			cancelButtonText: "取消",
-			showLoaderOnConfirm: true,
-			animation: true,
-			inputAttributes: {
-				accept: 'image/*'
-			}
-		}).then(function(file) {
-			if (file) {
-				var reader = new FileReader;
-				reader.onload = function (e) {
-					swal({
-						title: "上传预览",
-						text:"确认后将开始上传并应用设置！",
-						imageUrl: e.target.result,
-						showCancelButton: true,
-						confirmButtonColor: '#3085d6',
-						cancelButtonColor: '#d33',
-						confirmButtonText: '开始上传',
-						cancelButtonText: '取消',
-						showLoaderOnConfirm: true,
-						preConfirm: function () {
-							return new Promise(function (resolve, reject) {
-								$http.post("/upload/DecodeDataUri", {
-									data: e.target.result
-								}).then(function (res) {
-									var data = res.data;
-									if (data.Success) {
-										resolve(data.Data);
-									} else {
-										reject(data.Message);
-									}
-								}, function (error) {
-									reject("请求失败，错误码：" + error.status);
-								});
-							});
-						}
-					}).then(function (data) {
-						$scope.menu.Icon = data;
-					}).catch(swal.noop);
-				};
-				reader.readAsDataURL(file);
-			}
-		}).catch(swal.noop);
+		$scope.allowUpload=true;
 	}
 	$scope.init();
 	$scope.getMenuType();

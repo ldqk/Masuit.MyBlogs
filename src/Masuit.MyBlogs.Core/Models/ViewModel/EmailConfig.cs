@@ -1,4 +1,4 @@
-﻿using Common;
+﻿using Masuit.MyBlogs.Core.Common;
 
 namespace Masuit.MyBlogs.Core.Models.ViewModel
 {

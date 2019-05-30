@@ -18,8 +18,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 
     public partial interface INoticeService : IBaseService<Notice> { }
 
-    public partial interface IPostAccessRecordService : IBaseService<PostAccessRecord> { }
-
     public partial interface IPostHistoryVersionService : IBaseService<PostHistoryVersion> { }
 
     public partial interface ISearchDetailsService : IBaseService<SearchDetails> { }

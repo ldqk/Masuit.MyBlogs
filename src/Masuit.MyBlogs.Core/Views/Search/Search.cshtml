@@ -41,7 +41,7 @@
                                 <span>搜索推荐：</span>
                                 foreach (var item in hotSearches)
                                 {
-                                    @Html.ActionLink(item.KeyWords + "(" + item.SearchCount + ")", "Search", new { wd = item.KeyWords }, new { @class = "btn btn-danger" }) <span>  </span>
+                                    @Html.ActionLink(item.Keywords + "(" + item.Count + ")", "Search", new { wd = item.Keywords }, new { @class = "btn btn-danger" }) <span>  </span>
                                 }
                             }
                         </div>

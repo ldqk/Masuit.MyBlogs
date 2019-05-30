@@ -1,5 +1,5 @@
 ﻿@using System.Web
-@using Common
+@using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
@@ -80,7 +80,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 line-height24">
-                                    分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] }) | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.PostAccessRecord.Sum(r => r.ClickCount)</span>℃ | 状态：@Model.Status.GetDisplay()
+                                    分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] }) | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃ | 状态：@Model.Status.GetDisplay()
                                     @if (Model.Seminar.Any())
                                     {
                                         <span> | 所属专题：</span>

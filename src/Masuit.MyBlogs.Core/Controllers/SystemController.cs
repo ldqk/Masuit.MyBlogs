@@ -1,4 +1,4 @@
-﻿using Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Hubs;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -167,19 +167,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             SystemSetting[] settings = JsonConvert.DeserializeObject<List<SystemSetting>>(sets).ToArray();
             ConcurrentDictionary<string, HashSet<string>> dic = new ConcurrentDictionary<string, HashSet<string>>();
-            settings.FirstOrDefault(s => s.Name.Equals("DenyArea"))?.Value.Split(',', '，').ForEach(area =>
-            {
-                if (CommonHelper.DenyAreaIP.TryGetValue(area, out var hs))
-                {
-                    dic[area] = hs;
-                }
-                else
-                {
-                    dic[area] = new HashSet<string>();
-                }
-            });
-            CommonHelper.DenyAreaIP = dic;
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt"), CommonHelper.DenyAreaIP.ToJsonString(), Encoding.UTF8);
             foreach (var set in settings)
             {
                 var entry = SystemSettingService.GetFirstEntity(s => s.Name.Equals(set.Name));
@@ -302,15 +289,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
-        /// 获取地区IP黑名单
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult AreaIPBlackList()
-        {
-            return ResultData(CommonHelper.DenyAreaIP);
-        }
-
-        /// <summary>
         /// 获取IP地址段黑名单
         /// </summary>
         /// <returns></returns>
@@ -414,15 +392,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 list.Add(ip);
                 System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), string.Join(",", list.Distinct()), Encoding.UTF8);
                 CommonHelper.IPWhiteList = list;
-                foreach (var kv in CommonHelper.DenyAreaIP)
-                {
-                    foreach (string item in list)
-                    {
-                        CommonHelper.DenyAreaIP[kv.Key].Remove(item);
-                    }
-                }
-
-                System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyareaip.txt"), CommonHelper.DenyAreaIP.ToJsonString(), Encoding.UTF8);
                 return ResultData(null);
             }
 

@@ -4,74 +4,69 @@
         <name>Masuit.MyBlogs.Core</name>
     </assembly>
     <members>
-        <member name="T:Common.CommonHelper">
+        <member name="T:Masuit.MyBlogs.Core.Common.CommonHelper">
             <summary>
             公共类库
             </summary>
         </member>
-        <member name="P:Common.CommonHelper.BanRegex">
+        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.BanRegex">
             <summary>
             敏感词
             </summary>
         </member>
-        <member name="P:Common.CommonHelper.ModRegex">
+        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.ModRegex">
             <summary>
             审核词
             </summary>
         </member>
-        <member name="P:Common.CommonHelper.DenyIP">
+        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.DenyIP">
             <summary>
             全局禁止IP
             </summary>
         </member>
-        <member name="P:Common.CommonHelper.DenyAreaIP">
-            <summary>
-            按地区禁用ip
-            </summary>
-        </member>
-        <member name="P:Common.CommonHelper.IPWhiteList">
+        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.IPWhiteList">
             <summary>
             ip白名单
             </summary>
         </member>
-        <member name="P:Common.CommonHelper.IPErrorTimes">
+        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.IPErrorTimes">
             <summary>
             每IP错误的次数统计
             </summary>
         </member>
-        <member name="P:Common.CommonHelper.SystemSettings">
+        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.SystemSettings">
             <summary>
             系统设定
             </summary>
         </member>
-        <member name="P:Common.CommonHelper.InterviewCount">
+        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.InterviewCount">
             <summary>
             访问量
             </summary>
         </member>
-        <member name="P:Common.CommonHelper.AverageCount">
+        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.AverageCount">
             <summary>
             平均访问量
             </summary>
         </member>
-        <member name="P:Common.CommonHelper.StartupTime">
+        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.StartupTime">
             <summary>
             网站启动时间
             </summary>
         </member>
-        <member name="P:Common.CommonHelper.DenyIPRange">
+        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.DenyIPRange">
             <summary>
             IP黑名单地址段
             </summary>
         </member>
-        <member name="M:Common.CommonHelper.IsDenyIpAddress(System.String)">
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.IsDenyIpAddress(System.String)">
             <summary>
             判断IP地址是否被黑名单
             </summary>
             <param name="ip"></param>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.Mapper``1(System.Object)">
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.Mapper``1(System.Object)">
             <summary>
             类型映射
             </summary>
@@ -79,7 +74,7 @@
             <param name="source"></param>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.SendMail(System.String,System.String,System.String)">
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.SendMail(System.String,System.String,System.String)">
             <summary>
             发送邮件
             </summary>
@@ -87,25 +82,25 @@
             <param name="content">内容</param>
             <param name="tos">收件人</param>
         </member>
-        <member name="P:Common.CommonHelper.OssClient">
+        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.OssClient">
             <summary>
             OSS客户端
             </summary>
         </member>
-        <member name="M:Common.CommonHelper.UploadImage(System.String)">
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.UploadSmms(System.String)">
             <summary>
             上传图片到sm图床
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.ReplaceImgSrc(System.String)">
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.ReplaceImgSrc(System.String)">
             <summary>
             替换img标签的src属性
             </summary>
             <param name="content"></param>
             <returns></returns>
         </member>
-        <member name="M:Common.CommonHelper.IsRobot(Microsoft.AspNetCore.Http.HttpRequest)">
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.IsRobot(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             是否是机器人访问
             </summary>
@@ -221,6 +216,11 @@
             OSS配置
             </summary>
         </member>
+        <member name="P:Masuit.MyBlogs.Core.Configs.AppConfig.ImgbedDomains">
+            <summary>
+            图床域名
+            </summary>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Configs.HangfireJobInit">
             <summary>
             hangfire配置
@@ -239,6 +239,11 @@
         <member name="M:Masuit.MyBlogs.Core.Configs.HangfireJobInit.EverydayJob">
             <summary>
             每日任务
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Configs.HangfireJobInit.EveryHourJob">
+            <summary>
+            每小时任务
             </summary>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Configs.HangfireJobInit.EveryweekJob">
@@ -704,11 +709,6 @@
         <member name="P:Masuit.MyBlogs.Core.Controllers.HomeController.NoticeService">
             <summary>
             网站公告
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Controllers.HomeController.PostAccessRecordService">
-            <summary>
-            文章访问统计
             </summary>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Controllers.HomeController.FastShareService">
@@ -1468,13 +1468,6 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.Analyse(System.Int32)">
-            <summary>
-            文章分析
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.SearchController">
             <summary>
             站内搜索
@@ -1504,7 +1497,7 @@
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.SearchController.SearchList(System.Int32,System.Int32,System.String)">
             <summary>
-            关键词推荐
+            关键词搜索记录
             </summary>
             <param name="page"></param>
             <param name="size"></param>
@@ -1821,12 +1814,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.SystemController.AreaIPBlackList">
-            <summary>
-            获取地区IP黑名单
-            </summary>
-            <returns></returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.SystemController.GetIPRangeBlackList">
             <summary>
             获取IP地址段黑名单
@@ -2107,6 +2094,11 @@
             重建Lucene索引库
             </summary>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.StatisticsSearchKeywords">
+            <summary>
+            搜索统计
+            </summary>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob">
             <summary>
             hangfire后台任务
@@ -2145,6 +2137,11 @@
         <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob.CreateLuceneIndex">
             <summary>
             重建Lucene索引库
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob.StatisticsSearchKeywords">
+            <summary>
+            搜索统计
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Extensions.LuceneHelper">
@@ -5048,12 +5045,12 @@
             搜索统计输出模型
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.KeywordsRankOutputDto.KeyWords">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.KeywordsRankOutputDto.Keywords">
             <summary>
             关键词
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.KeywordsRankOutputDto.SearchCount">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.KeywordsRankOutputDto.Count">
             <summary>
             搜索次数
             </summary>
@@ -6313,29 +6310,9 @@
             专题
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.PostAccessRecord">
-            <summary>
-            点击记录
-            </summary>
-        </member>
         <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.PostHistoryVersion">
             <summary>
             文章历史版本
-            </summary>
-        </member>
-        <member name="T:Masuit.MyBlogs.Core.Models.Entity.PostAccessRecord">
-            <summary>
-            文章访问记录
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.PostAccessRecord.AccessTime">
-            <summary>
-            访问时间
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.PostAccessRecord.ClickCount">
-            <summary>
-            点击次数
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion">

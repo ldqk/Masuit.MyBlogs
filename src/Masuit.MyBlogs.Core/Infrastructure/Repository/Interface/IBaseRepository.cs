@@ -536,8 +536,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
 
     public partial interface IPostRepository : IBaseRepository<Post> { }
 
-    public partial interface IPostAccessRecordRepository : IBaseRepository<PostAccessRecord> { }
-
     public partial interface IPostHistoryVersionRepository : IBaseRepository<PostHistoryVersion> { }
 
     public partial interface ISearchDetailsRepository : IBaseRepository<SearchDetails> { }
