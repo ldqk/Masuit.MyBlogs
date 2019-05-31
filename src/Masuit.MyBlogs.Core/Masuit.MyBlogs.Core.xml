@@ -87,10 +87,31 @@
             OSS客户端
             </summary>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.UploadImage(System.String)">
+            <summary>
+            阿里云Oss图床
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.UploadGitlab(System.String)">
+            <summary>
+            gitlab图床
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.UploadSmms(System.String)">
             <summary>
             上传图片到sm图床
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.UploadPeople(System.String)">
+            <summary>
+            上传图片到人民网图床
+            </summary>
+            <param name="file"></param>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.ReplaceImgSrc(System.String)">
@@ -214,6 +235,11 @@
         <member name="P:Masuit.MyBlogs.Core.Configs.AppConfig.AliOssConfig">
             <summary>
             OSS配置
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Configs.AppConfig.GitlabConfig">
+            <summary>
+            gitlab图床配置
             </summary>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Configs.AppConfig.ImgbedDomains">

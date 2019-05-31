@@ -26,6 +26,11 @@
         public static AliOssConfig AliOssConfig { get; set; } = new AliOssConfig();
 
         /// <summary>
+        /// gitlab图床配置
+        /// </summary>
+        public static GitlabConfig GitlabConfig { get; set; } = new GitlabConfig();
+
+        /// <summary>
         /// 图床域名
         /// </summary>
         public static string[] ImgbedDomains { get; set; } = { };

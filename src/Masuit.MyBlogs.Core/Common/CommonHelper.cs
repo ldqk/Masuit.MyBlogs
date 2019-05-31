@@ -8,11 +8,14 @@ using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
+using Polly;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 #if !DEBUG
@@ -188,27 +191,65 @@ namespace Masuit.MyBlogs.Core.Common
         /// </summary>
         public static OssClient OssClient { get; set; } = new OssClient(AppConfig.AliOssConfig.EndPoint, AppConfig.AliOssConfig.AccessKeyId, AppConfig.AliOssConfig.AccessKeySecret);
 
+        /// <summary>
+        /// 阿里云Oss图床
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
         public static (string url, bool success) UploadImage(string file)
         {
             if (!AppConfig.AliOssConfig.Enabled)
             {
-                return UploadSmms(file);
+                return UploadGitlab(file);
             }
 
             var objectName = DateTime.Now.ToString("yyyyMMdd") + "/" + SnowFlake.NewId + Path.GetExtension(file);
-            for (int i = 0; i < 3; i++)
+            var result = Policy.Handle<Exception>().Retry(5, (e, i) =>
+             {
+                 Console.ForegroundColor = ConsoleColor.Red;
+                 Console.WriteLine(e.Message);
+                 Console.ResetColor();
+             }).Execute(() => OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, file));
+            return result.HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : UploadSmms(file);
+        }
+
+        /// <summary>
+        /// gitlab图床
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static (string url, bool success) UploadGitlab(string file)
+        {
+            if (!AppConfig.GitlabConfig.Enabled)
             {
-                try
-                {
-                    OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, file);
-                    return (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true);
-                }
-                catch
-                {
-                }
+                return UploadSmms(file);
             }
 
-            return UploadSmms(file);
+            using (Image image = Image.FromFile(file))
+            {
+                using (MemoryStream m = new MemoryStream())
+                {
+                    image.Save(m, image.RawFormat);
+                    string base64String = Convert.ToBase64String(m.ToArray());
+                    HttpClient httpClient = new HttpClient();
+                    httpClient.DefaultRequestHeaders.Add("PRIVATE-TOKEN", AppConfig.GitlabConfig.AccessToken);
+                    var resp = httpClient.PostAsJsonAsync(AppConfig.GitlabConfig.ApiUrl + Path.GetFileName(file), new
+                    {
+                        branch = AppConfig.GitlabConfig.Branch,
+                        author_email = "1@1.cn",
+                        author_name = "ldqk",
+                        encoding = "base64",
+                        content = base64String,
+                        commit_message = "上传一张图片"
+                    }).Result;
+                    if (resp.IsSuccessStatusCode)
+                    {
+                        return (AppConfig.GitlabConfig.RawUrl + Path.GetFileName(file), true);
+                    }
+
+                    return UploadSmms(file);
+                }
+            }
         }
 
         /// <summary>
@@ -267,7 +308,54 @@ namespace Masuit.MyBlogs.Core.Common
                 }
             }
 
-            return (url, success);
+            return success ? (url, true) : UploadPeople(file);
+        }
+
+        /// <summary>
+        /// 上传图片到人民网图床
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static (string url, bool success) UploadPeople(string file)
+        {
+            bool success = false;
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Chrome/72.0.3626.96"));
+                using (var stream = File.OpenRead(file))
+                {
+                    using (var sc = new StreamContent(stream))
+                    {
+                        using (var mc = new MultipartFormDataContent
+                        {
+                            { sc, "Filedata", Path.GetFileName(file) },
+                            {new StringContent("."+Path.GetExtension(file)),"filetype"}
+                        })
+                        {
+                            var str = httpClient.PostAsync("http://bbs1.people.com.cn/postImageUpload.do", mc).ContinueWith(t =>
+                            {
+                                if (t.IsCompletedSuccessfully)
+                                {
+                                    var res = t.Result;
+                                    if (res.IsSuccessStatusCode)
+                                    {
+                                        string result = res.Content.ReadAsStringAsync().Result;
+                                        string url = "http://bbs1.people.com.cn" + (string)JObject.Parse(result)["imageUrl"];
+                                        if (url.EndsWith(Path.GetExtension(file)))
+                                        {
+                                            success = true;
+                                            return url;
+                                        }
+                                    }
+                                }
+
+                                return "";
+                            }).Result;
+                            return (str, success);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

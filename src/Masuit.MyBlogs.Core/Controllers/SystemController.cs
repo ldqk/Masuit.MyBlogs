@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -166,7 +165,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Save(string sets)
         {
             SystemSetting[] settings = JsonConvert.DeserializeObject<List<SystemSetting>>(sets).ToArray();
-            ConcurrentDictionary<string, HashSet<string>> dic = new ConcurrentDictionary<string, HashSet<string>>();
             foreach (var set in settings)
             {
                 var entry = SystemSettingService.GetFirstEntity(s => s.Name.Equals(set.Name));
