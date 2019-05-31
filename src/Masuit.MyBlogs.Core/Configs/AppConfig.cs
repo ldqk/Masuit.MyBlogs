@@ -1,4 +1,6 @@
-﻿namespace Masuit.MyBlogs.Core.Configs
+﻿using System.Collections.Generic;
+
+namespace Masuit.MyBlogs.Core.Configs
 {
     /// <summary>
     /// 应用程序配置
@@ -33,6 +35,6 @@
         /// <summary>
         /// 图床域名
         /// </summary>
-        public static string[] ImgbedDomains { get; set; } = { };
+        public static List<string> ImgbedDomains { get; set; } = new List<string>();
     }
 }
