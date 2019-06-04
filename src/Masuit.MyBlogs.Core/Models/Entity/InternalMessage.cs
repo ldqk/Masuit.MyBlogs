@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using Masuit.MyBlogs.Core.Models.Entity;
 
 namespace Masuit.MyBlogs.Core.Models.Entity
 {

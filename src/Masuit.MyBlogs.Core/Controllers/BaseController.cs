@@ -11,12 +11,10 @@ using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -50,21 +48,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="isLogin">登录状态</param>
         /// <param name="code">http响应码</param>
         /// <returns></returns>
-        public ContentResult ResultData(object data, bool success = true, string message = "", bool isLogin = true, HttpStatusCode code = HttpStatusCode.OK)
+        public ActionResult ResultData(object data, bool success = true, string message = "", bool isLogin = true, HttpStatusCode code = HttpStatusCode.OK)
         {
-            return Content(JsonConvert.SerializeObject(new
+            return Ok(new
             {
                 IsLogin = isLogin,
                 Success = success,
                 Message = message,
                 Data = data,
                 code
-            }, new JsonSerializerSettings
-            {
-                MissingMemberHandling = MissingMemberHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            }), "application/json", Encoding.UTF8);
+            });
         }
 
         /// <summary>
@@ -74,12 +67,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="pageCount">总页数</param>
         /// <param name="total">总条数</param>
         /// <returns></returns>
-        public ContentResult PageResult(object data, int pageCount, int total)
+        public ActionResult PageResult(object data, int pageCount, int total)
         {
-            return Content(JsonConvert.SerializeObject(new PageDataModel(data, pageCount, total), new JsonSerializerSettings
-            {
-                MissingMemberHandling = MissingMemberHandling.Ignore
-            }), "application/json", Encoding.UTF8);
+            return Ok(new PageDataModel(data, pageCount, total));
         }
 
         /// <summary>在调用操作方法前调用。</summary>

@@ -1,8 +1,7 @@
-using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
+using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Masuit.MyBlogs.Core.Models.Entity
 {

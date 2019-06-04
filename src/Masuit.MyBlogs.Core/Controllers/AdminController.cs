@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Configs;
+﻿using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -8,11 +9,8 @@ using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Masuit.MyBlogs.Core.Common;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -37,18 +35,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult ResultData(object data, bool success = true, string message = "", bool isLogin = true)
         {
-            return Content(JsonConvert.SerializeObject(new
+            return Ok(new
             {
                 IsLogin = isLogin,
                 Success = success,
                 Message = message,
                 Data = data
-            }, new JsonSerializerSettings
-            {
-                MissingMemberHandling = MissingMemberHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            }), "application/json", Encoding.UTF8);
+            });
         }
 
         /// <summary>
@@ -60,10 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult PageResult(object data, int pageCount, int total)
         {
-            return Content(JsonConvert.SerializeObject(new PageDataModel(data, pageCount, total), new JsonSerializerSettings
-            {
-                MissingMemberHandling = MissingMemberHandling.Ignore
-            }), "application/json", Encoding.UTF8);
+            return Ok(new PageDataModel(data, pageCount, total));
         }
 
         /// <summary>在调用操作方法前调用。</summary>

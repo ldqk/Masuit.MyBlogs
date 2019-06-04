@@ -56,15 +56,16 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return RedirectToAction("Search");
             }
-            var start = DateTime.Today.AddDays(-7);
+
             string key = "Search:" + HttpContext.Session.Id;
             if (RedisHelper.Exists(key) && !RedisHelper.Get(key).Equals(wd))
             {
-                var hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week");
+                var hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week").Take(10).ToList();
                 ViewBag.hotSearches = hotSearches;
                 ViewBag.ErrorMsg = "10秒内只能搜索1次！";
                 return View(nul);
             }
+
             wd = wd.Trim().Replace("+", " ");
             if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
             {
@@ -78,6 +79,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                     HttpContext.Session.Set("search:" + wd, wd.ToByteArray());
                 }
+
                 var posts = _postService.SearchPage(page, size, wd);
                 ViewBag.Elapsed = posts.Elapsed;
                 ViewBag.Total = posts.Total;
@@ -87,10 +89,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                     RedisHelper.Set(key, wd);
                     RedisHelper.Expire(key, TimeSpan.FromSeconds(10));
                 }
+
                 ViewBag.hotSearches = new List<KeywordsRankOutputDto>();
                 return View(posts.Results);
             }
-            ViewBag.hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week");
+
+            ViewBag.hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week").Take(10).ToList();
             return View(nul);
         }
 

@@ -186,31 +186,76 @@ namespace Masuit.MyBlogs.Core.Common
 #endif
         }
 
+        #region 图床相关
+
         /// <summary>
         /// OSS客户端
         /// </summary>
         public static OssClient OssClient { get; set; } = new OssClient(AppConfig.AliOssConfig.EndPoint, AppConfig.AliOssConfig.AccessKeyId, AppConfig.AliOssConfig.AccessKeySecret);
 
         /// <summary>
-        /// 阿里云Oss图床
+        /// 上传图片
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
         public static (string url, bool success) UploadImage(string file)
         {
-            if (!AppConfig.AliOssConfig.Enabled)
+            if (AppConfig.GiteeConfig.Enabled)
+            {
+                return UploadGitee(file);
+            }
+
+            if (AppConfig.GitlabConfig.Enabled)
             {
                 return UploadGitlab(file);
             }
 
-            var objectName = DateTime.Now.ToString("yyyyMMdd") + "/" + SnowFlake.NewId + Path.GetExtension(file);
-            var result = Policy.Handle<Exception>().Retry(5, (e, i) =>
-             {
-                 Console.ForegroundColor = ConsoleColor.Red;
-                 Console.WriteLine(e.Message);
-                 Console.ResetColor();
-             }).Execute(() => OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, file));
-            return result.HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : UploadSmms(file);
+            if (AppConfig.AliOssConfig.Enabled)
+            {
+                return UploadOss(file);
+            }
+
+            return UploadSmms(file);
+        }
+
+        /// <summary>
+        /// 码云图床
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static (string url, bool success) UploadGitee(string file)
+        {
+            if (!file.Contains(new[] { ".jpg", ".jpeg", ".gif", ".png", ".bmp" }))
+            {
+                return (null, false);
+            }
+
+            using (Image image = Image.FromFile(file))
+            {
+                using (MemoryStream m = new MemoryStream())
+                {
+                    image.Save(m, image.RawFormat);
+                    string base64String = Convert.ToBase64String(m.ToArray());
+                    using (HttpClient httpClient = new HttpClient())
+                    {
+                        string path = $"{DateTime.Now:yyyyMMdd}/{Path.GetFileName(file)}";
+                        using (var resp = httpClient.PostAsJsonAsync(AppConfig.GiteeConfig.ApiUrl + path, new
+                        {
+                            access_token = AppConfig.GiteeConfig.AccessToken,
+                            content = base64String,
+                            message = "上传一张图片"
+                        }).Result)
+                        {
+                            if (resp.IsSuccessStatusCode || resp.Content.ReadAsStringAsync().Result.Contains("already exists"))
+                            {
+                                return (AppConfig.GiteeConfig.RawUrl + path, true);
+                            }
+                        }
+                    }
+
+                    return UploadSmms(file);
+                }
+            }
         }
 
         /// <summary>
@@ -220,9 +265,9 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public static (string url, bool success) UploadGitlab(string file)
         {
-            if (!AppConfig.GitlabConfig.Enabled)
+            if (!file.Contains(new[] { ".jpg", ".jpeg", ".gif", ".png", ".bmp" }))
             {
-                return UploadSmms(file);
+                return (null, false);
             }
 
             using (Image image = Image.FromFile(file))
@@ -231,25 +276,47 @@ namespace Masuit.MyBlogs.Core.Common
                 {
                     image.Save(m, image.RawFormat);
                     string base64String = Convert.ToBase64String(m.ToArray());
-                    HttpClient httpClient = new HttpClient();
-                    httpClient.DefaultRequestHeaders.Add("PRIVATE-TOKEN", AppConfig.GitlabConfig.AccessToken);
-                    var resp = httpClient.PostAsJsonAsync(AppConfig.GitlabConfig.ApiUrl + Path.GetFileName(file), new
+                    using (HttpClient httpClient = new HttpClient())
                     {
-                        branch = AppConfig.GitlabConfig.Branch,
-                        author_email = "1@1.cn",
-                        author_name = "ldqk",
-                        encoding = "base64",
-                        content = base64String,
-                        commit_message = "上传一张图片"
-                    }).Result;
-                    if (resp.IsSuccessStatusCode)
-                    {
-                        return (AppConfig.GitlabConfig.RawUrl + Path.GetFileName(file), true);
+                        httpClient.DefaultRequestHeaders.Add("PRIVATE-TOKEN", AppConfig.GitlabConfig.AccessToken);
+                        string path = $"{DateTime.Now:yyyyMMdd}/{Path.GetFileName(file)}";
+                        using (var resp = httpClient.PostAsJsonAsync(AppConfig.GitlabConfig.ApiUrl + path, new
+                        {
+                            branch = AppConfig.GitlabConfig.Branch,
+                            author_email = "1@1.cn",
+                            author_name = "ldqk",
+                            encoding = "base64",
+                            content = base64String,
+                            commit_message = "上传一张图片"
+                        }).Result)
+                        {
+                            if (resp.IsSuccessStatusCode || resp.Content.ReadAsStringAsync().Result.Contains("already exists"))
+                            {
+                                return (AppConfig.GitlabConfig.RawUrl + path, true);
+                            }
+                        }
                     }
 
                     return UploadSmms(file);
                 }
             }
+        }
+
+        /// <summary>
+        /// 阿里云Oss图床
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static (string url, bool success) UploadOss(string file)
+        {
+            var objectName = DateTime.Now.ToString("yyyyMMdd") + "/" + SnowFlake.NewId + Path.GetExtension(file);
+            var result = Policy.Handle<Exception>().Retry(5, (e, i) =>
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e.Message);
+                Console.ResetColor();
+            }).Execute(() => OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, file));
+            return result.HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : UploadSmms(file);
         }
 
         /// <summary>
@@ -358,6 +425,7 @@ namespace Masuit.MyBlogs.Core.Common
             }
         }
 
+        #endregion
         /// <summary>
         /// 替换img标签的src属性
         /// </summary>

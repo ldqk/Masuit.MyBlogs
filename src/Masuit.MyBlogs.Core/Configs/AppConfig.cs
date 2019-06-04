@@ -33,6 +33,11 @@ namespace Masuit.MyBlogs.Core.Configs
         public static GitlabConfig GitlabConfig { get; set; } = new GitlabConfig();
 
         /// <summary>
+        /// 码云图床配置
+        /// </summary>
+        public static GitlabConfig GiteeConfig { get; set; } = new GitlabConfig();
+
+        /// <summary>
         /// 图床域名
         /// </summary>
         public static List<string> ImgbedDomains { get; set; } = new List<string>();

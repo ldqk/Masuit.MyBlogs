@@ -1,11 +1,14 @@
-﻿using Hangfire;
+﻿using EFSecondLevelCache.Core;
+using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.DateTimeExt;
+using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Hosting;
@@ -13,13 +16,15 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using WilderMinds.RssSyndication;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
     /// <summary>
     /// 订阅服务
     /// </summary>
-    public class SubscribeController : BaseController
+    public class SubscribeController : Controller
     {
         /// <summary>
         /// 邮箱广播
@@ -44,6 +49,66 @@ namespace Masuit.MyBlogs.Core.Controllers
             BroadcastService = broadcastService;
             PostService = postService;
             _hostingEnvironment = hostingEnvironment;
+        }
+
+        /// <summary>
+        /// 响应数据
+        /// </summary>
+        /// <param name="data">数据</param>
+        /// <param name="success">响应状态</param>
+        /// <param name="message">响应消息</param>
+        /// <param name="isLogin">登录状态</param>
+        /// <param name="code">http响应码</param>
+        /// <returns></returns>
+        public ActionResult ResultData(object data, bool success = true, string message = "", bool isLogin = true, HttpStatusCode code = HttpStatusCode.OK)
+        {
+            return Ok(new
+            {
+                IsLogin = isLogin,
+                Success = success,
+                Message = message,
+                Data = data,
+                code
+            });
+        }
+
+        /// <summary>
+        /// RSS订阅
+        /// </summary>
+        /// <returns></returns>
+        [Route("/rss"), ResponseCache(Duration = 600)]
+        public IActionResult Rss()
+        {
+            var time = DateTime.Today.AddDays(-1);
+            string scheme = Request.Scheme;
+            var host = Request.Host;
+            var posts = PostService.LoadEntitiesNoTracking(p => p.Status == Status.Pended && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
+            {
+                Author = new Author
+                {
+                    Name = p.Author,
+                    Email = p.Email
+                },
+                Body = p.Content.RemoveHtmlTag(300),
+                Categories = new List<string>
+                {
+                    p.Category.Name
+                },
+                Link = new Uri(scheme + "://" + host + "/" + p.Id),
+                PublishDate = p.ModifyDate,
+                Title = p.Title,
+                Permalink = scheme + "://" + host + "/" + p.Id
+            }).Cacheable().ToList();
+            var feed = new Feed()
+            {
+                Title = CommonHelper.SystemSettings["Title"],
+                Description = CommonHelper.SystemSettings["Description"],
+                Link = new Uri(scheme + "://" + host + "/rss"),
+                Copyright = "(c) 2019"
+            };
+            feed.Items.AddRange(posts.ToArray());
+            var rss = feed.Serialize();
+            return Content(rss, "text/xml");
         }
 
         /// <summary>
@@ -267,7 +332,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 list = BroadcastService.LoadPageEntitiesFromL2CacheNoTracking(page, size, out total, b => b.Email.Contains(search), b => b.UpdateTime, false).ToList();
             }
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            return Ok(new PageDataModel(list, pageCount, total));
         }
 
         #endregion

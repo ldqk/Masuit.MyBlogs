@@ -69,6 +69,7 @@ namespace Masuit.MyBlogs.Core
             AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
             configuration.Bind("Imgbed:AliyunOSS", AppConfig.AliOssConfig);
             configuration.Bind("Imgbed:Gitlab", AppConfig.GitlabConfig);
+            configuration.Bind("Imgbed:Gitee", AppConfig.GiteeConfig);
             configuration.Bind("Imgbed:ImgbedDomains", AppConfig.ImgbedDomains);
         }
 
@@ -152,7 +153,6 @@ namespace Masuit.MyBlogs.Core
             services.AddMvc().AddJsonOptions(opt =>
             {
                 opt.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                //opt.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddControllersAsServices().AddViewComponentsAsServices().AddTagHelpersAsServices();
 
