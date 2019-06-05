@@ -27,7 +27,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -44,6 +46,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISearchEngine<DataContext> _searchEngine;
+        private readonly ImagebedClient _imagebedClient;
 
         /// <summary>
         /// 文章管理
@@ -55,7 +58,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="postHistoryVersionService"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="searchEngine"></param>
-        public PostController(IPostService postService, ICategoryService categoryService, IBroadcastService broadcastService, ISeminarService seminarService, IPostHistoryVersionService postHistoryVersionService, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine)
+        public PostController(IPostService postService, ICategoryService categoryService, IBroadcastService broadcastService, ISeminarService seminarService, IPostHistoryVersionService postHistoryVersionService, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine, IHttpClientFactory httpClientFactory)
         {
             PostService = postService;
             CategoryService = categoryService;
@@ -64,6 +67,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             PostHistoryVersionService = postHistoryVersionService;
             _hostingEnvironment = hostingEnvironment;
             _searchEngine = searchEngine;
+            _imagebedClient = new ImagebedClient(httpClientFactory.CreateClient());
         }
 
         /// <summary>
@@ -271,7 +275,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="post"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Publish(PostInputDto post)
+        public async Task<ActionResult> Publish(PostInputDto post)
         {
             if (Regex.Match(post.Content, CommonHelper.BanRegex).Length > 0)
             {
@@ -306,7 +310,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             else
             {
-                post.Content = CommonHelper.ReplaceImgSrc(Regex.Replace(post.Content.HtmlSantinizerStandard(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/");
+                post.Content = (await _imagebedClient.ReplaceImgSrc(Regex.Replace(post.Content.HtmlSantinizerStandard(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"))).Replace("/thumb150/", "/large/");
             }
 
             ViewBag.CategoryId = new SelectList(CategoryService.LoadEntitiesNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
@@ -765,9 +769,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="reserve"></param>
         /// <returns></returns>
         [HttpPost, Authority]
-        public ActionResult Edit(PostInputDto post, bool notify = true, bool reserve = true)
+        public async Task<ActionResult> Edit(PostInputDto post, bool notify = true, bool reserve = true)
         {
-            post.Content = CommonHelper.ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"));
+            post.Content = await _imagebedClient.ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"));
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
                 return ResultData(null, message: "请选择一个分类");
@@ -868,9 +872,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="schedule"></param>
         /// <returns></returns>
         [Authority, HttpPost]
-        public ActionResult Write(PostInputDto post, DateTime? timespan, bool schedule = false)
+        public async Task<ActionResult> Write(PostInputDto post, DateTime? timespan, bool schedule = false)
         {
-            post.Content = CommonHelper.ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/"); //提取img标签，提取src属性并重新创建个只包含src属性的img标签
+            post.Content = (await _imagebedClient.ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"))).Replace("/thumb150/", "/large/"); //提取img标签，提取src属性并重新创建个只包含src属性的img标签
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
                 return ResultData(null, message: "请选择一个分类");

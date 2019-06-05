@@ -15,7 +15,9 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -31,15 +33,18 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private readonly IHostingEnvironment _hostingEnvironment;
 
+        private readonly ImagebedClient _imagebedClient;
+
         /// <summary>
         /// 网站公告
         /// </summary>
         /// <param name="noticeService"></param>
         /// <param name="hostingEnvironment"></param>
-        public NoticeController(INoticeService noticeService, IHostingEnvironment hostingEnvironment)
+        public NoticeController(INoticeService noticeService, IHostingEnvironment hostingEnvironment, IHttpClientFactory httpClientFactory)
         {
             NoticeService = noticeService;
             _hostingEnvironment = hostingEnvironment;
+            _imagebedClient = new ImagebedClient(httpClientFactory.CreateClient());
         }
 
         /// <summary>
@@ -97,9 +102,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="notice"></param>
         /// <returns></returns>
         [Authority]
-        public ActionResult Write(Notice notice)
+        public async Task<ActionResult> Write(Notice notice)
         {
-            notice.Content = CommonHelper.ReplaceImgSrc(Regex.Replace(notice.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/");
+            notice.Content = (await _imagebedClient.ReplaceImgSrc(Regex.Replace(notice.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"))).Replace("/thumb150/", "/large/");
             Notice e = NoticeService.AddEntitySaved(notice);
             if (e != null)
             {
@@ -146,12 +151,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="notice"></param>
         /// <returns></returns>
         [Authority]
-        public ActionResult Edit(Notice notice)
+        public async Task<ActionResult> Edit(Notice notice)
         {
             Notice entity = NoticeService.GetById(notice.Id);
             entity.ModifyDate = DateTime.Now;
             entity.Title = notice.Title;
-            entity.Content = CommonHelper.ReplaceImgSrc(Regex.Replace(notice.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>")).Replace("/thumb150/", "/large/");
+            entity.Content = (await _imagebedClient.ReplaceImgSrc(Regex.Replace(notice.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"))).Replace("/thumb150/", "/large/");
             bool b = NoticeService.UpdateEntitySaved(entity);
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }

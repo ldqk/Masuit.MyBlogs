@@ -4,9 +4,7 @@
     ViewBag.Title = "网站公告栏";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<link href="~/Assets/timeline.css" rel="stylesheet" />
-<link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
-<div class="container min-height780">
+<div class="container min-height610">
     <ol class="cd-breadcrumb triangle">
         <li>@Html.ActionLink("首页", "Index", "Home")</li>
         <li class="current"><em>@ViewBag.Title</em></li>
@@ -15,47 +13,34 @@
         await Html.RenderPartialAsync("_Pagination");
     }
     <a href="/dashboard#/notice/index" class="btn btn-info">发布新公告</a>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="main-timeline">
-                @foreach (NoticeOutputDto n in Model)
-                {
-                    <div class="timeline">
-                        <div class="timeline-content">
-                            <div class="circle">
-                                <span><i class="fa fa-globe"></i></span>
-                            </div>
-                            <div class="content">
-                                <span class="year">@n.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
-                                <div class="title">
-                                    <span>@n.Title</span>
-                                    <div class="btn-group">
-                                        <button class="btn btn-danger" onclick="del(@n.Id,'@n.Title')">删除</button>
-                                        <a class="btn btn-info" href="/dashboard#/notice/index?id=@n.Id" target="_blank">修改</a>
-                                    </div>
-                                </div>
-                                <p class="description">
-                                    <a href="/n/@n.Id" class="tippy-scale" title="查看详情">@Html.Raw(n.Content)</a>
-                                </p>
-                                <div class="icon">
-                                    <span></span>
-                                </div>
-                            </div>
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        @foreach (NoticeOutputDto n in Model)
+        {
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="heading-@n.Id">
+                    <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-@n.Id" aria-expanded="false" aria-controls="collapse-@n.Id">
+                            @n.ModifyDate.ToString("yyyy-MM-dd") @n.Title
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapse-@n.Id" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-@n.Id">
+                    <div class="panel-body">
+                        <div class="btn-group">
+                            <a class="btn btn-info" onclick="del(@n.Id,'@n.Title')">删除</a>
+                            <a class="btn btn-danger" href="/dashboard#/notice/index?id=@n.Id" target="_blank">修改</a>
                         </div>
+                        @Html.Raw(n.Content)
                     </div>
-                }
+                </div>
             </div>
-        </div>
+        }
     </div>
     @{
         await Html.RenderPartialAsync("_Pagination");
     }
 </div>
-<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
-<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
 <script>
-    SyntaxHighlighter.all();
-    SyntaxHighlighter.defaults['toolbar'] = false;
     function del(id, title) {
         swal({
             title: "确认删除这条公告吗？",

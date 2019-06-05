@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -84,20 +85,26 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     using (var stream = response.GetResponseStream())
                     {
                         var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
-                        if (!Directory.Exists(Path.GetDirectoryName(savePath)))
+                        using (var httpClient = new HttpClient())
                         {
-                            Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-                        }
-                        using (var ms = new MemoryStream())
-                        {
-                            stream.CopyTo(ms);
-                            File.WriteAllBytes(savePath, ms.GetBuffer());
-                        }
-                        var (url, success) = CommonHelper.UploadImage(savePath);
-                        if (success)
-                        {
-                            BackgroundJob.Enqueue(() => File.Delete(savePath));
-                            ServerUrl = url;
+                            var (url, success) = new ImagebedClient(httpClient).UploadImage(stream, savePath).Result;
+                            if (success)
+                            {
+                                BackgroundJob.Enqueue(() => File.Delete(savePath));
+                                ServerUrl = url;
+                            }
+                            else
+                            {
+                                if (!Directory.Exists(Path.GetDirectoryName(savePath)))
+                                {
+                                    Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+                                }
+                                using (var ms = new MemoryStream())
+                                {
+                                    stream.CopyTo(ms);
+                                    File.WriteAllBytes(savePath, ms.GetBuffer());
+                                }
+                            }
                         }
                         State = "SUCCESS";
                     }

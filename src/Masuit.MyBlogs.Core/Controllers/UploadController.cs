@@ -1,5 +1,4 @@
-﻿using Hangfire;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.UEditor;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
@@ -16,9 +15,11 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -30,13 +31,16 @@ namespace Masuit.MyBlogs.Core.Controllers
     {
         private readonly IHostingEnvironment _hostingEnvironment;
 
+        private readonly ImagebedClient _imagebedClient;
+
         /// <summary>
         /// 文件上传
         /// </summary>
         /// <param name="hostingEnvironment"></param>
-        public UploadController(IHostingEnvironment hostingEnvironment)
+        public UploadController(IHostingEnvironment hostingEnvironment, IHttpClientFactory httpClientFactory)
         {
             _hostingEnvironment = hostingEnvironment;
+            _imagebedClient = new ImagebedClient(httpClientFactory.CreateClient());
         }
 
         /// <summary>
@@ -245,13 +249,19 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="file"></param>
         /// <returns></returns>
         [HttpPost("upload"), ApiExplorerSettings(IgnoreApi = false)]
-        public ActionResult UploadFile(IFormFile file)
+        public async Task<ActionResult> UploadFile(IFormFile file)
         {
             string path;
             string filename = SnowFlake.GetInstance().GetUniqueId() + Path.GetExtension(file.FileName);
             switch (file.ContentType)
             {
                 case var _ when file.ContentType.StartsWith("image"):
+                    var (url, success) = await _imagebedClient.UploadImage(file.OpenReadStream(), file.FileName);
+                    if (success)
+                    {
+                        //BackgroundJob.Enqueue(() => System.IO.File.Delete(path));
+                        return ResultData(url);
+                    }
                     path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "images", filename);
                     var dir = Path.GetDirectoryName(path);
                     if (!Directory.Exists(dir))
@@ -261,12 +271,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                     using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                     {
                         file.CopyTo(fs);
-                    }
-                    var (url, success) = CommonHelper.UploadImage(path);
-                    if (success)
-                    {
-                        BackgroundJob.Enqueue(() => System.IO.File.Delete(path));
-                        return ResultData(url);
                     }
                     break;
                 case var _ when file.ContentType.StartsWith("audio") || file.ContentType.StartsWith("video"):

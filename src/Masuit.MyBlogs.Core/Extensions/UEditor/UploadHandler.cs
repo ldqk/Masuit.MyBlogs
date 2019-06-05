@@ -1,9 +1,9 @@
-﻿using Hangfire;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -40,16 +40,17 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 return WriteResult();
             }
 
-            var uploadFileBytes = new byte[file.Length];
-            try
-            {
-                file.OpenReadStream().Read(uploadFileBytes, 0, (int)file.Length);
-            }
-            catch (Exception)
-            {
-                Result.State = UploadState.NetworkError;
-                return WriteResult();
-            }
+            //var uploadFileBytes = new byte[file.Length];
+            //try
+            //{
+            //    file.OpenReadStream().Read(uploadFileBytes, 0, (int)file.Length);
+            //}
+            //catch (Exception)
+            //{
+            //    Result.State = UploadState.NetworkError;
+            //    return WriteResult();
+            //}
+
             Result.OriginFileName = uploadFileName;
             var savePath = PathFormatter.Format(uploadFileName, UploadConfig.PathFormat);
             var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
@@ -57,20 +58,26 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             {
                 if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(uploadFileName)))
                 {
-                    if (!Directory.Exists(Path.GetDirectoryName(localPath)))
+                    using (Stream stream = file.OpenReadStream())
                     {
-                        Directory.CreateDirectory(Path.GetDirectoryName(localPath));
-                    }
-                    File.WriteAllBytes(localPath, file.OpenReadStream().ToByteArray());
-                    var (url, success) = CommonHelper.UploadImage(localPath);
-                    if (success)
-                    {
-                        BackgroundJob.Enqueue(() => File.Delete(localPath));
-                        Result.Url = url;
-                    }
-                    else
-                    {
-                        Result.Url = savePath;
+                        using (var httpClient = new HttpClient())
+                        {
+                            var (url, success) = new ImagebedClient(httpClient).UploadImage(stream, localPath).Result;
+                            if (success)
+                            {
+                                //BackgroundJob.Enqueue(() => File.Delete(localPath));
+                                Result.Url = url;
+                            }
+                            else
+                            {
+                                if (!Directory.Exists(Path.GetDirectoryName(localPath)))
+                                {
+                                    Directory.CreateDirectory(Path.GetDirectoryName(localPath));
+                                }
+                                File.WriteAllBytes(localPath, stream.ToByteArray());
+                                Result.Url = savePath;
+                            }
+                        }
                     }
                 }
                 else

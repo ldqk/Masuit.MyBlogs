@@ -82,59 +82,6 @@
             <param name="content">内容</param>
             <param name="tos">收件人</param>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Common.CommonHelper.OssClient">
-            <summary>
-            OSS客户端
-            </summary>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.UploadImage(System.String)">
-            <summary>
-            上传图片
-            </summary>
-            <param name="file"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.UploadGitee(System.String)">
-            <summary>
-            码云图床
-            </summary>
-            <param name="file"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.UploadGitlab(System.String)">
-            <summary>
-            gitlab图床
-            </summary>
-            <param name="file"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.UploadOss(System.String)">
-            <summary>
-            阿里云Oss图床
-            </summary>
-            <param name="file"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.UploadSmms(System.String)">
-            <summary>
-            上传图片到sm图床
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.UploadPeople(System.String)">
-            <summary>
-            上传图片到人民网图床
-            </summary>
-            <param name="file"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.ReplaceImgSrc(System.String)">
-            <summary>
-            替换img标签的src属性
-            </summary>
-            <param name="content"></param>
-            <returns></returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.IsRobot(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             是否是机器人访问
@@ -224,6 +171,75 @@
             <param name="method">调用方法</param>
             <param name="queue">队列名</param>
             <param name="args">调用参数</param>
+            <returns></returns>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Common.ImagebedClient">
+            <summary>
+            图床客户端
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.#ctor(System.Net.Http.HttpClient)">
+            <summary>
+            图床客户端
+            </summary>
+            <param name="httpClient"></param>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Common.ImagebedClient.OssClient">
+            <summary>
+            OSS客户端
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadImage(System.IO.Stream,System.String)">
+            <summary>
+            上传图片
+            </summary>
+            <param name="stream"></param>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadGitee(System.IO.Stream,System.String)">
+            <summary>
+            码云图床
+            </summary>
+            <param name="stream"></param>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadGitlab(System.IO.Stream,System.String)">
+            <summary>
+            gitlab图床
+            </summary>
+            <param name="stream"></param>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadOss(System.IO.Stream,System.String)">
+            <summary>
+            阿里云Oss图床
+            </summary>
+            <param name="stream"></param>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadSmms(System.IO.Stream,System.String)">
+            <summary>
+            上传图片到sm图床
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadPeople(System.IO.Stream,System.String)">
+            <summary>
+            上传图片到人民网图床
+            </summary>
+            <param name="stream"></param>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.ReplaceImgSrc(System.String)">
+            <summary>
+            替换img标签的src属性
+            </summary>
+            <param name="content"></param>
             <returns></returns>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Configs.AppConfig">
@@ -947,13 +963,14 @@
             捐赠
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.MiscController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IMiscService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IDonateService,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.MiscController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IMiscService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IDonateService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,System.Net.Http.IHttpClientFactory)">
             <summary>
             杂项页
             </summary>
             <param name="miscService"></param>
             <param name="donateService"></param>
             <param name="hostingEnvironment"></param>
+            <param name="httpClientFactory"></param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.MiscController.Index(System.Int32)">
             <summary>
@@ -1147,7 +1164,7 @@
             公告
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.NoticeController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.INoticeService,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.NoticeController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.INoticeService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,System.Net.Http.IHttpClientFactory)">
             <summary>
             网站公告
             </summary>
@@ -1290,7 +1307,7 @@
             文章管理
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ICategoryService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBroadcastService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISeminarService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostHistoryVersionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.DataContext})">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.#ctor(Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ICategoryService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBroadcastService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ISeminarService,Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IPostHistoryVersionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Masuit.LuceneEFCore.SearchEngine.Interfaces.ISearchEngine{Masuit.MyBlogs.Core.Infrastructure.DataContext},System.Net.Http.IHttpClientFactory)">
             <summary>
             文章管理
             </summary>
@@ -1934,19 +1951,6 @@
             <param name="ip"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.TestController.Test">
-            <summary>
-            迁移图床
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.TestController.UploadGitlab(System.IO.Stream,System.String)">
-            <summary>
-            gitlab图床
-            </summary>
-            <param name="file"></param>
-            <returns></returns>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.ToolsController">
             <summary>
             黑科技
@@ -1979,7 +1983,7 @@
             文件上传
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.UploadController.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.UploadController.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment,System.Net.Http.IHttpClientFactory)">
             <summary>
             文件上传
             </summary>
