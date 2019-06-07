@@ -40,17 +40,6 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 return WriteResult();
             }
 
-            //var uploadFileBytes = new byte[file.Length];
-            //try
-            //{
-            //    file.OpenReadStream().Read(uploadFileBytes, 0, (int)file.Length);
-            //}
-            //catch (Exception)
-            //{
-            //    Result.State = UploadState.NetworkError;
-            //    return WriteResult();
-            //}
-
             Result.OriginFileName = uploadFileName;
             var savePath = PathFormatter.Format(uploadFileName, UploadConfig.PathFormat);
             var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
@@ -65,7 +54,6 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                             var (url, success) = new ImagebedClient(httpClient).UploadImage(stream, localPath).Result;
                             if (success)
                             {
-                                //BackgroundJob.Enqueue(() => File.Delete(localPath));
                                 Result.Url = url;
                             }
                             else

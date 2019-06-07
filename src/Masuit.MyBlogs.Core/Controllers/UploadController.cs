@@ -123,33 +123,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             return ResultData(null, false, "请先选择您需要上传的文件!");
         }
 
-        ///// <summary>
-        ///// 解码Base64图片
-        ///// </summary>
-        ///// <param name="data"></param>
-        ///// <returns></returns>
-        //public ActionResult DecodeDataUri(string data)
-        //{
-        //    var filename = string.Empty.CreateShortToken() + ".jpg";
-        //    string path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "images", filename);
-        //    try
-        //    {
-        //        data.SaveDataUriAsImageFile().Save(path, System.Drawing.Imaging.ImageFormat.Jpeg);
-        //        var (url, success) = CommonHelper.UploadImage(path);
-        //        BackgroundJob.Enqueue(() => System.IO.File.Delete(path));
-        //        if (success)
-        //        {
-        //            return ResultData(url);
-        //        }
-        //        return ResultData(null, false, "图片上传失败！");
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        LogManager.Error(e);
-        //        return ResultData(null, false, "转码失败！");
-        //    }
-        //}
-
         #endregion
 
         /// <summary>
@@ -259,7 +232,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                     var (url, success) = await _imagebedClient.UploadImage(file.OpenReadStream(), file.FileName);
                     if (success)
                     {
-                        //BackgroundJob.Enqueue(() => System.IO.File.Delete(path));
                         return ResultData(url);
                     }
                     path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "images", filename);

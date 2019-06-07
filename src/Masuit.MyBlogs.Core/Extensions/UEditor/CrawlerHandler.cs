@@ -1,5 +1,4 @@
-﻿using Hangfire;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Http;
@@ -90,7 +89,6 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                             var (url, success) = new ImagebedClient(httpClient).UploadImage(stream, savePath).Result;
                             if (success)
                             {
-                                BackgroundJob.Enqueue(() => File.Delete(savePath));
                                 ServerUrl = url;
                             }
                             else
