@@ -1,0 +1,93 @@
+﻿@using Masuit.Tools
+@using Microsoft.Net.Http.Headers
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>访问被拒绝！</title>
+    <style type="text/css">
+        #main-scrollbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .STYLE1 {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 65px;
+        }
+
+        body {
+            background-image: url(/images/bg2.jpg);
+            background-size: cover;
+            background-position: 50% 0;
+            margin: 0;
+        }
+
+            body:before {
+                content: '';
+                display: inline-block;
+                vertical-align: middle;
+            }
+    </style>
+    <meta property="qc:admins" content="153016004160513163145" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="https://cdn.staticfile.org/smooth-scrollbar/7.4.1/smooth-scrollbar.css" rel="stylesheet">
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery.ripples/0.5.3/jquery.ripples.min.js"></script>
+    <script src="https://cdn.staticfile.org/smooth-scrollbar/7.4.1/smooth-scrollbar.js"></script>
+
+</head>
+<body id="main-scrollbar" data-scrollbar>
+    <div class="container">
+        <header id="header" class="page-header text-center">
+            <h1><a href="/">Oops!</a></h1>
+        </header>
+        <div id="container">
+            <h3 class="margintop20">
+                <em>
+                    <span class="STYLE1">Sorry!访问被拒绝&nbsp;</span>
+                </em>:您所在的地区暂时不允许访问本站，如有疑问，请联系站长！
+            </h3>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(function () {
+        Scrollbar.initAll({
+            speed: 3,
+            overscrollEffect: 'bounce',
+            overscrollEffectColor: '#d2527f'
+        });
+        try {
+            $('body').ripples({
+                resolution: 512,
+                dropRadius: 20, //px
+                perturbance: 0.04,
+            });
+        }
+        catch (e) {
+            $('.error').show().text(e);
+        }
+    });
+</script>
+<script src="~/Scripts/notify.min.js"></script>
+@{
+    if (Context.Request.Headers[HeaderNames.UserAgent].ToString().Contains(new[] { "IE", "InternetExplorer" }))
+    {
+        <script type="text/javascript">
+            notie.confirm("亲爱的访客，我们检测到您正在使用IE浏览器，本网站的某些功能或特性可能不会完美地支持IE浏览器，但您可以继续浏览，不过为了更好的体验效果，建议您使用Chrome、Firefox等相同或类似的更高级浏览器访问本网站。珍惜生命，远离IE！", '朕知道了', "挡住我了", function () {
+                notie.alert(1, '为消灭IE做一点贡献，就是为世界上所有广大的互联网开发者们少加一点儿班做善事！<br/>IE：只要不升级，我还会回来的，我就是这么倔强！', 5);
+            });
+        </script>
+    }
+}

@@ -77,9 +77,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
+            var user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+            if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true" && user?.IsAdmin != true)
+            {
+                filterContext.Result = RedirectToAction("ComingSoon", "Error");
+            }
+
             if (filterContext.HttpContext.Request.Method.Equals("GET", StringComparison.InvariantCultureIgnoreCase)) //get方式的多半是页面
             {
-                UserInfoOutputDto user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
 #if DEBUG
                 user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
                 filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);

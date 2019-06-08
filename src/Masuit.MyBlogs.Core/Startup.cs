@@ -89,46 +89,18 @@ namespace Masuit.MyBlogs.Core
                 opt.UseMySql(AppConfig.ConnString);
                 //opt.UseSqlServer(AppConfig.ConnString);
             }); //配置数据库
-            services.AddCors(opt =>
-            {
-                opt.AddDefaultPolicy(p =>
-                {
-                    p.AllowAnyHeader();
-                    p.AllowAnyMethod();
-                    p.AllowAnyOrigin();
-                    p.AllowCredentials();
-                });
-            }); //配置跨域
+            services.AddCors(opt => opt.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials())); //配置跨域
 
             services.AddHttpClient(); //注入HttpClient
             services.AddHttpContextAccessor(); //注入静态HttpContext
-            services.AddResponseCaching(); //注入响应缓存
             services.Configure<FormOptions>(options =>
             {
                 options.MultipartBodyLengthLimit = 104857600; // 100MB
             }); //配置请求长度
 
-            services.Configure<BrotliCompressionProviderOptions>(options =>
-            {
-                options.Level = CompressionLevel.Optimal;
-            });
-            services.Configure<GzipCompressionProviderOptions>(options =>
-            {
-                options.Level = CompressionLevel.Optimal;
-            });
-            services.AddResponseCompression(options =>
-            {
-                options.Providers.Add<BrotliCompressionProvider>();
-                options.Providers.Add<GzipCompressionProvider>();
-                options.Providers.Add<CustomCompressionProvider>();
-                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
-                {
-                    "image/svg+xml"
-                });
-            });
+            ConfigureResponse(services);
 
             services.AddSession(); //注入Session
-            //services.AddHangfire(x => x.UseRedisStorage(AppConfig.Redis)); //配置hangfire
             services.AddHangfire(x => x.UseMemoryStorage()); //配置hangfire
 
             services.AddSevenZipCompressor().AddResumeFileResult().AddSearchEngine<DataContext>(new LuceneIndexerOptions()
@@ -170,6 +142,29 @@ namespace Masuit.MyBlogs.Core
             return AutofacContainer;
         }
 
+        private static void ConfigureResponse(IServiceCollection services)
+        {
+            services.AddResponseCaching(); //注入响应缓存
+            services.Configure<BrotliCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.Optimal;
+            });
+            services.Configure<GzipCompressionProviderOptions>(options =>
+            {
+                options.Level = CompressionLevel.Optimal;
+            });
+            services.AddResponseCompression(options =>
+            {
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+                options.Providers.Add<CustomCompressionProvider>();
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+                {
+                    "image/svg+xml"
+                });
+            });
+        }
+
         /// <summary>
         /// Configure
         /// </summary>
@@ -187,12 +182,47 @@ namespace Masuit.MyBlogs.Core
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                //app.UseHsts();
                 app.UseException();
             }
 
             //db.Database.Migrate();
 
+            ConfigureLuceneSearch(env, hangfire, luceneIndexerOptions);
+
+            app.UseResponseCompression();
+            app.UseHttpsRedirection().UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
+            app.UseStaticHttpContext(); //注入静态HttpContext对象
+            app.UseSession().UseCookiePolicy(); //注入Session
+
+            app.UseStaticFiles(new StaticFileOptions //静态资源缓存策略
+            {
+                OnPrepareResponse = context =>
+                {
+                    context.Context.Response.Headers[HeaderNames.CacheControl] = "public,no-cache";
+                    context.Context.Response.Headers[HeaderNames.Expires] = DateTime.UtcNow.AddDays(7).ToString("R");
+                },
+                ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes),
+            });
+
+            app.UseFirewall().UseRequestIntercept(); //启用网站防火墙
+            var dic = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
+            foreach (var (key, value) in dic)
+            {
+                CommonHelper.SystemSettings.TryAdd(key, value);
+            }
+            app.UseHangfireServer().UseHangfireDashboard("/taskcenter", new DashboardOptions()
+            {
+                Authorization = new[] { new MyRestrictiveAuthorizationFilter() }
+            }); //配置hangfire
+            app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials()); //配置跨域
+            app.UseResponseCaching(); //启动Response缓存
+            app.UseSignalR(hub => hub.MapHub<MyHub>("/hubs"));
+            HangfireJobInit.Start(); //初始化定时任务
+            app.UseMvcWithDefaultRoute();
+        }
+
+        private static void ConfigureLuceneSearch(IHostingEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
+        {
             #region 导词库
 
             Console.WriteLine("正在导入自定义词库...");
@@ -216,44 +246,6 @@ namespace Masuit.MyBlogs.Core
                 hangfire.CreateLuceneIndex();
                 Console.WriteLine("索引库创建完成！");
             }
-
-            app.UseResponseCompression();
-            app.UseHttpsRedirection().UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
-            app.UseStaticHttpContext(); //注入静态HttpContext对象
-
-            app.UseSession().UseCookiePolicy(); //注入Session
-
-            app.UseStaticFiles(new StaticFileOptions //静态资源缓存策略
-            {
-                OnPrepareResponse = context =>
-                {
-                    context.Context.Response.Headers[HeaderNames.CacheControl] = "public,no-cache";
-                    context.Context.Response.Headers[HeaderNames.Expires] = DateTime.UtcNow.AddDays(7).ToString("R");
-                },
-                ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes),
-            });
-
-            app.UseFirewall().UseRequestIntercept(); //启用网站防火墙
-            CommonHelper.SystemSettings = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
-
-            app.UseHangfireServer().UseHangfireDashboard("/taskcenter", new DashboardOptions()
-            {
-                Authorization = new[]
-                {
-                    new MyRestrictiveAuthorizationFilter()
-                }
-            }); //配置hangfire
-            app.UseCors(builder =>
-            {
-                builder.AllowAnyHeader();
-                builder.AllowAnyMethod();
-                builder.AllowAnyOrigin();
-                builder.AllowCredentials();
-            }); //配置跨域
-            app.UseResponseCaching(); //启动Response缓存
-            app.UseSignalR(hub => hub.MapHub<MyHub>("/hubs"));
-            HangfireJobInit.Start(); //初始化定时任务
-            app.UseMvcWithDefaultRoute();
         }
     }
 

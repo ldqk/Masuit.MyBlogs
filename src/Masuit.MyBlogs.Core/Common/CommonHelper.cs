@@ -69,7 +69,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <summary>
         /// 系统设定
         /// </summary>
-        public static Dictionary<string, string> SystemSettings { get; set; }
+        public static ConcurrentDictionary<string, string> SystemSettings { get; set; } = new ConcurrentDictionary<string, string>();
 
         /// <summary>
         /// 访问量
@@ -131,13 +131,14 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             bool denyed = DenyIP.Split(',').Contains(ip) || DenyIPRange.Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
-            if ("true" == SystemSettings["EnableDenyArea"])
+            if (SystemSettings.GetOrAdd("EnableDenyArea", "false") == "true")
             {
                 using (DbSearcher searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db")))
                 {
-                    string[] region = searcher.MemorySearch(ip).Region.Split("|");
-                    string[] denyAreas = SystemSettings["DenyArea"].Split(',', '，');
-                    denyed = denyed || denyAreas.Intersect(region).Any();
+                    var pos = searcher.MemorySearch(ip).Region;
+                    string[] region = pos.Split("|");
+                    string[] denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
+                    denyed = denyed || denyAreas.Intersect(region).Any() || pos.Contains(denyAreas);
                 }
             }
 

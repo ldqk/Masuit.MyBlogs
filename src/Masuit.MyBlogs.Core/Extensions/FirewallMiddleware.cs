@@ -4,7 +4,6 @@ using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Http;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -45,7 +44,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 
-            if (context.Request.Path.ToString().Contains(new[] { "error", "serviceunavailable" }))
+            if (context.Request.Path.ToString().Contains(new[] { "error", "serviceunavailable", "accessdeny", "tempdeny" }))
             {
                 await _next.Invoke(context);
                 return;
@@ -54,23 +53,29 @@ namespace Masuit.MyBlogs.Core.Extensions
             string ip = context.Connection.RemoteIpAddress.MapToIPv4().ToString();
             if (ip.IsDenyIpAddress())
             {
-                context.Response.StatusCode = 403;
-                await context.Response.WriteAsync($"检测到您的IP（{ip}）异常，已被本站禁止访问，如有疑问，请联系站长！");
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
                 {
                     IP = ip,
                     RequestUrl = HttpUtility.UrlDecode(context.Request.Scheme + "://" + context.Request.Host + context.Request.Path),
                     Time = DateTime.Now
                 }));
+                context.Response.Redirect("/accessdeny", true);
                 return;
             }
 
-            var times = RedisHelper.IncrBy("Frequency:" + context.Session.Id);
-            RedisHelper.Expire("Frequency:" + context.Session.Id, TimeSpan.FromMinutes(1));
-            if (times > 300)
+            try
             {
-                await context.Response.WriteAsync($"检测到您的IP（{ip}）访问过于频繁，已被本站暂时禁止访问，如有疑问，请联系站长！");
-                return;
+                var times = RedisHelper.IncrBy("Frequency:" + context.Session.Id);
+                RedisHelper.Expire("Frequency:" + context.Session.Id, TimeSpan.FromMinutes(1));
+                if (times > 300)
+                {
+                    context.Response.Redirect("/tempdeny", true);
+                    return;
+                }
+            }
+            catch
+            {
+                // ignore
             }
 
             await _next.Invoke(context);

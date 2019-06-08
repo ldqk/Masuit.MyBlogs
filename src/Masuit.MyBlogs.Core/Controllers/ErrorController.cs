@@ -47,5 +47,37 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Message = "服务器发生错误！"
             });
         }
+
+        /// <summary>
+        /// 访问被拒绝
+        /// </summary>
+        /// <returns></returns>
+        [Route("AccessDeny"), ResponseCache(Duration = 360000)]
+        public ActionResult AccessDeny()
+        {
+            Response.StatusCode = 403;
+            return View();
+        }
+
+        /// <summary>
+        /// 临时被拒绝
+        /// </summary>
+        /// <returns></returns>
+        [Route("TempDeny"), ResponseCache(Duration = 360000)]
+        public ActionResult TempDeny()
+        {
+            Response.StatusCode = 403;
+            return View();
+        }
+
+        /// <summary>
+        /// 网站升级中
+        /// </summary>
+        /// <returns></returns>
+        [Route("ComingSoon"), ResponseCache(Duration = 360000)]
+        public ActionResult ComingSoon()
+        {
+            return View();
+        }
     }
 }

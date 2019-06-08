@@ -133,6 +133,27 @@
 			$scope.Settings.DisabledEmailBroadcast="true";
 		}
 	}
+	$scope.CloseSite= function() {
+		if($scope.Settings.CloseSite=="true") {
+			$scope.Settings.CloseSite="false";
+		} else {
+			swal({
+				title: '确定要关闭站点么?',
+				text: "一旦关闭，所有前台功能将不再可用！所有前台访问将会被重定向到：/ComingSoon",
+				type: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#3085d6',
+				cancelButtonColor: '#d33',
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+			}).then(function(isConfirm) {
+				if (isConfirm) {
+					$scope.Settings.CloseSite = "true";
+					$scope.$apply();
+				}
+			});
+		}
+	}
 }]);
 myApp.controller("log", ["$scope", "$http", function ($scope, $http) {
 	window.hub.stop();

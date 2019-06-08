@@ -46,6 +46,8 @@
     <link href="~/Assets/nav/css/style.css" rel="stylesheet" />
     <link href="~/Assets/tippy/tippy.css" rel="stylesheet" />
 
+    @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Styles", ""))
+
     <script src="https://cdn.staticfile.org/bluebird/3.5.3/bluebird.min.js"></script>
     <script src="https://cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/modernizr/2010.07.06dev/modernizr.min.js"></script>
@@ -290,6 +292,7 @@
                     </section>
                     <section class="copy">
                         @Html.Raw(CommonHelper.SystemSettings["Copyright"])
+                        @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Scripts", ""))
                     </section>
                 </div>
             </footer>

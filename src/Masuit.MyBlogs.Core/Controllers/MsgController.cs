@@ -309,6 +309,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取未读消息
         /// </summary>
         /// <returns></returns>
+        [Authority]
         public ActionResult GetUnreadMsgs()
         {
             IEnumerable<InternalMessage> msgs = MessageService.LoadEntitiesNoTracking(m => !m.Read, m => m.Time, false);

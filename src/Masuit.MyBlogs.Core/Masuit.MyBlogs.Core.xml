@@ -680,6 +680,24 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.ErrorController.AccessDeny">
+            <summary>
+            访问被拒绝
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.ErrorController.TempDeny">
+            <summary>
+            临时被拒绝
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.ErrorController.ComingSoon">
+            <summary>
+            网站升级中
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.FileController">
             <summary>
             资源管理器
