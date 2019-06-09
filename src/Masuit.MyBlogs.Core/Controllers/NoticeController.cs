@@ -104,7 +104,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public async Task<ActionResult> Write(Notice notice)
         {
-            notice.Content = (await _imagebedClient.ReplaceImgSrc(Regex.Replace(notice.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"))).Replace("/thumb150/", "/large/");
+            notice.Content = await _imagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes());
             Notice e = NoticeService.AddEntitySaved(notice);
             if (e != null)
             {
@@ -156,7 +156,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Notice entity = NoticeService.GetById(notice.Id);
             entity.ModifyDate = DateTime.Now;
             entity.Title = notice.Title;
-            entity.Content = (await _imagebedClient.ReplaceImgSrc(Regex.Replace(notice.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"))).Replace("/thumb150/", "/large/");
+            entity.Content = await _imagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes());
             bool b = NoticeService.UpdateEntitySaved(entity);
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }

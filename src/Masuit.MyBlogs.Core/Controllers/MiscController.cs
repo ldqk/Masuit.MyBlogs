@@ -133,7 +133,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public async Task<ActionResult> Write(Misc model)
         {
-            model.Content = (await _imagebedClient.ReplaceImgSrc(Regex.Replace(model.Content?.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"))).Replace("/thumb150/", "/large/");
+            model.Content = await _imagebedClient.ReplaceImgSrc(model.Content.Trim().ClearImgAttributes());
             var e = MiscService.AddEntitySaved(model);
             if (e != null)
             {
@@ -185,7 +185,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var entity = MiscService.GetById(misc.Id);
             entity.ModifyDate = DateTime.Now;
             entity.Title = misc.Title;
-            entity.Content = (await _imagebedClient.ReplaceImgSrc(Regex.Replace(misc.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"))).Replace("/thumb150/", "/large/");
+            entity.Content = await _imagebedClient.ReplaceImgSrc(misc.Content.ClearImgAttributes());
             bool b = MiscService.UpdateEntitySaved(entity);
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }

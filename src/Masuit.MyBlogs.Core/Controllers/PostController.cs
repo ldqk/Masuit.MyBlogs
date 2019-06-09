@@ -310,7 +310,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             else
             {
-                post.Content = (await _imagebedClient.ReplaceImgSrc(Regex.Replace(post.Content.HtmlSantinizerStandard(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"))).Replace("/thumb150/", "/large/");
+                post.Content = await _imagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes());
             }
 
             ViewBag.CategoryId = new SelectList(CategoryService.LoadEntitiesNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
@@ -771,7 +771,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, Authority]
         public async Task<ActionResult> Edit(PostInputDto post, bool notify = true, bool reserve = true)
         {
-            post.Content = await _imagebedClient.ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"));
+            post.Content = await _imagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
                 return ResultData(null, message: "请选择一个分类");
@@ -819,13 +819,16 @@ namespace Masuit.MyBlogs.Core.Controllers
                 tmp.ForEach(s =>
                 {
                     Seminar seminar = SeminarService.GetFirstEntity(e => e.Title.Equals(s));
-                    p.Seminar.Add(new SeminarPost()
+                    if (seminar != null)
                     {
-                        Post = p,
-                        Seminar = seminar,
-                        PostId = p.Id,
-                        SeminarId = seminar.Id
-                    });
+                        p.Seminar.Add(new SeminarPost()
+                        {
+                            Post = p,
+                            Seminar = seminar,
+                            PostId = p.Id,
+                            SeminarId = seminar.Id
+                        });
+                    }
                 });
             }
 
@@ -874,7 +877,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority, HttpPost]
         public async Task<ActionResult> Write(PostInputDto post, DateTime? timespan, bool schedule = false)
         {
-            post.Content = (await _imagebedClient.ReplaceImgSrc(Regex.Replace(post.Content.Trim(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>"))).Replace("/thumb150/", "/large/"); //提取img标签，提取src属性并重新创建个只包含src属性的img标签
+            post.Content = await _imagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
                 return ResultData(null, message: "请选择一个分类");

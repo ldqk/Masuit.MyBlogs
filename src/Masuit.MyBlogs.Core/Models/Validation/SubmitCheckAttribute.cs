@@ -55,7 +55,7 @@ namespace Masuit.MyBlogs.Core.Models.Validation
                 ErrorMessage = $"请输入有效的内容！提交的内容不能为空！";
                 return false;
             }
-            string content = (value as string).RemoveHtml().Trim();
+            string content = (value as string).RemoveHtmlTag().Trim();
             if (checkLength)
             {
                 if (string.IsNullOrEmpty(content) || content.Length < 2)

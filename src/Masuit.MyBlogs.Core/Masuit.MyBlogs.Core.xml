@@ -89,6 +89,20 @@
             <param name="req"></param>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.ClearImgAttributes(System.String)">
+            <summary>
+            清理html的img标签的除src之外的其他属性
+            </summary>
+            <param name="html"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.ReplaceImgAttribute(System.String)">
+            <summary>
+            将html的img标签的src属性名替换成data-original
+            </summary>
+            <param name="html"></param>
+            <returns></returns>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Common.DocumentConvert">
             <summary>
             文档转换操作

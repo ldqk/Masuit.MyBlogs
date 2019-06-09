@@ -1,4 +1,5 @@
-﻿using IP2Region;
+﻿using HtmlAgilityPack;
+using IP2Region;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
@@ -7,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 #if !DEBUG
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Models;
@@ -191,6 +193,59 @@ namespace Masuit.MyBlogs.Core.Common
                 "Python",
                 "bot"
             });
+        }
+
+        /// <summary>
+        /// 清理html的img标签的除src之外的其他属性
+        /// </summary>
+        /// <param name="html"></param>
+        /// <returns></returns>
+        public static string ClearImgAttributes(this string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            var nodes = doc.DocumentNode.Descendants("img");
+            foreach (var node in nodes)
+            {
+                string src = "";
+                if (node.Attributes.Contains("data-original"))
+                {
+                    src = node.Attributes["data-original"].Value;
+                }
+
+                if (node.Attributes.Contains("src"))
+                {
+                    src = node.Attributes["src"].Value;
+                }
+
+                node.Attributes.RemoveAll();
+                node.Attributes.Add("src", src);
+            }
+
+            return doc.DocumentNode.OuterHtml;
+        }
+
+        /// <summary>
+        /// 将html的img标签的src属性名替换成data-original
+        /// </summary>
+        /// <param name="html"></param>
+        /// <returns></returns>
+        public static string ReplaceImgAttribute(this string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            var nodes = doc.DocumentNode.Descendants("img");
+            foreach (var node in nodes)
+            {
+                if (node.Attributes.Contains("src"))
+                {
+                    string src = node.Attributes["src"].Value;
+                    node.Attributes.Remove("src");
+                    node.Attributes.Add("data-original", src);
+                }
+            }
+
+            return doc.DocumentNode.OuterHtml;
         }
     }
 }

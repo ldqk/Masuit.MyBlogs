@@ -66,7 +66,7 @@
                 <main>
                     <section>
                         <article class="article" id="article">
-                            @Html.Raw(Regex.Replace(Model.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.SystemSettings["Title"]}' title='{CommonHelper.SystemSettings["Title"]}'/>"))
+                            @Html.Raw(Model.Content.ReplaceImgAttribute())
                         </article>
                     </section>
                 </main>

@@ -1,9 +1,6 @@
-﻿@using System.IO
-@using System.Text.RegularExpressions
-@using System.Web
+﻿@using System.Web
 @using Masuit.Tools.Html
 @using Masuit.Tools.Systems
-@using Masuit.Tools.Win32
 @{
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
 }
@@ -27,24 +24,10 @@
             @{
                 //随机取合适大小的图片
                 string imgSrc = Model.Content.MatchRandomImgSrc();
-                MatchCollection imgTags = Model.Content.MatchImgTags();
-                for (var i = 0; i < imgTags.Count; i++)
-                {
-                    string src = Model.Content.MatchRandomImgSrc();
-                    if (File.Exists(AppContext.BaseDirectory + "wwwroot" + src) && !src.StartsWith("http"))
-                    {
-                        var fileInfo = new FileInfo(AppContext.BaseDirectory + "wwwroot" + src);
-                        if (fileInfo.Length > 5000 && fileInfo.Length < 100000)
-                        {
-                            imgSrc = src;
-                            break;
-                        }
-                    }
-                }
                 if (!string.IsNullOrEmpty(imgSrc))
                 {
                     <div class="col-sm-3">
-                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc.Replace("/large/", "/thumb150/")" alt="@Model.Title">
+                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@Model.Title">
                     </div>
                 }
             }

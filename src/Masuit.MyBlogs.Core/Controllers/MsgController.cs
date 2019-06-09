@@ -130,7 +130,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             msg.Content = msg.Content.Trim().Replace("<p><br></p>", string.Empty);
-            if (msg.Content.RemoveHtml().Trim().Equals(HttpContext.Session.Get<string>("msg")))
+            if (msg.Content.RemoveHtmlTag().Trim().Equals(HttpContext.Session.Get<string>("msg")))
             {
                 return ResultData(null, false, "您刚才已经发表过一次留言了！");
             }
@@ -151,13 +151,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
             msg.PostDate = DateTime.Now;
-            msg.Content = Regex.Replace(msg.Content.HtmlSantinizerStandard().ConvertImgSrcToRelativePath(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>");
+            msg.Content = msg.Content.HtmlSantinizerStandard().ClearImgAttributes();
             msg.Browser = msg.Browser ?? Request.Headers[HeaderNames.UserAgent];
             msg.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             LeaveMessage msg2 = LeaveMessageService.AddEntitySaved(msg.Mapper<LeaveMessage>());
             if (msg2 != null)
             {
-                HttpContext.Session.Set("msg", msg.Content.RemoveHtml().Trim());
+                HttpContext.Session.Set("msg", msg.Content.RemoveHtmlTag().Trim());
                 var email = CommonHelper.SystemSettings["ReceiveEmail"];
                 string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/notify.html").Replace("{{title}}", "网站留言板").Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg2.NickName).Replace("{{content}}", msg2.Content);
                 if (msg.Status == Status.Pended)

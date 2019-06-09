@@ -4,7 +4,6 @@
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.Tools.Core.Net
-@using Masuit.Tools.Win32
 @model Masuit.MyBlogs.Core.Models.Entity.Post
 @{
     ViewBag.Title = Model.Title;
@@ -82,7 +81,7 @@
                             </div>
                         </header>
                         <article class="article" id="article">
-                            @Html.Raw(Regex.Replace(Model.Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.SystemSettings["Title"]}' title='{CommonHelper.SystemSettings["Title"]}'/>"))
+                            @Html.Raw(Model.Content.ReplaceImgAttribute())
                             @if (!string.IsNullOrEmpty(Model.ProtectContent))
                             {
                                 <div class="row protected">
@@ -115,7 +114,7 @@
                                     else
                                     {
                                         <p class="text-red text-center size20">↓↓↓以下是文章加密部分↓↓↓</p>
-                                        @Html.Raw(Regex.Replace(Model.ProtectContent, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.SystemSettings["Title"]}' title='{CommonHelper.SystemSettings["Title"]}'/>"))
+                                        @Html.Raw(Model.ProtectContent.ReplaceImgAttribute())
                                     }
                                 </div>
                             }

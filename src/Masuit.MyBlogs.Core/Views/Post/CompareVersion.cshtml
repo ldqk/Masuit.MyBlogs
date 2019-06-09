@@ -82,7 +82,7 @@
                                     </div>
                                 </header>
                                 <article class="article" id="article">
-                                    @Html.Raw(Regex.Replace(Model[1].Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.SystemSettings["Title"]}' title='{CommonHelper.SystemSettings["Title"]}'/>"))
+                                    @Html.Raw(Model[1].Content.ReplaceImgAttribute())
                                 </article>
                             </section>
                         </main>
@@ -140,7 +140,7 @@
                                     </div>
                                 </header>
                                 <article class="article" id="article">
-                                    @Html.Raw(Regex.Replace(Model[2].Content, @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", $"<img data-original=\"$1\" alt='{CommonHelper.SystemSettings["Title"]}' title='{CommonHelper.SystemSettings["Title"]}'/>"))
+                                    @Html.Raw(Model[2].Content.ReplaceImgAttribute())
                                 </article>
                             </section>
                         </main>

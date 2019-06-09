@@ -66,7 +66,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             comment.Content = comment.Content.Trim().Replace("<p><br></p>", string.Empty);
 
-            if (comment.Content.RemoveHtml().Trim().Equals(HttpContext.Session.Get<string>("comment" + comment.PostId)))
+            if (comment.Content.RemoveHtmlTag().Trim().Equals(HttpContext.Session.Get<string>("comment" + comment.PostId)))
             {
                 return ResultData(null, false, "您刚才已经在这篇文章发表过一次评论了，换一篇文章吧，或者换一下评论内容吧！");
             }
@@ -87,14 +87,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                     comment.IsMaster = true;
                 }
             }
-            comment.Content = Regex.Replace(comment.Content.HtmlSantinizerStandard().ConvertImgSrcToRelativePath(), @"<img\s+[^>]*\s*src\s*=\s*['""]?(\S+\.\w{3,4})['""]?[^/>]*/>", "<img src=\"$1\"/>");
+            comment.Content = comment.Content.HtmlSantinizerStandard().ClearImgAttributes();
             comment.CommentDate = DateTime.Now;
             comment.Browser = comment.Browser ?? Request.Headers[HeaderNames.UserAgent];
             comment.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             Comment com = CommentService.AddEntitySaved(comment.Mapper<Comment>());
             if (com != null)
             {
-                HttpContext.Session.Set("comment" + comment.PostId, comment.Content.RemoveHtml().Trim());
+                HttpContext.Session.Set("comment" + comment.PostId, comment.Content.RemoveHtmlTag().Trim());
                 var emails = new List<string>();
                 var email = CommonHelper.SystemSettings["ReceiveEmail"]; //站长邮箱
                 emails.Add(email);

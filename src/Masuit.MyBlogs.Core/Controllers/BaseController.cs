@@ -129,9 +129,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
             base.OnActionExecuted(filterContext);
-            if (filterContext.HttpContext.Request.Method.Equals("POST", StringComparison.InvariantCultureIgnoreCase) && filterContext.Result is ViewResult)
+            if (filterContext.HttpContext.Request.Method.Equals("POST", StringComparison.InvariantCultureIgnoreCase))
             {
-                filterContext.Result = ResultData(null, false, "该URL仅支持Get请求方式", false, HttpStatusCode.MethodNotAllowed);
+                if (filterContext.Result is ViewResult)
+                {
+                    filterContext.Result = ResultData(null, false, "该URL仅支持Get请求方式", false, HttpStatusCode.MethodNotAllowed);
+                }
                 return;
             }
 

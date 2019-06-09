@@ -17,52 +17,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\upload\**" />
-    <Content Remove="wwwroot\upload\**" />
-    <EmbeddedResource Remove="wwwroot\upload\**" />
-    <None Remove="wwwroot\upload\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Controllers\TestController.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Remove="bundleconfig.json" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Include="bundleconfig.json" />
-    <None Include="Views\Shared\_Layout.cshtml" />
-    <None Include="wwwroot\Assets\highlight\js\highlight.js" />
-    <None Include="wwwroot\ng-views\controllers\analysis.js" />
-    <None Include="wwwroot\ng-views\controllers\analysis.min.js" />
-    <None Include="wwwroot\ng-views\controllers\comment.js" />
-    <None Include="wwwroot\ng-views\controllers\comment.min.js" />
-    <None Include="wwwroot\ng-views\controllers\dashboard.js" />
-    <None Include="wwwroot\ng-views\controllers\dashboard.min.js" />
-    <None Include="wwwroot\ng-views\controllers\donate.js" />
-    <None Include="wwwroot\ng-views\controllers\links.js" />
-    <None Include="wwwroot\ng-views\controllers\links.min.js" />
-    <None Include="wwwroot\ng-views\controllers\loginrecord.js" />
-    <None Include="wwwroot\ng-views\controllers\main.js" />
-    <None Include="wwwroot\ng-views\controllers\main.min.js" />
-    <None Include="wwwroot\ng-views\controllers\menu.js" />
-    <None Include="wwwroot\ng-views\controllers\menu.min.js" />
-    <None Include="wwwroot\ng-views\controllers\misc.js" />
-    <None Include="wwwroot\ng-views\controllers\misc.min.js" />
-    <None Include="wwwroot\ng-views\controllers\msg.js" />
-    <None Include="wwwroot\ng-views\controllers\msg.min.js" />
-    <None Include="wwwroot\ng-views\controllers\notice.js" />
-    <None Include="wwwroot\ng-views\controllers\notice.min.js" />
-    <None Include="wwwroot\ng-views\controllers\post.js" />
-    <None Include="wwwroot\ng-views\controllers\post.min.js" />
-    <None Include="wwwroot\ng-views\controllers\seminar.js" />
-    <None Include="wwwroot\ng-views\controllers\subscribe.js" />
-    <None Include="wwwroot\ng-views\controllers\system.js" />
-    <None Include="wwwroot\ng-views\controllers\system.min.js" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.9.1" />
@@ -73,7 +33,7 @@
     <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="1.2.0" />
     <PackageReference Include="CacheManager.Serialization.Json" Version="1.2.0" />
     <PackageReference Include="CSRedisCore" Version="3.0.60" />
-    <PackageReference Include="EFSecondLevelCache.Core" Version="2.3.0" />
+    <PackageReference Include="EFSecondLevelCache.Core" Version="2.3.1" />
     <PackageReference Include="Hangfire" Version="1.7.3" />
     <PackageReference Include="Hangfire.Autofac" Version="2.3.1" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.6.0" />
