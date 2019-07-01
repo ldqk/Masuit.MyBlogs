@@ -28,10 +28,13 @@ namespace Masuit.MyBlogs.Core
             return WebHost.CreateDefaultBuilder(args).UseKestrel(opt =>
             {
                 opt.ListenAnyIP(port.ToInt32());
-                opt.ListenAnyIP(sslport.ToInt32(), s =>
+                if (bool.Parse(config["Https:Enabled"]))
                 {
-                    s.UseHttps(AppContext.BaseDirectory + config["cert:path"], config["cert:password"]);
-                });
+                    opt.ListenAnyIP(sslport.ToInt32(), s =>
+                    {
+                        s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]);
+                    });
+                }
                 opt.Limits.MaxRequestBodySize = null;
             }).UseIISIntegration().UseStartup<Startup>();
         }

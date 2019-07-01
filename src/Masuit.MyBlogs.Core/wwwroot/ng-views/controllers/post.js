@@ -180,15 +180,20 @@
 }]);
 myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, $http, $timeout) {
 	window.hub.stop();
+	clearInterval(window.interval);
 	$scope.post = {
 		Title: "",
 		schedule: false,
 		Content: "",
 		CategoryId: 1,
 		Label: "",
-		Seminars: ""
+		Seminars: "",
+		Keyword:""
 	};
 	$scope.loading();
+	window.interval = setInterval(function () {
+		localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
+	},5000);
 	$scope.post.Author = $scope.user.NickName || $scope.user.Username;
 	$scope.post.Email = $scope.user.Email;
 	$scope.getCategory = function () {
@@ -322,6 +327,8 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 				$scope.post.Title = "";
 				$scope.post.IsWordDocument = false;
 				$scope.post.ResourceName = "";
+				clearInterval(window.interval);
+				localStorage.removeItem("write-post-draft");
 			} else {
 				window.notie.alert({
 					type: 3,
@@ -350,6 +357,26 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 			});
 		}, 0);
 	}
+
+	//检查草稿
+	if (localStorage.getItem("write-post-draft")) {
+		notie.confirm({
+			text: "检查到上次有未提交的草稿，是否加载？",
+			submitText: "确定", 
+			cancelText: "取消",
+			position: "bottom", 
+			submitCallback: function () {
+				$scope.post=JSON.parse(localStorage.getItem("write-post-draft"));
+				$scope.$apply();
+				$timeout(function () {
+					$('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
+					$('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
+					$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
+					$('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
+				}, 10);
+			}
+		});	
+	}
 }]);
 myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
 	window.hub.stop();
@@ -361,6 +388,9 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 		id: $scope.id
 	}, function (data) {
 		$scope.post = data.Data;
+		window.interval = setInterval(function () {
+			localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
+		},5000);
 		$scope.request("/post/gettag", null, function (res) {
 			$scope.Tags = res.Data;
 			$('.ui.dropdown.tags').dropdown({
@@ -532,6 +562,8 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 					time: 4
 				});
 				$scope.post = data.Data;
+				clearInterval(window.interval);
+				localStorage.removeItem("post-draft-"+$scope.id);
 			} else {
 				window.notie.alert({
 					type: 3,
@@ -542,6 +574,26 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 		});
 	}
 	//异步提交表单结束
+	
+	//检查草稿
+	if (localStorage.getItem("post-draft-"+$scope.id)) {
+		notie.confirm({
+		  text: "检查到上次有未提交的草稿，是否加载？",
+		  submitText: "确定", 
+		  cancelText: "取消",
+		  position: "bottom", 
+			submitCallback: function () {
+				$scope.post=JSON.parse(localStorage.getItem("post-draft-"+$scope.id));
+				$scope.$apply();
+				$timeout(function () {
+					$('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
+					$('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
+					$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
+					$('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
+				}, 10);
+			}
+		});	
+	}
 }]);
 myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
 	window.hub.stop();

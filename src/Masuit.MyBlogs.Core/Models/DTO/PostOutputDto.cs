@@ -7,11 +7,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     /// </summary>
     public class PostOutputDto : BaseDto
     {
-        //public PostOutputDto()
-        //{
-        //    Comment = new HashSet<CommentOutputDto>();
-        //}
-
         /// <summary>
         /// 标题
         /// </summary>

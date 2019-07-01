@@ -76,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="kw"></param>
         /// <returns></returns>
-        [Route("{id:int}/{kw}"), Route("{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "kw" }, VaryByHeader = HeaderNames.Cookie)]
+        [Route("{id:int}/{kw}"), Route("{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Details(int id, string kw)
         {
             Post post = PostService.GetById(id);
@@ -85,12 +85,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ViewBag.Keyword = post.Keyword + "," + post.Label;
                 UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
                 DateTime modifyDate = post.ModifyDate;
-                ViewBag.Next = PostService.GetFirstEntityNoTracking(p => p.ModifyDate > modifyDate && (p.Status == Status.Pended || user.IsAdmin), p => p.ModifyDate);
-                ViewBag.Prev = PostService.GetFirstEntityNoTracking(p => p.ModifyDate < modifyDate && (p.Status == Status.Pended || user.IsAdmin), p => p.ModifyDate, false);
+                ViewBag.Next = PostService.GetFirstEntity<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.Status == Status.Pended || user.IsAdmin), p => p.ModifyDate);
+                ViewBag.Prev = PostService.GetFirstEntity<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.Status == Status.Pended || user.IsAdmin), p => p.ModifyDate, false);
                 if (!string.IsNullOrEmpty(kw))
                 {
                     ViewData["keywords"] = post.Content.Contains(kw) ? $"['{kw}']" : _searchEngine.LuceneIndexSearcher.CutKeywords(kw).ToJsonString();
                 }
+
                 if (user.IsAdmin)
                 {
                     return View("Details_Admin", post);

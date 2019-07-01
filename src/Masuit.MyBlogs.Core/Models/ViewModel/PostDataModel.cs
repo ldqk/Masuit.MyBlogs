@@ -3,18 +3,9 @@
     /// <summary>
     /// 文章数据模型
     /// </summary>
-    public class PostDataModel
+    public class PostDataModel : PostModelBase
     {
-        /// <summary>
-        /// id
-        /// </summary>
-        public int Id { get; set; }
-
         public string Status { get; set; }
-        /// <summary>
-        /// 标题
-        /// </summary>
-        public string Title { get; set; }
 
         /// <summary>
         /// 作者

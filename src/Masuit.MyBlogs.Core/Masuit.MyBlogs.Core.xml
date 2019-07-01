@@ -291,11 +291,6 @@
             码云图床配置
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Configs.AppConfig.ImgbedDomains">
-            <summary>
-            图床域名
-            </summary>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Configs.HangfireJobInit">
             <summary>
             hangfire配置
@@ -7106,16 +7101,6 @@
             文章数据模型
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostDataModel.Id">
-            <summary>
-            id
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostDataModel.Title">
-            <summary>
-            标题
-            </summary>
-        </member>
         <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostDataModel.Author">
             <summary>
             作者
@@ -7174,6 +7159,16 @@
         <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostDataModel.ModifyCount">
             <summary>
             修改次数
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostModelBase.Id">
+            <summary>
+            id
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostModelBase.Title">
+            <summary>
+            标题
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Models.ViewModel.PostViewModel">
@@ -7299,6 +7294,11 @@
         <member name="P:Masuit.MyBlogs.Core.Startup.AutofacContainer">
             <summary>
             依赖注入容器
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Startup.Configuration">
+            <summary>
+            配置中心
             </summary>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">

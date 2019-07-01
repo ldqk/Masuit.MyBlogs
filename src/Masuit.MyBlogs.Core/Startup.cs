@@ -59,18 +59,23 @@ namespace Masuit.MyBlogs.Core
         public static IServiceProvider AutofacContainer { get; set; }
 
         /// <summary>
+        /// 配置中心
+        /// </summary>
+        public IConfiguration Configuration { get; set; }
+
+        /// <summary>
         /// asp.net core核心配置
         /// </summary>
         /// <param name="configuration"></param>
         public Startup(IConfiguration configuration)
         {
+            Configuration = configuration;
             AppConfig.ConnString = configuration[nameof(AppConfig.ConnString)];
             AppConfig.BaiduAK = configuration[nameof(AppConfig.BaiduAK)];
             AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
             configuration.Bind("Imgbed:AliyunOSS", AppConfig.AliOssConfig);
             configuration.Bind("Imgbed:Gitlab", AppConfig.GitlabConfig);
             configuration.Bind("Imgbed:Gitee", AppConfig.GiteeConfig);
-            configuration.Bind("Imgbed:ImgbedDomains", AppConfig.ImgbedDomains);
         }
 
         /// <summary>
@@ -190,7 +195,11 @@ namespace Masuit.MyBlogs.Core
             ConfigureLuceneSearch(env, hangfire, luceneIndexerOptions);
 
             app.UseResponseCompression();
-            app.UseHttpsRedirection().UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
+            if (bool.Parse(Configuration["Https:Enabled"]))
+            {
+                app.UseHttpsRedirection().UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
+            }
+
             app.UseStaticHttpContext(); //注入静态HttpContext对象
             app.UseSession().UseCookiePolicy(); //注入Session
 

@@ -25,7 +25,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// БъЬт
         /// </summary>
-        [Required, StringLength(64)]
+        [Required, StringLength(128)]
         public string Title { get; set; }
 
         /// <summary>

@@ -1,10 +1,12 @@
-﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+﻿using IP2Region;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
@@ -130,6 +132,18 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public static void InterceptLog(IpIntercepter s)
         {
             RedisHelper.IncrBy("interceptCount");
+            var result = s.IP.GetPhysicsAddressInfo().Result;
+            if (result.Status == 0)
+            {
+                s.Address = result.AddressResult.FormattedAddress;
+            }
+            else
+            {
+                using (DbSearcher searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db")))
+                {
+                    s.Address = searcher.MemorySearch(s.IP).Region;
+                }
+            }
             RedisHelper.LPush("intercept", s);
         }
 

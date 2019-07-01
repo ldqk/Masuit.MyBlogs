@@ -45,12 +45,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Route("s/{wd?}/{page:int?}/{size:int?}"), ResponseCache(VaryByQueryKeys = new[] { "wd", "page", "size" }, VaryByHeader = HeaderNames.Cookie, Duration = 60)]
-        public ActionResult Search(string wd = "", int page = 1, int size = 10)
+        [Route("s/{wd?}/{page:int?}/{size:int?}")]
+        public ActionResult Search(string wd = "", int page = 1, int size = 15)
         {
             var nul = new List<PostOutputDto>();
             ViewBag.Elapsed = 0;
             ViewBag.Total = 0;
+            ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
             if (Regex.Match(wd ?? "", CommonHelper.BanRegex + "|" + CommonHelper.ModRegex).Length > 0)
             {
@@ -66,7 +67,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return View(nul);
             }
 
-            wd = wd.Trim().Replace("+", " ");
+            wd = wd?.Trim().Replace("+", " ");
             if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
             {
                 if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !HttpContext.Request.IsRobot())
@@ -77,13 +78,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                         SearchTime = DateTime.Now,
                         IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString()
                     });
+                    SearchDetailsService.SaveChanges();
                     HttpContext.Session.Set("search:" + wd, wd.ToByteArray());
                 }
 
                 var posts = _postService.SearchPage(page, size, wd);
                 ViewBag.Elapsed = posts.Elapsed;
                 ViewBag.Total = posts.Total;
-                SearchDetailsService.SaveChanges();
                 if (posts.Total > 1)
                 {
                     RedisHelper.Set(key, wd);

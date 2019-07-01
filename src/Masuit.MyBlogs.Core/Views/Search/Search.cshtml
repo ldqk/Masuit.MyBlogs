@@ -41,7 +41,7 @@
                                 <span>搜索推荐：</span>
                                 foreach (var item in hotSearches)
                                 {
-                                    @Html.ActionLink(item.Keywords + "(" + item.Count + ")", "Search", new { wd = item.Keywords }, new { @class = "btn btn-danger" }) <span>  </span>
+                                    @Html.ActionLink(item.Keywords + "(" + item.Count + ")", "Search", new { wd = item.Keywords }, new { @class = "label label-danger" }) <span>  </span>
                                 }
                             }
                         </div>
@@ -70,7 +70,7 @@
                         @*下面是分页组件*@
                         @{
                             int count = ViewBag.Total;
-                            var size = Context.Request.Query["size"].ToString().ToInt32();
+                            int size = ViewBag.PageSize;
                             int pages = Math.Ceiling(count / (size > 0 ? size : 10.0)).ToInt32();
                             var page = Context.Request.Query["page"].ToString().ToInt32();
                             int current = page > 0 ? page : 1;

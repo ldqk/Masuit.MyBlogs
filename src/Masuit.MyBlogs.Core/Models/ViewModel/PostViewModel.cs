@@ -8,11 +8,6 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
     /// </summary>
     public class PostViewModel : BaseEntity
     {
-        //public PostViewModel()
-        //{
-        //    Comment = new HashSet<CommentViewModel>();
-        //}
-
         /// <summary>
         /// 标题
         /// </summary>

@@ -130,6 +130,36 @@
                         </div>
                     </div>
                 </section>
+                <section class="wow row size16 animated fadeIn">
+                    <div class="col-xs-6">
+                        上一篇：
+                        @{
+                            PostModelBase prev = ViewBag.Prev;
+                            if (prev != null)
+                            {
+                                @Html.ActionLink(prev.Title, "Details", "Post", new { id = prev.Id }, null)
+                            }
+                            else
+                            {
+                                <a>没有了</a>
+                            }
+                        }
+                    </div>
+                    <div class="col-xs-6 text-right">
+                        下一篇：
+                        @{
+                            PostModelBase next = ViewBag.Next;
+                            if (next != null)
+                            {
+                                @Html.ActionLink(next.Title, "Details", "Post", new { id = next.Id }, null)
+                            }
+                            else
+                            {
+                                <a>没有了</a>
+                            }
+                        }
+                    </div>
+                </section>
                 @if (Model.PostHistoryVersion.Any())
                 {
                     <section class="wow margintop20 animated fadeIn">
@@ -146,36 +176,6 @@
                         本文仅用于学习、研究和交流目的，欢迎非商业性质转载。本文链接：<a href="@(Context.Request.Scheme + "://" +Context.Request.Host+Context.Request.Path)">@(HttpUtility.UrlDecode(Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path))</a>。
                         @Html.Raw(CommonHelper.SystemSettings["Disclaimer"])
                     </p>
-                </section>
-                <section class="wow row size16 animated fadeIn">
-                    <div class="col-xs-6">
-                        上一篇：
-                        @{
-                            Post prev = ViewBag.Prev;
-                            if (prev != null)
-                            {
-                                @Html.ActionLink(prev.Title, "Details", "Post", new { id = prev.Id }, null)
-                            }
-                            else
-                            {
-                                <a>没有了</a>
-                            }
-                        }
-                    </div>
-                    <div class="col-xs-6 text-right">
-                        下一篇：
-                        @{
-                            Post next = ViewBag.Next;
-                            if (next != null)
-                            {
-                                @Html.ActionLink(next.Title, "Details", "Post", new { id = next.Id }, null)
-                            }
-                            else
-                            {
-                                <a>没有了</a>
-                            }
-                        }
-                    </div>
                 </section>
                 @{
                     var posts = Model.Category.Post.Where(p => p.Status == Status.Pended && p.Id != Model.Id).OrderBy(p => Guid.NewGuid()).ToList();

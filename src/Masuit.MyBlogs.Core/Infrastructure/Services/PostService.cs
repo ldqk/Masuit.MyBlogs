@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Microsoft.Extensions.Caching.Memory;
 using PanGu;
 using PanGu.HighLight;
 using System;
@@ -18,11 +19,21 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
     public partial class PostService : BaseService<Post>, IPostService
     {
-        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
+        private readonly IMemoryCache _memoryCache;
+
+        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, IMemoryCache memoryCache) : base(repository, searchEngine, searcher)
         {
+            _memoryCache = memoryCache;
         }
+
         public SearchResult<PostOutputDto> SearchPage(int page, int size, string keyword)
         {
+            var cacheKey = $"search:{keyword}:{page}:{size}";
+            if (_memoryCache.TryGetValue<SearchResult<PostOutputDto>>(cacheKey, out var value))
+            {
+                return value;
+            }
+
             var searchResult = _searchEngine.ScoredSearch<Post>(new SearchOptions(keyword, page, size, typeof(Post)));
             var posts = searchResult.Results.Select(p => p.Entity.Mapper<PostOutputDto>()).Where(p => p.Status == Status.Pended).ToList();
             var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
@@ -39,6 +50,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                         break;
                     }
                 }
+
                 bool handled = false;
                 foreach (var s in keywords)
                 {
@@ -50,17 +62,21 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                         break;
                     }
                 }
+
                 if (p.Content.Length > 200 && !handled)
                 {
                     p.Content = p.Content.Substring(0, 200);
                 }
             }
-            return new SearchResult<PostOutputDto>()
+
+            var result = new SearchResult<PostOutputDto>()
             {
                 Results = posts,
                 Elapsed = searchResult.Elapsed,
                 Total = searchResult.TotalHits
             };
+
+            return _memoryCache.Set(cacheKey, result, TimeSpan.FromHours(1));
         }
 
         /// <summary>

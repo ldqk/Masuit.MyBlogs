@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 using WilderMinds.RssSyndication;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -107,7 +108,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Copyright = "(c) 2019"
             };
             feed.Items.AddRange(posts.ToArray());
-            var rss = feed.Serialize();
+            var rss = feed.Serialize(new SerializeOption()
+            {
+                Encoding = Encoding.UTF8
+            });
             return Content(rss, "text/xml");
         }
 

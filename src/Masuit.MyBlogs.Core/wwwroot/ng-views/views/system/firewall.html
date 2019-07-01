@@ -63,7 +63,10 @@
                 <a data-microtip="查看{{row.IP}}的详细信息" data-microtip-position="bottom" ng-href="/tools/ip?ip={{row.IP}}" style="font-size: 20px;" target="_blank">{{row.IP}}</a>
                 <button class="badge btn btn-primary pull-right" ng-click="addToWhiteList(row.IP)">添加到白名单</button>
             </td>
-            <td filter="{RequestUrl: 'text'}" sortable="'RequestUrl'" title="'请求URL'">
+            <td filter="{Address: 'text'}" title="'IP地理位置'">
+                {{row.Address}}
+            </td>
+            <td filter="{RequestUrl: 'text'}" title="'请求URL'">
                 <a ng-href="{{row.RequestUrl}}" target="_blank">{{row.RequestUrl}}</a>
             </td>
             <td sortable="'Time'" title="'拦截时间'">

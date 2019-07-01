@@ -6,6 +6,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
     {
         public string IP { get; set; }
         public string RequestUrl { get; set; }
+        public string Address { get; set; }
         public DateTime Time { get; set; }
     }
 }

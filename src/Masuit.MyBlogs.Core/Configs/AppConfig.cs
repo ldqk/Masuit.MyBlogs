@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Masuit.MyBlogs.Core.Configs
+﻿namespace Masuit.MyBlogs.Core.Configs
 {
     /// <summary>
     /// 应用程序配置
@@ -36,10 +34,5 @@ namespace Masuit.MyBlogs.Core.Configs
         /// 码云图床配置
         /// </summary>
         public static GitlabConfig GiteeConfig { get; set; } = new GitlabConfig();
-
-        /// <summary>
-        /// 图床域名
-        /// </summary>
-        public static List<string> ImgbedDomains { get; set; } = new List<string>();
     }
 }
