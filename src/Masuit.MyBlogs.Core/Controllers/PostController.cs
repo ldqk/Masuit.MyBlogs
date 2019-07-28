@@ -393,24 +393,25 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 检查访问密码
         /// </summary>
+        /// <param name="email"></param>
         /// <param name="token"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult CheckViewToken(string token)
+        public ActionResult CheckViewToken(string email, string token)
         {
             if (string.IsNullOrEmpty(token))
             {
-                return ResultData(null, false, "请输入文章访问密码！");
+                return ResultData(null, false, "请输入访问密码！");
             }
 
-            var s = RedisHelper.Get("ArticleViewToken");
+            var s = RedisHelper.Get("token:" + email);
             if (token.Equals(s))
             {
-                HttpContext.Session.Set("ArticleViewToken", token);
+                HttpContext.Session.Set("AccessViewToken", token);
                 return ResultData(null);
             }
 
-            return ResultData(null, false, "文章访问密码不正确！");
+            return ResultData(null, false, "访问密码不正确！");
         }
 
         /// <summary>
@@ -418,10 +419,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 120, VaryByQueryKeys = new[] { "email" })]
+        [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 7200, VaryByQueryKeys = new[] { "email" })]
         public ActionResult GetViewToken(string email)
         {
-            if (string.IsNullOrEmpty(email) && !email.MatchEmail())
+            if (!string.IsNullOrEmpty(email) && !email.MatchEmail())
             {
                 return ResultData(null, false, "请输入正确的邮箱！");
             }
@@ -434,13 +435,14 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (BroadcastService.Any(b => b.Email.Equals(email) && b.SubscribeType == SubscribeType.ArticleToken))
             {
-                var s = RedisHelper.Get("ArticleViewToken");
-                CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "博客文章验证码", $"{CommonHelper.SystemSettings["Domain"]}博客文章验证码是：<span style='color:red'>{s}</span>，有效期为24h，请按时使用！", email);
-                RedisHelper.Set("code:" + email, s, 120);
+                string token = SnowFlake.GetInstance().GetUniqueShortId(6);
+                RedisHelper.Set("token:" + email, token, 86400);
+                CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "博客访问验证码", $"{CommonHelper.SystemSettings["Domain"]}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email);
+                RedisHelper.Set("code:" + email, token, 120);
                 return ResultData(null);
             }
 
-            return ResultData(null, false, "您目前没有权限访问这篇文章的加密部分，请联系站长开通这篇文章的访问权限！");
+            return ResultData(null, false, "您目前没有权限访问这个链接，请联系站长开通访问权限！");
         }
 
         #region 后端管理
@@ -1031,22 +1033,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             bool b = PostHistoryVersionService.DeleteByIdSaved(id);
             return ResultData(null, b, b ? "历史版本文章删除成功！" : "历史版本文章删除失败！");
-        }
-
-        /// <summary>
-        /// 获取文章访问密码
-        /// </summary>
-        /// <returns></returns>
-        [Authority, HttpPost]
-        public ActionResult ViewToken()
-        {
-            if (!RedisHelper.Exists("ArticleViewToken"))
-            {
-                RedisHelper.Set("ArticleViewToken", SnowFlake.GetInstance().GetUniqueShortId(6));
-            }
-
-            var token = RedisHelper.Get("ArticleViewToken");
-            return ResultData(token);
         }
 
         /// <summary>

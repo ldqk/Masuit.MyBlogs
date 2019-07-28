@@ -1,25 +1,24 @@
 ﻿@model IEnumerable<string>
 @using Masuit.MyBlogs.Core.Models.Entity
-@using Masuit.Tools.Win32
 @{
     ViewBag.Title = "投稿";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    string[] colors = {"success", "info", "warning", "danger", "default"};
+    string[] colors = { "success", "info", "warning", "danger", "default" };
     List<Category> cats = ViewBag.Category;
 }
 <link href="~/Assets/fileupload/filestyle.css" rel="stylesheet" />
 <link href="~/Assets/semantic/semantic.min.css" rel="stylesheet" />
 <div class="container">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页","Index","Home")</li>
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
         <li class="current"><em>@ViewBag.Title</em></li>
     </ol>
-    <hr/>
+    <hr />
     <form class="form-group" id="article-form" method="post" onsubmit="return false">
         @*文章表单*@
         @Html.AntiForgeryToken()
-        <input type="hidden" name="IsWordDocument" id="IsWordDocument" value="false"/>
-        <input type="hidden" name="ResourceName" id="ResourceName"/>
+        <input type="hidden" name="IsWordDocument" id="IsWordDocument" value="false" />
+        <input type="hidden" name="ResourceName" id="ResourceName" />
         <div class="input-group">
             <span class="input-group-addon size18"><label for="article">文章标题：</label></span>
             <input type="text" id="article" class="form-control input-lg" name="Title" required placeholder="请输入文章标题">

@@ -74,7 +74,7 @@
                             @if (!string.IsNullOrEmpty(Model.ProtectContent))
                             {
                                 <div class="row protected">
-                                    @if (string.IsNullOrEmpty(Context.Session.Get<string>("ArticleViewToken")))
+                                    @if (string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")))
                                     {
                                         <p class="text-red text-center size24 margin-bot10">↓↓↓恭喜你发现镇站之宝，请注意，前方高能！非战斗人员请及时撤离，这不是演习！↓↓↓</p>
                                         <div class="col-md-6">

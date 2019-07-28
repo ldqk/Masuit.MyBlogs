@@ -24,5 +24,10 @@
         /// 是否是推荐站点
         /// </summary>
         public bool Recommend { get; set; }
+
+        /// <summary>
+        /// 友链权重
+        /// </summary>
+        public int Weight { get; set; }
     }
 }

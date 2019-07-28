@@ -38,9 +38,6 @@
 			self.tableParams.reload();
 		}
 	});
-	$scope.request("/post/viewtoken",null, function(data) {
-		$scope.ViewToken=data.Data;
-	});
 	this.GetPageData = function (page, size) {
 		$scope.loading();
 		$http.post("/post/getpagedata", {

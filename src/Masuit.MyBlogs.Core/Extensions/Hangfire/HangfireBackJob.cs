@@ -8,7 +8,6 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
-using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
@@ -153,7 +152,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void EverydayJob()
         {
             CommonHelper.IPErrorTimes.RemoveWhere(kv => kv.Value < 100); //将访客访问出错次数少于100的移开
-            RedisHelper.Set("ArticleViewToken", SnowFlake.GetInstance().GetUniqueShortId(6)); //更新加密文章的密码
             RedisHelper.IncrBy("Interview:RunningDays");
             DateTime time = DateTime.Now.AddMonths(-1);
             _searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
@@ -179,6 +177,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                         link.Status = Status.Unavailable;
                         return;
                     }
+
                     var res = await t;
                     if (res.IsSuccessStatusCode)
                     {
@@ -188,10 +187,31 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                     {
                         link.Status = Status.Unavailable;
                     }
+
                     _linksService.UpdateEntity(link);
                 }).Wait();
             });
             _linksService.SaveChanges();
+        }
+
+        /// <summary>
+        /// 更新友链权重
+        /// </summary>
+        /// <param name="referer"></param>
+        public void UpdateLinkWeight(string referer)
+        {
+            var uri = new Uri(referer);
+            var query = _linksService.LoadEntities(l => l.Url.Contains(uri.Host));
+            if (query.Any())
+            {
+                var list = query.ToList();
+                foreach (var link in list)
+                {
+                    link.Weight += 1;
+                }
+
+                _linksService.SaveChanges();
+            }
         }
 
         /// <summary>

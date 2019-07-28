@@ -3,35 +3,19 @@
 	var self = this;
 	var source = [];
 	$scope.loading();
-	$scope.paginationConf = {
-		currentPage: $scope.currentPage ? $scope.currentPage : 1,
-		itemsPerPage: 10,
-		pagesLength: 25,
-		perPageOptions: [1, 5, 10, 15, 20, 30, 40, 50, 100, 200],
-		rememberPerPage: 'perPageItems',
-		onChange: function() {
-			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-		}
-	};
-	this.GetPageData = function(page, size) {
+	this.load = function() {
 		$scope.loading();
-		$http.post("/links/getpagedata", {
-			page,
-			size
-		}).then(function(res) {
-			$scope.paginationConf.currentPage = page;
-			$scope.paginationConf.totalItems = res.data.TotalCount;
-			$("div[ng-table-pagination]").remove();
-			self.tableParams = new NgTableParams({
-				count: 50000
-			}, {
+		$http.post("/links/get", null).then(function(res) {
+			self.tableParams = new NgTableParams({}, {
 				filterDelay: 0,
 				dataset: res.data.Data
-				});
-			source = angular.copy(res.data.Data);
+			});
+			source = res.data.Data;
 			$scope.loadingDone();
 		});
 	};
+	this.load();
+
 	self.del = function(row) {
 		swal({
 			title: "确认删除这条友情链接吗？",
@@ -127,7 +111,7 @@
 			if (result) {
 				if (result.Success) {
 					swal(result.Message, "", "success");
-					self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+					self.load();
 				} else {
 					swal(result.Message, "", "error");
 				}
@@ -154,7 +138,7 @@
 			id:row.Id,
 			state:row.Except
 		}, function (data) {
-			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+			self.load();
 		});
 	}
 	$scope.toggleState= function(row) {
@@ -162,7 +146,7 @@
 			id:row.Id,
 			state:row.Status==1
 		}, function (data) {
-			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+			self.load();
 		});
 	}
 
@@ -171,7 +155,7 @@
 			id:row.Id,
 			state:row.Recommend
 		}, function (data) {
-			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+			self.load();
 		});
 	}
 }]);

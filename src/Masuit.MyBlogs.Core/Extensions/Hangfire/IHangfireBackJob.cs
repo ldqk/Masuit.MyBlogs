@@ -40,6 +40,12 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         void CheckLinks();
 
         /// <summary>
+        /// 更新友链权重
+        /// </summary>
+        /// <param name="referer"></param>
+        void UpdateLinkWeight(string referer);
+
+        /// <summary>
         /// 重建Lucene索引库
         /// </summary>
         void CreateLuceneIndex();

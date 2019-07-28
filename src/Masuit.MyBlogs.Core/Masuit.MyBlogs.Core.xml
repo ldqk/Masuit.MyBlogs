@@ -901,12 +901,10 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.LinksController.GetPageData(System.Int32,System.Int32)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.LinksController.Get">
             <summary>
-            分页数据
+            所有的友情链接
             </summary>
-            <param name="page"></param>
-            <param name="size"></param>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.LinksController.ToggleWhitelist(System.Int32,System.Boolean)">
@@ -1419,10 +1417,11 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.CheckViewToken(System.String)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.CheckViewToken(System.String,System.String)">
             <summary>
             检查访问密码
             </summary>
+            <param name="email"></param>
             <param name="token"></param>
             <returns></returns>
         </member>
@@ -1542,12 +1541,6 @@
             删除历史版本
             </summary>
             <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.ViewToken">
-            <summary>
-            获取文章访问密码
-            </summary>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.Revert(System.Int32)">
@@ -2195,6 +2188,12 @@
             检查友链
             </summary>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.UpdateLinkWeight(System.String)">
+            <summary>
+            更新友链权重
+            </summary>
+            <param name="referer"></param>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.HangfireBackJob.CreateLuceneIndex">
             <summary>
             重建Lucene索引库
@@ -2239,6 +2238,12 @@
             <summary>
             友链检查
             </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob.UpdateLinkWeight(System.String)">
+            <summary>
+            更新友链权重
+            </summary>
+            <param name="referer"></param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Extensions.Hangfire.IHangfireBackJob.CreateLuceneIndex">
             <summary>
@@ -5311,6 +5316,11 @@
             是否是推荐站点
             </summary>
         </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.LinksOutputDto.Weight">
+            <summary>
+            友链权重
+            </summary>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Models.DTO.LoginRecordOutputDto">
             <summary>
             用户登录记录输出模型
@@ -6174,6 +6184,11 @@
         <member name="P:Masuit.MyBlogs.Core.Models.Entity.Links.Recommend">
             <summary>
             是否是推荐站点
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Links.Weight">
+            <summary>
+            友链权重
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Models.Entity.LoginRecord">

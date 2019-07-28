@@ -81,6 +81,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     return ResultData(null, false, "文件格式不支持，只能上传doc或者docx的文档!");
                 }
+
                 if (fileName != null)
                 {
                     string upload = _hostingEnvironment.WebRootPath + "/upload";
@@ -88,6 +89,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     {
                         Directory.CreateDirectory(upload);
                     }
+
                     string resourceName = string.Empty.CreateShortToken(9);
                     string ext = Path.GetExtension(fileName);
                     string docPath = Path.Combine(upload, resourceName + ext);
@@ -106,12 +108,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                         System.IO.File.Delete(docPath);
                         return ResultData(null, false, "读取文件内容失败，请检查文件的完整性，建议另存后重新上传！");
                     }
+
                     if (html.Length > 1000000)
                     {
                         Directory.Delete(htmlDir, true);
                         System.IO.File.Delete(docPath);
                         return ResultData(null, false, "文档内容超长，服务器拒绝接收，请优化文档内容后再尝试重新上传！");
                     }
+
                     return ResultData(new
                     {
                         Title = Path.GetFileNameWithoutExtension(fileName),
@@ -120,6 +124,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                 }
             }
+
             return ResultData(null, false, "请先选择您需要上传的文件!");
         }
 
@@ -140,6 +145,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return this.ResumePhysicalFile(file, Path.GetFileName(file));
             }
+
             return Content("null");
         }
 
@@ -181,6 +187,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     action = new CrawlerHandler(HttpContext);
                     break;
             }
+
             if (user.IsAdmin)
             {
                 switch (Request.Query["action"])//管理员用
@@ -234,16 +241,19 @@ namespace Masuit.MyBlogs.Core.Controllers
                     {
                         return ResultData(url);
                     }
+
                     path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "images", filename);
                     var dir = Path.GetDirectoryName(path);
                     if (!Directory.Exists(dir))
                     {
                         Directory.CreateDirectory(dir);
                     }
+
                     using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                     {
                         file.CopyTo(fs);
                     }
+
                     break;
                 case var _ when file.ContentType.StartsWith("audio") || file.ContentType.StartsWith("video"):
                     path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "media", filename);
@@ -262,10 +272,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     Directory.CreateDirectory(dir);
                 }
+
                 using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                 {
                     file.CopyTo(fs);
                 }
+
                 return ResultData(path.Substring(_hostingEnvironment.WebRootPath.Length).Replace("\\", "/"));
             }
             catch (Exception e)

@@ -1,6 +1,11 @@
 ﻿using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Extensions.Hangfire;
+using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
+using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions
@@ -27,7 +32,25 @@ namespace Masuit.MyBlogs.Core.Extensions
             {
                 context.Session.Set("session", 0);
                 CommonHelper.InterviewCount++;
+                var referer = context.Request.Headers[HeaderNames.Referer].ToString();
+                if (!string.IsNullOrEmpty(referer))
+                {
+                    try
+                    {
+                        new Uri(referer);//判断是不是一个合法的referer
+                        if (!referer.Contains(context.Request.Host.Value) && !referer.Contains(new[] { "baidu.com", "google", "sogou", "so.com", "bing.com", "sm.cn" }))
+                        {
+                            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(IHangfireBackJob.UpdateLinkWeight), args: referer);
+                        }
+                    }
+                    catch
+                    {
+                        await context.Response.WriteAsync("您的浏览器不支持访问本站！", Encoding.UTF8);
+                        return;
+                    }
+                }
             }
+
             await _next.Invoke(context);
         }
     }

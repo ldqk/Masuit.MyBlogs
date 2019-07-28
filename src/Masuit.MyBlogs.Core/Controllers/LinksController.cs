@@ -199,18 +199,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
-        /// 分页数据
+        /// 所有的友情链接
         /// </summary>
-        /// <param name="page"></param>
-        /// <param name="size"></param>
         /// <returns></returns>
         [Authority]
-        public ActionResult GetPageData(int page = 1, int size = 10)
+        public ActionResult Get()
         {
-            List<Links> list = LinksService.GetAll().OrderBy(p => p.Status).ThenByDescending(p => p.Recommend).ThenByDescending(p => p.Id).Skip((page - 1) * size).Take(size).ToList();
-            var total = LinksService.GetAll().Count();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            List<Links> list = LinksService.GetAll().OrderBy(p => p.Status).ThenByDescending(p => p.Recommend).ThenByDescending(p => p.Id).ToList();
+            return ResultData(list);
         }
 
         /// <summary>

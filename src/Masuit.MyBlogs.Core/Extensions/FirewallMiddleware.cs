@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools;
+using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
@@ -51,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             }
 
             string ip = context.Connection.RemoteIpAddress.MapToIPv4().ToString();
-            if (ip.IsDenyIpAddress())
+            if (ip.IsDenyIpAddress() && string.IsNullOrEmpty(context.Session.Get<string>("AccessViewToken")))
             {
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
                 {

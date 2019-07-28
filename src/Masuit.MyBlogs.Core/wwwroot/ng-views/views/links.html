@@ -3,7 +3,7 @@
         <button class="btn btn-danger waves-effect" ng-click="add()">
             <span class="glyphicon glyphicon-plus"></span>
         </button>
-        <button class="btn btn-info waves-effect" ng-click="list.GetPageData(paginationConf.currentPage, paginationConf.itemsPerPage);">
+        <button class="btn btn-info waves-effect" ng-click="list.load();">
             <span class="glyphicon glyphicon-refresh"></span>
         </button>
     </div>
@@ -26,6 +26,9 @@
                         <input type="text" name="name" ng-model="row.Url" class="form-control input-sm" required />
                     </div>
                 </div>
+            </td>
+            <td title="'来源次数'" sortable="'Weight'">
+                {{row.Weight}}
             </td>
             <td title="'白名单'">
                 <label class="el-switch">
@@ -66,5 +69,4 @@
             </td>
         </tr>
     </table>
-    <tm-pagination conf="paginationConf"></tm-pagination>
 </div>

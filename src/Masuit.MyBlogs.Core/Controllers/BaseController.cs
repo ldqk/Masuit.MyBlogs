@@ -143,7 +143,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.menus = MenuService.LoadEntitiesFromL2Cache<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
             PageFootViewModel model = new PageFootViewModel //页脚
             {
-                Links = LinksService.LoadEntities(l => l.Status == Status.Available, l => l.Recommend, false).ThenBy(l => new Random().Next()).Take(40).ProjectTo<LinksOutputDto>().Cacheable().ToList()
+                Links = LinksService.LoadEntities(l => l.Status == Status.Available, l => l.Recommend, false).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(40).ProjectTo<LinksOutputDto>().Cacheable().ToList()
             };
             ViewBag.Footer = model;
 

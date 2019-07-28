@@ -7,5 +7,6 @@
         public string RawUrl { get; set; }
         public string AccessToken { get; set; }
         public string Branch { get; set; }
+        public int FileLimitSize { get; set; }
     }
 }

@@ -44,12 +44,12 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public async Task<(string url, bool success)> UploadImage(Stream stream, string file)
         {
-            if (AppConfig.GiteeConfig.Enabled)
+            if (AppConfig.GiteeConfig.Enabled && stream.Length < AppConfig.GiteeConfig.FileLimitSize)
             {
                 return await UploadGitee(stream, file);
             }
 
-            if (AppConfig.GitlabConfig.Enabled)
+            if (AppConfig.GitlabConfig.Enabled && stream.Length < AppConfig.GitlabConfig.FileLimitSize)
             {
                 return await UploadGitlab(stream, file);
             }

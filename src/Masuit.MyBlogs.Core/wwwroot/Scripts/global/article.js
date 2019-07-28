@@ -49,6 +49,8 @@
 					$(".getcode").text('重新发送('+(120-count)+')');
 					if (count>120) {
 						clearInterval(timer);
+						$(".getcode").attr('disabled', false);
+                        $(".getcode").text('重新发送');
 					}
 				},1000);
 			} else {
