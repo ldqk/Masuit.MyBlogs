@@ -2,6 +2,7 @@
 using EFSecondLevelCache.Core;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
+using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -21,7 +22,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 基本父控制器
     /// </summary>
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [ApiExplorerSettings(IgnoreApi = true), Firewall]
     public class BaseController : Controller
     {
         /// <summary>

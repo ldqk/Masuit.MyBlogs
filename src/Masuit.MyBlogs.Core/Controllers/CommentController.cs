@@ -63,9 +63,13 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, false, "评论失败，文章不存在！");
             }
-            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
-            comment.Content = comment.Content.Trim().Replace("<p><br></p>", string.Empty);
 
+            if (post.DisableComment)
+            {
+                return ResultData(null, false, "本文已禁用评论功能，不允许任何人回复！");
+            }
+
+            comment.Content = comment.Content.Trim().Replace("<p><br></p>", string.Empty);
             if (comment.Content.RemoveHtmlTag().Trim().Equals(HttpContext.Session.Get<string>("comment" + comment.PostId)))
             {
                 return ResultData(null, false, "您刚才已经在这篇文章发表过一次评论了，换一篇文章吧，或者换一下评论内容吧！");
@@ -76,6 +80,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 comment.Status = Status.Pended;
             }
 
+            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             if (user != null)
             {
                 comment.NickName = user.NickName;

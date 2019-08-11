@@ -127,7 +127,15 @@ namespace Masuit.MyBlogs.Core
                 options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
             });
 
-            services.AddMvc().AddJsonOptions(opt =>
+            services.AddMvc(options =>
+            {
+                options.CacheProfiles.Add("Default", new CacheProfile()
+                {
+                    Location = ResponseCacheLocation.Any,
+                    VaryByHeader = HeaderNames.Cookie,
+                    Duration = 600
+                });
+            }).AddJsonOptions(opt =>
             {
                 opt.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -153,18 +161,20 @@ namespace Masuit.MyBlogs.Core
             services.Configure<BrotliCompressionProviderOptions>(options =>
             {
                 options.Level = CompressionLevel.Optimal;
-            });
-            services.Configure<GzipCompressionProviderOptions>(options =>
+            }).Configure<GzipCompressionProviderOptions>(options =>
             {
                 options.Level = CompressionLevel.Optimal;
-            });
-            services.AddResponseCompression(options =>
+            }).AddResponseCompression(options =>
             {
+                options.EnableForHttps = true;
                 options.Providers.Add<BrotliCompressionProvider>();
                 options.Providers.Add<GzipCompressionProvider>();
                 options.Providers.Add<CustomCompressionProvider>();
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
                 {
+                    "text/html; charset=utf-8",
+                    "application/xhtml+xml",
+                    "application/atom+xml",
                     "image/svg+xml"
                 });
             });
@@ -213,18 +223,22 @@ namespace Masuit.MyBlogs.Core
                 ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes),
             });
 
-            app.UseFirewall().UseRequestIntercept(); //启用网站防火墙
+            app.UseRequestIntercept(); //启用网站防火墙
             var dic = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
             foreach (var (key, value) in dic)
             {
                 CommonHelper.SystemSettings.TryAdd(key, value);
             }
+
             app.UseHangfireServer().UseHangfireDashboard("/taskcenter", new DashboardOptions()
             {
-                Authorization = new[] { new MyRestrictiveAuthorizationFilter() }
+                Authorization = new[]
+                {
+                    new MyRestrictiveAuthorizationFilter()
+                }
             }); //配置hangfire
             app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials()); //配置跨域
-            app.UseResponseCaching(); //启动Response缓存
+            app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
             app.UseSignalR(hub => hub.MapHub<MyHub>("/hubs"));
             HangfireJobInit.Start(); //初始化定时任务
             app.UseMvcWithDefaultRoute();

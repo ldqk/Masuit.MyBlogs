@@ -173,7 +173,17 @@
 		}, 500);
 	}
 	$scope.loadingDone();
-
+    $scope.toggleDisableComment= function(row) {
+        $scope.request("/post/DisableComment", {
+			id: row.Id
+		}, function(data) {
+			window.notie.alert({
+				type: 1,
+				text: data.Message,
+				time: 4
+			});
+		});
+    }
 }]);
 myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, $http, $timeout) {
 	window.hub.stop();

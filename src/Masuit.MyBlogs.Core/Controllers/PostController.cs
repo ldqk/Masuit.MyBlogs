@@ -396,7 +396,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="email"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email", "token" })]
         public ActionResult CheckViewToken(string email, string token)
         {
             if (string.IsNullOrEmpty(token))
@@ -419,7 +419,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 7200, VaryByQueryKeys = new[] { "email" })]
+        [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" })]
         public ActionResult GetViewToken(string email)
         {
             if (!string.IsNullOrEmpty(email) && !email.MatchEmail())
@@ -608,43 +608,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Read(int id) => ResultData(PostService.GetById(id).Mapper<PostOutputDto>());
 
         /// <summary>
-        /// 获取所有文章
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult GetAllData()
-        {
-            var plist = PostService.LoadEntitiesNoTracking(p => p.Status != Status.Deleted).OrderBy(p => p.Status).ThenByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).Select(p => new
-            {
-                p.Id,
-                p.Author,
-                CategoryName = p.Category.Name,
-                p.Email,
-                p.IsFixedTop,
-                p.Label,
-                md = p.ModifyDate,
-                pd = p.PostDate,
-                p.Title,
-                ViewCount = p.TotalViewCount,
-                p.VoteDownCount,
-                p.VoteUpCount,
-                stat = p.Status
-            }).ToList();
-            var list = new List<PostDataModel>();
-            plist.ForEach(item =>
-            {
-                PostDataModel model = item.MapTo<PostDataModel>();
-                model.PostDate = item.pd.ToString("yyyy-MM-dd HH:mm");
-                model.ModifyDate = item.md.ToString("yyyy-MM-dd HH:mm");
-                model.Status = item.stat.GetDisplay();
-                list.Add(model);
-            });
-            return ResultData(list);
-        }
-
-        /// <summary>
         /// 获取文章分页
         /// </summary>
         /// <returns></returns>
+        [Authority]
         public ActionResult GetPageData(int page = 1, int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "")
         {
             if (page < 1)
@@ -699,7 +666,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 p.VoteDownCount,
                 p.VoteUpCount,
                 stat = p.Status,
-                ModifyCount = p.PostHistoryVersion.Count
+                ModifyCount = p.PostHistoryVersion.Count,
+                p.DisableComment
             }).ToList();
             plist.ForEach(item =>
             {
@@ -1040,6 +1008,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authority]
         public ActionResult Revert(int id)
         {
             var history = PostHistoryVersionService.GetById(id);
@@ -1068,6 +1037,24 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             return ResultData(null, false, "版本不存在");
+        }
+
+        /// <summary>
+        /// 禁用或开启文章评论
+        /// </summary>
+        /// <param name="id">文章id</param>
+        /// <returns></returns>
+        [Authority]
+        public ActionResult DisableComment(int id)
+        {
+            var post = PostService.GetById(id);
+            if (post != null)
+            {
+                post.DisableComment = !post.DisableComment;
+                return ResultData(null, PostService.UpdateEntitySaved(post), post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
+            }
+
+            return ResultData(null, false, "文章不存在");
         }
 
         #endregion

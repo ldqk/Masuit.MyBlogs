@@ -83,10 +83,10 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// </summary>
         public DateTime LastAccessTime { get; set; }
 
-        ///// <summary>
-        ///// 评论
-        ///// </summary>
-        //public virtual ICollection<CommentViewModel> Comment { get; set; }
+        /// <summary>
+        /// 禁止评论
+        /// </summary>
+        public bool DisableComment { get; set; }
 
         /// <summary>
         /// 所属分类名

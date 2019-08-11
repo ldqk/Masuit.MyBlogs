@@ -126,6 +126,10 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// </summary>
         public string IP { get; set; }
 
+        /// <summary>
+        /// ½ûÖ¹ÆÀÂÛ
+        /// </summary>
+        public bool DisableComment { get; set; }
 
         /// <summary>
         /// ·ÖÀà

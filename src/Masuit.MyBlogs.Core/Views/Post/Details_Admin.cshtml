@@ -217,7 +217,6 @@
                                 </div>
                             </div>
                         </form>
-                        <ul class="wow media-list"></ul>
                         @if (Model.Comment.Any(c => c.Status == Status.Pended))
                         {
                             <div class="row">
@@ -230,6 +229,7 @@
                         {
                             <h4>还没有评论哦，赶紧来写评论吧</h4>
                         }
+                        <ul class="wow media-list"></ul>
                     </div>
                 </section>
             </div>

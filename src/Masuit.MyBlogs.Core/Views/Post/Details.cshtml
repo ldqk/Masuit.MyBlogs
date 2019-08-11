@@ -218,46 +218,53 @@
                 <section class="wow row animated fadeIn">
                     <div class="col-lg-12">
                         <h3>评论区：</h3>
-                        <form class="form-horizontal animated pulse" id="comment" method="post">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="PostId" value="@Model.Id" />
-                            <input type="hidden" id="OperatingSystem" name="OperatingSystem" />
-                            <input type="hidden" name="Browser" id="Browser" />
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">
-                                            <label for="name">昵称：</label>
-                                        </span>
-                                        <input type="text" class="form-control" name="NickName" id="name" required placeholder="昵称">
+                        @if (!Model.DisableComment)
+                        {
+                            <form class="form-horizontal animated pulse" id="comment" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="PostId" value="@Model.Id" />
+                                <input type="hidden" id="OperatingSystem" name="OperatingSystem" />
+                                <input type="hidden" name="Browser" id="Browser" />
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">
+                                                <label for="name">昵称：</label>
+                                            </span>
+                                            <input type="text" class="form-control" name="NickName" id="name" required placeholder="昵称">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">
+                                                <label for="email">邮箱：</label>
+                                            </span>
+                                            <input type="email" class="form-control" name="Email" id="email" required placeholder="留下您的真实邮箱，以方便接收回复">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            <span class="input-group-addon">
+                                                <label for="chat">QQ/微信：</label>
+                                            </span>
+                                            <input type="text" class="form-control" name="QQorWechat" id="chat" placeholder="QQ或微信(可选)">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">
-                                            <label for="email">邮箱：</label>
-                                        </span>
-                                        <input type="email" class="form-control" name="Email" id="email" required placeholder="留下您的真实邮箱，以方便接收回复">
+                                <div class="form-group overlay animated fadeInDown" style="margin-bottom: 0px !important;">
+                                    <textarea class="layui-textarea" id="layedit" name="Content" style="height: 100px"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-xs-12">
+                                        <button type="submit" class="btn btn-info btn-lg">提交</button>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">
-                                            <label for="chat">QQ/微信：</label>
-                                        </span>
-                                        <input type="text" class="form-control" name="QQorWechat" id="chat" placeholder="QQ或微信(可选)">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group overlay animated fadeInDown" style="margin-bottom: 0px !important;">
-                                <textarea class="layui-textarea" id="layedit" name="Content" style="height: 100px"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-xs-12">
-                                    <button type="submit" class="btn btn-info btn-lg">提交</button>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        }
+                        else
+                        {
+                            <h4>本篇文章已禁用评论和回复功能</h4>
+                        }
                         <ul class="wow media-list"></ul>
                         @if (Model.Comment.Any(c => c.Status == Status.Pended))
                         {
@@ -266,10 +273,6 @@
                                     <div id="pageToolbar"></div>
                                 </div>
                             </div>
-                        }
-                        else
-                        {
-                            <h4>还没有评论哦，赶紧来写评论吧</h4>
                         }
                     </div>
                 </section>

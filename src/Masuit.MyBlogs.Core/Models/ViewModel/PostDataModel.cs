@@ -69,5 +69,10 @@
         /// </summary>
         public int ModifyCount { get; set; }
 
+        /// <summary>
+        /// 禁止评论
+        /// </summary>
+        public bool DisableComment { get; set; }
+
     }
 }

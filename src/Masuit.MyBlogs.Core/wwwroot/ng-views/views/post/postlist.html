@@ -48,41 +48,47 @@
     </div>
     <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed editable-table listTable" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'标题'" filter="{Title: 'text'}" sortable="'Title'">
+            <td title="'标题'">
                 <a ng-href="/{{row.Id}}" target="_blank">{{row.Title}}</a>
             </td>
-            <td title="'作者'" filter="{Author: 'text'}" sortable="'Author'" ng-if="Author">
+            <td title="'作者'" ng-if="Author">
                 {{row.Author}}
             </td>
-            <td title="'阅读'" filter="{ViewCount: 'number'}" sortable="'ViewCount'">
+            <td title="'阅读'">
                 {{row.ViewCount}}
             </td>
-            <td title="'发表'" filter="{PostDate: 'text'}" sortable="'PostDate'">
+            <td title="'发表'">
                 {{row.PostDate|date:'yyyy-MM-dd HH:mm:ss'}}
             </td>
-            <td title="'修改'" filter="{ModifyDate: 'text'}" sortable="'ModifyDate'">
+            <td title="'修改'">
                 {{row.ModifyDate|date:'yyyy-MM-dd HH:mm:ss'}}
             </td>
-            <td title="'修改次数'" filter="{ModifyCount: 'text'}" sortable="'ModifyCount'">
+            <td title="'修改次数'">
                 {{row.ModifyCount}}
             </td>
-            <td title="'分类'" filter="{CategoryName: 'text'}" sortable="'CategoryName'">
+            <td title="'分类'">
                 {{row.CategoryName}}
             </td>
-            <td title="'作者邮箱'" filter="{Email: 'text'}" sortable="'Email'" ng-if="Email">
+            <td title="'作者邮箱'" ng-if="Email">
                 {{row.Email}}
             </td>
-            <td title="'标签'" filter="{Label: 'text'}" sortable="'Label'">
+            <td title="'标签'">
                 {{row.Label}}
             </td>
-            <td title="'支持'" filter="{VoteUpCount: 'number'}" sortable="'VoteUpCount'" ng-if="VoteUpCount">
+            <td title="'支持'" ng-if="VoteUpCount">
                 {{row.VoteUpCount}}
             </td>
-            <td title="'反对'" filter="{VoteDownCount: 'number'}" sortable="'VoteDownCount'" ng-if="VoteDownCount">
+            <td title="'反对'" ng-if="VoteDownCount">
                 {{row.VoteDownCount}}
             </td>
-            <td title="'状态'" filter="{Status: 'select'}" sortable="'Status'" filter-data="list.stats" ng-if="Status">
+            <td title="'状态'" ng-if="Status">
                 {{row.Status}}
+            </td>
+            <td title="'禁止评论'">
+                <label class="el-switch">
+                    <input type="checkbox" name="switch" ng-checked="row.DisableComment">
+                    <span class="el-switch-style" ng-click="toggleDisableComment(row)"></span>
+                </label>
             </td>
             <td title="'操作'" style="width: 185px;">
                 <div class="btn-group">
