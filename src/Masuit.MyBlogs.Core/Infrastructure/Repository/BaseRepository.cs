@@ -1,4 +1,5 @@
-﻿using AutoMapper.QueryableExtensions;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using EFSecondLevelCache.Core;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools.Systems;
@@ -19,10 +20,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
     public class BaseRepository<T> : Disposable, IBaseRepository<T> where T : class, new()
     {
         public virtual DataContext DataContext { get; set; }
-        public BaseRepository(DataContext dbContext)
-        {
-            DataContext = dbContext;
-        }
+
+        public MapperConfiguration MapperConfig { get; set; }
 
         /// <summary>
         /// 获取所有实体
@@ -67,7 +66,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<TDto> GetAll<TDto>() where TDto : class
         {
-            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>();
+            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig);
         }
 
         /// <summary>
@@ -77,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetAllFromL2Cache<TDto>() where TDto : class
         {
-            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>().Cacheable();
+            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig).Cacheable();
         }
 
         /// <summary>
@@ -138,7 +137,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<TDto> GetAll<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>();
+            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig);
         }
 
         /// <summary>
@@ -151,7 +150,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetAllFromL2Cache<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>().Cacheable();
+            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable();
         }
 
         /// <summary>
@@ -230,7 +229,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<TDto> LoadEntities<TDto>(Expression<Func<T, bool>> @where) where TDto : class
         {
-            return DataContext.Set<T>().Where(@where).AsNoTracking().ProjectTo<TDto>();
+            return DataContext.Set<T>().Where(@where).AsNoTracking().ProjectTo<TDto>(MapperConfig);
         }
 
         /// <summary>
@@ -244,7 +243,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<TDto> LoadEntities<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return LoadEntitiesNoTracking(where, orderby, isAsc).ProjectTo<TDto>();
+            return LoadEntitiesNoTracking(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig);
         }
 
         /// <summary>
@@ -277,7 +276,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体集合</returns>
         public virtual IEnumerable<TDto> LoadEntitiesFromL2Cache<TDto>(Expression<Func<T, bool>> @where) where TDto : class
         {
-            return DataContext.Set<T>().Where(@where).AsNoTracking().ProjectTo<TDto>().Cacheable();
+            return DataContext.Set<T>().Where(@where).AsNoTracking().ProjectTo<TDto>(MapperConfig).Cacheable();
         }
 
         /// <summary>
@@ -291,7 +290,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> LoadEntitiesFromL2Cache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return LoadEntitiesNoTracking(where, orderby, isAsc).ProjectTo<TDto>().Cacheable();
+            return LoadEntitiesNoTracking(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable();
         }
 
         /// <summary>
@@ -370,7 +369,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual TDto GetFirstEntity<TDto>(Expression<Func<T, bool>> @where) where TDto : class
         {
-            return DataContext.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>().FirstOrDefault();
+            return DataContext.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefault();
         }
 
         /// <summary>
@@ -384,7 +383,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual TDto GetFirstEntity<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).AsNoTracking().ProjectTo<TDto>().FirstOrDefault() : DataContext.Set<T>().Where(where).OrderByDescending(orderby).AsNoTracking().ProjectTo<TDto>().FirstOrDefault();
+            return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefault() : DataContext.Set<T>().Where(where).OrderByDescending(orderby).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefault();
         }
 
         /// <summary>
@@ -516,7 +515,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IQueryable<TDto> LoadPageEntities<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectTo<TDto>();
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectTo<TDto>(MapperConfig);
         }
 
         /// <summary>
@@ -549,7 +548,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual EFCachedQueryable<TDto> LoadPageEntitiesFromL2Cache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectTo<TDto>().Cacheable();
+            return LoadPageEntitiesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable();
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using AutoMapper.QueryableExtensions;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using EFSecondLevelCache.Core;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
@@ -39,6 +40,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// LinksService
         /// </summary>
         public ILinksService LinksService { get; set; }
+
+        public IMapper Mapper { get; set; }
+        public MapperConfiguration MapperConfig { get; set; }
 
         /// <summary>
         /// 响应数据
@@ -144,7 +148,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.menus = MenuService.LoadEntitiesFromL2Cache<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
             PageFootViewModel model = new PageFootViewModel //页脚
             {
-                Links = LinksService.LoadEntities(l => l.Status == Status.Available, l => l.Recommend, false).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(40).ProjectTo<LinksOutputDto>().Cacheable().ToList()
+                Links = LinksService.LoadEntities(l => l.Status == Status.Available, l => l.Recommend, false).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(40).ProjectTo<LinksOutputDto>(MapperConfig).Cacheable().ToList()
             };
             ViewBag.Footer = model;
 

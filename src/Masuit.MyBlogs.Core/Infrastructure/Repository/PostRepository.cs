@@ -5,8 +5,5 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
 {
     public partial class PostRepository : BaseRepository<Post>, IPostRepository
     {
-        public PostRepository(DataContext dbContext) : base(dbContext)
-        {
-        }
     }
 }

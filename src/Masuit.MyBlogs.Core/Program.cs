@@ -1,5 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Configs;
-using Masuit.MyBlogs.Core.Hubs;
+﻿using Masuit.MyBlogs.Core.Hubs;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -14,7 +13,6 @@ namespace Masuit.MyBlogs.Core
         public static void Main(string[] args)
         {
             LicenseManager.AddLicense("67;100-MASUIT", "809739091397182EC1ECEA8770EB4218");
-            RegisterAutomapper.Excute();
             MyHub.Init();
             CreateWebHostBuilder(args).Build().Run();
         }

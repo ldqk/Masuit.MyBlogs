@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using AutoMapper;
 using CacheManager.Core;
 using CSRedis;
 using EFSecondLevelCache.Core;
@@ -146,6 +147,10 @@ namespace Masuit.MyBlogs.Core
                 options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
             }); //解决razor视图中中文被编码的问题
 
+            var mc = new MapperConfiguration(e => e.AddProfile(new MappingProfile()));
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddSingleton(mc);
+            services.AddAutofac();
             ContainerBuilder builder = new ContainerBuilder();
             builder.Populate(services);
             builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsImplementedInterfaces().Where(t => t.Name.EndsWith("Repository") || t.Name.EndsWith("Service") || t.Name.EndsWith("Controller")).PropertiesAutowired().AsSelf().InstancePerDependency(); //注册控制器为属性注入

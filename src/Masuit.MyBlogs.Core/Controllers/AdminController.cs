@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using AutoMapper;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -24,6 +25,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// UserInfoService
         /// </summary>
         public IUserInfoService UserInfoService { get; set; }
+
+        public IMapper Mapper { get; set; }
 
         /// <summary>
         /// 返回结果json

@@ -169,7 +169,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var viewModel = GetIndexPageViewModel(1, 1, orderBy, user);
             ViewBag.CategoryName = cat.Name;
             ViewBag.Desc = cat.Description;
-            viewModel.Posts = posts.Skip(size * (page - 1)).Take(size).ProjectTo<PostOutputDto>().Cacheable().ToList();
+            viewModel.Posts = posts.Skip(size * (page - 1)).Take(size).ProjectTo<PostOutputDto>(MapperConfig).Cacheable().ToList();
             return View(viewModel);
         }
 

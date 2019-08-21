@@ -1,7 +1,9 @@
-﻿using HtmlAgilityPack;
+﻿using AutoMapper;
+using HtmlAgilityPack;
 using IP2Region;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Concurrent;
@@ -153,7 +155,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static T Mapper<T>(this object source) where T : class => AutoMapper.Mapper.Map<T>(source);
+        public static T Mapper<T>(this object source) where T : class => Startup.AutofacContainer.GetRequiredService<IMapper>().Map<T>(source);
 
         /// <summary>
         /// 发送邮件
