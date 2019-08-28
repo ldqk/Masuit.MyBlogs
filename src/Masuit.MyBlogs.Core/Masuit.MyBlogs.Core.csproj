@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="bundleconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.9.1" />
     <PackageReference Include="Aspose.Words" Version="18.11.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.4.0" />

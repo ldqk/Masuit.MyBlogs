@@ -10,5 +10,11 @@
     "inputFiles": [
       "wwwroot/Scripts/global/article.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/ng-views/controllers/menu.min.js",
+    "inputFiles": [
+      "wwwroot/ng-views/controllers/menu.js"
+    ]
   }
 ]

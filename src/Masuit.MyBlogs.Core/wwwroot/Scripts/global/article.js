@@ -139,9 +139,10 @@
 	//回复表单的提交
 	$("#reply-form").on("submit", function(e) {
 		e.preventDefault();
-		layui.layedit.sync(window.currentEditor);
+        var formData = $(this).serializeObject();
+        layui.layedit.sync(window.currentEditor);
 		loading();
-		if ($("#name2").val().trim().length <= 0 || $("#name").val().trim().length > 36) {
+		if (formData["NickName"].trim().length <= 0 ||formData["NickName"].trim().length > 36) {
 			window.notie.alert({
 				type: 3,
 				text: "亲，能留个正常点的名字不！",
@@ -150,8 +151,8 @@
 			loadingDone();
 			return;
 		}
-		if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($("#email2")
-			.val().trim())) {
+
+		if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(formData["Email"].trim())) {
 			window.notie.alert({
 				type: 3,
 				text: "请输入正确的邮箱格式！",
@@ -160,7 +161,8 @@
 			loadingDone();
 			return;
 		}
-		localStorage.setItem("user", JSON.stringify($(this).serializeObject()));
+
+		localStorage.setItem("user",  JSON.stringify(formData));
 		$.post("/comment/put", $(this).serialize(), (data) => {
 			loadingDone();
 			if (data.Success) {

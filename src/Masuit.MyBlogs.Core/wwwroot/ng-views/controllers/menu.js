@@ -160,28 +160,12 @@
 	};
 	$scope.menu = {};
 	$scope.newItem = function() {
-		//Custombox.open({
-		//	target: '#menu',
-		//	zIndex: 100,
-		//	height: 900,
-		//	close: function () {
-		//		$scope.menu = {};
-		//	},
-		//	overlayOpacity: 0.5
-		//});
 		layer.open({
 			type: 1,
 			zIndex: 20,
 			title: '修改菜单信息',
 			area: (window.screen.width > 600 ? 600 : window.screen.width) + 'px',// '340px'], //宽高
-			//area: ['600px', '260px'], //宽高
 			content: $("#modal"),
-			//cancel: function(index, layero) {
-			//	setTimeout(function() {
-			//		$("#modal").css("display", "none");
-			//	}, 500);
-			//	return true;
-			//},
 			success: function(layero, index) {
 				$scope.menu = {};
 			},
@@ -192,6 +176,7 @@
 		var nodeData = $scope.data[$scope.data.length - 1];
 		$scope.menu.Sort = nodeData.Sort + (nodeData.nodes.length + 1) * 10;
 		$scope.menu.ParentId  = 0;
+		$scope.menu.MenuType  = 0;
 	};
 	$scope.submenu = {};
 
@@ -202,28 +187,12 @@
 		}, 500);
 	}
 	$scope.newSubItem = function (scope) {
-		//Custombox.open({
-		//	target: '#menu',
-		//	zIndex: 100,
-		//	height: 900,
-		//	close: function () {
-		//		$scope.menu = {};
-		//	},
-		//	overlayOpacity:0.5
-		//});
 		layer.open({
 			type: 1,
 			zIndex: 20,
 			title: '修改菜单信息',
 			area: (window.screen.width > 600 ? 600 : window.screen.width) + 'px',// '340px'], //宽高
-			//area: ['600px', '270px'], //宽高
 			content: $("#modal"),
-			//cancel: function(index, layero) {
-			//	setTimeout(function() {
-			//		$("#modal").css("display", "none");
-			//	}, 500);
-			//	return true;
-			//},
 			success: function(layero, index) {
 				$scope.menu = {};
 			},
@@ -238,6 +207,7 @@
 			return false;
 		}
 		$scope.menu.Sort = (nodeData.Sort + nodeData.nodes.length + 1) * 10;
+		$scope.menu.MenuType  = nodeData.MenuType;
 		$scope.menu.ParentId = nodeData.Id;
 	};
 	$scope.expandAll = function() {
@@ -324,15 +294,6 @@
 			});
 		}else {
 			//添加
-			if (menu.ParentId == 0) {
-				//添加主菜单
-				var nodeData = $scope.data[$scope.data.length - 1];
-				menu.Sort = nodeData.Sort + (nodeData.nodes.length + 1) * 10;
-				$scope.data.push(menu);
-			} else {
-				//添加子菜单
-				$scope.submenu.nodes.push(menu);
-			}
 			$scope.request("/menu/save", menu, function (data) {
 				window.notie.alert({
 					type: 1,
@@ -341,7 +302,6 @@
 				});
 				$scope.menu = {};
 				$scope.closeAll();
-				//Custombox.close();
 				$scope.init();
 			});
 		}
