@@ -14,34 +14,30 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
     /// </summary>
     public class CrawlerHandler : Handler
     {
-        private string[] _sources;
-        private Crawler[] _crawlers;
-
         public CrawlerHandler(HttpContext context) : base(context)
         {
         }
 
         public override string Process()
         {
-            _sources = Request.Form["source[]"];
-            if (_sources == null || _sources.Length == 0)
+            string[] sources = Request.Form["source[]"];
+            if (sources?.Length > 0)
             {
                 return WriteJson(new
                 {
-                    state = "参数错误：没有指定抓取源"
+                    state = "SUCCESS",
+                    list = sources.AsParallel().Select(s => new Crawler(s).Fetch()).Select(x => new
+                    {
+                        state = x.State,
+                        source = x.SourceUrl,
+                        url = x.ServerUrl
+                    })
                 });
             }
 
-            _crawlers = _sources.Select(x => new Crawler(x).Fetch()).ToArray();
             return WriteJson(new
             {
-                state = "SUCCESS",
-                list = _crawlers.Select(x => new
-                {
-                    state = x.State,
-                    source = x.SourceUrl,
-                    url = x.ServerUrl
-                })
+                state = "参数错误：没有指定抓取源"
             });
         }
     }
@@ -51,6 +47,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
         public string SourceUrl { get; set; }
         public string ServerUrl { get; set; }
         public string State { get; set; }
+        private readonly HttpClient _httpClient = new HttpClient();
 
         public Crawler(string sourceUrl)
         {
@@ -64,51 +61,47 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 State = "INVALID_URL";
                 return this;
             }
-
-            using (var httpClient = new HttpClient())
+            var response = _httpClient.GetAsync(SourceUrl).Result;
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                var response = httpClient.GetAsync(SourceUrl).Result;
-                if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    State = "Url returns " + response.StatusCode;
-                    return this;
-                }
-
-                ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), UeditorConfig.GetString("catcherPathFormat"));
-
-                try
-                {
-                    using (var stream = response.Content.ReadAsStreamAsync().Result)
-                    {
-                        var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
-                        var (url, success) = new ImagebedClient(httpClient).UploadImage(stream, savePath).Result;
-                        if (success)
-                        {
-                            ServerUrl = url;
-                        }
-                        else
-                        {
-                            if (!Directory.Exists(Path.GetDirectoryName(savePath)))
-                            {
-                                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-                            }
-                            using (var ms = new MemoryStream())
-                            {
-                                stream.CopyTo(ms);
-                                File.WriteAllBytes(savePath, ms.GetBuffer());
-                            }
-                        }
-                    }
-
-                    State = "SUCCESS";
-                }
-                catch (Exception e)
-                {
-                    State = "抓取错误：" + e.Message;
-                }
-
+                State = "Url returns " + response.StatusCode;
                 return this;
             }
+
+            ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), UeditorConfig.GetString("catcherPathFormat"));
+
+            try
+            {
+                using (var stream = response.Content.ReadAsStreamAsync().Result)
+                {
+                    var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
+                    var (url, success) = new ImagebedClient(_httpClient).UploadImage(stream, savePath).Result;
+                    if (success)
+                    {
+                        ServerUrl = url;
+                    }
+                    else
+                    {
+                        if (!Directory.Exists(Path.GetDirectoryName(savePath)))
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+                        }
+                        using (var ms = new MemoryStream())
+                        {
+                            stream.CopyTo(ms);
+                            File.WriteAllBytes(savePath, ms.GetBuffer());
+                        }
+                    }
+                }
+
+                State = "SUCCESS";
+            }
+            catch (Exception e)
+            {
+                State = "抓取错误：" + e.Message;
+            }
+
+            return this;
         }
     }
 }
