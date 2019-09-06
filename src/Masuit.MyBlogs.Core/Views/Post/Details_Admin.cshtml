@@ -1,12 +1,10 @@
 ﻿@using System.Web
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
-@using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
 @using Masuit.Tools.Systems
-@using Masuit.Tools.Win32
 @model Masuit.MyBlogs.Core.Models.Entity.Post
 @{
     ViewBag.Title = Model.Title;
@@ -314,8 +312,6 @@
             $("#article").highlight(keywords[i]);
         }
 		loading();
-		//SyntaxHighlighter.all();
-		//SyntaxHighlighter.defaults['toolbar'] = false;
 		$('#pageToolbar').Paging({ //异步加载评论
 			pagesize: 10,
 			count: @Model.Comment.Count(c =>c.ParentId==0&& c.Status==Status.Pended),

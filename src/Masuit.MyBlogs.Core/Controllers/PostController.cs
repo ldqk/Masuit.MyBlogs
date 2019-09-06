@@ -442,6 +442,20 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 文章合并
         /// </summary>
+        /// <param name="id"></param>
+        /// <param name="mid"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/merge/{mid}")]
+        public ActionResult RepushMerge(int id, int mid)
+        {
+            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            var merge = post.PostMergeRequests.FirstOrDefault(p => p.Id == mid && p.MergeState != MergeStatus.Merged) ?? throw new NotFoundException("待合并文章未找到");
+            return View(merge);
+        }
+
+        /// <summary>
+        /// 文章合并
+        /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("{id}/pushmerge")]
@@ -498,21 +512,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
             }
 
-            return ResultData(null, b, b ? "修改请求已提交！" : "操作失败！");
-        }
-
-        /// <summary>
-        /// 文章合并
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="mid"></param>
-        /// <returns></returns>
-        [HttpGet("{id}/merge/{mid}")]
-        public ActionResult RepushMerge(int id, int mid)
-        {
-            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            var merge = post.PostMergeRequests.FirstOrDefault(p => p.Id == mid && p.MergeState != MergeStatus.Merged) ?? throw new NotFoundException("待合并文章未找到");
-            return View(merge);
+            return ResultData(null, b, b ? "您的修改请求已提交，已进入审核状态，感谢您的参与！" : "操作失败！");
         }
 
         #region 后端管理
