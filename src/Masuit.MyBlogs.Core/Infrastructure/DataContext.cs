@@ -29,6 +29,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             modelBuilder.Entity<Post>().HasMany(e => e.Comment).WithOne(e => e.Post).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Post>().HasMany(e => e.PostHistoryVersion).WithOne(e => e.Post).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Post>().HasMany(e => e.Seminar).WithOne(s => s.Post).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Post>().HasMany(e => e.PostMergeRequests).WithOne(s => s.Post).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<PostHistoryVersion>().HasMany(e => e.Seminar).WithOne(s => s.PostHistoryVersion);
             modelBuilder.Entity<SearchDetails>().Property(e => e.KeyWords).IsUnicode();
             modelBuilder.Entity<UserInfo>().HasMany(e => e.LoginRecord).WithOne(e => e.UserInfo).OnDelete(DeleteBehavior.Cascade);
@@ -78,6 +79,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure
         public virtual DbSet<InternalMessage> InternalMessage { get; set; }
         public virtual DbSet<FastShare> FastShare { get; set; }
         public virtual DbSet<Banner> Banner { get; set; }
+        public virtual DbSet<PostMergeRequest> PostMergeRequests { get; set; }
     }
 
     /// <summary>

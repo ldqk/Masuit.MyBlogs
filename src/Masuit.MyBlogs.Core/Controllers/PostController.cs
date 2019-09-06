@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using EFSecondLevelCache.Core;
+﻿using EFSecondLevelCache.Core;
 using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
@@ -38,35 +37,24 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// </summary>
     public class PostController : BaseController
     {
-        private IPostService PostService { get; set; }
-        private ICategoryService CategoryService { get; set; }
-        private IBroadcastService BroadcastService { get; set; }
-        private ISeminarService SeminarService { get; set; }
-        private IPostHistoryVersionService PostHistoryVersionService { get; set; }
+        public IPostService PostService { get; set; }
+        public ICategoryService CategoryService { get; set; }
+        public IBroadcastService BroadcastService { get; set; }
+        public ISeminarService SeminarService { get; set; }
+        public IPostHistoryVersionService PostHistoryVersionService { get; set; }
 
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly ISearchEngine<DataContext> _searchEngine;
+        public IInternalMessageService MessageService { get; set; }
+
+        public IHostingEnvironment HostingEnvironment { get; set; }
+        public ISearchEngine<DataContext> SearchEngine { get; set; }
         private readonly ImagebedClient _imagebedClient;
 
         /// <summary>
         /// 文章管理
         /// </summary>
-        /// <param name="postService"></param>
-        /// <param name="categoryService"></param>
-        /// <param name="broadcastService"></param>
-        /// <param name="seminarService"></param>
-        /// <param name="postHistoryVersionService"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="searchEngine"></param>
-        public PostController(IPostService postService, ICategoryService categoryService, IBroadcastService broadcastService, ISeminarService seminarService, IPostHistoryVersionService postHistoryVersionService, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine, IHttpClientFactory httpClientFactory)
+        /// <param name="httpClientFactory"></param>
+        public PostController(IHttpClientFactory httpClientFactory)
         {
-            PostService = postService;
-            CategoryService = categoryService;
-            BroadcastService = broadcastService;
-            SeminarService = seminarService;
-            PostHistoryVersionService = postHistoryVersionService;
-            _hostingEnvironment = hostingEnvironment;
-            _searchEngine = searchEngine;
             _imagebedClient = new ImagebedClient(httpClientFactory.CreateClient());
         }
 
@@ -89,7 +77,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ViewBag.Prev = PostService.GetFirstEntity<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.Status == Status.Pended || user.IsAdmin), p => p.ModifyDate, false);
                 if (!string.IsNullOrEmpty(kw))
                 {
-                    ViewData["keywords"] = post.Content.Contains(kw) ? $"['{kw}']" : _searchEngine.LuceneIndexSearcher.CutKeywords(kw).ToJsonString();
+                    ViewData["keywords"] = post.Content.Contains(kw) ? $"['{kw}']" : SearchEngine.LuceneIndexSearcher.CutKeywords(kw).ToJsonString();
                 }
 
                 if (user.IsAdmin)
@@ -261,12 +249,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             });
             ViewBag.Category = CategoryService.LoadEntitiesNoTracking(c => c.Status == Status.Available).ToList();
-            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
-            if (user != null)
-            {
-                return View("Publish_Admin", result.Distinct().OrderBy(s => s));
-            }
-
             return View(result.Distinct().OrderBy(s => s));
         }
 
@@ -276,14 +258,18 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="post"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Publish(PostInputDto post)
+        public async Task<ActionResult> Publish(PostInputDto post, string code)
         {
+            if (RedisHelper.Get("code:" + post.Email) != code)
+            {
+                return ResultData(null, false, "验证码错误！");
+            }
+
             if (Regex.Match(post.Content, CommonHelper.BanRegex).Length > 0)
             {
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请注意改善您的言辞！");
             }
 
-            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
                 return ResultData(null, message: "请选择一个分类");
@@ -305,26 +291,22 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.Status = Status.Pending;
             post.PostDate = DateTime.Now;
             post.ModifyDate = DateTime.Now;
-            if (user != null && user.IsAdmin)
-            {
-                post.Status = Status.Pended;
-            }
-            else
-            {
-                post.Content = await _imagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes());
-            }
-
+            post.Status = Status.Pended;
+            post.Content = await _imagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes());
             ViewBag.CategoryId = new SelectList(CategoryService.LoadEntitiesNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
             Post p = post.Mapper<Post>();
             p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            p.Modifier = p.Author;
+            p.ModifierEmail = p.Email;
             p = PostService.AddEntitySaved(p);
             if (p != null)
             {
+                RedisHelper.Expire("code:" + p.Email, 1);
                 if (p.Status == Status.Pending)
                 {
                     var email = CommonHelper.SystemSettings["ReceiveEmail"];
                     string link = Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme);
-                    string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/publish.html")
+                    string content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/publish.html")
                         .Replace("{{link}}", link)
                         .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                         .Replace("{{title}}", p.Title);
@@ -422,14 +404,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" })]
         public ActionResult GetViewToken(string email)
         {
-            if (!string.IsNullOrEmpty(email) && !email.MatchEmail())
+            if (string.IsNullOrEmpty(email) || !email.MatchEmail())
             {
                 return ResultData(null, false, "请输入正确的邮箱！");
             }
 
-            if (RedisHelper.Exists("code:" + email))
+            if (RedisHelper.Exists("get:" + email))
             {
-                RedisHelper.Expire("code:" + email, 120);
+                RedisHelper.Expire("get:" + email, 120);
                 return ResultData(null, false, "发送频率限制，请在2分钟后重新尝试发送邮件！请检查你的邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！");
             }
 
@@ -437,12 +419,100 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 string token = SnowFlake.GetInstance().GetUniqueShortId(6);
                 RedisHelper.Set("token:" + email, token, 86400);
-                CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "博客访问验证码", $"{CommonHelper.SystemSettings["Domain"]}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email);
-                RedisHelper.Set("code:" + email, token, 120);
+                BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "博客访问验证码", $"{CommonHelper.SystemSettings["Domain"]}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email));
+                RedisHelper.Set("get:" + email, token, 120);
                 return ResultData(null);
             }
 
             return ResultData(null, false, "您目前没有权限访问这个链接，请联系站长开通访问权限！");
+        }
+
+        /// <summary>
+        /// 文章合并
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/merge")]
+        public ActionResult PushMerge(int id)
+        {
+            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            return View(post);
+        }
+
+        /// <summary>
+        /// 文章合并
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost("{id}/pushmerge")]
+        public ActionResult PushMerge(PostMergeRequestInputDto dto)
+        {
+            if (RedisHelper.Get("code:" + dto.ModifierEmail) != dto.Code)
+            {
+                return ResultData(null, false, "验证码错误！");
+            }
+
+            var post = PostService.GetById(dto.PostId) ?? throw new NotFoundException("文章未找到");
+            if (post.Title.Equals(dto.Title) && post.Content.Equals(dto.Content))
+            {
+                return ResultData(null, false, "内容未被修改！");
+            }
+
+            #region 直接合并
+
+            if (post.Email.Equals(dto.ModifierEmail))
+            {
+                var history = post.Mapper<PostHistoryVersion>();
+                Mapper.Map(dto, post);
+                post.PostHistoryVersion.Add(history);
+                post.ModifyDate = DateTime.Now;
+                return PostService.UpdateEntitySaved(post) ? ResultData(null, true, "你是文章原作者，无需审核，文章已自动更新并在首页展示！") : ResultData(null, false, "操作失败！");
+            }
+
+            #endregion
+
+            var merge = post.PostMergeRequests.FirstOrDefault(r => r.Id == dto.Id && r.MergeState != MergeStatus.Merged);
+            if (merge != null)
+            {
+                Mapper.Map(dto, merge);
+                merge.SubmitTime = DateTime.Now;
+                merge.MergeState = MergeStatus.Pending;
+            }
+            else
+            {
+                merge = Mapper.Map<PostMergeRequest>(dto);
+                post.PostMergeRequests.Add(merge);
+            }
+
+            var b = PostService.UpdateEntitySaved(post);
+            if (b)
+            {
+                RedisHelper.Expire("code:" + dto.ModifierEmail, 1);
+                MessageService.AddEntitySaved(new InternalMessage()
+                {
+                    Title = $"来自【{dto.Modifier}】的文章修改合并请求",
+                    Content = dto.Title,
+                    Link = "#/merge/compare?id=" + merge.Id
+                });
+                var content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/merge-request.html").Replace("{{title}}", post.Title).Replace("{{link}}", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id);
+                BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
+            }
+
+            return ResultData(null, b, b ? "修改请求已提交！" : "操作失败！");
+        }
+
+        /// <summary>
+        /// 文章合并
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="mid"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/merge/{mid}")]
+        public ActionResult RepushMerge(int id, int mid)
+        {
+            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            var merge = post.PostMergeRequests.FirstOrDefault(p => p.Id == mid && p.MergeState != MergeStatus.Merged) ?? throw new NotFoundException("待合并文章未找到");
+            return View(merge);
         }
 
         #region 后端管理
@@ -490,7 +560,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 cast.ForEach(c =>
                 {
                     var ts = DateTime.Now.GetTotalMilliseconds();
-                    string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/broadcast.html")
+                    string content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/broadcast.html")
                         .Replace("{{link}}", link + "?email=" + c.Email)
                         .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                         .Replace("{{title}}", post.Title)
@@ -522,7 +592,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var post = PostService.GetById(id);
             post.Status = Status.Deleted;
             bool b = PostService.UpdateEntitySaved(post);
-            _searchEngine.LuceneIndexer.Delete(post);
+            SearchEngine.LuceneIndexer.Delete(post);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 
@@ -558,8 +628,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 try
                 {
-                    System.IO.File.Delete(Path.Combine(_hostingEnvironment.WebRootPath + "/upload", post.ResourceName));
-                    Directory.Delete(Path.Combine(_hostingEnvironment.WebRootPath + "/upload", Path.GetFileNameWithoutExtension(post.ResourceName)), true);
+                    System.IO.File.Delete(Path.Combine(HostingEnvironment.WebRootPath + "/upload", post.ResourceName));
+                    Directory.Delete(Path.Combine(HostingEnvironment.WebRootPath + "/upload", Path.GetFileNameWithoutExtension(post.ResourceName)), true);
                 }
                 catch (IOException)
                 {
@@ -573,7 +643,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     try
                     {
-                        System.IO.File.Delete(_hostingEnvironment.WebRootPath + path);
+                        System.IO.File.Delete(HostingEnvironment.WebRootPath + path);
                     }
                     catch (IOException)
                     {
@@ -775,14 +845,16 @@ namespace Masuit.MyBlogs.Core.Controllers
             Post p = PostService.GetById(post.Id);
             if (reserve)
             {
-                post.ModifyDate = DateTime.Now;
                 var history = p.Mapper<PostHistoryVersion>();
-                history.Id = 0;
                 p.PostHistoryVersion.Add(history);
+                post.ModifyDate = DateTime.Now;
             }
 
             p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             Mapper.Map(post, p);
+            var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+            p.Modifier = user.NickName;
+            p.ModifierEmail = user.Email;
             if (!string.IsNullOrEmpty(post.Seminars))
             {
                 var tmp = post.Seminars.Split(',').Distinct();
@@ -814,7 +886,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     cast.ForEach(c =>
                     {
                         var ts = DateTime.Now.GetTotalMilliseconds();
-                        string content = System.IO.File.ReadAllText(Path.Combine(_hostingEnvironment.WebRootPath, "template", "broadcast.html"))
+                        string content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "broadcast.html"))
                             .Replace("{{link}}", link + "?email=" + c.Email)
                             .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                             .Replace("{{title}}", post.Title)
@@ -882,6 +954,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.PostDate = DateTime.Now;
             post.ModifyDate = DateTime.Now;
             Post p = post.Mapper<Post>();
+            p.Modifier = p.Author;
+            p.ModifierEmail = p.Email;
             p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             if (!string.IsNullOrEmpty(post.Seminars))
             {
@@ -924,7 +998,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     cast.ForEach(c =>
                     {
                         var ts = DateTime.Now.GetTotalMilliseconds();
-                        string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/broadcast.html")
+                        string content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/broadcast.html")
                             .Replace("{{link}}", link + "?email=" + c.Email)
                             .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                             .Replace("{{title}}", post.Title).Replace("{{author}}", post.Author)

@@ -2,7 +2,7 @@
 @model List<Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion>
 @{
     var post = (PostOutputDto)ViewBag.Primary;
-    ViewBag.Title = post.Title+"的历史版本";
+    ViewBag.Title = post.Title + "的历史版本";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="container" style="min-height: 70vh">
@@ -21,12 +21,13 @@
                 <th>标题</th>
                 <th>原分类</th>
                 <th>修改时间</th>
+                <th>修改人</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td style="text-align: center">
-                    <input type="checkbox" name="vers" id="0"/>
+                    <input type="checkbox" name="vers" id="0" />
                 </td>
                 <td>
                     @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null) <span class="text-red">(最新版本)</span>
@@ -35,12 +36,13 @@
                     @Html.ActionLink(post.CategoryName, "Category", "Home", new { id = post.CategoryId }, null)
                 </td>
                 <td>@post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td>@post.Modifier</td>
             </tr>
             @foreach (var p in Model)
             {
                 <tr>
                     <td style="text-align: center">
-                        <input type="checkbox" name="vers" id="@p.Id"/>
+                        <input type="checkbox" name="vers" id="@p.Id" />
                     </td>
                     <td>
                         @Html.ActionLink(p.Title, "HistoryVersion", "Post", new { id = p.PostId, hid = p.Id }, null)
@@ -49,6 +51,7 @@
                         @Html.ActionLink(p.Category.Name, "Category", "Home", new { id = post.CategoryId }, null)
                     </td>
                     <td>@p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>@p.Modifier</td>
                 </tr>
             }
         </tbody>

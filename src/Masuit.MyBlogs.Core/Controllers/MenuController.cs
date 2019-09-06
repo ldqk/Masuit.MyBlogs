@@ -23,15 +23,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IMenuService MenuService { get; set; }
 
         /// <summary>
-        /// 菜单管理
-        /// </summary>
-        /// <param name="menuService"></param>
-        public MenuController(IMenuService menuService)
-        {
-            MenuService = menuService;
-        }
-
-        /// <summary>
         /// 获取菜单
         /// </summary>
         /// <returns></returns>

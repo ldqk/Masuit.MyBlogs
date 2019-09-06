@@ -30,21 +30,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 控制面板
         /// </summary>
-        /// <param name="userInfoService"></param>
-        /// <param name="postService"></param>
-        /// <param name="commentService"></param>
-        /// <param name="leaveMessageService"></param>
-        public DashboardController(IUserInfoService userInfoService, IPostService postService, ICommentService commentService, ILeaveMessageService leaveMessageService)
-        {
-            UserInfoService = userInfoService;
-            CommentService = commentService;
-            LeaveMessageService = leaveMessageService;
-            PostService = postService;
-        }
-
-        /// <summary>
-        /// 控制面板
-        /// </summary>
         /// <returns></returns>
         [Route("dashboard"), ResponseCache(Duration = 60, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index()

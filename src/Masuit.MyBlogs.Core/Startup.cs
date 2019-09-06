@@ -130,6 +130,9 @@ namespace Masuit.MyBlogs.Core
 
             services.AddMvc(options =>
             {
+#if !DEBUG
+                options.Filters.Add<MyExceptionFilter>(); 
+#endif
                 options.CacheProfiles.Add("Default", new CacheProfile()
                 {
                     Location = ResponseCacheLocation.Any,
@@ -202,7 +205,6 @@ namespace Masuit.MyBlogs.Core
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                app.UseException();
             }
 
             //db.Database.Migrate();

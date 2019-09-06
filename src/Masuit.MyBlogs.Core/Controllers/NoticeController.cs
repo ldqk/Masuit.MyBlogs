@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -31,19 +30,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public INoticeService NoticeService { get; set; }
 
-        private readonly IHostingEnvironment _hostingEnvironment;
+        public IHostingEnvironment HostingEnvironment { get; set; }
 
         private readonly ImagebedClient _imagebedClient;
 
         /// <summary>
         /// 网站公告
         /// </summary>
-        /// <param name="noticeService"></param>
-        /// <param name="hostingEnvironment"></param>
-        public NoticeController(INoticeService noticeService, IHostingEnvironment hostingEnvironment, IHttpClientFactory httpClientFactory)
+        /// <param name="httpClientFactory"></param>
+        public NoticeController(IHttpClientFactory httpClientFactory)
         {
-            NoticeService = noticeService;
-            _hostingEnvironment = hostingEnvironment;
             _imagebedClient = new ImagebedClient(httpClientFactory.CreateClient());
         }
 
@@ -134,7 +130,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     try
                     {
-                        System.IO.File.Delete(_hostingEnvironment.WebRootPath + path);
+                        System.IO.File.Delete(HostingEnvironment.WebRootPath + path);
                     }
                     catch
                     {

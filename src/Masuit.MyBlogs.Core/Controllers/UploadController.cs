@@ -29,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     [ApiExplorerSettings(IgnoreApi = true)]
     public class UploadController : Controller
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        public IHostingEnvironment HostingEnvironment { get; set; }
 
         private readonly ImagebedClient _imagebedClient;
 
@@ -37,9 +37,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 文件上传
         /// </summary>
         /// <param name="hostingEnvironment"></param>
-        public UploadController(IHostingEnvironment hostingEnvironment, IHttpClientFactory httpClientFactory)
+        public UploadController(IHttpClientFactory httpClientFactory)
         {
-            _hostingEnvironment = hostingEnvironment;
             _imagebedClient = new ImagebedClient(httpClientFactory.CreateClient());
         }
 
@@ -84,7 +83,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
                 if (fileName != null)
                 {
-                    string upload = _hostingEnvironment.WebRootPath + "/upload";
+                    string upload = HostingEnvironment.WebRootPath + "/upload";
                     if (!Directory.Exists(upload))
                     {
                         Directory.CreateDirectory(upload);
@@ -140,7 +139,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Download(string path)
         {
             if (string.IsNullOrEmpty(path)) return Content("null");
-            var file = Path.Combine(_hostingEnvironment.WebRootPath + "/upload", path.Trim('.', '/', '\\'));
+            var file = Path.Combine(HostingEnvironment.WebRootPath + "/upload", path.Trim('.', '/', '\\'));
             if (System.IO.File.Exists(file))
             {
                 return this.ResumePhysicalFile(file, Path.GetFileName(file));
@@ -242,7 +241,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         return ResultData(url);
                     }
 
-                    path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "images", filename);
+                    path = Path.Combine(HostingEnvironment.WebRootPath, "upload", "images", filename);
                     var dir = Path.GetDirectoryName(path);
                     if (!Directory.Exists(dir))
                     {
@@ -256,13 +255,13 @@ namespace Masuit.MyBlogs.Core.Controllers
 
                     break;
                 case var _ when file.ContentType.StartsWith("audio") || file.ContentType.StartsWith("video"):
-                    path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "media", filename);
+                    path = Path.Combine(HostingEnvironment.WebRootPath, "upload", "media", filename);
                     break;
                 case var _ when file.ContentType.StartsWith("text") || (ContentType.Doc + "," + ContentType.Xls + "," + ContentType.Ppt + "," + ContentType.Pdf).Contains(file.ContentType):
-                    path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "docs", filename);
+                    path = Path.Combine(HostingEnvironment.WebRootPath, "upload", "docs", filename);
                     break;
                 default:
-                    path = Path.Combine(_hostingEnvironment.WebRootPath, "upload", "files", filename);
+                    path = Path.Combine(HostingEnvironment.WebRootPath, "upload", "files", filename);
                     break;
             }
             try
@@ -278,7 +277,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     file.CopyTo(fs);
                 }
 
-                return ResultData(path.Substring(_hostingEnvironment.WebRootPath.Length).Replace("\\", "/"));
+                return ResultData(path.Substring(HostingEnvironment.WebRootPath.Length).Replace("\\", "/"));
             }
             catch (Exception e)
             {

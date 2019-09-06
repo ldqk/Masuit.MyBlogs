@@ -32,7 +32,7 @@
                             <div class="row">
                                 <div class="col-sm-7">
                                     <div class="padding-bot10">
-                                        修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
+                                        <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Modifier</span>修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
                                         原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })
                                         @if (Model.Seminar.Any())
                                         {

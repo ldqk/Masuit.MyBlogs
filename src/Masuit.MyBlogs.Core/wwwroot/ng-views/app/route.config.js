@@ -29,6 +29,36 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 					},cpath + "/post.js"]);
 				}]
 			}
+		}).state("merge-list", {
+			url: "/merge/list",
+			templateUrl: vpath + "/merge/list.html",
+			controller: "mergelist as list",
+			resolve: {
+				deps: ["$ocLazyLoad", function($ocLazyLoad) {
+					return $ocLazyLoad.load([cpath + "/merge.js"]);
+				}]
+			}
+		}).state("merge-compare", {
+			url: "/merge/compare",
+			templateUrl: vpath + "/merge/compare.html",
+			controller: "mergecompare",
+			resolve: {
+				deps: ["$ocLazyLoad", function($ocLazyLoad) {
+					return $ocLazyLoad.load([cpath + "/merge.js"]);
+				}]
+			}
+		}).state("merge-edit", {
+			url: "/merge/edit",
+			templateUrl: vpath + "/merge/edit.html",
+			controller: "mergeedit",
+			resolve: {
+				deps: ["$ocLazyLoad", function($ocLazyLoad) {
+					return $ocLazyLoad.load([{
+						files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.js","/Assets/semantic/semantic.css","https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"],
+						cache: true
+					},cpath + "/merge.js"]);
+				}]
+			}
 		}).state("post-pending", {
 			url: "/postpending",
 			templateUrl: vpath + "/post/pending.html",

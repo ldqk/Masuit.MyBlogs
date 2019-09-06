@@ -1,0 +1,49 @@
+﻿<style>
+    ins {
+        background-color: #cfc;
+        text-decoration: none;
+    }
+
+    del {
+        color: #999;
+        background-color: #FEC8C8;
+    }
+    article img {
+        max-width: 100%
+    }
+</style>
+<div>
+    <div class="btn-group-lg">
+        <button class="btn btn-info" ng-click="pass()">接受合并</button>
+        <a class="btn btn-success" ng-href="#/merge/edit?id={{newer.Id}}">编辑并合并</a>
+        <button class="btn btn-danger" ng-click="reject()">拒绝合并</button>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>原文：</h2>
+            <section>
+                <header class="page-header">
+                    <div class="text-center">
+                        <h2 class="padding-bot10">
+                            {{old.Title}}
+                        </h2>
+                    </div>
+                </header>
+                <article class="article" ng-bind-html="old.Content|htmlString"></article>
+            </section>
+        </div>
+        <div class="col-md-6">
+            <h2>修改后：</h2>
+            <section>
+                <header class="page-header">
+                    <div class="text-center">
+                        <h2 class="padding-bot10">
+                            {{newer.Title}}
+                        </h2>
+                    </div>
+                </header>
+                <article class="article" ng-bind-html="newer.Content|htmlString"></article>
+            </section>
+        </div>
+    </div>
+</div>

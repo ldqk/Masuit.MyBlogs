@@ -1,0 +1,196 @@
+﻿@model PostMergeRequest
+@using Masuit.MyBlogs.Core.Models.Entity
+@{
+    ViewBag.Title = "正在编辑：" + Model.Post.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="https://cdn.bootcss.com/limonte-sweetalert2/8.11.8/sweetalert2.min.css" rel="stylesheet">
+<div class="container">
+    <ol class="cd-breadcrumb triangle">
+        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li>@Html.ActionLink("文章列表", "Post", "Home")</li>
+        <li>@Html.ActionLink(Model.Post.Title.Length > 50 ? Model.Post.Title.Substring(0, 50) + "..." : Model.Post.Title, "Details", "Post", new { id = Model.Post.Id }, null)</li>
+        <li class="current"><em>重新编辑合并请求</em></li>
+    </ol>
+    <hr />
+    <form class="form-group" id="merge-form" method="post">
+        @Html.AntiForgeryToken()
+        <div class="input-group">
+            <span class="input-group-addon size18"><label for="title">文章标题：</label></span>
+            <input type="text" id="title" class="form-control input-lg" name="Title" required placeholder="请输入文章标题" value="@Model.Title">
+            <input type="hidden" name="PostId" value="@Model.Post.Id">
+            <input type="hidden" name="Id" value="@Model.Id">
+        </div>
+        <div class="form-group overlay animated bounceInDown">
+            <textarea id="editor" style="height: calc(100vh - 350px);" class="ueditor" name="Content" type="text/plain">@Model.Content</textarea>
+        </div>
+        <div class="row">
+            <div class="col-md-3 col-sm-4">
+                <div class="input-group">
+                    <span class="input-group-addon"><label for="Modifier">提交人：</label></span>
+                    <input type="text" class="form-control" id="Modifier" name="Modifier" required placeholder="投稿人真名或网名(非常重要)">
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-4">
+                <div class="input-group">
+                    <span class="input-group-addon"><label for="ModifierEmail">你的邮箱：</label></span>
+                    <input type="email" class="form-control" id="ModifierEmail" name="ModifierEmail" required placeholder="您的电子邮箱(非常重要)">
+                </div>
+            </div>
+            <div class="col-md-5 col-sm-4">
+                <div class="input-group">
+                    <span class="input-group-addon"><label for="Code">验证码：</label></span>
+                    <input type="text" class="form-control" id="Code" name="Code" required placeholder="验证码">
+                    <span class="input-group-btn">
+                        <button type="button" id="getcode" class="btn btn-danger">
+                            获取验证码
+                        </button>
+                        <button type="submit" id="submit" class="btn btn-info">
+                            <i class="icon-rocket2"></i>
+                            马上投递
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="~/Assets/UEditor/ueditor.config.front.min.js"></script>
+<script src="~/Assets/UEditor/ueditor.all.min.js"></script>
+<script src="https://cdn.bootcss.com/limonte-sweetalert2/8.11.8/sweetalert2.min.js"></script>
+<script>
+    $(function () {
+        if (window.UE) {
+		    window.ue = UE.getEditor('editor', {
+			    initialFrameWidth: null
+		    });
+	    }
+        var user = JSON.parse(localStorage.getItem("user"));
+        if (user) {
+            $("[name='Modifier']").val(user.NickName);
+            $("[name='ModifierEmail']").val(user.Email);
+        }
+
+	    //检查草稿
+        if (localStorage.getItem("merge-post-draft-" +@Model.Post.Id)) {
+            notie.confirm({
+                text: "检查到上次有未提交的草稿，是否加载？",
+                submitText: "确定",
+                cancelText: "取消",
+                position: "bottom",
+                submitCallback: function () {
+                    var post = JSON.parse(localStorage.getItem("merge-post-draft-" +@Model.Post.Id));
+                    $("#title").val(post.Title);
+                    ue.setContent(post.Content);
+                    window.interval = setInterval(function () {
+		                localStorage.setItem("merge-post-draft-"+@Model.Post.Id,JSON.stringify($("#merge-form").serializeObject()));
+	                },5000);
+                },
+                cancelCallback: function() {
+                    window.interval = setInterval(function () {
+		                localStorage.setItem("merge-post-draft-"+@Model.Post.Id,JSON.stringify($("#merge-form").serializeObject()));
+	                },5000);
+                }
+            });
+        } else {
+            window.interval = setInterval(function () {
+		        localStorage.setItem("merge-post-draft-"+@Model.Post.Id,JSON.stringify($("#merge-form").serializeObject()));
+	        },5000);
+        }
+
+        $("#getcode").on("click", function (e) {
+            e.preventDefault();
+            $.post("/validate/sendcode", {
+                __RequestVerificationToken: $("[name=__RequestVerificationToken]").val(),
+                email: $("#ModifierEmail").val()
+            }, function (data) {
+                if (data.Success) {
+                    layer.tips('验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！', '#getcode', {
+                      tips: [1, '#3595CC'],
+                      time: 5000
+                    });
+                    user.NickName = $("[name='Modifier']").val();
+                    user.Email = $("[name='ModifierEmail']").val();
+                    localStorage.setItem("user", JSON.stringify(user));
+                    $("#getcode").attr('disabled', true);
+                    var count = 0;
+                    var timer = setInterval(function () {
+                        count++;
+                        $("#getcode").text('重新发送(' + (120 - count) + ')');
+                        if (count > 120) {
+                            clearInterval(timer);
+                            $("#getcode").attr('disabled', false);
+                            $("#getcode").text('重新发送');
+                        }
+                    }, 1000);
+                } else {
+                    layer.tips(data.Message, '#getcode', {
+                      tips: [1, '#3595CC'],
+                      time: 5000
+                    });
+                }
+            });
+        });
+
+        //异步提交表单开始
+        $("#merge-form").on("submit", function (e) {
+            e.preventDefault();
+            loading();
+            var formData = $(this).serializeObject();
+            if (formData["Title"].trim().length <= 2 || formData["Title"].trim().length > 128) {
+                window.notie.alert({
+                    type: 3,
+                    text: '文章标题必须在2到128个字符以内！',
+                    time: 4
+                });
+                loadingDone();
+                return;
+            }
+            if (formData["Modifier"].trim().length <= 2 || formData["Modifier"].trim().length > 36) {
+                window.notie.alert({
+                    type: 3,
+                    text: '修改人名字至少2个字，最多36个字！',
+                    time: 4
+                });
+                loadingDone();
+                return;
+            }
+            if (!/^\w+([-+.]\w+)*@@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($("#ModifierEmail").val().trim())) {
+                window.notie.alert({
+                    type: 3,
+                    text: '请输入正确的邮箱格式！',
+                    time: 4
+                });
+                loadingDone();
+                return;
+            }
+            if (ue.getContent().length < 200 || ue.getContent().length > 1000000) {
+                window.notie.alert({
+                    type: 3,
+                    text: '文章内容过短或者超长的，字数200-1000000字！',
+                    time: 4
+                });
+                loadingDone();
+                return;
+            }
+            $.post("/@Model.Post.Id/pushmerge", $(this).serialize(), (data) => {
+                loadingDone();
+                if (data.Success) {
+                    window.notie.alert({
+                        type: 1,
+                        text: data.Message,
+                        time: 4
+                    });
+                    $("[name='Title']").val("");
+                    ue.setContent("");
+                } else {
+                    window.notie.alert({
+                        type: 3,
+                        text: data.Message,
+                        time: 4
+                    });
+                }
+            });
+        });
+    });
+</script>

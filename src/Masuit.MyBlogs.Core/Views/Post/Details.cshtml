@@ -43,8 +43,8 @@
                             <div class="row">
                                 <div class="col-sm-7">
                                     <div class="padding-bot10">
-                                        发表于<span class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
-                                        <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Author</span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                        <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Author</span>发表于<span class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
+                                        <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Modifier</span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
                                     </div>
                                 </div>
                                 @{
@@ -78,6 +78,9 @@
                                             @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })<text> </text>
                                         }
                                     }
+                                    <div class="pull-right margin-right20">
+                                        @Html.ActionLink("我要编辑", "PushMerge", "Post", new { id = Model.Id }, new { @class = "btn btn-success" })
+                                    </div>
                                 </div>
                             </div>
                         </header>

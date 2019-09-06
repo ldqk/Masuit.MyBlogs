@@ -82,4 +82,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
     public partial class BannerRepository : BaseRepository<Banner>, IBannerRepository
     {
     }
+    public partial class PostMergeRequestRepository : BaseRepository<PostMergeRequest>, IPostMergeRequestRepository
+    {
+    }
 }

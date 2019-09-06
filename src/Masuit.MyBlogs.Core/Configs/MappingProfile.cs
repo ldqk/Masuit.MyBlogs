@@ -52,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Configs
 
             CreateMap<Post, PostInputDto>().ReverseMap();
             CreateMap<Post, PostModelBase>();
-            CreateMap<Post, PostHistoryVersion>().ForMember(v => v.PostId, e => e.MapFrom(p => p.Id));
+            CreateMap<Post, PostHistoryVersion>().ForMember(p => p.Id, e => e.Ignore()).ForMember(v => v.PostId, e => e.MapFrom(p => p.Id));
             CreateMap<Post, PostOutputDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ForMember(p => p.CommentCount, e => e.MapFrom(p => p.Comment.Count(c => c.Status == Status.Pended))).ReverseMap();
             CreateMap<PostInputDto, PostOutputDto>().ReverseMap();
             CreateMap<PostHistoryVersion, PostOutputDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ReverseMap();
@@ -73,6 +73,14 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<SeminarInputDto, SeminarOutputDto>().ReverseMap();
 
             CreateMap<SeminarPost, SeminarPostHistoryVersion>().ForMember(s => s.PostHistoryVersionId, e => e.MapFrom(s => s.PostId)).ReverseMap();
+
+            CreateMap<PostMergeRequestInputDtoBase, PostMergeRequest>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.MergeState, e => e.Ignore()).ReverseMap();
+            CreateMap<PostMergeRequestInputDto, PostMergeRequest>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.MergeState, e => e.Ignore()).ReverseMap();
+            CreateMap<PostMergeRequestInputDto, Post>().ForMember(p => p.Id, e => e.Ignore()).ReverseMap();
+            CreateMap<PostMergeRequest, PostMergeRequestOutputDtoBase>().ForMember(p => p.PostTitle, e => e.MapFrom(r => r.Post.Title));
+            CreateMap<PostMergeRequest, PostMergeRequestOutputDto>().ForMember(p => p.PostTitle, e => e.MapFrom(r => r.Post.Title));
+            CreateMap<PostMergeRequest, Post>().ForMember(p => p.Id, e => e.Ignore()).ReverseMap();
+            CreateMap<Post, PostMergeRequestOutputDto>().ReverseMap();
         }
     }
 }

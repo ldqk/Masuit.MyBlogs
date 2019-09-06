@@ -236,6 +236,32 @@
 			$scope.loadingDone();
 		});
 	}
+
+	$scope.get = function(url, success, error) {
+		$http.get(url).then(function(res) {
+			if(res.data.Success) {
+				success(res.data);
+			} else {
+				if(error) {
+					error(res.data);
+				} else {
+					window.notie.alert({
+						type:3,
+						text:res.data.Message,
+						time:4
+					});
+				}
+				$scope.CheckLogin(res.data);
+			}
+		}, function() {
+			window.notie.alert({
+				type:3,
+				text:'服务请求失败！',
+				time:4
+			});
+		});
+	}
+
 	this.request = $scope.request;
 	$scope.CheckLogin = function(data) {
 		if(!data.IsLogin) {

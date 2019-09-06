@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
-using Masuit.MyBlogs.Core.Models.DTO;
+﻿using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,15 +9,6 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// </summary>
     public class UserController : AdminController
     {
-        /// <summary>
-        /// 用户管理
-        /// </summary>
-        /// <param name="userInfoService"></param>
-        public UserController(IUserInfoService userInfoService)
-        {
-            UserInfoService = userInfoService;
-        }
-
         /// <summary>
         /// 修改用户名
         /// </summary>

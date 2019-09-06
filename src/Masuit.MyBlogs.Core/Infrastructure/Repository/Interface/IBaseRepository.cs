@@ -548,5 +548,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
     public partial interface ISeminarPostRepository : IBaseRepository<SeminarPost> { }
     public partial interface ISeminarPostHistoryVersionRepository : IBaseRepository<SeminarPostHistoryVersion> { }
     public partial interface IBannerRepository : IBaseRepository<Banner> { }
+    public partial interface IPostMergeRequestRepository : IBaseRepository<PostMergeRequest> { }
 
 }

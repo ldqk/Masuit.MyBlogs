@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
@@ -25,25 +26,10 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// </summary>
     public class CommentController : BaseController
     {
-        private ICommentService CommentService { get; }
-        private IPostService PostService { get; }
-        private IInternalMessageService MessageService { get; }
-        private readonly IHostingEnvironment _hostingEnvironment;
-
-        /// <summary>
-        /// 评论管理
-        /// </summary>
-        /// <param name="commentService"></param>
-        /// <param name="postService"></param>
-        /// <param name="messageService"></param>
-        /// <param name="hostingEnvironment"></param>
-        public CommentController(ICommentService commentService, IPostService postService, IInternalMessageService messageService, IHostingEnvironment hostingEnvironment)
-        {
-            CommentService = commentService;
-            PostService = postService;
-            MessageService = messageService;
-            _hostingEnvironment = hostingEnvironment;
-        }
+        public ICommentService CommentService { get; set; }
+        public IPostService PostService { get; set; }
+        public IInternalMessageService MessageService { get; set; }
+        public IHostingEnvironment HostingEnvironment { get; set; }
 
         /// <summary>
         /// 发表评论
@@ -100,10 +86,10 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (com != null)
             {
                 HttpContext.Session.Set("comment" + comment.PostId, comment.Content.RemoveHtmlTag().Trim());
-                var emails = new List<string>();
+                var emails = new HashSet<string>();
                 var email = CommonHelper.SystemSettings["ReceiveEmail"]; //站长邮箱
                 emails.Add(email);
-                string content = System.IO.File.ReadAllText(_hostingEnvironment.WebRootPath + "/template/notify.html").Replace("{{title}}", post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", com.NickName).Replace("{{content}}", com.Content);
+                string content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/notify.html").Replace("{{title}}", post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", com.NickName).Replace("{{content}}", com.Content);
                 if (comment.Status == Status.Pended)
                 {
                     if (!com.IsMaster)
@@ -118,18 +104,22 @@ namespace Masuit.MyBlogs.Core.Controllers
 #if !DEBUG
                     if (com.ParentId == 0)
                     {
-                        emails.Add(PostService.GetById(com.PostId).Email);
+                        emails.Add(post.Email);
+                        emails.Add(post.ModifierEmail);
                         //新评论，只通知博主和楼主
-                        foreach (var s in emails.Distinct())
+                        foreach (var s in emails)
                         {
                             BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, Request.Scheme) + "#comment"), s));
                         }
                     }
                     else
                     {
+                        emails.Add(post.Email);
+                        emails.Add(post.ModifierEmail);
                         //通知博主和上层所有关联的评论访客
                         var pid = CommentService.GetParentCommentIdByChildId(com.Id);
-                        emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Except(new List<string> { com.Email }).Distinct().ToList();
+                        CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).ForEach(s => emails.Add(s));
+                        emails.Remove(com.Email);
                         string link = Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, Request.Scheme) + "#comment";
                         foreach (var s in emails)
                         {
@@ -139,7 +129,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 #endif
                     return ResultData(null, true, "评论发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将显示到评论列表中");
                 }
-                foreach (var s in emails.Distinct())
+                foreach (var s in emails)
                 {
                     BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new { id = com.PostId, cid = com.Id }, Request.Scheme) + "#comment") + "<p style='color:red;'>(待审核)</p>", s));
                 }
@@ -289,14 +279,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             bool b = CommentService.UpdateEntitySaved(comment);
             var pid = comment.ParentId == 0 ? comment.Id : CommentService.GetParentCommentIdByChildId(id);
 #if !DEBUG
-            string content = System.IO.File.ReadAllText(Path.Combine(_hostingEnvironment.WebRootPath, "template", "notify.html")).Replace("{{title}}", post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", comment.NickName).Replace("{{content}}", comment.Content);
+            string content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "notify.html")).Replace("{{title}}", post.Title).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", comment.NickName).Replace("{{content}}", comment.Content);
             var emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string> { comment.Email, CommonHelper.SystemSettings["ReceiveEmail"] }).ToList();
+            var emailSet = emails.Append(post.ModifierEmail).ToHashSet();
             string link = Url.Action("Details", "Post", new
             {
                 id = comment.PostId,
                 cid = pid
             }, Request.Scheme) + "#comment";
-            foreach (var email in emails)
+            foreach (var email in emailSet)
             {
                 BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Replace("{{link}}", link), email));
             }

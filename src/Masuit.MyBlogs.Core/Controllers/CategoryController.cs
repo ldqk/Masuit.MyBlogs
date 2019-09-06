@@ -20,15 +20,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ICategoryService CategoryService { get; set; }
 
         /// <summary>
-        /// 文章分类
-        /// </summary>
-        /// <param name="categoryService"></param>
-        public CategoryController(ICategoryService categoryService)
-        {
-            CategoryService = categoryService;
-        }
-
-        /// <summary>
         /// 获取所有分类
         /// </summary>
         /// <returns></returns>

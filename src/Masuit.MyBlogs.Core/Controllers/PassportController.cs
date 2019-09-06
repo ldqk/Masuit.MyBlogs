@@ -28,25 +28,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 用户
         /// </summary>
         public IUserInfoService UserInfoService { get; set; }
-        /// <summary>
-        /// 登录记录
-        /// </summary>
-        public ILoginRecordService LoginRecordService { get; set; }
-
-        private readonly IHostingEnvironment _env;
-
-        /// <summary>
-        /// 登录授权
-        /// </summary>
-        /// <param name="userInfoService"></param>
-        /// <param name="loginRecordService"></param>
-        /// <param name="env"></param>
-        public PassportController(IUserInfoService userInfoService, ILoginRecordService loginRecordService, IHostingEnvironment env)
-        {
-            UserInfoService = userInfoService;
-            LoginRecordService = loginRecordService;
-            _env = env;
-        }
+        public IHostingEnvironment HostingEnvironment { get; set; }
 
         /// <summary>
         /// 
@@ -178,7 +160,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult GetUserInfo()
         {
             UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
-            if (_env.IsDevelopment())
+            if (HostingEnvironment.IsDevelopment())
             {
                 user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
             }

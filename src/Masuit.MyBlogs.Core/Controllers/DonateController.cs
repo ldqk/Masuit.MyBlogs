@@ -17,15 +17,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IDonateService DonateService { get; set; }
 
         /// <summary>
-        /// 捐赠管理
-        /// </summary>
-        /// <param name="donateService"></param>
-        public DonateController(IDonateService donateService)
-        {
-            DonateService = donateService;
-        }
-
-        /// <summary>
         /// 分页数据
         /// </summary>
         /// <param name="page"></param>

@@ -29,20 +29,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public IPostService PostService { get; set; }
 
-        private readonly ISeminarPostService _seminarPostService;
-
-        /// <summary>
-        /// 专题页
-        /// </summary>
-        /// <param name="seminarService"></param>
-        /// <param name="postService"></param>
-        /// <param name="seminarPostService"></param>
-        public SeminarController(ISeminarService seminarService, IPostService postService, ISeminarPostService seminarPostService)
-        {
-            SeminarService = seminarService;
-            PostService = postService;
-            _seminarPostService = seminarPostService;
-        }
+        public ISeminarPostService SeminarPostService { get; set; }
 
         /// <summary>
         /// 专题页
@@ -215,7 +202,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             Seminar seminar = SeminarService.GetById(id);
             Post post = PostService.GetById(pid);
-            bool b = _seminarPostService.DeleteEntitySaved(s => s.SeminarId == id && s.PostId == pid) > 0;
+            bool b = SeminarPostService.DeleteEntitySaved(s => s.SeminarId == id && s.PostId == pid) > 0;
             return ResultData(null, b, b ? $"已成功将【{post.Title}】从专题【{seminar.Title}】移除" : "添加失败！");
         }
 

@@ -26,7 +26,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 是否是管理员
         /// </summary>
         [DefaultValue(false)]
-        public bool IsAdmin { get; set; }
+        public bool IsAdmin { get; set; } = false;
 
         /// <summary>
         /// QQ或微信

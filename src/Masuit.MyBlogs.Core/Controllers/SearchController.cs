@@ -1,7 +1,5 @@
-﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
-using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
@@ -24,19 +22,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 
         /// </summary>
         public ISearchDetailsService SearchDetailsService { get; set; }
-        private readonly IPostService _postService;
-
-        /// <summary>
-        /// 站内搜索
-        /// </summary>
-        /// <param name="searchDetailsService"></param>
-        /// <param name="postService"></param>
-        /// <param name="searchEngine"></param>
-        public SearchController(ISearchDetailsService searchDetailsService, IPostService postService, ISearchEngine<DataContext> searchEngine)
-        {
-            SearchDetailsService = searchDetailsService;
-            _postService = postService;
-        }
+        public IPostService PostService { get; set; }
 
         /// <summary>
         /// 搜索页
@@ -82,7 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     HttpContext.Session.Set("search:" + wd, wd.ToByteArray());
                 }
 
-                var posts = _postService.SearchPage(page, size, wd);
+                var posts = PostService.SearchPage(page, size, wd);
                 ViewBag.Elapsed = posts.Elapsed;
                 ViewBag.Total = posts.Total;
                 if (posts.Total > 1)

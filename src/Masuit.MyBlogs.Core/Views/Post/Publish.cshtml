@@ -55,12 +55,6 @@
             </div>
             <div class="col-md-4 col-sm-6">
                 <div class="input-group">
-                    <span class="input-group-addon"><label for="Email">邮箱：</label></span>
-                    <input type="email" class="form-control" id="Email" name="Email" required placeholder="您的电子邮箱(非常重要)">
-                </div>
-            </div>
-            <div class="col-md-12 col-sm-6">
-                <div class="input-group">
                     <span class="input-group-addon"><label for="Label">标签：</label></span>
                     <div class="ui fluid multiple search selection dropdown tags">
                         <input name="Label" type="hidden" id="Label">
@@ -73,8 +67,23 @@
                             }
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="input-group">
+                    <span class="input-group-addon"><label for="Email">邮箱：</label></span>
+                    <input type="email" class="form-control" id="Email" name="Email" required placeholder="您的电子邮箱(非常重要)">
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6">
+                <div class="input-group">
+                    <span class="input-group-addon"><label for="Code">验证码：</label></span>
+                    <input type="text" class="form-control" id="Code" name="Code" required placeholder="验证码">
                     <span class="input-group-btn">
-                        <button type="button" id="submit" class="btn btn-info">
+                        <button type="button" id="getcode" class="btn btn-danger">
+                            获取验证码
+                        </button>
+                        <button type="submit" id="submit" class="btn btn-info">
                             <i class="icon-rocket2"></i>
                             马上投递
                         </button>
@@ -86,5 +95,5 @@
 </div>
 <script src="https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"></script>
 <script src="~/Assets/UEditor/ueditor.config.front.min.js"></script>
-<script src="https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"></script>
+<script src="~/Assets/UEditor/ueditor.all.min.js"></script>
 <script src="~/Scripts/publish/publish.min.js"></script>

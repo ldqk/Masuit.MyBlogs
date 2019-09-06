@@ -33,11 +33,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ICategoryService CategoryService { get; set; }
 
         /// <summary>
-        /// 搜索关键词推荐
-        /// </summary>
-        public ISearchDetailsService SearchDetailsService { get; set; }
-
-        /// <summary>
         /// 网站公告
         /// </summary>
         public INoticeService NoticeService { get; set; }

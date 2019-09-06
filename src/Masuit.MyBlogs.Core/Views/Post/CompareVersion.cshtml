@@ -49,7 +49,7 @@
                                     <div class="row">
                                         <div class="col-sm-7">
                                             <div class="padding-bot10">
-                                                修改于<span class="text-success">@Model[1].ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> | 原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model[1].Category.Name, "Category", "Home", new { id = Model[1].CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })
+                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Modifier</span>修改于<span class="text-success">@Model[1].ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> | 原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model[1].Category.Name, "Category", "Home", new { id = Model[1].CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })
                                                 @if (Model[1].Seminar.Any())
                                                 {
                                                     <span> | 原所属专题：</span>
@@ -107,7 +107,7 @@
                                     <div class="row">
                                         <div class="col-sm-7">
                                             <div class="padding-bot10">
-                                                修改于<span class="text-success">@Model[2].ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> | 原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model[2].Category.Name, "Category", "Home", new { id = Model[2].CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })
+                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Modifier</span>修改于<span class="text-success">@Model[2].ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> | 原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model[2].Category.Name, "Category", "Home", new { id = Model[2].CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })
                                                 @if (Model[2].Seminar.Any())
                                                 {
                                                     <span> | 原所属专题：</span>

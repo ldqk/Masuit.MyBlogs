@@ -116,32 +116,3 @@
     </table>
     <tm-pagination conf="paginationConf"></tm-pagination>
 </div>
-<div id="modal" class="modal">
-    <div class="container-fluid m-t-10 m-b-10">
-        <div class="row m-l-30 m-r-30">
-            <div class="col-sm-4 col-md-2">
-                <div class="mini-charts-item bgm-cyan">
-                    <div class="clearfix">
-                        <div class="chart stats-bar" data-sparkline-bar></div>
-                        <div class="count">
-                            <small>历史最高({{postAnalyse.highDate|date:'yyyy-MM-dd'}})</small>
-                            <h2>{{postAnalyse.high}}次</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4 col-md-2">
-                <div class="mini-charts-item bgm-amber">
-                    <div class="clearfix">
-                        <div class="chart stats-bar" data-sparkline-bar></div>
-                        <div class="count">
-                            <small>每日平均</small>
-                            <h2>{{postAnalyse.aver|number:2}}次</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="chart" style="height: 500px;"></div>
-    </div>
-</div>

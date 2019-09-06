@@ -80,6 +80,16 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string Email { get; set; }
 
         /// <summary>
+        /// 修改人名字
+        /// </summary>
+        public string Modifier { get; set; }
+
+        /// <summary>
+        /// 修改人邮箱
+        /// </summary>
+        public string ModifierEmail { get; set; }
+
+        /// <summary>
         /// 标签
         /// </summary>
         [StringLength(255)]

@@ -198,9 +198,6 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 		Keyword:""
 	};
 	$scope.loading();
-	window.interval = setInterval(function () {
-		localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
-	},5000);
 	$scope.post.Author = $scope.user.NickName || $scope.user.Username;
 	$scope.post.Email = $scope.user.Email;
 	$scope.getCategory = function () {
@@ -366,24 +363,36 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 	}
 
 	//检查草稿
-	if (localStorage.getItem("write-post-draft")) {
-		notie.confirm({
-			text: "检查到上次有未提交的草稿，是否加载？",
-			submitText: "确定", 
-			cancelText: "取消",
-			position: "bottom", 
-			submitCallback: function () {
-				$scope.post=JSON.parse(localStorage.getItem("write-post-draft"));
-				$scope.$apply();
-				$timeout(function () {
-					$('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
-					$('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
-					$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
-					$('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
-				}, 10);
-			}
-		});	
-	}
+    if (localStorage.getItem("write-post-draft")) {
+        notie.confirm({
+            text: "检查到上次有未提交的草稿，是否加载？",
+            submitText: "确定",
+            cancelText: "取消",
+            position: "bottom",
+            submitCallback: function () {
+                $scope.post = JSON.parse(localStorage.getItem("write-post-draft"));
+                $scope.$apply();
+                $timeout(function () {
+                    $('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
+                    $('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
+                    $('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
+                    $('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
+                }, 10);
+                window.interval = setInterval(function () {
+		            localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
+	            },5000);
+            },
+            cancelCallback: function() {
+                window.interval = setInterval(function () {
+		            localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
+	            },5000);
+            }
+        });
+    } else {
+        window.interval = setInterval(function () {
+		    localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
+	    },5000);
+    }
 }]);
 myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
 	window.hub.stop();
@@ -395,9 +404,6 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 		id: $scope.id
 	}, function (data) {
 		$scope.post = data.Data;
-		window.interval = setInterval(function () {
-			localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
-		},5000);
 		$scope.request("/post/gettag", null, function (res) {
 			$scope.Tags = res.Data;
 			$('.ui.dropdown.tags').dropdown({
@@ -583,24 +589,36 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 	//异步提交表单结束
 	
 	//检查草稿
-	if (localStorage.getItem("post-draft-"+$scope.id)) {
-		notie.confirm({
-		  text: "检查到上次有未提交的草稿，是否加载？",
-		  submitText: "确定", 
-		  cancelText: "取消",
-		  position: "bottom", 
-			submitCallback: function () {
-				$scope.post=JSON.parse(localStorage.getItem("post-draft-"+$scope.id));
-				$scope.$apply();
-				$timeout(function () {
-					$('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
-					$('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
-					$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
-					$('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
-				}, 10);
-			}
-		});	
-	}
+    if (localStorage.getItem("post-draft-" + $scope.id)) {
+        notie.confirm({
+            text: "检查到上次有未提交的草稿，是否加载？",
+            submitText: "确定",
+            cancelText: "取消",
+            position: "bottom",
+            submitCallback: function () {
+                $scope.post = JSON.parse(localStorage.getItem("post-draft-" + $scope.id));
+                $scope.$apply();
+                $timeout(function () {
+                    $('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
+                    $('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
+                    $('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
+                    $('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
+                }, 10);
+                window.interval = setInterval(function () {
+			        localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
+		        },5000);
+            },
+            cancelCallback: function() {
+                window.interval = setInterval(function () {
+			        localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
+		        },5000);
+            }
+        });
+    } else {
+        window.interval = setInterval(function () {
+			localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
+		},5000);
+    }
 }]);
 myApp.controller("toppost", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
 	window.hub.stop();

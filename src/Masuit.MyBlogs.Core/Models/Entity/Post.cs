@@ -24,6 +24,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
             Status = Status.Pending;
             IsWordDocument = false;
             Seminar = new HashSet<SeminarPost>();
+            PostMergeRequests = new HashSet<PostMergeRequest>();
         }
 
         /// <summary>
@@ -88,6 +89,16 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string Email { get; set; }
 
         /// <summary>
+        /// 修改人名字
+        /// </summary>
+        public string Modifier { get; set; }
+
+        /// <summary>
+        /// 修改人邮箱
+        /// </summary>
+        public string ModifierEmail { get; set; }
+
+        /// <summary>
         /// 标签
         /// </summary>
         [StringLength(256, ErrorMessage = "标签最大允许255个字符"), LuceneIndex]
@@ -150,5 +161,10 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 文章历史版本
         /// </summary>
         public virtual ICollection<PostHistoryVersion> PostHistoryVersion { get; set; }
+
+        /// <summary>
+        /// 文章修改请求
+        /// </summary>
+        public virtual ICollection<PostMergeRequest> PostMergeRequests { get; set; }
     }
 }

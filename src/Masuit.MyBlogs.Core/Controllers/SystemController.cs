@@ -31,17 +31,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ISystemSettingService SystemSettingService { get; set; }
 
         /// <summary>
-        /// 系统设置
-        /// </summary>
-        /// <param name="userInfoService"></param>
-        /// <param name="systemSettingService"></param>
-        public SystemController(IUserInfoService userInfoService, ISystemSettingService systemSettingService)
-        {
-            UserInfoService = userInfoService;
-            SystemSettingService = systemSettingService;
-        }
-
-        /// <summary>
         /// 获取硬件基本信息
         /// </summary>
         /// <returns></returns>

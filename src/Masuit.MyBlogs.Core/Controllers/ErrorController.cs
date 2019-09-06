@@ -12,7 +12,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 404
         /// </summary>
         /// <returns></returns>
-        [Route("{*url}", Order = 99999), ResponseCache(Duration = 36000)]
+        [Route("error"), Route("{*url}", Order = 99999), ResponseCache(Duration = 36000)]
         public ActionResult Index()
         {
             Response.StatusCode = 404;

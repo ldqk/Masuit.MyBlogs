@@ -108,4 +108,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         {
         }
     }
+    public partial class PostMergeRequestService : BaseService<PostMergeRequest>, IPostMergeRequestService
+    {
+        public PostMergeRequestService(IBaseRepository<PostMergeRequest> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
+        {
+        }
+    }
 }

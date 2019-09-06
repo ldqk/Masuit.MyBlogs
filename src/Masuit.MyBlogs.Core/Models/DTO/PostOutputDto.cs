@@ -73,6 +73,16 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public string Email { get; set; }
 
         /// <summary>
+        /// 修改人名字
+        /// </summary>
+        public string Modifier { get; set; }
+
+        /// <summary>
+        /// 修改人邮箱
+        /// </summary>
+        public string ModifierEmail { get; set; }
+
+        /// <summary>
         /// 标签
         /// </summary>
         public string Label { get; set; }

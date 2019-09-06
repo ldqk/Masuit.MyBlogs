@@ -16,5 +16,29 @@
     "inputFiles": [
       "wwwroot/ng-views/controllers/menu.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/ng-views/controllers/merge.min.js",
+    "inputFiles": [
+      "wwwroot/ng-views/controllers/merge.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/ng-views/controllers/post.min.js",
+    "inputFiles": [
+      "wwwroot/ng-views/controllers/post.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/Scripts/publish/publish.min.js",
+    "inputFiles": [
+      "wwwroot/Scripts/publish/publish.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/Assets/UEditor/ueditor.all.min.js",
+    "inputFiles": [
+      "wwwroot/Assets/UEditor/ueditor.all.js"
+    ]
   }
 ]
