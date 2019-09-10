@@ -125,7 +125,6 @@
 	$(".btn-cancel").click(function() {
 		$(':input', '#reply-form').not(':button,:submit,:reset,:hidden').val('').removeAttr('checked')
 			.removeAttr('checked'); //评论成功清空表单
-		//Custombox.close();
 		layer.closeAll();
 		setTimeout(function() {
 			$("#reply").css("display", "none");
@@ -251,13 +250,6 @@ function bindReplyBtn() {
 		$("#uid").val(uid);
 		$("#OperatingSystem2").val(platform.os.toString());
 		$("#Browser2").val(platform.name + " " + platform.version);
-		//Custombox.open({
-		//	target: '#modal',
-		//	overlayOpacity: 0.1,
-		//	speed:10,
-		//	zIndex: 100
-		//});
-
 		layui.use("layer", function() {
 			var layer = layui.layer;
 			layer.open({

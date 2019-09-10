@@ -170,13 +170,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult CompareVersion(int id, int v1, int v2)
         {
             var main = PostService.GetById(id).Mapper<PostHistoryVersion>();
+            main.Id = id;
             var left = v1 <= 0 ? main : PostHistoryVersionService.GetById(v1);
             var right = v2 <= 0 ? main : PostHistoryVersionService.GetById(v2);
             if (left is null || right is null)
             {
                 return RedirectToAction("History", "Post", new { id });
             }
-            HtmlDiff.HtmlDiff diffHelper = new HtmlDiff.HtmlDiff(right.Content, left.Content);
+
+            var diffHelper = new HtmlDiff.HtmlDiff(right.Content, left.Content);
             string diffOutput = diffHelper.Build();
             right.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);
             left.Content = Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty);
@@ -848,20 +850,20 @@ namespace Masuit.MyBlogs.Core.Controllers
                 var history = p.Mapper<PostHistoryVersion>();
                 p.PostHistoryVersion.Add(history);
                 post.ModifyDate = DateTime.Now;
+                var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+                p.Modifier = user.NickName;
+                p.ModifierEmail = user.Email;
             }
 
             p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             Mapper.Map(post, p);
-            var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
-            p.Modifier = user.NickName;
-            p.ModifierEmail = user.Email;
             if (!string.IsNullOrEmpty(post.Seminars))
             {
                 var tmp = post.Seminars.Split(',').Distinct();
                 p.Seminar.Clear();
                 tmp.ForEach(s =>
                 {
-                    Seminar seminar = SeminarService.GetFirstEntity(e => e.Title.Equals(s));
+                    var seminar = SeminarService.GetFirstEntity(e => e.Title.Equals(s));
                     if (seminar != null)
                     {
                         p.Seminar.Add(new SeminarPost()
