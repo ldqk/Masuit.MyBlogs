@@ -10,6 +10,7 @@ using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
@@ -43,13 +44,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie), Route("msg")]
         public ActionResult Index()
         {
-            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             ViewBag.TotalCount = LeaveMessageService.LoadEntitiesNoTracking(m => m.ParentId == 0 && m.Status == Status.Pended).Count();
-            if (user.IsAdmin)
-            {
-                return View("Index_Admin");
-            }
-            return View();
+            return CurrentUser.IsAdmin ? View("Index_Admin") : View();
         }
 
         /// <summary>
@@ -61,7 +57,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetMsgs(int page = 1, int size = 10, int cid = 0)
         {
-            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             int total;
             if (cid != 0)
             {
@@ -80,14 +75,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                 }
             }
-            IEnumerable<LeaveMessage> parent = LeaveMessageService.LoadPageEntitiesNoTracking(page, size, out total, m => m.ParentId == 0 && (m.Status == Status.Pended || user.IsAdmin), m => m.PostDate, false);
+            var parent = LeaveMessageService.LoadPageEntitiesNoTracking(page, size, out total, m => m.ParentId == 0 && (m.Status == Status.Pended || CurrentUser.IsAdmin), m => m.PostDate, false);
             if (!parent.Any())
             {
                 return ResultData(null, false, "没有留言");
             }
-            var list = new List<LeaveMessageViewModel>();
-            parent.ForEach(c => LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(c.Id).ForEach(result => list.Add(result.Mapper<LeaveMessageViewModel>())));
-            var qlist = list.Where(c => c.Status == Status.Pended || user.IsAdmin);
+
+            var qlist = parent.ToList().SelectMany(c => LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(c.Id)).Where(c => c.Status == Status.Pended || CurrentUser.IsAdmin);
             if (total > 0)
             {
                 return ResultData(new
@@ -105,27 +99,30 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 发表留言
         /// </summary>
-        /// <param name="msg"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Put(LeaveMessageInputDto msg)
+        public ActionResult Put(LeaveMessageInputDto dto)
         {
-            if (Regex.Match(msg.Content, CommonHelper.BanRegex).Length > 0)
+            if (Regex.Match(dto.Content, CommonHelper.BanRegex).Length > 0)
             {
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请注意改善您的言辞！");
             }
 
-            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
-            msg.Content = msg.Content.Trim().Replace("<p><br></p>", string.Empty);
-            if (msg.Content.RemoveHtmlTag().Trim().Equals(HttpContext.Session.Get<string>("msg")))
+            dto.Content = dto.Content.Trim().Replace("<p><br></p>", string.Empty);
+            if (dto.Content.RemoveHtmlTag().Trim().Equals(HttpContext.Session.Get<string>("msg")))
             {
                 return ResultData(null, false, "您刚才已经发表过一次留言了！");
             }
-            if (Regex.Match(msg.Content, CommonHelper.ModRegex).Length <= 0)
+
+            var msg = dto.Mapper<LeaveMessage>();
+            if (Regex.Match(dto.Content, CommonHelper.ModRegex).Length <= 0)
             {
                 msg.Status = Status.Pended;
             }
 
+            msg.PostDate = DateTime.Now;
+            var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
             if (user != null)
             {
                 msg.NickName = user.NickName;
@@ -137,55 +134,57 @@ namespace Masuit.MyBlogs.Core.Controllers
                     msg.IsMaster = true;
                 }
             }
-            msg.PostDate = DateTime.Now;
-            msg.Content = msg.Content.HtmlSantinizerStandard().ClearImgAttributes();
-            msg.Browser = msg.Browser ?? Request.Headers[HeaderNames.UserAgent];
+
+            msg.Content = dto.Content.HtmlSantinizerStandard().ClearImgAttributes();
+            msg.Browser = dto.Browser ?? Request.Headers[HeaderNames.UserAgent];
             msg.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
-            LeaveMessage msg2 = LeaveMessageService.AddEntitySaved(msg.Mapper<LeaveMessage>());
-            if (msg2 != null)
+            msg.Location = msg.IP.GetIPLocation().Split("|").Where(s => !int.TryParse(s, out _)).ToHashSet().Join("|");
+            msg = LeaveMessageService.AddEntitySaved(msg);
+            if (msg == null)
             {
-                HttpContext.Session.Set("msg", msg.Content.RemoveHtmlTag().Trim());
-                var email = CommonHelper.SystemSettings["ReceiveEmail"];
-                string content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/notify.html").Replace("{{title}}", "网站留言板").Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg2.NickName).Replace("{{content}}", msg2.Content);
-                if (msg.Status == Status.Pended)
-                {
-                    if (!msg2.IsMaster)
-                    {
-                        MessageService.AddEntitySaved(new InternalMessage()
-                        {
-                            Title = $"来自【{msg2.NickName}】的新留言",
-                            Content = msg2.Content,
-                            Link = Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Scheme)
-                        });
-                    }
-#if !DEBUG
-                    if (msg.ParentId == 0)
-                    {
-                        //新评论，只通知博主
-                        BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "|博客新留言：", content.Replace("{{link}}", Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Scheme)), email));
-                    }
-                    else
-                    {
-                        //通知博主和上层所有关联的评论访客
-                        var pid = LeaveMessageService.GetParentMessageIdByChildId(msg2.Id);
-                        var emails = LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).ToList();
-                        emails.Add(email);
-                        string link = Url.Action("Index", "Msg", new { cid = msg2.Id }, Request.Scheme);
-                        foreach (var s in emails.Distinct().Except(new[] { msg2.Email }))
-                        {
-                            BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{CommonHelper.SystemSettings["Domain"]}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Replace("{{link}}", link), s));
-                        }
-                    }
-#endif
-                    return ResultData(null, true, "留言发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将会显示到列表中！");
-                }
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "|博客新留言(待审核)：", content.Replace("{{link}}", Url.Action("Index", "Msg", new
-                {
-                    cid = msg2.Id
-                }, Request.Scheme)) + "<p style='color:red;'>(待审核)</p>", email));
-                return ResultData(null, true, "留言发表成功，待站长审核通过以后将显示到列表中！");
+                return ResultData(null, false, "留言发表失败！");
             }
-            return ResultData(null, false, "留言发表失败！");
+
+            HttpContext.Session.Set("msg", msg.Content.RemoveHtmlTag().Trim());
+            var email = CommonHelper.SystemSettings["ReceiveEmail"];
+            var content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/notify.html").Replace("{{title}}", "网站留言板").Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg.NickName).Replace("{{content}}", msg.Content);
+            if (msg.Status == Status.Pended)
+            {
+                if (!msg.IsMaster)
+                {
+                    MessageService.AddEntitySaved(new InternalMessage()
+                    {
+                        Title = $"来自【{msg.NickName}】的新留言",
+                        Content = msg.Content,
+                        Link = Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)
+                    });
+                }
+#if !DEBUG
+                if (msg.ParentId == 0)
+                {
+                    //新评论，只通知博主
+                    BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "|博客新留言：", content.Replace("{{link}}", Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)), email));
+                }
+                else
+                {
+                    //通知博主和上层所有关联的评论访客
+                    var pid = LeaveMessageService.GetParentMessageIdByChildId(msg.Id);
+                    var emails = LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Append(email).Except(new[] { msg.Email }).ToHashSet();
+                    string link = Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme);
+                    foreach (var s in emails)
+                    {
+                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{CommonHelper.SystemSettings["Domain"]}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Replace("{{link}}", link), s));
+                    }
+                }
+#endif
+                return ResultData(null, true, "留言发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将会显示到列表中！");
+            }
+
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "|博客新留言(待审核)：", content.Replace("{{link}}", Url.Action("Index", "Msg", new
+            {
+                cid = msg.Id
+            }, Request.Scheme)) + "<p style='color:red;'>(待审核)</p>", email));
+            return ResultData(null, true, "留言发表成功，待站长审核通过以后将显示到列表中！");
         }
 
         /// <summary>
@@ -201,12 +200,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             bool b = LeaveMessageService.UpdateEntitySaved(msg);
 #if !DEBUG
             var pid = msg.ParentId == 0 ? msg.Id : LeaveMessageService.GetParentMessageIdByChildId(id);
-            string content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "notify.html")).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg.NickName).Replace("{{content}}", msg.Content);
-            var emails = LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Distinct().Except(new List<string>() { msg.Email }).ToList();
-            string link = Url.Action("Index", "Msg", new { cid = pid }, Request.Scheme);
+            var content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "notify.html")).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg.NickName).Replace("{{content}}", msg.Content);
+            var emails = LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Except(new List<string> { msg.Email, CurrentUser.Email }).ToHashSet();
+            var link = Url.Action("Index", "Msg", new { cid = pid }, Request.Scheme);
             foreach (var s in emails)
             {
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Replace("{{link}}", link), string.Join(",", s)));
+                BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Replace("{{link}}", link), s));
             }
 #endif
             return ResultData(null, b, b ? "审核通过！" : "审核失败！");
@@ -231,7 +230,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult GetPendingMsgs(int page = 1, int size = 10)
         {
-            List<LeaveMessageOutputDto> list = LeaveMessageService.LoadPageEntities<DateTime, LeaveMessageOutputDto>(page, size, out int total, m => m.Status == Status.Pending, l => l.PostDate, false).ToList();
+            var list = LeaveMessageService.LoadPageEntities<DateTime, LeaveMessageOutputDto>(page, size, out int total, m => m.Status == Status.Pending, l => l.PostDate, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }
@@ -246,7 +245,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult Read(int id)
         {
-            InternalMessage msg = MessageService.GetById(id);
+            var msg = MessageService.GetById(id);
             msg.Read = true;
             MessageService.UpdateEntitySaved(msg);
             return Content("ok");
@@ -260,7 +259,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult Unread(int id)
         {
-            InternalMessage msg = MessageService.GetById(id);
+            var msg = MessageService.GetById(id);
             msg.Read = false;
             MessageService.UpdateEntitySaved(msg);
             return Content("ok");
@@ -322,7 +321,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult MarkRead(int id)
         {
-            List<InternalMessage> msgs = MessageService.LoadEntities(m => m.Id <= id).ToList();
+            var msgs = MessageService.LoadEntities(m => m.Id <= id).ToList();
             foreach (var t in msgs)
             {
                 t.Read = true;

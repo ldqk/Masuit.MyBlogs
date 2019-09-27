@@ -3,9 +3,7 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
-using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -22,6 +20,9 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// </summary>
     public class LinksController : BaseController
     {
+        public IHttpClientFactory HttpClientFactory { get; set; }
+        private HttpClient HttpClient => HttpClientFactory.CreateClient();
+
         /// <summary>
         /// 友情链接页
         /// </summary>
@@ -29,14 +30,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("links"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index()
         {
-            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
-            List<LinksOutputDto> list = LinksService.LoadEntities<object, LinksOutputDto>(l => l.Status == Status.Available, l => l.Recommend, false).ToList();
-            if (user != null && user.IsAdmin)
-            {
-                return View("Index_Admin", list);
-            }
-
-            return View(list);
+            var list = LinksService.LoadEntities<object, LinksOutputDto>(l => l.Status == Status.Available, l => l.Recommend, false).ToList();
+            return CurrentUser.IsAdmin ? View("Index_Admin", list) : View(list);
         }
 
         /// <summary>
@@ -57,52 +52,45 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "添加失败！检测到您的网站已经是本站的友情链接了！");
             }
 
-            Uri uri = new Uri(links.Url);
-            using (HttpClient client = new HttpClient()
+            HttpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+            HttpClient.DefaultRequestHeaders.Referrer = new Uri(Request.Scheme + "://" + Request.Host.ToString());
+            return await await HttpClient.GetAsync(links.Url).ContinueWith(async t =>
             {
-                BaseAddress = uri,
-                Timeout = TimeSpan.FromSeconds(10)
-            })
-            {
-                client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-                client.DefaultRequestHeaders.Referrer = new Uri(Request.Scheme + "://" + Request.Host.ToString());
-                return await await client.GetAsync(uri.PathAndQuery).ContinueWith(async t =>
+                if (t.IsFaulted || t.IsCanceled)
                 {
-                    if (t.IsFaulted || t.IsCanceled)
-                    {
-                        return ResultData(null, false, "添加失败！检测到您的网站疑似挂了，或者连接到你网站的时候超时，请检查下！");
-                    }
+                    return ResultData(null, false, "添加失败！检测到您的网站疑似挂了，或者连接到你网站的时候超时，请检查下！");
+                }
 
-                    var res = await t;
-                    if (res.IsSuccessStatusCode)
-                    {
-                        var s = await res.Content.ReadAsStringAsync();
-                        if (s.Contains(CommonHelper.SystemSettings["Domain"]))
-                        {
-                            var entry = LinksService.GetFirstEntity(l => l.Url.Equals(links.Url));
-                            bool b;
-                            if (entry is null)
-                            {
-                                b = LinksService.AddEntitySaved(links) != null;
-                            }
-                            else
-                            {
-                                entry.Url = links.Url;
-                                entry.Except = links.Except;
-                                entry.Name = links.Name;
-                                entry.Recommend = links.Recommend;
-                                b = LinksService.UpdateEntitySaved(entry);
-                            }
-
-                            return ResultData(null, b, b ? "添加成功！这可能有一定的延迟，如果没有看到您的链接，请稍等几分钟后刷新页面即可，如有疑问，请联系站长。" : "添加失败！这可能是由于网站服务器内部发生了错误，如有疑问，请联系站长。");
-                        }
-
-                        return ResultData(null, false, $"添加失败！检测到您的网站上未将本站设置成友情链接，请先将本站主域名：{CommonHelper.SystemSettings["Domain"]}在您的网站设置为友情链接，并且能够展示后，再次尝试添加即可！");
-                    }
-
+                var res = await t;
+                if (!res.IsSuccessStatusCode)
+                {
                     return ResultData(null, false, "添加失败！检测到您的网站疑似挂了！返回状态码为：" + res.StatusCode);
-                });
-            }
+                }
+
+                var s = await res.Content.ReadAsStringAsync();
+                if (!s.Contains(CommonHelper.SystemSettings["Domain"]))
+                {
+                    return ResultData(null, false, $"添加失败！检测到您的网站上未将本站设置成友情链接，请先将本站主域名：{CommonHelper.SystemSettings["Domain"]}在您的网站设置为友情链接，并且能够展示后，再次尝试添加即可！");
+                }
+
+                var entry = LinksService.GetFirstEntity(l => l.Url.Equals(links.Url));
+                bool b;
+                if (entry is null)
+                {
+                    b = LinksService.AddEntitySaved(links) != null;
+                }
+                else
+                {
+                    entry.Url = links.Url;
+                    entry.Except = links.Except;
+                    entry.Name = links.Name;
+                    entry.Recommend = links.Recommend;
+                    b = LinksService.UpdateEntitySaved(entry);
+                }
+
+                return ResultData(null, b, b ? "添加成功！这可能有一定的延迟，如果没有看到您的链接，请稍等几分钟后刷新页面即可，如有疑问，请联系站长。" : "添加失败！这可能是由于网站服务器内部发生了错误，如有疑问，请联系站长。");
+
+            });
         }
 
         /// <summary>
@@ -139,36 +127,30 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public async Task<ActionResult> Check(string link)
         {
-            Uri uri = new Uri(link);
-            using (var client = new HttpClient()
+            HttpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+            return await await HttpClient.GetAsync(link).ContinueWith(async t =>
             {
-                BaseAddress = uri,
-                Timeout = TimeSpan.FromSeconds(10)
-            })
-            {
-                client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-                return await await client.GetAsync(uri.PathAndQuery).ContinueWith(async t =>
+                if (t.IsFaulted || t.IsCanceled)
                 {
-                    if (t.IsFaulted || t.IsCanceled)
-                    {
-                        return ResultData(null, false, link + " 似乎挂了！");
-                    }
+                    return ResultData(null, false, link + " 似乎挂了！");
+                }
 
-                    var res = await t;
-                    if (res.IsSuccessStatusCode)
-                    {
-                        var s = await res.Content.ReadAsStringAsync();
-                        if (s.Contains(CommonHelper.SystemSettings["Domain"]))
-                        {
-                            return ResultData(null, true, "友情链接正常！");
-                        }
-
-                        return ResultData(null, false, link + " 对方似乎没有本站的友情链接！");
-                    }
-
+                var res = await t;
+                if (!res.IsSuccessStatusCode)
+                {
                     return ResultData(null, false, link + " 对方网站返回错误的状态码！http响应码为：" + res.StatusCode);
-                });
-            }
+                }
+
+                var s = await res.Content.ReadAsStringAsync();
+                if (s.Contains(CommonHelper.SystemSettings["Domain"]))
+                {
+                    return ResultData(null, true, "友情链接正常！");
+                }
+
+                return ResultData(null, false, link + " 对方似乎没有本站的友情链接！");
+
+            });
+
         }
 
         /// <summary>

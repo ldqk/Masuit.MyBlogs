@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
@@ -38,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetMenuType()
         {
-            Array array = Enum.GetValues(typeof(MenuType));
+            var array = Enum.GetValues(typeof(MenuType));
             var list = new List<object>();
             foreach (Enum e in array)
             {
@@ -74,7 +73,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 model.Icon = null;
             }
-            Menu m = MenuService.GetById(model.Id);
+            var m = MenuService.GetById(model.Id);
             if (m == null)
             {
                 var menu = MenuService.AddEntitySaved(model.Mapper<Menu>());

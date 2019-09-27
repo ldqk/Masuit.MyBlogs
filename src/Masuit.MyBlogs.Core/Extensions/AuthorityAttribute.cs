@@ -29,43 +29,45 @@ namespace Masuit.MyBlogs.Core.Extensions
             }
 #if !DEBUG
             UserInfoOutputDto user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
-            if (user == null || !user.IsAdmin)
+            if (user != null && user.IsAdmin)
             {
-                //先尝试自动登录
-                if (filterContext.HttpContext.Request.Cookies.Count > 2)
-                {
-                    string name = filterContext.HttpContext.Request.Cookies["username"] ?? "";
-                    string pwd = filterContext.HttpContext.Request.Cookies["password"]?.DesDecrypt(AppConfig.BaiduAK) ?? "";
+                return;
+            }
 
-                    var userInfo = (Startup.AutofacContainer.GetService(typeof(IUserInfoService)) as IUserInfoService).Login(name, pwd);
-                    if (userInfo != null)
-                    {
-                        filterContext.HttpContext.Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                        filterContext.HttpContext.Response.Cookies.Append("password", filterContext.HttpContext.Request.Cookies["password"], new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                        filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
-                    }
-                    else
-                    {
-                        if (filterContext.HttpContext.Request.Method.ToLower().Equals("get"))
-                        {
-                            filterContext.Result = new RedirectResult("/passport/login?from=" + HttpUtility.UrlEncode(filterContext.HttpContext.Request.Path.ToString())?.Replace("#", "%23"));
-                        }
-                        else
-                        {
-                            filterContext.Result = new UnauthorizedObjectResult(new { StatusCode = 401, Success = false, IsLogin = false, Message = "未登录系统，请先登录！" });
-                        }
-                    }
+            //先尝试自动登录
+            if (filterContext.HttpContext.Request.Cookies.Any(x => x.Key == "username" || x.Key == "password"))
+            {
+                string name = filterContext.HttpContext.Request.Cookies["username"] ?? "";
+                string pwd = filterContext.HttpContext.Request.Cookies["password"]?.DesDecrypt(AppConfig.BaiduAK) ?? "";
+
+                var userInfo = (Startup.AutofacContainer.GetService(typeof(IUserInfoService)) as IUserInfoService).Login(name, pwd);
+                if (userInfo != null)
+                {
+                    filterContext.HttpContext.Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                    filterContext.HttpContext.Response.Cookies.Append("password", filterContext.HttpContext.Request.Cookies["password"], new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                    filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
                 }
                 else
                 {
                     if (filterContext.HttpContext.Request.Method.ToLower().Equals("get"))
                     {
-                        filterContext.Result = new RedirectResult("/passport/login?from=" + HttpUtility.UrlEncode(filterContext.HttpContext.Request.Path.ToString()));
+                        filterContext.Result = new RedirectResult("/passport/login?from=" + HttpUtility.UrlEncode(filterContext.HttpContext.Request.Path.ToString())?.Replace("#", "%23"));
                     }
                     else
                     {
                         filterContext.Result = new UnauthorizedObjectResult(new { StatusCode = 401, Success = false, IsLogin = false, Message = "未登录系统，请先登录！" });
                     }
+                }
+            }
+            else
+            {
+                if (filterContext.HttpContext.Request.Method.ToLower().Equals("get"))
+                {
+                    filterContext.Result = new RedirectResult("/passport/login?from=" + HttpUtility.UrlEncode(filterContext.HttpContext.Request.Path.ToString()));
+                }
+                else
+                {
+                    filterContext.Result = new UnauthorizedObjectResult(new { StatusCode = 401, Success = false, IsLogin = false, Message = "未登录系统，请先登录！" });
                 }
             }
 #endif

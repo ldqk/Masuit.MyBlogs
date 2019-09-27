@@ -1,8 +1,6 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
-using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
@@ -15,8 +13,8 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public CommentInputDto()
         {
             Status = Status.Pending;
-            IsMaster = false;
         }
+
         /// <summary>
         /// 昵称
         /// </summary>
@@ -52,11 +50,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public int PostId { get; set; }
 
         /// <summary>
-        /// 发表时间
-        /// </summary>
-        public DateTime CommentDate { get; set; }
-
-        /// <summary>
         /// 浏览器版本
         /// </summary>
         [StringLength(255)]
@@ -67,28 +60,5 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// </summary>
         [StringLength(255)]
         public string OperatingSystem { get; set; }
-
-        /// <summary>
-        /// 是否是博主
-        /// </summary>
-        [DefaultValue(false)]
-        public bool IsMaster { get; set; }
-
-        /// <summary>
-        /// 支持数
-        /// </summary>
-        public int VoteCount { get; set; }
-
-        /// <summary>
-        /// 反对数
-        /// </summary>
-        public int AgainstCount { get; set; }
-
-        /// <summary>
-        /// 访问者IP
-        /// </summary>
-        public string IP { get; set; }
-
     }
-
 }

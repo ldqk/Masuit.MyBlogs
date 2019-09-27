@@ -185,7 +185,7 @@ namespace Masuit.MyBlogs.Core.Hubs
 
             var up = SystemInfo.GetNetData(NetData.Received) / 1024;
             var down = SystemInfo.GetNetData(NetData.Sent) / 1024;
-            PerformanceCounter counter = new PerformanceCounter()
+            var counter = new PerformanceCounter()
             {
                 Time = time,
                 CpuLoad = load,

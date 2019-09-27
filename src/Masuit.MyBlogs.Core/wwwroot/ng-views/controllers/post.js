@@ -261,7 +261,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 	//上传Word文档
 	$scope.upload = function() {
 		$scope.loading();
-		$("#fileform").ajaxSubmit({
+		$("#docform").ajaxSubmit({
 			url: "/Upload/UploadWord",
 			type: "post",
 			success: function(data) {
@@ -299,7 +299,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 				type: 1,
 				title: '上传Word文档',
 				area: ['420px', '150px'], //宽高
-				content: $("#upfile")
+				content: $("#docfile")
 			});
 		});
 	}
@@ -477,7 +477,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 	//上传Word文档
 	$scope.upload = function () {
 		$scope.loading();
-		$("#fileform").ajaxSubmit({
+		$("#docform").ajaxSubmit({
 			url: "/Upload/UploadWord",
 			type: "post",
 			success: function (data) {
@@ -515,7 +515,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 				type: 1,
 				title: '上传Word文档',
 				area: ['420px', '150px'], //宽高
-				content: $("#upfile")
+				content: $("#docfile")
 			});
 		});
 	}

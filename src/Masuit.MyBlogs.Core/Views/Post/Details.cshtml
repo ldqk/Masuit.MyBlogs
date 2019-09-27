@@ -1,10 +1,12 @@
 ﻿@using System.Text.RegularExpressions
 @using System.Web
 @using Masuit.MyBlogs.Core.Common
+@using Masuit.MyBlogs.Core.Configs
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
+@using Masuit.Tools.Security
 @model Masuit.MyBlogs.Core.Models.Entity.Post
 @{
     ViewBag.Title = Model.Title;
@@ -41,7 +43,7 @@
                                 </a>
                             </div>
                             <div class="row">
-                                <div class="col-sm-7">
+                                <div class="col-sm-8">
                                     <div class="padding-bot10">
                                         <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Author</span>发表于<span class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
                                         <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Modifier</span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
@@ -89,7 +91,13 @@
                             @if (!string.IsNullOrEmpty(Model.ProtectContent))
                             {
                                 <div class="row protected">
-                                    @if (string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")))
+                                    @if (!string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")) || Context.Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Context.Request.Cookies["PostAccessToken"]))
+                                    {
+                                        <p class="text-red text-center size20">↓↓↓以下是文章加密部分↓↓↓</p>
+                                        @Html.Raw(Model.ProtectContent.ReplaceImgAttribute())
+
+                                    }
+                                    else
                                     {
                                         <p class="text-red text-center size24 margin-bot10">↓↓↓恭喜你发现镇站之宝，请注意，前方高能！非战斗人员请及时撤离，这不是演习！↓↓↓</p>
                                         <div class="col-md-12">
@@ -114,11 +122,6 @@
                                             </form>
                                             <p class="text-green">温馨提示：<span class="text-red">获取密码后本站所有加密文章将永久开放！请确保您的邮箱已经通过站长的登记，如果您未使用邮箱登记，请先联系站长获取文章密码并登记邮箱即可！</span></p>
                                         </div>
-                                    }
-                                    else
-                                    {
-                                        <p class="text-red text-center size20">↓↓↓以下是文章加密部分↓↓↓</p>
-                                        @Html.Raw(Model.ProtectContent.ReplaceImgAttribute())
                                     }
                                 </div>
                             }
@@ -260,6 +263,7 @@
                                 <div class="form-group">
                                     <div class="col-xs-12">
                                         <button type="submit" class="btn btn-info btn-lg">提交</button>
+                                        <a class="text-red">评论框可粘贴网络图片</a>
                                     </div>
                                 </div>
                             </form>

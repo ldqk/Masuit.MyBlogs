@@ -3,9 +3,7 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -53,11 +51,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("misc/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index(int id)
         {
-            Misc misc = MiscService.GetById(id);
-            if (misc is null)
-            {
-                return RedirectToAction("Index", "Error");
-            }
+            var misc = MiscService.GetById(id) ?? throw new NotFoundException("页面未找到");
             return View(misc);
         }
 
@@ -68,12 +62,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("donate")]
         public ActionResult Donate()
         {
-            var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
-            if (user != null && user.IsAdmin)
-            {
-                return View("Donate_Admin");
-            }
-            return View();
+            return CurrentUser.IsAdmin ? View("Donate_Admin") : View();
         }
 
         /// <summary>
@@ -149,20 +138,18 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "杂项页已经被删除！");
             }
 
-            var srcs = post.Content.MatchImgSrcs();
+            var srcs = post.Content.MatchImgSrcs().Where(s => s.StartsWith("/"));
             foreach (var path in srcs)
             {
-                if (path.StartsWith("/"))
+                try
                 {
-                    try
-                    {
-                        System.IO.File.Delete(Path.Combine(HostingEnvironment.WebRootPath + path));
-                    }
-                    catch (IOException)
-                    {
-                    }
+                    System.IO.File.Delete(Path.Combine(HostingEnvironment.WebRootPath + path));
+                }
+                catch (IOException)
+                {
                 }
             }
+
             bool b = MiscService.DeleteByIdSaved(id);
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }

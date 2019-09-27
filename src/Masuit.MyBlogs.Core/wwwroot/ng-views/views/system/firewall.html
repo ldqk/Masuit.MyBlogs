@@ -12,13 +12,25 @@
     }
 </style>
 <div class="card">
-    <div class="card-header">
-        <h2>防火墙策略配置</h2>
+    <div class="card-header p-b-0">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>防火墙策略配置</h2>
+            </div>
+            <div class="col-md-6 text-right">
+                <div class="btn-group">
+                    <button class="btn btn-danger" ng-click="getIPBlackList()" type="button">编辑全局IP黑名单</button>
+                    <button class="btn btn-success" ng-click="getIPRangeBlackList()" type="button">编辑IP地址段黑名单</button>
+                    <button class="btn btn-primary" ng-click="getIPWhiteList()" type="button">编辑IP白名单</button>
+                    <button class="btn btn-info" ng-click="save()" type="button">保存配置</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
+    <div class="card-body p-t-0">
         <div class="card-body card-padding">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-lg-2 col-md-4 col-sm-6">
                     <div class="input-group">
                         <span class="input-group-addon">启用地区限制访问策略：</span>
                         <span class="el-switch">
@@ -27,24 +39,33 @@
                         </span>
                     </div>
                 </div>
-                <div class="col-md-6 text-right">
-                    <div class="btn-group">
-                        <button class="btn btn-danger" ng-click="getIPBlackList()" type="button">编辑全局IP黑名单</button>
-                        <button class="btn btn-success" ng-click="getIPRangeBlackList()" type="button">编辑IP地址段黑名单</button>
-                        <button class="btn btn-primary" ng-click="getIPWhiteList()" type="button">编辑IP白名单</button>
+                <div class="col-lg-10 col-md-8 col-sm-6">
+                    <div class="input-group">
+                        <span class="input-group-addon">受限制的地区：</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.DenyArea" ng-readonly="Settings.EnableDenyArea=='false'" placeholder="禁止访问的地区，逗号分隔" type="text" />
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="input-group">
-                <span class="el-switch input-group-addon">
-                    <span>受限制的地区：</span>
-                </span>
-                <div class="fg-line">
-                    <textarea class="form-control" ng-model="Settings.DenyArea" ng-readonly="Settings.EnableDenyArea=='false'" placeholder="禁止访问的地区，逗号分隔" rows="3" type="text"></textarea>
+            <div class="row">
+                <div class="col-md-5 col-sm-6">
+                    <div class="input-group">
+                        <span class="input-group-addon">单IP访问频次：每</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.LimitIPFrequency" type="text" />
+                        </div>
+                        <span class="input-group-addon">秒内，最大请求</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.LimitIPRequestTimes" type="text" />
+                        </div>
+                        <span class="input-group-addon">次，冻结该IP：</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.BanIPTimespan" type="text" />
+                        </div>
+                        <span class="input-group-addon">分钟</span>
+                    </div>
                 </div>
-                <span class="input-group-btn">
-                    <button class="btn btn-primary" ng-click="save()" type="button">保存配置</button>
-                </span>
             </div>
         </div>
     </div>
@@ -91,15 +112,15 @@
         <div class="input-group">
             <span class="input-group-addon">搜索 IP ：</span>
             <div class="fg-line">
-                <input class="form-control" placeholder="114.114.114.114" type="text" ng-model="ip" ng-change="searchIP(ip)"/>
+                <input class="form-control" ng-change="searchIP(ip)" ng-model="ip" placeholder="114.114.114.114" type="text"/>
             </div>
         </div>
-        <div ng-if="AreaIPs.length<=0" class="text-center">
-            <p class="text-danger size18">暂无记录</p>
+        <div class="text-center" ng-if="AreaIPs.length<=0">
+            <p class="size18 text-danger">暂无记录</p>
         </div>
         <ul class="iplist list-group">
             <li class="list-group-item" ng-repeat="item in AreaIPs track by $index">
-                <a ng-href="/tools/ip?ip={{item}}" target="_blank" data-microtip="查看{{item}}的详细信息" data-microtip-position="bottom">{{item}}</a>
+                <a data-microtip="查看{{item}}的详细信息" data-microtip-position="bottom" ng-href="/tools/ip?ip={{item}}" target="_blank">{{item}}</a>
                 <button class="badge btn btn-primary" ng-click="addToWhiteList(item)">添加到白名单</button>
             </li>
         </ul>

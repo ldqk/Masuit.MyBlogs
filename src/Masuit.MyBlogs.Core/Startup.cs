@@ -45,6 +45,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using System.Threading.Tasks;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core
@@ -97,7 +98,7 @@ namespace Masuit.MyBlogs.Core
             }); //配置数据库
             services.AddCors(opt => opt.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials())); //配置跨域
 
-            services.AddHttpClient(); //注入HttpClient
+            services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)); //注入HttpClient
             services.AddHttpContextAccessor(); //注入静态HttpContext
             services.Configure<FormOptions>(options =>
             {
@@ -119,7 +120,7 @@ namespace Masuit.MyBlogs.Core
             services.AddEFSecondLevelCache();
             // 配置EF二级缓存策略
             services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
-            services.AddSingleton(new CacheManager.Core.ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10)).Build());
+            services.AddSingleton(new CacheManager.Core.ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Sliding, TimeSpan.FromMinutes(10)).Build());
 
             services.AddWebSockets(opt => opt.ReceiveBufferSize = 4096 * 1024).AddSignalR();
 
@@ -130,9 +131,7 @@ namespace Masuit.MyBlogs.Core
 
             services.AddMvc(options =>
             {
-#if !DEBUG
-                options.Filters.Add<MyExceptionFilter>(); 
-#endif
+                options.Filters.Add<MyExceptionFilter>();
                 options.CacheProfiles.Add("Default", new CacheProfile()
                 {
                     Location = ResponseCacheLocation.Any,
@@ -156,8 +155,9 @@ namespace Masuit.MyBlogs.Core
             services.AddAutofac();
             ContainerBuilder builder = new ContainerBuilder();
             builder.Populate(services);
-            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsImplementedInterfaces().Where(t => t.Name.EndsWith("Repository") || t.Name.EndsWith("Service") || t.Name.EndsWith("Controller")).PropertiesAutowired().AsSelf().InstancePerDependency(); //注册控制器为属性注入
+            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsImplementedInterfaces().Where(t => t.Name.EndsWith("Repository") || t.Name.EndsWith("Service") || t.Name.EndsWith("Controller") || t.Name.EndsWith("Attribute")).PropertiesAutowired().AsSelf().InstancePerDependency(); //注册控制器为属性注入
             builder.RegisterType<BackgroundJobClient>().SingleInstance(); //指定生命周期为单例
+            builder.RegisterType<FirewallAttribute>().PropertiesAutowired().AsSelf().InstancePerDependency(); //指定生命周期为单例
             builder.RegisterType<HangfireBackJob>().As<IHangfireBackJob>().PropertiesAutowired(PropertyWiringOptions.PreserveSetValues).InstancePerDependency();
             AutofacContainer = new AutofacServiceProvider(builder.Build());
             return AutofacContainer;
@@ -253,26 +253,25 @@ namespace Masuit.MyBlogs.Core
 
         private static void ConfigureLuceneSearch(IHostingEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
-            #region 导词库
-
-            Console.WriteLine("正在导入自定义词库...");
-            double time = HiPerfTimer.Execute(() =>
+            Task.Run(() =>
             {
-                var lines = File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomKeywords.txt"));
-                var segmenter = new JiebaSegmenter();
-                foreach (var word in lines)
+                Console.WriteLine("正在导入自定义词库...");
+                double time = HiPerfTimer.Execute(() =>
                 {
-                    segmenter.AddWord(word);
-                }
+                    var lines = File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomKeywords.txt"));
+                    var segmenter = new JiebaSegmenter();
+                    foreach (var word in lines)
+                    {
+                        segmenter.AddWord(word);
+                    }
+                });
+                Console.WriteLine($"导入自定义词库完成，耗时{time}s");
             });
-            Console.WriteLine($"导入自定义词库完成，耗时{time}s");
-
-            #endregion
 
             string lucenePath = Path.Combine(env.ContentRootPath, luceneIndexerOptions.Path);
             if (!Directory.Exists(lucenePath) || Directory.GetFiles(lucenePath).Length < 1)
             {
-                Console.WriteLine("，索引库不存在，开始自动创建Lucene索引库...");
+                Console.WriteLine("索引库不存在，开始自动创建Lucene索引库...");
                 hangfire.CreateLuceneIndex();
                 Console.WriteLine("索引库创建完成！");
             }

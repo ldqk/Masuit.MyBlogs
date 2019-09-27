@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Caching.Memory;
 using PanGu;
 using PanGu.HighLight;
@@ -34,7 +35,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 return value;
             }
 
-            var searchResult = _searchEngine.ScoredSearch<Post>(new SearchOptions(keyword, page, size, typeof(Post)));
+            var searchResult = _searchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
             var posts = searchResult.Results.Select(p => p.Entity.Mapper<PostOutputDto>()).Where(p => p.Status == Status.Pended).ToList();
             var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
             var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
@@ -77,6 +78,26 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             };
 
             return _memoryCache.Set(cacheKey, result, TimeSpan.FromHours(1));
+        }
+
+        private static SearchOptions BuildSearchOptions(int page, int size, string keyword)
+        {
+            var fields = new List<string>();
+            var newkeywords = new List<string>();
+            if (keyword.Contains("intitle:"))
+            {
+                fields.Add("Title");
+                newkeywords.Add(keyword.Split(' ', '　').FirstOrDefault(s => s.Contains("intitle")).Split(':')[1]);
+            }
+
+            if (keyword.Contains("content:"))
+            {
+                fields.Add("Content");
+                newkeywords.Add(keyword.Split(' ', '　').FirstOrDefault(s => s.Contains("content")).Split(':')[1]);
+            }
+
+            var searchOptions = fields.Any() ? new SearchOptions(newkeywords.Join(" "), page, size, fields.Join(",")) : new SearchOptions(keyword, page, size, typeof(Post));
+            return searchOptions;
         }
 
         /// <summary>

@@ -13,8 +13,8 @@ using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore.Internal;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
@@ -23,7 +23,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 基本父控制器
     /// </summary>
-    [ApiExplorerSettings(IgnoreApi = true), Firewall]
+    [ApiExplorerSettings(IgnoreApi = true), ServiceFilter(typeof(FirewallAttribute))]
     public class BaseController : Controller
     {
         /// <summary>
@@ -40,6 +40,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// LinksService
         /// </summary>
         public ILinksService LinksService { get; set; }
+
+        public UserInfoOutputDto CurrentUser => HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
 
         public IMapper Mapper { get; set; }
         public MapperConfiguration MapperConfig { get; set; }
@@ -83,50 +85,45 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             base.OnActionExecuting(filterContext);
             var user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+#if DEBUG
+            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
+            filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
+#endif
             if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true" && user?.IsAdmin != true)
             {
                 filterContext.Result = RedirectToAction("ComingSoon", "Error");
             }
 
-            if (filterContext.HttpContext.Request.Method.Equals("GET", StringComparison.InvariantCultureIgnoreCase)) //get方式的多半是页面
+            if (user == null && Request.Cookies.Any(x => x.Key == "username" || x.Key == "password")) //执行自动登录
             {
-#if DEBUG
-                user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
-                filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
-#endif
-                if (user == null && Request.Cookies.Count > 2) //执行自动登录
+                string name = Request.Cookies["username"];
+                string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.BaiduAK);
+                var userInfo = UserInfoService.Login(name, pwd);
+                if (userInfo != null)
                 {
-                    string name = Request.Cookies["username"];
-                    string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.BaiduAK);
-                    var userInfo = UserInfoService.Login(name, pwd);
-                    if (userInfo != null)
+                    Response.Cookies.Append("username", name, new CookieOptions
                     {
-                        Response.Cookies.Append("username", name, new CookieOptions
-                        {
-                            Expires = DateTime.Now.AddDays(7)
-                        });
-                        Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions
-                        {
-                            Expires = DateTime.Now.AddDays(7)
-                        });
-                        filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
-                    }
+                        Expires = DateTime.Now.AddDays(7)
+                    });
+                    Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions
+                    {
+                        Expires = DateTime.Now.AddDays(7)
+                    });
+                    filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
                 }
             }
-            else
+
+            if (ModelState.IsValid) return;
+            var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).ToList();
+            if (errmsgs.Any())
             {
-                if (ModelState.IsValid) return;
-                List<string> errmsgs = new List<string>();
-                ModelState.ForEach(kv => kv.Value.Errors.ForEach(error => errmsgs.Add(error.ErrorMessage)));
-                if (errmsgs.Count > 1)
+                for (var i = 0; i < errmsgs.Count; i++)
                 {
-                    for (var i = 0; i < errmsgs.Count; i++)
-                    {
-                        errmsgs[i] = i + 1 + ". " + errmsgs[i];
-                    }
+                    errmsgs[i] = i + 1 + ". " + errmsgs[i];
                 }
-                filterContext.Result = ResultData(errmsgs, false, "数据校验失败，错误信息：" + string.Join(" | ", errmsgs), true, HttpStatusCode.BadRequest);
             }
+
+            filterContext.Result = ResultData(errmsgs, false, "数据校验失败，错误信息：" + errmsgs.Join(" | "), user != null, HttpStatusCode.BadRequest);
         }
 
         /// <summary>在调用操作方法后调用。</summary>

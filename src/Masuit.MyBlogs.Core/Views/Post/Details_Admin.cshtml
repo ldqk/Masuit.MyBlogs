@@ -51,7 +51,7 @@
                                 </a>
                             </div>
                             <div class="row">
-                                <div class="col-sm-7">
+                                <div class="col-sm-8">
                                     <div class="padding-bot10">
                                         <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Author</span>发表于<span class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
                                         <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Modifier</span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
@@ -215,6 +215,7 @@
                             <div class="form-group">
                                 <div class="col-xs-12">
                                     <button type="submit" class="btn btn-info btn-lg">提交</button>
+                                    <a class="text-red">评论框可粘贴网络图片</a>
                                 </div>
                             </div>
                         </form>
@@ -286,8 +287,6 @@
 <script src="https://cdn.staticfile.org/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
-@*<script src="~/Assets/directory/script.min.js"></script>*@
-@*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js"></script>*@
 <script src="~/Assets/jquery.tocify/jquery.tocify.js"></script>
 <script src="~/Scripts/global/article.js"></script>
 <script src="~/Assets/highlight/js/highlight.js"></script>
@@ -422,11 +421,15 @@
                                     <div class="panel-body">
                                         ${rows[i].Content}
                                         <span class="cmvote label label-info" data-id="${rows[i].Id}"><i class="icon-thumbsup"></i>(<span class="count">${rows[i].VoteCount}</span>)</span>
-                                        <a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
+                                        <a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a><div class="margin-top10"></div>
+                                        <div class="pull-left">
+                                            <span class="label label-success">${rows[i].IP}</span>
+                                            <span class="label label-primary">${rows[i].Location}</span>
+                                        </div>
                                         <div class="pull-right">
                                             <span class="label label-success">${rows[i].Email}</span>
                                             <span class="label label-warning">${rows[i].QQorWechat}</span>
-                                        </div>
+                                        </div><br/>
                                         ${loadComments(data.rows, Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.CommentDate).ToArray(), startfloor--)}
                                     </div>
                                 </article>
@@ -455,10 +458,15 @@
                                 ${item.Content}
                                 <span class="cmvote label label-${color}" data-id="${item.Id}"><i class="icon-thumbsup"></i>(<span class="count">${item.VoteCount}</span>)</span>
                                 <a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
+                                <div class="margin-top10"></div>
+                                <div class="pull-left">
+                                    <span class="label label-success">${item.IP}</span>
+                                    <span class="label label-primary">${item.Location}</span>
+                                </div>
                                 <div class="pull-right">
                                     <span class="label label-success">${item.Email}</span>
                                     <span class="label label-primary">${item.QQorWechat}</span>
-                                </div>
+                                </div><br/>
                                 ${loadComments(data, Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.CommentDate), root, depth)}
                             </div>
                         </article>`;
@@ -495,7 +503,5 @@
 			swal(res.Message, "", res.Success ? "success" : "error");
 			getcomments();
 		});
-
 	}
-
 </script>

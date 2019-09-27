@@ -10,7 +10,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
     /// </summary>
     public static class UeditorConfig
     {
-        private static bool noCache = true;
+        private static bool noCache = false;
         private static JObject BuildItems()
         {
             var json = File.ReadAllText(AppContext.BaseDirectory + "ueconfig.json");

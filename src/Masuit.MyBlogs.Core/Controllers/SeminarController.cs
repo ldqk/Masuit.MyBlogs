@@ -4,8 +4,6 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -43,13 +41,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index(int id, int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
         {
             IList<Post> posts;
-            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
-            var s = SeminarService.GetById(id);
-            if (s is null)
-            {
-                return RedirectToAction("Index", "Error");
-            }
-            var temp = PostService.LoadEntities(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || user.IsAdmin)).OrderByDescending(p => p.IsFixedTop);
+            var s = SeminarService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            var temp = PostService.LoadEntities(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin)).OrderByDescending(p => p.IsFixedTop);
             switch (orderBy)
             {
                 case OrderBy.CommentCount:
@@ -103,8 +96,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, false, $"{seminar.Title} 已经存在了");
             }
-            //var b = SeminarService.AddOrUpdateSaved(s => s.Id, seminar) > 0;
-            Seminar entry = SeminarService.GetById(seminar.Id);
+
+            var entry = SeminarService.GetById(seminar.Id);
             bool b;
             if (entry is null)
             {
@@ -153,7 +146,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult GetPageData(int page, int size)
         {
-            List<SeminarOutputDto> list = SeminarService.LoadPageEntities<int, SeminarOutputDto>(page, size, out int total, s => true, s => s.Id, false).ToList();
+            var list = SeminarService.LoadPageEntities<int, SeminarOutputDto>(page, size, out int total, s => true, s => s.Id, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }
@@ -165,7 +158,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult GetAll()
         {
-            List<SeminarOutputDto> list = SeminarService.GetAll<string, SeminarOutputDto>(s => s.Title).ToList();
+            var list = SeminarService.GetAll<string, SeminarOutputDto>(s => s.Title).ToList();
             return ResultData(list);
         }
 

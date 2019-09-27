@@ -19,11 +19,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="referrer" content="no-referrer">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=8">
-    <meta http-equiv="Expires" content="0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Cache-control" content="no-cache">
-    <meta http-equiv="Cache" content="no-cache">
     <title>@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])</title>
     <meta name="keywords" content="@(CommonHelper.SystemSettings["Keyword"]+","+ViewBag.Keyword)" />
     <meta name="description" content="@(CommonHelper.SystemSettings["Description"]+","+ViewBag.Keyword)" />
@@ -70,8 +65,6 @@
     <script src="~/Scripts/global/scripts.js"></script>
     <script src="~/Assets/tippy/tippy.js"></script>
     <script src="~/Assets/newsbox/jquery.bootstrap.newsbox.js"></script>
-    @*<script src="~/Assets/tab/stopExecutionOnTimeout.js"></script>
-        <script src="~/Assets/tab/init.js"></script>*@
     <script src="~/Assets/tagcloud/js/tagcloud.js"></script>
     <script src="~/Assets/scrolltop/js/scrolltop.js"></script>
     <script src="~/Assets/nav/js/main.js"></script>
@@ -81,14 +74,12 @@
         <a class="close">
             <i class="icon-cross"></i>
         </a>
-    </div><!--/.well -->
+    </div>
     <div class="sr-only">
         <img src="~/images/hx.png" />
         <img src="~/images/bg1.png" />
         <img src="~/images/bg0.png" />
     </div>
-    @*<canvas id="c" width="300" height="150"></canvas>
-        <a class="btn btn-default close-bg">关闭网页背景</a>*@
     <div class="header">
         <header class="cd-main-header">
             <a class="cd-logo" href="/"><img src="@CommonHelper.SystemSettings["logo"]" alt="@CommonHelper.SystemSettings["Title"]"><span class="slogan">@CommonHelper.SystemSettings["Slogan"]</span></a>
@@ -117,7 +108,6 @@
                                 <ul class="cd-secondary-nav is-hidden">
                                     <li class="go-back"><a href="#">上级菜单</a></li>
                                     <li class="see-all"><a href="/all">所有 @m.Name</a></li>
-                                    @*@NodeHelper(menus.Where(s => s.ParentId == m.Id).OrderBy(c => c.Sort))*@
                                     @foreach (MenuOutputDto m2 in menus.Where(s => s.ParentId == m.Id).OrderBy(c => c.Sort))
                                     {
                                         if (menus.Any(mm => mm.ParentId == m2.Id))
@@ -262,7 +252,7 @@
         </nav>
         <div id="cd-search" class="cd-search">
             <form action="/s" method="get">
-                <input type="search" name="wd" placeholder="请在此处输入您想要的任何东西的关键词...">
+                <input type="search" name="wd" placeholder="请在此处输入您想要的任何东西的关键词，支持部分指令：intitle，content，如：intitle:会声会影 content:懒得勤快，指令支持组合">
             </form>
         </div>
 

@@ -350,3 +350,62 @@ function bindVote() {
 		});
 	});
 }
+
+//递归加载评论
+//加载父楼层
+function loadParentComments(data) {
+    loading();
+    var html = '';
+	if (data) {
+        var rows = Enumerable.From(data.rows).Where(c => c.ParentId === 0).ToArray();
+        var page = data.page;
+        var size = data.size;
+        var maxPage = Math.ceil(data.total / size);
+        page = page > maxPage ? maxPage : page;
+        page = page < 1 ? 1 : page;
+        var startfloor = data.parentTotal - (page - 1) * size;
+        for (let i = 0; i < rows.length; i++) {
+            html += `<li class="msg-list media animated fadeInRight" id='${rows[i].Id}'>
+                        <div class="media-body">
+                            <article class="panel panel-info">
+                                <header class="panel-heading">${startfloor}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""}
+                                    <span class="pull-right" style="font-size: 10px;">${rows[i].CommentDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span></span>
+                                </header>
+                                <div class="panel-body">
+                                    ${rows[i].Content} 
+                                    <span class="cmvote label label-info" data-id="${rows[i].Id}"><i class="icon-thumbsup"></i>(<span>${rows[i].VoteCount}</span>)</span>
+                                    <a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
+                                    ${loadComments(data.rows, Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.CommentDate).ToArray(), startfloor--)}
+                                </div>
+                            </article>
+                        </div>
+                    </li>`;
+        }
+	}
+    loadingDone();
+    return html;
+}
+
+//加载子楼层
+function loadComments(data, comments, root, depth = 0) {
+    var colors = ["info", "success", "primary", "warning", "danger"];
+    var floor = 1;
+    depth++;
+    var html = '';
+    Enumerable.From(comments).ForEach((item, index) => {
+	    var color = colors[depth%5];
+		html += `<article id="${item.Id}" class="panel panel-${color}">
+                        <div class="panel-heading">
+                            ${depth}-${floor++}# ${item.IsMaster ?`<i class="icon icon-user"></i>`:""}${item.NickName}${item.IsMaster ?`(管理员)`:""}
+                            <span class="pull-right" style="font-size: 10px;">${item.CommentDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span></span>
+                        </div>
+                        <div class="panel-body">
+                            ${item.Content} 
+                            <span class="cmvote label label-${color}" data-id="${item.Id}"><i class="icon-thumbsup"></i>(<span>${item.VoteCount}</span>)</span>
+                            <a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
+                            ${loadComments(data, Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.CommentDate), root, depth)}
+                        </div>
+                    </article>`;
+    });
+    return html;
+}

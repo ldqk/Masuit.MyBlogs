@@ -59,6 +59,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, true, "分类添加成功！");
             }
+
             return ResultData(null, false, "分类添加失败！");
         }
 

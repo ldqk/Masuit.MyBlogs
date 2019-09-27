@@ -40,5 +40,11 @@
     "inputFiles": [
       "wwwroot/Assets/UEditor/ueditor.all.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/Scripts/global/leavemsg.min.js",
+    "inputFiles": [
+      "wwwroot/Scripts/global/leavemsg.js"
+    ]
   }
 ]

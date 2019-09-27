@@ -2,7 +2,6 @@
 using Masuit.MyBlogs.Core.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -27,7 +26,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult GetRecentRecord(int id)
         {
             var time = DateTime.Now.AddMonths(-1);
-            List<LoginRecordOutputDto> list = LoginRecordService.LoadEntitiesFromL2Cache<DateTime, LoginRecordOutputDto>(r => r.UserInfoId == id && r.LoginTime >= time, r => r.LoginTime, false).ToList();
+            var list = LoginRecordService.LoadEntitiesFromL2Cache<DateTime, LoginRecordOutputDto>(r => r.UserInfoId == id && r.LoginTime >= time, r => r.LoginTime, false).ToList();
             return ResultData(list);
         }
     }

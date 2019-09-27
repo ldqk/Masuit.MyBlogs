@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using CacheManager.Core;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -24,6 +25,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ISearchDetailsService SearchDetailsService { get; set; }
         public IPostService PostService { get; set; }
 
+        public ICacheManager<string> CacheManager { get; set; }
+
         /// <summary>
         /// 搜索页
         /// </summary>
@@ -44,8 +47,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return RedirectToAction("Search");
             }
 
-            string key = "Search:" + HttpContext.Session.Id;
-            if (RedisHelper.Exists(key) && !RedisHelper.Get(key).Equals(wd))
+            string ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            string key = "Search:" + ip;
+            if (CacheManager.Exists(key))
             {
                 var hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week").Take(10).ToList();
                 ViewBag.hotSearches = hotSearches;
@@ -73,8 +77,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ViewBag.Total = posts.Total;
                 if (posts.Total > 1)
                 {
-                    RedisHelper.Set(key, wd);
-                    RedisHelper.Expire(key, TimeSpan.FromSeconds(10));
+                    CacheManager.AddOrUpdate(key, wd, s => wd);
+                    CacheManager.Expire(key, TimeSpan.FromSeconds(10));
                 }
 
                 ViewBag.hotSearches = new List<KeywordsRankOutputDto>();
@@ -95,10 +99,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority, HttpPost, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "search" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult SearchList(int page = 1, int size = 10, string search = "")
         {
-            if (page <= 0)
-            {
-                page = 1;
-            }
             var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.KeyWords.Contains(search);
             var list = SearchDetailsService.LoadPageEntities<DateTime, SearchDetailsOutputDto>(page, size, out int total, where, s => s.SearchTime, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();

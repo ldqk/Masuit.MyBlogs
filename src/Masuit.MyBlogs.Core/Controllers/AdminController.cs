@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -64,46 +64,39 @@ namespace Masuit.MyBlogs.Core.Controllers
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
-            if (filterContext.HttpContext.Request.Method.Equals("GET", StringComparison.InvariantCultureIgnoreCase)) //get方式的多半是页面
-            {
-                UserInfoOutputDto user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+            var user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
 #if DEBUG
-                user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
-                filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
+            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
+            filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
 #endif
-                if (user == null && Request.Cookies.Count > 2) //执行自动登录
-                {
-                    string name = Request.Cookies["username"];
-                    string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.BaiduAK);
-                    var userInfo = UserInfoService.Login(name, pwd);
-                    if (userInfo != null)
-                    {
-                        Response.Cookies.Append("username", name, new CookieOptions
-                        {
-                            Expires = DateTime.Now.AddDays(7)
-                        });
-                        Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions
-                        {
-                            Expires = DateTime.Now.AddDays(7)
-                        });
-                        filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
-                    }
-                }
-            }
-            else
+            if (user == null && Request.Cookies.Any(x => x.Key == "username" || x.Key == "password")) //执行自动登录
             {
-                if (ModelState.IsValid) return;
-                List<string> errmsgs = new List<string>();
-                ModelState.ForEach(kv => kv.Value.Errors.ForEach(error => errmsgs.Add(error.ErrorMessage)));
-                if (errmsgs.Count > 1)
+                string name = Request.Cookies["username"];
+                string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.BaiduAK);
+                var userInfo = UserInfoService.Login(name, pwd);
+                if (userInfo != null)
                 {
-                    for (var i = 0; i < errmsgs.Count; i++)
+                    Response.Cookies.Append("username", name, new CookieOptions
                     {
-                        errmsgs[i] = i + 1 + ". " + errmsgs[i];
-                    }
+                        Expires = DateTime.Now.AddDays(7)
+                    });
+                    Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions
+                    {
+                        Expires = DateTime.Now.AddDays(7)
+                    });
+                    filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
                 }
-                filterContext.Result = ResultData(null, false, "数据校验失败，错误信息：" + string.Join(" | ", errmsgs));
             }
+            if (ModelState.IsValid) return;
+            var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).ToList();
+            if (errmsgs.Any())
+            {
+                for (var i = 0; i < errmsgs.Count; i++)
+                {
+                    errmsgs[i] = i + 1 + ". " + errmsgs[i];
+                }
+            }
+            filterContext.Result = ResultData(null, false, "数据校验失败，错误信息：" + string.Join(" | ", errmsgs));
         }
     }
 }

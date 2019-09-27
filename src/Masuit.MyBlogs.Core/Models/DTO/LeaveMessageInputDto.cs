@@ -1,8 +1,6 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
-using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
@@ -14,9 +12,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     {
         public LeaveMessageInputDto()
         {
-            PostDate = DateTime.Now;
             Status = Status.Pending;
-            IsMaster = false;
         }
 
         /// <summary>
@@ -30,11 +26,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// </summary>
         [Required(ErrorMessage = "留言内容不能为空！"), SubmitCheck(2, 500)]
         public string Content { get; set; }
-
-        /// <summary>
-        /// 发表时间
-        /// </summary>
-        public DateTime PostDate { get; set; }
 
         /// <summary>
         /// 邮箱
@@ -63,16 +54,5 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// </summary>
         [StringLength(255)]
         public string OperatingSystem { get; set; }
-
-        /// <summary>
-        /// 是否是博主
-        /// </summary>
-        [DefaultValue(false)]
-        public bool IsMaster { get; set; }
-
-        /// <summary>
-        /// 提交人IP地址
-        /// </summary>
-        public string IP { get; set; }
     }
 }

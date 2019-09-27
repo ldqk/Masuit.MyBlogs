@@ -34,7 +34,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost]
         public async Task<IActionResult> Save(Banner banner)
         {
-            Banner entity = BannerService.GetById(banner.Id);
+            var entity = BannerService.GetById(banner.Id);
             if (entity != null)
             {
                 entity.Url = banner.Url;

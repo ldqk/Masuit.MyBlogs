@@ -3,6 +3,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.Systems;
 using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Configs
@@ -22,12 +23,12 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<Category, CategoryOutputDto>().ForMember(c => c.TotalPostCount, e => e.MapFrom(c => c.Post.Count)).ForMember(c => c.PendedPostCount, e => e.MapFrom(c => c.Post.Count())).ReverseMap();
             CreateMap<CategoryInputDto, CategoryOutputDto>().ReverseMap();
 
-            CreateMap<Comment, CommentInputDto>().ReverseMap();
+            CreateMap<CommentInputDto, Comment>().ForMember(c => c.Status, e => e.MapFrom(c => Status.Pending)).ReverseMap();
             CreateMap<Comment, CommentOutputDto>().ReverseMap();
             CreateMap<CommentInputDto, CommentOutputDto>().ReverseMap();
             CreateMap<Comment, CommentViewModel>().ForMember(c => c.CommentDate, e => e.MapFrom(c => c.CommentDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
 
-            CreateMap<LeaveMessage, LeaveMessageInputDto>().ReverseMap();
+            CreateMap<LeaveMessageInputDto, LeaveMessage>().ForMember(c => c.Status, e => e.MapFrom(c => Status.Pending)).ReverseMap();
             CreateMap<LeaveMessage, LeaveMessageOutputDto>().ReverseMap();
             CreateMap<LeaveMessageInputDto, LeaveMessageOutputDto>().ReverseMap();
             CreateMap<LeaveMessage, LeaveMessageViewModel>().ForMember(l => l.PostDate, e => e.MapFrom(l => l.PostDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
@@ -57,6 +58,7 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<PostInputDto, PostOutputDto>().ReverseMap();
             CreateMap<PostHistoryVersion, PostOutputDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ReverseMap();
             CreateMap<Post, PostViewModel>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ForMember(p => p.PostDate, e => e.MapFrom(p => p.PostDate.ToString("yyyy-MM-dd HH:mm:ss"))).ForMember(p => p.ModifyDate, e => e.MapFrom(p => p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
+            CreateMap<Post, PostDataModel>().ForMember(p => p.ModifyDate, e => e.MapFrom(p => p.ModifyDate.ToString("yyyy-MM-dd HH:mm"))).ForMember(p => p.PostDate, e => e.MapFrom(p => p.PostDate.ToString("yyyy-MM-dd HH:mm"))).ForMember(p => p.Status, e => e.MapFrom(p => p.Status.GetDisplay())).ForMember(p => p.ModifyCount, e => e.MapFrom(p => p.PostHistoryVersion.Count)).ForMember(p => p.ViewCount, e => e.MapFrom(p => p.TotalViewCount));
 
             CreateMap<SearchDetails, SearchDetailsInputDto>().ReverseMap();
             CreateMap<SearchDetails, SearchDetailsOutputDto>().ReverseMap();
@@ -76,10 +78,10 @@ namespace Masuit.MyBlogs.Core.Configs
 
             CreateMap<PostMergeRequestInputDtoBase, PostMergeRequest>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.MergeState, e => e.Ignore()).ReverseMap();
             CreateMap<PostMergeRequestInputDto, PostMergeRequest>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.MergeState, e => e.Ignore()).ReverseMap();
-            CreateMap<PostMergeRequestInputDto, Post>().ForMember(p => p.Id, e => e.Ignore()).ReverseMap();
+            CreateMap<PostMergeRequestInputDto, Post>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.Status, e => e.Ignore()).ReverseMap();
             CreateMap<PostMergeRequest, PostMergeRequestOutputDtoBase>().ForMember(p => p.PostTitle, e => e.MapFrom(r => r.Post.Title));
             CreateMap<PostMergeRequest, PostMergeRequestOutputDto>().ForMember(p => p.PostTitle, e => e.MapFrom(r => r.Post.Title));
-            CreateMap<PostMergeRequest, Post>().ForMember(p => p.Id, e => e.Ignore()).ReverseMap();
+            CreateMap<PostMergeRequest, Post>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.Status, e => e.Ignore()).ReverseMap();
             CreateMap<Post, PostMergeRequestOutputDto>().ReverseMap();
         }
     }

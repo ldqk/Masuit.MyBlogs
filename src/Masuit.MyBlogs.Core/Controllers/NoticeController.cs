@@ -4,7 +4,6 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
@@ -53,27 +52,25 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("notice"), ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "page", "size", "id" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index(int page = 1, int size = 10, int id = 0)
         {
-            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
-            List<NoticeOutputDto> list;
-            int total;
-            if (user != null && user.IsAdmin)
+            var list = NoticeService.LoadPageEntities<DateTime, NoticeOutputDto>(page, size, out var total, n => n.Status == Status.Display, n => n.ModifyDate, false).ToList();
+            ViewBag.Total = total;
+            if (!CurrentUser.IsAdmin)
             {
-                if (id != 0)
-                {
-                    Notice notice = NoticeService.GetById(id);
-                    ViewBag.Total = 1;
-                    return View("Index_Admin", new List<NoticeOutputDto>
-                    {
-                        notice.MapTo<NoticeOutputDto>()
-                    });
-                }
-                list = NoticeService.LoadPageEntities<DateTime, NoticeOutputDto>(page, size, out total, n => n.Status == Status.Display, n => n.ModifyDate, false).ToList();
-                ViewBag.Total = total;
+                return View(list);
+            }
+
+            if (id == 0)
+            {
                 return View("Index_Admin", list);
             }
-            list = NoticeService.LoadPageEntities<DateTime, NoticeOutputDto>(page, size, out total, n => n.Status == Status.Display, n => n.ModifyDate, false).ToList();
-            ViewBag.Total = total;
-            return View(list);
+
+            var notice = NoticeService.GetById(id);
+            ViewBag.Total = 1;
+            return View("Index_Admin", new List<NoticeOutputDto>
+            {
+                notice.MapTo<NoticeOutputDto>()
+            });
+
         }
 
         /// <summary>
@@ -84,12 +81,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("n/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Details(int id)
         {
-            Notice notice = NoticeService.GetById(id);
-            if (notice != null)
-            {
-                return View(notice);
-            }
-            return RedirectToAction("Index");
+            var notice = NoticeService.GetById(id) ?? throw new NotFoundException("页面未找到");
+            return View(notice);
         }
 
         /// <summary>
@@ -123,20 +116,18 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "公告已经被删除！");
             }
 
-            var srcs = post.Content.MatchImgSrcs();
+            var srcs = post.Content.MatchImgSrcs().Where(s => s.StartsWith("/"));
             foreach (var path in srcs)
             {
-                if (path.StartsWith("/"))
+                try
                 {
-                    try
-                    {
-                        System.IO.File.Delete(HostingEnvironment.WebRootPath + path);
-                    }
-                    catch
-                    {
-                    }
+                    System.IO.File.Delete(HostingEnvironment.WebRootPath + path);
+                }
+                catch
+                {
                 }
             }
+
             bool b = NoticeService.DeleteByIdSaved(id);
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
@@ -149,7 +140,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public async Task<ActionResult> Edit(Notice notice)
         {
-            Notice entity = NoticeService.GetById(notice.Id);
+            var entity = NoticeService.GetById(notice.Id);
             entity.ModifyDate = DateTime.Now;
             entity.Title = notice.Title;
             entity.Content = await _imagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes());
@@ -165,7 +156,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetPageData(int page = 1, int size = 10)
         {
-            List<Notice> list = NoticeService.LoadPageEntitiesNoTracking(page, size, out int total, n => true, n => n.ModifyDate, false).ToList();
+            var list = NoticeService.LoadPageEntitiesNoTracking(page, size, out int total, n => true, n => n.ModifyDate, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }
@@ -177,13 +168,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult Get(int id)
         {
-            Notice notice = NoticeService.GetById(id);
-            if (HttpContext.Session.Get("notice" + id) is null)
+            var notice = NoticeService.GetById(id);
+            if (HttpContext.Session.Get("notice" + id) != null)
             {
-                notice.ViewCount++;
-                NoticeService.UpdateEntitySaved(notice);
-                HttpContext.Session.Set("notice" + id, id.GetBytes());
+                return ResultData(notice.MapTo<NoticeOutputDto>());
             }
+
+            notice.ViewCount += 1;
+            NoticeService.UpdateEntitySaved(notice);
+            HttpContext.Session.Set("notice" + id, id.GetBytes());
             return ResultData(notice.MapTo<NoticeOutputDto>());
         }
 
@@ -195,17 +188,20 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Last()
         {
             var notice = NoticeService.GetFirstEntity(n => n.Status == Status.Display, n => n.ModifyDate, false);
-            if (notice != null)
+            if (notice == null)
             {
-                if (HttpContext.Session.Get("notice" + notice.Id) is null)
-                {
-                    notice.ViewCount++;
-                    NoticeService.UpdateEntitySaved(notice);
-                    HttpContext.Session.Set("notice" + notice.Id, notice.Id.GetBytes());
-                }
+                return ResultData(null, false);
+            }
+
+            if (HttpContext.Session.Get("notice" + notice.Id) != null)
+            {
                 return ResultData(notice.Mapper<NoticeOutputDto>());
             }
-            return ResultData(null, false);
+
+            notice.ViewCount += 1;
+            NoticeService.UpdateEntitySaved(notice);
+            HttpContext.Session.Set("notice" + notice.Id, notice.Id.GetBytes());
+            return ResultData(notice.Mapper<NoticeOutputDto>());
         }
     }
 }

@@ -27,7 +27,7 @@
                         <div class="search-form">
                             <form action="/s" method="get">
                                 <div class="input-group">
-                                    <input type="text" placeholder="在这里发现任何你需要的东西" id="search" name="wd" maxlength="32" value="@ViewBag.Keyword" class="form-control input-lg">
+                                    <input type="text" placeholder="你要查找的关键词，支持部分指令：intitle，content，如：intitle:会声会影 content:懒得勤快，指令支持组合" id="search" name="wd" maxlength="32" value="@ViewBag.Keyword" class="form-control input-lg">
                                     <div class="input-group-btn">
                                         <button type="button" class="sr-only btn btn-default dropdown-toggle" data-toggle="dropdown" style="display: none"><span class="caret"></span></button>
                                         <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>

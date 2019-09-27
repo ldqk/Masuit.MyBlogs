@@ -66,5 +66,15 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// 反对数
         /// </summary>
         public int AgainstCount { get; set; }
+
+        /// <summary>
+        /// 提交人IP地址
+        /// </summary>
+        public string IP { get; set; }
+
+        /// <summary>
+        /// 地理信息
+        /// </summary>
+        public string Location { get; set; }
     }
 }

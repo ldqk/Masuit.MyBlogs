@@ -67,7 +67,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var newer = PostMergeRequestService.GetById(mid) ?? throw new NotFoundException("待合并文章未找到");
             var old = newer.Post;
-            HtmlDiff.HtmlDiff diffHelper = new HtmlDiff.HtmlDiff(old.Content, newer.Content);
+            var diffHelper = new HtmlDiff.HtmlDiff(old.Content, newer.Content);
             string diffOutput = diffHelper.Build();
             old.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);
             newer.Content = Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty);
@@ -90,15 +90,16 @@ namespace Masuit.MyBlogs.Core.Controllers
             merge.Post.ModifyDate = DateTime.Now;
             merge.MergeState = MergeStatus.Merged;
             var b = PostMergeRequestService.UpdateEntitySaved(merge);
-            if (b)
+            if (!b)
             {
-                string link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id;
-                string content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/merge-pass.html").Replace("{{link}}", link).Replace("{{title}}", merge.Post.Title);
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已通过", content, merge.ModifierEmail));
-                return ResultData(null, true, "文章合并完成！");
+                return ResultData(null, false, "文章合并失败！");
             }
 
-            return ResultData(null, false, "文章合并失败！");
+            string link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id;
+            string content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/merge-pass.html").Replace("{{link}}", link).Replace("{{title}}", merge.Post.Title);
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已通过", content, merge.ModifierEmail));
+            return ResultData(null, true, "文章合并完成！");
+
         }
 
         /// <summary>
@@ -132,15 +133,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             var merge = PostMergeRequestService.GetById(id) ?? throw new NotFoundException("待合并文章未找到");
             merge.MergeState = MergeStatus.Reject;
             var b = PostMergeRequestService.UpdateEntitySaved(merge);
-            if (b)
+            if (!b)
             {
-                string link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id + "/merge/" + id;
-                string content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/merge-reject.html").Replace("{{link}}", link).Replace("{{title}}", merge.Post.Title).Replace("{{reason}}", reason);
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已被拒绝", content, merge.ModifierEmail));
-                return ResultData(null, true, "合并已拒绝！");
+                return ResultData(null, false, "操作失败！");
             }
 
-            return ResultData(null, false, "操作失败！");
+            var link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id + "/merge/" + id;
+            var content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/merge-reject.html").Replace("{{link}}", link).Replace("{{title}}", merge.Post.Title).Replace("{{reason}}", reason);
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已被拒绝", content, merge.ModifierEmail));
+            return ResultData(null, true, "合并已拒绝！");
         }
     }
 }

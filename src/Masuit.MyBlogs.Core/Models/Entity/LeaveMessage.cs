@@ -75,5 +75,10 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 提交人IP
         /// </summary>
         public string IP { get; set; }
+
+        /// <summary>
+        /// 地理信息
+        /// </summary>
+        public string Location { get; set; }
     }
 }

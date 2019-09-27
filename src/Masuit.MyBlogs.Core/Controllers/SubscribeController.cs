@@ -215,27 +215,28 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return Content("操作失败，链接已被非法篡改");
             }
             Broadcast entity = BroadcastService.GetFirstEntity(b => b.Email.Equals(email, StringComparison.InvariantCultureIgnoreCase) && b.ValidateCode.Equals(validate));
-            if (entity != null)
+            if (entity == null)
             {
-                switch (act)
-                {
-                    case "verify":
-                        entity.Status = Status.Subscribed;
-                        entity.ValidateCode = Guid.NewGuid().ToString();
-                        entity.UpdateTime = DateTime.Now;
-                        BroadcastService.UpdateEntity(entity);
-                        BroadcastService.SaveChanges();
-                        return Content("订阅成功！");
-                    case "cancel":
-                        entity.Status = Status.Canceled;
-                        entity.UpdateTime = DateTime.Now;
-                        BroadcastService.UpdateEntity(entity);
-                        BroadcastService.SaveChanges();
-                        return Content("取消订阅成功，您将不会再接收到文章更新，如果您以后需要再次接收更新推送，可以到主站点重新进行订阅操作！");
-                    default: return RedirectToAction("Index", "Home");
-                }
+                return Content("该邮箱账户未使用邮件订阅！");
             }
-            return Content("该邮箱账户未使用邮件订阅！");
+
+            switch (act)
+            {
+                case "verify":
+                    entity.Status = Status.Subscribed;
+                    entity.ValidateCode = Guid.NewGuid().ToString();
+                    entity.UpdateTime = DateTime.Now;
+                    BroadcastService.UpdateEntity(entity);
+                    BroadcastService.SaveChanges();
+                    return Content("订阅成功！");
+                case "cancel":
+                    entity.Status = Status.Canceled;
+                    entity.UpdateTime = DateTime.Now;
+                    BroadcastService.UpdateEntity(entity);
+                    BroadcastService.SaveChanges();
+                    return Content("取消订阅成功，您将不会再接收到文章更新，如果您以后需要再次接收更新推送，可以到主站点重新进行订阅操作！");
+                default: return RedirectToAction("Index", "Home");
+            }
         }
 
 

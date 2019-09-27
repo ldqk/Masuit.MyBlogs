@@ -29,6 +29,7 @@
                 <button type="submit" class="btn btn-info btn-lg">
                     发表留言
                 </button>
+                <a class="text-red">留言框可粘贴网络图片</a>
             </div>
         </div>
     </form>
@@ -106,22 +107,27 @@
             var startfloor = data.parentTotal - (page - 1) * size;
             for (let i = 0; i < rows.length; i++) {
                 html += `<li class="msg-list media animated fadeInRight" id='${rows[i].Id}'>
-                                <div class="media-body">
-                                    <article class="panel panel-info">
-                                        <header class="panel-heading">${startfloor}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""}
-                                            <span class="pull-right" style="font-size: 10px;">${rows[i].Status == 4 ? `<a class="label label-success" onclick="pass(${rows[i].Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${rows[i].Id})">删除</a> | ${rows[i].PostDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span></span>
-                                        </header>
-                                        <div class="panel-body">
-                                            ${rows[i].Content} <a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
-                                            <div class="pull-right">
-                                                <span class="label label-success">${rows[i].Email}</span>
-                                                <span class="label label-primary">${rows[i].QQorWechat}</span>
-                                            </div>
-                                            ${loadMsgs(data.rows, Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.PostDate).ToArray(), startfloor--)}
+                            <div class="media-body">
+                                <article class="panel panel-info">
+                                    <header class="panel-heading">${startfloor}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""}
+                                        <span class="pull-right" style="font-size: 10px;">${rows[i].Status == 4 ? `<a class="label label-success" onclick="pass(${rows[i].Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${rows[i].Id})">删除</a> | ${rows[i].PostDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span></span>
+                                    </header>
+                                    <div class="panel-body">
+                                        ${rows[i].Content} <a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
+                                        <div class="margin-top10"></div>
+                                        <div class="pull-left">
+                                            <span class="label label-success">${rows[i].IP}</span>
+                                            <span class="label label-primary">${rows[i].Location}</span>
                                         </div>
-                                    </article>
-                                </div>
-                            </li>`;
+                                        <div class="pull-right">
+                                            <span class="label label-success">${rows[i].Email}</span>
+                                            <span class="label label-primary">${rows[i].QQorWechat}</span>
+                                        </div><br/>
+                                        ${loadMsgs(data.rows, Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.PostDate).ToArray(), startfloor--)}
+                                    </div>
+                                </article>
+                            </div>
+                        </li>`;
             }
 		}
         loadingDone();
@@ -137,20 +143,25 @@
         Enumerable.From(msg).ForEach((item, index) => {
             var color = colors[depth % 5];
             html += `<article id="${item.Id}" class="panel panel-${color}">
-                            <div class="panel-heading">
-                                ${depth}-${floor++}# ${item.IsMaster ?`<i class="icon icon-user"></i>`:""}${item.NickName}${item.IsMaster ?`(管理员)`:""}
-                                <span class="pull-right" style="font-size: 10px;">${item.Status == 4 ? `<a class="label label-success" onclick="pass(${item.Id})">通过</a> |`:""} <a class="label label-danger" onclick="del(${item.Id})">删除</a> | ${item.PostDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span></span>
+                        <div class="panel-heading">
+                            ${depth}-${floor++}# ${item.IsMaster ?`<i class="icon icon-user"></i>`:""}${item.NickName}${item.IsMaster ?`(管理员)`:""}
+                            <span class="pull-right" style="font-size: 10px;">${item.Status == 4 ? `<a class="label label-success" onclick="pass(${item.Id})">通过</a> |`:""} <a class="label label-danger" onclick="del(${item.Id})">删除</a> | ${item.PostDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span></span>
+                        </div>
+                        <div class="panel-body">
+                            ${item.Content}
+                            <a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
+                            <div class="margin-top10"></div>
+                            <div class="pull-left">
+                                <span class="label label-success">${item.IP}</span>
+                                <span class="label label-primary">${item.Location}</span>
                             </div>
-                            <div class="panel-body">
-                                ${item.Content}
-                                <a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
-                                <div class="pull-right">
-                                    <span class="label label-success">${item.Email}</span>
-                                    <span class="label label-primary">${item.QQorWechat}</span>
-                                </div>
-                                ${loadMsgs(data, Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.PostDate), root, depth)}
-                            </div>
-                        </article>`;
+                            <div class="pull-right">
+                                <span class="label label-success">${item.Email}</span>
+                                <span class="label label-primary">${item.QQorWechat}</span>
+                            </div><br/>
+                            ${loadMsgs(data, Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.PostDate), root, depth)}
+                        </div>
+                    </article>`;
         });
         return html;
     }
@@ -181,8 +192,7 @@
 			    swal(res.Message, "", res.Success ? "success" : "error");
 			    getmsgs();
 		    });
-        }, function () {
-        });
+        }, function () {});
     }
 
     /**

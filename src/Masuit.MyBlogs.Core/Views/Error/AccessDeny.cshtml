@@ -102,7 +102,7 @@
 <script>
     $("#code-token").on("submit", function (e) {
         e.preventDefault();
-        $.post("/post/CheckViewToken", $(this).serialize(), function (data) {
+        $.post("/error/CheckViewToken", $(this).serialize(), function (data) {
             if (data.Success) {
                 window.location.href = "/";
             } else {
@@ -117,7 +117,7 @@
     });
     $(".getcode").on("click", function (e) {
         e.preventDefault();
-        $.post("/post/getviewtoken",
+        $.post("/error/getviewtoken",
             {
                 __RequestVerificationToken: $("[name=__RequestVerificationToken]").val(),
                 email: $("#email3").val()

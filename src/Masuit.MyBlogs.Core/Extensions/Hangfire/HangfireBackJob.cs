@@ -65,24 +65,30 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void LoginRecord(UserInfoOutputDto userInfo, string ip, LoginType type)
         {
             var result = ip.GetPhysicsAddressInfo().Result;
-            if (result?.Status == 0)
+            if (result?.Status != 0)
             {
-                string addr = result.AddressResult.FormattedAddress;
-                string prov = result.AddressResult.AddressComponent.Province;
-                LoginRecord record = new LoginRecord()
-                {
-                    IP = ip,
-                    LoginTime = DateTime.Now,
-                    LoginType = type,
-                    PhysicAddress = addr,
-                    Province = prov
-                };
-                UserInfo u = _userInfoService.GetByUsername(userInfo.Username);
-                u.LoginRecord.Add(record);
-                _userInfoService.UpdateEntitySaved(u);
-                string content = File.ReadAllText(Path.Combine(_hostingEnvironment.WebRootPath, "template", "login.html")).Replace("{{name}}", u.Username).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{ip}}", record.IP).Replace("{{address}}", record.PhysicAddress);
-                CommonHelper.SendMail(_settingService.GetFirstEntity(s => s.Name.Equals("Title")).Value + "账号登录通知", content, _settingService.GetFirstEntity(s => s.Name.Equals("ReceiveEmail")).Value);
+                return;
             }
+
+            string addr = result.AddressResult.FormattedAddress;
+            string prov = result.AddressResult.AddressComponent.Province;
+            var record = new LoginRecord()
+            {
+                IP = ip,
+                LoginTime = DateTime.Now,
+                LoginType = type,
+                PhysicAddress = addr,
+                Province = prov
+            };
+            var u = _userInfoService.GetByUsername(userInfo.Username);
+            u.LoginRecord.Add(record);
+            _userInfoService.UpdateEntitySaved(u);
+            var content = File.ReadAllText(Path.Combine(_hostingEnvironment.WebRootPath, "template", "login.html"))
+                .Replace("{{name}}", u.Username)
+                .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                .Replace("{{ip}}", record.IP)
+                .Replace("{{address}}", record.PhysicAddress);
+            CommonHelper.SendMail(_settingService.GetFirstEntity(s => s.Name.Equals("Title")).Value + "账号登录通知", content, _settingService.GetFirstEntity(s => s.Name.Equals("ReceiveEmail")).Value);
         }
 
         /// <summary>
@@ -94,10 +100,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             p.Status = Status.Pended;
             p.PostDate = DateTime.Now;
             p.ModifyDate = DateTime.Now;
-            Post post = _postService.GetById(p.Id);
+            var post = _postService.GetById(p.Id);
             if (post is null)
             {
-                _postService.AddEntitySaved(post);
+                _postService.AddEntitySaved(p);
             }
             else
             {
@@ -114,14 +120,16 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="pid"></param>
         public void RecordPostVisit(int pid)
         {
-            Post post = _postService.GetById(pid);
-            if (post != null)
+            var post = _postService.GetById(pid);
+            if (post == null)
             {
-                post.TotalViewCount += 1;
-                post.AverageViewCount = post.TotalViewCount / (DateTime.Now - post.PostDate).TotalDays;
-                _postService.UpdateEntity(post);
-                _postService.SaveChanges();
+                return;
             }
+
+            post.TotalViewCount += 1;
+            post.AverageViewCount = post.TotalViewCount / (DateTime.Now - post.PostDate).TotalDays;
+            _postService.UpdateEntity(post);
+            _postService.SaveChanges();
         }
 
         /// <summary>
@@ -163,14 +171,13 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void CheckLinks()
         {
             var links = _linksService.LoadEntities(l => !l.Except).AsParallel();
+            var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+            client.DefaultRequestHeaders.Referrer = new Uri("https://masuit.com");
+            client.Timeout = TimeSpan.FromSeconds(10);
             Parallel.ForEach(links, link =>
             {
-                Uri uri = new Uri(link.Url);
-                HttpClient client = _httpClientFactory.CreateClient();
-                client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-                client.DefaultRequestHeaders.Referrer = new Uri("https://masuit.com");
-                client.Timeout = TimeSpan.FromHours(10);
-                client.GetAsync(uri).ContinueWith(async t =>
+                client.GetAsync(link.Url).ContinueWith(async t =>
                 {
                     if (t.IsCanceled || t.IsFaulted)
                     {

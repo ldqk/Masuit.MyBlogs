@@ -1,4 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Hangfire;
+using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Configs;
+using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Infrastructure.Services;
+using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools;
+using Masuit.Tools.Core.Net;
+using Masuit.Tools.Security;
+using Masuit.Tools.Systems;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -8,6 +20,8 @@ namespace Masuit.MyBlogs.Core.Controllers
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorController : Controller
     {
+        public BroadcastService BroadcastService { get; set; }
+
         /// <summary>
         /// 404
         /// </summary>
@@ -15,9 +29,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("error"), Route("{*url}", Order = 99999), ResponseCache(Duration = 36000)]
         public ActionResult Index()
         {
-            Response.StatusCode = 404;
             if (Request.Method.ToLower().Equals("get"))
             {
+                Response.StatusCode = 404;
                 return View();
             }
             return Json(new
@@ -35,9 +49,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("ServiceUnavailable"), ResponseCache(Duration = 36000)]
         public ActionResult ServiceUnavailable()
         {
-            Response.StatusCode = 503;
             if (Request.Method.ToLower().Equals("get"))
             {
+                Response.StatusCode = 503;
                 return View();
             }
             return Json(new
@@ -55,6 +69,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("AccessDeny"), ResponseCache(Duration = 360000)]
         public ActionResult AccessDeny()
         {
+            if (Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Request.Cookies["FullAccessToken"]))
+            {
+                return Redirect("/");
+            }
+
             Response.StatusCode = 403;
             return View();
         }
@@ -78,6 +97,88 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult ComingSoon()
         {
             return View();
+        }
+
+        /// <summary>
+        /// 检查访问密码
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email", "token" })]
+        public ActionResult CheckViewToken(string email, string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return ResultData(null, false, "请输入访问密码！");
+            }
+
+            var s = RedisHelper.Get("token:" + email);
+            if (!token.Equals(s))
+            {
+                return ResultData(null, false, "访问密码不正确！");
+            }
+
+            HttpContext.Session.Set("FullAccessViewToken", token);
+            Response.Cookies.Append("Email", email, new CookieOptions
+            {
+                Expires = DateTime.Now.AddYears(1)
+            });
+            Response.Cookies.Append("FullAccessToken", email.MDString3(AppConfig.BaiduAK), new CookieOptions
+            {
+                Expires = DateTime.Now.AddYears(1)
+            });
+            return ResultData(null);
+
+        }
+
+        /// <summary>
+        /// 检查授权邮箱
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" })]
+        public ActionResult GetViewToken(string email)
+        {
+            if (string.IsNullOrEmpty(email) || !email.MatchEmail())
+            {
+                return ResultData(null, false, "请输入正确的邮箱！");
+            }
+
+            if (RedisHelper.Exists("get:" + email))
+            {
+                RedisHelper.Expire("get:" + email, 120);
+                return ResultData(null, false, "发送频率限制，请在2分钟后重新尝试发送邮件！请检查你的邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！");
+            }
+
+            if (!BroadcastService.Any(b => b.Email.Equals(email) && b.SubscribeType == SubscribeType.ArticleToken))
+            {
+                return ResultData(null, false, "您目前没有权限访问这个链接，请联系站长开通访问权限！");
+            }
+
+            var token = SnowFlake.GetInstance().GetUniqueShortId(6);
+            RedisHelper.Set("token:" + email, token, 86400);
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "博客访问验证码", $"{CommonHelper.SystemSettings["Domain"]}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email));
+            RedisHelper.Set("get:" + email, token, 120);
+            return ResultData(null);
+
+        }
+
+        /// <summary>
+        /// 响应数据
+        /// </summary>
+        /// <param name="data">数据</param>
+        /// <param name="success">响应状态</param>
+        /// <param name="message">响应消息</param>
+        /// <returns></returns>
+        public ActionResult ResultData(object data, bool success = true, string message = "")
+        {
+            return Ok(new
+            {
+                Success = success,
+                Message = message,
+                Data = data
+            });
         }
     }
 }

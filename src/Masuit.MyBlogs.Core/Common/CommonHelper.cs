@@ -10,7 +10,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using System.Net;
+using System.Threading;
 #if !DEBUG
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Models;
@@ -25,24 +26,32 @@ namespace Masuit.MyBlogs.Core.Common
     {
         static CommonHelper()
         {
-            BanRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "ban.txt"));
-            ModRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "mod.txt"));
-            DenyIP = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "denyip.txt"));
-            string[] lines = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory + "App_Data", "DenyIPRange.txt"));
-            DenyIPRange = new Dictionary<string, string>();
-            foreach (string line in lines)
+            ThreadPool.QueueUserWorkItem(s =>
             {
-                try
+                while (true)
                 {
-                    var strs = line.Split(' ');
-                    DenyIPRange[strs[0]] = strs[1];
-                }
-                catch (IndexOutOfRangeException)
-                {
-                }
-            }
+                    BanRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "ban.txt"));
+                    ModRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "mod.txt"));
+                    DenyIP = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "denyip.txt"));
+                    string[] lines = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory + "App_Data", "DenyIPRange.txt"));
+                    DenyIPRange = new Dictionary<string, string>();
+                    foreach (string line in lines)
+                    {
+                        try
+                        {
+                            var strs = line.Split(' ');
+                            DenyIPRange[strs[0]] = strs[1];
+                        }
+                        catch (IndexOutOfRangeException)
+                        {
+                        }
+                    }
 
-            IPWhiteList = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "whitelist.txt")).Split(',', '，').ToList();
+                    IPWhiteList = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "whitelist.txt")).Split(',', '，').ToList();
+                    Console.WriteLine("刷新公共数据...");
+                    Thread.Sleep(TimeSpan.FromMinutes(10));
+                }
+            });
         }
 
         /// <summary>
@@ -135,18 +144,25 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             bool denyed = DenyIP.Split(',').Contains(ip) || DenyIPRange.Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
-            if (SystemSettings.GetOrAdd("EnableDenyArea", "false") == "true")
+            if (SystemSettings.GetOrAdd("EnableDenyArea", "false") == "false")
             {
-                using (DbSearcher searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db")))
-                {
-                    var pos = searcher.MemorySearch(ip).Region;
-                    string[] region = pos.Split("|");
-                    string[] denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
-                    denyed = denyed || denyAreas.Intersect(region).Any() || pos.Contains(denyAreas);
-                }
+                return denyed;
             }
 
-            return denyed;
+            var pos = GetIPLocation(ip);
+            string[] region = pos.Split("|");
+            string[] denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
+            return denyed || denyAreas.Intersect(region).Any() || pos.Contains(denyAreas);
+        }
+
+        public static string GetIPLocation(this IPAddress ip) => GetIPLocation(ip.MapToIPv4().ToString());
+
+        public static string GetIPLocation(this string ip)
+        {
+            using (var searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db")))
+            {
+                return searcher.MemorySearch(ip).Region;
+            }
         }
 
         /// <summary>
