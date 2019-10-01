@@ -23,7 +23,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, $"用户名{username}已经存在，请尝试更换其他用户名！");
             }
             userInfo.Username = username;
-            bool b = UserInfoService.UpdateEntitySaved(userInfo);
+            bool b = UserInfoService.SaveChanges() > 0;
             return ResultData(Mapper.Map<UserInfoOutputDto>(userInfo), b, b ? $"用户名修改成功，新用户名为{username}。" : "用户名修改失败！");
         }
 
@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             UserInfo userInfo = UserInfoService.GetById(id);
             userInfo.NickName = username;
-            bool b = UserInfoService.UpdateEntitySaved(userInfo);
+            bool b = UserInfoService.SaveChanges() > 0;
             return ResultData(Mapper.Map<UserInfoOutputDto>(userInfo), b, b ? $"昵称修改成功，新昵称为{username}。" : "昵称修改失败！");
         }
 
@@ -69,7 +69,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             UserInfo userInfo = UserInfoService.GetById(id);
             userInfo.Avatar = path;
-            bool b = UserInfoService.UpdateEntitySaved(userInfo);
+            bool b = UserInfoService.SaveChanges() > 0;
             return ResultData(Mapper.Map<UserInfoOutputDto>(userInfo), b, b ? $"头像修改成功。" : "头像修改失败！");
         }
     }

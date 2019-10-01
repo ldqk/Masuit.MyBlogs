@@ -210,49 +210,5 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             base.DeleteEntity(t);
             return _searchEngine.SaveChangesAsync();
         }
-
-        /// <summary>
-        /// 更新实体并保存
-        /// </summary>
-        /// <param name="t">更新后的实体</param>
-        /// <returns>更新成功</returns>
-        public override bool UpdateEntitySaved(Post t)
-        {
-            base.UpdateEntity(t);
-            return _searchEngine.SaveChanges() > 0;
-        }
-
-        /// <summary>
-        /// 更新多个实体并保存
-        /// </summary>
-        /// <param name="list">实体集合</param>
-        /// <returns>更新成功</returns>
-        public override bool UpdateEntitiesSaved(IEnumerable<Post> list)
-        {
-            base.UpdateEntities(list);
-            return _searchEngine.SaveChanges() > 0;
-        }
-
-        /// <summary>
-        /// 更新多个实体并保存（异步）
-        /// </summary>
-        /// <param name="list">实体集合</param>
-        /// <returns>更新成功</returns>
-        public override Task<int> UpdateEntitiesSavedAsync(IEnumerable<Post> list)
-        {
-            base.UpdateEntities(list);
-            return _searchEngine.SaveChangesAsync();
-        }
-
-        /// <summary>
-        /// 更新实体并保存（异步）
-        /// </summary>
-        /// <param name="t">更新后的实体</param>
-        /// <returns>更新成功</returns>
-        public override Task<int> UpdateEntitySavedAsync(Post t)
-        {
-            base.UpdateEntity(t);
-            return _searchEngine.SaveChangesAsync();
-        }
     }
 }

@@ -61,7 +61,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             share.Title = model.Title;
             share.Link = model.Link;
             share.Sort = model.Sort;
-            bool b = FastShareService.UpdateEntitySaved(share);
+            bool b = FastShareService.SaveChanges() > 0;
             return ResultData(null, b, b ? "更新成功" : "更新失败");
         }
     }

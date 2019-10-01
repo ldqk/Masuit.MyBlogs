@@ -155,7 +155,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost]
         public ActionResult CommentVote(int id)
         {
-            Comment cm = CommentService.GetFirstEntity(c => c.Id == id && c.Status == Status.Pended);
+            Comment cm = CommentService.Get(c => c.Id == id && c.Status == Status.Pended);
             if (HttpContext.Session.Get("cm" + id) != null)
             {
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
@@ -167,7 +167,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             cm.VoteCount++;
-            CommentService.UpdateEntity(cm);
             HttpContext.Session.Set("cm" + id, id.GetBytes());
             bool b = CommentService.SaveChanges() > 0;
             return ResultData(null, b, b ? "投票成功" : "投票失败");
@@ -202,7 +201,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                 }
             }
-            var parent = CommentService.LoadPageEntities(page, size, out total, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Pended || CurrentUser.IsAdmin), c => c.CommentDate, false).ToList();
+            var parent = CommentService.GetPagesFromCache(page, size, out total, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Pended || CurrentUser.IsAdmin), c => c.CommentDate, false).ToList();
             if (!parent.Any())
             {
                 return ResultData(null, false, "没有评论");
@@ -223,56 +222,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
-        /// 分页获取评论
-        /// </summary>
-        /// <param name="page"></param>
-        /// <param name="size"></param>
-        /// <param name="cid"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public ActionResult GetPageComments(int page = 1, int size = 5, int cid = 0)
-        {
-            int total; //总条数，用于前台分页
-            if (cid != 0)
-            {
-                int pid = CommentService.GetParentCommentIdByChildId(cid);
-                var single = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).ToList();
-                if (single.Any())
-                {
-                    total = 1;
-                    return ResultData(new
-                    {
-                        total,
-                        parentTotal = total,
-                        page,
-                        size,
-                        rows = single.Mapper<IList<CommentViewModel>>()
-                    });
-                }
-            }
-
-            var parent = CommentService.LoadPageEntities(page, size, out total, c => c.ParentId == 0 && (c.Status == Status.Pended || CurrentUser.IsAdmin), c => c.CommentDate, false).ToList();
-            if (!parent.Any())
-            {
-                return ResultData(null, false, "没有评论");
-            }
-
-            var qlist = parent.SelectMany(c => CommentService.GetSelfAndAllChildrenCommentsByParentId(c.Id)).Where(c => (c.Status == Status.Pended || CurrentUser.IsAdmin));
-            if (total > 0)
-            {
-                return ResultData(new
-                {
-                    total,
-                    parentTotal = total,
-                    page,
-                    size,
-                    rows = qlist.Mapper<IList<CommentViewModel>>()
-                });
-            }
-            return ResultData(null, false, "没有评论");
-        }
-
-        /// <summary>
         /// 审核评论
         /// </summary>
         /// <param name="id"></param>
@@ -283,26 +232,31 @@ namespace Masuit.MyBlogs.Core.Controllers
             Comment comment = CommentService.GetById(id);
             comment.Status = Status.Pended;
             Post post = PostService.GetById(comment.PostId);
-            bool b = CommentService.UpdateEntitySaved(comment);
-            var pid = comment.ParentId == 0 ? comment.Id : CommentService.GetParentCommentIdByChildId(id);
+            bool b = CommentService.SaveChanges() > 0;
+            if (b)
+            {
+                var pid = comment.ParentId == 0 ? comment.Id : CommentService.GetParentCommentIdByChildId(id);
 #if !DEBUG
-            var content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "notify.html"))
-                .Replace("{{title}}", post.Title)
-                .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                .Replace("{{nickname}}", comment.NickName)
-                .Replace("{{content}}", comment.Content);
-            var emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Append(post.ModifierEmail).Except(new List<string> { comment.Email, CurrentUser.Email }).ToHashSet();
-            var link = Url.Action("Details", "Post", new
-            {
-                id = comment.PostId,
-                cid = pid
-            }, Request.Scheme) + "#comment";
-            foreach (var email in emails)
-            {
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Replace("{{link}}", link), email));
-            }
+                var content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "notify.html"))
+                    .Replace("{{title}}", post.Title)
+                    .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                    .Replace("{{nickname}}", comment.NickName)
+                    .Replace("{{content}}", comment.Content);
+                var emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Append(post.ModifierEmail).Except(new List<string> { comment.Email, CurrentUser.Email }).ToHashSet();
+                var link = Url.Action("Details", "Post", new
+                {
+                    id = comment.PostId,
+                    cid = pid
+                }, Request.Scheme) + "#comment";
+                foreach (var email in emails)
+                {
+                    BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Replace("{{link}}", link), email));
+                }
 #endif
-            return ResultData(null, b, b ? "审核通过！" : "审核失败！");
+                return ResultData(null, true, "审核通过！");
+            }
+
+            return ResultData(null, false, "审核失败！");
         }
 
         /// <summary>
@@ -324,7 +278,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult GetPendingComments(int page = 1, int size = 10)
         {
-            var list = CommentService.LoadPageEntities<DateTime, CommentOutputDto>(page, size, out int total, c => c.Status == Status.Pending, c => c.CommentDate, false).ToList();
+            var list = CommentService.GetPages<DateTime, CommentOutputDto>(page, size, out int total, c => c.Status == Status.Pending, c => c.CommentDate, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }

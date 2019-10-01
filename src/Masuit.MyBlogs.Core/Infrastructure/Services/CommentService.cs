@@ -34,7 +34,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         private void GetSelfAndAllChildrenCommentsByParentId(Comment comment, List<Comment> list)
         {
-            var comments = LoadEntitiesFromL2CacheNoTracking(x => x.ParentId == comment.Id).ToList();
+            var comments = GetQueryFromCache(x => x.ParentId == comment.Id).ToList();
             if (comments.Any())
             {
                 list.AddRange(comments);
@@ -67,7 +67,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         private int GetParentCommentIdByChildId(Comment com)
         {
-            Comment comment = GetFirstEntityNoTracking(c => c.Id == com.ParentId);
+            Comment comment = GetNoTracking(c => c.Id == com.ParentId);
             if (comment != null)
             {
                 return GetParentCommentIdByChildId(comment);

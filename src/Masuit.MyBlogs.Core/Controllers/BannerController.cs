@@ -21,9 +21,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取全部
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> Get()
+        public IActionResult Get()
         {
-            return ResultData(await BannerService.GetAllFromL2CacheNoTracking(b => b.Id, false).ToListAsync());
+            return ResultData(BannerService.GetAllFromCache(b => b.Id, false));
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 entity.Description = banner.Description;
                 entity.ImageUrl = banner.ImageUrl;
                 entity.Title = banner.Title;
-                bool b1 = await BannerService.UpdateEntitySavedAsync(entity) > 0;
+                bool b1 = await BannerService.SaveChangesAsync() > 0;
                 return ResultData(null, b1, b1 ? "修改成功" : "修改失败");
             }
 

@@ -84,7 +84,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "添加失败");
             }
             Mapper.Map(model, m);
-            bool b = MenuService.UpdateEntitySaved(m);
+            bool b = MenuService.SaveChanges() > 0;
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }
     }

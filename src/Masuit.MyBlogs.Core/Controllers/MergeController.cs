@@ -51,7 +51,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(r => r.Title.Contains(kw) || r.Content.Contains(kw) || r.Modifier.Contains(kw) || r.ModifierEmail.Contains(kw));
             }
 
-            var list = PostMergeRequestService.LoadEntities(where).OrderBy(d => d.MergeState).ThenByDescending(r => r.Id).Skip((page - 1) * size).Take(size).ProjectTo<PostMergeRequestOutputDtoBase>(MapperConfig).ToList();
+            var list = PostMergeRequestService.GetQuery(where).OrderBy(d => d.MergeState).ThenByDescending(r => r.Id).Skip((page - 1) * size).Take(size).ProjectTo<PostMergeRequestOutputDtoBase>(MapperConfig).ToList();
             var count = PostMergeRequestService.Count(where);
             var pageCount = Math.Ceiling(count * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, count);
@@ -89,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             merge.Post.PostHistoryVersion.Add(history);
             merge.Post.ModifyDate = DateTime.Now;
             merge.MergeState = MergeStatus.Merged;
-            var b = PostMergeRequestService.UpdateEntitySaved(merge);
+            var b = PostMergeRequestService.SaveChanges() > 0;
             if (!b)
             {
                 return ResultData(null, false, "文章合并失败！");
@@ -112,7 +112,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var merge = PostMergeRequestService.GetById(dto.Id) ?? throw new NotFoundException("待合并文章未找到");
             Mapper.Map(dto, merge);
-            var b = PostMergeRequestService.UpdateEntitySaved(merge);
+            var b = PostMergeRequestService.SaveChanges() > 0;
             if (b)
             {
                 return Merge(merge.Id);
@@ -132,7 +132,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var merge = PostMergeRequestService.GetById(id) ?? throw new NotFoundException("待合并文章未找到");
             merge.MergeState = MergeStatus.Reject;
-            var b = PostMergeRequestService.UpdateEntitySaved(merge);
+            var b = PostMergeRequestService.SaveChanges() > 0;
             if (!b)
             {
                 return ResultData(null, false, "操作失败！");

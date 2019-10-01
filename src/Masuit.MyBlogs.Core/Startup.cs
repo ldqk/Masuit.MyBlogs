@@ -87,6 +87,7 @@ namespace Masuit.MyBlogs.Core
         /// <returns></returns>
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.MinimumSameSitePolicy = SameSiteMode.None;
@@ -97,37 +98,33 @@ namespace Masuit.MyBlogs.Core
                 //opt.UseSqlServer(AppConfig.ConnString);
             }); //配置数据库
             services.AddCors(opt => opt.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials())); //配置跨域
-
-            services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)); //注入HttpClient
-            services.AddHttpContextAccessor(); //注入静态HttpContext
             services.Configure<FormOptions>(options =>
             {
                 options.MultipartBodyLengthLimit = 104857600; // 100MB
             }); //配置请求长度
+            services.AddSession(); //注入Session
+            services.AddWebSockets(opt => opt.ReceiveBufferSize = 4096 * 1024).AddSignalR();
+            services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
+            });
 
             ConfigureResponse(services);
 
-            services.AddSession(); //注入Session
             services.AddHangfire(x => x.UseMemoryStorage()); //配置hangfire
-
-            services.AddSevenZipCompressor().AddResumeFileResult().AddSearchEngine<DataContext>(new LuceneIndexerOptions()
-            {
-                Path = "lucene"
-            }); // 配置7z和断点续传和Redis和Lucene搜索引擎
-            RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
 
             //配置EF二级缓存
             services.AddEFSecondLevelCache();
             // 配置EF二级缓存策略
             services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
             services.AddSingleton(new CacheManager.Core.ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Sliding, TimeSpan.FromMinutes(10)).Build());
-
-            services.AddWebSockets(opt => opt.ReceiveBufferSize = 4096 * 1024).AddSignalR();
-
-            services.AddHttpsRedirection(options =>
+            services.AddSevenZipCompressor().AddResumeFileResult().AddSearchEngine<DataContext>(new LuceneIndexerOptions()
             {
-                options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
-            });
+                Path = "lucene"
+            }); // 配置7z和断点续传和Redis和Lucene搜索引擎
+
+            services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)); //注入HttpClient
+            services.AddHttpContextAccessor(); //注入静态HttpContext
 
             services.AddMvc(options =>
             {

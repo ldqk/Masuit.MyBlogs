@@ -22,7 +22,7 @@ namespace Service
         /// <returns></returns>
         public UserInfo GetByUsername(string name)
         {
-            return GetFirstEntity(u => u.Username.Equals(name));
+            return Get(u => u.Username.Equals(name));
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Service
         /// <returns></returns>
         public UserInfo Register(UserInfo userInfo)
         {
-            UserInfo exist = GetFirstEntity(u => u.Username.Equals(userInfo.Username) || u.Email.Equals(userInfo.Email));
+            UserInfo exist = Get(u => u.Username.Equals(userInfo.Username) || u.Email.Equals(userInfo.Email));
             if (exist is null)
             {
                 var salt = $"{new Random().StrictNext()}{DateTime.Now.GetTotalMilliseconds()}".MDString2(Guid.NewGuid().ToString()).AESEncrypt();
@@ -84,7 +84,7 @@ namespace Service
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public bool EmailExist(string email) => GetFirstEntityNoTracking(u => u.Email.Equals(email)) != null;
+        public bool EmailExist(string email) => GetNoTracking(u => u.Email.Equals(email)) != null;
 
         /// <summary>
         /// 修改密码

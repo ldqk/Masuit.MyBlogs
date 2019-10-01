@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using EFSecondLevelCache.Core;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -9,6 +10,7 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -38,27 +40,27 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="orderBy"></param>
         /// <returns></returns>
         [Route("c/{id:int}/{page:int?}/{size:int?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = HeaderNames.Cookie)]
-        public ActionResult Index(int id, int page = 1, int size = 15, OrderBy orderBy = OrderBy.ModifyDate)
+        public ActionResult Index(int id, [Optional]OrderBy? orderBy, int page = 1, int size = 15)
         {
             IList<Post> posts;
             var s = SeminarService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            var temp = PostService.LoadEntities(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin)).OrderByDescending(p => p.IsFixedTop);
+            var temp = PostService.GetQuery(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin)).OrderByDescending(p => p.IsFixedTop);
             switch (orderBy)
             {
                 case OrderBy.CommentCount:
-                    posts = temp.ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = temp.ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.PostDate:
-                    posts = temp.ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = temp.ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.ViewCount:
-                    posts = temp.ThenByDescending(p => p.TotalViewCount).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = temp.ThenByDescending(p => p.TotalViewCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 case OrderBy.VoteCount:
-                    posts = temp.ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = temp.ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
                 default:
-                    posts = temp.ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();
+                    posts = temp.ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).Cacheable().ToList();
                     break;
             }
             ViewBag.Total = temp.Count();
@@ -108,7 +110,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 entry.Description = seminar.Description;
                 entry.Title = seminar.Title;
                 entry.SubTitle = seminar.SubTitle;
-                b = SeminarService.UpdateEntitySaved(entry);
+                b = SeminarService.SaveChanges() > 0;
             }
             return ResultData(null, b, b ? "保存成功" : "保存失败");
         }
@@ -146,7 +148,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult GetPageData(int page, int size)
         {
-            var list = SeminarService.LoadPageEntities<int, SeminarOutputDto>(page, size, out int total, s => true, s => s.Id, false).ToList();
+            var list = SeminarService.GetPages<int, SeminarOutputDto>(page, size, out int total, s => true, s => s.Id, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }
@@ -180,7 +182,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 PostId = post.Id,
                 SeminarId = id
             });
-            bool b = SeminarService.UpdateEntitySaved(seminar);
+            bool b = SeminarService.SaveChanges() > 0;
             return ResultData(null, b, b ? $"已成功将【{post.Title}】添加到专题【{seminar.Title}】" : "添加失败！");
         }
 

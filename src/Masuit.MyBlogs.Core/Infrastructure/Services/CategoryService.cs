@@ -26,7 +26,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             {
                 moveCat.PostHistoryVersion.Add(p);
             });
-            UpdateEntity(moveCat);
+
             bool b = DeleteByIdSaved(id);
             return b;
         }

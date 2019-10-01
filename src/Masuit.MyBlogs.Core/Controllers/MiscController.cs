@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using EFSecondLevelCache.Core;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -51,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("misc/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Index(int id)
         {
-            var misc = MiscService.GetById(id) ?? throw new NotFoundException("页面未找到");
+            var misc = MiscService.GetFromCache(m => m.Id == id) ?? throw new NotFoundException("页面未找到");
             return View(misc);
         }
 
@@ -74,7 +75,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("donatelist")]
         public ActionResult DonateList(int page = 1, int size = 10)
         {
-            var list = DonateService.LoadPageEntitiesFromL2CacheNoTracking(page, size, out int total, d => true, d => d.DonateTime, false).Select(d => new
+            var list = DonateService.GetPages(page, size, out int total, d => true, d => d.DonateTime, false).Select(d => new
             {
                 d.NickName,
                 d.EmailDisplay,
@@ -82,7 +83,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 d.DonateTime,
                 d.Amount,
                 d.Via
-            }).ToList();
+            }).Cacheable().ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }
@@ -166,7 +167,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             entity.ModifyDate = DateTime.Now;
             entity.Title = misc.Title;
             entity.Content = await _imagebedClient.ReplaceImgSrc(misc.Content.ClearImgAttributes());
-            bool b = MiscService.UpdateEntitySaved(entity);
+            bool b = MiscService.SaveChanges() > 0;
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }
 
@@ -179,7 +180,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult GetPageData(int page = 1, int size = 10)
         {
-            var list = MiscService.LoadPageEntitiesNoTracking(page, size, out int total, n => true, n => n.ModifyDate, false).Select(m => new
+            var list = MiscService.GetPagesNoTracking(page, size, out int total, n => true, n => n.ModifyDate, false).Select(m => new
             {
                 m.Id,
                 m.Title,

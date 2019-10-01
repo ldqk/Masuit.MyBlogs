@@ -44,7 +44,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie), Route("msg")]
         public ActionResult Index()
         {
-            ViewBag.TotalCount = LeaveMessageService.LoadEntitiesNoTracking(m => m.ParentId == 0 && m.Status == Status.Pended).Count();
+            ViewBag.TotalCount = LeaveMessageService.GetQueryNoTracking(m => m.ParentId == 0 && m.Status == Status.Pended).Count();
             return CurrentUser.IsAdmin ? View("Index_Admin") : View();
         }
 
@@ -75,7 +75,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                 }
             }
-            var parent = LeaveMessageService.LoadPageEntitiesNoTracking(page, size, out total, m => m.ParentId == 0 && (m.Status == Status.Pended || CurrentUser.IsAdmin), m => m.PostDate, false);
+            var parent = LeaveMessageService.GetPagesNoTracking(page, size, out total, m => m.ParentId == 0 && (m.Status == Status.Pended || CurrentUser.IsAdmin), m => m.PostDate, false);
             if (!parent.Any())
             {
                 return ResultData(null, false, "没有留言");
@@ -197,7 +197,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var msg = LeaveMessageService.GetById(id);
             msg.Status = Status.Pended;
-            bool b = LeaveMessageService.UpdateEntitySaved(msg);
+            bool b = LeaveMessageService.SaveChanges() > 0;
 #if !DEBUG
             var pid = msg.ParentId == 0 ? msg.Id : LeaveMessageService.GetParentMessageIdByChildId(id);
             var content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "notify.html")).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg.NickName).Replace("{{content}}", msg.Content);
@@ -230,7 +230,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult GetPendingMsgs(int page = 1, int size = 10)
         {
-            var list = LeaveMessageService.LoadPageEntities<DateTime, LeaveMessageOutputDto>(page, size, out int total, m => m.Status == Status.Pending, l => l.PostDate, false).ToList();
+            var list = LeaveMessageService.GetPages<DateTime, LeaveMessageOutputDto>(page, size, out int total, m => m.Status == Status.Pending, l => l.PostDate, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }
@@ -247,7 +247,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var msg = MessageService.GetById(id);
             msg.Read = true;
-            MessageService.UpdateEntitySaved(msg);
+            MessageService.SaveChanges();
             return Content("ok");
         }
 
@@ -261,7 +261,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var msg = MessageService.GetById(id);
             msg.Read = false;
-            MessageService.UpdateEntitySaved(msg);
+            MessageService.SaveChanges();
             return Content("ok");
         }
 
@@ -286,7 +286,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult GetInternalMsgs(int page = 1, int size = 10)
         {
-            IEnumerable<InternalMessage> msgs = MessageService.LoadPageEntitiesNoTracking(page, size, out int total, m => true, m => m.Time, false);
+            IEnumerable<InternalMessage> msgs = MessageService.GetPagesNoTracking(page, size, out int total, m => true, m => m.Time, false);
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(msgs, pageCount, total);
         }
@@ -298,7 +298,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult GetUnreadMsgs()
         {
-            IEnumerable<InternalMessage> msgs = MessageService.LoadEntitiesNoTracking(m => !m.Read, m => m.Time, false);
+            IEnumerable<InternalMessage> msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false);
             return ResultData(msgs);
         }
 
@@ -321,12 +321,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public ActionResult MarkRead(int id)
         {
-            var msgs = MessageService.LoadEntities(m => m.Id <= id).ToList();
+            var msgs = MessageService.GetQuery(m => m.Id <= id).ToList();
             foreach (var t in msgs)
             {
                 t.Read = true;
             }
-            MessageService.UpdateEntities(msgs);
+
             MessageService.SaveChanges();
             return ResultData(null);
         }

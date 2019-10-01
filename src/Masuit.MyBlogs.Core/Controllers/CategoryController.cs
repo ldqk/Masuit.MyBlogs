@@ -26,7 +26,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600)]
         public ActionResult GetCategories()
         {
-            var list = CategoryService.LoadEntities<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).Cacheable().ToList();
+            var list = CategoryService.GetQuery<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).Cacheable().ToList();
             return ResultData(list);
         }
 
@@ -73,7 +73,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Category cat = CategoryService.GetById(dto.Id);
             cat.Name = dto.Name;
             cat.Description = dto.Description;
-            bool b = CategoryService.UpdateEntitySaved(cat);
+            bool b = CategoryService.SaveChanges() > 0;
             return ResultData(null, b, b ? "分类修改成功！" : "分类修改失败！");
         }
 

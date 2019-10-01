@@ -20,8 +20,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public IEnumerable<Menu> GetChildrenMenusByParentId(int id)
         {
-            //return SqlQuery<Menu>("exec sp_getChildrenMenusByParentId " + id);
-            Menu c = GetById(id);
+            Menu c = GetFromCache(m => m.Id == id);
             var menus = new List<Menu>() { c };
             GetChildrenMenusByParentId(c, menus);
             return menus;
@@ -34,7 +33,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         private void GetChildrenMenusByParentId(Menu menu, List<Menu> list)
         {
-            var menus = LoadEntitiesFromL2CacheNoTracking(x => x.ParentId == menu.Id).ToList();
+            var menus = GetQueryFromCache(x => x.ParentId == menu.Id).ToList();
             if (menus.Any())
             {
                 list.AddRange(menus);

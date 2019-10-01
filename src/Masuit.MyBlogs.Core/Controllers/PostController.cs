@@ -71,11 +71,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/{kw}"), Route("{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult Details(int id, string kw)
         {
-            var post = PostService.GetFirstEntity(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
+            var post = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             ViewBag.Keyword = post.Keyword + "," + post.Label;
             var modifyDate = post.ModifyDate;
-            ViewBag.Next = PostService.GetFirstEntity<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.Status == Status.Pended || CurrentUser.IsAdmin), p => p.ModifyDate);
-            ViewBag.Prev = PostService.GetFirstEntity<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.Status == Status.Pended || CurrentUser.IsAdmin), p => p.ModifyDate, false);
+            ViewBag.Next = PostService.GetFromCache<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.Status == Status.Pended || CurrentUser.IsAdmin), p => p.ModifyDate);
+            ViewBag.Prev = PostService.GetFromCache<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.Status == Status.Pended || CurrentUser.IsAdmin), p => p.ModifyDate, false);
             if (!string.IsNullOrEmpty(kw))
             {
                 ViewData["keywords"] = post.Content.Contains(kw) ? $"['{kw}']" : SearchEngine.LuceneIndexSearcher.CutKeywords(kw).ToJsonString();
@@ -105,9 +105,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history"), Route("{id:int}/history/{page:int}/{size:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult History(int id, int page = 1, int size = 20)
         {
-            var post = PostService.GetFirstEntity(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostOutputDto>() ?? throw new NotFoundException("文章未找到");
+            var post = PostService.GetFromCache(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostOutputDto>() ?? throw new NotFoundException("文章未找到");
             ViewBag.Primary = post;
-            var list = PostHistoryVersionService.LoadPageEntitiesNoTracking(page, size, out int total, v => v.PostId == id, v => v.ModifyDate, false).Cacheable().ToList();
+            var list = PostHistoryVersionService.GetPagesFromCache(page, size, out int total, v => v.PostId == id, v => v.ModifyDate, false).ToList();
             ViewBag.Total = total;
             ViewBag.PageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return View(list);
@@ -122,9 +122,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "hid" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult HistoryVersion(int id, int hid)
         {
-            var post = PostHistoryVersionService.GetById(hid) ?? throw new NotFoundException("文章未找到");
-            ViewBag.Next = PostHistoryVersionService.GetFirstEntityNoTracking(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
-            ViewBag.Prev = PostHistoryVersionService.GetFirstEntityNoTracking(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
+            var post = PostHistoryVersionService.GetFromCache(v => v.Id == hid) ?? throw new NotFoundException("文章未找到");
+            ViewBag.Next = PostHistoryVersionService.GetFromCache(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
+            ViewBag.Prev = PostHistoryVersionService.GetFromCache(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
             return CurrentUser.IsAdmin ? View("HistoryVersion_Admin", post) : View(post);
         }
 
@@ -138,9 +138,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "v1", "v2" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult CompareVersion(int id, int v1, int v2)
         {
-            var main = PostService.GetFirstEntity(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
-            var left = v1 <= 0 ? main : PostHistoryVersionService.GetById(v1) ?? throw new NotFoundException("文章未找到");
-            var right = v2 <= 0 ? main : PostHistoryVersionService.GetById(v2) ?? throw new NotFoundException("文章未找到");
+            var main = PostService.GetFromCache(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
+            var left = v1 <= 0 ? main : PostHistoryVersionService.GetFromCache(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
+            var right = v2 <= 0 ? main : PostHistoryVersionService.GetFromCache(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
             main.Id = id;
             var diff = new HtmlDiff.HtmlDiff(right.Content, left.Content);
             var diffOutput = diff.Build();
@@ -156,12 +156,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult VoteDown(int id)
         {
-            Post post = PostService.GetById(id);
             if (HttpContext.Session.Get("post-vote" + id) != null)
             {
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
 
+            Post post = PostService.GetById(id);
             if (post == null)
             {
                 return ResultData(null, false, "非法操作");
@@ -169,7 +169,6 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             HttpContext.Session.Set("post-vote" + id, id.GetBytes());
             post.VoteDownCount += 1;
-            PostService.UpdateEntity(post);
             var b = PostService.SaveChanges() > 0;
             return ResultData(null, b, b ? "投票成功！" : "投票失败！");
 
@@ -182,12 +181,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult VoteUp(int id)
         {
-            Post post = PostService.GetById(id);
             if (HttpContext.Session.Get("post-vote" + id) != null)
             {
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
 
+            Post post = PostService.GetById(id);
             if (post == null)
             {
                 return ResultData(null, false, "非法操作");
@@ -195,7 +194,6 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             HttpContext.Session.Set("post-vote" + id, id.GetBytes());
             post.VoteUpCount += 1;
-            PostService.UpdateEntity(post);
             var b = PostService.SaveChanges() > 0;
             return ResultData(null, b, b ? "投票成功！" : "投票失败！");
 
@@ -207,8 +205,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult Publish()
         {
-            var list = PostService.LoadEntities(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
-            ViewBag.Category = CategoryService.LoadEntitiesNoTracking(c => c.Status == Status.Available).ToList();
+            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).Cacheable().ToHashSet();
+            ViewBag.Category = CategoryService.GetQueryFromCache(c => c.Status == Status.Available).ToList();
             return View(list);
         }
 
@@ -241,7 +239,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.PostDate = DateTime.Now;
             post.ModifyDate = DateTime.Now;
             post.Content = await _imagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes());
-            ViewBag.CategoryId = new SelectList(CategoryService.LoadEntitiesNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
+            ViewBag.CategoryId = new SelectList(CategoryService.GetQueryNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
             Post p = post.Mapper<Post>();
             p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             p.Modifier = p.Author;
@@ -268,7 +266,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult GetTag()
         {
-            var list = PostService.LoadEntities(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
+            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).Cacheable().ToHashSet();
             return ResultData(list);
         }
 
@@ -279,20 +277,20 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("all"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult All()
         {
-            var tags = PostService.LoadEntities(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToList(); //tag
+            var tags = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Cacheable().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToList(); //tag
             ViewBag.tags = tags.GroupBy(t => t).OrderByDescending(g => g.Count()).ThenBy(g => g.Key);
             ViewBag.cats = CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
                 Id = c.Id,
                 Name = c.Name,
                 Count = c.Post.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin)
-            }).ToList(); //category
+            }).Cacheable().ToList(); //category
             ViewBag.seminars = SeminarService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
                 Id = c.Id,
                 Name = c.Title,
                 Count = c.Post.Count(p => p.Post.Status == Status.Pended || CurrentUser.IsAdmin)
-            }).ToList(); //seminars
+            }).Cacheable().ToList(); //seminars
             return View();
         }
 
@@ -413,7 +411,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Mapper.Map(dto, post);
                 post.PostHistoryVersion.Add(history);
                 post.ModifyDate = DateTime.Now;
-                return PostService.UpdateEntitySaved(post) ? ResultData(null, true, "你是文章原作者，无需审核，文章已自动更新并在首页展示！") : ResultData(null, false, "操作失败！");
+                return PostService.SaveChanges() > 0 ? ResultData(null, true, "你是文章原作者，无需审核，文章已自动更新并在首页展示！") : ResultData(null, false, "操作失败！");
             }
 
             #endregion
@@ -431,7 +429,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 post.PostMergeRequests.Add(merge);
             }
 
-            var b = PostService.UpdateEntitySaved(post);
+            var b = PostService.SaveChanges() > 0;
             if (!b)
             {
                 return ResultData(null, b, b ? "您的修改请求已提交，已进入审核状态，感谢您的参与！" : "操作失败！");
@@ -462,7 +460,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             Post post = PostService.GetById(id);
             post.IsFixedTop = !post.IsFixedTop;
-            bool b = PostService.UpdateEntitySaved(post);
+            bool b = PostService.SaveChanges() > 0;
             if (b)
             {
                 return ResultData(null, true, post.IsFixedTop ? "置顶成功！" : "取消置顶成功！");
@@ -483,7 +481,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.Status = Status.Pended;
             post.ModifyDate = DateTime.Now;
             post.PostDate = DateTime.Now;
-            bool b = PostService.UpdateEntitySaved(post);
+            bool b = PostService.SaveChanges() > 0;
             if (!b)
             {
                 return ResultData(null, false, "审核失败！");
@@ -494,7 +492,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, true, "审核通过！");
             }
 
-            var cast = BroadcastService.LoadEntities(c => c.Status == Status.Subscribed).ToList();
+            var cast = BroadcastService.GetQuery(c => c.Status == Status.Subscribed).ToList();
             var link = Request.Scheme + "://" + Request.Host + "/" + id;
             cast.ForEach(c =>
             {
@@ -529,7 +527,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var post = PostService.GetById(id);
             post.Status = Status.Deleted;
-            bool b = PostService.UpdateEntitySaved(post);
+            bool b = PostService.SaveChanges() > 0;
             SearchEngine.LuceneIndexer.Delete(post);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
@@ -544,7 +542,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var post = PostService.GetById(id);
             post.Status = Status.Pended;
-            bool b = PostService.UpdateEntitySaved(post);
+            bool b = PostService.SaveChanges() > 0;
             return ResultData(null, b, b ? "恢复成功！" : "恢复失败！");
         }
 
@@ -623,7 +621,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "")
         {
             IOrderedQueryable<Post> temp;
-            var query = string.IsNullOrEmpty(kw) ? PostService.GetAll() : PostService.LoadEntities(p => p.Title.Contains(kw) || p.Author.Contains(kw) || p.Email.Contains(kw) || p.Label.Contains(kw) || p.Content.Contains(kw));
+            var query = string.IsNullOrEmpty(kw) ? PostService.GetAll() : PostService.GetQuery(p => p.Title.Contains(kw) || p.Author.Contains(kw) || p.Email.Contains(kw) || p.Label.Contains(kw) || p.Content.Contains(kw));
             var total = query.Count();
             var order = query.OrderByDescending(p => p.Status).ThenByDescending(p => p.IsFixedTop);
             switch (orderby)
@@ -669,7 +667,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(search) || p.Author.Contains(search) || p.Email.Contains(search) || p.Label.Contains(search));
             }
 
-            var temp = PostService.LoadPageEntitiesNoTracking(page, size, out var total, where, p => p.Id);
+            var temp = PostService.GetPagesNoTracking(page, size, out var total, where, p => p.Id);
             var list = temp.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).ProjectTo<PostDataModel>(MapperConfig).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
@@ -734,7 +732,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 p.Seminar.Clear();
                 tmp.ForEach(s =>
                 {
-                    var seminar = SeminarService.GetFirstEntity(e => e.Title.Equals(s));
+                    var seminar = SeminarService.Get(e => e.Title.Equals(s));
                     if (seminar != null)
                     {
                         p.Seminar.Add(new SeminarPost()
@@ -748,39 +746,39 @@ namespace Masuit.MyBlogs.Core.Controllers
                 });
             }
 
-            bool b = PostService.UpdateEntitySaved(p);
-            if (b)
+            bool b = PostService.SaveChanges() > 0;
+            if (!b)
             {
-#if !DEBUG
-                if (notify && "false" == CommonHelper.SystemSettings["DisabledEmailBroadcast"])
-                {
-                    var cast = BroadcastService.LoadEntities(c => c.Status == Status.Subscribed).ToList();
-                    string link = Request.Scheme + "://" + Request.Host + "/" + p.Id;
-                    cast.ForEach(c =>
-                    {
-                        var ts = DateTime.Now.GetTotalMilliseconds();
-                        string content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "broadcast.html"))
-                            .Replace("{{link}}", link + "?email=" + c.Email)
-                            .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
-                            .Replace("{{title}}", post.Title)
-                            .Replace("{{author}}", post.Author)
-                            .Replace("{{content}}", post.Content.RemoveHtmlTag(150))
-                            .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
-                            {
-                                c.Email,
-                                act = "cancel",
-                                validate = c.ValidateCode,
-                                timespan = ts,
-                                hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
-                            }, Request.Scheme));
-                        BackgroundJob.Schedule(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
-                    });
-                }
-#endif
-                return ResultData(p.Mapper<PostOutputDto>(), message: "文章修改成功！");
+                return ResultData(null, false, "文章修改失败！");
             }
 
-            return ResultData(null, false, "文章修改失败！");
+#if !DEBUG
+            if (notify && "false" == CommonHelper.SystemSettings["DisabledEmailBroadcast"])
+            {
+                var cast = BroadcastService.GetQuery(c => c.Status == Status.Subscribed).ToList();
+                string link = Request.Scheme + "://" + Request.Host + "/" + p.Id;
+                cast.ForEach(c =>
+                {
+                    var ts = DateTime.Now.GetTotalMilliseconds();
+                    string content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "broadcast.html"))
+                        .Replace("{{link}}", link + "?email=" + c.Email)
+                        .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
+                        .Replace("{{title}}", post.Title)
+                        .Replace("{{author}}", post.Author)
+                        .Replace("{{content}}", post.Content.RemoveHtmlTag(150))
+                        .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
+                        {
+                            c.Email,
+                            act = "cancel",
+                            validate = c.ValidateCode,
+                            timespan = ts,
+                            hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
+                        }, Request.Scheme));
+                    BackgroundJob.Schedule(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
+                });
+            }
+#endif
+            return ResultData(p.Mapper<PostOutputDto>(), message: "文章修改成功！");
         }
 
         /// <summary>
@@ -871,7 +869,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, true, "文章发表成功！");
             }
-            var cast = BroadcastService.LoadEntities(c => c.Status == Status.Subscribed).ToList();
+            var cast = BroadcastService.GetQuery(c => c.Status == Status.Subscribed).ToList();
             string link = Request.Scheme + "://" + Request.Host + "/" + p.Id;
             cast.ForEach(c =>
             {
@@ -912,7 +910,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 SeminarId = seminar.Id,
                 PostId = post.Id
             });
-            bool b = PostService.UpdateEntitySaved(post);
+            bool b = PostService.SaveChanges() > 0;
             return ResultData(null, b, b ? $"已将文章【{post.Title}】添加到专题【{seminar.Title}】" : "添加失败");
         }
 
@@ -934,7 +932,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 SeminarId = seminar.Id,
                 PostId = post.Id
             });
-            bool b = PostService.UpdateEntitySaved(post);
+            bool b = PostService.SaveChanges() > 0;
             return ResultData(null, b, b ? $"已将文章【{post.Title}】从【{seminar.Title}】专题移除" : "添加失败");
         }
 
@@ -981,7 +979,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     SeminarId = s.SeminarId
                 });
             }
-            bool b = PostHistoryVersionService.UpdateEntitySaved(history);
+            bool b = PostHistoryVersionService.SaveChanges() > 0;
             PostHistoryVersionService.DeleteByIdSaved(id);
             return ResultData(null, b, b ? "回滚成功" : "回滚失败");
 
@@ -999,7 +997,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (post != null)
             {
                 post.DisableComment = !post.DisableComment;
-                return ResultData(null, PostService.UpdateEntitySaved(post), post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
+                return ResultData(null, PostService.SaveChanges() > 0, post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
             }
 
             return ResultData(null, false, "文章不存在");

@@ -142,7 +142,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [AllowAnonymous]
         public ActionResult GetSetting(string name)
         {
-            var entity = SystemSettingService.GetFirstEntity(s => s.Name.Equals(name));
+            var entity = SystemSettingService.Get(s => s.Name.Equals(name));
             return ResultData(entity);
         }
 
@@ -156,7 +156,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             SystemSetting[] settings = JsonConvert.DeserializeObject<List<SystemSetting>>(sets).ToArray();
             foreach (var set in settings)
             {
-                var entry = SystemSettingService.GetFirstEntity(s => s.Name.Equals(set.Name));
+                var entry = SystemSettingService.Get(s => s.Name.Equals(set.Name));
                 if (entry is null)
                 {
                     SystemSettingService.AddEntity(set);
@@ -164,7 +164,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 else
                 {
                     entry.Value = set.Value;
-                    SystemSettingService.UpdateEntity(entry);
                 }
             }
 

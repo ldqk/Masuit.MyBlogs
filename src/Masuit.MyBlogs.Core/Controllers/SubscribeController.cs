@@ -70,7 +70,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var posts = PostService.LoadEntitiesNoTracking(p => p.Status == Status.Pended && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
+            var posts = PostService.GetQueryNoTracking(p => p.Status == Status.Pended && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
             {
                 Author = new Author
                 {
@@ -114,7 +114,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, false, CommonHelper.SystemSettings["DisabledEmailBroadcastTip"]);
             }
-            Broadcast entity = BroadcastService.GetFirstEntity(b => b.Email.Equals(email, StringComparison.InvariantCultureIgnoreCase));
+            Broadcast entity = BroadcastService.Get(b => b.Email.Equals(email, StringComparison.InvariantCultureIgnoreCase));
             var guid = Guid.NewGuid();
             if (entity != null)
             {
@@ -124,7 +124,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
                 entity.ValidateCode = guid.ToString();
                 entity.UpdateTime = DateTime.Now;
-                BroadcastService.UpdateEntity(entity);
             }
             else
             {
@@ -175,7 +174,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost]
         public ActionResult Cancel(string email)
         {
-            Broadcast c = BroadcastService.GetFirstEntity(b => b.Email.Equals(email) && b.Status == Status.Subscribed);
+            Broadcast c = BroadcastService.Get(b => b.Email.Equals(email) && b.Status == Status.Subscribed);
             if (c != null)
             {
                 var ts = DateTime.Now.GetTotalMilliseconds();
@@ -214,7 +213,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return Content("操作失败，链接已被非法篡改");
             }
-            Broadcast entity = BroadcastService.GetFirstEntity(b => b.Email.Equals(email, StringComparison.InvariantCultureIgnoreCase) && b.ValidateCode.Equals(validate));
+            Broadcast entity = BroadcastService.Get(b => b.Email.Equals(email, StringComparison.InvariantCultureIgnoreCase) && b.ValidateCode.Equals(validate));
             if (entity == null)
             {
                 return Content("该邮箱账户未使用邮件订阅！");
@@ -226,13 +225,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                     entity.Status = Status.Subscribed;
                     entity.ValidateCode = Guid.NewGuid().ToString();
                     entity.UpdateTime = DateTime.Now;
-                    BroadcastService.UpdateEntity(entity);
                     BroadcastService.SaveChanges();
                     return Content("订阅成功！");
                 case "cancel":
                     entity.Status = Status.Canceled;
                     entity.UpdateTime = DateTime.Now;
-                    BroadcastService.UpdateEntity(entity);
                     BroadcastService.SaveChanges();
                     return Content("取消订阅成功，您将不会再接收到文章更新，如果您以后需要再次接收更新推送，可以到主站点重新进行订阅操作！");
                 default: return RedirectToAction("Index", "Home");
@@ -251,7 +248,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Save(Broadcast model)
         {
             model.UpdateTime = DateTime.Now;
-            var entry = BroadcastService.GetFirstEntity(c => c.Email.Equals(model.Email));
+            var entry = BroadcastService.Get(c => c.Email.Equals(model.Email));
             bool b;
             if (entry is null)
             {
@@ -262,7 +259,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 entry.Email = model.Email;
                 entry.SubscribeType = model.SubscribeType;
                 entry.UpdateTime = DateTime.Now;
-                b = BroadcastService.UpdateEntitySaved(entry);
+                b = BroadcastService.SaveChanges() > 0;
             }
             return ResultData(model, b, b ? "更新订阅成功！" : "更新订阅失败！");
         }
@@ -291,7 +288,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Status status = cast.Status;
             cast.UpdateTime = DateTime.Now;
             cast.Status = status == Status.Subscribed ? Status.Subscribing : Status.Subscribed;
-            bool b = BroadcastService.UpdateEntitySaved(cast);
+            bool b = BroadcastService.SaveChanges() > 0;
             return ResultData(null, b, status == Status.Subscribed ? "订阅成功" : "取消订阅成功！");
         }
 
@@ -317,12 +314,13 @@ namespace Masuit.MyBlogs.Core.Controllers
             int total;
             if (string.IsNullOrEmpty(search))
             {
-                list = BroadcastService.LoadPageEntitiesFromL2CacheNoTracking(page, size, out total, b => true, b => b.UpdateTime, false).ToList();
+                list = BroadcastService.GetPagesFromCache(page, size, out total, b => true, b => b.UpdateTime, false).ToList();
             }
             else
             {
-                list = BroadcastService.LoadPageEntitiesFromL2CacheNoTracking(page, size, out total, b => b.Email.Contains(search), b => b.UpdateTime, false).ToList();
+                list = BroadcastService.GetPagesFromCache(page, size, out total, b => b.Email.Contains(search), b => b.UpdateTime, false).ToList();
             }
+
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return Ok(new PageDataModel(list, pageCount, total));
         }

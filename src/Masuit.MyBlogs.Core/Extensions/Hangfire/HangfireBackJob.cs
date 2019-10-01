@@ -82,13 +82,13 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             };
             var u = _userInfoService.GetByUsername(userInfo.Username);
             u.LoginRecord.Add(record);
-            _userInfoService.UpdateEntitySaved(u);
+            _userInfoService.SaveChanges();
             var content = File.ReadAllText(Path.Combine(_hostingEnvironment.WebRootPath, "template", "login.html"))
                 .Replace("{{name}}", u.Username)
                 .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Replace("{{ip}}", record.IP)
                 .Replace("{{address}}", record.PhysicAddress);
-            CommonHelper.SendMail(_settingService.GetFirstEntity(s => s.Name.Equals("Title")).Value + "账号登录通知", content, _settingService.GetFirstEntity(s => s.Name.Equals("ReceiveEmail")).Value);
+            CommonHelper.SendMail(_settingService.Get(s => s.Name.Equals("Title")).Value + "账号登录通知", content, _settingService.Get(s => s.Name.Equals("ReceiveEmail")).Value);
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 post.Status = Status.Pended;
                 post.PostDate = DateTime.Now;
                 post.ModifyDate = DateTime.Now;
-                _postService.UpdateEntitySaved(post);
+                _postService.SaveChanges();
             }
         }
 
@@ -128,7 +128,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
 
             post.TotalViewCount += 1;
             post.AverageViewCount = post.TotalViewCount / (DateTime.Now - post.PostDate).TotalDays;
-            _postService.UpdateEntity(post);
             _postService.SaveChanges();
         }
 
@@ -170,7 +169,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// </summary>
         public void CheckLinks()
         {
-            var links = _linksService.LoadEntities(l => !l.Except).AsParallel();
+            var links = _linksService.GetQuery(l => !l.Except).AsParallel();
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
             client.DefaultRequestHeaders.Referrer = new Uri("https://masuit.com");
@@ -194,8 +193,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                     {
                         link.Status = Status.Unavailable;
                     }
-
-                    _linksService.UpdateEntity(link);
                 }).Wait();
             });
             _linksService.SaveChanges();
@@ -208,7 +205,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void UpdateLinkWeight(string referer)
         {
             var uri = new Uri(referer);
-            var query = _linksService.LoadEntities(l => l.Url.Contains(uri.Host));
+            var query = _linksService.GetQuery(l => l.Url.Contains(uri.Host));
             if (query.Any())
             {
                 var list = query.ToList();
@@ -240,7 +237,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void StatisticsSearchKeywords()
         {
             var start = DateTime.Today.AddMonths(-1);
-            var temp = _searchDetailsService.LoadEntitiesNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).ToList();
+            var temp = _searchDetailsService.GetQueryNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).ToList();
             var month = temp.GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(30).Select(g => new
             {
                 Keywords = g.FirstOrDefault().KeyWords,

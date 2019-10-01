@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+﻿using EFSecondLevelCache.Core;
+using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -43,26 +44,26 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetMessages()
         {
-            var post = PostService.LoadEntitiesFromL2CacheNoTracking(p => p.Status == Status.Pending).Select(p => new
+            var post = PostService.GetQuery(p => p.Status == Status.Pending).Select(p => new
             {
                 p.Id,
                 p.Title,
                 p.PostDate,
                 p.Author
-            });
-            var msgs = LeaveMessageService.LoadEntitiesFromL2CacheNoTracking(m => m.Status == Status.Pending).Select(p => new
+            }).Cacheable();
+            var msgs = LeaveMessageService.GetQuery(m => m.Status == Status.Pending).Select(p => new
             {
                 p.Id,
                 p.PostDate,
                 p.NickName
-            });
-            var comments = CommentService.LoadEntitiesFromL2CacheNoTracking(c => c.Status == Status.Pending).Select(p => new
+            }).Cacheable();
+            var comments = CommentService.GetQuery(c => c.Status == Status.Pending).Select(p => new
             {
                 p.Id,
                 p.CommentDate,
                 p.PostId,
                 p.NickName
-            });
+            }).Cacheable();
             return ResultData(new
             {
                 post,

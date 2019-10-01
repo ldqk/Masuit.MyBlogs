@@ -100,7 +100,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult SearchList(int page = 1, int size = 10, string search = "")
         {
             var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.KeyWords.Contains(search);
-            var list = SearchDetailsService.LoadPageEntities<DateTime, SearchDetailsOutputDto>(page, size, out int total, where, s => s.SearchTime, false).ToList();
+            var list = SearchDetailsService.GetPages<DateTime, SearchDetailsOutputDto>(page, size, out int total, where, s => s.SearchTime, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }

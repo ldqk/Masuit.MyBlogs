@@ -24,7 +24,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetPageData(int page = 1, int size = 10)
         {
-            var list = DonateService.LoadPageEntitiesFromL2CacheNoTracking(page, size, out int total, d => true, d => d.DonateTime, false).ToList();
+            var list = DonateService.GetPagesFromCache(page, size, out int total, d => true, d => d.DonateTime, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }
@@ -63,7 +63,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 entry.QQorWechat = donate.QQorWechat;
                 entry.QQorWechatDisplay = donate.QQorWechatDisplay;
                 entry.Via = donate.Via;
-                b = DonateService.UpdateEntitySaved(entry);
+                b = DonateService.SaveChanges() > 0;
             }
             return ResultData(null, b, b ? "保存成功！" : "保存失败！");
         }

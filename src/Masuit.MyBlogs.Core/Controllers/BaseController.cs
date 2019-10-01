@@ -142,10 +142,10 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             #region 准备页面数据模型
 
-            ViewBag.menus = MenuService.LoadEntitiesFromL2Cache<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
+            ViewBag.menus = MenuService.GetQueryFromCache<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
             PageFootViewModel model = new PageFootViewModel //页脚
             {
-                Links = LinksService.LoadEntities(l => l.Status == Status.Available, l => l.Recommend, false).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(40).ProjectTo<LinksOutputDto>(MapperConfig).Cacheable().ToList()
+                Links = LinksService.GetQuery(l => l.Status == Status.Available, l => l.Recommend, false).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(40).ProjectTo<LinksOutputDto>(MapperConfig).Cacheable().ToList()
             };
             ViewBag.Footer = model;
 

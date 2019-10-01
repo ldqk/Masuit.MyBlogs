@@ -20,8 +20,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public IEnumerable<LeaveMessage> GetSelfAndAllChildrenMessagesByParentId(int id)
         {
-            //return SqlQuery<LeaveMessage>("exec sp_getChildrenLeaveMsgByParentId " + id);
-            LeaveMessage c = GetById(id);
+            LeaveMessage c = GetFromCache(m => m.Id == id);
             var msgs = new List<LeaveMessage>() { c };
             GetSelfAndAllChildrenMessagesByParentId(c, msgs);
             return msgs;
@@ -34,7 +33,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         private void GetSelfAndAllChildrenMessagesByParentId(LeaveMessage msg, List<LeaveMessage> list)
         {
-            var msgs = LoadEntitiesFromL2CacheNoTracking(x => x.ParentId == msg.Id).ToList();
+            var msgs = GetQueryFromCache(x => x.ParentId == msg.Id).ToList();
             if (msgs.Any())
             {
                 list.AddRange(msgs);
@@ -52,7 +51,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public int GetParentMessageIdByChildId(int id)
         {
-            LeaveMessage msg = GetById(id);
+            LeaveMessage msg = GetFromCache(m => m.Id == id);
             if (msg != null)
             {
                 return GetParentMessageIdByChildId(msg);
@@ -67,7 +66,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         private int GetParentMessageIdByChildId(LeaveMessage m)
         {
-            LeaveMessage msg = GetFirstEntityNoTracking(c => c.Id == m.ParentId);
+            LeaveMessage msg = GetNoTracking(c => c.Id == m.ParentId);
             if (msg != null)
             {
                 return GetParentMessageIdByChildId(msg);
