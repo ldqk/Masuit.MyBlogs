@@ -25,19 +25,6 @@
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 		}
 	});
-	$('.field').dropdown({
-		allowAdditions: false,
-		onChange: function (value) {
-			var state = ["Author", "Email", "Status", "VoteUpCount", "VoteDownCount"];
-			state.map(function (item, index, array) {
-				$scope[item] = false;
-			});
-			value.split(",").map(function (item, index, array) {
-				$scope[item] = true;
-			});
-			self.tableParams.reload();
-		}
-	});
 	this.GetPageData = function (page, size) {
 		$scope.loading();
 		$http.post("/post/getpagedata", {

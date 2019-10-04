@@ -105,9 +105,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history"), Route("{id:int}/history/{page:int}/{size:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult History(int id, int page = 1, int size = 20)
         {
-            var post = PostService.GetFromCache(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostOutputDto>() ?? throw new NotFoundException("文章未找到");
+            var post = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostOutputDto>() ?? throw new NotFoundException("文章未找到");
             ViewBag.Primary = post;
-            var list = PostHistoryVersionService.GetPagesFromCache(page, size, out int total, v => v.PostId == id, v => v.ModifyDate, false).ToList();
+            var list = PostHistoryVersionService.GetPages(page, size, out int total, v => v.PostId == id, v => v.ModifyDate, false).ToList();
             ViewBag.Total = total;
             ViewBag.PageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return View(list);
@@ -122,9 +122,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "hid" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult HistoryVersion(int id, int hid)
         {
-            var post = PostHistoryVersionService.GetFromCache(v => v.Id == hid) ?? throw new NotFoundException("文章未找到");
-            ViewBag.Next = PostHistoryVersionService.GetFromCache(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
-            ViewBag.Prev = PostHistoryVersionService.GetFromCache(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
+            var post = PostHistoryVersionService.Get(v => v.Id == hid) ?? throw new NotFoundException("文章未找到");
+            ViewBag.Next = PostHistoryVersionService.Get(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
+            ViewBag.Prev = PostHistoryVersionService.Get(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
             return CurrentUser.IsAdmin ? View("HistoryVersion_Admin", post) : View(post);
         }
 
@@ -138,9 +138,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "v1", "v2" }, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult CompareVersion(int id, int v1, int v2)
         {
-            var main = PostService.GetFromCache(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
-            var left = v1 <= 0 ? main : PostHistoryVersionService.GetFromCache(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
-            var right = v2 <= 0 ? main : PostHistoryVersionService.GetFromCache(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
+            var main = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
+            var left = v1 <= 0 ? main : PostHistoryVersionService.Get(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
+            var right = v2 <= 0 ? main : PostHistoryVersionService.Get(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
             main.Id = id;
             var diff = new HtmlDiff.HtmlDiff(right.Content, left.Content);
             var diffOutput = diff.Build();
@@ -277,7 +277,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("all"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
         public ActionResult All()
         {
-            var tags = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Cacheable().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToList(); //tag
+            var tags = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).SelectMany(s => s.Split(',', '，')).OrderBy(s => s).Cacheable().ToList(); //tag
             ViewBag.tags = tags.GroupBy(t => t).OrderByDescending(g => g.Count()).ThenBy(g => g.Key);
             ViewBag.cats = CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {

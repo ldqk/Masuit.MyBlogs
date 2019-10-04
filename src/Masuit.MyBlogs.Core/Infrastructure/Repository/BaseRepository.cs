@@ -264,7 +264,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>实体</returns>
-        public T GetFromCache(Expression<Func<T, bool>> @where)
+        public virtual T GetFromCache(Expression<Func<T, bool>> @where)
         {
             return DataContext.Set<T>().Where(where).Cacheable().FirstOrDefault();
         }
@@ -290,7 +290,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>实体</returns>
-        public T GetFromCache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
+        public virtual T GetFromCache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return isAsc ? DataContext.Set<T>().OrderBy(orderby).Where(where).Cacheable().FirstOrDefault() : DataContext.Set<T>().OrderByDescending(orderby).Where(where).Cacheable().FirstOrDefault();
         }
@@ -304,7 +304,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>映射实体</returns>
-        public TDto GetFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
+        public virtual TDto GetFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
             return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ProjectTo<TDto>(MapperConfig).Cacheable().FirstOrDefault() : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ProjectTo<TDto>(MapperConfig).Cacheable().FirstOrDefault(); ;
         }
@@ -370,7 +370,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>实体</returns>
-        public TDto GetFromCache<TDto>(Expression<Func<T, bool>> @where) where TDto : class
+        public virtual TDto GetFromCache<TDto>(Expression<Func<T, bool>> @where) where TDto : class
         {
             return DataContext.Set<T>().Where(where).ProjectTo<TDto>(MapperConfig).Cacheable().FirstOrDefault();
         }

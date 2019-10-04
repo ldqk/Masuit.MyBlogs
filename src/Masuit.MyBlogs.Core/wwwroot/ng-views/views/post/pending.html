@@ -10,24 +10,24 @@
             </div>
         </div>
     </div>
-    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed editable-table listTable" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed listTable" ng-form="list.tableForm" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'标题'" filter="{Title: 'text'}" sortable="'Title'">
+            <td title="'标题'">
                 <a href="/{{row.Id}}" target="_blank">{{row.Title}}</a>
             </td>
-            <td title="'作者'" filter="{Author: 'text'}" sortable="'Author'" ng-if="Author">
+            <td title="'作者'">
                 {{row.Author}}
             </td>
-            <td title="'发表'" filter="{PostDate: 'text'}" sortable="'PostDate'">
+            <td title="'发表'">
                 {{row.PostDate|date:'yyyy-MM-dd HH:mm:ss'}}
             </td>
-            <td title="'分类'" filter="{CategoryName: 'text'}" sortable="'CategoryName'">
+            <td title="'分类'">
                 {{row.CategoryName}}
             </td>
-            <td title="'作者邮箱'" filter="{Email: 'text'}" sortable="'Email'" ng-if="Email">
+            <td title="'作者邮箱'">
                 {{row.Email}}
             </td>
-            <td title="'标签'" filter="{Label: 'text'}" sortable="'Label'">
+            <td title="'标签'">
                 {{row.Label}}
             </td>
             <td title="'操作'" style="width: 155px;">

@@ -25,7 +25,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// 从二级缓存获取所有实体
         /// </summary>
         /// <returns>还未执行的SQL语句</returns>
-        EFCachedDbSet<T> GetAllFromCache();
+        IEnumerable<T> GetAllFromCache();
 
         /// <summary>
         /// 获取所有实体

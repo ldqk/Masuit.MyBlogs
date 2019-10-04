@@ -49,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// 从二级缓存获取所有实体
         /// </summary>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual EFCachedDbSet<T> GetAllFromCache()
+        public virtual IEnumerable<T> GetAllFromCache()
         {
             return BaseDal.GetAllFromCache();
         }

@@ -30,29 +30,17 @@
                 </div>
             </div>
         </div>
-        <div class="input-group">
-            <span class="input-group-addon">显示字段：</span>
-            <div class="ui multiple search selection dropdown field">
-                <input type="hidden" id="field">
-                <i class="dropdown icon"></i>
-                <div class="default text">选择字段</div>
-                <div class="menu">
-                    <div class="item" data-value="Author">作者</div>
-                    <div class="item" data-value="Email">作者邮箱</div>
-                    <div class="item" data-value="VoteUpCount">支持数</div>
-                    <div class="item" data-value="VoteDownCount">反对数</div>
-                    <div class="item" data-value="Status">状态</div>
-                </div>
-            </div>
-        </div>
     </div>
-    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed editable-table listTable" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
+    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed listTable" ng-form="list.tableForm" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
             <td title="'标题'">
                 <a ng-href="/{{row.Id}}" target="_blank">{{row.Title}}</a>
             </td>
-            <td title="'作者'" ng-if="Author">
+            <td title="'作者'">
                 {{row.Author}}
+            </td>
+            <td title="'作者邮箱'">
+                {{row.Email}}
             </td>
             <td title="'阅读'">
                 {{row.ViewCount}}
@@ -69,19 +57,13 @@
             <td title="'分类'">
                 {{row.CategoryName}}
             </td>
-            <td title="'作者邮箱'" ng-if="Email">
-                {{row.Email}}
-            </td>
             <td title="'标签'">
                 {{row.Label}}
             </td>
-            <td title="'支持'" ng-if="VoteUpCount">
+            <td title="'支持'">
                 {{row.VoteUpCount}}
             </td>
-            <td title="'反对'" ng-if="VoteDownCount">
-                {{row.VoteDownCount}}
-            </td>
-            <td title="'状态'" ng-if="Status">
+            <td title="'状态'">
                 {{row.Status}}
             </td>
             <td title="'禁止评论'">
