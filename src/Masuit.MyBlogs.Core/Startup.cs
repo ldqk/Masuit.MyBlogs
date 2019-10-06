@@ -174,7 +174,6 @@ namespace Masuit.MyBlogs.Core
                 options.EnableForHttps = true;
                 options.Providers.Add<BrotliCompressionProvider>();
                 options.Providers.Add<GzipCompressionProvider>();
-                options.Providers.Add<CustomCompressionProvider>();
                 options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
                 {
                     "text/html; charset=utf-8",
@@ -275,18 +274,6 @@ namespace Masuit.MyBlogs.Core
         }
     }
 
-    public class CustomCompressionProvider : ICompressionProvider
-    {
-        public string EncodingName => "mycustomcompression";
-        public bool SupportsFlush => true;
-
-        public Stream CreateStream(Stream outputStream)
-        {
-            // Create a custom compression stream wrapper here
-            return outputStream;
-        }
-    }
-
     /// <summary>
     /// hangfire授权拦截器
     /// </summary>
@@ -302,7 +289,7 @@ namespace Masuit.MyBlogs.Core
 #if DEBUG
             return true;
 #endif
-            UserInfoOutputDto user = context.GetHttpContext().Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            var user = context.GetHttpContext().Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
             return user.IsAdmin;
         }
     }
