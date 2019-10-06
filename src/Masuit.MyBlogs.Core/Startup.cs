@@ -117,7 +117,7 @@ namespace Masuit.MyBlogs.Core
             services.AddEFSecondLevelCache();
             // 配置EF二级缓存策略
             services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
-            services.AddSingleton(new CacheManager.Core.ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Sliding, TimeSpan.FromMinutes(10)).Build());
+            services.AddSingleton(new CacheManager.Core.ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10)).Build());
             services.AddSevenZipCompressor().AddResumeFileResult().AddSearchEngine<DataContext>(new LuceneIndexerOptions()
             {
                 Path = "lucene"
