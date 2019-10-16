@@ -76,8 +76,8 @@ namespace Masuit.MyBlogs.Core
             AppConfig.BaiduAK = configuration[nameof(AppConfig.BaiduAK)];
             AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
             configuration.Bind("Imgbed:AliyunOSS", AppConfig.AliOssConfig);
-            configuration.Bind("Imgbed:Gitlab", AppConfig.GitlabConfig);
             configuration.Bind("Imgbed:Gitee", AppConfig.GiteeConfig);
+            configuration.Bind("Imgbed:Gitlabs", AppConfig.GitlabConfigs);
         }
 
         /// <summary>
@@ -124,6 +124,7 @@ namespace Masuit.MyBlogs.Core
             }); // 配置7z和断点续传和Redis和Lucene搜索引擎
 
             services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)); //注入HttpClient
+            services.AddTransient<ImagebedClient>();
             services.AddHttpContextAccessor(); //注入静态HttpContext
 
             services.AddMvc(options =>

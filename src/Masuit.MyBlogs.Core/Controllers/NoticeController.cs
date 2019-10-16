@@ -14,7 +14,6 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -31,16 +30,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public IHostingEnvironment HostingEnvironment { get; set; }
 
-        private readonly ImagebedClient _imagebedClient;
-
-        /// <summary>
-        /// 网站公告
-        /// </summary>
-        /// <param name="httpClientFactory"></param>
-        public NoticeController(IHttpClientFactory httpClientFactory)
-        {
-            _imagebedClient = new ImagebedClient(httpClientFactory.CreateClient());
-        }
+        public ImagebedClient ImagebedClient { get; set; }
 
         /// <summary>
         /// 公告列表
@@ -93,7 +83,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public async Task<ActionResult> Write(Notice notice)
         {
-            notice.Content = await _imagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes());
+            notice.Content = await ImagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes());
             Notice e = NoticeService.AddEntitySaved(notice);
             if (e != null)
             {
@@ -143,7 +133,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var entity = NoticeService.GetById(notice.Id);
             entity.ModifyDate = DateTime.Now;
             entity.Title = notice.Title;
-            entity.Content = await _imagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes());
+            entity.Content = await ImagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes());
             bool b = NoticeService.SaveChanges() > 0;
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }

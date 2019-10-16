@@ -30,7 +30,6 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -51,16 +50,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public IHostingEnvironment HostingEnvironment { get; set; }
         public ISearchEngine<DataContext> SearchEngine { get; set; }
-        private readonly ImagebedClient _imagebedClient;
-
-        /// <summary>
-        /// 文章管理
-        /// </summary>
-        /// <param name="httpClientFactory"></param>
-        public PostController(IHttpClientFactory httpClientFactory)
-        {
-            _imagebedClient = new ImagebedClient(httpClientFactory.CreateClient());
-        }
+        public ImagebedClient ImagebedClient { get; set; }
 
         /// <summary>
         /// 文章详情页
@@ -238,7 +228,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.Status = Status.Pending;
             post.PostDate = DateTime.Now;
             post.ModifyDate = DateTime.Now;
-            post.Content = await _imagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes());
+            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes());
             ViewBag.CategoryId = new SelectList(CategoryService.GetQueryNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
             Post p = post.Mapper<Post>();
             p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
@@ -527,7 +517,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var post = PostService.GetById(id);
             post.Status = Status.Deleted;
-            bool b = PostService.SaveChanges() > 0;
+            bool b = SearchEngine.SaveChanges() > 0;
             SearchEngine.LuceneIndexer.Delete(post);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
@@ -683,7 +673,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, Authority]
         public async Task<ActionResult> Edit(PostInputDto post, bool notify = true, bool reserve = true)
         {
-            post.Content = await _imagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
+            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
                 return ResultData(null, message: "请选择一个分类");
@@ -791,7 +781,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority, HttpPost]
         public async Task<ActionResult> Write(PostInputDto post, DateTime? timespan, bool schedule = false)
         {
-            post.Content = await _imagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
+            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
                 return ResultData(null, message: "请选择一个分类");

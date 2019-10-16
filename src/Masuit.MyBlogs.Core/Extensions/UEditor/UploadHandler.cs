@@ -1,9 +1,9 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -49,22 +49,20 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 {
                     using (Stream stream = file.OpenReadStream())
                     {
-                        using (var httpClient = new HttpClient())
+                        var (url, success) = Startup.AutofacContainer.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath).Result;
+                        if (success)
                         {
-                            var (url, success) = new ImagebedClient(httpClient).UploadImage(stream, localPath).Result;
-                            if (success)
+                            Result.Url = url;
+                        }
+                        else
+                        {
+                            if (!Directory.Exists(Path.GetDirectoryName(localPath)))
                             {
-                                Result.Url = url;
+                                Directory.CreateDirectory(Path.GetDirectoryName(localPath));
                             }
-                            else
-                            {
-                                if (!Directory.Exists(Path.GetDirectoryName(localPath)))
-                                {
-                                    Directory.CreateDirectory(Path.GetDirectoryName(localPath));
-                                }
-                                File.WriteAllBytes(localPath, stream.ToByteArray());
-                                Result.Url = savePath;
-                            }
+
+                            File.WriteAllBytes(localPath, stream.ToByteArray());
+                            Result.Url = savePath;
                         }
                     }
                 }

@@ -12,7 +12,6 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -33,16 +32,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IDonateService DonateService { get; set; }
 
         public IHostingEnvironment HostingEnvironment { get; set; }
-        private readonly ImagebedClient _imagebedClient;
-
-        /// <summary>
-        /// 杂项页
-        /// </summary>
-        /// <param name="httpClientFactory"></param>
-        public MiscController(IHttpClientFactory httpClientFactory)
-        {
-            _imagebedClient = new ImagebedClient(httpClientFactory.CreateClient());
-        }
+        public ImagebedClient ImagebedClient { get; set; }
 
         /// <summary>
         /// 杂项页
@@ -116,7 +106,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Authority]
         public async Task<ActionResult> Write(Misc model)
         {
-            model.Content = await _imagebedClient.ReplaceImgSrc(model.Content.Trim().ClearImgAttributes());
+            model.Content = await ImagebedClient.ReplaceImgSrc(model.Content.Trim().ClearImgAttributes());
             var e = MiscService.AddEntitySaved(model);
             if (e != null)
             {
@@ -166,7 +156,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var entity = MiscService.GetById(misc.Id);
             entity.ModifyDate = DateTime.Now;
             entity.Title = misc.Title;
-            entity.Content = await _imagebedClient.ReplaceImgSrc(misc.Content.ClearImgAttributes());
+            entity.Content = await ImagebedClient.ReplaceImgSrc(misc.Content.ClearImgAttributes());
             bool b = MiscService.SaveChanges() > 0;
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }

@@ -1,6 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using System.Linq;
@@ -75,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 using (var stream = response.Content.ReadAsStreamAsync().Result)
                 {
                     var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
-                    var (url, success) = new ImagebedClient(_httpClient).UploadImage(stream, savePath).Result;
+                    var (url, success) = Startup.AutofacContainer.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath).Result;
                     if (success)
                     {
                         ServerUrl = url;

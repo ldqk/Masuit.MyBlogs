@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.IO;
-using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -37,9 +36,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 文件上传
         /// </summary>
         /// <param name="hostingEnvironment"></param>
-        public UploadController(IHttpClientFactory httpClientFactory)
+        public UploadController(ImagebedClient imagebedClient)
         {
-            _imagebedClient = new ImagebedClient(httpClientFactory.CreateClient());
+            _imagebedClient = imagebedClient;
         }
 
         /// <summary>

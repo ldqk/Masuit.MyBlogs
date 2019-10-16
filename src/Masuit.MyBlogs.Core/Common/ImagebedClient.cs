@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Polly;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -26,9 +27,9 @@ namespace Masuit.MyBlogs.Core.Common
         /// 图床客户端
         /// </summary>
         /// <param name="httpClient"></param>
-        public ImagebedClient(HttpClient httpClient)
+        public ImagebedClient(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClientFactory.CreateClient();
         }
 
         /// <summary>
@@ -49,7 +50,7 @@ namespace Masuit.MyBlogs.Core.Common
                 return await UploadGitee(stream, file);
             }
 
-            if (AppConfig.GitlabConfig.Enabled && stream.Length < AppConfig.GitlabConfig.FileLimitSize)
+            if (AppConfig.GitlabConfigs.Any())
             {
                 return await UploadGitlab(stream, file);
             }
@@ -85,7 +86,7 @@ namespace Masuit.MyBlogs.Core.Common
                 }
             }
 
-            return await UploadSmms(stream, file);
+            return AppConfig.AliOssConfig.Enabled ? await UploadOss(stream, file) : await UploadSmms(stream, file);
         }
 
         /// <summary>
@@ -96,14 +97,22 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public async Task<(string url, bool success)> UploadGitlab(Stream stream, string file)
         {
-            string base64String = Convert.ToBase64String(stream.ToByteArray());
-            _httpClient.DefaultRequestHeaders.Add("PRIVATE-TOKEN", AppConfig.GitlabConfig.AccessToken);
-            string path = $"{DateTime.Now:yyyyMMdd}/{Path.GetFileName(file)}";
-            using (var resp = await _httpClient.PostAsJsonAsync(AppConfig.GitlabConfig.ApiUrl + HttpUtility.UrlEncode(path), new
+            var gitlab = AppConfig.GitlabConfigs.OrderBy(c => Guid.NewGuid()).FirstOrDefault() ?? throw new Exception("没有可用的gitlab相关配置，请先在appsettings.json中的Imgbed:Gitlabs节点下配置gitlab");
+            if (stream.Length > gitlab.FileLimitSize)
             {
-                branch = AppConfig.GitlabConfig.Branch,
-                author_email = "1@1.cn",
-                author_name = "ldqk",
+                return AppConfig.AliOssConfig.Enabled ? await UploadOss(stream, file) : await UploadSmms(stream, file);
+            }
+
+            string base64String = Convert.ToBase64String(stream.ToByteArray());
+            _httpClient.DefaultRequestHeaders.Add("PRIVATE-TOKEN", gitlab.AccessToken);
+            string path = $"{DateTime.Now:yyyyMMdd}/{Path.GetFileName(file)}";
+            using (var resp = await _httpClient.PostAsJsonAsync(gitlab.ApiUrl.Contains("/v3/") ? gitlab.ApiUrl : gitlab.ApiUrl + HttpUtility.UrlEncode(path), new
+            {
+                file_path = path,
+                branch_name = gitlab.Branch,
+                branch = gitlab.Branch,
+                author_email = CommonHelper.SystemSettings["ReceiveEmail"],
+                author_name = SnowFlake.NewId,
                 encoding = "base64",
                 content = base64String,
                 commit_message = "上传一张图片"
@@ -111,11 +120,11 @@ namespace Masuit.MyBlogs.Core.Common
             {
                 if (resp.IsSuccessStatusCode || (await resp.Content.ReadAsStringAsync()).Contains("already exists"))
                 {
-                    return (AppConfig.GitlabConfig.RawUrl + path, true);
+                    return (gitlab.RawUrl + path, true);
                 }
             }
 
-            return await UploadSmms(stream, file);
+            return AppConfig.AliOssConfig.Enabled ? await UploadOss(stream, file) : await UploadSmms(stream, file);
         }
 
         /// <summary>
@@ -162,22 +171,22 @@ namespace Masuit.MyBlogs.Core.Common
                         }
 
                         var res = t.Result;
-                        if (res.IsSuccessStatusCode)
+                        if (!res.IsSuccessStatusCode)
                         {
-                            try
-                            {
-                                string s = res.Content.ReadAsStringAsync().Result;
-                                var token = JObject.Parse(s);
-                                url = (string)token["data"]["url"];
-                                return 1;
-                            }
-                            catch
-                            {
-                                return 2;
-                            }
+                            return 2;
                         }
 
-                        return 2;
+                        try
+                        {
+                            string s = res.Content.ReadAsStringAsync().Result;
+                            var token = JObject.Parse(s);
+                            url = (string)token["data"]["url"];
+                            return 1;
+                        }
+                        catch
+                        {
+                            return 2;
+                        }
                     });
                     if (code == 1)
                     {
@@ -241,20 +250,24 @@ namespace Masuit.MyBlogs.Core.Common
             var srcs = content.MatchImgSrcs();
             foreach (string src in srcs)
             {
-                if (!src.StartsWith("http"))
+                if (src.StartsWith("http"))
                 {
-                    var path = Path.Combine(AppContext.BaseDirectory + "wwwroot", src.Replace("/", @"\").Substring(1));
-                    if (File.Exists(path))
+                    continue;
+                }
+
+                var path = Path.Combine(AppContext.BaseDirectory + "wwwroot", src.Replace("/", @"\").Substring(1));
+                if (!File.Exists(path))
+                {
+                    continue;
+                }
+
+                using (var stream = File.OpenRead(path))
+                {
+                    var (url, success) = await UploadImage(stream, path);
+                    if (success)
                     {
-                        using (var stream = File.OpenRead(path))
-                        {
-                            var (url, success) = await UploadImage(stream, path);
-                            if (success)
-                            {
-                                content = content.Replace(src, url);
-                                BackgroundJob.Enqueue(() => File.Delete(path));
-                            }
-                        }
+                        content = content.Replace(src, url);
+                        BackgroundJob.Enqueue(() => File.Delete(path));
                     }
                 }
             }

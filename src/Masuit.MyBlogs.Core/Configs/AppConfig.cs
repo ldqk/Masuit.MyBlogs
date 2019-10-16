@@ -1,4 +1,6 @@
-﻿namespace Masuit.MyBlogs.Core.Configs
+﻿using System.Collections.Generic;
+
+namespace Masuit.MyBlogs.Core.Configs
 {
     /// <summary>
     /// 应用程序配置
@@ -28,7 +30,7 @@
         /// <summary>
         /// gitlab图床配置
         /// </summary>
-        public static GitlabConfig GitlabConfig { get; set; } = new GitlabConfig();
+        public static List<GitlabConfig> GitlabConfigs { get; set; } = new List<GitlabConfig>();
 
         /// <summary>
         /// 码云图床配置
