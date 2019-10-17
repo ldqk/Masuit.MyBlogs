@@ -210,5 +210,23 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             base.DeleteEntity(t);
             return _searchEngine.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// 统一保存的方法
+        /// </summary>
+        /// <returns>受影响的行数</returns>
+        public override int SaveChanges()
+        {
+            return _searchEngine.SaveChanges();
+        }
+
+        /// <summary>
+        /// 统一保存数据
+        /// </summary>
+        /// <returns>受影响的行数</returns>
+        public override Task<int> SaveChangesAsync()
+        {
+            return _searchEngine.SaveChangesAsync();
+        }
     }
 }

@@ -474,6 +474,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             bool b = PostService.SaveChanges() > 0;
             if (!b)
             {
+                SearchEngine.LuceneIndexer.Add(post);
                 return ResultData(null, false, "审核失败！");
             }
 
@@ -533,6 +534,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var post = PostService.GetById(id);
             post.Status = Status.Pended;
             bool b = PostService.SaveChanges() > 0;
+            SearchEngine.LuceneIndexer.Add(post);
             return ResultData(null, b, b ? "恢复成功！" : "恢复失败！");
         }
 
@@ -736,7 +738,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 });
             }
 
-            bool b = PostService.SaveChanges() > 0;
+            bool b = SearchEngine.SaveChanges() > 0;
             if (!b)
             {
                 return ResultData(null, false, "文章修改失败！");
@@ -849,7 +851,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "如果要定时发布，请选择正确的一个将来时间点！");
             }
 
-            bool b = PostService.AddEntitySaved(p) != null;
+            PostService.AddEntity(p);
+            bool b = SearchEngine.SaveChanges() > 0;
             if (!b)
             {
                 return ResultData(null, false, "文章发表失败！");
@@ -969,10 +972,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                     SeminarId = s.SeminarId
                 });
             }
-            bool b = PostHistoryVersionService.SaveChanges() > 0;
+            bool b = SearchEngine.SaveChanges() > 0;
             PostHistoryVersionService.DeleteByIdSaved(id);
             return ResultData(null, b, b ? "回滚成功" : "回滚失败");
-
         }
 
         /// <summary>
@@ -987,7 +989,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (post != null)
             {
                 post.DisableComment = !post.DisableComment;
-                return ResultData(null, PostService.SaveChanges() > 0, post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
+                return ResultData(null, SearchEngine.SaveChanges() > 0, post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
             }
 
             return ResultData(null, false, "文章不存在");
