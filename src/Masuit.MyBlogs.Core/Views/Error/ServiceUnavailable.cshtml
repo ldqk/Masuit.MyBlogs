@@ -1,4 +1,4 @@
-﻿@inject IHostingEnvironment HostingEnvironment
+﻿@inject IWebHostEnvironment HostEnvironment
 @using System.IO
 @using Masuit.Tools
 @using Masuit.Tools.Win32
@@ -96,7 +96,7 @@
         <div id="container">
             @{
                 Random r = new Random();
-                string imgPath = $"/Assets/images/503/503{r.StrictNext(Directory.GetFiles(HostingEnvironment.WebRootPath + "/Assets/images/503").Length) + 1}.jpg";
+                string imgPath = $"/Assets/images/503/503{r.StrictNext(Directory.GetFiles(HostEnvironment.WebRootPath + "/Assets/images/503").Length) + 1}.jpg";
             }
             <img class="img img-responsive img-thumbnail" width="100%" src="@imgPath" alt="@ViewBag.Keywords" />
             <h3 class="margintop20">

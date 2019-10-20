@@ -171,7 +171,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static T Mapper<T>(this object source) where T : class => Startup.AutofacContainer.GetRequiredService<IMapper>().Map<T>(source);
+        public static T Mapper<T>(this object source) where T : class => Startup.ServiceProvider.GetRequiredService<IMapper>().Map<T>(source);
 
         /// <summary>
         /// 发送邮件

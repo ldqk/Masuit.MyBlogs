@@ -35,13 +35,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public IInternalMessageService MessageService { get; set; }
 
-        public IHostingEnvironment HostingEnvironment { get; set; }
+        public IWebHostEnvironment HostEnvironment { get; set; }
 
         /// <summary>
         /// 留言板
         /// </summary>
         /// <returns></returns>
-        [ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie), Route("msg")]
+        [ResponseCache(Duration = 600, VaryByHeader = "Cookie"), Route("msg")]
         public ActionResult Index()
         {
             ViewBag.TotalCount = LeaveMessageService.GetQueryNoTracking(m => m.ParentId == 0 && m.Status == Status.Pended).Count();
@@ -147,7 +147,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             HttpContext.Session.Set("msg", msg.Content.RemoveHtmlTag().Trim());
             var email = CommonHelper.SystemSettings["ReceiveEmail"];
-            var content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/notify.html").Replace("{{title}}", "网站留言板").Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg.NickName).Replace("{{content}}", msg.Content);
+            var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/notify.html").Replace("{{title}}", "网站留言板").Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg.NickName).Replace("{{content}}", msg.Content);
             if (msg.Status == Status.Pended)
             {
                 if (!msg.IsMaster)
@@ -200,7 +200,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             bool b = LeaveMessageService.SaveChanges() > 0;
 #if !DEBUG
             var pid = msg.ParentId == 0 ? msg.Id : LeaveMessageService.GetParentMessageIdByChildId(id);
-            var content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "notify.html")).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg.NickName).Replace("{{content}}", msg.Content);
+            var content = System.IO.File.ReadAllText(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")).Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg.NickName).Replace("{{content}}", msg.Content);
             var emails = LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Except(new List<string> { msg.Email, CurrentUser.Email }).ToHashSet();
             var link = Url.Action("Index", "Msg", new { cid = pid }, Request.Scheme);
             foreach (var s in emails)

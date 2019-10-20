@@ -21,7 +21,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class MergeController : AdminController
     {
         public IPostMergeRequestService PostMergeRequestService { get; set; }
-        public IHostingEnvironment HostingEnvironment { get; set; }
+        public IWebHostEnvironment HostEnvironment { get; set; }
         public MapperConfiguration MapperConfig { get; set; }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             string link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id;
-            string content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/merge-pass.html").Replace("{{link}}", link).Replace("{{title}}", merge.Post.Title);
+            string content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-pass.html").Replace("{{link}}", link).Replace("{{title}}", merge.Post.Title);
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已通过", content, merge.ModifierEmail));
             return ResultData(null, true, "文章合并完成！");
 
@@ -139,7 +139,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id + "/merge/" + id;
-            var content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/merge-reject.html").Replace("{{link}}", link).Replace("{{title}}", merge.Post.Title).Replace("{{reason}}", reason);
+            var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-reject.html").Replace("{{link}}", link).Replace("{{title}}", merge.Post.Title).Replace("{{reason}}", reason);
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已被拒绝", content, merge.ModifierEmail));
             return ResultData(null, true, "合并已拒绝！");
         }

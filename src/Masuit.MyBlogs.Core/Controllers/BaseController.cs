@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using EFSecondLevelCache.Core;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
@@ -143,9 +141,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             #region 准备页面数据模型
 
             ViewBag.menus = MenuService.GetQueryFromCache<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
-            PageFootViewModel model = new PageFootViewModel //页脚
+            var model = new PageFootViewModel //页脚
             {
-                Links = LinksService.GetQuery(l => l.Status == Status.Available, l => l.Recommend, false).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(40).ProjectTo<LinksOutputDto>(MapperConfig).Cacheable().ToList()
+                Links = LinksService.GetQueryFromCache<LinksOutputDto>(l => l.Status == Status.Available).OrderBy(l => l.Recommend).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(40).ToList()
             };
             ViewBag.Footer = model;
 

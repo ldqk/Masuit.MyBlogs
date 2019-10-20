@@ -31,7 +31,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public IDonateService DonateService { get; set; }
 
-        public IHostingEnvironment HostingEnvironment { get; set; }
+        public IWebHostEnvironment HostEnvironment { get; set; }
         public ImagebedClient ImagebedClient { get; set; }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Route("misc/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = HeaderNames.Cookie)]
+        [Route("misc/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
         public ActionResult Index(int id)
         {
             var misc = MiscService.GetFromCache(m => m.Id == id) ?? throw new NotFoundException("页面未找到");
@@ -82,7 +82,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 关于
         /// </summary>
         /// <returns></returns>
-        [Route("about"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
+        [Route("about"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult About()
         {
             return View();
@@ -92,7 +92,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 声明
         /// </summary>
         /// <returns></returns>
-        [Route("disclaimer"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
+        [Route("disclaimer"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult Disclaimer()
         {
             return View();
@@ -134,7 +134,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 try
                 {
-                    System.IO.File.Delete(Path.Combine(HostingEnvironment.WebRootPath + path));
+                    System.IO.File.Delete(Path.Combine(HostEnvironment.WebRootPath + path));
                 }
                 catch (IOException)
                 {

@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public IPostService PostService { get; set; }
 
-        public IHostingEnvironment HostingEnvironment { get; set; }
+        public IWebHostEnvironment HostEnvironment { get; set; }
 
         /// <summary>
         /// 响应数据
@@ -146,7 +146,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     timespan = ts,
                     hash = (email + "verify" + guid + ts).AESEncrypt(AppConfig.BaiduAK)
                 }, "http");
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客订阅：" + Request.Host, System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/subscribe.html").Replace("{{link}}", link), email));
+                BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客订阅：" + Request.Host, System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/subscribe.html").Replace("{{link}}", link), email));
                 BroadcastService.SaveChanges();
                 return ResultData(null, message: "订阅成功，请打开您的邮箱确认操作后便可收到订阅更新！");
             }

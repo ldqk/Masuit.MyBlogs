@@ -49,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 {
                     using (Stream stream = file.OpenReadStream())
                     {
-                        var (url, success) = Startup.AutofacContainer.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath).Result;
+                        var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath).Result;
                         if (success)
                         {
                             Result.Url = url;

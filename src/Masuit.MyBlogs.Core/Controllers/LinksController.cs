@@ -27,7 +27,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 友情链接页
         /// </summary>
         /// <returns></returns>
-        [Route("links"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
+        [Route("links"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult Index()
         {
             var list = LinksService.GetQueryFromCache<bool, LinksOutputDto>(l => l.Status == Status.Available, l => l.Recommend, false).ToList();

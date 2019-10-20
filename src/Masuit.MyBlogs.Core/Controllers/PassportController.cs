@@ -10,7 +10,6 @@ using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -28,7 +27,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 用户
         /// </summary>
         public IUserInfoService UserInfoService { get; set; }
-        public IHostingEnvironment HostingEnvironment { get; set; }
 
         /// <summary>
         /// 
@@ -159,11 +157,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetUserInfo()
         {
-            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
-            if (HostingEnvironment.IsDevelopment())
-            {
-                user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
-            }
+            var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+#if DEBUG
+            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
+#endif
+
             return ResultData(user);
         }
 

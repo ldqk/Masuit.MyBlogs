@@ -6,7 +6,6 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -51,7 +50,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 首页
         /// </summary>
         /// <returns></returns>
-        [HttpGet, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "orderBy" }, VaryByHeader = HeaderNames.Cookie)]
+        [HttpGet, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "orderBy" }, VaryByHeader = "Cookie")]
         public ActionResult Index()
         {
             ViewBag.Total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin);
@@ -70,7 +69,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        [Route("p"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = HeaderNames.Cookie)]
+        [Route("p"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         public ActionResult Post([Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 15)
         {
             ViewBag.Total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin && !p.IsFixedTop);
@@ -86,7 +85,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        [Route("tag/{id}/{page:int?}/{size:int?}/{orderBy:int?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = HeaderNames.Cookie)]
+        [Route("tag/{id}/{page:int?}/{size:int?}/{orderBy:int?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         public ActionResult Tag(string id, [Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 15)
         {
             IList<PostOutputDto> posts;
@@ -127,7 +126,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        [Route("cat/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = HeaderNames.Cookie)]
+        [Route("cat/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         [Route("cat/{id:int}/{page:int?}/{size:int?}/{orderBy:int?}")]
         public async Task<ActionResult> Category(int id, [Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 15)
         {
@@ -188,7 +187,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             var hot6Post = postsQuery.OrderByDescending(order).Skip(0).Take(5).Cacheable().ToList(); //热门文章
             var newdic = new Dictionary<string, int>(); //标签云最终结果
-            var tagdic = postsQuery.Where(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Cacheable().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).ToDictionary(g => g.Key, g => g.Count()); //统计标签
+            var tagdic = postsQuery.Where(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Cacheable().AsEnumerable().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).ToDictionary(g => g.Key, g => g.Count()); //统计标签
 
             if (tagdic.Any())
             {

@@ -28,7 +28,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public INoticeService NoticeService { get; set; }
 
-        public IHostingEnvironment HostingEnvironment { get; set; }
+        public IWebHostEnvironment HostEnvironment { get; set; }
 
         public ImagebedClient ImagebedClient { get; set; }
 
@@ -39,7 +39,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Route("notice"), ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "page", "size", "id" }, VaryByHeader = HeaderNames.Cookie)]
+        [Route("notice"), ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "page", "size", "id" }, VaryByHeader = "Cookie")]
         public ActionResult Index(int page = 1, int size = 10, int id = 0)
         {
             var list = NoticeService.GetPages<DateTime, NoticeOutputDto>(page, size, out var total, n => n.Status == Status.Display, n => n.ModifyDate, false).ToList();
@@ -68,7 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Route("n/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = HeaderNames.Cookie)]
+        [Route("n/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
         public ActionResult Details(int id)
         {
             var notice = NoticeService.GetById(id) ?? throw new NotFoundException("页面未找到");
@@ -111,7 +111,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 try
                 {
-                    System.IO.File.Delete(HostingEnvironment.WebRootPath + path);
+                    System.IO.File.Delete(HostEnvironment.WebRootPath + path);
                 }
                 catch
                 {
@@ -175,7 +175,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 最近一条公告
         /// </summary>
         /// <returns></returns>
-        [ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
+        [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult Last()
         {
             if (HttpContext.Session.Get("last-notice") != null)

@@ -24,7 +24,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -48,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public IInternalMessageService MessageService { get; set; }
 
-        public IHostingEnvironment HostingEnvironment { get; set; }
+        public IWebHostEnvironment HostEnvironment { get; set; }
         public ISearchEngine<DataContext> SearchEngine { get; set; }
         public ImagebedClient ImagebedClient { get; set; }
 
@@ -58,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="kw"></param>
         /// <returns></returns>
-        [Route("{id:int}/{kw}"), Route("{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = HeaderNames.Cookie)]
+        [Route("{id:int}/{kw}"), Route("{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
         public ActionResult Details(int id, string kw)
         {
             var post = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
@@ -92,7 +91,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Route("{id:int}/history"), Route("{id:int}/history/{page:int}/{size:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size" }, VaryByHeader = HeaderNames.Cookie)]
+        [Route("{id:int}/history"), Route("{id:int}/history/{page:int}/{size:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size" }, VaryByHeader = "Cookie")]
         public ActionResult History(int id, int page = 1, int size = 20)
         {
             var post = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostOutputDto>() ?? throw new NotFoundException("文章未找到");
@@ -109,7 +108,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="hid"></param>
         /// <returns></returns>
-        [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "hid" }, VaryByHeader = HeaderNames.Cookie)]
+        [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "hid" }, VaryByHeader = "Cookie")]
         public ActionResult HistoryVersion(int id, int hid)
         {
             var post = PostHistoryVersionService.Get(v => v.Id == hid) ?? throw new NotFoundException("文章未找到");
@@ -125,7 +124,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="v1"></param>
         /// <param name="v2"></param>
         /// <returns></returns>
-        [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "v1", "v2" }, VaryByHeader = HeaderNames.Cookie)]
+        [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "v1", "v2" }, VaryByHeader = "Cookie")]
         public ActionResult CompareVersion(int id, int v1, int v2)
         {
             var main = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
@@ -241,7 +240,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             RedisHelper.Expire("code:" + p.Email, 1);
-            var content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/publish.html")
+            var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/publish.html")
                 .Replace("{{link}}", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
                 .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Replace("{{title}}", p.Title);
@@ -253,10 +252,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取标签
         /// </summary>
         /// <returns></returns>
-        [ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
+        [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult GetTag()
         {
-            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).Cacheable().ToHashSet();
+            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().Cacheable().AsEnumerable().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
             return ResultData(list);
         }
 
@@ -264,10 +263,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 标签云
         /// </summary>
         /// <returns></returns>
-        [Route("all"), ResponseCache(Duration = 600, VaryByHeader = HeaderNames.Cookie)]
+        [Route("all"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult All()
         {
-            var tags = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).SelectMany(s => s.Split(',', '，')).OrderBy(s => s).Cacheable().ToList(); //tag
+            var tags = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Cacheable().AsEnumerable().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToList(); //tag
             ViewBag.tags = tags.GroupBy(t => t).OrderByDescending(g => g.Count()).ThenBy(g => g.Key);
             ViewBag.cats = CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
@@ -432,7 +431,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Content = dto.Title,
                 Link = "#/merge/compare?id=" + merge.Id
             });
-            var content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/merge-request.html").Replace("{{title}}", post.Title).Replace("{{link}}", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id);
+            var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-request.html").Replace("{{title}}", post.Title).Replace("{{link}}", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id);
             BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
 
             return ResultData(null, b, b ? "您的修改请求已提交，已进入审核状态，感谢您的参与！" : "操作失败！");
@@ -488,7 +487,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             cast.ForEach(c =>
             {
                 var ts = DateTime.Now.GetTotalMilliseconds();
-                var content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/broadcast.html")
+                var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/broadcast.html")
                     .Replace("{{link}}", link + "?email=" + c.Email)
                     .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                     .Replace("{{title}}", post.Title)
@@ -556,8 +555,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 try
                 {
-                    System.IO.File.Delete(Path.Combine(HostingEnvironment.WebRootPath + "/upload", post.ResourceName));
-                    Directory.Delete(Path.Combine(HostingEnvironment.WebRootPath + "/upload", Path.GetFileNameWithoutExtension(post.ResourceName)), true);
+                    System.IO.File.Delete(Path.Combine(HostEnvironment.WebRootPath + "/upload", post.ResourceName));
+                    Directory.Delete(Path.Combine(HostEnvironment.WebRootPath + "/upload", Path.GetFileNameWithoutExtension(post.ResourceName)), true);
                 }
                 catch (IOException)
                 {
@@ -571,7 +570,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     try
                     {
-                        System.IO.File.Delete(HostingEnvironment.WebRootPath + path);
+                        System.IO.File.Delete(HostEnvironment.WebRootPath + path);
                     }
                     catch (IOException)
                     {
@@ -752,7 +751,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 cast.ForEach(c =>
                 {
                     var ts = DateTime.Now.GetTotalMilliseconds();
-                    string content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "broadcast.html"))
+                    string content = System.IO.File.ReadAllText(Path.Combine(HostEnvironment.WebRootPath, "template", "broadcast.html"))
                         .Replace("{{link}}", link + "?email=" + c.Email)
                         .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                         .Replace("{{title}}", post.Title)
@@ -867,7 +866,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             cast.ForEach(c =>
             {
                 var ts = DateTime.Now.GetTotalMilliseconds();
-                string content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/broadcast.html")
+                string content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/broadcast.html")
                     .Replace("{{link}}", link + "?email=" + c.Email)
                     .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                     .Replace("{{title}}", post.Title).Replace("{{author}}", post.Author)

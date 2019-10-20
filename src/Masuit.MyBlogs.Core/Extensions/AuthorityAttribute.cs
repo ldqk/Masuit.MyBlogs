@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Web;
@@ -40,7 +41,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 string name = filterContext.HttpContext.Request.Cookies["username"] ?? "";
                 string pwd = filterContext.HttpContext.Request.Cookies["password"]?.DesDecrypt(AppConfig.BaiduAK) ?? "";
 
-                var userInfo = (Startup.AutofacContainer.GetService(typeof(IUserInfoService)) as IUserInfoService).Login(name, pwd);
+                var userInfo = (Startup.ServiceProvider.GetRequiredService<IUserInfoService>()).Login(name, pwd);
                 if (userInfo != null)
                 {
                     filterContext.HttpContext.Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });

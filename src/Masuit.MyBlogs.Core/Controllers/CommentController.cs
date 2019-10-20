@@ -6,7 +6,6 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
@@ -30,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ICommentService CommentService { get; set; }
         public IPostService PostService { get; set; }
         public IInternalMessageService MessageService { get; set; }
-        public IHostingEnvironment HostingEnvironment { get; set; }
+        public IWebHostEnvironment HostEnvironment { get; set; }
 
         /// <summary>
         /// 发表评论
@@ -95,7 +94,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var emails = new HashSet<string>();
             var email = CommonHelper.SystemSettings["ReceiveEmail"]; //站长邮箱
             emails.Add(email);
-            var content = System.IO.File.ReadAllText(HostingEnvironment.WebRootPath + "/template/notify.html")
+            var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/notify.html")
                 .Replace("{{title}}", post.Title)
                 .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Replace("{{nickname}}", comment.NickName)
@@ -237,7 +236,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 var pid = comment.ParentId == 0 ? comment.Id : CommentService.GetParentCommentIdByChildId(id);
 #if !DEBUG
-                var content = System.IO.File.ReadAllText(Path.Combine(HostingEnvironment.WebRootPath, "template", "notify.html"))
+                var content = System.IO.File.ReadAllText(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html"))
                     .Replace("{{title}}", post.Title)
                     .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                     .Replace("{{nickname}}", comment.NickName)

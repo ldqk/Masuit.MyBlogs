@@ -1,9 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using AutoMapper;
-using CacheManager.Core;
 using CSRedis;
-using EFSecondLevelCache.Core;
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.MemoryStorage;
@@ -26,26 +23,19 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.WebEncoders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
-using System.Text.Encodings.Web;
-using System.Text.Unicode;
 using System.Threading.Tasks;
+using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core
@@ -58,7 +48,7 @@ namespace Masuit.MyBlogs.Core
         /// <summary>
         /// 依赖注入容器
         /// </summary>
-        public static IServiceProvider AutofacContainer { get; set; }
+        public static IServiceProvider ServiceProvider { get; private set; }
 
         /// <summary>
         /// 配置中心
@@ -85,7 +75,7 @@ namespace Masuit.MyBlogs.Core
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
             services.Configure<CookiePolicyOptions>(options =>
@@ -97,7 +87,7 @@ namespace Masuit.MyBlogs.Core
                 opt.UseMySql(AppConfig.ConnString);
                 //opt.UseSqlServer(AppConfig.ConnString);
             }); //配置数据库
-            services.AddCors(opt => opt.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials())); //配置跨域
+            services.AddCors(opt => opt.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin())); //配置跨域
             services.Configure<FormOptions>(options =>
             {
                 options.MultipartBodyLengthLimit = 104857600; // 100MB
@@ -109,15 +99,9 @@ namespace Masuit.MyBlogs.Core
                 options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
             });
 
-            ConfigureResponse(services);
-
+            services.AddResponseCache().AddCacheConfig();
             services.AddHangfire(x => x.UseMemoryStorage()); //配置hangfire
 
-            //配置EF二级缓存
-            services.AddEFSecondLevelCache();
-            // 配置EF二级缓存策略
-            services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
-            services.AddSingleton(new CacheManager.Core.ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10)).Build());
             services.AddSevenZipCompressor().AddResumeFileResult().AddSearchEngine<DataContext>(new LuceneIndexerOptions()
             {
                 Path = "lucene"
@@ -127,62 +111,12 @@ namespace Masuit.MyBlogs.Core
             services.AddTransient<ImagebedClient>();
             services.AddHttpContextAccessor(); //注入静态HttpContext
 
-            services.AddMvc(options =>
-            {
-                options.Filters.Add<MyExceptionFilter>();
-                options.CacheProfiles.Add("Default", new CacheProfile()
-                {
-                    Location = ResponseCacheLocation.Any,
-                    VaryByHeader = HeaderNames.Cookie,
-                    Duration = 600
-                });
-            }).AddJsonOptions(opt =>
-            {
-                opt.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddControllersAsServices().AddViewComponentsAsServices().AddTagHelpersAsServices();
-
-            services.Configure<WebEncoderOptions>(options =>
-            {
-                options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
-            }); //解决razor视图中中文被编码的问题
-
-            var mc = new MapperConfiguration(e => e.AddProfile(new MappingProfile()));
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddSingleton(mc);
-            services.AddAutofac();
-            ContainerBuilder builder = new ContainerBuilder();
-            builder.Populate(services);
-            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsImplementedInterfaces().Where(t => t.Name.EndsWith("Repository") || t.Name.EndsWith("Service") || t.Name.EndsWith("Controller") || t.Name.EndsWith("Attribute")).PropertiesAutowired().AsSelf().InstancePerDependency(); //注册控制器为属性注入
-            builder.RegisterType<BackgroundJobClient>().SingleInstance(); //指定生命周期为单例
-            builder.RegisterType<FirewallAttribute>().PropertiesAutowired().AsSelf().InstancePerDependency(); //指定生命周期为单例
-            builder.RegisterType<HangfireBackJob>().As<IHangfireBackJob>().PropertiesAutowired(PropertyWiringOptions.PreserveSetValues).InstancePerDependency();
-            AutofacContainer = new AutofacServiceProvider(builder.Build());
-            return AutofacContainer;
+            services.AddMapper().AddAutofac().AddMyMvc();
         }
 
-        private static void ConfigureResponse(IServiceCollection services)
+        public void ConfigureContainer(ContainerBuilder builder)
         {
-            services.AddResponseCaching(); //注入响应缓存
-            services.Configure<BrotliCompressionProviderOptions>(options =>
-            {
-                options.Level = CompressionLevel.Optimal;
-            }).Configure<GzipCompressionProviderOptions>(options =>
-            {
-                options.Level = CompressionLevel.Optimal;
-            }).AddResponseCompression(options =>
-            {
-                options.EnableForHttps = true;
-                options.Providers.Add<BrotliCompressionProvider>();
-                options.Providers.Add<GzipCompressionProvider>();
-                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
-                {
-                    "text/html; charset=utf-8",
-                    "application/xhtml+xml",
-                    "application/atom+xml",
-                    "image/svg+xml"
-                });
-            });
+            builder.RegisterModule(new AutofacModule());
         }
 
         /// <summary>
@@ -193,8 +127,9 @@ namespace Masuit.MyBlogs.Core
         /// <param name="db"></param>
         /// <param name="hangfire"></param>
         /// <param name="luceneIndexerOptions"></param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, DataContext db, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext db, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
+            ServiceProvider = app.ApplicationServices;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -206,7 +141,7 @@ namespace Masuit.MyBlogs.Core
 
             //db.Database.Migrate();
 
-            ConfigureLuceneSearch(env, hangfire, luceneIndexerOptions);
+            UseLuceneSearch(env, hangfire, luceneIndexerOptions);
 
             app.UseResponseCompression();
             if (bool.Parse(Configuration["Https:Enabled"]))
@@ -241,14 +176,19 @@ namespace Masuit.MyBlogs.Core
                     new MyRestrictiveAuthorizationFilter()
                 }
             }); //配置hangfire
-            app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials()); //配置跨域
+            app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()); //配置跨域
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
-            app.UseSignalR(hub => hub.MapHub<MyHub>("/hubs"));
             HangfireJobInit.Start(); //初始化定时任务
-            app.UseMvcWithDefaultRoute();
+            app.UseRouting(); // 放在 UseStaticFiles 之后
+            app.UseEndpoints(endpoints =>
+           {
+               endpoints.MapControllers(); // 属性路由
+               endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}"); // 默认路由
+               endpoints.MapHub<MyHub>("/hubs");
+           });
         }
 
-        private static void ConfigureLuceneSearch(IHostingEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
+        private static void UseLuceneSearch(IWebHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
             Task.Run(() =>
             {

@@ -1,7 +1,8 @@
-﻿using Masuit.MyBlogs.Core.Hubs;
-using Microsoft.AspNetCore;
+﻿using Autofac.Extensions.DependencyInjection;
+using Masuit.MyBlogs.Core.Hubs;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
 using Z.EntityFramework.Extensions;
@@ -17,24 +18,28 @@ namespace Masuit.MyBlogs.Core
             CreateWebHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        public static IHostBuilder CreateWebHostBuilder(string[] args)
         {
             var builder = new ConfigurationBuilder().AddCommandLine(args).SetBasePath(Directory.GetCurrentDirectory()).AddEnvironmentVariables().AddJsonFile("appsettings.json", true, true);
             var config = builder.Build();
             var port = config["port"] ?? Environment.GetEnvironmentVariable("port") ?? "5000";
             var sslport = config["sslport"] ?? Environment.GetEnvironmentVariable("sslport") ?? "5001";
-            return WebHost.CreateDefaultBuilder(args).UseKestrel(opt =>
+            return Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureWebHostDefaults(configurationBuilder =>
             {
-                opt.ListenAnyIP(port.ToInt32());
-                if (bool.Parse(config["Https:Enabled"]))
+                configurationBuilder.UseKestrel(opt =>
                 {
-                    opt.ListenAnyIP(sslport.ToInt32(), s =>
+                    opt.ListenAnyIP(port.ToInt32());
+                    if (bool.Parse(config["Https:Enabled"]))
                     {
-                        s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]);
-                    });
-                }
-                opt.Limits.MaxRequestBodySize = null;
-            }).UseIISIntegration().UseStartup<Startup>();
+                        opt.ListenAnyIP(sslport.ToInt32(), s =>
+                        {
+                            s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]);
+                        });
+                    }
+
+                    opt.Limits.MaxRequestBodySize = null;
+                }).UseIISIntegration().UseStartup<Startup>();
+            });
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         private readonly ISearchDetailsService _searchDetailsService;
         private readonly ILinksService _linksService;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _HostEnvironment;
         private readonly ISearchEngine<DataContext> _searchEngine;
 
         /// <summary>
@@ -42,9 +42,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="searchDetailsService"></param>
         /// <param name="linksService"></param>
         /// <param name="httpClientFactory"></param>
-        /// <param name="hostingEnvironment"></param>
+        /// <param name="HostEnvironment"></param>
         /// <param name="searchEngine"></param>
-        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IHostingEnvironment hostingEnvironment, ISearchEngine<DataContext> searchEngine)
+        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IWebHostEnvironment HostEnvironment, ISearchEngine<DataContext> searchEngine)
         {
             _userInfoService = userInfoService;
             _postService = postService;
@@ -52,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             _searchDetailsService = searchDetailsService;
             _linksService = linksService;
             _httpClientFactory = httpClientFactory;
-            _hostingEnvironment = hostingEnvironment;
+            _HostEnvironment = HostEnvironment;
             _searchEngine = searchEngine;
         }
 
@@ -83,7 +83,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             var u = _userInfoService.GetByUsername(userInfo.Username);
             u.LoginRecord.Add(record);
             _userInfoService.SaveChanges();
-            var content = File.ReadAllText(Path.Combine(_hostingEnvironment.WebRootPath, "template", "login.html"))
+            var content = File.ReadAllText(Path.Combine(_HostEnvironment.WebRootPath, "template", "login.html"))
                 .Replace("{{name}}", u.Username)
                 .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Replace("{{ip}}", record.IP)

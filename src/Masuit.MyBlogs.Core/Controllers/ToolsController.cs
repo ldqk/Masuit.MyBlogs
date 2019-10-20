@@ -25,7 +25,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="ip"></param>
         /// <returns></returns>
-        [HttpGet, Route("ip/{ip?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "ip" }, VaryByHeader = HeaderNames.Cookie)]
+        [HttpGet, Route("ip/{ip?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "ip" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> GetIpInfo(string ip)
         {
             if (string.IsNullOrEmpty(ip))
@@ -47,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="lat"></param>
         /// <param name="lng"></param>
         /// <returns></returns>
-        [HttpGet, Route("pos"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "lat", "lng" }, VaryByHeader = HeaderNames.Cookie)]
+        [HttpGet, Route("pos"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "lat", "lng" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Position(string lat, string lng)
         {
             if (string.IsNullOrEmpty(lat) || string.IsNullOrEmpty(lng))
@@ -76,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="addr"></param>
         /// <returns></returns>
-        [HttpGet, Route("addr"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "addr" }, VaryByHeader = HeaderNames.Cookie)]
+        [HttpGet, Route("addr"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "addr" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Address(string addr)
         {
             if (string.IsNullOrEmpty(addr))

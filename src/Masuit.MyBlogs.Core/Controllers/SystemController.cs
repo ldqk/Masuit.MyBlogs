@@ -52,7 +52,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             IList<string> ips = SystemInfo.GetIPAddress();
             var span = DateTime.Now - CommonHelper.StartupTime;
             var boot = DateTime.Now - SystemInfo.BootTime();
-
             return Json(new
             {
                 runningTime = $"{span.Days}天{span.Hours}小时{span.Minutes}分钟",

@@ -18,7 +18,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     [Route("[controller]/[action]")]
     public class FileController : AdminController
     {
-        public IHostingEnvironment HostingEnvironment { get; set; }
+        public IWebHostEnvironment HostEnvironment { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -31,7 +31,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetFiles(string path)
         {
-            var files = Directory.GetFiles(HostingEnvironment.WebRootPath + path).OrderByDescending(s => s).Select(s => new
+            var files = Directory.GetFiles(HostEnvironment.WebRootPath + path).OrderByDescending(s => s).Select(s => new
             {
                 filename = Path.GetFileName(s),
                 path = s
@@ -86,7 +86,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 foreach (var t in Request.Form.Files)
                 {
-                    string path = Path.Combine(HostingEnvironment.ContentRootPath, CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/'), destination.TrimStart('\\', '/'), t.FileName);
+                    string path = Path.Combine(HostEnvironment.ContentRootPath, CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/'), destination.TrimStart('\\', '/'), t.FileName);
                     using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                     {
                         t.CopyTo(fs);
@@ -108,7 +108,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Handle([FromBody]FileRequest req)
         {
             List<object> list = new List<object>();
-            var root = Path.Combine(HostingEnvironment.ContentRootPath, CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/'));
+            var root = Path.Combine(HostEnvironment.ContentRootPath, CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/'));
             switch (req.Action)
             {
                 case "list":
@@ -274,7 +274,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             path = path?.TrimStart('\\', '/') ?? "";
             var root = CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/');
-            var file = Path.Combine(HostingEnvironment.ContentRootPath, root, path);
+            var file = Path.Combine(HostEnvironment.ContentRootPath, root, path);
             switch (Request.Query["action"])
             {
                 case "download":
@@ -284,7 +284,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     }
                     break;
                 case "downloadMultiple":
-                    byte[] buffer = SevenZipCompressor.ZipStream(items.Select(s => Path.Combine(HostingEnvironment.ContentRootPath, root, s.TrimStart('\\', '/'))).ToList()).ToArray();
+                    byte[] buffer = SevenZipCompressor.ZipStream(items.Select(s => Path.Combine(HostEnvironment.ContentRootPath, root, s.TrimStart('\\', '/'))).ToList()).ToArray();
                     return this.ResumeFile(buffer, Path.GetFileName(toFilename));
             }
             return Content("null");
