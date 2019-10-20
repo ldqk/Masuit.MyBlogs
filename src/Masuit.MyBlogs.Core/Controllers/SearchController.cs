@@ -42,9 +42,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Total = 0;
             ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
-            if (Regex.Match(wd ?? "", CommonHelper.BanRegex + "|" + CommonHelper.ModRegex).Length > 0)
+            if (Regex.Match(wd ?? "", CommonHelper.BanRegex).Length + Regex.Match(wd ?? "", CommonHelper.ModRegex).Length > 0)
             {
-                return RedirectToAction("Search");
+                return RedirectToAction("Search", "Search", new { wd = "" });
             }
 
             string ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();

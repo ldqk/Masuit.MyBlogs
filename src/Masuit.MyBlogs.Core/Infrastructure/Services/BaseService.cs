@@ -269,7 +269,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>实体</returns>
-        public T GetFromCache(Expression<Func<T, bool>> @where)
+        public virtual T GetFromCache(Expression<Func<T, bool>> @where)
         {
             return BaseDal.GetFromCache(where);
         }

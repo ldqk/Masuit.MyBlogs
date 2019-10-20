@@ -7,6 +7,7 @@ using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
 using System.Web;
@@ -25,40 +26,38 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 
-            string httpMethod = context.HttpContext.Request.Method;
+            var request = context.HttpContext.Request;
+            var httpMethod = request.Method;
             if (httpMethod.Equals("OPTIONS", StringComparison.InvariantCultureIgnoreCase) || httpMethod.Equals("HEAD", StringComparison.InvariantCultureIgnoreCase))
             {
                 return;
             }
 
-            if (context.HttpContext.Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(context.HttpContext.Request.Cookies["FullAccessToken"]))
+            if (request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]))
             {
                 return;
             }
 
-            string ip = context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            var ip = context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             if (ip.IsDenyIpAddress() && string.IsNullOrEmpty(context.HttpContext.Session.Get<string>("FullAccessViewToken")))
             {
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
                 {
                     IP = ip,
-                    RequestUrl = HttpUtility.UrlDecode(context.HttpContext.Request.Scheme + "://" + context.HttpContext.Request.Host + context.HttpContext.Request.Path),
-                    Time = DateTime.Now
+                    RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + request.Path),
+                    Time = DateTime.Now,
+                    UserAgent = request.Headers[HeaderNames.UserAgent]
                 }));
                 context.Result = new RedirectToActionResult("AccessDeny", "Error", null);
                 return;
             }
 
-            if (context.HttpContext.Request.IsRobot())
+            if (request.IsRobot())
             {
                 return;
             }
 
-            var times = CacheManager.AddOrUpdate("Frequency:" + ip, 1, i =>
-            {
-                i++;
-                return i;
-            }, 5);
+            var times = CacheManager.AddOrUpdate("Frequency:" + ip, 1, i => i + 1, 5);
             CacheManager.Expire("Frequency:" + ip, ExpirationMode.Sliding, TimeSpan.FromSeconds(CommonHelper.SystemSettings.GetOrAdd("LimitIPFrequency", "60").ToInt32()));
             var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPRequestTimes", "90").ToInt32();
             if (times <= limit)
@@ -72,8 +71,9 @@ namespace Masuit.MyBlogs.Core.Extensions
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
                 {
                     IP = ip,
-                    RequestUrl = HttpUtility.UrlDecode(context.HttpContext.Request.Scheme + "://" + context.HttpContext.Request.Host + context.HttpContext.Request.Path),
-                    Time = DateTime.Now
+                    RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + request.Path),
+                    Time = DateTime.Now,
+                    UserAgent = request.Headers[HeaderNames.UserAgent]
                 }));
             }
 

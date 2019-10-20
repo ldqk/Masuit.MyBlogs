@@ -454,18 +454,10 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			}
 		}).then(function (data) {
 			if (data.Success) {
-				$scope.AreaIPs.remove(ip);
 				swal("添加成功",'','success');
 			} else {
 				swal("添加失败",'','error');
 			}
 		}).catch(swal.noop);
-	}
-	$scope.searchIP= function(ip) {
-		if (ip) {
-			$scope.AreaIPs = _.filter($scope.AreaIPsCopy, i => i.indexOf(ip) > -1);
-		} else {
-			$scope.AreaIPs =$scope.AreaIPsCopy;
-		}
 	}
 }]);

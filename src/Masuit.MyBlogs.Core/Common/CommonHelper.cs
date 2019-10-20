@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 #if !DEBUG
 using Masuit.MyBlogs.Core.Models.ViewModel;
@@ -30,10 +31,10 @@ namespace Masuit.MyBlogs.Core.Common
             {
                 while (true)
                 {
-                    BanRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "ban.txt"));
-                    ModRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "mod.txt"));
-                    DenyIP = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "denyip.txt"));
-                    string[] lines = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory + "App_Data", "DenyIPRange.txt"));
+                    BanRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "ban.txt"), Encoding.UTF8);
+                    ModRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "mod.txt"), Encoding.UTF8);
+                    DenyIP = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "denyip.txt"), Encoding.UTF8);
+                    string[] lines = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory + "App_Data", "DenyIPRange.txt"), Encoding.UTF8);
                     DenyIPRange = new Dictionary<string, string>();
                     foreach (string line in lines)
                     {
@@ -143,16 +144,15 @@ namespace Masuit.MyBlogs.Core.Common
                 return false;
             }
 
-            bool denyed = DenyIP.Split(',').Contains(ip) || DenyIPRange.Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
+            var denyed = DenyIP.Contains(ip) || DenyIPRange.AsParallel().Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
             if (SystemSettings.GetOrAdd("EnableDenyArea", "false") == "false")
             {
                 return denyed;
             }
 
             var pos = GetIPLocation(ip);
-            string[] region = pos.Split("|");
-            string[] denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
-            return denyed || denyAreas.Intersect(region).Any() || pos.Contains(denyAreas);
+            var denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
+            return denyed || pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any();
         }
 
         public static string GetIPLocation(this IPAddress ip) => GetIPLocation(ip.MapToIPv4().ToString());
