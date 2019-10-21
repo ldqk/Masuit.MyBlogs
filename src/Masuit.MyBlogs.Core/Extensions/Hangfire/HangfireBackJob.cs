@@ -145,10 +145,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             }
             else
             {
-                using (DbSearcher searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db")))
-                {
-                    s.Address = searcher.MemorySearch(s.IP).Region;
-                }
+                using var searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
+                s.Address = searcher.MemorySearch(s.IP).Region;
             }
             RedisHelper.LPush("intercept", s);
         }

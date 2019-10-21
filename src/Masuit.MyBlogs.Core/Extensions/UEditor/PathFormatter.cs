@@ -23,7 +23,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             string filename = Path.GetFileNameWithoutExtension(originFileName);
 
             pathFormat = pathFormat.Replace("{filename}", filename);
-            pathFormat = new Regex(@"\{rand(\:?)(\d+)\}", RegexOptions.Compiled).Replace(pathFormat, match =>
+            pathFormat = new Regex(@"\{rand(\:?)(\d+)\}").Replace(pathFormat, match =>
             {
                 var digit = 6;
                 if (match.Groups.Count > 2)

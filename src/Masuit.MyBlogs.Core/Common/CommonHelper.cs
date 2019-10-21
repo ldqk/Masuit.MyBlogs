@@ -159,10 +159,8 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static string GetIPLocation(this string ip)
         {
-            using (var searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db")))
-            {
-                return searcher.MemorySearch(ip).Region;
-            }
+            using var searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
+            return searcher.MemorySearch(ip).Region;
         }
 
         /// <summary>

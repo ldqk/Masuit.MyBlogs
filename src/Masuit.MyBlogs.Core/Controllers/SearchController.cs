@@ -5,12 +5,10 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -42,11 +40,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Total = 0;
             ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
-            if (Regex.Match(wd ?? "", CommonHelper.BanRegex).Length + Regex.Match(wd ?? "", CommonHelper.ModRegex).Length > 0)
-            {
-                return RedirectToAction("Search", "Search", new { wd = "" });
-            }
-
             string ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             string key = "Search:" + ip;
             if (CacheManager.Exists(key))

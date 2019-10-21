@@ -87,10 +87,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 foreach (var t in Request.Form.Files)
                 {
                     string path = Path.Combine(HostEnvironment.ContentRootPath, CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/'), destination.TrimStart('\\', '/'), t.FileName);
-                    using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                    {
-                        t.CopyTo(fs);
-                    }
+                    using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    t.CopyTo(fs);
                 }
             }
             return Json(new

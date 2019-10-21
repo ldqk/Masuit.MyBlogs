@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using Hangfire;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
@@ -6,7 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Masuit.MyBlogs.Core.Extensions
 {
@@ -28,6 +31,22 @@ namespace Masuit.MyBlogs.Core.Extensions
 
         public async Task Invoke(HttpContext context)
         {
+            var request = context.Request;
+            var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
+            if (Regex.Match(path ?? "", CommonHelper.BanRegex).Length > 0)
+            {
+                BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
+                {
+                    IP = context.Connection.RemoteIpAddress.MapToIPv4().ToString(),
+                    RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path),
+                    Time = DateTime.Now,
+                    UserAgent = request.Headers[HeaderNames.UserAgent]
+                }));
+                context.Response.StatusCode = 504;
+                await context.Response.WriteAsync("参数不合法！", Encoding.UTF8);
+                return;
+            }
+
             if (!context.Session.TryGetValue("session", out _) && !context.Request.IsRobot())
             {
                 context.Session.Set("session", 0);
@@ -45,6 +64,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     }
                     catch
                     {
+                        context.Response.StatusCode = 504;
                         await context.Response.WriteAsync("您的浏览器不支持访问本站！", Encoding.UTF8);
                         return;
                     }

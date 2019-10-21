@@ -2,7 +2,6 @@
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
@@ -60,15 +59,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                 PhysicsAddress address = await ip.GetPhysicsAddressInfo();
                 return View(address);
             }
-            using (HttpClient client = new HttpClient()
+
+            using var client = new HttpClient()
             {
                 BaseAddress = new Uri("http://api.map.baidu.com")
-            })
-            {
-                var s = await client.GetStringAsync($"/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={AppConfig.BaiduAK}");
-                PhysicsAddress physicsAddress = JsonConvert.DeserializeObject<PhysicsAddress>(s);
-                return View(physicsAddress);
-            }
+            };
+            var s = await client.GetStringAsync($"/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={AppConfig.BaiduAK}");
+            var physicsAddress = JsonConvert.DeserializeObject<PhysicsAddress>(s);
+            return View(physicsAddress);
         }
 
         /// <summary>
@@ -86,7 +84,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Random r = new Random();
                 ip = $"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}";
 #endif
-                PhysicsAddress address = await ip.GetPhysicsAddressInfo();
+                var address = await ip.GetPhysicsAddressInfo();
                 if (address?.Status == 0)
                 {
                     ViewBag.Address = address.AddressResult.FormattedAddress;
@@ -98,26 +96,24 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
             ViewBag.Address = addr;
-            using (HttpClient client = new HttpClient()
+            using HttpClient client = new HttpClient()
             {
                 BaseAddress = new Uri("http://api.map.baidu.com")
-            })
+            };
+            var s = await client.GetStringAsync($"/geocoder/v2/?output=json&address={addr}&ak={AppConfig.BaiduAK}");
+            var physicsAddress = JsonConvert.DeserializeAnonymousType(s, new
             {
-                var s = await client.GetStringAsync($"/geocoder/v2/?output=json&address={addr}&ak={AppConfig.BaiduAK}");
-                var physicsAddress = JsonConvert.DeserializeAnonymousType(s, new
+                status = 0,
+                result = new
                 {
-                    status = 0,
-                    result = new
-                    {
-                        location = new Location()
-                    }
-                });
-                if (Request.Method.ToLower().Equals("get"))
-                {
-                    return View(physicsAddress.result.location);
+                    location = new Location()
                 }
-                return Json(physicsAddress.result.location);
+            });
+            if (Request.Method.ToLower().Equals("get"))
+            {
+                return View(physicsAddress.result.location);
             }
+            return Json(physicsAddress.result.location);
         }
     }
 }

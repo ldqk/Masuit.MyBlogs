@@ -73,17 +73,15 @@ namespace Masuit.MyBlogs.Core.Common
         {
             string base64String = Convert.ToBase64String(stream.ToByteArray());
             string path = $"{DateTime.Now:yyyyMMdd}/{Path.GetFileName(file)}";
-            using (var resp = await _httpClient.PostAsJsonAsync(AppConfig.GiteeConfig.ApiUrl + HttpUtility.UrlEncode(path), new
+            using var resp = await _httpClient.PostAsJsonAsync(AppConfig.GiteeConfig.ApiUrl + HttpUtility.UrlEncode(path), new
             {
                 access_token = AppConfig.GiteeConfig.AccessToken,
                 content = base64String,
                 message = "上传一张图片"
-            }))
+            });
+            if (resp.IsSuccessStatusCode || (await resp.Content.ReadAsStringAsync()).Contains("already exists"))
             {
-                if (resp.IsSuccessStatusCode || (await resp.Content.ReadAsStringAsync()).Contains("already exists"))
-                {
-                    return (AppConfig.GiteeConfig.RawUrl + path, true);
-                }
+                return (AppConfig.GiteeConfig.RawUrl + path, true);
             }
 
             return AppConfig.AliOssConfig.Enabled ? await UploadOss(stream, file) : await UploadSmms(stream, file);
@@ -106,7 +104,7 @@ namespace Masuit.MyBlogs.Core.Common
             string base64String = Convert.ToBase64String(stream.ToByteArray());
             _httpClient.DefaultRequestHeaders.Add("PRIVATE-TOKEN", gitlab.AccessToken);
             string path = $"{DateTime.Now:yyyyMMdd}/{Path.GetFileName(file)}";
-            using (var resp = await _httpClient.PostAsJsonAsync(gitlab.ApiUrl.Contains("/v3/") ? gitlab.ApiUrl : gitlab.ApiUrl + HttpUtility.UrlEncode(path), new
+            using var resp = await _httpClient.PostAsJsonAsync(gitlab.ApiUrl.Contains("/v3/") ? gitlab.ApiUrl : gitlab.ApiUrl + HttpUtility.UrlEncode(path), new
             {
                 file_path = path,
                 branch_name = gitlab.Branch,
@@ -116,12 +114,10 @@ namespace Masuit.MyBlogs.Core.Common
                 encoding = "base64",
                 content = base64String,
                 commit_message = "上传一张图片"
-            }))
+            });
+            if (resp.IsSuccessStatusCode || (await resp.Content.ReadAsStringAsync()).Contains("already exists"))
             {
-                if (resp.IsSuccessStatusCode || (await resp.Content.ReadAsStringAsync()).Contains("already exists"))
-                {
-                    return (gitlab.RawUrl + path, true);
-                }
+                return (gitlab.RawUrl + path, true);
             }
 
             return AppConfig.AliOssConfig.Enabled ? await UploadOss(stream, file) : await UploadSmms(stream, file);
@@ -154,45 +150,41 @@ namespace Masuit.MyBlogs.Core.Common
             string url = string.Empty;
             bool success = false;
             _httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-            using (var bc = new StreamContent(stream))
+            using var bc = new StreamContent(stream);
+            bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
             {
-                bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                FileName = Path.GetFileName(file),
+                Name = "smfile"
+            };
+            using var content = new MultipartFormDataContent { bc };
+            var code = await _httpClient.PostAsync("https://sm.ms/api/upload?inajax=1&ssl=1", content).ContinueWith(t =>
+            {
+                if (t.IsCanceled || t.IsFaulted)
                 {
-                    FileName = Path.GetFileName(file),
-                    Name = "smfile"
-                };
-                using (var content = new MultipartFormDataContent { bc })
-                {
-                    var code = await _httpClient.PostAsync("https://sm.ms/api/upload?inajax=1&ssl=1", content).ContinueWith(t =>
-                    {
-                        if (t.IsCanceled || t.IsFaulted)
-                        {
-                            return 0;
-                        }
-
-                        var res = t.Result;
-                        if (!res.IsSuccessStatusCode)
-                        {
-                            return 2;
-                        }
-
-                        try
-                        {
-                            string s = res.Content.ReadAsStringAsync().Result;
-                            var token = JObject.Parse(s);
-                            url = (string)token["data"]["url"];
-                            return 1;
-                        }
-                        catch
-                        {
-                            return 2;
-                        }
-                    });
-                    if (code == 1)
-                    {
-                        success = true;
-                    }
+                    return 0;
                 }
+
+                var res = t.Result;
+                if (!res.IsSuccessStatusCode)
+                {
+                    return 2;
+                }
+
+                try
+                {
+                    string s = res.Content.ReadAsStringAsync().Result;
+                    var token = JObject.Parse(s);
+                    url = (string)token["data"]["url"];
+                    return 1;
+                }
+                catch
+                {
+                    return 2;
+                }
+            });
+            if (code == 1)
+            {
+                success = true;
             }
 
             return success ? (url, true) : await UploadPeople(stream, file);
@@ -208,36 +200,32 @@ namespace Masuit.MyBlogs.Core.Common
         {
             bool success = false;
             _httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Chrome/72.0.3626.96"));
-            using (var sc = new StreamContent(stream))
+            using var sc = new StreamContent(stream);
+            using var mc = new MultipartFormDataContent
             {
-                using (var mc = new MultipartFormDataContent
+                { sc, "Filedata", Path.GetFileName(file) },
+                {new StringContent("."+Path.GetExtension(file)),"filetype"}
+            };
+            var str = await _httpClient.PostAsync("http://bbs1.people.com.cn/postImageUpload.do", mc).ContinueWith(t =>
+            {
+                if (t.IsCompletedSuccessfully)
                 {
-                    { sc, "Filedata", Path.GetFileName(file) },
-                    {new StringContent("."+Path.GetExtension(file)),"filetype"}
-                })
-                {
-                    var str = await _httpClient.PostAsync("http://bbs1.people.com.cn/postImageUpload.do", mc).ContinueWith(t =>
+                    var res = t.Result;
+                    if (res.IsSuccessStatusCode)
                     {
-                        if (t.IsCompletedSuccessfully)
+                        string result = res.Content.ReadAsStringAsync().Result;
+                        string url = "http://bbs1.people.com.cn" + (string)JObject.Parse(result)["imageUrl"];
+                        if (url.EndsWith(Path.GetExtension(file)))
                         {
-                            var res = t.Result;
-                            if (res.IsSuccessStatusCode)
-                            {
-                                string result = res.Content.ReadAsStringAsync().Result;
-                                string url = "http://bbs1.people.com.cn" + (string)JObject.Parse(result)["imageUrl"];
-                                if (url.EndsWith(Path.GetExtension(file)))
-                                {
-                                    success = true;
-                                    return url;
-                                }
-                            }
+                            success = true;
+                            return url;
                         }
-
-                        return "";
-                    });
-                    return (str, success);
+                    }
                 }
-            }
+
+                return "";
+            });
+            return (str, success);
         }
 
         /// <summary>
@@ -261,14 +249,12 @@ namespace Masuit.MyBlogs.Core.Common
                     continue;
                 }
 
-                using (var stream = File.OpenRead(path))
+                await using var stream = File.OpenRead(path);
+                var (url, success) = await UploadImage(stream, path);
+                if (success)
                 {
-                    var (url, success) = await UploadImage(stream, path);
-                    if (success)
-                    {
-                        content = content.Replace(src, url);
-                        BackgroundJob.Enqueue(() => File.Delete(path));
-                    }
+                    content = content.Replace(src, url);
+                    BackgroundJob.Enqueue(() => File.Delete(path));
                 }
             }
 

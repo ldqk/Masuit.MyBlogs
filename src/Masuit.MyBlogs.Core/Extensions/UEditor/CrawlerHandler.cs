@@ -73,26 +73,23 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
 
             try
             {
-                using (var stream = response.Content.ReadAsStreamAsync().Result)
+                using var stream = response.Content.ReadAsStreamAsync().Result;
+                var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
+                var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath).Result;
+                if (success)
                 {
-                    var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
-                    var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath).Result;
-                    if (success)
+                    ServerUrl = url;
+                }
+                else
+                {
+                    if (!Directory.Exists(Path.GetDirectoryName(savePath)))
                     {
-                        ServerUrl = url;
+                        Directory.CreateDirectory(Path.GetDirectoryName(savePath));
                     }
-                    else
-                    {
-                        if (!Directory.Exists(Path.GetDirectoryName(savePath)))
-                        {
-                            Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-                        }
-                        using (var ms = new MemoryStream())
-                        {
-                            stream.CopyTo(ms);
-                            File.WriteAllBytes(savePath, ms.GetBuffer());
-                        }
-                    }
+
+                    using var ms = new MemoryStream();
+                    stream.CopyTo(ms);
+                    File.WriteAllBytes(savePath, ms.GetBuffer());
                 }
 
                 State = "SUCCESS";

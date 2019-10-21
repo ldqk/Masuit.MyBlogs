@@ -54,7 +54,7 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="2.0.0-beta-1629" />
     <PackageReference Include="CacheManager.Serialization.Json" Version="2.0.0-beta-1629" />
-    <PackageReference Include="CSRedisCore" Version="3.1.8" />
+    <PackageReference Include="CSRedisCore" Version="3.1.10" />
     <PackageReference Include="EFSecondLevelCache.Core" Version="2.8.1" />
     <PackageReference Include="Hangfire" Version="1.7.6" />
     <PackageReference Include="Hangfire.Autofac" Version="2.3.1" />
@@ -63,6 +63,7 @@
     <PackageReference Include="htmldiff.net-core" Version="1.3.6" />
     <PackageReference Include="IP2Region" Version="1.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.0.0" />
     <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
     <PackageReference Include="Polly" Version="7.1.1" />

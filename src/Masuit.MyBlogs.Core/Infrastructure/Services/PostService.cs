@@ -215,18 +215,18 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// 统一保存的方法
         /// </summary>
         /// <returns>受影响的行数</returns>
-        public override int SaveChanges()
+        public int SaveChanges(bool flushIndex)
         {
-            return _searchEngine.SaveChanges();
+            return flushIndex ? _searchEngine.SaveChanges() : base.SaveChanges();
         }
 
         /// <summary>
         /// 统一保存数据
         /// </summary>
         /// <returns>受影响的行数</returns>
-        public override Task<int> SaveChangesAsync()
+        public async Task<int> SaveChangesAsync(bool flushIndex)
         {
-            return _searchEngine.SaveChangesAsync();
+            return flushIndex ? await _searchEngine.SaveChangesAsync() : await base.SaveChangesAsync();
         }
     }
 }

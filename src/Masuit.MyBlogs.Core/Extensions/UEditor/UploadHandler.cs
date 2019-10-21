@@ -47,23 +47,21 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             {
                 if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(uploadFileName)))
                 {
-                    using (Stream stream = file.OpenReadStream())
+                    using var stream = file.OpenReadStream();
+                    var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath).Result;
+                    if (success)
                     {
-                        var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath).Result;
-                        if (success)
+                        Result.Url = url;
+                    }
+                    else
+                    {
+                        if (!Directory.Exists(Path.GetDirectoryName(localPath)))
                         {
-                            Result.Url = url;
+                            Directory.CreateDirectory(Path.GetDirectoryName(localPath));
                         }
-                        else
-                        {
-                            if (!Directory.Exists(Path.GetDirectoryName(localPath)))
-                            {
-                                Directory.CreateDirectory(Path.GetDirectoryName(localPath));
-                            }
 
-                            File.WriteAllBytes(localPath, stream.ToByteArray());
-                            Result.Url = savePath;
-                        }
+                        File.WriteAllBytes(localPath, stream.ToByteArray());
+                        Result.Url = savePath;
                     }
                 }
                 else

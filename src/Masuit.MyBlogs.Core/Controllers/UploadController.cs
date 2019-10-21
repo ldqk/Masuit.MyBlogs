@@ -96,10 +96,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             string resourceName = string.Empty.CreateShortToken(9);
             string ext = Path.GetExtension(fileName);
             string docPath = Path.Combine(upload, resourceName + ext);
-            using (FileStream fs = new FileStream(docPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            {
-                file.CopyTo(fs);
-            }
+            using var fs = new FileStream(docPath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            file.CopyTo(fs);
             string htmlDir = docPath.Replace(".docx", "").Replace(".doc", "");
             DocumentConvert.Doc2Html(docPath, htmlDir);
             string htmlfile = Path.Combine(htmlDir, "index.html");
@@ -248,7 +246,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         Directory.CreateDirectory(dir);
                     }
 
-                    using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                    await using (var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                     {
                         file.CopyTo(fs);
                     }
@@ -272,7 +270,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Directory.CreateDirectory(dir);
                 }
 
-                using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                await using (var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                 {
                     file.CopyTo(fs);
                 }

@@ -5,11 +5,13 @@ using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
+using System.Text;
 using System.Web;
 
 namespace Masuit.MyBlogs.Core.Extensions
@@ -41,14 +43,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             var ip = context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             if (ip.IsDenyIpAddress() && string.IsNullOrEmpty(context.HttpContext.Session.Get<string>("FullAccessViewToken")))
             {
-                BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
-                {
-                    IP = ip,
-                    RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + request.Path),
-                    Time = DateTime.Now,
-                    UserAgent = request.Headers[HeaderNames.UserAgent]
-                }));
-                context.Result = new RedirectToActionResult("AccessDeny", "Error", null);
+                AccessDeny(context, ip, request);
                 return;
             }
 
@@ -68,16 +63,30 @@ namespace Masuit.MyBlogs.Core.Extensions
             if (times > limit * 1.2)
             {
                 CacheManager.Expire("Frequency:" + ip, ExpirationMode.Sliding, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
+                var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
                 {
                     IP = ip,
-                    RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + request.Path),
+                    RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path),
                     Time = DateTime.Now,
                     UserAgent = request.Headers[HeaderNames.UserAgent]
                 }));
             }
 
             context.Result = new RedirectResult("/tempdeny");
+        }
+
+        private void AccessDeny(ActionExecutingContext context, string ip, HttpRequest request)
+        {
+            var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
+            BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
+            {
+                IP = ip,
+                RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path),
+                Time = DateTime.Now,
+                UserAgent = request.Headers[HeaderNames.UserAgent]
+            }));
+            context.Result = new RedirectToActionResult("AccessDeny", "Error", null);
         }
     }
 }

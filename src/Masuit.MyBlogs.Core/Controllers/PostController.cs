@@ -194,7 +194,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult Publish()
         {
-            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).Cacheable().ToHashSet();
+            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().Cacheable().AsParallel().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
             ViewBag.Category = CategoryService.GetQueryFromCache(c => c.Status == Status.Available).ToList();
             return View(list);
         }
@@ -517,8 +517,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var post = PostService.GetById(id);
             post.Status = Status.Deleted;
-            bool b = SearchEngine.SaveChanges() > 0;
-            SearchEngine.LuceneIndexer.Delete(post);
+            bool b = PostService.SaveChanges(true) > 0;
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 
