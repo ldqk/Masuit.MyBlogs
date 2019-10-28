@@ -12,6 +12,7 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace Masuit.MyBlogs.Core.Extensions
@@ -23,31 +24,29 @@ namespace Masuit.MyBlogs.Core.Extensions
         /// <inheritdoc />
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (context.Filters.Any(m => m.ToString().Contains(nameof(AllowAccessFirewallAttribute))))
-            {
-                return;
-            }
-
             var request = context.HttpContext.Request;
-            var httpMethod = request.Method;
-            if (httpMethod.Equals("OPTIONS", StringComparison.InvariantCultureIgnoreCase) || httpMethod.Equals("HEAD", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return;
-            }
-
-            if (request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]))
+            if (context.Filters.Any(m => m.ToString().Contains(nameof(AllowAccessFirewallAttribute))) || request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]))
             {
                 return;
             }
 
             var ip = context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
-            if (ip.IsDenyIpAddress() && string.IsNullOrEmpty(context.HttpContext.Session.Get<string>("FullAccessViewToken")))
+            var sessionToken = context.HttpContext.Session.Get<string>("FullAccessViewToken");
+            if (ip.IsDenyIpAddress() && string.IsNullOrEmpty(sessionToken))
             {
                 AccessDeny(context, ip, request);
+                context.Result = new BadRequestObjectResult("您当前所在的网络环境不支持访问本站！");
                 return;
             }
 
-            if (request.IsRobot())
+            if (ip.IsInDenyArea() && string.IsNullOrEmpty(sessionToken))
+            {
+                AccessDeny(context, ip, request);
+                context.Result = new RedirectToActionResult("AccessDeny", "Error", null);
+                return;
+            }
+
+            if (Regex.IsMatch(request.Method, "OPTIONS|HEAD", RegexOptions.IgnoreCase) || request.IsRobot())
             {
                 return;
             }
@@ -63,14 +62,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             if (times > limit * 1.2)
             {
                 CacheManager.Expire("Frequency:" + ip, ExpirationMode.Sliding, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
-                var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
-                BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
-                {
-                    IP = ip,
-                    RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path),
-                    Time = DateTime.Now,
-                    UserAgent = request.Headers[HeaderNames.UserAgent]
-                }));
+                AccessDeny(context, ip, request);
             }
 
             context.Result = new RedirectResult("/tempdeny");
@@ -86,7 +78,6 @@ namespace Masuit.MyBlogs.Core.Extensions
                 Time = DateTime.Now,
                 UserAgent = request.Headers[HeaderNames.UserAgent]
             }));
-            context.Result = new RedirectToActionResult("AccessDeny", "Error", null);
         }
     }
 }

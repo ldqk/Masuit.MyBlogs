@@ -2,7 +2,7 @@
 @model List<Masuit.MyBlogs.Core.Models.Entity.Donate>
 
 @{
-    ViewBag.Title = "网站捐赠";
+    ViewBag.Title = "网站打赏";
     Layout = "~/Views/Shared/_Layout.cshtml";
     Random r = new Random();
 }
@@ -105,10 +105,10 @@
             本网站由博主一个人打造，开发和运营均为博主本人，如果您是真心喜欢本博客，您可以对博主表示一下感谢，以支持后期发布更多好资源，5毛也好、1元也罢，都是你们的心意。网站运营也需要成本，有你的援助，一切会更好。
         </p>
         <p class="text-red size20">
-            捐赠时最好能够附上你的完整信息，包括：您的昵称或真名、邮箱地址、QQ或微信、金额等；因为不能保证能够完全的清楚捐赠者的基本信息，如果你完成了捐赠，推荐你在网站留言板备注一下，或者QQ私信告知你是谁。
+            打赏时最好能够附上你的完整信息，包括：您的昵称或真名、邮箱地址、QQ或微信、金额等；因为不能保证能够完全的清楚打赏者的基本信息，如果你完成了打赏，推荐你在网站留言板备注一下，或者QQ私信告知你是谁。
         </p>
         <p>
-            您可以尽您所能地捐赠，如果您临时改变主意，您可以在事后一个月之内联系作者申请退款！
+            您可以尽您所能地打赏，如果您临时改变主意，您可以在事后一个月之内联系作者申请退款！
         </p>
         <p>
             本站的宗旨是：互联网分享精神，乐于发现，勤于分享；
@@ -121,13 +121,13 @@
 <div class="container-fluid" ng-app="myApp" ng-controller="home as list">
     <div class="page-header margin-clear">
         <h2 class="size24" style="display: inline">
-            捐赠名单(排名不分先后)：
+            打赏名单(排名不分先后)：
         </h2>
-        <button class="btn btn-info pull-right" ng-click="save()">添加捐赠</button>
+        <button class="btn btn-info pull-right" ng-click="save()">添加打赏</button>
     </div>
     <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed margin-clear" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'捐赠时间'" filter="{DonateTime: 'text'}" sortable="'DonateTime'">
+            <td title="'打赏时间'" filter="{DonateTime: 'text'}" sortable="'DonateTime'">
                 {{row.DonateTime|date:'yyyy-MM-dd'}}
             </td>
             <td title="'昵称'" filter="{NickName: 'text'}" sortable="'NickName'">
@@ -136,7 +136,7 @@
             <td title="'金额'" filter="{Amount: 'number'}" sortable="'Amount'">
                 {{row.Amount}}
             </td>
-            <td title="'捐赠方式'" filter="{Via: 'text'}" sortable="'Via'">
+            <td title="'打赏方式'" filter="{Via: 'text'}" sortable="'Via'">
                 {{row.Via}}
             </td>
             <td title="'Email'" filter="{Email: 'text'}" sortable="'Email'">
@@ -204,7 +204,7 @@
         };
         self.del = function (row) {
             swal({
-                title: "确认删除这条捐赠记录吗？",
+                title: "确认删除这条打赏记录吗？",
                 text: row.NickName,
                 showCancelButton: true,
                 confirmButtonColor: "#DD6B55",
@@ -249,12 +249,12 @@
                 };
             }
             swal({
-                title: '添加捐赠记录',
+                title: '添加打赏记录',
                 html:
                     '<div class="input-group"><span class="input-group-addon">昵称： </span><input type="text" id="name" class="form-control input-lg" placeholder="请输入昵称" value="' + row.NickName + '"></div>' +
-                    '<div class="input-group"><span class="input-group-addon">捐赠时间： </span><input id="date" type="text" class="form-control input-lg date datainp dateicon" readonly placeholder="请输入捐赠时间" value="' + row.DonateTime + '"></div>	' +
-                    '<div class="input-group"><span class="input-group-addon">捐赠金额： </span><input id="amount" type="text" class="form-control input-lg" placeholder="请输入金额" value="' + row.Amount + '"></div>' +
-                    '<div class="input-group"><span class="input-group-addon">捐赠方式： </span><input id="via" type="text" class="form-control input-lg" placeholder="请输入捐赠方式" value="' + row.Via + '"></div>' +
+                    '<div class="input-group"><span class="input-group-addon">打赏时间： </span><input id="date" type="text" class="form-control input-lg date datainp dateicon" readonly placeholder="请输入打赏时间" value="' + row.DonateTime + '"></div>	' +
+                    '<div class="input-group"><span class="input-group-addon">打赏金额： </span><input id="amount" type="text" class="form-control input-lg" placeholder="请输入金额" value="' + row.Amount + '"></div>' +
+                    '<div class="input-group"><span class="input-group-addon">打赏方式： </span><input id="via" type="text" class="form-control input-lg" placeholder="请输入打赏方式" value="' + row.Via + '"></div>' +
                     '<div class="input-group"><span class="input-group-addon">Email： </span><input type="email" id="email" class="form-control input-lg" placeholder="请输入Email" value="' + row.Email + '"></div>' +
                     '<div class="input-group"><span class="input-group-addon">QQ或微信： </span><input type="text" id="qq" class="form-control input-lg" placeholder="请输入QQ或微信" value="' + row.QQorWechat + '"></div>' +
                     '<div class="input-group"><span class="input-group-addon">显示Email： </span><input type="text" id="demail" class="form-control input-lg" placeholder="请输入显示Email" value="' + row.EmailDisplay + '"></div>' +

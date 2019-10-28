@@ -66,7 +66,6 @@ namespace Masuit.MyBlogs.Core
             AppConfig.BaiduAK = configuration[nameof(AppConfig.BaiduAK)];
             AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
             configuration.Bind("Imgbed:AliyunOSS", AppConfig.AliOssConfig);
-            configuration.Bind("Imgbed:Gitee", AppConfig.GiteeConfig);
             configuration.Bind("Imgbed:Gitlabs", AppConfig.GitlabConfigs);
         }
 

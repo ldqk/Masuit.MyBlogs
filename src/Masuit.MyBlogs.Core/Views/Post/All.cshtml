@@ -109,7 +109,7 @@
                     @{
                         foreach (var g in cats)
                         {
-                            <a href="/cat/@g.Id" class="label label-@colors[r.Next(colors.Length)]">@g.Name (@(g.Count)篇)</a>
+                            <a asp-controller="Home" asp-action="Category" asp-route-id="@g.Id" class="label label-@colors[r.Next(colors.Length)]">@g.Name (@(g.Count)篇)</a>
                         }
                     }
                 </p>
@@ -119,7 +119,7 @@
                     @{
                         foreach (var g in tags)
                         {
-                            <a href="/tag/@HttpUtility.UrlEncode(g.Key)" class="label label-@colors[r.Next(colors.Length)]">@g.Key (@g.Count()篇)</a>
+                            <a asp-controller="Home" asp-action="Tag" asp-route-id="@g.Key" class="label label-@colors[r.Next(colors.Length)]">@g.Key (@g.Count()篇)</a>
                         }
                     }
                 </p>
@@ -129,7 +129,7 @@
                     @{
                         foreach (var g in seminars)
                         {
-                            <a href="/c/@g.Id" class="label label-@colors[r.Next(colors.Length)]">@g.Name (@(g.Count)篇)</a>
+                            <a asp-controller="Seminar" asp-action="Index" asp-route-id="@g.Id" class="label label-@colors[r.Next(colors.Length)]">@g.Name (@(g.Count)篇)</a>
                         }
                     }
                 </p>

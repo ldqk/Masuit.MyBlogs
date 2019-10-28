@@ -29,5 +29,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
 
         public virtual ICollection<Post> Post { get; set; }
         public virtual ICollection<PostHistoryVersion> PostHistoryVersion { get; set; }
+        public virtual ICollection<Advertisement> Advertisements { get; set; }
     }
 }

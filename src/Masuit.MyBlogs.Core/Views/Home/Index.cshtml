@@ -2,9 +2,7 @@
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
-@using Masuit.MyBlogs.Core.Extensions
 @using Masuit.Tools.Core.Net
-@using Masuit.Tools.Win32
 @using Microsoft.AspNetCore.Http
 @model Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel
 @{
@@ -50,7 +48,7 @@
                             <div class="slide-text @style[r.Next(style.Length)]">
                                 <h2 data-animation="animated @ani[r.Next(ani.Length)]">@p.Title</h2>
                                 <p data-animation="animated @ani[r.Next(ani.Length)]">@p.Description</p>
-                                <a href="@p.Url" target="_blank" class="btn btn-default" data-animation="animated @ani[r.Next(ani.Length)]">查看详情</a>
+                                <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@p.Id" target="_blank" class="btn btn-default" data-animation="animated @ani[r.Next(ani.Length)]">查看详情</a>
                             </div>
                         </div>
                     </div>
@@ -73,7 +71,7 @@
 @if (Model.Notices.Any())
 {
     <div class="container notice">
-        <a href="/n/@(Model.Notices.FirstOrDefault()?.Id)">
+        <a asp-controller="Notice" asp-action="Details" asp-route-id="@(Model.Notices.FirstOrDefault()?.Id)">
             <h3 class="size18 text-red text-center">网站最新公告</h3>
         </a>
         @Html.Raw(Model.Notices.FirstOrDefault()?.Content.Replace("img src=", $"img title='{CommonHelper.SystemSettings["Title"]}' alt='{CommonHelper.SystemSettings["Title"]}' data-original="))

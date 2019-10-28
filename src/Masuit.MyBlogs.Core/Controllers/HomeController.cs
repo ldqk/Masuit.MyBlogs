@@ -42,11 +42,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IFastShareService FastShareService { get; set; }
 
         /// <summary>
-        /// banner
-        /// </summary>
-        public IBannerService BannerService { get; set; }
-
-        /// <summary>
         /// 首页
         /// </summary>
         /// <returns></returns>
@@ -54,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index()
         {
             ViewBag.Total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin);
-            var banners = BannerService.GetAllFromCache().OrderBy(b => new Random().Next()).ToList();
+            var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner).OrderBy(a => Guid.NewGuid()).ToList();
             var fastShares = FastShareService.GetAllFromCache(s => s.Sort).ToList();
             ViewBag.FastShare = fastShares;
             var viewModel = GetIndexPageViewModel(1, 15, OrderBy.ModifyDate, CurrentUser);
@@ -171,7 +166,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         private IndexPageViewModel GetIndexPageViewModel(int page, int size, OrderBy? orderBy, UserInfoOutputDto user)
         {
-            IQueryable<PostOutputDto> postsQuery = PostService.GetQuery<PostOutputDto>(p => (p.Status == Status.Pended || user.IsAdmin)); //准备文章的查询
+            var postsQuery = PostService.GetQuery<PostOutputDto>(p => (p.Status == Status.Pended || user.IsAdmin)); //准备文章的查询
             var notices = NoticeService.GetPagesFromCache<DateTime, NoticeOutputDto>(1, 5, out int _, n => (n.Status == Status.Display || user.IsAdmin), n => n.ModifyDate, false).ToList(); //加载前5条公告
             var cats = CategoryService.GetQueryFromCache<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).ToList(); //加载分类目录
             var hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week").Take(10).ToList(); //热词统计
@@ -232,7 +227,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Posts = posts,
                 Tags = newdic,
                 Top6Post = hot6Post,
-                PostsQueryable = postsQuery
+                PostsQueryable = postsQuery,
+                SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar),
+                ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.PostList)
             };
         }
     }

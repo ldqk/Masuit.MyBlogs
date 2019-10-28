@@ -31,10 +31,5 @@ namespace Masuit.MyBlogs.Core.Configs
         /// gitlab图床配置
         /// </summary>
         public static List<GitlabConfig> GitlabConfigs { get; set; } = new List<GitlabConfig>();
-
-        /// <summary>
-        /// 码云图床配置
-        /// </summary>
-        public static GitlabConfig GiteeConfig { get; set; } = new GitlabConfig();
     }
 }

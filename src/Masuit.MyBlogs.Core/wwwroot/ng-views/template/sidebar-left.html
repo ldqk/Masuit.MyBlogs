@@ -44,7 +44,6 @@
                 <li><a data-ui-sref-active="active" data-ui-sref="post-list" data-ng-click="mactrl.sidebarStat($event)">文章列表</a></li>
                 <li><a data-ui-sref-active="active" data-ui-sref="merge-list" data-ng-click="mactrl.sidebarStat($event)">文章合并</a></li>
                 <li><a data-ui-sref-active="active" data-ui-sref="write-blog" data-ng-click="mactrl.sidebarStat($event)">写文章</a></li>
-                <li><a data-ui-sref-active="active" data-ui-sref="top-post" data-ng-click="mactrl.sidebarStat($event)">banner头图管理</a></li>
                 <li><a data-ui-sref-active="active" data-ui-sref="post-cat" data-ng-click="mactrl.sidebarStat($event)">文章分类管理</a></li>
                 <li><a data-ui-sref-active="active" data-ui-sref="seminar" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-format-underlined"></i>文章专题管理</a></li>
                 <li><a data-ui-sref-active="active" data-ui-sref="share" data-ng-click="mactrl.sidebarStat($event)">快速分享</a></li>
@@ -57,7 +56,7 @@
                 <li><a data-ui-sref-active="active" data-ui-sref="msg" data-ng-click="mactrl.sidebarStat($event)">留言审核</a></li>
             </ul>
         </li>
-        
+
         <li class="sub-menu" data-ng-class="{ 'active toggled': mactrl.$state.includes('form') }">
             <a href="" toggle-submenu><i class="zmdi zmdi-collection-text"></i>网站公告</a>
 
@@ -91,7 +90,10 @@
             </ul>
         </li>
         <li data-ui-sref-active="active">
-            <a data-ui-sref-active="active" data-ui-sref="donate" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-money"></i>捐赠列表</a>
+            <a data-ui-sref-active="active" data-ui-sref="partner" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-assignment"></i>广告管理</a>
+        </li>
+        <li data-ui-sref-active="active">
+            <a data-ui-sref-active="active" data-ui-sref="donate" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-money"></i>打赏列表</a>
         </li>
         <li data-ui-sref-active="active">
             <a data-ui-sref-active="active" data-ui-sref="subscribe" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-swap-alt"></i>订阅管理</a>

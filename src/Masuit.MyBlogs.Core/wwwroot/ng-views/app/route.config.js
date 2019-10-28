@@ -100,13 +100,16 @@ myApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
 						cpath + "/post.js"]);
 				}]
 			}
-		}).state("top-post", {
-			url: "/post/top",
-			templateUrl: vpath + "/post/top.html",
-			controller: "toppost",
+		}).state("partner", {
+			url: "/partner",
+			templateUrl: vpath + "/partner.html",
+			controller: "partner as list",
 			resolve: {
 				deps: ["$ocLazyLoad", function($ocLazyLoad) {
-					return $ocLazyLoad.load([cpath + "/post.js"]);
+					return $ocLazyLoad.load([{
+						files: ["/Assets/semantic/semantic.css","https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"],
+						cache: true
+					},cpath + "/partner.js"]);
 				}]
 			}
 		}).state("post-cat", {

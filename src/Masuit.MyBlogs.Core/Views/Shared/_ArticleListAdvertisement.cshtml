@@ -1,0 +1,29 @@
+﻿@model Masuit.MyBlogs.Core.Models.Entity.Advertisement
+<div class="ibox">
+    <div class="ibox-content">
+        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank">
+            <h4>
+                <i class="text-red size18">[荐]</i>
+                @Model.Title
+            </h4>
+        </a>
+        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank">
+            <div class="row padding-bot10">
+                @{
+                    string imgSrc = Model.ThumbImgUrl;
+                    if (!string.IsNullOrEmpty(imgSrc))
+                    {
+                        <div class="col-md-3">
+                            <img class="img-thumbnail img-responsive thumb" original="@imgSrc" alt="@Model.Title" title="@Model.Title">
+                        </div>
+                    }
+                }
+                <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
+                    <p>
+                        @Model.Description
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>

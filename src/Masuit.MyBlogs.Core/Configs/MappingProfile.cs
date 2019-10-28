@@ -4,6 +4,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Systems;
+using System;
 using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Configs
@@ -83,6 +84,9 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<PostMergeRequest, PostMergeRequestOutputDto>().ForMember(p => p.PostTitle, e => e.MapFrom(r => r.Post.Title));
             CreateMap<PostMergeRequest, Post>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.Status, e => e.Ignore()).ReverseMap();
             CreateMap<Post, PostMergeRequestOutputDto>().ReverseMap();
+
+            CreateMap<Advertisement, AdvertisementViewModel>().ForMember(a => a.CategoryName, e => e.MapFrom(a => a.Category.Name));
+            CreateMap<AdvertisementInputDto, Advertisement>().ForMember(a => a.CategoryId, e => e.MapFrom(d => string.IsNullOrEmpty(d.CategoryId) ? null : d.CategoryId)).ForMember(a => a.Status, e => e.Ignore()).ForMember(a => a.UpdateTime, e => e.MapFrom(a => DateTime.Now));
         }
     }
 }

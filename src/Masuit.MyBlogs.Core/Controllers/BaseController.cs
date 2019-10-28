@@ -39,6 +39,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public ILinksService LinksService { get; set; }
 
+        public IAdvertisementService AdsService { get; set; }
+
         public UserInfoOutputDto CurrentUser => HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
 
         public IMapper Mapper { get; set; }
@@ -143,7 +145,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.menus = MenuService.GetQueryFromCache<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
             var model = new PageFootViewModel //页脚
             {
-                Links = LinksService.GetQueryFromCache<LinksOutputDto>(l => l.Status == Status.Available).OrderBy(l => l.Recommend).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(40).ToList()
+                Links = LinksService.GetQueryFromCache<LinksOutputDto>(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(40).ToList()
             };
             ViewBag.Footer = model;
 

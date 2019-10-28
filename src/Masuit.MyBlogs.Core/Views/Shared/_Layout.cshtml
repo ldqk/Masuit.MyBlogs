@@ -107,7 +107,7 @@
                                 <a href="#">@m.Name</a>
                                 <ul class="cd-secondary-nav is-hidden">
                                     <li class="go-back"><a href="#">上级菜单</a></li>
-                                    <li class="see-all"><a href="/all">所有 @m.Name</a></li>
+                                    <li class="see-all"><a asp-controller="Post" asp-action="All">所有 @m.Name</a></li>
                                     @foreach (MenuOutputDto m2 in menus.Where(s => s.ParentId == m.Id).OrderBy(c => c.Sort))
                                     {
                                         if (menus.Any(mm => mm.ParentId == m2.Id))
@@ -175,7 +175,7 @@
                                 <a href="#">@m.Name</a>
                                 <ul class="cd-nav-gallery is-hidden">
                                     <li class="go-back"><a href="#">返回主菜单</a></li>
-                                    <li class="see-all"><a href="/all">所有 @m.Name</a></li>
+                                    <li class="see-all"><a asp-controller="Post" asp-action="All">所有 @m.Name</a></li>
                                     @{
                                         var ms = menus.Where(s => s.ParentId == m.Id);
                                         foreach (var mm in ms)

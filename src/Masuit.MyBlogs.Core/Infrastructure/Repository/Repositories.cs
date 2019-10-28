@@ -269,19 +269,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
     }
 
-    public partial class BannerRepository : BaseRepository<Banner>, IBannerRepository
-    {
-        /// <summary>
-        /// 添加实体
-        /// </summary>
-        /// <param name="t">需要添加的实体</param>
-        /// <returns>添加成功</returns>
-        public override Banner AddEntity(Banner t)
-        {
-            DataContext.Add(t);
-            return t;
-        }
-    }
     public partial class PostMergeRequestRepository : BaseRepository<PostMergeRequest>, IPostMergeRequestRepository
     {
         /// <summary>
@@ -290,6 +277,19 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="t">需要添加的实体</param>
         /// <returns>添加成功</returns>
         public override PostMergeRequest AddEntity(PostMergeRequest t)
+        {
+            DataContext.Add(t);
+            return t;
+        }
+    }
+    public partial class AdvertisementRepository : BaseRepository<Advertisement>, IAdvertisementRepository
+    {
+        /// <summary>
+        /// 添加实体
+        /// </summary>
+        /// <param name="t">需要添加的实体</param>
+        /// <returns>添加成功</returns>
+        public override Advertisement AddEntity(Advertisement t)
         {
             DataContext.Add(t);
             return t;

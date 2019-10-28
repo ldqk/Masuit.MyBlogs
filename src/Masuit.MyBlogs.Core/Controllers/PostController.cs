@@ -70,6 +70,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ViewData["keywords"] = post.Content.Contains(kw) ? $"['{kw}']" : SearchEngine.LuceneIndexSearcher.CutKeywords(kw).ToJsonString();
             }
 
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
             if (CurrentUser.IsAdmin)
             {
                 return View("Details_Admin", post);
@@ -99,6 +100,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var list = PostHistoryVersionService.GetPages(page, size, out int total, v => v.PostId == id, v => v.ModifyDate, false).ToList();
             ViewBag.Total = total;
             ViewBag.PageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
             return View(list);
         }
 
@@ -114,6 +116,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var post = PostHistoryVersionService.Get(v => v.Id == hid) ?? throw new NotFoundException("文章未找到");
             ViewBag.Next = PostHistoryVersionService.Get(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
             ViewBag.Prev = PostHistoryVersionService.Get(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
             return CurrentUser.IsAdmin ? View("HistoryVersion_Admin", post) : View(post);
         }
 
@@ -135,6 +138,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var diffOutput = diff.Build();
             right.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);
             left.Content = Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty);
+            ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, main.CategoryId);
             return View(new[] { main, left, right });
         }
 

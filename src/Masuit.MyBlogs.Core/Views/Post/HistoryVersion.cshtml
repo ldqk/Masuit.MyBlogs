@@ -1,14 +1,13 @@
-﻿@using System.Text.RegularExpressions
-@using System.Web
+﻿@using System.Web
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.Tools.Core.Net
-@using Masuit.Tools.Win32
 @model Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion
 @{
     ViewBag.Title = Model.Post.Title + "于" + Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss") + "的历史版本：" + Model.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
+    Advertisement ad = ViewBag.Ads;
 }
 <link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
 <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
@@ -58,7 +57,7 @@
                                                 {
                                                     if (!string.IsNullOrEmpty(s))
                                                     {
-                                                        <a href="/tag/@HttpUtility.UrlEncode(s)">
+                                                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
                                                             <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
                                                         </a>
                                                     }
@@ -149,6 +148,34 @@
                         }
                     </div>
                 </section>
+                @if (ad != null)
+                {
+                    <section class="protected">
+                        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank">
+                            <h3>
+                                @ad.Title
+                                <span class="text-red">[推广]</span>
+                            </h3>
+
+                            <div class="row padding-bot10">
+                                @{
+                                    string imgSrc = ad.ThumbImgUrl;
+                                    if (!string.IsNullOrEmpty(imgSrc))
+                                    {
+                                        <div class="col-md-3">
+                                            <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@ad.Title" title="@ad.Title ">
+                                        </div>
+                                    }
+                                }
+                                <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
+                                    <p>
+                                        @ad.Description
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </section>
+                }
             </div>
         </div>
     </div>

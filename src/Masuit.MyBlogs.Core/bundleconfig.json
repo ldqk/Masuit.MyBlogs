@@ -46,5 +46,17 @@
     "inputFiles": [
       "wwwroot/Scripts/global/leavemsg.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/Assets/jquery.tocify/jquery.tocify.min.css",
+    "inputFiles": [
+      "wwwroot/Assets/jquery.tocify/jquery.tocify.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/Assets/banner/bootstrap-touch-slider.min.css",
+    "inputFiles": [
+      "wwwroot/Assets/banner/bootstrap-touch-slider.css"
+    ]
   }
 ]

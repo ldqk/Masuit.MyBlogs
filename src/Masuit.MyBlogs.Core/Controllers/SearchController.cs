@@ -42,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Keyword = wd;
             string ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             string key = "Search:" + ip;
-            if (CacheManager.Exists(key))
+            if (CacheManager.Exists(key) && CacheManager.Get(key) != wd)
             {
                 var hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week").Take(10).ToList();
                 ViewBag.hotSearches = hotSearches;

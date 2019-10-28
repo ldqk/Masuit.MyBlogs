@@ -40,14 +40,21 @@
                 </div>
             </div>
 
-            foreach (PostOutputDto post in Model.Posts)
+            var rnd = new Random().Next(Model.Posts.Count);
+            for (var index = 0; index < Model.Posts.Count; index++)
             {
+                if (rnd == index && Model.ListAdvertisement != null)
+                {
+                    await Html.RenderPartialAsync("_ArticleListAdvertisement", Model.ListAdvertisement);
+                }
+
+                var post = Model.Posts[index];
                 await Html.RenderPartialAsync("_ArticleListItem", post);
             }
         }
         else
         {
-            List<PostOutputDto> list = Model.PostsQueryable.OrderBy(p => Guid.NewGuid()).Skip(0).Take(5).ToList();
+            var list = Model.PostsQueryable.OrderBy(p => Guid.NewGuid()).Skip(0).Take(5).ToList();
             if (list.Any())
             {
                 <div class="page-header">

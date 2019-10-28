@@ -185,7 +185,7 @@
 	$("#donate").on("click", function (e) {
 		$.post("/system/getsetting", { name: "Donate" }, function (data) {
 			swal({
-				title: "支付宝扫一扫付款捐赠！",
+				title: "支付宝扫一扫付款打赏！",
 				html:"<a href='/donate'>更多方式</a>",
 				showCancelButton: true,
 				confirmButtonColor: "#DD6B55",
@@ -199,7 +199,7 @@
 			}).then(function() {
 
 			}, function() {
-				swal("您的捐赠将会支持本站做的更好！", null, "error");
+				swal("您的打赏将会支持本站做的更好！", null, "error");
 			});
 		});
 	});

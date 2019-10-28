@@ -27,7 +27,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IMiscService MiscService { get; set; }
 
         /// <summary>
-        /// 捐赠
+        /// 打赏
         /// </summary>
         public IDonateService DonateService { get; set; }
 
@@ -47,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
-        /// 捐赠
+        /// 打赏
         /// </summary>
         /// <returns></returns>
         [Route("donate")]
@@ -57,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
-        /// 捐赠列表
+        /// 打赏列表
         /// </summary>
         /// <param name="page"></param>
         /// <param name="size"></param>

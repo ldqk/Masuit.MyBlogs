@@ -152,6 +152,10 @@
         white-space: pre-line;
     }
 
+    .ibox-content div.col-sm-3 {
+        text-align: center;
+    }
+
 .article>.ibox>.ibox-content>main header.page-header a h2 {
     font-size: 24px;
     line-height: 32px;
@@ -163,6 +167,7 @@
     word-break: break-all;
 }
 .ibox-content .thumb {
+    max-height: 125px;
     transition: ease-in-out .3s;
     overflow: hidden;
 }

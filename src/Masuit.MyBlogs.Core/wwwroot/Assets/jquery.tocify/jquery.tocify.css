@@ -17,7 +17,9 @@
 }
 @media only screen and (min-width: 1420px) {
     .tocify {
-        right: 0px;
+        right: 0;
+        max-width: 200px;
+        overflow-x: hidden;
     }
 }
 
@@ -38,7 +40,7 @@
     float: right;
     z-index:20;
 }
-/* The Table of Contents is composed of multiple nested unordered lists.  These styles remove the default styling of an unordered list because it is ugly. */
+
 .tocify ul, .tocify li {
     list-style: none;
     margin: 0;

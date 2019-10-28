@@ -7,7 +7,7 @@ using System.Linq;
 namespace Masuit.MyBlogs.Core.Controllers
 {
     /// <summary>
-    /// 捐赠管理
+    /// 打赏管理
     /// </summary>
     public class DonateController : AdminController
     {

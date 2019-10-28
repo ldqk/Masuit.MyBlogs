@@ -7,7 +7,7 @@
 @model Masuit.MyBlogs.Core.Models.DTO.PostOutputDto
 <div class="ibox wow fadeIn">
     <div class="ibox-content">
-        <a href="/@Model.Id" target="_blank">
+        <a asp-controller="Post" asp-action="Details" asp-route-id="@Model.Id" target="_blank">
             <h4>
                 @if (Model.IsFixedTop)
                 {
@@ -49,7 +49,7 @@
                 <div class="col-md-6">
                     @foreach (string s in Model.Label.Split(',', '，'))
                     {
-                        <a href="/tag/@HttpUtility.UrlEncode(s)" target="_blank">
+                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@s" target="_blank">
                             <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
                         </a>
                     }

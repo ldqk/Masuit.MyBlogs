@@ -1,10 +1,12 @@
 ﻿@using System.Web
 @using Masuit.MyBlogs.Core.Common
+@using Masuit.MyBlogs.Core.Models.Entity
 @model Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion[]
 @{
     ViewBag.Title = Model[0].Title + "版本对比";
     Layout = "~/Views/Shared/_Layout.cshtml";
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
+    List<Advertisement> ads = ViewBag.Ads;
 }
 <style>
     ins {
@@ -67,7 +69,7 @@
                                                         {
                                                             if (!string.IsNullOrEmpty(s))
                                                             {
-                                                                <a href="/tag/@HttpUtility.UrlEncode(s)">
+                                                                <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
                                                                     <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
                                                                 </a>
                                                             }
@@ -82,6 +84,34 @@
                                     @Html.Raw(Model[1].Content.ReplaceImgAttribute())
                                 </article>
                             </section>
+                            @if (ads.Any())
+                            {
+                                <section class="protected">
+                                    <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ads[0].Id" target="_blank">
+                                        <h3>
+                                            @ads[0].Title
+                                            <span class="text-red">[推广]</span>
+                                        </h3>
+
+                                        <div class="row padding-bot10">
+                                            @{
+                                                string imgSrc = ads[0].ThumbImgUrl;
+                                                if (!string.IsNullOrEmpty(imgSrc))
+                                                {
+                                                    <div class="col-md-3">
+                                                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@ads[0].Title" title="@ads[0].Title ">
+                                                    </div>
+                                                }
+                                            }
+                                            <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
+                                                <p>
+                                                    @ads[0].Description
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </section>
+                            }
                         </main>
                     </div>
                 </div>
@@ -125,7 +155,7 @@
                                                         {
                                                             if (!string.IsNullOrEmpty(s))
                                                             {
-                                                                <a href="/tag/@HttpUtility.UrlEncode(s)">
+                                                                <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
                                                                     <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
                                                                 </a>
                                                             }
@@ -140,6 +170,34 @@
                                     @Html.Raw(Model[2].Content.ReplaceImgAttribute())
                                 </article>
                             </section>
+                            @if (ads.Count > 1)
+                            {
+                                <section class="protected">
+                                    <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ads[1].Id" target="_blank">
+                                        <h3>
+                                            @ads[1].Title
+                                            <span class="text-red">[推广]</span>
+                                        </h3>
+
+                                        <div class="row padding-bot10">
+                                            @{
+                                                string imgSrc = ads[1].ThumbImgUrl;
+                                                if (!string.IsNullOrEmpty(imgSrc))
+                                                {
+                                                    <div class="col-md-3">
+                                                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@ads[1].Title" title="@ads[1].Title ">
+                                                    </div>
+                                                }
+                                            }
+                                            <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
+                                                <p>
+                                                    @ads[1].Description
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </section>
+                            }
                         </main>
                     </div>
                 </div>

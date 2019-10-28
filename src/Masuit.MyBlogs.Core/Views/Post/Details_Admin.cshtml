@@ -1,6 +1,7 @@
 ﻿@using System.Web
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
@@ -12,6 +13,7 @@
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
     UserInfoOutputDto user = Context.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
     string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
+    Advertisement ad = ViewBag.Ads;
 }
 <style>
     #gooey-h {
@@ -66,7 +68,7 @@
                                                 {
                                                     if (!string.IsNullOrEmpty(s))
                                                     {
-                                                        <a href="/tag/@HttpUtility.UrlEncode(s)">
+                                                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
                                                             <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
                                                         </a>
                                                     }
@@ -108,6 +110,34 @@
                         <div id="cyReward" role="cylabs" data-use="reward"></div>
                     </section>
                 </main>
+                @if (ad != null)
+                {
+                    <section class="protected">
+                        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank">
+                            <h3>
+                                @ad.Title
+                                <span class="text-red">[推广]</span>
+                            </h3>
+
+                            <div class="row padding-bot10">
+                                @{
+                                    string imgSrc = ad.ThumbImgUrl;
+                                    if (!string.IsNullOrEmpty(imgSrc))
+                                    {
+                                        <div class="col-md-3">
+                                            <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@ad.Title" title="@ad.Title ">
+                                        </div>
+                                    }
+                                }
+                                <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
+                                    <p>
+                                        @ad.Description
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </section>
+                }
                 <section class="wow fadeIn row padding-top40 padding-bot20">
                     <div class="col-xs-6">
                         <div class="btn-group">
@@ -281,7 +311,7 @@
             <a class="gooey-menu-item" id="pass"> <i class="icon icon-checkmark"></i></a>
         }
     }
-    <a href="/dashboard#/post/edit?id=@Model.Id" class="gooey-menu-item" target="_blank"> <i class="icon icon-pencil"></i></a>
+    <a asp-controller="Dashboard" asp-action="Index" asp-fragment="/post/edit?id=@Model.Id" class="gooey-menu-item" target="_blank"> <i class="icon icon-pencil"></i></a>
     <a class="gooey-menu-item" id="del"> <i class="icon icon-bin"></i></a>
 </nav>
 <script src="https://cdn.staticfile.org/jqueryui/1.12.1/jquery-ui.min.js"></script>

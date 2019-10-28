@@ -45,11 +45,6 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public async Task<(string url, bool success)> UploadImage(Stream stream, string file)
         {
-            if (AppConfig.GiteeConfig.Enabled && stream.Length < AppConfig.GiteeConfig.FileLimitSize)
-            {
-                return await UploadGitee(stream, file);
-            }
-
             if (AppConfig.GitlabConfigs.Any())
             {
                 return await UploadGitlab(stream, file);
@@ -61,30 +56,6 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             return await UploadSmms(stream, file);
-        }
-
-        /// <summary>
-        /// 码云图床
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        public async Task<(string url, bool success)> UploadGitee(Stream stream, string file)
-        {
-            string base64String = Convert.ToBase64String(stream.ToByteArray());
-            string path = $"{DateTime.Now:yyyyMMdd}/{Path.GetFileName(file)}";
-            using var resp = await _httpClient.PostAsJsonAsync(AppConfig.GiteeConfig.ApiUrl + HttpUtility.UrlEncode(path), new
-            {
-                access_token = AppConfig.GiteeConfig.AccessToken,
-                content = base64String,
-                message = "上传一张图片"
-            });
-            if (resp.IsSuccessStatusCode || (await resp.Content.ReadAsStringAsync()).Contains("already exists"))
-            {
-                return (AppConfig.GiteeConfig.RawUrl + path, true);
-            }
-
-            return AppConfig.AliOssConfig.Enabled ? await UploadOss(stream, file) : await UploadSmms(stream, file);
         }
 
         /// <summary>
@@ -101,9 +72,14 @@ namespace Masuit.MyBlogs.Core.Common
                 return AppConfig.AliOssConfig.Enabled ? await UploadOss(stream, file) : await UploadSmms(stream, file);
             }
 
+            if (gitlab.ApiUrl.Contains("gitee.com"))
+            {
+                return await UploadGitee(gitlab, stream, file);
+            }
+
             string base64String = Convert.ToBase64String(stream.ToByteArray());
+            string path = $"{DateTime.Now:yyyy/MM/dd}/{SnowFlake.NewId + Path.GetExtension(file)}";
             _httpClient.DefaultRequestHeaders.Add("PRIVATE-TOKEN", gitlab.AccessToken);
-            string path = $"{DateTime.Now:yyyyMMdd}/{Path.GetFileName(file)}";
             using var resp = await _httpClient.PostAsJsonAsync(gitlab.ApiUrl.Contains("/v3/") ? gitlab.ApiUrl : gitlab.ApiUrl + HttpUtility.UrlEncode(path), new
             {
                 file_path = path,
@@ -124,6 +100,31 @@ namespace Masuit.MyBlogs.Core.Common
         }
 
         /// <summary>
+        /// 码云图床
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="stream"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        private async Task<(string url, bool success)> UploadGitee(GitlabConfig config, Stream stream, string file)
+        {
+            string base64String = Convert.ToBase64String(stream.ToByteArray());
+            string path = $"{DateTime.Now:yyyy/MM/dd}/{Path.GetFileName(file)}";
+            using var resp = await _httpClient.PostAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path), new
+            {
+                access_token = config.AccessToken,
+                content = base64String,
+                message = "上传一张图片"
+            });
+            if (resp.IsSuccessStatusCode || (await resp.Content.ReadAsStringAsync()).Contains("already exists"))
+            {
+                return (config.RawUrl + path, true);
+            }
+
+            return AppConfig.AliOssConfig.Enabled ? await UploadOss(stream, file) : await UploadSmms(stream, file);
+        }
+
+        /// <summary>
         /// 阿里云Oss图床
         /// </summary>
         /// <param name="stream"></param>
@@ -132,13 +133,13 @@ namespace Masuit.MyBlogs.Core.Common
         public async Task<(string url, bool success)> UploadOss(Stream stream, string file)
         {
             var objectName = DateTime.Now.ToString("yyyyMMdd") + "/" + SnowFlake.NewId + Path.GetExtension(file);
-            var result = Policy.Handle<Exception>().Retry(5, (e, i) =>
+            var policy = Policy.Handle<Exception>().Retry(5, (e, i) =>
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(e.Message);
                 Console.ResetColor();
-            }).Execute(() => OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, stream));
-            return result.HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : await UploadSmms(stream, file);
+            });
+            return policy.Wrap(Policy<(string url, bool success)>.Handle<Exception>().Fallback(() => UploadSmms(stream, file).Result)).Execute(() => OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, stream).HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : UploadSmms(stream, file).Result);
         }
 
         /// <summary>

@@ -20,7 +20,7 @@
     </div>
     <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'捐赠时间'" filter="{DonateTime: 'text'}" sortable="'DonateTime'">
+            <td title="'打赏时间'" filter="{DonateTime: 'text'}" sortable="'DonateTime'">
                 {{row.DonateTime|date:'yyyy-MM-dd'}}
             </td>
             <td title="'昵称'" filter="{NickName: 'text'}" sortable="'NickName'">
@@ -29,7 +29,7 @@
             <td title="'金额'" filter="{Amount: 'number'}" sortable="'Amount'">
                 {{row.Amount}}
             </td>
-            <td title="'捐赠方式'" filter="{Via: 'text'}" sortable="'Via'">
+            <td title="'打赏方式'" filter="{Via: 'text'}" sortable="'Via'">
                 {{row.Via}}
             </td>
             <td title="'Email'" filter="{Email: 'text'}" sortable="'Email'">

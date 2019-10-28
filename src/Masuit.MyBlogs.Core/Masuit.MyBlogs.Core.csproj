@@ -56,7 +56,7 @@
     <PackageReference Include="CacheManager.Serialization.Json" Version="2.0.0-beta-1629" />
     <PackageReference Include="CSRedisCore" Version="3.1.10" />
     <PackageReference Include="EFSecondLevelCache.Core" Version="2.8.1" />
-    <PackageReference Include="Hangfire" Version="1.7.6" />
+    <PackageReference Include="Hangfire" Version="1.7.7" />
     <PackageReference Include="Hangfire.Autofac" Version="2.3.1" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.6.3" />
     <PackageReference Include="Hangfire.Redis.StackExchange" Version="1.8.0" />
@@ -70,8 +70,8 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.0.0-rc1.final" />
     <PackageReference Include="WilderMinds.RssSyndication" Version="1.6.0" />
     <PackageReference Include="WinInsider.System.Net.Http.Formatting" Version="1.0.5" />
-    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="3.0.9" />
-    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="3.0.14" />
+    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="3.0.12" />
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="3.0.17" />
     <PackageReference Include="Z.ExtensionMethods" Version="2.1.1" />
   </ItemGroup>
 

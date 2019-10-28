@@ -2,7 +2,8 @@
 @model Masuit.MyBlogs.Core.Models.ViewModel.IndexPageViewModel
 <div class="col-md-9 box-left">
     <div class="wrapper-content  animated fadeIn blog">
-        @if(Model.Posts.Any()) {
+        @if (Model.Posts.Any())
+        {
             <div class="orderby">
                 <div class="row">
                     <div class="col-md-9 text-center">
@@ -10,7 +11,7 @@
                     </div>
                     <div class="col-md-3">
                         <div class="btn-group pull-right">
-                            <a class="btn btn-info" href="/dashboard#/writeblog" target="_blank">
+                            <a class="btn btn-info" asp-controller="Dashboard" asp-action="Index" asp-fragment="/writeblog" target="_blank">
                                 <i class="icon icon-pencil"></i>
                                 写文章
                             </a>
@@ -43,16 +44,28 @@
                 </div>
             </div>
 
-            foreach(PostOutputDto post in Model.Posts) {
+            var rnd = new Random().Next(Model.Posts.Count);
+            for (var index = 0; index < Model.Posts.Count; index++)
+            {
+                if (rnd == index && Model.ListAdvertisement != null)
+                {
+                    await Html.RenderPartialAsync("_ArticleListAdvertisement", Model.ListAdvertisement);
+                }
+
+                var post = Model.Posts[index];
                 await Html.RenderPartialAsync("_ArticleListItem_Admin", post);
             }
-        } else {
-            List<PostOutputDto> list = Model.PostsQueryable.OrderBy(p => Guid.NewGuid()).Skip(0).Take(5).ToList();
-            if(list.Any()) {
+        }
+        else
+        {
+            var list = Model.PostsQueryable.OrderBy(p => Guid.NewGuid()).Skip(0).Take(5).ToList();
+            if (list.Any())
+            {
                 <div class="page-header">
-                    <h3>Oops！抱歉~没有找到相关的文章或资源！如果您有相关的结果，您可以 @Html.ActionLink("点击这里", "Publish", "Post", null, new {@class = "btn btn-info btn-lg"}) 投稿哦！以下是一些随机推荐：</h3>
+                    <h3>Oops！抱歉~没有找到相关的文章或资源！如果您有相关的结果，您可以 @Html.ActionLink("点击这里", "Publish", "Post", null, new { @class = "btn btn-info btn-lg" }) 投稿哦！以下是一些随机推荐：</h3>
                 </div>
-                foreach(PostOutputDto post in list) {
+                foreach (PostOutputDto post in list)
+                {
                     await Html.RenderPartialAsync("_ArticleListItem_Admin", post);
                 }
             }

@@ -71,6 +71,21 @@
             </div>
         </article>
     </section>
+    @foreach (var ad in Model.SidebarAds)
+    {
+        <section>
+            <article class="panel panel-danger">
+                <div class="panel-heading">
+                    @ad.Title
+                </div>
+                <div class="panel-body">
+                    <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank">
+                        <img class="img img-responsive" src="@ad.ThumbImgUrl" alt="@ad.Title" title="@ad.Title" />
+                    </a>
+                </div>
+            </article>
+        </section>
+    }
 
     <section class="wow animated fadeIn">
         <div class="leaderboard-box">
@@ -80,7 +95,7 @@
                     @foreach (PostOutputDto post in Model.Top6Post)
                     {
                         <li>
-                            <a href="/@post.Id">
+                            <a asp-controller="Post" asp-action="Details" asp-route-id="@post.Id">
                                 <mark>@(post.Title.Length >= 20 ? post.Title.Substring(0, 20) + "..." : post.Title) </mark>
                                 <small style="color:#00ffff"> @post.TotalViewCount</small>
                             </a>
@@ -106,27 +121,10 @@
 				c0.33-0.865,0.479-1.723,0.545-2.327c0.207,0.021,0.416,0.033,0.627,0.033c0.211,0,0.42-0.013,0.627-0.033
 				C13.195,16.578,13.344,17.436,13.673,18.301z M12.5,14.276c-2.856,0-4.93-2.638-4.93-6.273V1.73h9.859v6.273
 				C17.43,11.638,15.357,14.276,12.5,14.276z M21.215,7.138h-1.452c-0.197,0-0.39,0.024-0.572,0.07v-2.06
-				c0-1.097,0.908-1.99,2.024-1.99c1.117,0,2.025,0.893,2.025,1.99C23.241,6.246,22.333,7.138,21.215,7.138z" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            </symbol>
+				c0-1.097,0.908-1.99,2.024-1.99c1.117,0,2.025,0.893,2.025,1.99C23.241,6.246,22.333,7.138,21.215,7.138z" /></symbol>
             </svg>
         </div>
     </section>
-
     <section class="wow animated fadeIn">
         <article class="panel panel-primary">
             <div class="panel-heading">
@@ -140,7 +138,7 @@
                         foreach (KeyValuePair<string, int>
                             s in tags)
                         {
-                            <a href="/tag/@s.Key" class="tagc-@(new Random().Next(100) % 10)" style="font-size: @(s.Value)px; line-height: @(s.Value * 1.2)px;">@s.Key</a>
+                            <a asp-controller="Home" asp-action="Tag" asp-route-id="@s.Key" class="tagc-@(new Random().Next(100) % 10)" style="font-size: @(s.Value)px; line-height: @(s.Value * 1.2)px;">@s.Key</a>
                         }
                     }
                     else
@@ -160,7 +158,7 @@
             <div class="panel-body text-center line-height24">
                 @foreach (var s in Model.HotSearch)
                 {
-                    <a href="/s/@s.Keywords">
+                    <a asp-controller="Search" asp-action="Search" asp-route-wd="@s.Keywords">
                         @if (s.Keywords.Length > 15)
                         {
                             <span class="label label-@colors[s.Count % colors.Length]">@s.Keywords.Substring(0, 15)... (@s.Count)</span>

@@ -48,6 +48,16 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// banner文章
         /// </summary>
-        public List<Banner> Banner { get; set; }
+        public List<Advertisement> Banner { get; set; }
+
+        /// <summary>
+        /// 边栏广告
+        /// </summary>
+        public List<Advertisement> SidebarAds { get; set; }
+
+        /// <summary>
+        /// 列表内广告
+        /// </summary>
+        public Advertisement ListAdvertisement { get; set; }
     }
 }

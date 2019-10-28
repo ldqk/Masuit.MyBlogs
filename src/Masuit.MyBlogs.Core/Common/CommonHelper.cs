@@ -144,15 +144,24 @@ namespace Masuit.MyBlogs.Core.Common
                 return false;
             }
 
-            var denyed = DenyIP.Contains(ip) || DenyIPRange.AsParallel().Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
+            return DenyIP.Contains(ip) || DenyIPRange.AsParallel().Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
+        }
+
+        /// <summary>
+        /// 是否是禁区
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <returns></returns>
+        public static bool IsInDenyArea(this string ip)
+        {
             if (SystemSettings.GetOrAdd("EnableDenyArea", "false") == "false")
             {
-                return denyed;
+                var pos = GetIPLocation(ip);
+                var denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
+                return pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any();
             }
 
-            var pos = GetIPLocation(ip);
-            var denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
-            return denyed || pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any();
+            return false;
         }
 
         public static string GetIPLocation(this IPAddress ip) => GetIPLocation(ip.MapToIPv4().ToString());
