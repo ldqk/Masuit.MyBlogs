@@ -1,8 +1,8 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using HtmlAgilityPack;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.UEditor;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
@@ -17,7 +17,6 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -68,7 +67,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult UploadWord()
+        public async Task<ActionResult> UploadWord()
         {
             var files = Request.Form.Files;
             if (files.Count <= 0)
@@ -87,42 +86,74 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "文件格式不支持，只能上传doc或者docx的文档!");
             }
 
-            string upload = HostEnvironment.WebRootPath + "/upload";
-            if (!Directory.Exists(upload))
-            {
-                Directory.CreateDirectory(upload);
-            }
-
-            string resourceName = string.Empty.CreateShortToken(9);
-            string ext = Path.GetExtension(fileName);
-            string docPath = Path.Combine(upload, resourceName + ext);
-            using var fs = new FileStream(docPath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            file.CopyTo(fs);
-            string htmlDir = docPath.Replace(".docx", "").Replace(".doc", "");
-            DocumentConvert.Doc2Html(docPath, htmlDir);
-            string htmlfile = Path.Combine(htmlDir, "index.html");
-            string html = System.IO.File.ReadAllText(htmlfile).ReplaceHtmlImgSource("/upload/" + resourceName).ClearHtml().HtmlSantinizerStandard();
-            ThreadPool.QueueUserWorkItem(state => System.IO.File.Delete(htmlfile));
+            await using var reqStream = file.OpenReadStream();
+            await using var ms = new MemoryStream();
+            await reqStream.CopyToAsync(ms);
+            var html = await SaveAsHtml(ms, file);
             if (html.Length < 10)
             {
-                Directory.Delete(htmlDir, true);
-                System.IO.File.Delete(docPath);
                 return ResultData(null, false, "读取文件内容失败，请检查文件的完整性，建议另存后重新上传！");
             }
 
             if (html.Length > 1000000)
             {
-                Directory.Delete(htmlDir, true);
-                System.IO.File.Delete(docPath);
                 return ResultData(null, false, "文档内容超长，服务器拒绝接收，请优化文档内容后再尝试重新上传！");
             }
 
             return ResultData(new
             {
                 Title = Path.GetFileNameWithoutExtension(fileName),
-                Content = html,
-                ResourceName = resourceName + ext
+                Content = html
             });
+        }
+
+        private async Task<string> SaveAsHtml(MemoryStream ms, IFormFile file)
+        {
+            var html = DocxToHtml.Docx.ConvertToHtml(ms);
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            var body = doc.DocumentNode.SelectSingleNode("//body");
+            var nodes = body.SelectNodes("//img");
+            foreach (var img in nodes)
+            {
+                var attr = img.Attributes["src"].Value;
+                var strs = attr.Split(",");
+                var base64 = strs[1];
+                var bytes = Convert.FromBase64String(base64);
+                var ext = strs[0].Split(";")[0].Split("/")[1];
+                await using var image = new MemoryStream(bytes);
+                var imgFile = $"{SnowFlake.NewId}.{ext}";
+                var (url, success) = await _imagebedClient.UploadImage(image, imgFile);
+                if (success)
+                {
+                    img.Attributes["src"].Value = url;
+                }
+                else
+                {
+                    var path = Path.Combine(HostEnvironment.WebRootPath, "upload", "images", imgFile);
+                    await SaveFile(file, path);
+                    img.Attributes["src"].Value = path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/");
+                }
+            }
+
+            html = body.InnerHtml.HtmlSantinizerStandard().HtmlSantinizerCustom(attributes: new[]
+            {
+                "dir",
+                "lang"
+            });
+            return html;
+        }
+
+        private static async Task SaveFile(IFormFile file, string path)
+        {
+            var dir = Path.GetDirectoryName(path);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            file.CopyTo(fs);
         }
 
         #endregion
@@ -264,17 +295,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             try
             {
-                var dir = Path.GetDirectoryName(path);
-                if (!Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
-
-                await using (var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                {
-                    file.CopyTo(fs);
-                }
-
+                await SaveFile(file, path);
                 return ResultData(path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/"));
             }
             catch (Exception e)

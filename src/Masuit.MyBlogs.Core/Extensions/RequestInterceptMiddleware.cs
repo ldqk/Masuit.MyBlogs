@@ -33,12 +33,13 @@ namespace Masuit.MyBlogs.Core.Extensions
         {
             var request = context.Request;
             var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
+            var requestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path);
             if (Regex.Match(path ?? "", CommonHelper.BanRegex).Length > 0)
             {
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
                 {
                     IP = context.Connection.RemoteIpAddress.MapToIPv4().ToString(),
-                    RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path),
+                    RequestUrl = requestUrl,
                     Time = DateTime.Now,
                     UserAgent = request.Headers[HeaderNames.UserAgent]
                 }));
@@ -71,6 +72,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 }
             }
 
+            TrackData.RequestLogs.AddOrUpdate(requestUrl, 1, (s, i) => i + 1);
             await _next.Invoke(context);
         }
     }

@@ -5,7 +5,6 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +65,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
             return View(posts.Mapper<IList<PostOutputDto>>());
         }
 

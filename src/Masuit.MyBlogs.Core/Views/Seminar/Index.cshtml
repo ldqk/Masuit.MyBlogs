@@ -1,4 +1,5 @@
 ﻿@using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
 @model IList<Masuit.MyBlogs.Core.Models.DTO.PostOutputDto>
@@ -6,6 +7,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     Random r = new Random();
     UserInfoOutputDto user = Context.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+    Advertisement ad = ViewBag.Ads;
 }
 <style>
     .bg-title {
@@ -93,8 +95,15 @@
                     </div>
                 </div>
             </div>
-            foreach (PostOutputDto post in Model)
+            var rnd = new Random().Next(2, Model.Count);
+            for (var i = 0; i < Model.Count; i++)
             {
+                if (rnd == i && ad != null)
+                {
+                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
+                }
+
+                var post = Model[i];
                 await Html.RenderPartialAsync(user.IsAdmin ? "_ArticleListItem_Admin" : "_ArticleListItem", post);
             }
         }

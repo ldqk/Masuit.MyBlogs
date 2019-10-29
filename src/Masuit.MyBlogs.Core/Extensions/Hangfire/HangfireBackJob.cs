@@ -160,6 +160,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             RedisHelper.IncrBy("Interview:RunningDays");
             DateTime time = DateTime.Now.AddMonths(-1);
             _searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
+
+            TrackData.DumpLog();
         }
 
         /// <summary>
