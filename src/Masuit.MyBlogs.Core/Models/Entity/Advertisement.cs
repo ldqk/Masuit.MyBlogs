@@ -11,6 +11,8 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public Advertisement()
         {
             Status = Status.Available;
+            CreateTime = DateTime.Now;
+            UpdateTime = DateTime.Now;
         }
 
         /// <summary>
