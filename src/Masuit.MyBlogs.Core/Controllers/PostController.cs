@@ -229,8 +229,6 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
             post.Status = Status.Pending;
-            post.PostDate = DateTime.Now;
-            post.ModifyDate = DateTime.Now;
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes());
             ViewBag.CategoryId = new SelectList(CategoryService.GetQueryNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
             Post p = post.Mapper<Post>();
@@ -712,7 +710,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 var history = p.Mapper<PostHistoryVersion>();
                 p.PostHistoryVersion.Add(history);
-                post.ModifyDate = DateTime.Now;
+                p.ModifyDate = DateTime.Now;
                 var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
                 p.Modifier = user.NickName;
                 p.ModifierEmail = user.Email;
@@ -756,7 +754,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     var ts = DateTime.Now.GetTotalMilliseconds();
                     string content = System.IO.File.ReadAllText(Path.Combine(HostEnvironment.WebRootPath, "template", "broadcast.html"))
                         .Replace("{{link}}", link + "?email=" + c.Email)
-                        .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
+                        .Replace("{{time}}", p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                         .Replace("{{title}}", post.Title)
                         .Replace("{{author}}", post.Author)
                         .Replace("{{content}}", post.Content.RemoveHtmlTag(150))
@@ -816,8 +814,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             post.Status = Status.Pended;
-            post.PostDate = DateTime.Now;
-            post.ModifyDate = DateTime.Now;
             Post p = post.Mapper<Post>();
             p.Modifier = p.Author;
             p.ModifierEmail = p.Email;
@@ -871,7 +867,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 var ts = DateTime.Now.GetTotalMilliseconds();
                 string content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/broadcast.html")
                     .Replace("{{link}}", link + "?email=" + c.Email)
-                    .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
+                    .Replace("{{time}}", p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                     .Replace("{{title}}", post.Title).Replace("{{author}}", post.Author)
                     .Replace("{{content}}", post.Content.RemoveHtmlTag(150))
                     .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new

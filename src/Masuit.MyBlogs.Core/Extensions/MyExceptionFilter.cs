@@ -43,7 +43,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             }
 #if !DEBUG
             context.Result = new RedirectToActionResult("ServiceUnavailable", "Error", null);
-            context.ExceptionHandled = true; 
+            context.ExceptionHandled = true;
 #endif
         }
     }

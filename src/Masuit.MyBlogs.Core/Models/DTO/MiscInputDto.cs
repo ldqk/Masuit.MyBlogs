@@ -1,7 +1,6 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
@@ -13,8 +12,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     {
         public MiscInputDto()
         {
-            PostDate = DateTime.Now;
-            ModifyDate = DateTime.Now;
             Status = Status.Display;
         }
 
@@ -29,15 +26,5 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// </summary>
         [Required(ErrorMessage = "内容不能为空！"), SubmitCheck(100000, false)]
         public string Content { get; set; }
-
-        /// <summary>
-        /// 发表时间
-        /// </summary>
-        public DateTime PostDate { get; set; }
-
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime ModifyDate { get; set; }
     }
 }

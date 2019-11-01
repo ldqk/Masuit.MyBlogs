@@ -3,7 +3,6 @@
 @{
     ViewBag.Title = "投稿";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    string[] colors = { "success", "info", "warning", "danger", "default" };
     List<Category> cats = ViewBag.Category;
 }
 <link href="~/Assets/fileupload/filestyle.css" rel="stylesheet" />
@@ -22,9 +21,6 @@
         <div class="input-group">
             <span class="input-group-addon size18"><label for="article">文章标题：</label></span>
             <input type="text" id="article" class="form-control input-lg" name="Title" required placeholder="请输入文章标题">
-            <span class="input-group-btn">
-                <button type="button" class="btn btn-@colors[new Random().Next() % 5] btn-lg show-fileup"><i class="icon-upload4 size18"></i>上传word文档</button>
-            </span>
         </div>
         <!-- 加载编辑器的容器 -->
         <div class="form-group overlay animated bounceInDown">

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.ViewModel
 {
     public class SearchResult<T>
     {

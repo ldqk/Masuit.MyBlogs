@@ -3,6 +3,7 @@ using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.UEditor;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
@@ -29,16 +30,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     {
         public IWebHostEnvironment HostEnvironment { get; set; }
 
-        private readonly ImagebedClient _imagebedClient;
-
-        /// <summary>
-        /// 文件上传
-        /// </summary>
-        /// <param name="HostEnvironment"></param>
-        public UploadController(ImagebedClient imagebedClient)
-        {
-            _imagebedClient = imagebedClient;
-        }
+        public ImagebedClient ImagebedClient { get; set; }
 
         /// <summary>
         /// 
@@ -77,18 +69,12 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var file = files[0];
             string fileName = file.FileName;
-            if (fileName == null)
-            {
-                return ResultData(null, false, "请先选择您需要上传的文件!");
-            }
             if (!Regex.IsMatch(Path.GetExtension(fileName), "doc|docx"))
             {
                 return ResultData(null, false, "文件格式不支持，只能上传doc或者docx的文档!");
             }
 
-            await using var reqStream = file.OpenReadStream();
-            await using var ms = new MemoryStream();
-            await reqStream.CopyToAsync(ms);
+            await using var ms = file.OpenReadStream().SaveAsMemoryStream();
             var html = await SaveAsHtml(ms, file);
             if (html.Length < 10)
             {
@@ -113,35 +99,34 @@ namespace Masuit.MyBlogs.Core.Controllers
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
             var body = doc.DocumentNode.SelectSingleNode("//body");
+            var style = doc.DocumentNode.SelectSingleNode("//style");
             var nodes = body.SelectNodes("//img");
-            foreach (var img in nodes)
+            if (nodes != null)
             {
-                var attr = img.Attributes["src"].Value;
-                var strs = attr.Split(",");
-                var base64 = strs[1];
-                var bytes = Convert.FromBase64String(base64);
-                var ext = strs[0].Split(";")[0].Split("/")[1];
-                await using var image = new MemoryStream(bytes);
-                var imgFile = $"{SnowFlake.NewId}.{ext}";
-                var (url, success) = await _imagebedClient.UploadImage(image, imgFile);
-                if (success)
+                foreach (var img in nodes)
                 {
-                    img.Attributes["src"].Value = url;
-                }
-                else
-                {
-                    var path = Path.Combine(HostEnvironment.WebRootPath, "upload", "images", imgFile);
-                    await SaveFile(file, path);
-                    img.Attributes["src"].Value = path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/");
+                    var attr = img.Attributes["src"].Value;
+                    var strs = attr.Split(",");
+                    var base64 = strs[1];
+                    var bytes = Convert.FromBase64String(base64);
+                    var ext = strs[0].Split(";")[0].Split("/")[1];
+                    await using var image = new MemoryStream(bytes);
+                    var imgFile = $"{SnowFlake.NewId}.{ext}";
+                    var (url, success) = await ImagebedClient.UploadImage(image, imgFile);
+                    if (success)
+                    {
+                        img.Attributes["src"].Value = url;
+                    }
+                    else
+                    {
+                        var path = Path.Combine(HostEnvironment.WebRootPath, "upload", "images", imgFile);
+                        await SaveFile(file, path);
+                        img.Attributes["src"].Value = path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/");
+                    }
                 }
             }
 
-            html = body.InnerHtml.HtmlSantinizerStandard().HtmlSantinizerCustom(attributes: new[]
-            {
-                "dir",
-                "lang"
-            });
-            return html;
+            return style.OuterHtml + body.InnerHtml.HtmlSantinizerStandard().HtmlSantinizerCustom(attributes: new[] { "dir", "lang" });
         }
 
         private static async Task SaveFile(IFormFile file, string path)
@@ -264,7 +249,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             switch (file.ContentType)
             {
                 case var _ when file.ContentType.StartsWith("image"):
-                    var (url, success) = await _imagebedClient.UploadImage(file.OpenReadStream(), file.FileName);
+                    var (url, success) = await ImagebedClient.UploadImage(file.OpenReadStream(), file.FileName);
                     if (success)
                     {
                         return ResultData(url);

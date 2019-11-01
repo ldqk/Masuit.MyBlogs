@@ -265,3 +265,7 @@ __pycache__/
 lucenedir
 /Masuit.MyBlogs.WebApp/upload
 Test
+/Masuit.LuceneEFCore.SearchEngine
+/Masuit.Tools
+/src/Masuit.MyBlogs.Core/lucene
+/src/Masuit.MyBlogs.Core/appsettings.prod.json

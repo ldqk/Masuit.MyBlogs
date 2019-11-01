@@ -8,6 +8,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.MyBlogs.Core.Models.ViewModel;
 using Microsoft.EntityFrameworkCore.Internal;
 using PanGu;
 using PanGu.HighLight;

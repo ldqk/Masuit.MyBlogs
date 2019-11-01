@@ -1,7 +1,6 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
-using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -14,9 +13,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     {
         public PostInputDto()
         {
-            PostDate = DateTime.Now;
-            ModifyDate = DateTime.Now;
-            IsFixedTop = false;
             Status = Status.Pending;
             IsWordDocument = false;
         }
@@ -51,22 +47,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public string ProtectContent { get; set; }
 
         /// <summary>
-        /// 发表时间
-        /// </summary>
-        public DateTime PostDate { get; set; }
-
-        /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime ModifyDate { get; set; }
-
-        /// <summary>
-        /// 是否置顶
-        /// </summary>
-        [DefaultValue(false)]
-        public bool IsFixedTop { get; set; }
-
-        /// <summary>
         /// 分类id
         /// </summary>
         public int CategoryId { get; set; }
@@ -98,6 +78,5 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 专题
         /// </summary>
         public string Seminars { get; set; }
-
     }
 }

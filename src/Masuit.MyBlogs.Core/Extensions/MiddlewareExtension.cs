@@ -54,7 +54,10 @@ namespace Masuit.MyBlogs.Core.Extensions
         /// <returns></returns>
         public static IServiceCollection AddMyMvc(this IServiceCollection services)
         {
-            services.AddMvc().AddNewtonsoftJson(options =>
+            services.AddMvc(options =>
+            {
+                options.Filters.Add<MyExceptionFilter>();
+            }).AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc; // 设置时区为 UTC
