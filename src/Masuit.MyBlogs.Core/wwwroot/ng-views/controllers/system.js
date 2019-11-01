@@ -282,6 +282,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			$scope.interceptCount=res.Data.interceptCount;
 		});
 	}
+
 	self.load();
 	this.clear= function() {
 		swal({
@@ -305,6 +306,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			self.load();
 		}).catch(swal.noop);
 	}
+
 	$scope.EnableDenyAreaPolicy= function() {
 		if($scope.Settings.EnableDenyArea=="true") {
 			$scope.Settings.EnableDenyArea="false";
@@ -312,6 +314,29 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			$scope.Settings.EnableDenyArea="true";
 		}
 	}
+
+	$scope.EnableFirewall= function() {
+		if($scope.Settings.FirewallEnabled=="true") {
+            swal({
+				title: '确定要关闭网站防火墙么?',
+				text: "一旦关闭，网站将面临可能会被流量攻击的风险！",
+				type: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#3085d6',
+				cancelButtonColor: '#d33',
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+			}).then(function(isConfirm) {
+				if (isConfirm) {
+			        $scope.Settings.FirewallEnabled="false";
+					$scope.$apply();
+				}
+			});
+		} else {
+			$scope.Settings.FirewallEnabled="true";
+		}
+	}
+
 	$scope.getIPBlackList= function() {
 		$scope.request("/system/IpBlackList",null, function (data) {
 			swal({
@@ -338,6 +363,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			}).catch(swal.noop);
 		});
 	}
+
 	$scope.getIPWhiteList= function() {
 		$scope.request("/system/IpWhiteList",null, function (data) {
 			swal({
@@ -364,6 +390,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			}).catch(swal.noop);
 		});
 	}
+
 	$scope.getIPRangeBlackList= function() {
 		$scope.request("/system/GetIPRangeBlackList",null, function (data) {
 			swal({
@@ -390,6 +417,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			}).catch(swal.noop);
 		});
 	}
+
 	$scope.save = function() {
 		swal({
 			title: '确认保存吗？',
@@ -430,6 +458,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			});
 		}).catch(swal.noop);
 	}
+
 	$scope.addToWhiteList= function(ip) {
 		swal({
 			title: "确认添加白名单吗？",

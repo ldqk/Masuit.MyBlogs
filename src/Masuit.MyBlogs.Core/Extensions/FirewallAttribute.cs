@@ -25,7 +25,7 @@ namespace Masuit.MyBlogs.Core.Extensions
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var request = context.HttpContext.Request;
-            if (context.Filters.Any(m => m.ToString().Contains(nameof(AllowAccessFirewallAttribute))) || request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]))
+            if (!bool.Parse(CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true")) || context.Filters.Any(m => m.ToString().Contains(nameof(AllowAccessFirewallAttribute))) || request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]))
             {
                 return;
             }

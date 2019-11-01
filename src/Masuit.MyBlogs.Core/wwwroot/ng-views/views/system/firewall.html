@@ -25,26 +25,21 @@
     <div class="card-body p-t-0">
         <div class="card-body card-padding">
             <div class="row">
-                <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="col-md-12 form-inline">
                     <div class="input-group">
-                        <span class="input-group-addon">启用地区限制访问策略：</span>
+                        <span class="input-group-addon">防火墙状态：</span>
+                        <span class="el-switch">
+                            <input name="switch" ng-checked="Settings.FirewallEnabled=='true'" type="checkbox">
+                            <span class="el-switch-style" ng-click="EnableFirewall()"></span>
+                        </span>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon">地区限制：</span>
                         <span class="el-switch">
                             <input name="switch" ng-checked="Settings.EnableDenyArea=='true'" type="checkbox">
                             <span class="el-switch-style" ng-click="EnableDenyAreaPolicy()"></span>
                         </span>
                     </div>
-                </div>
-                <div class="col-lg-10 col-md-8 col-sm-6">
-                    <div class="input-group">
-                        <span class="input-group-addon">受限制的地区：</span>
-                        <div class="fg-line">
-                            <input class="form-control" ng-model="Settings.DenyArea" ng-readonly="Settings.EnableDenyArea=='false'" placeholder="禁止访问的地区，逗号分隔" type="text" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-5 col-sm-6">
                     <div class="input-group">
                         <span class="input-group-addon">单IP访问频次：每</span>
                         <div class="fg-line">
@@ -59,6 +54,14 @@
                             <input class="form-control" ng-model="Settings.BanIPTimespan" type="text" />
                         </div>
                         <span class="input-group-addon">分钟</span>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <span class="input-group-addon">受限制的地区：</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.DenyArea" ng-readonly="Settings.EnableDenyArea=='false'" placeholder="禁止访问的地区，逗号分隔" type="text" />
+                        </div>
                     </div>
                 </div>
             </div>
