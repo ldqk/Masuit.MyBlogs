@@ -22,7 +22,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
             ModifyDate = DateTime.Now;
             IsFixedTop = false;
             Status = Status.Pending;
-            IsWordDocument = false;
             Seminar = new HashSet<SeminarPost>();
             PostMergeRequests = new HashSet<PostMergeRequest>();
         }
@@ -70,17 +69,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 分类id
         /// </summary>
         public int CategoryId { get; set; }
-
-        /// <summary>
-        /// 资源名
-        /// </summary>
-        public string ResourceName { get; set; }
-
-        /// <summary>
-        /// 是否是Word文档
-        /// </summary>
-        [DefaultValue(false)]
-        public bool IsWordDocument { get; set; }
 
         /// <summary>
         /// 作者邮箱

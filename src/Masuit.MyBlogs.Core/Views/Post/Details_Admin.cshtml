@@ -154,10 +154,6 @@
                             <button type="button" id="donate" class="btn btn-@colors[new Random().Next() % colors.Length] btn-lg">
                                 <i class="icon-coin-yen"></i><span>支持站长</span>
                             </button>
-                            @if (Model.IsWordDocument)
-                            {
-                                <a class="btn btn-@colors[new Random().Next() % colors.Length] btn-lg" href="~/upload/@(Model.ResourceName)" target="_blank"><i class="icon-download4"></i>下载为Word文档</a>
-                            }
                         </div>
                     </div>
                 </section>

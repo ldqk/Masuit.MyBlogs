@@ -5492,16 +5492,6 @@
             分类id
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostInputDto.ResourceName">
-            <summary>
-            资源名
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostInputDto.IsWordDocument">
-            <summary>
-            是否是Word文档
-            </summary>
-        </member>
         <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostInputDto.Email">
             <summary>
             作者邮箱
@@ -5660,16 +5650,6 @@
         <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.IsFixedTop">
             <summary>
             是否置顶
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.ResourceName">
-            <summary>
-            资源名
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.IsWordDocument">
-            <summary>
-            是否是Word文档
             </summary>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Models.DTO.PostOutputDto.Email">
@@ -6407,16 +6387,6 @@
             分类id
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.ResourceName">
-            <summary>
-            资源名
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.IsWordDocument">
-            <summary>
-            是否是Word文档
-            </summary>
-        </member>
         <member name="P:Masuit.MyBlogs.Core.Models.Entity.Post.Email">
             <summary>
             作者邮箱
@@ -6535,16 +6505,6 @@
         <member name="P:Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion.PostId">
             <summary>
             文章id
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion.ResourceName">
-            <summary>
-            资源名
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion.IsWordDocument">
-            <summary>
-            是否是Word文档
             </summary>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion.Email">
@@ -7367,16 +7327,6 @@
             是否置顶
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostDataModel.ResourceName">
-            <summary>
-            资源名
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostDataModel.IsWordDocument">
-            <summary>
-            是否是Word文档
-            </summary>
-        </member>
         <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostDataModel.Email">
             <summary>
             作者邮箱
@@ -7460,16 +7410,6 @@
         <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostViewModel.IsFixedTop">
             <summary>
             是否置顶
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostViewModel.ResourceName">
-            <summary>
-            资源名
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostViewModel.IsWordDocument">
-            <summary>
-            是否是Word文档
             </summary>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.PostViewModel.Email">

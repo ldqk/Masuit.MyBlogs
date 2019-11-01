@@ -33,16 +33,6 @@
         public bool IsFixedTop { get; set; }
 
         /// <summary>
-        /// 资源名
-        /// </summary>
-        public string ResourceName { get; set; }
-
-        /// <summary>
-        /// 是否是Word文档
-        /// </summary>
-        public bool IsWordDocument { get; set; }
-
-        /// <summary>
         /// 作者邮箱
         /// </summary>
         public string Email { get; set; }

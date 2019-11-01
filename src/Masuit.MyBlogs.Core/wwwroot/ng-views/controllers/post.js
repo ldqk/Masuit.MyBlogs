@@ -262,7 +262,6 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 					});
 					$scope.$apply(function() {
 						$scope.post.Content = data.Data.Content;
-						$scope.post.IsWordDocument = true;
 						$scope.post.ResourceName = data.Data.ResourceName;
 						$scope.post.Title = data.Data.Title;
 					});
@@ -316,8 +315,6 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 				});
 				$scope.post.Content = "";
 				$scope.post.Title = "";
-				$scope.post.IsWordDocument = false;
-				$scope.post.ResourceName = "";
 				clearInterval(window.interval);
 				localStorage.removeItem("write-post-draft");
 			} else {
@@ -478,8 +475,6 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 					});
 					$scope.$apply(function () {
 						$scope.post.Content = data.Data.Content;
-						$scope.post.IsWordDocument = true;
-						$scope.post.ResourceName = data.Data.ResourceName;
 						$scope.post.Title = data.Data.Title;
 					});
 					layer.closeAll();

@@ -16,8 +16,6 @@
     <form class="form-group" id="article-form" method="post" onsubmit="return false">
         @*文章表单*@
         @Html.AntiForgeryToken()
-        <input type="hidden" name="IsWordDocument" id="IsWordDocument" value="false" />
-        <input type="hidden" name="ResourceName" id="ResourceName" />
         <div class="input-group">
             <span class="input-group-addon size18"><label for="article">文章标题：</label></span>
             <input type="text" id="article" class="form-control input-lg" name="Title" required placeholder="请输入文章标题">

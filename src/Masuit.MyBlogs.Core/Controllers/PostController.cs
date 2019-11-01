@@ -552,18 +552,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "文章已经被删除！");
             }
 
-            if (post.IsWordDocument)
-            {
-                try
-                {
-                    System.IO.File.Delete(Path.Combine(HostEnvironment.WebRootPath + "/upload", post.ResourceName));
-                    Directory.Delete(Path.Combine(HostEnvironment.WebRootPath + "/upload", Path.GetFileNameWithoutExtension(post.ResourceName)), true);
-                }
-                catch (IOException)
-                {
-                }
-            }
-
             var srcs = post.Content.MatchImgSrcs();
             foreach (var path in srcs)
             {
@@ -695,11 +683,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 post.Label = post.Label.Replace("，", ",");
             }
 
-            if (!post.IsWordDocument)
-            {
-                post.ResourceName = null;
-            }
-
             if (string.IsNullOrEmpty(post.ProtectContent) || post.ProtectContent.Equals("null", StringComparison.InvariantCultureIgnoreCase))
             {
                 post.ProtectContent = null;
@@ -801,11 +784,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             else
             {
                 post.Label = post.Label.Replace("，", ",");
-            }
-
-            if (!post.IsWordDocument)
-            {
-                post.ResourceName = null;
             }
 
             if (string.IsNullOrEmpty(post.ProtectContent) || post.ProtectContent.Equals("null", StringComparison.InvariantCultureIgnoreCase))

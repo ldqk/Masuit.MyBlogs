@@ -18,7 +18,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         {
             ModifyDate = DateTime.Now;
             Status = Status.Pending;
-            IsWordDocument = false;
             Seminar = new HashSet<SeminarPostHistoryVersion>();
         }
 
@@ -61,17 +60,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// </summary>
         [ForeignKey("Post")]
         public int PostId { get; set; }
-
-        /// <summary>
-        /// 资源名
-        /// </summary>
-        public string ResourceName { get; set; }
-
-        /// <summary>
-        /// 是否是Word文档
-        /// </summary>
-        [DefaultValue(false)]
-        public bool IsWordDocument { get; set; }
 
         /// <summary>
         /// 作者邮箱

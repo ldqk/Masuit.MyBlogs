@@ -1,7 +1,6 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
@@ -14,7 +13,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public PostInputDto()
         {
             Status = Status.Pending;
-            IsWordDocument = false;
         }
 
         /// <summary>
@@ -50,17 +48,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 分类id
         /// </summary>
         public int CategoryId { get; set; }
-
-        /// <summary>
-        /// 资源名
-        /// </summary>
-        public string ResourceName { get; set; }
-
-        /// <summary>
-        /// 是否是Word文档
-        /// </summary>
-        [DefaultValue(false)]
-        public bool IsWordDocument { get; set; }
 
         /// <summary>
         /// 作者邮箱
