@@ -76,8 +76,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine.csproj" />
-    <ProjectReference Include="..\..\Masuit.Tools\Masuit.Tools.Core\Masuit.Tools.Core.csproj" />
+    <ProjectReference Include="..\..\..\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine.csproj" />
+    <ProjectReference Include="..\..\..\Masuit.Tools\Masuit.Tools.Core\Masuit.Tools.Core.csproj" />
   </ItemGroup>
   
   <ItemGroup>

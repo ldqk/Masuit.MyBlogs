@@ -5,9 +5,9 @@ VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.MyBlogs.Core", "Masuit.MyBlogs.Core\Masuit.MyBlogs.Core.csproj", "{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.Tools.Core", "..\Masuit.Tools\Masuit.Tools.Core\Masuit.Tools.Core.csproj", "{9AABBE74-4F5C-4E7C-A398-663DE8632AFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.LuceneEFCore.SearchEngine", "..\..\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine.csproj", "{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.LuceneEFCore.SearchEngine", "..\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine.csproj", "{EB2C02F5-1447-4B97-9FF2-8AF9C0FC53A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.Tools.Core", "..\..\Masuit.Tools\Masuit.Tools.Core\Masuit.Tools.Core.csproj", "{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,26 +28,26 @@ Global
 		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Release|Any CPU.Build.0 = Release|Any CPU
 		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.String版本|Any CPU.ActiveCfg = Release|Any CPU
 		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.String版本|Any CPU.Build.0 = Release|Any CPU
-		{9AABBE74-4F5C-4E7C-A398-663DE8632AFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AABBE74-4F5C-4E7C-A398-663DE8632AFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9AABBE74-4F5C-4E7C-A398-663DE8632AFE}.Guid版本|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AABBE74-4F5C-4E7C-A398-663DE8632AFE}.Guid版本|Any CPU.Build.0 = Debug|Any CPU
-		{9AABBE74-4F5C-4E7C-A398-663DE8632AFE}.Long版本|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AABBE74-4F5C-4E7C-A398-663DE8632AFE}.Long版本|Any CPU.Build.0 = Debug|Any CPU
-		{9AABBE74-4F5C-4E7C-A398-663DE8632AFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9AABBE74-4F5C-4E7C-A398-663DE8632AFE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9AABBE74-4F5C-4E7C-A398-663DE8632AFE}.String版本|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AABBE74-4F5C-4E7C-A398-663DE8632AFE}.String版本|Any CPU.Build.0 = Debug|Any CPU
-		{EB2C02F5-1447-4B97-9FF2-8AF9C0FC53A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB2C02F5-1447-4B97-9FF2-8AF9C0FC53A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB2C02F5-1447-4B97-9FF2-8AF9C0FC53A8}.Guid版本|Any CPU.ActiveCfg = Guid版本|Any CPU
-		{EB2C02F5-1447-4B97-9FF2-8AF9C0FC53A8}.Guid版本|Any CPU.Build.0 = Guid版本|Any CPU
-		{EB2C02F5-1447-4B97-9FF2-8AF9C0FC53A8}.Long版本|Any CPU.ActiveCfg = Long版本|Any CPU
-		{EB2C02F5-1447-4B97-9FF2-8AF9C0FC53A8}.Long版本|Any CPU.Build.0 = Long版本|Any CPU
-		{EB2C02F5-1447-4B97-9FF2-8AF9C0FC53A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB2C02F5-1447-4B97-9FF2-8AF9C0FC53A8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB2C02F5-1447-4B97-9FF2-8AF9C0FC53A8}.String版本|Any CPU.ActiveCfg = String版本|Any CPU
-		{EB2C02F5-1447-4B97-9FF2-8AF9C0FC53A8}.String版本|Any CPU.Build.0 = String版本|Any CPU
+		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Guid版本|Any CPU.ActiveCfg = Guid版本|Any CPU
+		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Guid版本|Any CPU.Build.0 = Guid版本|Any CPU
+		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Long版本|Any CPU.ActiveCfg = Long版本|Any CPU
+		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Long版本|Any CPU.Build.0 = Long版本|Any CPU
+		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.String版本|Any CPU.ActiveCfg = String版本|Any CPU
+		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.String版本|Any CPU.Build.0 = String版本|Any CPU
+		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Guid版本|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Guid版本|Any CPU.Build.0 = Debug|Any CPU
+		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Long版本|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Long版本|Any CPU.Build.0 = Debug|Any CPU
+		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.String版本|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.String版本|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
