@@ -126,6 +126,7 @@
 			swal('服务请求失败','','error');
 		}).catch(swal.noop);
 	}
+
 	$scope.DisabledEmailBroadcast= function() {
 		if($scope.Settings.DisabledEmailBroadcast=="true") {
 			$scope.Settings.DisabledEmailBroadcast="false";
@@ -133,6 +134,7 @@
 			$scope.Settings.DisabledEmailBroadcast="true";
 		}
 	}
+
 	$scope.CloseSite= function() {
 		if($scope.Settings.CloseSite=="true") {
 			$scope.Settings.CloseSite="false";
@@ -149,6 +151,28 @@
 			}).then(function(isConfirm) {
 				if (isConfirm) {
 					$scope.Settings.CloseSite = "true";
+					$scope.$apply();
+				}
+			});
+		}
+	}
+
+	$scope.DataReadonly= function() {
+		if($scope.Settings.DataReadonly=="true") {
+			$scope.Settings.DataReadonly="false";
+		} else {
+			swal({
+				title: '确定要开启站点写保护么?',
+				text: "一旦开启，前台所有表单数据将无法被提交！",
+				type: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#3085d6',
+				cancelButtonColor: '#d33',
+				confirmButtonText: '确定',
+				cancelButtonText: '取消',
+			}).then(function(isConfirm) {
+				if (isConfirm) {
+					$scope.Settings.DataReadonly = "true";
 					$scope.$apply();
 				}
 			});

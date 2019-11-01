@@ -94,6 +94,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 filterContext.Result = RedirectToAction("ComingSoon", "Error");
             }
 
+            if (filterContext.HttpContext.Request.Method.Equals(HttpMethods.Post) && CommonHelper.SystemSettings.GetOrAdd("DataReadonly", "false") == "true")
+            {
+                filterContext.Result = ResultData("网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", false, "网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", user != null, HttpStatusCode.BadRequest);
+            }
+
             if (user == null && Request.Cookies.Any(x => x.Key == "username" || x.Key == "password")) //执行自动登录
             {
                 string name = Request.Cookies["username"];
