@@ -62,8 +62,6 @@
     <PackageReference Include="Hangfire.Redis.StackExchange" Version="1.8.0" />
     <PackageReference Include="htmldiff.net-core" Version="1.3.6" />
     <PackageReference Include="IP2Region" Version="1.2.0" />
-    <PackageReference Include="Masuit.LuceneEFCore.SearchEngine_int" Version="1.0.2" />
-    <PackageReference Include="Masuit.Tools.Core" Version="2.2.7.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.0.0" />
@@ -75,6 +73,11 @@
     <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="3.0.13" />
     <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="3.0.20" />
     <PackageReference Include="Z.ExtensionMethods" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine.csproj" />
+    <ProjectReference Include="..\..\Masuit.Tools\Masuit.Tools.Core\Masuit.Tools.Core.csproj" />
   </ItemGroup>
   
   <ItemGroup>
