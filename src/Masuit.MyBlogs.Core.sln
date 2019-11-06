@@ -12,42 +12,21 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Guid版本|Any CPU = Guid版本|Any CPU
-		Long版本|Any CPU = Long版本|Any CPU
 		Release|Any CPU = Release|Any CPU
-		String版本|Any CPU = String版本|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Guid版本|Any CPU.ActiveCfg = Release|Any CPU
-		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Guid版本|Any CPU.Build.0 = Release|Any CPU
-		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Long版本|Any CPU.ActiveCfg = Release|Any CPU
-		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Long版本|Any CPU.Build.0 = Release|Any CPU
 		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.Release|Any CPU.Build.0 = Release|Any CPU
-		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.String版本|Any CPU.ActiveCfg = Release|Any CPU
-		{51A09BD3-AB54-4DF9-AB8B-C68DF0672C39}.String版本|Any CPU.Build.0 = Release|Any CPU
 		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Guid版本|Any CPU.ActiveCfg = Guid版本|Any CPU
-		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Guid版本|Any CPU.Build.0 = Guid版本|Any CPU
-		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Long版本|Any CPU.ActiveCfg = Long版本|Any CPU
-		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Long版本|Any CPU.Build.0 = Long版本|Any CPU
 		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.String版本|Any CPU.ActiveCfg = String版本|Any CPU
-		{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}.String版本|Any CPU.Build.0 = String版本|Any CPU
 		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Guid版本|Any CPU.ActiveCfg = Debug|Any CPU
-		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Guid版本|Any CPU.Build.0 = Debug|Any CPU
-		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Long版本|Any CPU.ActiveCfg = Debug|Any CPU
-		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Long版本|Any CPU.Build.0 = Debug|Any CPU
 		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.String版本|Any CPU.ActiveCfg = Debug|Any CPU
-		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}.String版本|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

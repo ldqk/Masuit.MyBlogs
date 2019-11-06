@@ -41,7 +41,8 @@ namespace Masuit.MyBlogs.Core.Extensions
                     IP = context.Connection.RemoteIpAddress.MapToIPv4().ToString(),
                     RequestUrl = requestUrl,
                     Time = DateTime.Now,
-                    UserAgent = request.Headers[HeaderNames.UserAgent]
+                    UserAgent = request.Headers[HeaderNames.UserAgent],
+                    Remark = "检测到敏感词拦截"
                 }));
                 context.Response.StatusCode = 504;
                 await context.Response.WriteAsync("参数不合法！", Encoding.UTF8);

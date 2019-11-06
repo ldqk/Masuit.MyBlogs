@@ -9,5 +9,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public string Address { get; set; }
         public string UserAgent { get; set; }
         public DateTime Time { get; set; }
+        public string Remark { get; set; }
     }
 }

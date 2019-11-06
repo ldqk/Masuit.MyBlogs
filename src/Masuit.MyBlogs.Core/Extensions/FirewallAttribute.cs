@@ -34,14 +34,14 @@ namespace Masuit.MyBlogs.Core.Extensions
             var sessionToken = context.HttpContext.Session.Get<string>("FullAccessViewToken");
             if (ip.IsDenyIpAddress() && string.IsNullOrEmpty(sessionToken))
             {
-                AccessDeny(context, ip, request);
+                AccessDeny(ip, request, "黑名单IP地址");
                 context.Result = new BadRequestObjectResult("您当前所在的网络环境不支持访问本站！");
                 return;
             }
 
             if (ip.IsInDenyArea() && string.IsNullOrEmpty(sessionToken))
             {
-                AccessDeny(context, ip, request);
+                AccessDeny(ip, request, "访问地区限制");
                 context.Result = new RedirectToActionResult("AccessDeny", "Error", null);
                 return;
             }
@@ -62,13 +62,13 @@ namespace Masuit.MyBlogs.Core.Extensions
             if (times > limit * 1.2)
             {
                 CacheManager.Expire("Frequency:" + ip, ExpirationMode.Sliding, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
-                AccessDeny(context, ip, request);
+                AccessDeny(ip, request, "访问频次限制");
             }
 
             context.Result = new RedirectResult("/tempdeny");
         }
 
-        private void AccessDeny(ActionExecutingContext context, string ip, HttpRequest request)
+        private void AccessDeny(string ip, HttpRequest request, string remark)
         {
             var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
             BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
@@ -76,7 +76,8 @@ namespace Masuit.MyBlogs.Core.Extensions
                 IP = ip,
                 RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path),
                 Time = DateTime.Now,
-                UserAgent = request.Headers[HeaderNames.UserAgent]
+                UserAgent = request.Headers[HeaderNames.UserAgent],
+                Remark = remark
             }));
         }
     }
