@@ -20,12 +20,12 @@ Redis：redis-server-windows 3.2
 运行时：.NET Framework 4.7.2/.NET Core 2.2  
 服务器配置：2核+4GB+5M，香港云  
 ### 硬件要求
-||最低配置|推荐配置|
-| --------   | -----:   | :----: |
-|CPU|1核|2核|
-|内存|1GB|3GB|
-|带宽|1Mbps|2Mbps|
-|数据库|SQL Server 2008/MySQL 5|SQL Server 2012/MySQL 8|
+||最低配置|推荐配置|豪华配置|
+| --------   | -----:   | :----: | :----: |
+|CPU|1核|2核|4核|
+|内存|1GB|2GB|4GB|
+|带宽|1Mbps|2Mbps|5Mbps|
+|数据库|SQL Server 2008/MySQL 5|SQL Server 2012/MySQL 8|SQL Server 2016/MySQL 8|
 ### 主要功能
 #### 服务器性能监控
 可直接在线实时监控服务器的运行状态，包括CPU、网络带宽、磁盘使用率、内存占用等情况，可记录最近一天的服务器健康状态，通过websocket进行数据的推送，仅支持Windows，且需要Windows安装最新的更新。
