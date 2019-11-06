@@ -18,7 +18,7 @@ Redis：redis-server-windows 3.2
 数据库：SQL Server 2012 express/MySQL 8.0  
 Redis：redis-server-windows 3.2  
 运行时：.NET Framework 4.7.2/.NET Core 2.2  
-服务器配置：2核+4GB+5M，香港云  
+服务器配置：2核+2GB+5M，香港云  
 ### 硬件要求
 ||最低配置|推荐配置|豪华配置|
 | --------   | -----:   | :----: | :----: |
