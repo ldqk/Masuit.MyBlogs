@@ -166,10 +166,10 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static string GetIPLocation(this IPAddress ip) => GetIPLocation(ip.MapToIPv4().ToString());
 
+        private static readonly DbSearcher Searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
         public static string GetIPLocation(this string ip)
         {
-            using var searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
-            return searcher.MemorySearch(ip).Region;
+            return Searcher.MemorySearch(ip).Region;
         }
 
         /// <summary>
