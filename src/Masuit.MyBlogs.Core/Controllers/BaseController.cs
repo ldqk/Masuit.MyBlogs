@@ -94,7 +94,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 filterContext.Result = RedirectToAction("ComingSoon", "Error");
             }
 
-            if (filterContext.HttpContext.Request.Method.Equals(HttpMethods.Post) && CommonHelper.SystemSettings.GetOrAdd("DataReadonly", "false") == "true")
+            if (Request.Method.Equals(HttpMethods.Post) && CommonHelper.SystemSettings.GetOrAdd("DataReadonly", "false") == "true" && !filterContext.Filters.Any(m => m.ToString().Contains(nameof(AuthorityAttribute))))
             {
                 filterContext.Result = ResultData("网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", false, "网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", user != null, HttpStatusCode.BadRequest);
             }
