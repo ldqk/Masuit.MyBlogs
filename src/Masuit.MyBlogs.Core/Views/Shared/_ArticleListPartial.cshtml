@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            var rnd = new Random().Next(2, Model.Posts.Count);
+            var rnd = new Random().Next(Model.Posts.Count > 2 ? 2 : 0, Model.Posts.Count);
             for (var index = 0; index < Model.Posts.Count; index++)
             {
                 if (rnd == index && Model.ListAdvertisement != null)
