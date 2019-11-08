@@ -24,7 +24,7 @@ namespace Masuit.MyBlogs.Core.Common
                 File.Create(logPath).Dispose();
             }
 
-            File.WriteAllLines(logPath, RequestLogs.OrderByDescending(x => x.Value).Select(x => x.Value + "\t" + x.Key), Encoding.UTF8);
+            File.WriteAllLines(logPath, RequestLogs.OrderByDescending(x => x.Value).ThenBy(x => x.Key).Select(x => x.Value + "\t" + x.Key), Encoding.UTF8);
             RequestLogs.Clear();
         }
     }

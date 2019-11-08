@@ -44,7 +44,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     UserAgent = request.Headers[HeaderNames.UserAgent],
                     Remark = "检测到敏感词拦截"
                 }));
-                context.Response.StatusCode = 504;
+                context.Response.StatusCode = 400;
                 await context.Response.WriteAsync("参数不合法！", Encoding.UTF8);
                 return;
             }
