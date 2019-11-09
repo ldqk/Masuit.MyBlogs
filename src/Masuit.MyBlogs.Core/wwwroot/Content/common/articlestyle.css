@@ -1,4 +1,7 @@
-﻿.border {
+﻿.label a {
+    color: white;
+}
+.border {
     border: #ccc 1px solid;
     border-radius: 5px;
     /*margin-bottom: 10px;*/

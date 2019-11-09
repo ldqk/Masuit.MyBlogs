@@ -750,6 +750,16 @@
             <param name="orderBy"></param>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.HomeController.Author(System.String,System.Nullable{Masuit.MyBlogs.Core.Models.Enum.OrderBy},System.Int32,System.Int32)">
+            <summary>
+            作者文章页
+            </summary>
+            <param name="id"></param>
+            <param name="page"></param>
+            <param name="size"></param>
+            <param name="orderBy"></param>
+            <returns></returns>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.HomeController.Category(System.Int32,System.Nullable{Masuit.MyBlogs.Core.Models.Enum.OrderBy},System.Int32,System.Int32)">
             <summary>
             分类文章页

@@ -55,8 +55,12 @@
                             <div class="row">
                                 <div class="col-sm-8">
                                     <div class="padding-bot10">
-                                        <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Author</span>发表于<span class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
-                                        <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Modifier</span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                        <span class="label label-@colors[new Random().Next() % colors.Length]">
+                                            <a asp-controller="Home" asp-action="Author" asp-route-author="@Model.Author">@Model.Author</a>
+                                        </span>发表于<span class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
+                                        <span class="label label-@colors[new Random().Next() % colors.Length]">
+                                            <a asp-controller="Home" asp-action="Author" asp-route-author="@Model.Modifier">@Model.Modifier</a>
+                                        </span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
                                     </div>
                                 </div>
                                 @{
