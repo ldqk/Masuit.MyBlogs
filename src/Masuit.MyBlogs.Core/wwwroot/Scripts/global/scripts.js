@@ -29,7 +29,7 @@ $(function() {
     popBrowserTips();
     $("img").lazyload({
         effect: "fadeIn", //渐现，show(直接显示),fadeIn(淡入),slideDown(下拉)
-        threshold: 180, //预加载，在图片距离屏幕180px时提前载入
+        threshold: 2700, //预加载，在图片距离屏幕180px时提前载入
         //event: 'click',  // 事件触发时才加载，click(点击),mouseover(鼠标划过),sporty(运动的),默认为scroll（滑动）
         //container: $("#container"), // 指定对某容器中的图片实现效果
         failure_limit: 2 //加载2张可见区域外的图片,lazyload默认在找到第一张不在可见区域里的图片时则不再继续加载,但当HTML容器混乱的时候可能出现可见区域内图片并没加载出来的情况
@@ -152,8 +152,7 @@ $(function() {
         multiWord: true, //以分隔符号分割的多关键字支持  
         separator: ",", //多关键字支持时的分隔符，默认为空格  
         getDataMethod: "url", //获取数据的方式，总是从 URL 获取  
-        url: 'https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?p=3&t=' + (new Date()).getTime() +
-            '&wd=', /*优先从url ajax 请求 json 帮助数据，注意最后一个参数为关键字请求参数*/
+        url: 'https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?p=3&t=' + (new Date()).getTime() + '&wd=', /*优先从url ajax 请求 json 帮助数据，注意最后一个参数为关键字请求参数*/
         jsonp: 'cb', //如果从 url 获取数据，并且需要跨域，则该参数必须设置  
         processData: function(json) { // url 获取数据时，对数据的处理，作为 getData 的回调函数  
             var i, data = {
@@ -192,8 +191,8 @@ $(function() {
     if (!Object.prototype.hasOwnProperty.call(window, 'event')) {
         ['mousedown', 'mouseenter', 'onmouseleave'].forEach(function(eventType) {
             window.addEventListener(eventType, function(event) {
-                    window.event = event;
-                }, true);
+                window.event = event;
+            }, true);
         });
     }
 

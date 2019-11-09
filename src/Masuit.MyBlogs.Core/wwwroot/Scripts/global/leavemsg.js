@@ -21,7 +21,7 @@
         if ($("#name").val().trim().length <= 0 || $("#name").val().trim().length > 36) {
 	        window.notie.alert({
 		        type: 3,
-		        text: '再怎么你也应该留个合理的名字吧，非主流的我可不喜欢！',
+		        text: '昵称要求2-36个字符！',
 		        time: 4
 	        });
             loadingDone();
@@ -87,7 +87,7 @@
         if ($("#name2").val().trim().length <= 0 || $("#name").val().trim().length > 36) {
 	        window.notie.alert({
 		        type: 3,
-                text: "亲，能留个正常点的名字不！",
+                text: "昵称要求2-36个字符！",
 		        time: 4
 	        });
             loadingDone();

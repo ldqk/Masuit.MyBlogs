@@ -15,7 +15,6 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -41,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             if (Regex.Match(dto.Content, CommonHelper.BanRegex).Length > 0)
             {
-                return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请注意改善您的言辞！");
+                return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
 
             Post post = PostService.GetById(dto.PostId);

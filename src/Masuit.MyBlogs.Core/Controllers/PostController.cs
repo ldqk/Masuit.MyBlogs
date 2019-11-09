@@ -217,9 +217,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "验证码错误！");
             }
 
-            if (Regex.Match(post.Content, CommonHelper.BanRegex).Length > 0)
+            if (Regex.Match(post.Title + post.Content, CommonHelper.BanRegex).Length > 0)
             {
-                return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请注意改善您的言辞！");
+                return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
 
             if (!CategoryService.Any(c => c.Id == post.CategoryId))
