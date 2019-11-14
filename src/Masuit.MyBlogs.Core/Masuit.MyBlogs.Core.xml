@@ -134,7 +134,7 @@
             <summary>
             图床客户端
             </summary>
-            <param name="httpClient"></param>
+            <param name="httpClientFactory"></param>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Common.ImagebedClient.OssClient">
             <summary>
@@ -144,6 +144,14 @@
         <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadImage(System.IO.Stream,System.String)">
             <summary>
             上传图片
+            </summary>
+            <param name="stream"></param>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadOss(System.IO.Stream,System.String)">
+            <summary>
+            阿里云Oss图床
             </summary>
             <param name="stream"></param>
             <param name="file"></param>
@@ -166,26 +174,10 @@
             <param name="file"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadOss(System.IO.Stream,System.String)">
-            <summary>
-            阿里云Oss图床
-            </summary>
-            <param name="stream"></param>
-            <param name="file"></param>
-            <returns></returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadSmms(System.IO.Stream,System.String)">
             <summary>
             上传图片到sm图床
             </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadPeople(System.IO.Stream,System.String)">
-            <summary>
-            上传图片到人民网图床
-            </summary>
-            <param name="stream"></param>
-            <param name="file"></param>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.ReplaceImgSrc(System.String)">

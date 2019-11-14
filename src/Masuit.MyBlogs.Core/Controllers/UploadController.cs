@@ -112,7 +112,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     var ext = strs[0].Split(";")[0].Split("/")[1];
                     await using var image = new MemoryStream(bytes);
                     var imgFile = $"{SnowFlake.NewId}.{ext}";
-                    var (url, success) = await ImagebedClient.UploadImage(image, imgFile);
+                    var (url, success) = ImagebedClient.UploadImage(image, imgFile);
                     if (success)
                     {
                         img.Attributes["src"].Value = url;
@@ -249,7 +249,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             switch (file.ContentType)
             {
                 case var _ when file.ContentType.StartsWith("image"):
-                    var (url, success) = await ImagebedClient.UploadImage(file.OpenReadStream(), file.FileName);
+                    var (url, success) = ImagebedClient.UploadImage(file.OpenReadStream(), file.FileName);
                     if (success)
                     {
                         return ResultData(url);
