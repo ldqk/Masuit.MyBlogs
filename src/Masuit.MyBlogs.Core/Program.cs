@@ -1,6 +1,5 @@
 ﻿using Autofac.Extensions.DependencyInjection;
 using Masuit.MyBlogs.Core.Hubs;
-using Masuit.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;

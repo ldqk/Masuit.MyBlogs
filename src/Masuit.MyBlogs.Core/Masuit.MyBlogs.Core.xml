@@ -2741,22 +2741,9 @@
             <param name="t">需要添加的实体</param>
             <returns>添加成功</returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.BulkInsert(System.Collections.Generic.IEnumerable{`0})">
-            <summary>
-            批量添加实体
-            </summary>
-            <param name="list">需要添加的实体</param>
-            <returns>添加成功</returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.SaveChanges">
             <summary>
             统一保存数据
-            </summary>
-            <returns>受影响的行数</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.BaseRepository`1.BulkSaveChanges">
-            <summary>
-            统一批量保存数据
             </summary>
             <returns>受影响的行数</returns>
         </member>
@@ -3198,22 +3185,9 @@
             <param name="t">需要添加的实体</param>
             <returns>添加成功</returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.BulkInsert(System.Collections.Generic.IEnumerable{`0})">
-            <summary>
-            批量添加实体
-            </summary>
-            <param name="list">需要添加的实体</param>
-            <returns>添加成功</returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.SaveChanges">
             <summary>
             统一保存数据
-            </summary>
-            <returns>受影响的行数</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Repository.Interface.IBaseRepository`1.BulkSaveChanges">
-            <summary>
-            统一批量保存数据
             </summary>
             <returns>受影响的行数</returns>
         </member>
@@ -4003,17 +3977,6 @@
             <param name="list">实体集合</param>
             <returns>添加成功</returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.BulkInsert(System.Collections.Generic.IEnumerable{`0})">
-            <summary>
-            批量添加实体
-            </summary>
-            <param name="list">需要添加的实体</param>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.BaseService`1.BulkSaveChanges">
-            <summary>
-            统一批量保存数据
-            </summary>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.CategoryService.Delete(System.Int32,System.Int32)">
             <summary>
             删除分类，并将该分类下的文章移动到新分类下
@@ -4604,17 +4567,6 @@
             </summary>
             <param name="list">实体集合</param>
             <returns>添加成功</returns>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.BulkInsert(System.Collections.Generic.IEnumerable{`0})">
-            <summary>
-            批量添加实体
-            </summary>
-            <param name="list">需要添加的实体</param>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.IBaseService`1.BulkSaveChanges">
-            <summary>
-            统一批量保存数据
-            </summary>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.Interface.ICategoryService.Delete(System.Int32,System.Int32)">
             <summary>
