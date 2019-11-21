@@ -8,7 +8,6 @@ using Masuit.Tools;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.IO;
 using System.Linq;

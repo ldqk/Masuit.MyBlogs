@@ -746,7 +746,7 @@
             <summary>
             作者文章页
             </summary>
-            <param name="id"></param>
+            <param name="author"></param>
             <param name="page"></param>
             <param name="size"></param>
             <param name="orderBy"></param>
@@ -762,13 +762,10 @@
             <param name="orderBy"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.HomeController.GetIndexPageViewModel(System.Int32,System.Int32,System.Nullable{Masuit.MyBlogs.Core.Models.Enum.OrderBy},Masuit.MyBlogs.Core.Models.DTO.UserInfoOutputDto)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.HomeController.GetIndexPageViewModel">
             <summary>
             获取页面视图模型
             </summary>
-            <param name="page"></param>
-            <param name="size"></param>
-            <param name="orderBy"></param>
             <param name="user"></param>
             <returns></returns>
         </member>
@@ -6706,7 +6703,7 @@
             按修改时间
             </summary>
         </member>
-        <member name="F:Masuit.MyBlogs.Core.Models.Enum.OrderBy.ViewCount">
+        <member name="F:Masuit.MyBlogs.Core.Models.Enum.OrderBy.TotalViewCount">
             <summary>
             按访问次数
             </summary>
@@ -6716,7 +6713,7 @@
             按评论数
             </summary>
         </member>
-        <member name="F:Masuit.MyBlogs.Core.Models.Enum.OrderBy.VoteCount">
+        <member name="F:Masuit.MyBlogs.Core.Models.Enum.OrderBy.VoteUpCount">
             <summary>
             按投票数
             </summary>

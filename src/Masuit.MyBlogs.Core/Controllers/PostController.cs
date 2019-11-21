@@ -28,6 +28,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -257,7 +258,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult GetTag()
         {
-            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().Cacheable().AsEnumerable().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
+            var list = Enumerable.AsEnumerable(PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().Cacheable()).SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
             return ResultData(list);
         }
 
@@ -268,7 +269,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("all"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult All()
         {
-            var tags = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Cacheable().AsEnumerable().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToList(); //tag
+            var tags = Enumerable.AsEnumerable(PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Cacheable()).SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToList(); //tag
             ViewBag.tags = tags.GroupBy(t => t).OrderByDescending(g => g.Count()).ThenBy(g => g.Key);
             ViewBag.cats = CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
@@ -603,30 +604,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             IOrderedQueryable<Post> temp;
             var query = string.IsNullOrEmpty(kw) ? PostService.GetAll() : PostService.GetQuery(p => p.Title.Contains(kw) || p.Author.Contains(kw) || p.Email.Contains(kw) || p.Label.Contains(kw) || p.Content.Contains(kw));
             var total = query.Count();
-            var order = query.OrderByDescending(p => p.Status).ThenByDescending(p => p.IsFixedTop);
-            switch (orderby)
-            {
-                case OrderBy.CommentCount:
-                    temp = order.ThenByDescending(p => p.Comment.Count);
-                    break;
-                case OrderBy.PostDate:
-                    temp = order.ThenByDescending(p => p.PostDate);
-                    break;
-                case OrderBy.ViewCount:
-                    temp = order.ThenByDescending(p => p.TotalViewCount);
-                    break;
-                case OrderBy.VoteCount:
-                    temp = order.ThenByDescending(p => p.VoteUpCount);
-                    break;
-                case OrderBy.AverageViewCount:
-                    temp = order.ThenByDescending(p => p.AverageViewCount);
-                    break;
-                default:
-                    temp = order.ThenByDescending(p => p.ModifyDate);
-                    break;
-            }
-
-            var list = temp.Skip((page - 1) * size).Take(size).ProjectTo<PostDataModel>(MapperConfig).ToList();
+            var list = query.OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").Skip((page - 1) * size).Take(size).ProjectTo<PostDataModel>(MapperConfig).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }

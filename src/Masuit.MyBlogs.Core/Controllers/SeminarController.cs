@@ -5,10 +5,12 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
+using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Runtime.InteropServices;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -41,27 +43,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("c/{id:int}/{page:int?}/{size:int?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         public ActionResult Index(int id, [Optional]OrderBy? orderBy, int page = 1, int size = 15)
         {
-            IList<Post> posts;
             var s = SeminarService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            var temp = PostService.GetQuery(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin)).OrderByDescending(p => p.IsFixedTop);
-            switch (orderBy)
-            {
-                case OrderBy.CommentCount:
-                    posts = temp.ThenByDescending(p => p.Comment.Count).Skip(size * (page - 1)).Take(size).ToList();
-                    break;
-                case OrderBy.PostDate:
-                    posts = temp.ThenByDescending(p => p.PostDate).Skip(size * (page - 1)).Take(size).ToList();
-                    break;
-                case OrderBy.ViewCount:
-                    posts = temp.ThenByDescending(p => p.TotalViewCount).Skip(size * (page - 1)).Take(size).ToList();
-                    break;
-                case OrderBy.VoteCount:
-                    posts = temp.ThenByDescending(p => p.VoteUpCount).Skip(size * (page - 1)).Take(size).ToList();
-                    break;
-                default:
-                    posts = temp.ThenByDescending(p => p.ModifyDate).Skip(size * (page - 1)).Take(size).ToList();
-                    break;
-            }
+            var temp = PostService.GetQuery(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin));
+            var posts = temp.OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).ToList();
             ViewBag.Total = temp.Count();
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
