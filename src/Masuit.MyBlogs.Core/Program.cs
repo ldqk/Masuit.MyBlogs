@@ -1,11 +1,11 @@
 ﻿using Autofac.Extensions.DependencyInjection;
 using Masuit.MyBlogs.Core.Hubs;
+using Masuit.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
-using Z.EntityFramework.Extensions;
 
 namespace Masuit.MyBlogs.Core
 {
@@ -13,7 +13,6 @@ namespace Masuit.MyBlogs.Core
     {
         public static void Main(string[] args)
         {
-            LicenseManager.AddLicense("67;100-MASUIT", "809739091397182EC1ECEA8770EB4218");
             MyHub.Init();
             CreateWebHostBuilder(args).Build().Run();
         }

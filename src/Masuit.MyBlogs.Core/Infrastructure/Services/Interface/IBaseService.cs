@@ -528,16 +528,5 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <param name="list">实体集合</param>
         /// <returns>添加成功</returns>
         Task<IEnumerable<T>> AddEntitiesAsync(IList<T> list);
-
-        /// <summary>
-        /// 批量添加实体
-        /// </summary>
-        /// <param name="list">需要添加的实体</param>
-        void BulkInsert(IEnumerable<T> list);
-
-        /// <summary>
-        /// 统一批量保存数据
-        /// </summary>
-        void BulkSaveChanges();
     }
 }

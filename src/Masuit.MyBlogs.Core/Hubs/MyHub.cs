@@ -1,4 +1,5 @@
-﻿using Masuit.Tools.DateTimeExt;
+﻿using Masuit.Tools;
+using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Hardware;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.SignalR;

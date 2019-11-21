@@ -172,6 +172,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 CommonHelper.SystemSettings.AddOrUpdate(key, value);
             }
+
             return ResultData(null, b, b ? "设置保存成功！" : "设置保存失败！");
         }
 

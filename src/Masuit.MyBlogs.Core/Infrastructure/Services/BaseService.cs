@@ -751,22 +751,5 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             await SaveChangesAsync();
             return entities;
         }
-
-        /// <summary>
-        /// 批量添加实体
-        /// </summary>
-        /// <param name="list">需要添加的实体</param>
-        public virtual void BulkInsert(IEnumerable<T> list)
-        {
-            BaseDal.BulkInsert(list);
-        }
-
-        /// <summary>
-        /// 统一批量保存数据
-        /// </summary>
-        public virtual void BulkSaveChanges()
-        {
-            BaseDal.BulkSaveChanges();
-        }
     }
 }

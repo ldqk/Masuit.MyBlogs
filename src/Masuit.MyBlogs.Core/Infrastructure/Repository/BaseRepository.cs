@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using EFSecondLevelCache.Core;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
+using Masuit.Tools;
 using Masuit.Tools.Systems;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository
 {
@@ -576,7 +576,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>删除成功</returns>
         public virtual int DeleteEntity(Expression<Func<T, bool>> @where)
         {
-            return DataContext.Set<T>().Where(@where).Delete();
+            var query = DataContext.Set<T>().Where(@where);
+            DataContext.RemoveRange(query);
+            return DataContext.SaveChanges();
         }
 
         /// <summary>
@@ -586,7 +588,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>删除成功</returns>
         public virtual async Task<int> DeleteEntityAsync(Expression<Func<T, bool>> @where)
         {
-            return await DataContext.Set<T>().Where(@where).DeleteAsync().ConfigureAwait(true);
+            var query = DataContext.Set<T>().Where(@where);
+            DataContext.RemoveRange(query);
+            return await DataContext.SaveChangesAsync();
         }
 
         /// <summary>
@@ -597,31 +601,12 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public abstract T AddEntity(T t);
 
         /// <summary>
-        /// 批量添加实体
-        /// </summary>
-        /// <param name="list">需要添加的实体</param>
-        /// <returns>添加成功</returns>
-        public virtual void BulkInsert(IEnumerable<T> list)
-        {
-            DataContext.BulkInsert(list);
-        }
-
-        /// <summary>
         /// 统一保存数据
         /// </summary>
         /// <returns>受影响的行数</returns>
         public virtual int SaveChanges()
         {
             return DataContext.SaveChanges();
-        }
-
-        /// <summary>
-        /// 统一批量保存数据
-        /// </summary>
-        /// <returns>受影响的行数</returns>
-        public virtual void BulkSaveChanges()
-        {
-            DataContext.BulkSaveChanges();
         }
 
         /// <summary>

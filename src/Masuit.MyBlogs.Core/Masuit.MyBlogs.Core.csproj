@@ -70,8 +70,6 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.0.0" />
     <PackageReference Include="WilderMinds.RssSyndication" Version="1.6.0" />
     <PackageReference Include="WinInsider.System.Net.Http.Formatting" Version="1.0.10" />
-    <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="3.0.17" />
-    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="3.0.22" />
     <PackageReference Include="Z.ExtensionMethods" Version="2.1.1" />
   </ItemGroup>
 

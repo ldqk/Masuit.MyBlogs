@@ -415,23 +415,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         T AddEntity(T t);
 
         /// <summary>
-        /// 批量添加实体
-        /// </summary>
-        /// <param name="list">需要添加的实体</param>
-        /// <returns>添加成功</returns>
-        void BulkInsert(IEnumerable<T> list);
-
-        /// <summary>
         /// 统一保存数据
         /// </summary>
         /// <returns>受影响的行数</returns>
         int SaveChanges();
-
-        /// <summary>
-        /// 统一批量保存数据
-        /// </summary>
-        /// <returns>受影响的行数</returns>
-        void BulkSaveChanges();
 
         /// <summary>
         /// 统一保存数据（异步）
