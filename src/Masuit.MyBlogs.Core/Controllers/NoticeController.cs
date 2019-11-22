@@ -10,6 +10,7 @@ using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -177,12 +178,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult Last()
         {
-            if (HttpContext.Session.Get("last-notice") != null)
+            if (Request.Cookies.TryGetValue("last-notice", out var json))
             {
-                return ResultData(HttpContext.Session.Get<NoticeOutputDto>("last-notice"));
+                var data = JsonConvert.DeserializeObject<NoticeOutputDto>(json);
+                if (NoticeService.Any(n => n.Id <= data.Id))
+                {
+                    return ResultData(data);
+                }
             }
 
-            var notice = NoticeService.Get(n => n.Status == Status.Display, n => n.ModifyDate, false);
+            var notice = NoticeService.GetFromCache(n => n.Status == Status.Display, n => n.ModifyDate, false);
             if (notice == null)
             {
                 return ResultData(null, false);
@@ -191,7 +196,10 @@ namespace Masuit.MyBlogs.Core.Controllers
             notice.ViewCount += 1;
             NoticeService.SaveChanges();
             var dto = notice.Mapper<NoticeOutputDto>();
-            HttpContext.Session.Set("last-notice", dto);
+            Response.Cookies.Append("last-notice", dto.ToJsonString(), new CookieOptions()
+            {
+                Expires = DateTime.Now.AddMonths(1)
+            });
             return ResultData(dto);
         }
     }
