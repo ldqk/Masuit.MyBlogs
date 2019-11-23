@@ -1,5 +1,4 @@
-﻿using AutoMapper.QueryableExtensions;
-using EFSecondLevelCache.Core;
+﻿using EFSecondLevelCache.Core;
 using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -7,7 +6,6 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -58,7 +56,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             var fastShares = FastShareService.GetAllFromCache(s => s.Sort).ToList();
             var postsQuery = PostService.GetQuery<PostOutputDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
             var posts = postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").Take(15).Cacheable().ToList();
-
             var viewModel = GetIndexPageViewModel();
             viewModel.Banner = banners;
             viewModel.Posts = Enumerable.AsEnumerable(postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate)).Union(posts).ToList();
@@ -79,7 +76,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin && !p.IsFixedTop);
             var viewModel = GetIndexPageViewModel();
             var postsQuery = PostService.GetQuery<PostOutputDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
-
             var posts = postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
             if (page == 1)
             {
@@ -145,10 +141,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Category(int id, [Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 15)
         {
             var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
-            var posts = PostService.GetQueryNoTracking(p => p.CategoryId == cat.Id && (p.Status == Status.Pended || CurrentUser.IsAdmin));
+            var posts = PostService.GetQuery<PostOutputDto>(p => p.CategoryId == cat.Id && (p.Status == Status.Pended || CurrentUser.IsAdmin));
             ViewBag.Total = posts.Count();
             var viewModel = GetIndexPageViewModel();
-            viewModel.Posts = posts.OrderBy($"{nameof(PostOutputDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).ProjectTo<PostOutputDto>(MapperConfig).Cacheable().ToList();
+            viewModel.Posts = posts.OrderBy($"{nameof(PostOutputDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
             ViewBag.CategoryName = cat.Name;
             ViewBag.Desc = cat.Description;
             return View(viewModel);
@@ -157,7 +153,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 获取页面视图模型
         /// </summary>
-        /// <param name="user"></param>
         /// <returns></returns>
         private IndexPageViewModel GetIndexPageViewModel()
         {

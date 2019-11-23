@@ -766,7 +766,6 @@
             <summary>
             获取页面视图模型
             </summary>
-            <param name="user"></param>
             <returns></returns>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.LinksController">
