@@ -4,7 +4,6 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.Tools;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -44,14 +43,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index(int id, [Optional]OrderBy? orderBy, int page = 1, int size = 15)
         {
             var s = SeminarService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            var temp = PostService.GetQuery(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin));
+            var temp = PostService.GetQuery<PostOutputDto>(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin));
             var posts = temp.OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).ToList();
             ViewBag.Total = temp.Count();
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
-            return View(posts.Mapper<IList<PostOutputDto>>());
+            return View(posts);
         }
 
         #region 管理端
