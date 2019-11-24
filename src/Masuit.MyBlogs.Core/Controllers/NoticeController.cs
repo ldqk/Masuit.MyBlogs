@@ -181,7 +181,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (Request.Cookies.TryGetValue("last-notice", out var json))
             {
                 var data = JsonConvert.DeserializeObject<NoticeOutputDto>(json);
-                if (NoticeService.Any(n => n.Id <= data.Id))
+                if (!NoticeService.Any(n => n.Id > data.Id))
                 {
                     return ResultData(data);
                 }
