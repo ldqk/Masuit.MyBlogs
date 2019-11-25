@@ -187,7 +187,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            var notice = NoticeService.GetFromCache(n => n.Status == Status.Display, n => n.ModifyDate, false);
+            var notice = NoticeService.Get(n => n.Status == Status.Display, n => n.ModifyDate, false);
             if (notice == null)
             {
                 return ResultData(null, false);
