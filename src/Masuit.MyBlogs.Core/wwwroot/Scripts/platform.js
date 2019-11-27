@@ -1,8 +1,8 @@
 /*!
- * Platform.js <https://mths.be/platform>
- * Copyright 2014-2016 Benjamin Tan <https://demoneaux.github.io/>
- * Copyright 2011-2013 John-David Dalton <http://allyoucanleet.com/>
- * Available under MIT license <https://mths.be/mit>
+ * Platform.js
+ * Copyright 2014-2018 Benjamin Tan
+ * Copyright 2011-2013 John-David Dalton
+ * Available under MIT license
  */
 ;(function() {
   'use strict';
@@ -339,7 +339,7 @@
 
     /* Detectable layout engines (order is important). */
     var layout = getLayout([
-      { 'label': 'EdgeHTML', 'pattern': 'Edge' },
+      { 'label': 'EdgeHTML', 'pattern': '(?:Edge|EdgA|EdgiOS)' },
       'Trident',
       { 'label': 'WebKit', 'pattern': 'AppleWebKit' },
       'iCab',
@@ -369,7 +369,7 @@
       'Konqueror',
       'Lunascape',
       'Maxthon',
-      { 'label': 'Microsoft Edge', 'pattern': 'Edge' },
+      { 'label': 'Microsoft Edge', 'pattern': '(?:Edge|Edg|EdgA|EdgiOS)' },
       'Midori',
       'Nook Browser',
       'PaleMoon',
@@ -695,7 +695,7 @@
     // Detect non-Opera (Presto-based) versions (order is important).
     if (!version) {
       version = getVersion([
-        '(?:Cloud9|CriOS|CrMo|Edge|FxiOS|IEMobile|Iron|Opera ?Mini|OPiOS|OPR|Raven|SamsungBrowser|Silk(?!/[\\d.]+$))',
+        '(?:Cloud9|CriOS|CrMo|Edge|Edg|EdgA|EdgiOS|FxiOS|IEMobile|Iron|Opera ?Mini|OPiOS|OPR|Raven|SamsungBrowser|Silk(?!/[\\d.]+$))',
         'Version',
         qualify(name),
         '(?:Firefox|Minefield|NetFront)'
@@ -742,16 +742,18 @@
           arch = data.getProperty('os.arch');
           os = os || data.getProperty('os.name') + ' ' + data.getProperty('os.version');
         }
-        if (isModuleScope && isHostType(context, 'system') && (data = [context.system])[0]) {
-          os || (os = data[0].os || null);
+        if (rhino) {
           try {
-            data[1] = context.require('ringo/engine').version;
-            version = data[1].join('.');
+            version = context.require('ringo/engine').version.join('.');
             name = 'RingoJS';
           } catch(e) {
-            if (data[0].global.system == context.system) {
+            if ((data = context.system) && data.global.system == context.system) {
               name = 'Narwhal';
+              os || (os = data[0].os || null);
             }
+          }
+          if (!name) {
+            name = 'Rhino';
           }
         }
         else if (
@@ -768,16 +770,14 @@
               name = 'NW.js';
               version = data.versions.nw;
             }
-          } else {
+          }
+          if (!name) {
             name = 'Node.js';
             arch = data.arch;
             os = data.platform;
-            version = /[\d.]+/.exec(data.version)
-            version = version ? version[0] : 'unknown';
+            version = /[\d.]+/.exec(data.version);
+            version = version ? version[0] : null;
           }
-        }
-        else if (rhino) {
-          name = 'Rhino';
         }
       }
       // Detect Adobe AIR.
