@@ -3,7 +3,6 @@ using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
@@ -26,17 +25,17 @@ namespace Masuit.MyBlogs.Core.Extensions
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var request = context.HttpContext.Request;
-            if (!bool.Parse(CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true")) || context.Filters.Any(m => m.ToString().Contains(nameof(AllowAccessFirewallAttribute))) || request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]))
-            {
-                return;
-            }
-
             var ip = context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             var sessionToken = context.HttpContext.Session.Get<string>("FullAccessViewToken");
             if (ip.IsDenyIpAddress() && string.IsNullOrEmpty(sessionToken))
             {
                 AccessDeny(ip, request, "黑名单IP地址");
                 context.Result = new BadRequestObjectResult("您当前所在的网络环境不支持访问本站！");
+                return;
+            }
+
+            if (!bool.Parse(CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true")) || context.Filters.Any(m => m.ToString().Contains(nameof(AllowAccessFirewallAttribute))) || request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]))
+            {
                 return;
             }
 
