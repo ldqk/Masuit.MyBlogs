@@ -75,7 +75,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             {
                 using var stream = response.Content.ReadAsStreamAsync().Result;
                 var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
-                var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath);
+                var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath).Result;
                 if (success)
                 {
                     ServerUrl = url;

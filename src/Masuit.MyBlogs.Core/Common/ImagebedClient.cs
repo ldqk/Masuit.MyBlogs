@@ -43,30 +43,9 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="stream"></param>
         /// <param name="file"></param>
         /// <returns></returns>
-        public (string url, bool success) UploadImage(Stream stream, string file)
+        public async Task<(string url, bool success)> UploadImage(Stream stream, string file)
         {
-            return UploadOss(stream, file);
-        }
-
-        /// <summary>
-        /// 阿里云Oss图床
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        private (string url, bool success) UploadOss(Stream stream, string file)
-        {
-            var objectName = DateTime.Now.ToString("yyyyMMdd") + "/" + SnowFlake.NewId + Path.GetExtension(file);
-            return Policy.Handle<Exception>().Retry(5, (e, i) =>
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(e.Message);
-                Console.ResetColor();
-            }).Wrap(Policy<(string url, bool success)>.Handle<Exception>().Fallback(() => UploadGitlab(stream, file).Result)).Execute(() =>
-            {
-                var result = OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, stream);
-                return result.HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : UploadGitlab(stream, file).Result;
-            });
+            return await UploadGitlab(stream, file);
         }
 
         /// <summary>
@@ -109,7 +88,7 @@ namespace Masuit.MyBlogs.Core.Common
                 }
             }
 
-            return await UploadSmms(stream, file);
+            return UploadOss(stream, file);
         }
 
         /// <summary>
@@ -133,7 +112,28 @@ namespace Masuit.MyBlogs.Core.Common
                 return (config.RawUrl + path, true);
             }
 
-            return await UploadSmms(stream, file);
+            return UploadOss(stream, file);
+        }
+
+        /// <summary>
+        /// 阿里云Oss图床
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        private (string url, bool success) UploadOss(Stream stream, string file)
+        {
+            var objectName = DateTime.Now.ToString("yyyyMMdd") + "/" + SnowFlake.NewId + Path.GetExtension(file);
+            return Policy.Handle<Exception>().Retry(5, (e, i) =>
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e.Message);
+                Console.ResetColor();
+            }).Wrap(Policy<(string url, bool success)>.Handle<Exception>().Fallback(() => UploadSmms(stream, file).Result)).Execute(() =>
+            {
+                var result = OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, stream);
+                return result.HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : UploadSmms(stream, file).Result;
+            });
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Masuit.MyBlogs.Core.Common
                 }
 
                 await using var stream = File.OpenRead(path);
-                var (url, success) = UploadImage(stream, path);
+                var (url, success) = await UploadImage(stream, path);
                 if (success)
                 {
                     content = content.Replace(src, url);

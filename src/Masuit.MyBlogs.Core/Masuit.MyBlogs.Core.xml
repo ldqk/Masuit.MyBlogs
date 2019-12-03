@@ -149,14 +149,6 @@
             <param name="file"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadOss(System.IO.Stream,System.String)">
-            <summary>
-            阿里云Oss图床
-            </summary>
-            <param name="stream"></param>
-            <param name="file"></param>
-            <returns></returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadGitlab(System.IO.Stream,System.String)">
             <summary>
             gitlab图床
@@ -170,6 +162,14 @@
             码云图床
             </summary>
             <param name="config"></param>
+            <param name="stream"></param>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadOss(System.IO.Stream,System.String)">
+            <summary>
+            阿里云Oss图床
+            </summary>
             <param name="stream"></param>
             <param name="file"></param>
             <returns></returns>

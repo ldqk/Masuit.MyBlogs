@@ -48,7 +48,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(uploadFileName)))
                 {
                     using var stream = file.OpenReadStream();
-                    var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath);
+                    var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath).Result;
                     if (success)
                     {
                         Result.Url = url;
