@@ -70,7 +70,9 @@
 .ui-draggable .ibox-title {
     cursor: move
 }
-
+.history {
+    background-image: url(https://bkssl.bdimg.com/static/wiki-lemma/history/img/watermark-transparent_5444b91.png);
+}
 .ibox {
     clear: both;
     margin-bottom: 10px;

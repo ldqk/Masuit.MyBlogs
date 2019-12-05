@@ -1,5 +1,4 @@
-﻿@using System.Web
-@using Masuit.MyBlogs.Core.Models.Entity
+﻿@using Masuit.MyBlogs.Core.Models.Entity
 @model Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion
 @{
     ViewBag.Title = Model.Post.Title + "于" + Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss") + "的历史版本：" + Model.Title;
@@ -21,7 +20,7 @@
         <div class="ibox">
             <div class="ibox-content animated fadeIn">
                 <main>
-                    <section>
+                    <section class="history">
                         <header class="page-header">
                             <div class="text-center">
                                 <a>
