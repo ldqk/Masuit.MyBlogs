@@ -105,38 +105,27 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost]
         public ActionResult Handle([FromBody]FileRequest req)
         {
-            List<object> list = new List<object>();
+            var list = new List<object>();
             var root = Path.Combine(HostEnvironment.ContentRootPath, CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/'));
             switch (req.Action)
             {
                 case "list":
-                    string path = Path.Combine(root, req.Path.TrimStart('\\', '/'));
-                    string[] dirs = Directory.GetDirectories(path);
-                    string[] files = Directory.GetFiles(path);
-                    dirs.ForEach(s =>
+                    var path = Path.Combine(root, req.Path.TrimStart('\\', '/'));
+                    var dirs = Directory.GetDirectories(path);
+                    var files = Directory.GetFiles(path);
+                    list.AddRange(dirs.Select(s => new DirectoryInfo(s)).Select(dirinfo => new FileList
                     {
-                        DirectoryInfo dirinfo = new DirectoryInfo(s);
-                        list.Add(new FileList()
-                        {
-                            date = dirinfo.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                            name = dirinfo.Name,
-                            //rights = "drwxrwxrwx",
-                            size = 0,
-                            type = "dir"
-                        });
-                    });
-                    files.ForEach(s =>
+                        date = dirinfo.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                        name = dirinfo.Name,
+                        size = 0,
+                        type = "dir"
+                    }).Union(files.Select(s => new FileInfo(s)).Select(info => new FileList
                     {
-                        FileInfo info = new FileInfo(s);
-                        list.Add(new FileList()
-                        {
-                            name = info.Name,
-                            //rights = "-rw-rw-rw-",
-                            size = info.Length,
-                            date = info.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                            type = "file"
-                        });
-                    });
+                        name = info.Name,
+                        size = info.Length,
+                        date = info.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                        type = "file"
+                    })));
                     break;
                 case "remove":
                     req.Items.ForEach(s =>
@@ -193,11 +182,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                     break;
                 case "copy":
-                    path = Path.Combine(root, req.Item.TrimStart('\\', '/'));
-                    newpath = Path.Combine(root, req.NewItemPath.TrimStart('\\', '/'));
                     if (!string.IsNullOrEmpty(req.Item))
                     {
-                        System.IO.File.Copy(path, newpath);
+                        System.IO.File.Copy(Path.Combine(root, req.Item.TrimStart('\\', '/')), Path.Combine(root, req.NewItemPath.TrimStart('\\', '/')));
                     }
                     else
                     {
@@ -210,43 +197,37 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                     break;
                 case "edit":
-                    path = Path.Combine(root, req.Item.TrimStart('\\', '/'));
-                    string content = req.Content;
-                    System.IO.File.WriteAllText(path, content, Encoding.UTF8);
+                    System.IO.File.WriteAllText(Path.Combine(root, req.Item.TrimStart('\\', '/')), req.Content, Encoding.UTF8);
                     list.Add(new
                     {
                         success = "true"
                     });
                     break;
                 case "getContent":
-                    path = Path.Combine(root, req.Item.TrimStart('\\', '/'));
-                    content = System.IO.File.ReadAllText(path, Encoding.UTF8);
                     return Json(new
                     {
-                        result = content
+                        result = System.IO.File.ReadAllText(Path.Combine(root, req.Item.TrimStart('\\', '/')), Encoding.UTF8)
                     });
                 case "createFolder":
-                    string dir = Path.Combine(root, req.NewPath.TrimStart('\\', '/'));
-                    var directoryInfo = Directory.CreateDirectory(dir);
                     list.Add(new
                     {
-                        success = directoryInfo.Exists.ToString()
+                        success = Directory.CreateDirectory(Path.Combine(root, req.NewPath.TrimStart('\\', '/'))).Exists.ToString()
                     });
                     break;
                 case "changePermissions":
+                    //todo:文件权限修改
                     break;
                 case "compress":
-                    string filename = Path.Combine(Path.Combine(root, req.Destination.TrimStart('\\', '/')), Path.GetFileNameWithoutExtension(req.CompressedFilename) + ".zip");
+                    var filename = Path.Combine(Path.Combine(root, req.Destination.TrimStart('\\', '/')), Path.GetFileNameWithoutExtension(req.CompressedFilename) + ".zip");
                     SevenZipCompressor.Zip(req.Items.Select(s => Path.Combine(root, s.TrimStart('\\', '/'))).ToList(), filename);
-
                     list.Add(new
                     {
                         success = "true"
                     });
                     break;
                 case "extract":
-                    string folder = Path.Combine(Path.Combine(root, req.Destination.TrimStart('\\', '/')), req.FolderName.Trim('/', '\\'));
-                    string zip = Path.Combine(root, req.Item.TrimStart('\\', '/'));
+                    var folder = Path.Combine(Path.Combine(root, req.Destination.TrimStart('\\', '/')), req.FolderName.Trim('/', '\\'));
+                    var zip = Path.Combine(root, req.Item.TrimStart('\\', '/'));
                     SevenZipCompressor.Extract(zip, folder);
                     list.Add(new
                     {
@@ -282,9 +263,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                     }
                     break;
                 case "downloadMultiple":
-                    byte[] buffer = SevenZipCompressor.ZipStream(items.Select(s => Path.Combine(HostEnvironment.ContentRootPath, root, s.TrimStart('\\', '/'))).ToList()).ToArray();
+                    var buffer = SevenZipCompressor.ZipStream(items.Select(s => Path.Combine(HostEnvironment.ContentRootPath, root, s.TrimStart('\\', '/'))).ToList()).ToArray();
                     return this.ResumeFile(buffer, Path.GetFileName(toFilename));
             }
+
             return Content("null");
         }
     }
