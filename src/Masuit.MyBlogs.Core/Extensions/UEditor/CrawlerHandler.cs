@@ -88,7 +88,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                         Directory.CreateDirectory(Path.GetDirectoryName(savePath));
                     }
 
-                    using var ms = new MemoryStream();
+                    var ms = new MemoryStream();
                     stream.CopyTo(ms);
                     File.WriteAllBytes(savePath, ms.GetBuffer());
                 }
