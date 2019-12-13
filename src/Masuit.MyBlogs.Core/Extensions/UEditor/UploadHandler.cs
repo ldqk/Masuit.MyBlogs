@@ -1,4 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Common;
+using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -74,6 +75,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             {
                 Result.State = UploadState.FileAccessError;
                 Result.ErrorMessage = e.Message;
+                LogManager.Error(e);
             }
             return WriteResult();
 

@@ -1,5 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.Tools;
+using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -97,6 +98,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             catch (Exception e)
             {
                 State = "抓取错误：" + e.Message;
+                LogManager.Error(e);
             }
 
             return this;

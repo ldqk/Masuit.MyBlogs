@@ -58,7 +58,7 @@ namespace Masuit.MyBlogs.Core.Common
         {
             if (AppConfig.GitlabConfigs.Any())
             {
-                var gitlab = AppConfig.GitlabConfigs.OrderBy(c => Guid.NewGuid()).FirstOrDefault() ?? throw new Exception("没有可用的gitlab相关配置，请先在appsettings.json中的Imgbed:Gitlabs节点下配置gitlab");
+                var gitlab = AppConfig.GitlabConfigs.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
                 if (stream.Length > gitlab.FileLimitSize)
                 {
                     return AppConfig.AliOssConfig.Enabled ? UploadOss(stream, file) : ("", false);
@@ -69,9 +69,9 @@ namespace Masuit.MyBlogs.Core.Common
                     return await UploadGitee(gitlab, stream, file);
                 }
 
-                string path = $"{DateTime.Now:yyyy/MM/dd}/{SnowFlake.NewId + Path.GetExtension(file)}";
+                var path = $"{DateTime.Now:yyyy/MM/dd}/{SnowFlake.NewId + Path.GetExtension(file)}";
                 _httpClient.DefaultRequestHeaders.Add("PRIVATE-TOKEN", gitlab.AccessToken);
-                using var resp = await _httpClient.PostAsJsonAsync(gitlab.ApiUrl.Contains("/v3/") ? gitlab.ApiUrl : gitlab.ApiUrl + HttpUtility.UrlEncode(path), new
+                return await _httpClient.PostAsJsonAsync(gitlab.ApiUrl.Contains("/v3/") ? gitlab.ApiUrl : gitlab.ApiUrl + HttpUtility.UrlEncode(path), new
                 {
                     file_path = path,
                     branch_name = gitlab.Branch,
@@ -80,12 +80,21 @@ namespace Masuit.MyBlogs.Core.Common
                     author_name = SnowFlake.NewId,
                     encoding = "base64",
                     content = Convert.ToBase64String(stream.ToByteArray()),
-                    commit_message = "上传一张图片"
-                });
-                if (resp.IsSuccessStatusCode || (await resp.Content.ReadAsStringAsync()).Contains("already exists"))
+                    commit_message = SnowFlake.NewId
+                }).ContinueWith(t =>
                 {
-                    return (gitlab.RawUrl + path, true);
-                }
+                    if (t.IsCompletedSuccessfully)
+                    {
+                        using var resp = t.Result;
+                        using var content = resp.Content;
+                        if (resp.IsSuccessStatusCode || content.ReadAsStringAsync().Result.Contains("already exists"))
+                        {
+                            return (gitlab.RawUrl + path, true);
+                        }
+                    }
+
+                    return UploadOss(stream, file);
+                });
             }
 
             return UploadOss(stream, file);
@@ -100,19 +109,26 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         private async Task<(string url, bool success)> UploadGitee(GitlabConfig config, Stream stream, string file)
         {
-            string path = $"{DateTime.Now:yyyy/MM/dd}/{Path.GetFileName(file)}";
-            using var resp = await _httpClient.PostAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path), new
+            var path = $"{DateTime.Now:yyyy/MM/dd}/{Path.GetFileName(file)}";
+            return await _httpClient.PostAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path), new
             {
                 access_token = config.AccessToken,
                 content = Convert.ToBase64String(stream.ToByteArray()),
-                message = "上传一张图片"
-            });
-            if (resp.IsSuccessStatusCode || (await resp.Content.ReadAsStringAsync()).Contains("already exists"))
+                message = SnowFlake.NewId
+            }).ContinueWith(t =>
             {
-                return (config.RawUrl + path, true);
-            }
+                if (t.IsCompletedSuccessfully)
+                {
+                    using var resp = t.Result;
+                    using var content = resp.Content;
+                    if (resp.IsSuccessStatusCode || content.ReadAsStringAsync().Result.Contains("already exists"))
+                    {
+                        return (config.RawUrl + path, true);
+                    }
+                }
 
-            return UploadOss(stream, file);
+                return UploadOss(stream, file);
+            });
         }
 
         /// <summary>
