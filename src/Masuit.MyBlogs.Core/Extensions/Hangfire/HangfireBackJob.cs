@@ -138,7 +138,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         {
             RedisHelper.IncrBy("interceptCount");
             var result = s.IP.GetPhysicsAddressInfo().Result;
-            if (result.Status == 0)
+            if (result?.Status == 0)
             {
                 s.Address = result.AddressResult.FormattedAddress;
             }
@@ -159,7 +159,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             RedisHelper.IncrBy("Interview:RunningDays");
             DateTime time = DateTime.Now.AddMonths(-1);
             _searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
-
             TrackData.DumpLog();
         }
 
