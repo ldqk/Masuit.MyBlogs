@@ -1,6 +1,7 @@
 ﻿using Aliyun.OSS;
 using Hangfire;
 using Masuit.MyBlogs.Core.Configs;
+using Masuit.Tools;
 using Masuit.Tools.Html;
 using Masuit.Tools.Systems;
 using Newtonsoft.Json.Linq;
@@ -74,7 +75,7 @@ namespace Masuit.MyBlogs.Core.Common
                     author_email = CommonHelper.SystemSettings["ReceiveEmail"],
                     author_name = SnowFlake.NewId,
                     encoding = "base64",
-                    content = Convert.ToBase64String(stream.ToByteArray()),
+                    content = Convert.ToBase64String(stream.ToArray()),
                     commit_message = SnowFlake.NewId
                 }).ContinueWith(t =>
                 {
@@ -108,7 +109,7 @@ namespace Masuit.MyBlogs.Core.Common
             return await _httpClient.PostAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path), new
             {
                 access_token = config.AccessToken,
-                content = Convert.ToBase64String(stream.ToByteArray()),
+                content = Convert.ToBase64String(stream.ToArray()),
                 message = SnowFlake.NewId
             }).ContinueWith(t =>
             {
