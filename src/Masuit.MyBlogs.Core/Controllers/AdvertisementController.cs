@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
-    [Route("ads/[action]")]
+    [Route("partner/[action]")]
     public class AdvertisementController : BaseController
     {
         /// <summary>

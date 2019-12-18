@@ -18,7 +18,7 @@
 	};
 	this.GetPageData = function (page, size) {
 		$scope.loading();
-		$http.post("/ads/getpagedata", {
+		$http.post("/partner/getpagedata", {
 			page,
 			size,
 			kw: $scope.kw
@@ -80,7 +80,7 @@
 		}).then(function(isConfirm) {
 			if (isConfirm) {
 				$scope.loading();
-				$scope.request("/ads/delete/"+partner.Id, null, function(data) {
+				$scope.request("/partner/delete/"+partner.Id, null, function(data) {
 					swal(data.Message, null, 'success');
 			        self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 				});
@@ -140,7 +140,7 @@
 		if ($scope.isAdd) {
 			partner.Id = 0;
 		}
-		$scope.request("/ads/save", partner, function(data) {
+		$scope.request("/partner/save", partner, function(data) {
 			$scope.closeAll();
 			window.notie.alert({
 				type: 1,
@@ -195,7 +195,7 @@
 	}
 
     $scope.changeState= function(row) {
-        $scope.request("/ads/ChangeState/"+row.Id, null, function(data) {
+        $scope.request("/partner/ChangeState/"+row.Id, null, function(data) {
 			window.notie.alert({
 				type: 1,
 				text: data.Message,
