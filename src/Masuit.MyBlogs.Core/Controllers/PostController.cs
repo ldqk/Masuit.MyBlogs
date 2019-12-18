@@ -211,7 +211,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="code"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Publish(PostInputDto post, string code)
+        public async Task<ActionResult> Publish(PostInputDto post, [Required(ErrorMessage = "验证码不能为空")]string code)
         {
             if (RedisHelper.Get("code:" + post.Email) != code)
             {
