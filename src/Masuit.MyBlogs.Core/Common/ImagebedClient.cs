@@ -1,6 +1,7 @@
 ﻿using Aliyun.OSS;
 using Hangfire;
 using Masuit.MyBlogs.Core.Configs;
+using Masuit.Tools;
 using Masuit.Tools.Html;
 using Masuit.Tools.Systems;
 using Newtonsoft.Json.Linq;
@@ -56,14 +57,9 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         private async Task<(string url, bool success)> UploadGitlab(Stream stream, string file)
         {
-            if (AppConfig.GitlabConfigs.Any())
+            if (AppConfig.GitlabConfigs.Any(c => c.FileLimitSize >= stream.Length))
             {
-                var gitlab = AppConfig.GitlabConfigs.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
-                if (stream.Length > gitlab.FileLimitSize)
-                {
-                    return AppConfig.AliOssConfig.Enabled ? UploadOss(stream, file) : ("", false);
-                }
-
+                var gitlab = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length).OrderBy(c => Guid.NewGuid()).FirstOrDefault();
                 if (gitlab.ApiUrl.Contains("gitee.com"))
                 {
                     return await UploadGitee(gitlab, stream, file);
@@ -79,7 +75,7 @@ namespace Masuit.MyBlogs.Core.Common
                     author_email = CommonHelper.SystemSettings["ReceiveEmail"],
                     author_name = SnowFlake.NewId,
                     encoding = "base64",
-                    content = Convert.ToBase64String(stream.ToByteArray()),
+                    content = Convert.ToBase64String(stream.ToArray()),
                     commit_message = SnowFlake.NewId
                 }).ContinueWith(t =>
                 {
@@ -113,7 +109,7 @@ namespace Masuit.MyBlogs.Core.Common
             return await _httpClient.PostAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path), new
             {
                 access_token = config.AccessToken,
-                content = Convert.ToBase64String(stream.ToByteArray()),
+                content = Convert.ToBase64String(stream.ToArray()),
                 message = SnowFlake.NewId
             }).ContinueWith(t =>
             {
@@ -139,6 +135,10 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         private (string url, bool success) UploadOss(Stream stream, string file)
         {
+            if (!AppConfig.AliOssConfig.Enabled)
+            {
+                return UploadSmms(stream, file).Result;
+            }
             var objectName = DateTime.Now.ToString("yyyyMMdd") + "/" + SnowFlake.NewId + Path.GetExtension(file);
             return Policy.Handle<Exception>().Retry(5, (e, i) =>
             {

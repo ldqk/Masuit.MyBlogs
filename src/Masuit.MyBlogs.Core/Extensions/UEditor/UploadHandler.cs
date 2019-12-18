@@ -1,4 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Common;
+using Masuit.Tools;
 using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             {
                 if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(uploadFileName)))
                 {
-                    using var stream = file.OpenReadStream();
+                    var stream = file.OpenReadStream();
                     var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath).Result;
                     if (success)
                     {
@@ -61,7 +62,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                             Directory.CreateDirectory(Path.GetDirectoryName(localPath));
                         }
 
-                        File.WriteAllBytes(localPath, stream.ToByteArray());
+                        File.WriteAllBytes(localPath, stream.ToArray());
                         Result.Url = savePath;
                     }
                 }

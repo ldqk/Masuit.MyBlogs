@@ -1,5 +1,6 @@
 ﻿using Autofac.Extensions.DependencyInjection;
 using Masuit.MyBlogs.Core.Hubs;
+using Masuit.Tools;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +19,7 @@ namespace Masuit.MyBlogs.Core
 
         public static IHostBuilder CreateWebHostBuilder(string[] args)
         {
-            var builder = new ConfigurationBuilder().AddCommandLine(args).SetBasePath(Directory.GetCurrentDirectory()).AddEnvironmentVariables().AddJsonFile("appsettings.json", true, true).AddJsonFile("appsettings.prod.json", true, true);
+            var builder = new ConfigurationBuilder().AddCommandLine(args).SetBasePath(Directory.GetCurrentDirectory()).AddEnvironmentVariables().AddJsonFile("appsettings.json", true, true);
             var config = builder.Build();
             var port = config["port"] ?? Environment.GetEnvironmentVariable("port") ?? "5000";
             var sslport = config["sslport"] ?? Environment.GetEnvironmentVariable("sslport") ?? "5001";
