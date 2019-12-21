@@ -236,15 +236,11 @@ $(function() {
 
 //两个全局加载动画
 function loading() {
-    let r = new Date().getMilliseconds();
-    //$(".loading" + (r % 3 + 1)).show();
     $(".loading1").show();
 }
 
 function loadingDone() {
     $(".loading1").hide();
-    $(".loading2").hide();
-    $(".loading3").hide();
 }
 
 function GetOperatingSystem(os) {

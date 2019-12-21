@@ -199,7 +199,6 @@
 		$scope.isloading = false;
 		$(".loading1").hide();
 		$(".loading2").hide();
-		//$(".loading3").hide();
 	}
 	$http.post("/passport/getuserinfo", null).then(function(res) {
 		if(res.data.Success) {
