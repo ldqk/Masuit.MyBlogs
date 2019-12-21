@@ -15,19 +15,9 @@
     string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
     Advertisement ad = ViewBag.Ads;
 }
-<style>
-    #gooey-h {
-        position: fixed;
-        bottom: 250px;
-        right: 0;
-        z-index: 3;
-    }
-</style>
 <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
-<link href="~/Assets/gooey/gooey.min.css" rel="stylesheet" />
 <link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
 <script src="~/Assets/layui/layui.all.js"></script>
-<script src="~/Assets/gooey/gooey.min.js"></script>
 <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
 <link href="~/Assets/highlight/css/highlight.css" rel="stylesheet" />
 <link href="~/Assets/share/share.css" rel="stylesheet" />
@@ -66,19 +56,19 @@
                                 @{
                                     if (!string.IsNullOrEmpty(Model.Label))
                                     {
-                                        <div class="pull-right margin-right20">
-                                            <div>
-                                                @foreach (string s in Model.Label.Split(',', '，', ' '))
+                                    <div class="pull-right margin-right20">
+                                        <div>
+                                            @foreach (string s in Model.Label.Split(',', '，', ' '))
                                                 {
                                                     if (!string.IsNullOrEmpty(s))
                                                     {
-                                                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
-                                                            <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
-                                                        </a>
+                                            <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
+                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
+                                            </a>
                                                     }
                                                 }
-                                            </div>
                                         </div>
+                                    </div>
                                     }
                                 }
                             </div>
@@ -87,15 +77,28 @@
                                     分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] }) | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃ | 状态：@Model.Status.GetDisplay()
                                     @if (Model.Seminar.Any())
                                     {
-                                        <span> | 所属专题：</span>
+                                    <span> | 所属专题：</span>
                                         var seminars = Model.Seminar;
                                         foreach (var s in seminars)
                                         {
-                                            @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })<text> </text>
+                                    @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })<text> </text>
                                         }
                                     }
                                     <div class="pull-right margin-right20">
-                                        @Html.ActionLink("我要编辑", "PushMerge", "Post", new { id = Model.Id }, new { @class = "btn btn-danger" })
+                                        <div class="btn-group">
+                                            @Html.ActionLink("刷新", "Refresh", "Post", new { id = Model.Id }, new { @class = "btn btn-info" })
+                                            @if(Model.IsFixedTop) {
+                                            <button class="btn btn-success" id="pin">取消置顶</button>
+                                            }else {
+                                            <button class="btn btn-success" id="pin">置顶</button>
+                                            }
+                                            @if (Model.Status == Status.Pending)
+                                            {
+                                            <button class="btn btn-primary" id="pass">通过</button>
+                                            }
+                                            <a asp-controller="Dashboard" asp-action="Index" asp-fragment="/post/edit?id=@Model.Id" class="btn btn-primary" target="_blank">修改</a>
+                                            <button class="btn btn-danger" id="del">删除</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -104,9 +107,9 @@
                             @Html.Raw(Model.Content)
                             @if (!string.IsNullOrEmpty(Model.ProtectContent))
                             {
-                                <div class="row protected">
-                                    @Html.Raw(Model.ProtectContent)
-                                </div>
+                            <div class="row protected">
+                                @Html.Raw(Model.ProtectContent)
+                            </div>
                             }
                         </article>
                         <h3>分享到：</h3>
@@ -297,23 +300,6 @@
         </form>
     </div>
 </div>
-<nav id="gooey-h" style="max-height: 100px;">
-    <input type="checkbox" class="menu-open" name="menu-open2" id="menu-open2" />
-    <label class="open-button" for="menu-open2">
-        <span class="burger burger-1"></span>
-        <span class="burger burger-2"></span>
-        <span class="burger burger-3"></span>
-    </label>
-    <a class="gooey-menu-item" id="pin"> <i class="icon icon-pushpin"></i></a>
-    @{
-        if (Model.Status == Status.Pending)
-        {
-            <a class="gooey-menu-item" id="pass"> <i class="icon icon-checkmark"></i></a>
-        }
-    }
-    <a asp-controller="Dashboard" asp-action="Index" asp-fragment="/post/edit?id=@Model.Id" class="gooey-menu-item" target="_blank"> <i class="icon icon-pencil"></i></a>
-    <a class="gooey-menu-item" id="del"> <i class="icon icon-bin"></i></a>
-</nav>
 <script src="https://cdn.bootcss.com/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
@@ -321,8 +307,7 @@
 <script src="~/Scripts/global/article.js"></script>
 <script src="~/Assets/highlight/js/highlight.js"></script>
 <script>
-
-	function getcomments() {
+    function getcomments() {
 		$.post("/comment/getcomments", {
 			id: $("#postId").val(),
 			page: 1,
@@ -360,28 +345,6 @@
 				});
 			}
 		});
-		$("#gooey-h").gooeymenu({
-			bgColor: "#681ddf",
-			contentColor: "white",
-			style: "circle",
-			horizontal: {
-				menuItemPosition: "glue"
-			},
-			vertical: {
-				menuItemPosition: "spaced",
-				direction: "up"
-			},
-			circle: {
-				radius: 85
-			},
-			margin: "small",
-			size: 80,
-			bounce: true,
-			bounceLength: "small",
-			transitionStep: 100,
-			hover: "#2d1d89"
-		});
-		$("#gooey-h").insertAfter($("body"));
 		$("#del").on("click", function (e) {
 			swal({
 				title: "确认删除这篇文章吗？",
@@ -413,17 +376,17 @@
 					text: data.Message,
 					time: 4
 				});
+                location.reload();
 			});
 		});
 		$("#pin").on("click", function (e) {
-			$.post("/post/Fixtop", {
-				id: @Model.Id
-			}, function (data) {
+			$.post("/post/Fixtop", { id: @Model.Id }, function (data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
 					time: 4
 				});
+                location.reload();
 			});
 		});
 		loadingDone();

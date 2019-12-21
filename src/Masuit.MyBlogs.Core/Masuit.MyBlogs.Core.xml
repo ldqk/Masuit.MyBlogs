@@ -1477,6 +1477,13 @@
             <param name="id">文章id</param>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.Refresh(System.Int32)">
+            <summary>
+            刷新文章
+            </summary>
+            <param name="id">文章id</param>
+            <returns></returns>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.SearchController">
             <summary>
             站内搜索

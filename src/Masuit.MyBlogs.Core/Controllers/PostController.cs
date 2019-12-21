@@ -949,6 +949,20 @@ namespace Masuit.MyBlogs.Core.Controllers
             return ResultData(null, false, "文章不存在");
         }
 
+        /// <summary>
+        /// 刷新文章
+        /// </summary>
+        /// <param name="id">文章id</param>
+        /// <returns></returns>
+        [Authority]
+        public ActionResult Refresh(int id)
+        {
+            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            post.ModifyDate = DateTime.Now;
+            PostService.SaveChanges();
+            return RedirectToAction("Details", new { id });
+        }
+
         #endregion
     }
 }
