@@ -362,7 +362,6 @@
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
 <script src="~/Assets/jquery.tocify/jquery.tocify.js"></script>
-@*<script src="~/Assets/directory/script.min.js"></script>*@
 <script src="~/Scripts/global/article.min.js"></script>
 <script>
 	window.onload = function() {
@@ -376,7 +375,7 @@
 			count: @Model.Comment.Count(c =>c.ParentId==0&& c.Status==Status.Pended),
 			toolbar: true,
 			callback: function(page, size, count) {
-				$.post("/comment/getcomments", {
+				window.post("/comment/getcomments", {
 					id: @Model.Id,
 					page: page,
 					size: size
@@ -397,7 +396,7 @@
    * 获取评论
    */
 	function getcomments() {
-		$.post("/comment/getcomments", {
+		window.post("/comment/getcomments", {
 			id: $("#postId").val(),
 			page: 1,
             size: 10,

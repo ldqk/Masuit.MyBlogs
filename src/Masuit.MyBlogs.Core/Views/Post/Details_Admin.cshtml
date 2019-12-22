@@ -56,19 +56,19 @@
                                 @{
                                     if (!string.IsNullOrEmpty(Model.Label))
                                     {
-                                    <div class="pull-right margin-right20">
-                                        <div>
-                                            @foreach (string s in Model.Label.Split(',', '，', ' '))
+                                        <div class="pull-right margin-right20">
+                                            <div>
+                                                @foreach (string s in Model.Label.Split(',', '，', ' '))
                                                 {
                                                     if (!string.IsNullOrEmpty(s))
                                                     {
-                                            <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
-                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
-                                            </a>
+                                                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
+                                                            <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
+                                                        </a>
                                                     }
                                                 }
+                                            </div>
                                         </div>
-                                    </div>
                                     }
                                 }
                             </div>
@@ -77,24 +77,27 @@
                                     分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] }) | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃ | 状态：@Model.Status.GetDisplay()
                                     @if (Model.Seminar.Any())
                                     {
-                                    <span> | 所属专题：</span>
+                                        <span> | 所属专题：</span>
                                         var seminars = Model.Seminar;
                                         foreach (var s in seminars)
                                         {
-                                    @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })<text> </text>
+                                            @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })<text> </text>
                                         }
                                     }
                                     <div class="pull-right margin-right20">
                                         <div class="btn-group">
                                             @Html.ActionLink("刷新", "Refresh", "Post", new { id = Model.Id }, new { @class = "btn btn-info" })
-                                            @if(Model.IsFixedTop) {
-                                            <button class="btn btn-success" id="pin">取消置顶</button>
-                                            }else {
-                                            <button class="btn btn-success" id="pin">置顶</button>
+                                            @if (Model.IsFixedTop)
+                                            {
+                                                <button class="btn btn-success" id="pin">取消置顶</button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-success" id="pin">置顶</button>
                                             }
                                             @if (Model.Status == Status.Pending)
                                             {
-                                            <button class="btn btn-primary" id="pass">通过</button>
+                                                <button class="btn btn-primary" id="pass">通过</button>
                                             }
                                             <a asp-controller="Dashboard" asp-action="Index" asp-fragment="/post/edit?id=@Model.Id" class="btn btn-primary" target="_blank">修改</a>
                                             <button class="btn btn-danger" id="del">删除</button>
@@ -107,9 +110,9 @@
                             @Html.Raw(Model.Content)
                             @if (!string.IsNullOrEmpty(Model.ProtectContent))
                             {
-                            <div class="row protected">
-                                @Html.Raw(Model.ProtectContent)
-                            </div>
+                                <div class="row protected">
+                                    @Html.Raw(Model.ProtectContent)
+                                </div>
                             }
                         </article>
                         <h3>分享到：</h3>
@@ -308,17 +311,17 @@
 <script src="~/Assets/highlight/js/highlight.js"></script>
 <script>
     function getcomments() {
-		$.post("/comment/getcomments", {
+        window.post("/comment/getcomments",{
 			id: $("#postId").val(),
 			page: 1,
 			size: 10,
 			cid: @cid
-		}, (data) => {
-			data = data.Data;
+		},function(data) {
+            data = data.Data;
 			document.querySelector(".media-list").innerHTML = loadParentComments(data);
 			bindReplyBtn();
 			commentVoteBind(); //评论投票
-		});
+        });
     }
 	window.onload = function() {
         var keywords = @Html.Raw(ViewData["keywords"] ?? "[]");
@@ -331,7 +334,7 @@
 			count: @Model.Comment.Count(c =>c.ParentId==0&& c.Status==Status.Pended),
 			toolbar: true,
 			callback: function(page, size, count) {
-				$.post("/comment/getcomments", {
+				window.post("/comment/getcomments", {
 					id: @Model.Id,
 					page: page,
 					size: size
@@ -357,35 +360,51 @@
 				animation: true,
 				allowOutsideClick: false
 			}).then(function () {
-				$.post("/post/delete", {
-					id: @Model.Id
-				}, function (data) {
+				window.post("/post/delete", { id: @Model.Id}, function (data) {
 					window.notie.alert({
 						type: 1,
 						text: data.Message,
 						time: 4
 					});
-				});
+                }, () => {
+                    window.notie.alert({
+						type: 3,
+						text: "请求失败，请稍候再试！",
+						time: 4
+					});
+                });
 			}, function () {
 			});
 		});
 		$("#pass").on("click", function (e) {
-			$.post("/post/pass", { id:@Model.Id}, function (data) {
+			window.post("/post/pass", { id:@Model.Id}, function (data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
 					time: 4
-				});
+				}, () => {
+                    window.notie.alert({
+						type: 3,
+						text: "请求失败，请稍候再试！",
+						time: 4
+					});
+                });
                 location.reload();
 			});
 		});
 		$("#pin").on("click", function (e) {
-			$.post("/post/Fixtop", { id: @Model.Id }, function (data) {
+			window.post("/post/Fixtop", { id: @Model.Id }, function (data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
 					time: 4
-				});
+				}, () => {
+                    window.notie.alert({
+						type: 3,
+						text: "请求失败，请稍候再试！",
+						time: 4
+					});
+                });
                 location.reload();
 			});
 		});
@@ -468,10 +487,16 @@
 	}
 
 	function pass(id) {
-		$.post("/comment/pass", { id: id }, function (res) {
+		window.post("/comment/pass", { id: id }, function (res) {
 			swal(res.Message, "", res.Success ? "success" : "error");
 			getcomments();
-		});
+		}, () => {
+                    window.notie.alert({
+						type: 3,
+						text: "请求失败，请稍候再试！",
+						time: 4
+					});
+                });
 	}
 	function del(id) {
 		swal({
@@ -484,11 +509,11 @@
 			cancelButtonText: '取消',
 			preConfirm: function() {
 				return new Promise(function (resolve) {
-					$.post("/comment/delete", {
+					window.post("/comment/delete", {
 						id: id
 					}, function (res) {
 						resolve(res);
-					});
+					}, (e) => reject(e));
 				});
 			},
 			allowOutsideClick: false

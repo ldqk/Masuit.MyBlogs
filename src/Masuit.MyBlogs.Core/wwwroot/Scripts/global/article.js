@@ -16,7 +16,7 @@
 	});
 	$("#code-token").on("submit", function(e) {
 		e.preventDefault();
-		$.post("/post/CheckViewToken", $(this).serialize(), function(data) {
+		window.post("/post/CheckViewToken", $(this).serializeObject(), function(data) {
 			if (data.Success) {
 				window.location.reload();
 			} else {
@@ -26,15 +26,20 @@
 					time: 4
 				});
 			}
-		});
+		}, () => {
+            window.notie.alert({
+				type: 3,
+				text: "请求失败，请稍候再试！",
+				time: 4
+			});
+        });
 	});
 	$(".getcode").on("click", function(e) {
 		e.preventDefault();
-		$.post("/post/getviewtoken",
-			{
-				__RequestVerificationToken:$("[name=__RequestVerificationToken]").val(),
-				email:$("#email3").val()
-			}, function(data) {
+		window.post("/post/getviewtoken", {
+			__RequestVerificationToken:$("[name=__RequestVerificationToken]").val(),
+			email:$("#email3").val()
+		}, function(data) {
 			if (data.Success) {
 				window.notie.alert({
 					type: 1,
@@ -60,7 +65,13 @@
 					time: 4
 				});
 			}
-		});
+		}, () => {
+            window.notie.alert({
+				type: 3,
+				text: "请求失败，请稍候再试！",
+				time: 4
+			});
+        });
 	});
 	var user = JSON.parse(localStorage.getItem("user"));
 	if (user) {
@@ -158,7 +169,7 @@
 		}
 
 		localStorage.setItem("user",  JSON.stringify(formData));
-		$.post("/comment/put", $(this).serialize(), (data) => {
+		window.post("/comment/put", formData, (data) => {
 			loadingDone();
 			if (data.Success) {
 				window.notie.alert({
@@ -179,11 +190,17 @@
 					time: 4
 				});
 			}
-		});
+		}, () => {
+            window.notie.alert({
+				type: 3,
+				text: "请求失败，请稍候再试！",
+				time: 4
+			});
+        });
 	});
 
 	$("#donate").on("click", function (e) {
-		$.post("/system/getsetting", { name: "Donate" }, function (data) {
+		window.post("/system/getsetting", { name: "Donate" }, function (data) {
 			swal({
 				title: "支付宝扫一扫付款打赏！",
 				html:"<a href='/donate'>更多方式</a>",
@@ -201,7 +218,13 @@
 			}, function() {
 				swal("您的打赏将会支持本站做的更好！", null, "error");
 			});
-		});
+		}, () => {
+            window.notie.alert({
+				type: 3,
+				text: "请求失败，请稍候再试！",
+				time: 4
+			});
+        });
 	});
 });
 
@@ -212,7 +235,7 @@
 function submitComment(_this) {
 	loading();
 	localStorage.setItem("user", JSON.stringify($(_this).serializeObject()));
-	$.post("/comment/put", $(_this).serialize(), (data) => {
+	window.post("/comment/put", $(_this).serializeObject(), (data) => {
 		loadingDone();
 		if (data.Success) {
 			window.notie.alert({
@@ -231,7 +254,13 @@ function submitComment(_this) {
 				time: 4
 			});
 		}
-	});
+	}, () => {
+        window.notie.alert({
+			type: 3,
+			text: "请求失败，请稍候再试！",
+			time: 4
+		});
+    });
 }
 
 //评论回复按钮事件
@@ -274,9 +303,7 @@ function bindReplyBtn() {
 //绑定评论投票
 function commentVoteBind() {
 	$(".cmvote").on("click", function(e) {
-		$.post("/comment/CommentVote", {
-			id: $(this).data("id")
-		}, (data) => {
+		window.post("/comment/CommentVote", { id: $(this).data("id") }, (data) => {
 			if (data) {
 				if (data.Success) {
 					console.log($(this).children("span.count"));
@@ -297,14 +324,18 @@ function commentVoteBind() {
 				}
 			}
 		});
-	});
+	}, () => {
+        window.notie.alert({
+			type: 3,
+			text: "请求失败，请稍候再试！",
+			time: 4
+		});
+    });
 }
 
 function bindVote() {
     $("#voteup").on("click", function(e) {
-        $.post("/post/voteup", {
-			id: $("#postId").val()
-		}, (data) => {
+        window.post("/post/voteup", { id: $("#postId").val() }, (data) => {
 			if (data) {
 				if (data.Success) {
 					$(this).children()[1].innerText = parseInt($(this).children()[1].innerText) + 1;
@@ -323,12 +354,16 @@ function bindVote() {
 					});
 				}
 			}
-		});
+		}, () => {
+            window.notie.alert({
+				type: 3,
+				text: "请求失败，请稍候再试！",
+				time: 4
+			});
+        });
 	});
     $("#votedown").on("click", function(e) {
-        $.post("/post/votedown", {
-			id: $("#postId").val()
-		}, (data) => {
+        window.post("/post/votedown", { id: $("#postId").val() }, (data) => {
 			if (data) {
 				if (data.Success) {
 					$(this).children()[1].innerText = parseInt($(this).children()[1].innerText) + 1;
@@ -348,7 +383,13 @@ function bindVote() {
 				}
 			}
 		});
-	});
+	}, () => {
+        window.notie.alert({
+		    type: 3,
+		    text: "请求失败，请稍候再试！",
+		    time: 4
+	    });
+    });
 }
 
 //递归加载评论

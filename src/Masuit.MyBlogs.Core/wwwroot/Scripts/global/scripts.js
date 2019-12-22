@@ -77,7 +77,7 @@ $(function() {
 
     function subscribe() {
         loading();
-        $.post("/subscribe/subscribe", $("#subscribe").serialize(), function(data) {
+        window.post("/subscribe/subscribe", $("#subscribe").serializeObject(), function(data) {
                 loadingDone();
                 if (data && data.Success) {
                     window.notie.alert({
@@ -93,6 +93,12 @@ $(function() {
                         time: 4
                     });
                 }
+            }, () => {
+                window.notie.alert({
+					type: 3,
+					text: "请求失败，请稍候再试！",
+					time: 4
+				});
             });
     }
 
@@ -198,10 +204,10 @@ $(function() {
 
     var nid = window.localStorage.getItem("notice") || '0';
     window.fetch("/notice/last", {
-            credentials: 'include',
-            method: 'POST',
-            mode: 'cors'
-        }).then(function(response) {
+        credentials: 'include',
+        method: 'POST',
+        mode: 'cors'
+    }).then(function(response) {
         return response.json();
     }).then(function(data) {
         data = data.Data;
@@ -234,7 +240,7 @@ $(function() {
     });
 });
 
-//两个全局加载动画
+//全局加载动画
 function loading() {
     $(".loading1").show();
 }
@@ -284,9 +290,7 @@ function GetBrowser(browser) {
 }
 
 function getFile(obj, inputName) {
-    var file_name = $(obj).val();
-    console.log(file_name);
-    $("input[name='" + inputName + "']").val(file_name);
+    $("input[name='" + inputName + "']").val($(obj).val());
 }
 
 function popBrowserTips() {
@@ -295,7 +299,7 @@ function popBrowserTips() {
         if (window.screen.width <= 320 && !deny) {
             swal({
                 title: '访问受限制?',
-                html: "首先欢迎您的访问，由于检测到您的设备<span style='color:red'>屏幕宽度过小</span>，网站的部分功能可能不会兼容你的设备，但是您<span style='color:red'>可以继续浏览</span>，为确保最佳用户体验，建议使用<span style='color:red'>5寸以上移动设备</span>，或分辨率大于<span style='color:red'>1360 x 768</span>的<span style='color:red'>电脑浏览器</span>访问本站，感谢您的来访和支持！",
+                html: "由于检测到您的设备<span style='color:red'>屏幕宽度过小</span>，网站的部分功能可能不会兼容你的设备，但是您<span style='color:red'>可以继续浏览</span>，为确保最佳用户体验，建议使用<span style='color:red'>5寸以上移动设备</span>，或分辨率大于<span style='color:red'>1360 x 768</span>的<span style='color:red'>电脑浏览器</span>访问本站，感谢您的来访和支持！",
                 type: 'error',
                 showCloseButton: true,
                 showCancelButton: true,
@@ -310,6 +314,28 @@ function popBrowserTips() {
             });
         }
     }
+}
+
+function post(url, params, callback, error) {
+    var formData = new FormData();
+    Object.keys(params).forEach((key) => {
+        formData.append(key, params[key]);
+    });
+    window.fetch(url, {
+        credentials: 'include',
+        method: 'POST',
+        mode: 'cors',
+        body: formData
+    }).then(function(response) {
+        return response.json();
+    }).then(function(data) {
+        callback(data);
+    }).catch(function(e) {
+        loadingDone();
+        if (error) {
+            error(e);
+        }
+    });
 }
 
 /**
