@@ -254,8 +254,9 @@ namespace Masuit.MyBlogs.Core.Common
         /// 将html的img标签的src属性名替换成data-original
         /// </summary>
         /// <param name="html"></param>
+        /// <param name="title"></param>
         /// <returns></returns>
-        public static string ReplaceImgAttribute(this string html)
+        public static string ReplaceImgAttribute(this string html, string title)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
@@ -267,6 +268,8 @@ namespace Masuit.MyBlogs.Core.Common
                     string src = node.Attributes["src"].Value;
                     node.Attributes.Remove("src");
                     node.Attributes.Add("data-original", src);
+                    node.Attributes.Add("alt", SystemSettings["Title"]);
+                    node.Attributes.Add("title", title);
                 }
             }
 

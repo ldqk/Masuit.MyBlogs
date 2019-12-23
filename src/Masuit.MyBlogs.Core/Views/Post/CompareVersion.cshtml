@@ -1,5 +1,4 @@
-﻿@using System.Web
-@using Masuit.MyBlogs.Core.Common
+﻿@using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.Entity
 @model Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion[]
 @{
@@ -81,7 +80,7 @@
                                     </div>
                                 </header>
                                 <article class="article" id="article">
-                                    @Html.Raw(Model[1].Content.ReplaceImgAttribute())
+                                    @Html.Raw(Model[1].Content.ReplaceImgAttribute(Model[0].Title))
                                 </article>
                             </section>
                             @if (ads.Any())
@@ -167,7 +166,7 @@
                                     </div>
                                 </header>
                                 <article class="article" id="article">
-                                    @Html.Raw(Model[2].Content.ReplaceImgAttribute())
+                                    @Html.Raw(Model[2].Content.ReplaceImgAttribute(Model[0].Title))
                                 </article>
                             </section>
                             @if (ads.Count > 1)

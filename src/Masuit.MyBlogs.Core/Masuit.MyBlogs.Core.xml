@@ -103,11 +103,12 @@
             <param name="html"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.ReplaceImgAttribute(System.String)">
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.ReplaceImgAttribute(System.String,System.String)">
             <summary>
             将html的img标签的src属性名替换成data-original
             </summary>
             <param name="html"></param>
+            <param name="title"></param>
             <returns></returns>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Common.HangfireHelper">

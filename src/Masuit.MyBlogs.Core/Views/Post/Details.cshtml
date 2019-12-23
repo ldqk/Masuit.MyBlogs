@@ -91,14 +91,14 @@
                             </div>
                         </header>
                         <article class="article" id="article">
-                            @Html.Raw(Model.Content.ReplaceImgAttribute())
+                            @Html.Raw(Model.Content.ReplaceImgAttribute(Model.Title))
                             @if (!string.IsNullOrEmpty(Model.ProtectContent))
                             {
                                 <div class="row protected">
                                     @if (!string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")) || Context.Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Context.Request.Cookies["PostAccessToken"]))
                                     {
                                         <p class="text-red text-center size20">↓↓↓以下是文章加密部分↓↓↓</p>
-                                        @Html.Raw(Model.ProtectContent.ReplaceImgAttribute())
+                                        @Html.Raw(Model.ProtectContent.ReplaceImgAttribute(Model.Title))
 
                                     }
                                     else

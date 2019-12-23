@@ -53,7 +53,7 @@
 </div>
 <div class="container">
     <article class="content">
-        @Html.Raw(Model.Content.ReplaceImgAttribute())
+        @Html.Raw(Model.Content.ReplaceImgAttribute(Model.Title))
     </article>
 </div>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>

@@ -66,7 +66,7 @@
                 <main>
                     <section>
                         <article class="article" id="article">
-                            @Html.Raw(Model.Content.ReplaceImgAttribute())
+                            @Html.Raw(Model.Content.ReplaceImgAttribute(Model.Title))
                         </article>
                     </section>
                 </main>
