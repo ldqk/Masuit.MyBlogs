@@ -9,7 +9,6 @@
 	$scope.CategoryId = "";
 	$scope.paginationConf = {
 		currentPage:  1,
-		//totalItems: $scope.total,
 		itemsPerPage: 10,
 		pagesLength: 25,
 		perPageOptions: [1, 5, 10, 15, 20, 30, 40, 50, 100, 200],
@@ -18,6 +17,7 @@
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 		}
 	};
+
 	$('.orderby').dropdown('set value', $scope.orderby);
 	$('.orderby').dropdown({
 		allowAdditions: false,
@@ -26,6 +26,7 @@
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 		}
 	});
+
 	$http.post("/category/getcategories", null).then(function (res) {
 		$scope.loadingDone();
 		var data = res.data;
@@ -41,6 +42,14 @@
 					noResults: '无搜索结果！'
 				}
 			});
+			
+            var params = JSON.parse(localStorage.getItem("postlist-params"));
+	        if (params) {
+		        $scope.kw = params["kw"];
+	            $scope.orderby = params["orderby"];
+		        $scope.paginationConf.currentPage= params["page"];
+				$timeout(()=>$('.category').dropdown('set selected', params["cid"]),10);
+	        }
 		} else {
 			window.notie.alert({
 				type: 3,
@@ -49,21 +58,14 @@
 			});
 		}
 	});
+
 	this.GetPageData = function (page, size) {
 		$scope.loading();
-		$http.post("/post/getpagedata", {
-			page,
-			size,
-			kw: $scope.kw,
-			orderby:$scope.orderby,
-			cid:$scope.CategoryId
-		}).then(function(res) {
-			//$scope.paginationConf.currentPage = page;
+		var params={ page, size, kw: $scope.kw, orderby:$scope.orderby, cid:$scope.CategoryId };
+		$http.post("/post/getpagedata", params).then(function(res) {
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$("div[ng-table-pagination]").remove();
-			self.tableParams = new NgTableParams({
-				count: 50000
-			}, {
+			self.tableParams = new NgTableParams({ count: 50000 }, {
 				filterDelay: 0,
 				dataset: res.data.Data
 			});
@@ -76,8 +78,10 @@
 			});
 			self.stats = Enumerable.From(self.stats).Distinct().ToArray();
 			$scope.loadingDone();
+			localStorage.setItem("postlist-params",JSON.stringify(params));
 		});
 	}
+
 	self.del = function(row) {
 		swal({
 			title: "确认删除这篇文章吗？",
