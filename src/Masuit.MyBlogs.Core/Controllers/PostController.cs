@@ -599,10 +599,20 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Authority]
-        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "")
+        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
         {
-            IOrderedQueryable<Post> temp;
-            var query = string.IsNullOrEmpty(kw) ? PostService.GetAll() : PostService.GetQuery(p => p.Title.Contains(kw) || p.Author.Contains(kw) || p.Email.Contains(kw) || p.Label.Contains(kw) || p.Content.Contains(kw));
+            Expression<Func<Post, bool>> where = p => true;
+            if (cid.HasValue)
+            {
+                where = where.And(p => p.CategoryId == cid.Value);
+            }
+
+            if (!string.IsNullOrEmpty(kw))
+            {
+                where = where.And(p => p.Title.Contains(kw) || p.Author.Contains(kw) || p.Email.Contains(kw) || p.Label.Contains(kw) || p.Content.Contains(kw));
+            }
+
+            var query = PostService.GetQuery(where);
             var total = query.Count();
             var list = query.OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").Skip((page - 1) * size).Take(size).ProjectTo<PostDataModel>(MapperConfig).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();

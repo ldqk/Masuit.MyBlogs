@@ -6,6 +6,7 @@
 	self.data = {};
 	$scope.kw = "";
 	$scope.orderby = 1;
+	$scope.CategoryId = "";
 	$scope.paginationConf = {
 		currentPage:  1,
 		//totalItems: $scope.total,
@@ -25,13 +26,37 @@
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 		}
 	});
+	$http.post("/category/getcategories", null).then(function (res) {
+		$scope.loadingDone();
+		var data = res.data;
+		if (data.Success) {
+			$scope.cat = data.Data;
+			$('.ui.dropdown.category').dropdown({
+				onChange: function (value) {
+					$scope.CategoryId = value;
+					self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+				},
+				message: {
+					maxSelections: '最多选择 {maxCount} 项',
+					noResults: '无搜索结果！'
+				}
+			});
+		} else {
+			window.notie.alert({
+				type: 3,
+				text: '获取文章分类失败！',
+				time: 4
+			});
+		}
+	});
 	this.GetPageData = function (page, size) {
 		$scope.loading();
 		$http.post("/post/getpagedata", {
 			page,
 			size,
 			kw: $scope.kw,
-			orderby:$scope.orderby
+			orderby:$scope.orderby,
+			cid:$scope.CategoryId
 		}).then(function(res) {
 			//$scope.paginationConf.currentPage = page;
 			$scope.paginationConf.totalItems = res.data.TotalCount;

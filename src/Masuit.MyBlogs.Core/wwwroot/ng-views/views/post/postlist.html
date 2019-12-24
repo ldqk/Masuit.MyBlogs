@@ -10,6 +10,18 @@
             </div>
         </div>
         <div class="input-group">
+            <span class="input-group-addon">分类：</span>
+            <div class="ui search selection dropdown category">
+                <input name="category" type="hidden" id="category">
+                <i class="dropdown icon"></i>
+                <div class="default text">请选择分类</div>
+                <div class="menu">
+                    <div class="item"data-value="">无</div>
+                    <div class="item" ng-repeat="item in cat track by $index" data-value="{{item.Id}}">{{item.Name}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="input-group">
             <span class="input-group-addon">服务端排序方式：</span>
             <div class="ui selection dropdown orderby">
                 <input name="gender" type="hidden" value="default">

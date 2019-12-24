@@ -1408,7 +1408,7 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.GetPageData(System.Int32,System.Int32,Masuit.MyBlogs.Core.Models.Enum.OrderBy,System.String)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.PostController.GetPageData(System.Int32,System.Int32,Masuit.MyBlogs.Core.Models.Enum.OrderBy,System.String,System.Nullable{System.Int32})">
             <summary>
             获取文章分页
             </summary>
