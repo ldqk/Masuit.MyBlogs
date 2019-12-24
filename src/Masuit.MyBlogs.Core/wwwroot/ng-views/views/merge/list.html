@@ -29,11 +29,13 @@
             <td title="'修改人邮箱'">
                 {{row.ModifierEmail}}
             </td>
-            <td title="'合并状态'">
-                {{row.MergeState==0?'待合并':row.MergeState==1?'已合并':'已拒绝'}}
+            <td title="'状态'">
+                <span ng-if="row.MergeState==0" class="text-warning">待合并</span>
+                <span ng-if="row.MergeState==1" class="text-success">已合并</span>
+                <span ng-if="row.MergeState==2" class="text-danger">已拒绝</span>
             </td>
-            <td title="'操作'" ng-if="row.MergeState==0">
-                <div class="btn-group">
+            <td title="'操作'">
+                <div class="btn-group" ng-if="row.MergeState==0">
                     <a class="btn btn-info btn-sm waves-effect" ng-href="#/merge/compare?id={{row.Id}}">
                         对比
                     </a>
@@ -44,7 +46,7 @@
                         编辑并合并
                     </a>
                     <button class="btn btn-danger btn-sm waves-effect" ng-click="list.reject(row)">
-                        拒绝合并
+                        拒绝
                     </button>
                 </div>
             </td>

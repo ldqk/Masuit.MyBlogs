@@ -46,10 +46,12 @@
             var params = JSON.parse(localStorage.getItem("postlist-params"));
 	        if (params) {
 		        $scope.kw = params["kw"];
-	            $scope.orderby = params["orderby"];
 		        $scope.paginationConf.currentPage= params["page"];
-				$timeout(()=>$('.category').dropdown('set selected', params["cid"]),10);
-	        }
+				$timeout(() => {
+                    $('.category').dropdown('set selected', params["cid"]);
+	                $('.orderby').dropdown('set selected', params["orderby"]);
+                },10);
+            }
 		} else {
 			window.notie.alert({
 				type: 3,

@@ -82,7 +82,7 @@
 
 	bindReplyBtn();//绑定回复按钮事件
 	bindVote();//绑定文章投票按钮
-	getcomments();//获取评论
+	window.getcomments();//获取评论
 	commentVoteBind(); //评论投票
 	$("#OperatingSystem").val(platform.os.toString());
     $("#Browser").val(platform.name + " " + platform.version);
@@ -145,9 +145,9 @@
 	//回复表单的提交
 	$("#reply-form").on("submit", function(e) {
 		e.preventDefault();
-        var formData = $(this).serializeObject();
         layui.layedit.sync(window.currentEditor);
 		loading();
+        var formData = $("#reply-form").serializeObject();
 		if (formData["NickName"].trim().length <= 0 ||formData["NickName"].trim().length > 36) {
 			window.notie.alert({
 				type: 3,
@@ -179,7 +179,7 @@
 				});
 				layer.closeAll();
 				setTimeout(function () {
-					getcomments();
+					window.getcomments();
 					$("[id^='LAY_layedit']").contents().find('body').html('');
 					$("#reply").css("display", "none");
 				}, 500);

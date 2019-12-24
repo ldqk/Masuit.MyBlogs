@@ -7,7 +7,7 @@
     });
 	$("#OperatingSystem").val(platform.os.toString());
 	$("#Browser").val(platform.name + " " + platform.version);
-	getmsgs();
+	window.getmsgs();
 	var user = JSON.parse(localStorage.getItem("user"));
 	if (user) {
 		$("[name='NickName']").val(user.NickName);
@@ -113,7 +113,7 @@
 		        });
 				layer.closeAll();
 					setTimeout(function() {
-					getmsgs();
+					window.getmsgs();
 					$("#reply").css("display", "none");
 					$("[id^=LAY_layedit]").contents().find('body').html('');
 				}, 500);

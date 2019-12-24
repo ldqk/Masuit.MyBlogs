@@ -59,18 +59,27 @@
     }
 
 	self.reject = function(row) {
-        swal({
-			title: "确认拒绝合并这篇文章吗？",
-			text: row.Title,
+		swal({
+			title: "拒绝合并理由：",
+            input: 'textarea',
 			showCancelButton: true,
 			confirmButtonColor: "#DD6B55",
 			confirmButtonText: "确定",
 			cancelButtonText: "取消",
 			showLoaderOnConfirm: true,
 			animation: true,
-			allowOutsideClick: false
-		}).then(function() {
-			$scope.request("/merge/reject/"+row.Id, null, function(data) {
+			allowOutsideClick: false,
+            inputValidator: function(value) {
+            return new Promise(function(resolve, reject) {
+              if (value) {
+                resolve();
+              } else {
+                reject('请填写拒绝理由!');
+              }
+            });
+          }
+		}).then(function(reason) {
+            $scope.request("/merge/reject/"+row.Id, null, function(data) {
 			    window.notie.alert({
 				    type: 1,
 				    text: data.Message,
