@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -59,7 +60,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 notice.MapTo<NoticeOutputDto>()
             });
-
         }
 
         /// <summary>
@@ -71,6 +71,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Details(int id)
         {
             var notice = NoticeService.GetById(id) ?? throw new NotFoundException("页面未找到");
+            if (!HttpContext.Session.TryGetValue("notice" + id, out _))
+            {
+                notice.ViewCount += 1;
+                NoticeService.SaveChanges();
+                HttpContext.Session.Set("notice" + id, notice.Title);
+            }
+
             return View(notice);
         }
 
