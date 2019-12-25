@@ -131,11 +131,12 @@
             图床客户端
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.#ctor(System.Net.Http.IHttpClientFactory)">
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.#ctor(System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             图床客户端
             </summary>
             <param name="httpClientFactory"></param>
+            <param name="config"></param>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Common.ImagebedClient.OssClient">
             <summary>

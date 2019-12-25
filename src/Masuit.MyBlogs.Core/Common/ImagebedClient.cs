@@ -4,6 +4,7 @@ using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools;
 using Masuit.Tools.Html;
 using Masuit.Tools.Systems;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using Polly;
 using System;
@@ -23,13 +24,16 @@ namespace Masuit.MyBlogs.Core.Common
     public class ImagebedClient
     {
         private readonly HttpClient _httpClient;
+        private readonly IConfiguration _config;
 
         /// <summary>
         /// 图床客户端
         /// </summary>
         /// <param name="httpClientFactory"></param>
-        public ImagebedClient(IHttpClientFactory httpClientFactory)
+        /// <param name="config"></param>
+        public ImagebedClient(IHttpClientFactory httpClientFactory, IConfiguration config)
         {
+            _config = config;
             _httpClient = httpClientFactory.CreateClient();
         }
 
@@ -197,6 +201,11 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public async Task<string> ReplaceImgSrc(string content)
         {
+            if (bool.TryParse(_config["Imgbed:EnableLocalStorage"], out var b) && b)
+            {
+                return content;
+            }
+
             var srcs = content.MatchImgSrcs();
             foreach (string src in srcs)
             {
