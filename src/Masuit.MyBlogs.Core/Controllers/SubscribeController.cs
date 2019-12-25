@@ -245,7 +245,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Save(Broadcast model)
         {
             model.UpdateTime = DateTime.Now;
@@ -270,7 +270,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Delete(int id)
         {
             bool b = BroadcastService.DeleteByIdSaved(id);
@@ -282,7 +282,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Change(int id)
         {
             Broadcast cast = BroadcastService.GetById(id);
@@ -298,7 +298,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Get(int id) => ResultData(BroadcastService.GetById(id));
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="search"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult GetPageData(int page = 1, int size = 10, string search = "")
         {
             List<Broadcast> list;

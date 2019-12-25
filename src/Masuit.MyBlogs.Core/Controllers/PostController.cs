@@ -447,7 +447,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Fixtop(int id)
         {
             Post post = PostService.GetById(id);
@@ -466,7 +466,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Pass(int id)
         {
             Post post = PostService.GetById(id);
@@ -515,7 +515,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Delete(int id)
         {
             var post = PostService.GetById(id);
@@ -529,7 +529,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Restore(int id)
         {
             var post = PostService.GetById(id);
@@ -544,7 +544,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Truncate(int id)
         {
             var post = PostService.GetById(id);
@@ -577,7 +577,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Get(int id)
         {
             Post post = PostService.GetById(id);
@@ -591,14 +591,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Read(int id) => ResultData(PostService.GetById(id).Mapper<PostOutputDto>());
 
         /// <summary>
         /// 获取文章分页
         /// </summary>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
         {
             Expression<Func<Post, bool>> where = p => true;
@@ -626,7 +626,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="search"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult GetPending(int page = 1, int size = 10, string search = "")
         {
             Expression<Func<Post, bool>> where = p => p.Status == Status.Pending;
@@ -648,7 +648,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="notify"></param>
         /// <param name="reserve"></param>
         /// <returns></returns>
-        [HttpPost, Authority]
+        [HttpPost, MyAuthorize]
         public async Task<ActionResult> Edit(PostInputDto post, bool notify = true, bool reserve = true)
         {
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
@@ -751,7 +751,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="timespan"></param>
         /// <param name="schedule"></param>
         /// <returns></returns>
-        [Authority, HttpPost]
+        [MyAuthorize, HttpPost]
         public async Task<ActionResult> Write(PostInputDto post, DateTime? timespan, bool schedule = false)
         {
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
@@ -855,7 +855,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="sid"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult AddSeminar(int id, int sid)
         {
             var post = PostService.GetById(id);
@@ -877,7 +877,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="sid"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult RemoveSeminar(int id, int sid)
         {
             var post = PostService.GetById(id);
@@ -898,7 +898,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult DeleteHistory(int id)
         {
             bool b = PostHistoryVersionService.DeleteByIdSaved(id);
@@ -910,7 +910,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Revert(int id)
         {
             var history = PostHistoryVersionService.GetById(id);
@@ -946,7 +946,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id">文章id</param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult DisableComment(int id)
         {
             var post = PostService.GetById(id);
@@ -964,7 +964,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id">文章id</param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Refresh(int id)
         {
             var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");

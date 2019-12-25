@@ -90,7 +90,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="search"></param>
         /// <returns></returns>
-        [Authority, HttpPost, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "search" }, VaryByHeader = "Cookie")]
+        [MyAuthorize, HttpPost, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "search" }, VaryByHeader = "Cookie")]
         public ActionResult SearchList(int page = 1, int size = 10, string search = "")
         {
             var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.KeyWords.Contains(search);
@@ -103,7 +103,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 热词
         /// </summary>
         /// <returns></returns>
-        [Authority, HttpPost, ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
+        [MyAuthorize, HttpPost, ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult HotKey()
         {
             return ResultData(new
@@ -119,7 +119,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPost, Authority]
+        [HttpPost, MyAuthorize]
         public ActionResult Delete(int id)
         {
             bool b = SearchDetailsService.DeleteByIdSaved(id);

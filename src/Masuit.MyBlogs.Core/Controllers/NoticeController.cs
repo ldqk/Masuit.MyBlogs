@@ -5,7 +5,6 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -80,7 +79,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="notice"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public async Task<ActionResult> Write(Notice notice)
         {
             notice.Content = await ImagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes());
@@ -97,7 +96,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Delete(int id)
         {
             var post = NoticeService.GetById(id);
@@ -127,7 +126,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="notice"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public async Task<ActionResult> Edit(Notice notice)
         {
             var entity = NoticeService.GetById(notice.Id);
@@ -156,19 +155,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [MyAuthorize]
         public ActionResult Get(int id)
         {
-            if (HttpContext.Session.Get("notice" + id) != null)
-            {
-                return ResultData(HttpContext.Session.Get<NoticeOutputDto>("notice" + id));
-            }
-
-            var notice = NoticeService.GetById(id);
-            notice.ViewCount += 1;
-            NoticeService.SaveChanges();
-            var dto = notice.MapTo<NoticeOutputDto>();
-            HttpContext.Session.Set("notice" + id, dto);
-            return ResultData(dto);
+            return ResultData(NoticeService.Get<NoticeOutputDto>(n => n.Id == id));
         }
 
         /// <summary>

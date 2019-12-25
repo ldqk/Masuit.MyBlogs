@@ -61,7 +61,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="seminar"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Save(Seminar seminar)
         {
             bool contain;
@@ -104,7 +104,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Delete(int id)
         {
             bool b = SeminarService.DeleteByIdSaved(id);
@@ -116,7 +116,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Get(int id)
         {
             Seminar seminar = SeminarService.GetById(id);
@@ -129,7 +129,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult GetPageData(int page, int size)
         {
             var list = SeminarService.GetPages<int, SeminarOutputDto>(page, size, out int total, s => true, s => s.Id, false).ToList();
@@ -141,7 +141,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取所有专题
         /// </summary>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult GetAll()
         {
             var list = SeminarService.GetAll<string, SeminarOutputDto>(s => s.Title).ToList();
@@ -154,7 +154,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="pid"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult AddPost(int id, int pid)
         {
             Seminar seminar = SeminarService.GetById(id);
@@ -176,7 +176,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="pid"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult RemovePost(int id, int pid)
         {
             Seminar seminar = SeminarService.GetById(id);
