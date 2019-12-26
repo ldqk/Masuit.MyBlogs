@@ -8360,10 +8360,11 @@ h6 small,
 .top-menu > li .dropdown-menu-lg {
   padding: 0;
 }
-.top-menu > li .dropdown-menu-lg .lv-body {
-  min-height: 295px;
-  overflow-x: hidden;
-}
+    .top-menu > li .dropdown-menu-lg .lv-body {
+        min-height: 295px;
+        overflow-x: hidden;
+        max-height: 80vh;
+    }
 @media (min-width: 768px) {
   .top-menu > li:not(#toggle-width) {
     position: relative;
