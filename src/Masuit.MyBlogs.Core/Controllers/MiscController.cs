@@ -102,7 +102,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public async Task<ActionResult> Write(Misc model)
         {
             model.Content = await ImagebedClient.ReplaceImgSrc(model.Content.Trim().ClearImgAttributes());
@@ -119,7 +119,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Delete(int id)
         {
             var post = MiscService.GetById(id);
@@ -149,7 +149,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="misc"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public async Task<ActionResult> Edit(Misc misc)
         {
             var entity = MiscService.GetById(misc.Id);
@@ -166,7 +166,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult GetPageData(int page = 1, int size = 10)
         {
             var list = MiscService.GetPagesNoTracking(page, size, out int total, n => true, n => n.ModifyDate, false).Select(m => new
@@ -185,7 +185,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Get(int id)
         {
             var notice = MiscService.GetById(id);

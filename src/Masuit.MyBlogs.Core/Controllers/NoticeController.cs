@@ -60,7 +60,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 notice.MapTo<NoticeOutputDto>()
             });
-
         }
 
         /// <summary>
@@ -72,6 +71,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Details(int id)
         {
             var notice = NoticeService.GetById(id) ?? throw new NotFoundException("页面未找到");
+            if (!HttpContext.Session.TryGetValue("notice" + id, out _))
+            {
+                notice.ViewCount += 1;
+                NoticeService.SaveChanges();
+                HttpContext.Session.Set("notice" + id, notice.Title);
+            }
+
             return View(notice);
         }
 
@@ -80,7 +86,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="notice"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public async Task<ActionResult> Write(Notice notice)
         {
             notice.Content = await ImagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes());
@@ -97,7 +103,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Delete(int id)
         {
             var post = NoticeService.GetById(id);
@@ -127,7 +133,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="notice"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public async Task<ActionResult> Edit(Notice notice)
         {
             var entity = NoticeService.GetById(notice.Id);
@@ -156,19 +162,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [MyAuthorize]
         public ActionResult Get(int id)
         {
-            if (HttpContext.Session.Get("notice" + id) != null)
-            {
-                return ResultData(HttpContext.Session.Get<NoticeOutputDto>("notice" + id));
-            }
-
-            var notice = NoticeService.GetById(id);
-            notice.ViewCount += 1;
-            NoticeService.SaveChanges();
-            var dto = notice.MapTo<NoticeOutputDto>();
-            HttpContext.Session.Set("notice" + id, dto);
-            return ResultData(dto);
+            return ResultData(NoticeService.Get<NoticeOutputDto>(n => n.Id == id));
         }
 
         /// <summary>

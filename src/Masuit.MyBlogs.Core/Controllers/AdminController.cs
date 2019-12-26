@@ -18,7 +18,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 管理页的父控制器
     /// </summary>
-    [Authority, ApiExplorerSettings(IgnoreApi = true)]
+    [MyAuthorize, ApiExplorerSettings(IgnoreApi = true)]
     public class AdminController : Controller
     {
         /// <summary>

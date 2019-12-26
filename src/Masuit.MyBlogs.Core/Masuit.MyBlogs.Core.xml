@@ -131,11 +131,12 @@
             图床客户端
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.#ctor(System.Net.Http.IHttpClientFactory)">
+        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.#ctor(System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             图床客户端
             </summary>
             <param name="httpClientFactory"></param>
+            <param name="config"></param>
         </member>
         <member name="P:Masuit.MyBlogs.Core.Common.ImagebedClient.OssClient">
             <summary>
@@ -1988,15 +1989,6 @@
             <param name="email"></param>
             <returns></returns>
         </member>
-        <member name="T:Masuit.MyBlogs.Core.Extensions.AuthorityAttribute">
-            <summary>
-            授权验证过滤器
-            </summary>
-        </member>
-        <member name="M:Masuit.MyBlogs.Core.Extensions.AuthorityAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
-            <summary>在执行操作方法之前由 ASP.NET MVC 框架调用。</summary>
-            <param name="filterContext">筛选器上下文。</param>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Extensions.FirewallAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
             <inheritdoc />
         </member>
@@ -2148,6 +2140,15 @@
             </summary>
             <param name="services"></param>
             <returns></returns>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Extensions.MyAuthorizeAttribute">
+            <summary>
+            授权验证过滤器
+            </summary>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Extensions.MyAuthorizeAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
+            <summary>在执行操作方法之前由 ASP.NET MVC 框架调用。</summary>
+            <param name="filterContext">筛选器上下文。</param>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Extensions.MyExceptionFilter.OnException(Microsoft.AspNetCore.Mvc.Filters.ExceptionContext)">
             <inheritdoc />

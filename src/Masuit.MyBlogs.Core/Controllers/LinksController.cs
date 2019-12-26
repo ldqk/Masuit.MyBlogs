@@ -97,7 +97,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="links"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Add(Links links)
         {
             var entry = LinksService.GetById(links.Id);
@@ -123,7 +123,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public async Task<ActionResult> Check(string link)
         {
             HttpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
@@ -157,7 +157,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Delete(int id)
         {
             bool b = LinksService.DeleteByIdSaved(id);
@@ -169,7 +169,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Edit(Links model)
         {
             Links links = LinksService.GetById(model.Id);
@@ -183,7 +183,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 所有的友情链接
         /// </summary>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Get()
         {
             List<Links> list = LinksService.GetAll().OrderBy(p => p.Status).ThenByDescending(p => p.Recommend).ThenByDescending(p => p.Id).ToList();

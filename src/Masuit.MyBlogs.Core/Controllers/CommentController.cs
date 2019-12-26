@@ -226,7 +226,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Pass(int id)
         {
             Comment comment = CommentService.GetById(id);
@@ -264,7 +264,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Delete(int id)
         {
             var b = CommentService.DeleteEntitiesSaved(CommentService.GetSelfAndAllChildrenCommentsByParentId(id).ToList());
@@ -275,7 +275,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取未审核的评论
         /// </summary>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult GetPendingComments(int page = 1, int size = 10)
         {
             var list = CommentService.GetPages<DateTime, CommentOutputDto>(page, size, out int total, c => c.Status == Status.Pending, c => c.CommentDate, false).ToList();

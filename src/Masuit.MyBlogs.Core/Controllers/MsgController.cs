@@ -193,7 +193,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Pass(int id)
         {
             var msg = LeaveMessageService.GetById(id);
@@ -217,7 +217,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Delete(int id)
         {
             var b = LeaveMessageService.DeleteEntitiesSaved(LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(id).ToList());
@@ -228,7 +228,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取待审核的留言
         /// </summary>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult GetPendingMsgs(int page = 1, int size = 10)
         {
             var list = LeaveMessageService.GetPages<DateTime, LeaveMessageOutputDto>(page, size, out int total, m => m.Status == Status.Pending, l => l.PostDate, false).ToList();
@@ -243,7 +243,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Read(int id)
         {
             var msg = MessageService.GetById(id);
@@ -257,7 +257,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult Unread(int id)
         {
             var msg = MessageService.GetById(id);
@@ -271,7 +271,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult DeleteMsg(int id)
         {
             bool b = MessageService.DeleteByIdSaved(id);
@@ -284,7 +284,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult GetInternalMsgs(int page = 1, int size = 10)
         {
             IEnumerable<InternalMessage> msgs = MessageService.GetPagesNoTracking(page, size, out int total, m => true, m => m.Time, false);
@@ -296,7 +296,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取未读消息
         /// </summary>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult GetUnreadMsgs()
         {
             IEnumerable<InternalMessage> msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false);
@@ -307,7 +307,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 清除站内信
         /// </summary>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult ClearMsgs()
         {
             MessageService.DeleteEntitySaved(m => m.Read);
@@ -319,7 +319,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult MarkRead(int id)
         {
             var msgs = MessageService.GetQuery(m => m.Id <= id).ToList();

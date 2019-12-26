@@ -43,7 +43,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取文章分页
         /// </summary>
         /// <returns></returns>
-        [Authority]
+        [MyAuthorize]
         public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 10, string kw = "")
         {
             Expression<Func<Advertisement, bool>> where = p => true;
@@ -64,7 +64,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [HttpPost, Authority]
+        [HttpPost, MyAuthorize]
         public async Task<IActionResult> Save(AdvertisementInputDto model)
         {
             model.CategoryId = model.CategoryId?.Replace("null", "");
@@ -85,7 +85,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPost("{id}"), HttpGet("{id}"), Authority]
+        [HttpPost("{id}"), HttpGet("{id}"), MyAuthorize]
         public IActionResult Delete(int id)
         {
             bool b = AdsService.DeleteByIdSaved(id);
@@ -98,7 +98,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id">文章id</param>
         /// <returns></returns>
-        [Authority, HttpPost("{id}")]
+        [MyAuthorize, HttpPost("{id}")]
         public ActionResult ChangeState(int id)
         {
             var ad = AdsService.GetById(id);
