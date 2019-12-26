@@ -1,4 +1,8 @@
-﻿article strong {
+﻿article video,
+article img {
+    max-width: 100%
+}
+article strong {
     font-weight: bold;
     font-size: 16px;
 }
