@@ -139,7 +139,7 @@ namespace Masuit.MyBlogs.Core.Common
             {
                 return UploadSmms(stream, file).Result;
             }
-            var objectName = DateTime.Now.ToString("yyyyMMdd") + "/" + SnowFlake.NewId + Path.GetExtension(file);
+            var objectName = DateTime.Now.ToString("yyyy/MM/dd/") + SnowFlake.NewId + Path.GetExtension(file);
             return Policy.Handle<Exception>().Retry(5, (e, i) =>
             {
                 Console.ForegroundColor = ConsoleColor.Red;
