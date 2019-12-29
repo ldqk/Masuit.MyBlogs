@@ -82,7 +82,7 @@ namespace Masuit.MyBlogs.Core
             }); //配置Cookie策略
             services.AddDbContext<DataContext>(opt =>
             {
-                opt.UseMySql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(3)).EnableDetailedErrors();
+                opt.UseMySql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(3)).EnableDetailedErrors().EnableSensitiveDataLogging();
                 //opt.UseSqlServer(AppConfig.ConnString);
             }); //配置数据库
             services.AddCors(opt => opt.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin())); //配置跨域
