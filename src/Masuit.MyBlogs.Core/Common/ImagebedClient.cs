@@ -5,14 +5,12 @@ using Masuit.Tools;
 using Masuit.Tools.Html;
 using Masuit.Tools.Systems;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
 using Polly;
 using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -50,7 +48,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public async Task<(string url, bool success)> UploadImage(Stream stream, string file)
         {
-            return await UploadGitlab(stream, file);
+            return await Policy<(string url, bool success)>.Handle<Exception>().FallbackAsync(t => UploadOss(stream, file)).WrapAsync(Policy.Handle<Exception>().RetryAsync(5)).ExecuteAsync(() => UploadGitlab(stream, file));
         }
 
         /// <summary>
@@ -93,11 +91,11 @@ namespace Masuit.MyBlogs.Core.Common
                         }
                     }
 
-                    return UploadOss(stream, file);
+                    throw new Exception("上传失败");
                 });
             }
 
-            return UploadOss(stream, file);
+            throw new Exception("上传失败");
         }
 
         /// <summary>
@@ -127,7 +125,7 @@ namespace Masuit.MyBlogs.Core.Common
                     }
                 }
 
-                return UploadOss(stream, file);
+                throw new Exception("上传失败");
             });
         }
 
@@ -137,61 +135,15 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="stream"></param>
         /// <param name="file"></param>
         /// <returns></returns>
-        private (string url, bool success) UploadOss(Stream stream, string file)
+        private async Task<(string url, bool success)> UploadOss(Stream stream, string file)
         {
             if (!AppConfig.AliOssConfig.Enabled)
             {
-                return UploadSmms(stream, file).Result;
+                return (null, false);
             }
+
             var objectName = DateTime.Now.ToString("yyyy/MM/dd/") + SnowFlake.NewId + Path.GetExtension(file);
-            return Policy.Handle<Exception>().Retry(5, (e, i) =>
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(e.Message);
-                Console.ResetColor();
-            }).Wrap(Policy<(string url, bool success)>.Handle<Exception>().Fallback(() => UploadSmms(stream, file).Result)).Execute(() =>
-            {
-                var result = OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, stream);
-                return result.HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : UploadSmms(stream, file).Result;
-            });
-        }
-
-        /// <summary>
-        /// 上传图片到sm图床
-        /// </summary>
-        /// <returns></returns>
-        public async Task<(string url, bool success)> UploadSmms(Stream stream, string file)
-        {
-            string url = string.Empty;
-            _httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-            using var bc = new StreamContent(stream);
-            bc.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-            {
-                FileName = Path.GetFileName(file),
-                Name = "smfile"
-            };
-            using var content = new MultipartFormDataContent { bc };
-            var success = await _httpClient.PostAsync("https://sm.ms/api/upload?inajax=1&ssl=1", content).ContinueWith(t =>
-            {
-                if (t.IsCanceled || t.IsFaulted || !t.Result.IsSuccessStatusCode)
-                {
-                    return false;
-                }
-
-                try
-                {
-                    var s = t.Result.Content.ReadAsStringAsync().Result;
-                    var token = JObject.Parse(s);
-                    url = (string)token["data"]["url"];
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            });
-
-            return (url, success);
+            return await Task.FromResult(Policy<(string url, bool success)>.Handle<Exception>().Fallback((null, false)).Wrap(Policy.Handle<Exception>().Retry(5)).Execute(() => OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, stream).HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : (null, false)));
         }
 
         /// <summary>

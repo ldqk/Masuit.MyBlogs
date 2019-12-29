@@ -176,12 +176,6 @@
             <param name="file"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.UploadSmms(System.IO.Stream,System.String)">
-            <summary>
-            上传图片到sm图床
-            </summary>
-            <returns></returns>
-        </member>
         <member name="M:Masuit.MyBlogs.Core.Common.ImagebedClient.ReplaceImgSrc(System.String)">
             <summary>
             替换img标签的src属性
