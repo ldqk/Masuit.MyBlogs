@@ -3,6 +3,7 @@ using Hangfire;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools;
 using Masuit.Tools.Html;
+using Masuit.Tools.Logging;
 using Masuit.Tools.Systems;
 using Microsoft.Extensions.Configuration;
 using Polly;
@@ -48,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public async Task<(string url, bool success)> UploadImage(Stream stream, string file)
         {
-            return await Policy<(string url, bool success)>.Handle<Exception>().FallbackAsync(t => UploadOss(stream, file)).WrapAsync(Policy.Handle<Exception>().RetryAsync(5)).ExecuteAsync(() => UploadGitlab(stream, file));
+            return await Policy<(string url, bool success)>.Handle<Exception>().FallbackAsync(t => UploadOss(stream, file)).WrapAsync(Policy.Handle<Exception>().RetryAsync(5, (e, i) => LogManager.Info(e.Message + "重试" + i))).ExecuteAsync(() => UploadGitlab(stream, file));
         }
 
         /// <summary>
@@ -91,11 +92,11 @@ namespace Masuit.MyBlogs.Core.Common
                         }
                     }
 
-                    throw new Exception("上传失败");
+                    throw new Exception($"图片上传到gitlab({gitlab.ApiUrl})失败。");
                 });
             }
 
-            throw new Exception("上传失败");
+            return await UploadOss(stream, file);
         }
 
         /// <summary>
@@ -125,7 +126,7 @@ namespace Masuit.MyBlogs.Core.Common
                     }
                 }
 
-                throw new Exception("上传失败");
+                throw new Exception("图片上传到gitee失败。");
             });
         }
 
@@ -143,7 +144,7 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             var objectName = DateTime.Now.ToString("yyyy/MM/dd/") + SnowFlake.NewId + Path.GetExtension(file);
-            return await Task.FromResult(Policy<(string url, bool success)>.Handle<Exception>().Fallback((null, false)).Wrap(Policy.Handle<Exception>().Retry(5)).Execute(() => OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, stream).HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : (null, false)));
+            return await Task.FromResult(Policy<(string url, bool success)>.Handle<Exception>().Fallback((null, false)).Wrap(Policy.Handle<Exception>().Retry(5, (e, i) => LogManager.Info($"图片上传到oss失败，重试{i}：" + e.Message))).Execute(() => OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, stream).HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : (null, false)));
         }
 
         /// <summary>
