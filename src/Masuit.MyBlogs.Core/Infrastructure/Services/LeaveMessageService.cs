@@ -20,10 +20,15 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public IEnumerable<LeaveMessage> GetSelfAndAllChildrenMessagesByParentId(int id)
         {
-            LeaveMessage c = GetFromCache(m => m.Id == id);
-            var msgs = new List<LeaveMessage>() { c };
-            GetSelfAndAllChildrenMessagesByParentId(c, msgs);
-            return msgs;
+            var msg = GetFromCache(m => m.Id == id);
+            if (msg != null)
+            {
+                var msgs = new List<LeaveMessage>() { msg };
+                GetSelfAndAllChildrenMessagesByParentId(msg, msgs);
+                return msgs;
+            }
+
+            return new List<LeaveMessage>();
         }
 
         /// <summary>

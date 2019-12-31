@@ -21,16 +21,22 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public List<Comment> GetSelfAndAllChildrenCommentsByParentId(int id)
         {
             //return SqlQuery("exec sp_getChildrenCommentByParentId " + id);
-            Comment c = GetById(id);
-            var comments = new List<Comment>() { c };
-            GetSelfAndAllChildrenCommentsByParentId(c, comments);
-            return comments;
+            var c = GetById(id);
+            if (c != null)
+            {
+                var comments = new List<Comment>() { c };
+                GetSelfAndAllChildrenCommentsByParentId(c, comments);
+                return comments;
+            }
+
+            return new List<Comment>();
         }
 
         /// <summary>
         /// 通过存储过程获得自己以及自己所有的子元素集合
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="comment"></param>
+        /// <param name="list"></param>
         /// <returns></returns>
         private void GetSelfAndAllChildrenCommentsByParentId(Comment comment, List<Comment> list)
         {
