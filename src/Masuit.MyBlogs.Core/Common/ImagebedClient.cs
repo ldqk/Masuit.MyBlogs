@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Common
                 }
                 catch (Exception e)
                 {
-                    LogManager.Info(e.Message + "重试" + i);
+                    LogManager.Error(e);
                 }
             }
 
@@ -103,7 +103,8 @@ namespace Masuit.MyBlogs.Core.Common
                         }
                     }
 
-                    throw new Exception($"图片上传到gitlab({gitlab.ApiUrl})失败。" + t.Exception.Message);
+                    LogManager.Info($"图片上传到gitlab({gitlab.ApiUrl})失败。");
+                    throw t.Exception ?? new Exception(t.Result.ReasonPhrase);
                 });
             }
 
@@ -137,7 +138,8 @@ namespace Masuit.MyBlogs.Core.Common
                     }
                 }
 
-                throw new Exception("图片上传到gitee失败。");
+                LogManager.Info("图片上传到gitee失败。");
+                throw t.Exception ?? new Exception(t.Result.ReasonPhrase);
             });
         }
 
