@@ -3995,7 +3995,8 @@
             <summary>
             通过存储过程获得自己以及自己所有的子元素集合
             </summary>
-            <param name="id"></param>
+            <param name="comment"></param>
+            <param name="list"></param>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Infrastructure.Services.CommentService.GetParentCommentIdByChildId(System.Int32)">

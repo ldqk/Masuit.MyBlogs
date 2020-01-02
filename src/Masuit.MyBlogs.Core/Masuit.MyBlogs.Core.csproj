@@ -65,7 +65,6 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.0" />
     <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
-    <PackageReference Include="Polly" Version="7.2.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.0" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.19" />
     <PackageReference Include="WilderMinds.RssSyndication" Version="1.6.0" />

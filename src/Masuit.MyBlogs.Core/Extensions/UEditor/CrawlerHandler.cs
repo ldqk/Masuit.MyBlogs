@@ -63,17 +63,16 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 State = "INVALID_URL";
                 return this;
             }
-            var response = _httpClient.GetAsync(SourceUrl).Result;
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                State = "Url returns " + response.StatusCode;
-                return this;
-            }
-
-            ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), UeditorConfig.GetString("catcherPathFormat"));
-
             try
             {
+                var response = _httpClient.GetAsync(SourceUrl).Result;
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    State = "Url returns " + response.StatusCode;
+                    return this;
+                }
+
+                ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), UeditorConfig.GetString("catcherPathFormat"));
                 using var stream = response.Content.ReadAsStreamAsync().Result;
                 var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
                 var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath).Result;
