@@ -47,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
             try
             {
-                if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(uploadFileName)))
+                if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(uploadFileName).ToLower()))
                 {
                     var stream = file.OpenReadStream();
                     var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath).Result;
@@ -65,12 +65,13 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                         File.WriteAllBytes(localPath, stream.ToArray());
                         Result.Url = savePath;
                     }
+                    Result.State = UploadState.Success;
                 }
                 else
                 {
-                    Result.Url = savePath;
+                    Result.State = UploadState.FileAccessError;
+                    Result.ErrorMessage = "不支持的文件格式";
                 }
-                Result.State = UploadState.Success;
             }
             catch (Exception e)
             {
@@ -78,8 +79,8 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 Result.ErrorMessage = e.Message;
                 LogManager.Error(e);
             }
-            return WriteResult();
 
+            return WriteResult();
         }
 
         private string WriteResult()
