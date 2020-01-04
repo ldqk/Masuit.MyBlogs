@@ -30,7 +30,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             services.AddEFSecondLevelCache();
             // 配置EF二级缓存策略
             services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
-            services.AddSingleton(new CacheManager.Core.ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10)).Build());
+            services.AddSingleton(new ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(10)).Build());
             return services;
         }
 
