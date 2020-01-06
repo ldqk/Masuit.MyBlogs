@@ -1,6 +1,7 @@
 ﻿using AutoMapper.QueryableExtensions;
 using EFSecondLevelCache.Core;
 using Hangfire;
+using Masuit.LuceneEFCore.SearchEngine.Extensions;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Common;

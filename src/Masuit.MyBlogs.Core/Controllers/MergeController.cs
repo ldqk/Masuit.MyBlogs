@@ -52,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(r => r.Title.Contains(kw) || r.Content.Contains(kw) || r.Modifier.Contains(kw) || r.ModifierEmail.Contains(kw));
             }
 
-            var list = PostMergeRequestService.GetQuery(where).OrderBy(d => d.MergeState == MergeStatus.Pending).ThenByDescending(r => r.Id).Skip((page - 1) * size).Take(size).ProjectTo<PostMergeRequestOutputDtoBase>(MapperConfig).ToList();
+            var list = PostMergeRequestService.GetQuery(where).OrderByDescending(d => d.MergeState == MergeStatus.Pending).ThenByDescending(r => r.Id).Skip((page - 1) * size).Take(size).ProjectTo<PostMergeRequestOutputDtoBase>(MapperConfig).ToList();
             var count = PostMergeRequestService.Count(where);
             var pageCount = Math.Ceiling(count * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, count);
