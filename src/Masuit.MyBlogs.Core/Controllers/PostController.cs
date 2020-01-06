@@ -391,7 +391,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var post = PostService.GetById(dto.PostId) ?? throw new NotFoundException("文章未找到");
-            if (post.Title.Equals(dto.Title) && post.Content.Equals(dto.Content))
+            var diff = new HtmlDiff.HtmlDiff(post.Content.RemoveHtmlTag(), dto.Content.RemoveHtmlTag());
+            if (post.Title.Equals(dto.Title) && !diff.Build().Contains("diffmod"))
             {
                 return ResultData(null, false, "内容未被修改！");
             }
