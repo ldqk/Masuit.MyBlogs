@@ -86,16 +86,19 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Link = new Uri(scheme + "://" + host + "/" + p.Id),
                 PublishDate = p.ModifyDate,
                 Title = p.Title,
-                Permalink = scheme + "://" + host + "/" + p.Id
+                Permalink = scheme + "://" + host + "/" + p.Id,
+                Guid = p.Id.ToString(),
+                FullHtmlContent = p.Content
             }).Cacheable().ToList();
             var feed = new Feed()
             {
                 Title = CommonHelper.SystemSettings["Title"],
                 Description = CommonHelper.SystemSettings["Description"],
                 Link = new Uri(scheme + "://" + host + "/rss"),
-                Copyright = "(c) 2019"
+                Copyright = CommonHelper.SystemSettings["Title"],
+                Language = "zh-cn",
+                Items = posts.ToArray()
             };
-            feed.Items.AddRange(posts.ToArray());
             var rss = feed.Serialize(new SerializeOption()
             {
                 Encoding = Encoding.UTF8
