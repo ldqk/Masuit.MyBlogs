@@ -13,6 +13,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using Microsoft.EntityFrameworkCore.Internal;
 #if !DEBUG
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Models;
@@ -150,26 +151,29 @@ namespace Masuit.MyBlogs.Core.Common
         /// <summary>
         /// 是否是禁区
         /// </summary>
-        /// <param name="ip"></param>
+        /// <param name="ips"></param>
         /// <returns></returns>
-        public static bool IsInDenyArea(this string ip)
+        public static bool IsInDenyArea(this string ips)
         {
             if (SystemSettings.GetOrAdd("EnableDenyArea", "false") == "true")
             {
-                var pos = GetIPLocation(ip);
-                var denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
-                return pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any();
+                foreach (var item in ips.Split(','))
+                {
+                    var pos = GetIPLocation(item);
+                    var denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
+                    return pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any();
+                }
             }
 
             return false;
         }
 
+        private static readonly DbSearcher Searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
         public static string GetIPLocation(this IPAddress ip) => GetIPLocation(ip.MapToIPv4().ToString());
 
-        private static readonly DbSearcher Searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
-        public static string GetIPLocation(this string ip)
+        public static string GetIPLocation(this string ips)
         {
-            return Searcher.MemorySearch(ip).Region;
+            return ips.Split(',').Select(s => Searcher.MemorySearch(s).Region).Join(" , ");
         }
 
         /// <summary>

@@ -70,7 +70,7 @@
             <summary>
             是否是禁区
             </summary>
-            <param name="ip"></param>
+            <param name="ips"></param>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.Mapper``1(System.Object)">
