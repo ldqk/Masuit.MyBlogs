@@ -41,7 +41,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Total = 0;
             ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
-            string ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            string ip = ClientIP;
             string key = "Search:" + ip;
             if (CacheManager.Exists(key) && CacheManager.Get(key) != wd)
             {
@@ -60,7 +60,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     {
                         KeyWords = wd,
                         SearchTime = DateTime.Now,
-                        IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString()
+                        IP = ClientIP
                     });
                     SearchDetailsService.SaveChanges();
                     HttpContext.Session.Set("search:" + wd, wd.ToByteArray());

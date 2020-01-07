@@ -138,7 +138,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             msg.Content = dto.Content.HtmlSantinizerStandard().ClearImgAttributes();
             msg.Browser = dto.Browser ?? Request.Headers[HeaderNames.UserAgent];
-            msg.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            msg.IP = ClientIP;
             msg.Location = msg.IP.GetIPLocation().Split("|").Where(s => !int.TryParse(s, out _)).ToHashSet().Join("|");
             msg = LeaveMessageService.AddEntitySaved(msg);
             if (msg == null)

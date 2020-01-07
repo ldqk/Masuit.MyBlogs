@@ -43,6 +43,11 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public UserInfoOutputDto CurrentUser => HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
 
+        /// <summary>
+        /// 客户端的真实IP
+        /// </summary>
+        public string ClientIP => string.IsNullOrEmpty(Request.Headers["X-Forwarded-For"]) ? HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString() : Request.Headers["X-Forwarded-For"].ToString();
+
         public IMapper Mapper { get; set; }
         public MapperConfiguration MapperConfig { get; set; }
 

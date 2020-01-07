@@ -29,6 +29,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IUserInfoService UserInfoService { get; set; }
 
         /// <summary>
+        /// 客户端的真实IP
+        /// </summary>
+        public string ClientIP => string.IsNullOrEmpty(Request.Headers["X-Forwarded-For"]) ? HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString() : Request.Headers["X-Forwarded-For"].ToString();
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="data"></param>
@@ -75,7 +80,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                     Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                     HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
-                    HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString(), LoginType.Default);
+                    HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, ClientIP, LoginType.Default);
                     if (string.IsNullOrEmpty(from))
                     {
                         return RedirectToAction("Index", "Home");
@@ -116,7 +121,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                     Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.BaiduAK), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
                 }
-                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString(), LoginType.Default);
+                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, ClientIP, LoginType.Default);
                 string refer = Request.Cookies["refer"];
                 return ResultData(null, true, string.IsNullOrEmpty(refer) ? "/" : refer);
             }

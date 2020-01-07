@@ -345,6 +345,11 @@
             LinksService
             </summary>
         </member>
+        <member name="P:Masuit.MyBlogs.Core.Controllers.BaseController.ClientIP">
+            <summary>
+            客户端的真实IP
+            </summary>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.BaseController.ResultData(System.Object,System.Boolean,System.String,System.Boolean,System.Net.HttpStatusCode)">
             <summary>
             响应数据
@@ -1186,6 +1191,11 @@
         <member name="P:Masuit.MyBlogs.Core.Controllers.PassportController.UserInfoService">
             <summary>
             用户
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Controllers.PassportController.ClientIP">
+            <summary>
+            客户端的真实IP
             </summary>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.PassportController.ResultData(System.Object,System.Boolean,System.String)">

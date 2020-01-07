@@ -234,7 +234,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes());
             ViewBag.CategoryId = new SelectList(CategoryService.GetQueryNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
             Post p = post.Mapper<Post>();
-            p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            p.IP = ClientIP;
             p.Modifier = p.Author;
             p.ModifierEmail = p.Email;
             p = PostService.AddEntitySaved(p);
@@ -689,7 +689,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 p.ModifierEmail = user.Email;
             }
 
-            p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            p.IP = ClientIP;
             Mapper.Map(post, p);
             if (!string.IsNullOrEmpty(post.Seminars))
             {
@@ -785,7 +785,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Post p = post.Mapper<Post>();
             p.Modifier = p.Author;
             p.ModifierEmail = p.Email;
-            p.IP = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            p.IP = ClientIP;
             if (!string.IsNullOrEmpty(post.Seminars))
             {
                 var tmp = post.Seminars.Split(',').Distinct();
