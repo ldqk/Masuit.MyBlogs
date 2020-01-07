@@ -7,6 +7,7 @@ using Masuit.Tools.Logging;
 using Masuit.Tools.Systems;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -48,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public async Task<(string url, bool success)> UploadImage(Stream stream, string file)
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 3; i++)
             {
                 try
                 {
@@ -63,6 +64,8 @@ namespace Masuit.MyBlogs.Core.Common
             return UploadOss(stream, file);
         }
 
+        private readonly List<string> _failedList = new List<string>();
+
         /// <summary>
         /// gitlab图床
         /// </summary>
@@ -71,9 +74,10 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         private async Task<(string url, bool success)> UploadGitlab(Stream stream, string file)
         {
-            if (AppConfig.GitlabConfigs.Any(c => c.FileLimitSize >= stream.Length))
+            var gitlabs = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length && !_failedList.Contains(c.ApiUrl)).OrderBy(c => Guid.NewGuid()).ToList();
+            if (gitlabs.Count > 0)
             {
-                var gitlab = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length).OrderBy(c => Guid.NewGuid()).FirstOrDefault();
+                var gitlab = gitlabs[0];
                 if (gitlab.ApiUrl.Contains("gitee.com"))
                 {
                     return await UploadGitee(gitlab, stream, file);
@@ -104,6 +108,7 @@ namespace Masuit.MyBlogs.Core.Common
                     }
 
                     LogManager.Info($"图片上传到gitlab({gitlab.ApiUrl})失败。");
+                    _failedList.Add(gitlab.ApiUrl);
                     throw t.Exception ?? new Exception(t.Result.ReasonPhrase);
                 });
             }
