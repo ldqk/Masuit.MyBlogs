@@ -154,7 +154,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public static bool IsInDenyArea(this string ip)
         {
-            if (SystemSettings.GetOrAdd("EnableDenyArea", "false") == "false")
+            if (SystemSettings.GetOrAdd("EnableDenyArea", "false") == "true")
             {
                 var pos = GetIPLocation(ip);
                 var denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
