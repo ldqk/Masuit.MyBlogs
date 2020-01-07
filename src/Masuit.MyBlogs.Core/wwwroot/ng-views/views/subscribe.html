@@ -19,7 +19,7 @@
     </div>
     <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'邮箱'" filter="{Email: 'text'}" sortable="'Email'" ng-switch="row.isEditing" ng-class="Email.$dirty ? 'bg-warning' : ''" ng-form="Email" tracked-table-cell>
+            <td title="'邮箱'" ng-switch="row.isEditing" ng-class="Email.$dirty ? 'bg-warning' : ''" ng-form="Email" tracked-table-cell>
                 <span ng-switch-default>{{row.Email}}</span>
                 <div ng-class="Email.$invalid && Email.$dirty ? 'has-error' : ''" ng-switch-when="true">
                     <div class="fg-line">
@@ -27,7 +27,7 @@
                     </div>
                 </div>
             </td>
-            <td title="'状态'" filter="{Status: 'select'}" sortable="'Status'" ng-switch="row.isEditing" ng-class="Status.$dirty ? 'bg-warning' : ''" filter-data="list.stats" ng-form="Status" tracked-table-cell>
+            <td title="'状态'" ng-switch="row.isEditing" ng-class="Status.$dirty ? 'bg-warning' : ''" filter-data="list.stats" ng-form="Status" tracked-table-cell>
                 <span ng-switch-default>{{AllStatus[row.Status].name}}</span>
                 <div ng-class="Status.$invalid && Status.$dirty ? 'has-error' : ''" ng-switch-when="true">
                     <select class="form-control" ng-model="row.Status" ng-options="m.e as m.name for m in AllStatus" required>

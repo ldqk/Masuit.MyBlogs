@@ -1,17 +1,4 @@
-﻿<style>
-    .datainp {
-        width: 270px;
-        height: 30px;
-        border: 1px #A5D2EC solid;
-    }
-
-    .dateicon {
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAQCAYAAADj5tSrAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABZ0RVh0Q3JlYXRpb24gVGltZQAwNi8xNS8xNGnF/oAAAAAcdEVYdFNvZnR3YXJlAEFkb2JlIEZpcmV3b3JrcyBDUzVxteM2AAAAoElEQVQ4jWPceOnNfwYqAz9dYRQ+E7UtwAaGjyUsDAyYYUgJ2HT5LXZLcEmSCnA6duOlN///////H0bDALl8dPH/////Z8FuNW6Qtvw2nL3lyjsGBgYGhlmRqnj1kGwJuqHIlhJlCXq8EOITEsdqCXLEbbr8FisfFkTo+vBZRFZwERNEFFkCiw90nxJtCalxQmzegltCzVyP1RJq5HZ8AABuNZr0628DMwAAAABJRU5ErkJggg==");
-        background-repeat: no-repeat;
-        background-position: right center;
-    }
-</style>
-<div class="row">
+﻿<div class="row">
     <div class="form-inline pull-right">
         <button class="btn btn-info waves-effect" ng-click="list.GetPageData(paginationConf.currentPage, paginationConf.itemsPerPage);">
             <span class="glyphicon glyphicon-refresh"></span>
@@ -27,13 +14,13 @@
     </div>
     <table ng-table="list.tableParams" id="interview" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'关键词'" filter="{KeyWords: 'text'}" sortable="'KeyWords'">
+            <td title="'关键词'">
                 <a ng-href="/s/{{row.KeyWords}}" target="_blank">{{row.KeyWords}}</a>
             </td>
-            <td title="'搜索时间'" filter="{SearchTime: 'text'}" sortable="'SearchTime'">
+            <td title="'搜索时间'">
                 {{row.SearchTime|date:'yyyy-MM-dd HH:mm:ss'}}
             </td>
-            <td title="'客户端IP'" filter="{IP: 'text'}" sortable="'IP'">
+            <td title="'客户端IP'">
                 <a ng-href="/tools/ip?ip={{row.IP}}" target="_blank" style="font-size: 20px;" data-microtip="查看{{row.IP}}的详细信息" data-microtip-position="bottom">{{row.IP}}</a>
                 <button class="badge btn btn-primary pull-right" ng-click="addToBlackList(row.IP)">黑名单</button>
             </td>

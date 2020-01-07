@@ -6,23 +6,23 @@
     </div>
     <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'昵称'" filter="{NickName: 'text'}" sortable="'NickName'">
+            <td title="'昵称'">
                 {{row.NickName}}
             </td>
-            <td title="'内容'" filter="{Content: 'text'}" sortable="'Content'" ng-bind-html="row.Content|htmlString"></td>
+            <td title="'内容'" ng-bind-html="row.Content|htmlString"></td>
             <td title="'评论时间'" filter="{CommentDate: 'text'}" sortable="'CommentDate'">
                 {{row.CommentDate|date:'yyyy-MM-dd HH:mm:ss'}}
             </td>
-            <td title="'邮箱'" filter="{Email: 'text'}" sortable="'Email'">
+            <td title="'邮箱'">
                 {{row.Email}}
             </td>
-            <td title="'QQ或微信'" filter="{QQorWechat: 'text'}" sortable="'QQorWechat'">
+            <td title="'QQ或微信'">
                 {{row.QQorWechat}}
             </td>
-            <td title="'操作系统'" filter="{OperatingSystem: 'number'}" sortable="'OperatingSystem'">
+            <td title="'操作系统'">
                 {{row.OperatingSystem}}
             </td>
-            <td title="'浏览器'" filter="{Browser: 'text'}" sortable="'Browser'">
+            <td title="'浏览器'">
                 {{row.Browser}}
             </td>
             <td title="'操作'" style="width: 155px;">
