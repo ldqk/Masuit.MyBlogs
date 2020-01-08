@@ -157,10 +157,10 @@ namespace Masuit.MyBlogs.Core.Common
         {
             if (SystemSettings.GetOrAdd("EnableDenyArea", "false") == "true")
             {
+                var denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
                 foreach (var item in ips.Split(','))
                 {
                     var pos = GetIPLocation(item);
-                    var denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
                     return pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any();
                 }
             }

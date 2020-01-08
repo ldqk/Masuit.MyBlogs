@@ -49,6 +49,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public async Task<(string url, bool success)> UploadImage(Stream stream, string file)
         {
+            file = SnowFlake.NewId + Path.GetExtension(file);
             for (int i = 0; i < 3; i++)
             {
                 try
@@ -83,7 +84,7 @@ namespace Masuit.MyBlogs.Core.Common
                     return await UploadGitee(gitlab, stream, file);
                 }
 
-                var path = $"{DateTime.Now:yyyy/MM/dd}/{SnowFlake.NewId + Path.GetExtension(file)}";
+                var path = $"{DateTime.Now:yyyy/MM/dd}/{file}";
                 _httpClient.DefaultRequestHeaders.Add("PRIVATE-TOKEN", gitlab.AccessToken);
                 return await _httpClient.PostAsJsonAsync(gitlab.ApiUrl.Contains("/v3/") ? gitlab.ApiUrl : gitlab.ApiUrl + HttpUtility.UrlEncode(path), new
                 {
@@ -125,7 +126,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         private async Task<(string url, bool success)> UploadGitee(GitlabConfig config, Stream stream, string file)
         {
-            var path = $"{DateTime.Now:yyyy/MM/dd}/{Path.GetFileName(file)}";
+            var path = $"{DateTime.Now:yyyy/MM/dd}/{file}";
             return await _httpClient.PostAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path), new
             {
                 access_token = config.AccessToken,
@@ -161,7 +162,7 @@ namespace Masuit.MyBlogs.Core.Common
                 return (null, false);
             }
 
-            var objectName = DateTime.Now.ToString("yyyy/MM/dd/") + SnowFlake.NewId + Path.GetExtension(file);
+            var objectName = DateTime.Now.ToString("yyyy/MM/dd/") + file;
             for (int i = 0; i < 5; i++)
             {
                 try
