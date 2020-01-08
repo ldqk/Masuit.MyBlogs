@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools;
 using Masuit.Tools.RandomSelector;
 using System;
 using System.Collections.Generic;
