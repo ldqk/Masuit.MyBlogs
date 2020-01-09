@@ -279,5 +279,23 @@ namespace Masuit.MyBlogs.Core.Common
 
             return doc.DocumentNode.OuterHtml;
         }
+
+        /// <summary>
+        /// 获取文章摘要
+        /// </summary>
+        /// <param name="html"></param>
+        /// <returns></returns>
+        public static string GetSummary(this string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            var summary = doc.DocumentNode.Descendants("p").FirstOrDefault(n => n.InnerText.Length > 10)?.InnerText ?? "没有摘要";
+            if (summary.Length > 150)
+            {
+                return summary.Substring(0, 150) + "...";
+            }
+
+            return summary;
+        }
     }
 }

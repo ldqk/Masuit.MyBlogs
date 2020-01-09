@@ -111,6 +111,13 @@
             <param name="title"></param>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.GetSummary(System.String)">
+            <summary>
+            获取文章摘要
+            </summary>
+            <param name="html"></param>
+            <returns></returns>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Common.HangfireHelper">
             <summary>
             HangfireHelper
