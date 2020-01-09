@@ -22,6 +22,7 @@ using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
@@ -108,7 +109,13 @@ namespace Masuit.MyBlogs.Core
             services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)); //注入HttpClient
             services.AddTransient<ImagebedClient>();
             services.AddHttpContextAccessor(); //注入静态HttpContext
-            services.AddMapper().AddAutofac().AddMyMvc();
+            services.AddMapper().AddAutofac().AddMyMvc().Configure<ForwardedHeadersOptions>(options => // X-Forwarded-For
+            {
+                options.ForwardLimit = null;
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -126,6 +133,7 @@ namespace Masuit.MyBlogs.Core
         /// <param name="luceneIndexerOptions"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext db, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
+            app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For
             ServiceProvider = app.ApplicationServices;
             if (env.IsDevelopment())
             {

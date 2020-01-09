@@ -46,7 +46,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 客户端的真实IP
         /// </summary>
-        public string ClientIP => string.IsNullOrEmpty(Request.Headers["X-Forwarded-For"]) ? HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString() : Request.Headers["X-Forwarded-For"].ToString();
+        public string ClientIP => HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
         public IMapper Mapper { get; set; }
         public MapperConfiguration MapperConfig { get; set; }

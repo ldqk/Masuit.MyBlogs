@@ -15,7 +15,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             base.OnException(context);
             string err;
             var req = context.HttpContext.Request;
-            var ip = string.IsNullOrEmpty(req.Headers["X-Forwarded-For"]) ? context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString() : req.Headers["X-Forwarded-For"].ToString();
+            var ip = context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             switch (context.Exception)
             {
                 case DbUpdateConcurrencyException ex:

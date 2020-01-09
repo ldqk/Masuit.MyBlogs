@@ -26,7 +26,7 @@ namespace Masuit.MyBlogs.Core.Extensions
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var request = context.HttpContext.Request;
-            var ip = string.IsNullOrEmpty(context.HttpContext.Request.Headers["X-Forwarded-For"]) ? context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString() : context.HttpContext.Request.Headers["X-Forwarded-For"].ToString();
+            var ip = context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
             var sessionToken = context.HttpContext.Session.Get<string>("FullAccessViewToken");
             if (ip.IsDenyIpAddress() && string.IsNullOrEmpty(sessionToken))
             {
