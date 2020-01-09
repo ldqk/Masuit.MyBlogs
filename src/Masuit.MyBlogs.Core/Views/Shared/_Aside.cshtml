@@ -41,7 +41,7 @@
                                 @foreach (NoticeOutputDto notice in Model.Notices)
                                 {
                                     <li class="news-item">
-                                        @Html.ActionLink(notice.Content.RemoveHtmlTag(45) + "...", "Details", "Notice", new { id = notice.Id }, new { @class = "tippy-scale", title = "查看详情" })
+                                        @Html.ActionLink(notice.Content.GetSummary(45, 2), "Details", "Notice", new { id = notice.Id }, new { @class = "tippy-scale", title = "查看详情" })
                                     </li>
                                 }
                             </ul>

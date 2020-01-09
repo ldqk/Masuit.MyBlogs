@@ -111,11 +111,13 @@
             <param name="title"></param>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.GetSummary(System.String)">
+        <member name="M:Masuit.MyBlogs.Core.Common.CommonHelper.GetSummary(System.String,System.Int32,System.Int32)">
             <summary>
             获取文章摘要
             </summary>
             <param name="html"></param>
+            <param name="length">截取长度</param>
+            <param name="min">摘要最少字数</param>
             <returns></returns>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Common.HangfireHelper">

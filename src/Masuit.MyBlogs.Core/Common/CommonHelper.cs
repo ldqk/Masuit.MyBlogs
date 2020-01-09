@@ -284,15 +284,17 @@ namespace Masuit.MyBlogs.Core.Common
         /// 获取文章摘要
         /// </summary>
         /// <param name="html"></param>
+        /// <param name="length">截取长度</param>
+        /// <param name="min">摘要最少字数</param>
         /// <returns></returns>
-        public static string GetSummary(this string html)
+        public static string GetSummary(this string html, int length = 150, int min = 10)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
-            var summary = doc.DocumentNode.Descendants("p").FirstOrDefault(n => n.InnerText.Length > 10)?.InnerText ?? "没有摘要";
+            var summary = doc.DocumentNode.Descendants("p").FirstOrDefault(n => n.InnerText.Length > min)?.InnerText ?? "没有摘要";
             if (summary.Length > 150)
             {
-                return summary.Substring(0, 150) + "...";
+                return summary.Substring(0, length) + "...";
             }
 
             return summary;

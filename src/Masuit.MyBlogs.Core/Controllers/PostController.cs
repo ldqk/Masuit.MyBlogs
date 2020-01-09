@@ -497,7 +497,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                     .Replace("{{title}}", post.Title)
                     .Replace("{{author}}", post.Author)
-                    .Replace("{{content}}", post.Content.RemoveHtmlTag(150))
+                    .Replace("{{content}}", post.Content.GetSummary())
                     .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
                     {
                         c.Email,
@@ -730,7 +730,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         .Replace("{{time}}", p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                         .Replace("{{title}}", post.Title)
                         .Replace("{{author}}", post.Author)
-                        .Replace("{{content}}", post.Content.RemoveHtmlTag(150))
+                        .Replace("{{content}}", post.Content.GetSummary())
                         .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
                         {
                             c.Email,
@@ -837,7 +837,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     .Replace("{{link}}", link + "?email=" + c.Email)
                     .Replace("{{time}}", p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
                     .Replace("{{title}}", post.Title).Replace("{{author}}", post.Author)
-                    .Replace("{{content}}", post.Content.RemoveHtmlTag(150))
+                    .Replace("{{content}}", post.Content.GetSummary())
                     .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
                     {
                         c.Email,

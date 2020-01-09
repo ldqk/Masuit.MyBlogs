@@ -36,7 +36,7 @@
         //工具栏上的所有的功能按钮和下拉框，可以在new编辑器的实例时选择自己需要的重新定义
         ,
         toolbars: [[
-            //'source', //源代码
+            'source', //源代码
             'removeformat', //清除格式
             //'cleardoc', //清空文档
             'autotypeset', //自动排版

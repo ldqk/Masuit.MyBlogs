@@ -39,10 +39,9 @@
                     </span>
                 </div>
                 <p>
-                    @Model.Content.GetSummary()
+                    @Html.Raw(Model.Content.GetSummary())
                 </p>
             </div>
-
         </div>
         <div class="row">
             @if (!string.IsNullOrEmpty(Model.Label))

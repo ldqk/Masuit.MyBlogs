@@ -9,7 +9,6 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.DateTimeExt;
-using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Hosting;
@@ -78,7 +77,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Name = p.Author,
                     Email = p.Email
                 },
-                Body = p.Content.RemoveHtmlTag(300),
+                Body = p.Content.GetSummary(300, 10),
                 Categories = new List<string>
                 {
                     p.Category.Name
