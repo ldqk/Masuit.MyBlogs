@@ -3,6 +3,7 @@ using HtmlAgilityPack;
 using IP2Region;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -13,7 +14,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using Microsoft.EntityFrameworkCore.Internal;
 #if !DEBUG
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Models;
@@ -173,7 +173,7 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static string GetIPLocation(this string ips)
         {
-            return ips.Split(',').Select(s => Searcher.MemorySearch(s).Region).Join(" , ");
+            return ips.Split(',').Select(s => Searcher.MemorySearch(IPAddress.Parse(s).MapToIPv4().ToString()).Region).Join(" , ");
         }
 
         /// <summary>
