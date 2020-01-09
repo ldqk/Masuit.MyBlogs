@@ -292,7 +292,7 @@ namespace Masuit.MyBlogs.Core.Common
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
             var summary = doc.DocumentNode.Descendants("p").FirstOrDefault(n => n.InnerText.Length > min)?.InnerText ?? "没有摘要";
-            if (summary.Length > 150)
+            if (summary.Length > length)
             {
                 return summary.Substring(0, length) + "...";
             }
