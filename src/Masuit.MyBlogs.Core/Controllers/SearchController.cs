@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools;
@@ -80,6 +81,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             ViewBag.hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week").Take(10).ToList();
+            ViewData["page"] = new Pagination(page, size);
             return View(nul);
         }
 

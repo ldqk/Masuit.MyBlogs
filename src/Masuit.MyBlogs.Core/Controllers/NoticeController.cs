@@ -1,6 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -12,7 +13,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -37,29 +37,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="page"></param>
         /// <param name="size"></param>
-        /// <param name="id"></param>
         /// <returns></returns>
-        [Route("notice"), ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "page", "size", "id" }, VaryByHeader = "Cookie")]
-        public ActionResult Index(int page = 1, int size = 10, int id = 0)
+        [Route("notice"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
+        public ActionResult Index(int page = 1, int size = 10)
         {
             var list = NoticeService.GetPages<DateTime, NoticeOutputDto>(page, size, out var total, n => n.Status == Status.Display, n => n.ModifyDate, false).ToList();
             ViewBag.Total = total;
-            if (!CurrentUser.IsAdmin)
-            {
-                return View(list);
-            }
-
-            if (id == 0)
-            {
-                return View("Index_Admin", list);
-            }
-
-            var notice = NoticeService.GetById(id);
-            ViewBag.Total = 1;
-            return View("Index_Admin", new List<NoticeOutputDto>
-            {
-                notice.MapTo<NoticeOutputDto>()
-            });
+            ViewData["page"] = new Pagination(page, size);
+            return CurrentUser.IsAdmin ? View("Index_Admin", list) : View(list);
         }
 
         /// <summary>

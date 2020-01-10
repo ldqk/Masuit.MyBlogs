@@ -10,6 +10,7 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -103,6 +104,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Total = total;
             ViewBag.PageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
+            ViewData["page"] = new Pagination(page, size);
             return View(list);
         }
 

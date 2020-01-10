@@ -112,7 +112,7 @@
             <h3>Oops！抱歉~本专题没有收录相关的文章或资源！如果您有相关的结果，您可以 @Html.ActionLink("点击这里", "Publish", "Post", null, new { @class = "btn btn-info btn-lg" }) 投稿哦！</h3>
         }
         <div class="col-md-12 text-center">
-            @{ await Html.RenderPartialAsync("_Pagination"); }
+            @{ await Html.RenderPartialAsync("_Pagination", ViewData["page"]); }
         </div>
     </div>
 </div>

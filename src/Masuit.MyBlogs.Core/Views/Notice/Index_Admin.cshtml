@@ -1,5 +1,4 @@
-﻿@using Masuit.MyBlogs.Core.Models.DTO
-@model IList<Masuit.MyBlogs.Core.Models.DTO.NoticeOutputDto>
+﻿@model IList<Masuit.MyBlogs.Core.Models.DTO.NoticeOutputDto>
 @{
     ViewBag.Title = "网站公告栏";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -9,12 +8,9 @@
         <li>@Html.ActionLink("首页", "Index", "Home")</li>
         <li class="current"><em>@ViewBag.Title</em></li>
     </ol>
-    @{
-        await Html.RenderPartialAsync("_Pagination");
-    }
     <a asp-controller="Dashboard" asp-action="Index" asp-fragment="/notice/index" class="btn btn-info">发布新公告</a>
     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-        @foreach (NoticeOutputDto n in Model)
+        @foreach (var n in Model)
         {
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="heading-@n.Id">
@@ -37,7 +33,7 @@
         }
     </div>
     @{
-        await Html.RenderPartialAsync("_Pagination");
+        await Html.RenderPartialAsync("_Pagination", ViewData["page"]);
     }
 </div>
 <script>

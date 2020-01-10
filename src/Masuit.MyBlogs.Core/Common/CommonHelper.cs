@@ -299,5 +299,10 @@ namespace Masuit.MyBlogs.Core.Common
 
             return summary;
         }
+
+        public static string TrimQuery(this string path)
+        {
+            return path.Split('&').Where(s => s.Split('=', StringSplitOptions.RemoveEmptyEntries).Length == 2).Join("&");
+        }
     }
 }

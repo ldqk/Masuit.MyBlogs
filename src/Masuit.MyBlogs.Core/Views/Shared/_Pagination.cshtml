@@ -1,10 +1,10 @@
-﻿@using Masuit.Tools
+﻿@model Masuit.MyBlogs.Core.Models.Pagination
+@using Masuit.MyBlogs.Core.Common
+@using Masuit.Tools
 @{
     int count = ViewBag.Total;
-    var size = Context.Request.Query["size"].ToString().ToInt32();
-    int pages = Math.Ceiling(count / (size > 0 ? size : 15.0)).ToInt32();
-    var page = Context.Request.Query["page"].ToString().ToInt32();
-    int current = page > 0 ? page : 1;
+    int pages = Math.Ceiling(count / (Model.Size > 0 ? Model.Size : 15.0)).ToInt32();
+    int current = Model.Page > 0 ? Model.Page : 1;
     int pageStart = current - 4 > 0 ? current - 4 : 1;
     int pageEnd = current + 4 >= pages ? pages : current + 4;
     current = current > pages ? pages : current;
@@ -40,12 +40,12 @@
         else
         {
             <li>
-                <a href="@Context.Request.Path?orderby=@Context.Request.Query["orderby"]" aria-label="Previous">
+                <a href="@($"{Context.Request.Path}?orderby={Model.OrderBy}".TrimQuery())" aria-label="Previous">
                     首页
                 </a>
             </li>
             <li>
-                <a href="@Context.Request.Path?page=@(Context.Request.Query["page"].ToString().ToInt32() - 1 <= 0 ? 1 : Context.Request.Query["page"].ToString().ToInt32() - 1)&orderby=@Context.Request.Query["orderby"]" aria-label="Previous">
+                <a href="@($"{Context.Request.Path}?page={(Model.Page - 1 <= 0 ? 1 : Model.Page - 1)}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
@@ -69,7 +69,7 @@
             else
             {
                 <li>
-                    <a href="@Context.Request.Path?page=@i&orderby=@Context.Request.Query["orderby"]">@i</a>
+                    <a href="@($"{Context.Request.Path}?page={i}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())">@i</a>
                 </li>
             }
         }
@@ -97,12 +97,12 @@
         else
         {
             <li>
-                <a href="@Context.Request.Path?page=@(current + 1)&orderby=@Context.Request.Query["orderby"]" aria-label="Next">
+                <a href="@($"{Context.Request.Path}?page={current + 1}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
             <li>
-                <a href="@Context.Request.Path?page=@pages&orderby=@Context.Request.Query["orderby"]" aria-label="Next">
+                <a href="@($"{Context.Request.Path}?page={pages}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())" aria-label="Next">
                     末页
                 </a>
             </li>

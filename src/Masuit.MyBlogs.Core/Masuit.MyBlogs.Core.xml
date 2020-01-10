@@ -1134,13 +1134,12 @@
             公告
             </summary>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.NoticeController.Index(System.Int32,System.Int32,System.Int32)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.NoticeController.Index(System.Int32,System.Int32)">
             <summary>
             公告列表
             </summary>
             <param name="page"></param>
             <param name="size"></param>
-            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.NoticeController.Details(System.Int32)">

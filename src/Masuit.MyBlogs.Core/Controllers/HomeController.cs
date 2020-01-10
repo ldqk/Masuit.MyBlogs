@@ -2,6 +2,7 @@
 using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -60,6 +61,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.Banner = banners;
             viewModel.Posts = Enumerable.AsEnumerable(postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate)).Union(posts).ToList();
             ViewBag.FastShare = fastShares;
+            ViewData["page"] = new Pagination(1, 15, OrderBy.ModifyDate);
             return View(viewModel);
         }
 
@@ -83,6 +85,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             viewModel.Posts = posts;
+            ViewData["page"] = new Pagination(page, size, orderBy);
             return View(viewModel);
         }
 
@@ -103,6 +106,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Total = temp.Count();
             ViewBag.Tag = id;
             viewModel.Posts = posts;
+            ViewData["page"] = new Pagination(page, size, orderBy);
             return View(viewModel);
         }
 
@@ -125,6 +129,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Total = temp.Count();
             ViewBag.Author = author;
             viewModel.Posts = posts;
+            ViewData["page"] = new Pagination(page, size, orderBy);
             return View(viewModel);
         }
 
@@ -147,6 +152,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.Posts = posts.OrderBy($"{nameof(PostOutputDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
             ViewBag.CategoryName = cat.Name;
             ViewBag.Desc = cat.Description;
+            ViewData["page"] = new Pagination(page, size, orderBy);
             return View(viewModel);
         }
 

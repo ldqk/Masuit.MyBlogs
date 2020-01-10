@@ -1,6 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -51,6 +52,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
+            ViewData["page"] = new Pagination(page, size, orderBy);
             return View(posts);
         }
 
