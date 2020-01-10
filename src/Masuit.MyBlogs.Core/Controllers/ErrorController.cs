@@ -5,7 +5,6 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Http;
@@ -119,7 +118,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "访问密码不正确！");
             }
 
-            HttpContext.Session.Set("FullAccessViewToken", token);
             Response.Cookies.Append("Email", email, new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(1)
@@ -129,7 +127,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Expires = DateTime.Now.AddYears(1)
             });
             return ResultData(null);
-
         }
 
         /// <summary>

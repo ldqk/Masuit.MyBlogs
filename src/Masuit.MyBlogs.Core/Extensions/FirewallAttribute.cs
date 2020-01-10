@@ -4,7 +4,6 @@ using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,20 +26,20 @@ namespace Masuit.MyBlogs.Core.Extensions
         {
             var request = context.HttpContext.Request;
             var ip = context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
-            var sessionToken = context.HttpContext.Session.Get<string>("FullAccessViewToken");
-            if (ip.IsDenyIpAddress() && string.IsNullOrEmpty(sessionToken))
+            var tokenValid = request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]);
+            if (ip.IsDenyIpAddress() && !tokenValid)
             {
                 AccessDeny(ip, request, "黑名单IP地址");
                 context.Result = new BadRequestObjectResult("您当前所在的网络环境不支持访问本站！");
                 return;
             }
 
-            if (!bool.Parse(CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true")) || context.Filters.Any(m => m.ToString().Contains(nameof(AllowAccessFirewallAttribute))) || request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]))
+            if (CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true") == "false" || context.Filters.Any(m => m.ToString().Contains(nameof(AllowAccessFirewallAttribute))) || tokenValid)
             {
                 return;
             }
 
-            if (ip.IsInDenyArea() && string.IsNullOrEmpty(sessionToken))
+            if (ip.IsInDenyArea() && !tokenValid)
             {
                 AccessDeny(ip, request, "访问地区限制");
                 context.Result = new RedirectToActionResult("AccessDeny", "Error", null);
