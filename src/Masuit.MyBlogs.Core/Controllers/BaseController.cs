@@ -7,14 +7,17 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Web;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -22,7 +25,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// 基本父控制器
     /// </summary>
     [ApiExplorerSettings(IgnoreApi = true), ServiceFilter(typeof(FirewallAttribute))]
-    public class BaseController : Controller
+    public class BaseController : Controller, IResultFilter
     {
         /// <summary>
         /// UserInfoService
@@ -50,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public IMapper Mapper { get; set; }
         public MapperConfiguration MapperConfig { get; set; }
-
+        public Stopwatch Stopwatch { get; } = new Stopwatch();
         /// <summary>
         /// 响应数据
         /// </summary>
@@ -88,6 +91,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="filterContext">有关当前请求和操作的信息。</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            Stopwatch.Start();
             base.OnActionExecuting(filterContext);
             var user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
 #if DEBUG
@@ -160,6 +164,26 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Footer = model;
 
             #endregion
+
+            ViewData["ActionElapsed"] = Stopwatch.ElapsedMilliseconds + "ms";
+            if (Stopwatch.ElapsedMilliseconds > 5000)
+            {
+                LogManager.Debug($"请求路径：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(Request.Path)}执行耗时{Stopwatch.ElapsedMilliseconds}ms");
+            }
+        }
+
+        /// <summary>Called after the action result executes.</summary>
+        /// <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.Filters.ResultExecutedContext" />.</param>
+        public void OnResultExecuted(ResultExecutedContext context)
+        {
+        }
+
+        /// <summary>Called before the action result executes.</summary>
+        /// <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.Filters.ResultExecutingContext" />.</param>
+        public void OnResultExecuting(ResultExecutingContext context)
+        {
+            Stopwatch.Restart();
+            ViewData["ResultWatch"] = Stopwatch;
         }
     }
 }

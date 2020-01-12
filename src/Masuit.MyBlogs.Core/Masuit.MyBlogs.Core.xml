@@ -387,6 +387,14 @@
             <summary>在调用操作方法后调用。</summary>
             <param name="filterContext">有关当前请求和操作的信息。</param>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.BaseController.OnResultExecuted(Microsoft.AspNetCore.Mvc.Filters.ResultExecutedContext)">
+            <summary>Called after the action result executes.</summary>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.Filters.ResultExecutedContext" />.</param>
+        </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.BaseController.OnResultExecuting(Microsoft.AspNetCore.Mvc.Filters.ResultExecutingContext)">
+            <summary>Called before the action result executes.</summary>
+            <param name="context">The <see cref="T:Microsoft.AspNetCore.Mvc.Filters.ResultExecutingContext" />.</param>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Controllers.CategoryController">
             <summary>
             文章分类
