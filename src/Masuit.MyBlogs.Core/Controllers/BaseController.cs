@@ -53,7 +53,8 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public IMapper Mapper { get; set; }
         public MapperConfiguration MapperConfig { get; set; }
-        public Stopwatch Stopwatch { get; } = new Stopwatch();
+        public Stopwatch Stopwatch { get; set; }
+
         /// <summary>
         /// 响应数据
         /// </summary>
@@ -183,7 +184,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public void OnResultExecuting(ResultExecutingContext context)
         {
             Stopwatch.Restart();
-            ViewData["ResultWatch"] = Stopwatch;
         }
     }
 }

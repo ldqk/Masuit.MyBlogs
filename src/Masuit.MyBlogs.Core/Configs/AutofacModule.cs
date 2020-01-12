@@ -2,6 +2,7 @@
 using Hangfire;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Masuit.MyBlogs.Core.Configs
@@ -14,6 +15,7 @@ namespace Masuit.MyBlogs.Core.Configs
             builder.RegisterType<BackgroundJobClient>().SingleInstance();
             builder.RegisterType<FirewallAttribute>().PropertiesAutowired().AsSelf().InstancePerDependency();
             builder.RegisterType<HangfireBackJob>().As<IHangfireBackJob>().PropertiesAutowired(PropertyWiringOptions.PreserveSetValues).InstancePerDependency();
+            builder.Register(c => new Stopwatch()).As<Stopwatch>().AsSelf().PropertiesAutowired(PropertyWiringOptions.PreserveSetValues).InstancePerLifetimeScope();
         }
     }
 }
