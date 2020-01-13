@@ -82,7 +82,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "没有留言");
             }
 
-            var qlist = parent.ToList().SelectMany(c => LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(c.Id)).Where(c => c.Status == Status.Pended || CurrentUser.IsAdmin);
+            var qlist = parent.AsEnumerable().SelectMany(c => LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(c.Id)).Where(c => c.Status == Status.Pended || CurrentUser.IsAdmin);
             if (total > 0)
             {
                 return ResultData(new
@@ -91,9 +91,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                     parentTotal = total,
                     page,
                     size,
-                    rows = qlist
+                    rows = Mapper.Map<List<LeaveMessageViewModel>>(qlist)
                 });
             }
+
             return ResultData(null, false, "没有留言");
         }
 

@@ -61,7 +61,6 @@ namespace Masuit.MyBlogs.Core.Extensions
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local; // 设置时区为 UTC
-                options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
             }).AddControllersAsServices().AddViewComponentsAsServices().AddTagHelpersAsServices(); // MVC
             services.Configure<WebEncoderOptions>(options =>
             {
