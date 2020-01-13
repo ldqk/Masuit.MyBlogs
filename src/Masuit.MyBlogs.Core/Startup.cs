@@ -15,6 +15,7 @@ using Masuit.MyBlogs.Core.Hubs;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Net;
@@ -31,6 +32,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
+using StackExchange.Profiling;
 using System;
 using System.IO;
 using System.Linq;
@@ -109,6 +111,17 @@ namespace Masuit.MyBlogs.Core
             services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)); //注入HttpClient
             services.AddTransient<ImagebedClient>();
             services.AddHttpContextAccessor(); //注入静态HttpContext
+            services.AddMiniProfiler(options =>
+            {
+                options.RouteBasePath = "/profiler";
+                options.EnableServerTimingHeader = true;
+                options.ResultsAuthorize = req => req.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo)?.IsAdmin ?? false;
+                options.ResultsListAuthorize = options.ResultsAuthorize;
+                options.IgnoredPaths.AddRange("/Assets/", "/Content/", "/fonts/", "/images/", "/ng-views/", "/Scripts/", "/static/", "/template/", "/cloud10.png", "/favicon.ico");
+                options.PopupRenderPosition = RenderPosition.BottomLeft;
+                options.PopupShowTimeWithChildren = true;
+                options.PopupShowTrivial = true;
+            }).AddEntityFramework();
             services.AddMapper().AddAutofac().AddMyMvc().Configure<ForwardedHeadersOptions>(options => // X-Forwarded-For
             {
                 options.ForwardLimit = null;
@@ -157,7 +170,7 @@ namespace Masuit.MyBlogs.Core
                 app.UseHttpsRedirection().UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
             }
 
-            app.UseSession().UseCookiePolicy(); //注入Session
+            app.UseSession().UseCookiePolicy().UseMiniProfiler(); //注入Session
             app.UseRequestIntercept(); //启用网站请求拦截
             app.UseStaticHttpContext(); //注入静态HttpContext对象
             app.UseStaticFiles(new StaticFileOptions //静态资源缓存策略
@@ -181,11 +194,11 @@ namespace Masuit.MyBlogs.Core
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
             app.UseRouting(); // 放在 UseStaticFiles 之后
             app.UseEndpoints(endpoints =>
-           {
-               endpoints.MapControllers(); // 属性路由
-               endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}"); // 默认路由
-               endpoints.MapHub<MyHub>("/hubs");
-           });
+            {
+                endpoints.MapControllers(); // 属性路由
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}"); // 默认路由
+                endpoints.MapHub<MyHub>("/hubs");
+            });
             HangfireJobInit.Start(); //初始化定时任务
         }
 

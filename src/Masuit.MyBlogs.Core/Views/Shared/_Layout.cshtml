@@ -96,156 +96,156 @@
                 @{
                     if (user.IsAdmin)
                     {
-                        <li>
-                            <a asp-action="Index" asp-controller="Dashboard" target="_blank">控制面板</a>
-                        </li>
+                    <li>
+                        <a asp-action="Index" asp-controller="Dashboard" target="_blank">控制面板</a>
+                    </li>
                     }
                     var parent = menus.Where(m => m.ParentId == 0);
                     foreach (var m in parent)
                     {
                         if (m.MenuType == MenuType.SubMenu)
                         {
-                            <li class="has-children">
-                                <a href="#">@m.Name</a>
-                                <ul class="cd-secondary-nav is-hidden">
-                                    <li class="go-back"><a href="#">上级菜单</a></li>
-                                    <li class="see-all"><a asp-controller="Post" asp-action="All">所有 @m.Name</a></li>
-                                    @foreach (MenuOutputDto m2 in menus.Where(s => s.ParentId == m.Id).OrderBy(c => c.Sort))
+                    <li class="has-children">
+                        <a href="#">@m.Name</a>
+                        <ul class="cd-secondary-nav is-hidden">
+                            <li class="go-back"><a href="#">上级菜单</a></li>
+                            <li class="see-all"><a asp-controller="Post" asp-action="All">所有 @m.Name</a></li>
+                            @foreach (MenuOutputDto m2 in menus.Where(s => s.ParentId == m.Id).OrderBy(c => c.Sort))
                                     {
                                         if (menus.Any(mm => mm.ParentId == m2.Id))
                                         {
-                                            <li class="has-children">
-                                                <a href="#">@m2.Name</a>
-                                                <ul class="is-hidden">
-                                                    <li class="go-back"><a href="#">上级菜单</a></li>
-                                                    @foreach (MenuOutputDto m3 in menus.Where(s => s.ParentId == m2.Id).OrderBy(c => c.Sort))
+                            <li class="has-children">
+                                <a href="#">@m2.Name</a>
+                                <ul class="is-hidden">
+                                    <li class="go-back"><a href="#">上级菜单</a></li>
+                                    @foreach (MenuOutputDto m3 in menus.Where(s => s.ParentId == m2.Id).OrderBy(c => c.Sort))
                                                     {
                                                         if (menus.Any(mmm => mmm.ParentId == m3.Id))
                                                         {
-                                                            <li class="has-children">
-                                                                <a href="#">@m3.Name</a>
-                                                                <ul class="is-hidden">
-                                                                    <li class="go-back"><a href="#">上级菜单</a></li>
-                                                                    @foreach (MenuOutputDto m4 in menus.Where(s => s.ParentId == m3.Id).OrderBy(c => c.Sort))
+                                    <li class="has-children">
+                                        <a href="#">@m3.Name</a>
+                                        <ul class="is-hidden">
+                                            <li class="go-back"><a href="#">上级菜单</a></li>
+                                            @foreach (MenuOutputDto m4 in menus.Where(s => s.ParentId == m3.Id).OrderBy(c => c.Sort))
                                                                     {
                                                                         if (m4.NewTab)
                                                                         {
-                                                                            <li><a href="@m4.Url" target="_blank">@m4.Name</a></li>
+                                            <li><a href="@m4.Url" target="_blank">@m4.Name</a></li>
                                                                         }
                                                                         else
                                                                         {
-                                                                            <li><a href="@m4.Url">@m4.Name</a></li>
+                                            <li><a href="@m4.Url">@m4.Name</a></li>
                                                                         }
                                                                     }
-                                                                </ul>
-                                                            </li>
+                                        </ul>
+                                    </li>
                                                         }
                                                         else
                                                         {
                                                             if (m3.NewTab)
                                                             {
-                                                                <li><a href="@m3.Url" target="_blank">@m3.Name</a></li>
+                                    <li><a href="@m3.Url" target="_blank">@m3.Name</a></li>
                                                             }
                                                             else
                                                             {
-                                                                <li><a href="@m3.Url">@m3.Name</a></li>
+                                    <li><a href="@m3.Url">@m3.Name</a></li>
                                                             }
                                                         }
                                                     }
-                                                </ul>
-                                            </li>
+                                </ul>
+                            </li>
                                         }
                                         else
                                         {
                                             if (m2.NewTab)
                                             {
-                                                <li><a href="@m2.Url" target="_blank">@m2.Name</a></li>
+                            <li><a href="@m2.Url" target="_blank">@m2.Name</a></li>
                                             }
                                             else
                                             {
-                                                <li><a href="@m2.Url">@m2.Name</a></li>
+                            <li><a href="@m2.Url">@m2.Name</a></li>
                                             }
                                         }
                                     }
 
-                                </ul>
-                            </li>
+                        </ul>
+                    </li>
                         }
                         else if (m.MenuType == MenuType.GalleryMenu)
                         {
-                            <li class="has-children">
-                                <a href="#">@m.Name</a>
-                                <ul class="cd-nav-gallery is-hidden">
-                                    <li class="go-back"><a href="#">返回主菜单</a></li>
-                                    <li class="see-all"><a asp-controller="Post" asp-action="All">所有 @m.Name</a></li>
-                                    @{
+                    <li class="has-children">
+                        <a href="#">@m.Name</a>
+                        <ul class="cd-nav-gallery is-hidden">
+                            <li class="go-back"><a href="#">返回主菜单</a></li>
+                            <li class="see-all"><a asp-controller="Post" asp-action="All">所有 @m.Name</a></li>
+                            @{
                                         var ms = menus.Where(s => s.ParentId == m.Id);
                                         foreach (var mm in ms)
                                         {
                                             if (mm.NewTab)
                                             {
-                                                <li>
-                                                    <a class="cd-nav-item" href="@mm.Url" target="_blank">
-                                                        <img src="@mm.Icon" alt="@mm.Name">
-                                                        <h3>@mm.Name</h3>
-                                                    </a>
-                                                </li>
+                                <li>
+                                    <a class="cd-nav-item" href="@mm.Url" target="_blank">
+                                        <img src="@mm.Icon" alt="@mm.Name">
+                                        <h3>@mm.Name</h3>
+                                    </a>
+                                </li>
                                             }
                                             else
                                             {
-                                                <li>
-                                                    <a class="cd-nav-item" href="@mm.Url">
-                                                        <img src="@mm.Icon" alt="@mm.Name">
-                                                        <h3>@mm.Name</h3>
-                                                    </a>
-                                                </li>
+                                <li>
+                                    <a class="cd-nav-item" href="@mm.Url">
+                                        <img src="@mm.Icon" alt="@mm.Name">
+                                        <h3>@mm.Name</h3>
+                                    </a>
+                                </li>
                                             }
                                         }
-                                    }
-                                </ul>
-                            </li>
+                            }
+                        </ul>
+                    </li>
                         }
                         else if (m.MenuType == MenuType.IconMenu)
                         {
-                            <li class="has-children">
-                                <a href="#">@m.Name</a>
-                                <ul class="cd-nav-icons is-hidden">
-                                    <li class="go-back"><a href="#">返回主菜单</a></li>
-                                    @{
+                    <li class="has-children">
+                        <a href="#">@m.Name</a>
+                        <ul class="cd-nav-icons is-hidden">
+                            <li class="go-back"><a href="#">返回主菜单</a></li>
+                            @{
                                         var ms = menus.Where(s => s.ParentId == m.Id);
                                         var step = 1;
                                         foreach (var mm in ms)
                                         {
                                             if (mm.NewTab)
                                             {
-                                                <li>
-                                                    <a class="cd-nav-item item-@(step++%8)" href="@mm.Url" target="_blank">
-                                                        <p>@mm.Name</p>
-                                                    </a>
-                                                </li>
+                                <li>
+                                    <a class="cd-nav-item item-@(step++%8)" href="@mm.Url" target="_blank">
+                                        <p>@mm.Name</p>
+                                    </a>
+                                </li>
                                             }
                                             else
                                             {
-                                                <li>
-                                                    <a class="cd-nav-item item-@(step++%8)" href="@mm.Url">
-                                                        <p>@mm.Name</p>
-                                                    </a>
-                                                </li>
+                                <li>
+                                    <a class="cd-nav-item item-@(step++%8)" href="@mm.Url">
+                                        <p>@mm.Name</p>
+                                    </a>
+                                </li>
                                             }
                                         }
-                                    }
-                                </ul>
-                            </li>
+                            }
+                        </ul>
+                    </li>
                         }
                         else
                         {
                             if (m.NewTab)
                             {
-                                <li><a href="@m.Url" target="_blank">@m.Name</a></li>
+                    <li><a href="@m.Url" target="_blank">@m.Name</a></li>
                             }
                             else
                             {
-                                <li><a href="@m.Url">@m.Name</a></li>
+                    <li><a href="@m.Url">@m.Name</a></li>
                             }
                         }
                     }
@@ -269,15 +269,15 @@
                         @{
                             if (user.IsAdmin)
                             {
-                                <a asp-controller="Dashboard" asp-action="FileManager" target="_blank">资源管理器</a>
-                                <span> | </span>
-                                <a href="/taskcenter" target="_blank">任务管理器</a>
-                                <span> | </span>
+                            <a asp-controller="Dashboard" asp-action="FileManager" target="_blank">资源管理器</a>
+                            <span> | </span>
+                            <a href="/taskcenter" target="_blank">任务管理器</a>
+                            <span> | </span>
                             }
                             foreach (LinksOutputDto link in footer.Links)
                             {
-                                <a href="@link.Url" target="_blank">@link.Name</a>
-                                <span> | </span>
+                            <a href="@link.Url" target="_blank">@link.Name</a>
+                            <span> | </span>
                             }
                         }
                         <a asp-controller="Links" asp-action="Index">更多链接>></a>
@@ -298,9 +298,9 @@
                     var num = new Random().StrictNext();
                     for (int i = 0; i < 7; i++)
                     {
-                        <div>
-                            <span class="bg-@colors[(num+i) % 5]"></span>
-                        </div>
+                    <div>
+                        <span class="bg-@colors[(num+i) % 5]"></span>
+                    </div>
                     }
                 }
             </div>
@@ -318,27 +318,27 @@
 @{
     if (Context.Request.Headers["User-Agent"].ToString().Contains(new[] { "IE", "InternetExplorer" }))
     {
-        <script type="text/javascript">
-            var b = localStorage.getItem("browser");
-            if (!b) {
-                layer.open({
-                    title: '浏览器版本提示',
-                    area: '400px;',
-                    closeBtn: false,
-                    content: '亲爱的访客，我们检测到您正在使用IE浏览器，本网站的某些功能或特性可能不会完美地支持IE浏览器，但您可以继续浏览，不过为了更好的体验效果，建议您使用Chrome、Firefox等相同或类似的更高级浏览器访问本网站。珍惜生命，远离IE！',
-                    btn: ['知道了', '哦'],
-                    btn1: function (layero) {
-                        layer.closeAll();
-                        layer.msg('为消灭IE做一点贡献，就是为世界上所有广大的互联网开发者们少加一点儿班做善事！<br/>IE：只要不升级，我还会回来的，我就是这么倔强！', {
-                            icon: 5
-                        });
-                        window.localStorage.setItem("browser", true);
-                    },
-                    btn2: function (index) {
-                    }
-                });
-            }
-        </script>
+    <script type="text/javascript">
+        var b = localStorage.getItem("browser");
+        if (!b) {
+            layer.open({
+                title: '浏览器版本提示',
+                area: '400px;',
+                closeBtn: false,
+                content: '亲爱的访客，我们检测到您正在使用IE浏览器，本网站的某些功能或特性可能不会完美地支持IE浏览器，但您可以继续浏览，不过为了更好的体验效果，建议您使用Chrome、Firefox等相同或类似的更高级浏览器访问本网站。珍惜生命，远离IE！',
+                btn: ['知道了', '哦'],
+                btn1: function (layero) {
+                    layer.closeAll();
+                    layer.msg('为消灭IE做一点贡献，就是为世界上所有广大的互联网开发者们少加一点儿班做善事！<br/>IE：只要不升级，我还会回来的，我就是这么倔强！', {
+                        icon: 5
+                    });
+                    window.localStorage.setItem("browser", true);
+                },
+                btn2: function (index) {
+                }
+            });
+        }
+    </script>
     }
 }
 <script>
@@ -373,3 +373,4 @@
     });
     tpwidget("show");
 </script>
+<mini-profiler max-traces="5"/>

@@ -11,6 +11,7 @@ using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -36,20 +37,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetBaseInfo()
         {
-            List<CpuInfo> cpuInfo = SystemInfo.GetCpuInfo();
-            RamInfo ramInfo = SystemInfo.GetRamInfo();
-            string osVersion = SystemInfo.GetOsVersion();
-            var total = new StringBuilder();
-            var free = new StringBuilder();
-            var usage = new StringBuilder();
-            SystemInfo.DiskTotalSpace().ForEach(kv =>
-            {
-                total.Append(kv.Key + kv.Value + " | ");
-            });
-            SystemInfo.DiskFree().ForEach(kv => free.Append(kv.Key + kv.Value + " | "));
-            SystemInfo.DiskUsage().ForEach(kv => usage.Append(kv.Key + kv.Value.ToString("P") + " | "));
-            IList<string> mac = SystemInfo.GetMacAddress();
-            IList<string> ips = SystemInfo.GetIPAddress();
+            var cpuInfo = SystemInfo.GetCpuInfo();
+            var ramInfo = SystemInfo.GetRamInfo();
+            var osVersion = SystemInfo.GetOsVersion();
+            var mac = SystemInfo.GetMacAddress();
+            var ips = SystemInfo.GetIPAddress();
+            var diskTotal = SystemInfo.DiskTotalSpace().Select(kv => kv.Key + kv.Value).Join(" | ");
+            var diskFree = SystemInfo.DiskFree().Select(kv => kv.Key + kv.Value).Join(" | ");
+            var diskUsage = SystemInfo.DiskUsage().Select(kv => kv.Key + kv.Value.ToString("P")).Join(" | ");
             var span = DateTime.Now - CommonHelper.StartupTime;
             var boot = DateTime.Now - SystemInfo.BootTime();
             return Json(new
@@ -61,9 +56,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 osVersion,
                 diskInfo = new
                 {
-                    total = total.ToString(),
-                    free = free.ToString(),
-                    usage = usage.ToString()
+                    total = diskTotal,
+                    free = diskFree,
+                    usage = diskUsage
                 },
                 netInfo = new
                 {
