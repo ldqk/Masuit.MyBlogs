@@ -58,5 +58,17 @@
     "inputFiles": [
       "wwwroot/Assets/banner/bootstrap-touch-slider.css"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/Assets/UEditor/ueditor.config.front.min.js",
+    "inputFiles": [
+      "wwwroot/Assets/UEditor/ueditor.config.front.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/Assets/UEditor/ueditor.config.admin.min.js",
+    "inputFiles": [
+      "wwwroot/Assets/UEditor/ueditor.config.admin.js"
+    ]
   }
 ]
