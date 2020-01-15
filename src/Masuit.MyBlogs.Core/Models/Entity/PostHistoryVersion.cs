@@ -1,5 +1,5 @@
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.MyBlogs.Core.Models.Validation;
+using Masuit.Tools.Core.Validator;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

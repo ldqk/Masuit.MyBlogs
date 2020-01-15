@@ -1,5 +1,6 @@
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
+using Masuit.Tools.Core.Validator;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;

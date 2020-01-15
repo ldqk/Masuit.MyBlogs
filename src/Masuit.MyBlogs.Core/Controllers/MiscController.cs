@@ -88,6 +88,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
+        /// 评论及留言须知
+        /// </summary>
+        /// <returns></returns>
+        [Route("agreement"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
+        public ActionResult Agreement()
+        {
+            return View();
+        }
+
+        /// <summary>
         /// 声明
         /// </summary>
         /// <returns></returns>

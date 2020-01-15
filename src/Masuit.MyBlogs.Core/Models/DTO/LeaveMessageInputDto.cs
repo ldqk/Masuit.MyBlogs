@@ -1,6 +1,7 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
+using Masuit.Tools.Core.Validator;
 using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
@@ -54,5 +55,11 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// </summary>
         [StringLength(255)]
         public string OperatingSystem { get; set; }
+
+        /// <summary>
+        /// 是否已接受条款
+        /// </summary>
+        [AssignTrue(ErrorMessage = "请先同意接受本站的《留言须知》")]
+        public bool Agree { get; set; }
     }
 }

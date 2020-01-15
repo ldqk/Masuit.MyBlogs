@@ -64,6 +64,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.1.0" />
     <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.1.0" />
     <PackageReference Include="PanGu.HighLight" Version="1.0.0" />

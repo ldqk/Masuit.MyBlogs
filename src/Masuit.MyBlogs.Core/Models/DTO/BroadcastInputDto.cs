@@ -1,6 +1,6 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.MyBlogs.Core.Models.Validation;
+using Masuit.Tools.Core.Validator;
 using System;
 
 namespace Masuit.MyBlogs.Core.Models.DTO

@@ -985,6 +985,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Masuit.MyBlogs.Core.Controllers.MiscController.Agreement">
+            <summary>
+            评论及留言须知
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Masuit.MyBlogs.Core.Controllers.MiscController.Disclaimer">
             <summary>
             声明
@@ -4970,6 +4976,11 @@
             操作系统版本
             </summary>
         </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.CommentInputDto.Agree">
+            <summary>
+            是否已接受条款
+            </summary>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Models.DTO.CommentOutputDto">
             <summary>
             文章评论输出模型
@@ -5098,6 +5109,11 @@
         <member name="P:Masuit.MyBlogs.Core.Models.DTO.LeaveMessageInputDto.OperatingSystem">
             <summary>
             操作系统版本
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.LeaveMessageInputDto.Agree">
+            <summary>
+            是否已接受条款
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Models.DTO.LeaveMessageOutputDto">
@@ -6840,9 +6856,9 @@
             id
             </summary>
         </member>
-        <member name="T:Masuit.MyBlogs.Core.Models.Validation.IsEmailAttribute">
+        <member name="T:Masuit.MyBlogs.Core.Models.Validation.AssignTrueAttribute">
             <summary>
-            邮箱格式验证
+            强制true检查
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Models.Validation.SubmitCheckAttribute">
