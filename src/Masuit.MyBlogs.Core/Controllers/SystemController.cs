@@ -9,6 +9,7 @@ using Masuit.Tools.Hardware;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
+using Masuit.Tools.Win32;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -17,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -39,9 +41,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var cpuInfo = SystemInfo.GetCpuInfo();
             var ramInfo = SystemInfo.GetRamInfo();
-            var osVersion = SystemInfo.GetOsVersion();
+            var osVersion = Windows.GetOsVersion();
             var mac = SystemInfo.GetMacAddress();
-            var ips = SystemInfo.GetIPAddress();
+            var ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToList();
             var diskTotal = SystemInfo.DiskTotalSpace().Select(kv => kv.Key + kv.Value).Join(" | ");
             var diskFree = SystemInfo.DiskFree().Select(kv => kv.Key + kv.Value).Join(" | ");
             var diskUsage = SystemInfo.DiskUsage().Select(kv => kv.Key + kv.Value.ToString("P")).Join(" | ");

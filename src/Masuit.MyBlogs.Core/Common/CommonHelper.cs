@@ -173,7 +173,7 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static string GetIPLocation(this string ips)
         {
-            return ips.Split(',').Select(s => Searcher.MemorySearch(s).Region).Join(" , ");
+            return ips.Split(',').Select(s => Searcher.MemorySearch(s)?.Region).Join(" , ");
         }
 
         /// <summary>

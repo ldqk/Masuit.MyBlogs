@@ -111,28 +111,28 @@
     </div>
     <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed margin-clear" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'打赏时间'" filter="{DonateTime: 'text'}" sortable="'DonateTime'">
+            <td title="'打赏时间'">
                 {{row.DonateTime|date:'yyyy-MM-dd'}}
             </td>
-            <td title="'昵称'" filter="{NickName: 'text'}" sortable="'NickName'">
+            <td title="'昵称'">
                 {{row.NickName}}
             </td>
-            <td title="'金额'" filter="{Amount: 'number'}" sortable="'Amount'">
+            <td title="'金额'">
                 {{row.Amount}}
             </td>
-            <td title="'打赏方式'" filter="{Via: 'text'}" sortable="'Via'">
+            <td title="'打赏方式'">
                 {{row.Via}}
             </td>
-            <td title="'Email'" filter="{Email: 'text'}" sortable="'Email'">
+            <td title="'Email'">
                 {{row.Email}}
             </td>
-            <td title="'QQ或微信'" filter="{QQorWechat: 'text'}" sortable="'QQorWechat'">
+            <td title="'QQ或微信'">
                 {{row.QQorWechat}}
             </td>
-            <td title="'显示邮箱'" filter="{EmailDisplay: 'text'}" sortable="'EmailDisplay'">
+            <td title="'显示邮箱'">
                 {{row.EmailDisplay}}
             </td>
-            <td title="'显示QQ或微信'" filter="{QQorWechatDisplay: 'text'}" sortable="'QQorWechatDisplay'">
+            <td title="'显示QQ或微信'">
                 {{row.QQorWechatDisplay}}
             </td>
             <td title="'操作'">

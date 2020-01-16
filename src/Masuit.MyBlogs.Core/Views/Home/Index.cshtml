@@ -11,11 +11,6 @@
     List<FastShare> shares = ViewBag.FastShare;
     Context.Request.Path = new PathString("/p");
 }
-<style>
-    marquee p, marquee br, marquee div, marquee h1, marquee h2, marquee h3, marquee h4 {
-        display: inline !important;
-    }
-</style>
 <link href="~/Assets/banner/bootstrap-touch-slider.min.css" rel="stylesheet" />
 @if (Model.Banner.Any())
 {
@@ -37,21 +32,12 @@
             @for (int i = 0; i < Model.Banner.Count; i++)
             {
                 var p = Model.Banner[i];
-                string[] style = { "slide_style_left", "slide_style_center", "slide_style_right" };
                 string[] ani = { "zoomInRight", "flipInX", "fadeInLeft", "lightSpeedIn", "fadeInUp", "zoomInLeft", "fadeInRight" };
                 Random r = new Random();
-                <div class="item @(i == 0 ? "active" : "")" class="img-responsive" style="max-height: 700px;">
-                    <img src="@p.ImageUrl" alt="@p.Title" class="slide-image" title="@CommonHelper.SystemSettings["Title"]" />
-                    <div class="bs-slider-overlay"></div>
-                    <div class="container">
-                        <div class="row">
-                            <div class="slide-text @style[r.Next(style.Length)]">
-                                <h2 data-animation="animated @ani[r.Next(ani.Length)]">@p.Title</h2>
-                                <p data-animation="animated @ani[r.Next(ani.Length)]">@p.Description</p>
-                                <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@p.Id" target="_blank" class="btn btn-default" data-animation="animated @ani[r.Next(ani.Length)]">查看详情</a>
-                            </div>
-                        </div>
-                    </div>
+                <div class="item @(i == 0 ? "active" : "")" class="img-responsive">
+                    <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@p.Id" target="_blank" data-animation="animated @ani[r.Next(ani.Length)]">
+                        <img src="@p.ImageUrl" title="@p.Title" alt="@p.Description" />
+                    </a>
                 </div>
             }
         </div>
@@ -81,7 +67,7 @@
 {
     <div class="container padding-clear">
         <div class="panel panel-info">
-            <div class="panel-heading">⚡快速分享🉐　投递/寻其他网站收费资源，可到 @Html.ActionLink("投稿", "Publish", "Post") 进行投稿。</div>
+            <div class="panel-heading">⚡小撇步Tips⚡</div>
             <div class="panel-body padding-clear">
                 <table class="table table-bordered margin-clear">
                     @for (int i = 1; i < shares.Count + 1; i += 2)
@@ -129,7 +115,7 @@
     </div>
 }
 @{
-    UserInfoOutputDto user = Context.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+    var user = Context.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
     await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
 }
 <script type="text/javascript">
