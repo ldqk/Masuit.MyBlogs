@@ -22,6 +22,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, false, $"用户名{username}已经存在，请尝试更换其他用户名！");
             }
+
             userInfo.Username = username;
             bool b = UserInfoService.SaveChanges() > 0;
             return ResultData(Mapper.Map<UserInfoOutputDto>(userInfo), b, b ? $"用户名修改成功，新用户名为{username}。" : "用户名修改失败！");
@@ -56,6 +57,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 bool b = UserInfoService.ChangePassword(id, old, pwd);
                 return ResultData(null, b, b ? $"密码修改成功，新密码为：{pwd}！" : "密码修改失败，可能是原密码不正确！");
             }
+
             return ResultData(null, false, "两次输入的密码不一致！");
         }
 

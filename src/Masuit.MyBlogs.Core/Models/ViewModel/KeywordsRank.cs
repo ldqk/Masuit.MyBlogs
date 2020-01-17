@@ -1,9 +1,9 @@
-﻿namespace Masuit.MyBlogs.Core.Models.DTO
+﻿namespace Masuit.MyBlogs.Core.Models.ViewModel
 {
     /// <summary>
     /// 搜索统计输出模型
     /// </summary>
-    public class KeywordsRankOutputDto
+    public class KeywordsRank
     {
         /// <summary>
         /// 关键词

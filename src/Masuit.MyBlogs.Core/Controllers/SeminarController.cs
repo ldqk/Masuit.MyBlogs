@@ -98,6 +98,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 entry.SubTitle = seminar.SubTitle;
                 b = SeminarService.SaveChanges() > 0;
             }
+
             return ResultData(null, b, b ? "保存成功" : "保存失败");
         }
 

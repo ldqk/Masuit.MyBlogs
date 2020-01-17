@@ -165,7 +165,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var postsQuery = PostService.GetQuery<PostOutputDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
             var notices = NoticeService.GetPagesFromCache<DateTime, NoticeOutputDto>(1, 5, out _, n => (n.Status == Status.Display || CurrentUser.IsAdmin), n => n.ModifyDate, false).ToList(); //加载前5条公告
             var cats = CategoryService.GetQueryFromCache<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).ToList(); //加载分类目录
-            var hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week").Take(10).ToList(); //热词统计
+            var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList(); //热词统计
             var hot6Post = postsQuery.OrderBy((new Random().Next() % 3) switch
             {
                 1 => nameof(OrderBy.VoteUpCount),

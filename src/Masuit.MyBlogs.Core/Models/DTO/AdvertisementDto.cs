@@ -2,7 +2,7 @@
 
 namespace Masuit.MyBlogs.Core.Models.DTO
 {
-    public class AdvertisementInputDto : BaseDto
+    public class AdvertisementDto : BaseDto
     {
         /// <summary>
         /// 标题

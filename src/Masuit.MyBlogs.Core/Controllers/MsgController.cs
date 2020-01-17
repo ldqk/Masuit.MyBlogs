@@ -288,7 +288,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetInternalMsgs(int page = 1, int size = 10)
         {
-            IEnumerable<InternalMessage> msgs = MessageService.GetPagesNoTracking(page, size, out int total, m => true, m => m.Time, false);
+            var msgs = MessageService.GetPagesNoTracking(page, size, out int total, m => true, m => m.Time, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(msgs, pageCount, total);
         }
@@ -300,7 +300,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetUnreadMsgs()
         {
-            IEnumerable<InternalMessage> msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false);
+            var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).ToList();
             return ResultData(msgs);
         }
 

@@ -65,7 +65,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost, MyAuthorize]
-        public async Task<IActionResult> Save(AdvertisementInputDto model)
+        public async Task<IActionResult> Save(AdvertisementDto model)
         {
             model.CategoryId = model.CategoryId?.Replace("null", "");
             var entity = AdsService.GetById(model.Id);

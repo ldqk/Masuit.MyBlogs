@@ -170,36 +170,31 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult UeditorFileUploader()
         {
             UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
-            Handler action = new NotSupportedHandler(HttpContext);
-            switch (Request.Query["action"])//通用
+            var action = Request.Query["action"].ToString() switch //通用
             {
-                case "config":
-                    action = new ConfigHandler(HttpContext);
-                    break;
-                case "uploadimage":
-                    action = new UploadHandler(HttpContext, new UploadConfig()
+                "config" => (Handler)new ConfigHandler(HttpContext),
+                "uploadimage" => new UploadHandler(HttpContext, new UploadConfig()
+                {
+                    AllowExtensions = UeditorConfig.GetStringList("imageAllowFiles"),
+                    PathFormat = UeditorConfig.GetString("imagePathFormat"),
+                    SizeLimit = UeditorConfig.GetInt("imageMaxSize"),
+                    UploadFieldName = UeditorConfig.GetString("imageFieldName")
+                }),
+                "uploadscrawl" => new UploadHandler(HttpContext, new UploadConfig()
+                {
+                    AllowExtensions = new[]
                     {
-                        AllowExtensions = UeditorConfig.GetStringList("imageAllowFiles"),
-                        PathFormat = UeditorConfig.GetString("imagePathFormat"),
-                        SizeLimit = UeditorConfig.GetInt("imageMaxSize"),
-                        UploadFieldName = UeditorConfig.GetString("imageFieldName")
-                    });
-                    break;
-                case "uploadscrawl":
-                    action = new UploadHandler(HttpContext, new UploadConfig()
-                    {
-                        AllowExtensions = new[] { ".png" },
-                        PathFormat = UeditorConfig.GetString("scrawlPathFormat"),
-                        SizeLimit = UeditorConfig.GetInt("scrawlMaxSize"),
-                        UploadFieldName = UeditorConfig.GetString("scrawlFieldName"),
-                        Base64 = true,
-                        Base64Filename = "scrawl.png"
-                    });
-                    break;
-                case "catchimage":
-                    action = new CrawlerHandler(HttpContext);
-                    break;
-            }
+                        ".png"
+                    },
+                    PathFormat = UeditorConfig.GetString("scrawlPathFormat"),
+                    SizeLimit = UeditorConfig.GetInt("scrawlMaxSize"),
+                    UploadFieldName = UeditorConfig.GetString("scrawlFieldName"),
+                    Base64 = true,
+                    Base64Filename = "scrawl.png"
+                }),
+                "catchimage" => new CrawlerHandler(HttpContext),
+                _ => new NotSupportedHandler(HttpContext)
+            };
 
             if (user.IsAdmin)
             {

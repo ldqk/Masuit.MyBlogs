@@ -440,7 +440,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             });
             var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-request.html").Replace("{{title}}", post.Title).Replace("{{link}}", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id);
             BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
-
             return ResultData(null, b, b ? "您的修改请求已提交，已进入审核状态，感谢您的参与！" : "操作失败！");
         }
 
@@ -457,12 +456,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Post post = PostService.GetById(id);
             post.IsFixedTop = !post.IsFixedTop;
             bool b = PostService.SaveChanges() > 0;
-            if (b)
-            {
-                return ResultData(null, true, post.IsFixedTop ? "置顶成功！" : "取消置顶成功！");
-            }
-
-            return ResultData(null, false, "操作失败！");
+            return b ? ResultData(null, true, post.IsFixedTop ? "置顶成功！" : "取消置顶成功！") : ResultData(null, false, "操作失败！");
         }
 
         /// <summary>
@@ -807,16 +801,16 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (schedule)
             {
-                if (timespan.HasValue && timespan.Value > DateTime.Now)
+                if (!timespan.HasValue || timespan.Value <= DateTime.Now)
                 {
-                    p.Status = Status.Schedule;
-                    p.PostDate = timespan.Value;
-                    p.ModifyDate = timespan.Value;
-                    HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.PublishPost), args: p);
-                    return ResultData(p.Mapper<PostOutputDto>(), message: $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！");
+                    return ResultData(null, false, "如果要定时发布，请选择正确的一个将来时间点！");
                 }
 
-                return ResultData(null, false, "如果要定时发布，请选择正确的一个将来时间点！");
+                p.Status = Status.Schedule;
+                p.PostDate = timespan.Value;
+                p.ModifyDate = timespan.Value;
+                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.PublishPost), args: p);
+                return ResultData(p.Mapper<PostOutputDto>(), message: $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！");
             }
 
             PostService.AddEntity(p);
@@ -954,13 +948,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult DisableComment(int id)
         {
             var post = PostService.GetById(id);
-            if (post != null)
+            if (post is null)
             {
-                post.DisableComment = !post.DisableComment;
-                return ResultData(null, SearchEngine.SaveChanges() > 0, post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
+                return ResultData(null, false, "文章不存在");
             }
 
-            return ResultData(null, false, "文章不存在");
+            post.DisableComment = !post.DisableComment;
+            return ResultData(null, SearchEngine.SaveChanges() > 0, post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
         }
 
         /// <summary>

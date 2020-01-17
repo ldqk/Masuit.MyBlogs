@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -46,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string key = "Search:" + ip;
             if (CacheManager.Exists(key) && CacheManager.Get(key) != wd)
             {
-                var hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week").Take(10).ToList();
+                var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList();
                 ViewBag.hotSearches = hotSearches;
                 ViewBag.ErrorMsg = "10秒内只能搜索1次！";
                 return View(nul);
@@ -76,11 +77,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                     CacheManager.Expire(key, TimeSpan.FromSeconds(10));
                 }
 
-                ViewBag.hotSearches = new List<KeywordsRankOutputDto>();
+                ViewBag.hotSearches = new List<KeywordsRank>();
                 return View(posts.Results);
             }
 
-            ViewBag.hotSearches = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week").Take(10).ToList();
+            ViewBag.hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList();
             ViewData["page"] = new Pagination(page, size);
             return View(nul);
         }
@@ -110,9 +111,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             return ResultData(new
             {
-                month = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Month"),
-                week = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Week"),
-                today = RedisHelper.Get<List<KeywordsRankOutputDto>>("SearchRank:Today")
+                month = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Month"),
+                week = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week"),
+                today = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Today")
             });
         }
 

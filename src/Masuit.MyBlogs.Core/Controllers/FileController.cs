@@ -1,4 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Files;
@@ -267,7 +268,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     return this.ResumeFile(buffer, Path.GetFileName(toFilename));
             }
 
-            return Content("null");
+            throw new NotFoundException("文件未找到");
         }
     }
 }

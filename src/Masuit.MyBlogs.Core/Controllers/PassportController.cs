@@ -85,9 +85,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                     {
                         return RedirectToAction("Index", "Home");
                     }
+
                     return Redirect(from);
                 }
             }
+
             return View();
         }
 
@@ -113,19 +115,20 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "用户名或密码不能为空");
             }
             var userInfo = UserInfoService.Login(username, password);
-            if (userInfo != null)
+            if (userInfo == null)
             {
-                HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
-                if (remem.Trim().Contains(new[] { "on", "true" })) //是否记住登录
-                {
-                    Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                    Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.BaiduAK), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                }
-                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, ClientIP, LoginType.Default);
-                string refer = Request.Cookies["refer"];
-                return ResultData(null, true, string.IsNullOrEmpty(refer) ? "/" : refer);
+                return ResultData(null, false, "用户名或密码错误");
             }
-            return ResultData(null, false, "用户名或密码错误");
+
+            HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
+            if (remem.Trim().Contains(new[] { "on", "true" })) //是否记住登录
+            {
+                Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.BaiduAK), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+            }
+            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, ClientIP, LoginType.Default);
+            string refer = Request.Cookies["refer"];
+            return ResultData(null, true, string.IsNullOrEmpty(refer) ? "/" : refer);
         }
 
         /// <summary>
@@ -153,6 +156,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, false, "验证码错误");
             }
+
             return ResultData(null, false, "验证码正确");
         }
 

@@ -69,7 +69,7 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<UserInfo, UserInfoOutputDto>().ReverseMap();
             CreateMap<UserInfoInputDto, UserInfoOutputDto>().ReverseMap();
 
-            CreateMap<LoginRecord, LoginRecordOutputDto>().ReverseMap();
+            CreateMap<LoginRecord, LoginRecordViewModel>().ReverseMap();
 
             CreateMap<Seminar, SeminarInputDto>().ReverseMap();
             CreateMap<Seminar, SeminarOutputDto>().ReverseMap();
@@ -86,7 +86,7 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<Post, PostMergeRequestOutputDto>().ReverseMap();
 
             CreateMap<Advertisement, AdvertisementViewModel>().ForMember(a => a.CategoryName, e => e.MapFrom(a => a.Category.Name));
-            CreateMap<AdvertisementInputDto, Advertisement>().ForMember(a => a.CategoryId, e => e.MapFrom(d => string.IsNullOrEmpty(d.CategoryId) ? null : d.CategoryId)).ForMember(a => a.Status, e => e.Ignore()).ForMember(a => a.UpdateTime, e => e.MapFrom(a => DateTime.Now));
+            CreateMap<AdvertisementDto, Advertisement>().ForMember(a => a.CategoryId, e => e.MapFrom(d => string.IsNullOrEmpty(d.CategoryId) ? null : d.CategoryId)).ForMember(a => a.Status, e => e.Ignore()).ForMember(a => a.UpdateTime, e => e.MapFrom(a => DateTime.Now));
         }
     }
 }
