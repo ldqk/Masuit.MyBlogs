@@ -173,7 +173,7 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static string GetIPLocation(this string ips)
         {
-            return ips.Split(',').Select(s => Searcher.MemorySearch(s)?.Region).Join(" , ");
+            return ips.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => Searcher.MemorySearch(s.Trim())?.Region).Join(" , ");
         }
 
         /// <summary>
@@ -236,19 +236,7 @@ namespace Masuit.MyBlogs.Core.Common
             var nodes = doc.DocumentNode.Descendants("img");
             foreach (var node in nodes)
             {
-                string src = "";
-                if (node.Attributes.Contains("data-original"))
-                {
-                    src = node.Attributes["data-original"].Value;
-                }
-
-                if (node.Attributes.Contains("src"))
-                {
-                    src = node.Attributes["src"].Value;
-                }
-
-                node.Attributes.RemoveAll();
-                node.Attributes.Add("src", src);
+                node.Attributes.RemoveWhere(a => !new[] { "src", "data-original", "width", "style", "class" }.Contains(a.Name));
             }
 
             return doc.DocumentNode.OuterHtml;
