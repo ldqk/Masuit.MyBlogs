@@ -77,12 +77,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (m == null)
             {
                 var menu = MenuService.AddEntitySaved(model.Mapper<Menu>());
-                if (menu != null)
-                {
-                    return ResultData(menu, true, "添加成功");
-                }
-                return ResultData(null, false, "添加失败");
+                return menu != null ? ResultData(menu, true, "添加成功") : ResultData(null, false, "添加失败");
             }
+
             Mapper.Map(model, m);
             bool b = MenuService.SaveChanges() > 0;
             return ResultData(null, b, b ? "修改成功" : "修改失败");

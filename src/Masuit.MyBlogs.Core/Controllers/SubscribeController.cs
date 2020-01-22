@@ -1,5 +1,6 @@
 ﻿using EFSecondLevelCache.Core;
 using Hangfire;
+using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Text;
 using WilderMinds.RssSyndication;
@@ -178,21 +180,22 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Cancel(string email)
         {
             Broadcast c = BroadcastService.Get(b => b.Email.Equals(email) && b.Status == Status.Subscribed);
-            if (c != null)
+            if (c == null)
             {
-                var ts = DateTime.Now.GetTotalMilliseconds();
-                string url = Url.Action("Subscribe", "Subscribe", new
-                {
-                    email,
-                    act = "cancel",
-                    validate = c.ValidateCode,
-                    timespan = ts,
-                    hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
-                }, Request.Scheme);
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail("取消本站订阅", $"请<a href=\"{url}\">点击这里</a>取消订阅本站更新。", email));
-                return Content("取消订阅的链接已经发送到了您的邮箱，请到您的邮箱内进行取消订阅");
+                return Content("您输入的邮箱没有订阅本站更新，或者已经取消订阅了");
             }
-            return Content("您输入的邮箱没有订阅本站更新，或者已经取消订阅了");
+
+            var ts = DateTime.Now.GetTotalMilliseconds();
+            string url = Url.Action("Subscribe", "Subscribe", new
+            {
+                email,
+                act = "cancel",
+                validate = c.ValidateCode,
+                timespan = ts,
+                hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
+            }, Request.Scheme);
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail("取消本站订阅", $"请<a href=\"{url}\">点击这里</a>取消订阅本站更新。", email));
+            return Content("取消订阅的链接已经发送到了您的邮箱，请到您的邮箱内进行取消订阅");
         }
 
         /// <summary>
@@ -313,17 +316,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetPageData(int page = 1, int size = 10, string search = "")
         {
-            List<Broadcast> list;
-            int total;
-            if (string.IsNullOrEmpty(search))
+            Expression<Func<Broadcast, bool>> where = b => true;
+            if (!string.IsNullOrEmpty(search))
             {
-                list = BroadcastService.GetPagesFromCache(page, size, out total, b => true, b => b.UpdateTime, false).ToList();
-            }
-            else
-            {
-                list = BroadcastService.GetPagesFromCache(page, size, out total, b => b.Email.Contains(search), b => b.UpdateTime, false).ToList();
+                where = where.And(b => b.Email.Contains(search));
             }
 
+            var list = BroadcastService.GetPagesFromCache(page, size, out var total, @where, b => b.UpdateTime, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return Ok(new PageDataModel(list, pageCount, total));
         }

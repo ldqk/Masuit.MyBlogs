@@ -114,12 +114,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var merge = PostMergeRequestService.GetById(dto.Id) ?? throw new NotFoundException("待合并文章未找到");
             Mapper.Map(dto, merge);
             var b = PostMergeRequestService.SaveChanges() > 0;
-            if (b)
-            {
-                return Merge(merge.Id);
-            }
-
-            return ResultData(null, false, "文章合并失败！");
+            return b ? Merge(merge.Id) : ResultData(null, false, "文章合并失败！");
         }
 
         /// <summary>

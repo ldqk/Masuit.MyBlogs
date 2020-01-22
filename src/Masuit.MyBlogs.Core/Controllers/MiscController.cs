@@ -117,11 +117,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             model.Content = await ImagebedClient.ReplaceImgSrc(model.Content.Trim().ClearImgAttributes());
             var e = MiscService.AddEntitySaved(model);
-            if (e != null)
-            {
-                return ResultData(null, message: "发布成功");
-            }
-            return ResultData(null, false, "发布失败");
+            return e != null ? ResultData(null, message: "发布成功") : ResultData(null, false, "发布失败");
         }
 
         /// <summary>

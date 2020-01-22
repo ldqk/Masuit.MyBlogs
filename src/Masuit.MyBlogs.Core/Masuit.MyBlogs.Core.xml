@@ -313,7 +313,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Masuit.MyBlogs.Core.Controllers.AdvertisementController.Save(Masuit.MyBlogs.Core.Models.DTO.AdvertisementInputDto)">
+        <member name="M:Masuit.MyBlogs.Core.Controllers.AdvertisementController.Save(Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto)">
             <summary>
             保存banner
             </summary>
@@ -4801,42 +4801,42 @@
             </summary>
             <returns>受影响的行数</returns>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementInputDto.Title">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto.Title">
             <summary>
             标题
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementInputDto.ImageUrl">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto.ImageUrl">
             <summary>
             宣传图片
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementInputDto.ThumbImgUrl">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto.ThumbImgUrl">
             <summary>
             小宣传图片
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementInputDto.Description">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto.Description">
             <summary>
             描述
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementInputDto.Url">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto.Url">
             <summary>
             广告url
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementInputDto.Weight">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto.Weight">
             <summary>
             权重
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementInputDto.Price">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto.Price">
             <summary>
             价格
             </summary>
         </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementInputDto.Types">
+        <member name="P:Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto.Types">
             <summary>
             广告类型
             </summary>
@@ -5056,21 +5056,6 @@
             地理信息
             </summary>
         </member>
-        <member name="T:Masuit.MyBlogs.Core.Models.DTO.KeywordsRankOutputDto">
-            <summary>
-            搜索统计输出模型
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.KeywordsRankOutputDto.Keywords">
-            <summary>
-            关键词
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.KeywordsRankOutputDto.Count">
-            <summary>
-            搜索次数
-            </summary>
-        </member>
         <member name="T:Masuit.MyBlogs.Core.Models.DTO.LeaveMessageInputDto">
             <summary>
             留言板输入模型
@@ -5224,41 +5209,6 @@
         <member name="P:Masuit.MyBlogs.Core.Models.DTO.LinksOutputDto.Weight">
             <summary>
             友链权重
-            </summary>
-        </member>
-        <member name="T:Masuit.MyBlogs.Core.Models.DTO.LoginRecordOutputDto">
-            <summary>
-            用户登录记录输出模型
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.LoginRecordOutputDto.IP">
-            <summary>
-            登录点IP
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.LoginRecordOutputDto.LoginTime">
-            <summary>
-            登录时间
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.LoginRecordOutputDto.Province">
-            <summary>
-            所在省份
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.LoginRecordOutputDto.PhysicAddress">
-            <summary>
-            详细地理位置
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.LoginRecordOutputDto.LoginType">
-            <summary>
-            登录类型
-            </summary>
-        </member>
-        <member name="P:Masuit.MyBlogs.Core.Models.DTO.LoginRecordOutputDto.UserInfoId">
-            <summary>
-            登陆者ID
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Models.DTO.MenuInputDto">
@@ -7103,6 +7053,21 @@
             列表内广告
             </summary>
         </member>
+        <member name="T:Masuit.MyBlogs.Core.Models.ViewModel.KeywordsRank">
+            <summary>
+            搜索统计输出模型
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.KeywordsRank.Keywords">
+            <summary>
+            关键词
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.KeywordsRank.Count">
+            <summary>
+            搜索次数
+            </summary>
+        </member>
         <member name="T:Masuit.MyBlogs.Core.Models.ViewModel.LeaveMessageViewModel">
             <summary>
             留言板视图模型
@@ -7166,6 +7131,41 @@
         <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.LeaveMessageViewModel.Location">
             <summary>
             地理信息
+            </summary>
+        </member>
+        <member name="T:Masuit.MyBlogs.Core.Models.ViewModel.LoginRecordViewModel">
+            <summary>
+            用户登录记录输出模型
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.LoginRecordViewModel.IP">
+            <summary>
+            登录点IP
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.LoginRecordViewModel.LoginTime">
+            <summary>
+            登录时间
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.LoginRecordViewModel.Province">
+            <summary>
+            所在省份
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.LoginRecordViewModel.PhysicAddress">
+            <summary>
+            详细地理位置
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.LoginRecordViewModel.LoginType">
+            <summary>
+            登录类型
+            </summary>
+        </member>
+        <member name="P:Masuit.MyBlogs.Core.Models.ViewModel.LoginRecordViewModel.UserInfoId">
+            <summary>
+            登陆者ID
             </summary>
         </member>
         <member name="T:Masuit.MyBlogs.Core.Models.ViewModel.MiscViewModel">

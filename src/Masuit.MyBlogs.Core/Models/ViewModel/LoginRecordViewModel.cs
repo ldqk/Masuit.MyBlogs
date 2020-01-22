@@ -1,12 +1,13 @@
+using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Enum;
 using System;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.ViewModel
 {
     /// <summary>
     /// 用户登录记录输出模型
     /// </summary>
-    public class LoginRecordOutputDto : BaseDto
+    public class LoginRecordViewModel : BaseDto
     {
         /// <summary>
         /// 登录点IP

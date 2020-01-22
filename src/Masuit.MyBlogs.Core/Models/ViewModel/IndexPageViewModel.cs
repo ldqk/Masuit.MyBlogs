@@ -33,7 +33,7 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 近期热搜
         /// </summary>
-        public List<KeywordsRankOutputDto> HotSearch { get; set; }
+        public List<KeywordsRank> HotSearch { get; set; }
 
         /// <summary>
         /// 热门文章

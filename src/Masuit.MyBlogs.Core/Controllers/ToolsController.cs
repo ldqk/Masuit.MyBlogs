@@ -18,6 +18,13 @@ namespace Masuit.MyBlogs.Core.Controllers
     [Route("tools")]
     public class ToolsController : BaseController
     {
+        private readonly HttpClient _httpClient;
+
+        public ToolsController(IHttpClientFactory httpClientFactory)
+        {
+            _httpClient = httpClientFactory.CreateClient();
+        }
+
         /// <summary>
         /// 获取ip地址详细信息
         /// </summary>
@@ -59,8 +66,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return View(address);
             }
 
-            using var client = new HttpClient();
-            var s = await client.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={AppConfig.BaiduAK}");
+            var s = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={AppConfig.BaiduAK}");
             var physicsAddress = JsonConvert.DeserializeObject<PhysicsAddress>(s);
             return View(physicsAddress);
         }
@@ -94,8 +100,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             ViewBag.Address = addr;
-            using var client = new HttpClient();
-            var s = await client.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?output=json&address={addr}&ak={AppConfig.BaiduAK}");
+            var s = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?output=json&address={addr}&ak={AppConfig.BaiduAK}");
             var physicsAddress = JsonConvert.DeserializeObject<PhysicsAddress>(s);
             if (Request.Method.ToLower().Equals("get"))
             {

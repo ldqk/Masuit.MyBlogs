@@ -6,7 +6,6 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -147,9 +146,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
 
                 return ResultData(null, false, link + " 对方似乎没有本站的友情链接！");
-
             });
-
         }
 
         /// <summary>
@@ -186,7 +183,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Get()
         {
-            List<Links> list = LinksService.GetAll().OrderBy(p => p.Status).ThenByDescending(p => p.Recommend).ThenByDescending(p => p.Id).ToList();
+            var list = LinksService.GetAll().OrderBy(p => p.Status).ThenByDescending(p => p.Recommend).ThenByDescending(p => p.Id).ToList();
             return ResultData(list);
         }
 

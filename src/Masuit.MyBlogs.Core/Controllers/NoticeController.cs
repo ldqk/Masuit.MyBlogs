@@ -76,11 +76,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             notice.Content = await ImagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes());
             Notice e = NoticeService.AddEntitySaved(notice);
-            if (e != null)
-            {
-                return ResultData(null, message: "发布成功");
-            }
-            return ResultData(null, false, "发布失败");
+            return e != null ? ResultData(null, message: "发布成功") : ResultData(null, false, "发布失败");
         }
 
         /// <summary>
