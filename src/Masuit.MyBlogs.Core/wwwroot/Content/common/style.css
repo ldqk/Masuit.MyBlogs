@@ -53,6 +53,7 @@ body {
 }
 .footer a {
     color: wheat;
+    text-shadow: 1px 1px 1px #000;
 }
 .footer a:hover {
     text-decoration: underline;
