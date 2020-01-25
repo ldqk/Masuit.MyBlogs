@@ -21,12 +21,14 @@ namespace Masuit.MyBlogs.Core
         {
             var config = opt.ApplicationServices.GetService<IConfiguration>();
             var port = config["Port"] ?? "5000";
+            var sslport = config["Https:Port"] ?? "5001";
             opt.ListenAnyIP(port.ToInt32());
             if (bool.Parse(config["Https:Enabled"]))
             {
-                opt.ListenAnyIP(config["Https:Port"].ToInt32(), s => s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]));
+                opt.ListenAnyIP(sslport.ToInt32(), s => s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]));
             }
             opt.Limits.MaxRequestBodySize = null;
+            Console.WriteLine($"应用程序监听端口：http：{port}，https：{sslport}");
         }).UseIISIntegration().UseStartup<Startup>());
     }
 }
