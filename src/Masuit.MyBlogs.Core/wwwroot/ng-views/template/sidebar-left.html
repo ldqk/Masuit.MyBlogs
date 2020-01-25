@@ -38,12 +38,12 @@
             <a data-ui-sref="dashboard" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-home"></i>控制面板</a>
         </li>
         <li class="sub-menu" data-ng-class="{ 'active toggled': mactrl.$state.includes('headers') }">
-            <a href="" toggle-submenu><i class="zmdi zmdi-view-compact"></i>文章管理</a>
+            <a toggle-submenu><i class="zmdi zmdi-view-compact"></i>文章管理</a>
             <ul>
+                <li><a data-ui-sref-active="active" data-ui-sref="write-blog" data-ng-click="mactrl.sidebarStat($event)">写文章</a></li>
                 <li><a data-ui-sref-active="active" data-ui-sref="post-pending" data-ng-click="mactrl.sidebarStat($event)">文章审核</a></li>
                 <li><a data-ui-sref-active="active" data-ui-sref="post-list" data-ng-click="mactrl.sidebarStat($event)">文章列表</a></li>
                 <li><a data-ui-sref-active="active" data-ui-sref="merge-list" data-ng-click="mactrl.sidebarStat($event)">文章合并</a></li>
-                <li><a data-ui-sref-active="active" data-ui-sref="write-blog" data-ng-click="mactrl.sidebarStat($event)">写文章</a></li>
                 <li><a data-ui-sref-active="active" data-ui-sref="post-cat" data-ng-click="mactrl.sidebarStat($event)">文章分类管理</a></li>
                 <li><a data-ui-sref-active="active" data-ui-sref="seminar" data-ng-click="mactrl.sidebarStat($event)"><i class="zmdi zmdi-format-underlined"></i>文章专题管理</a></li>
                 <li><a data-ui-sref-active="active" data-ui-sref="share" data-ng-click="mactrl.sidebarStat($event)">快速分享</a></li>
