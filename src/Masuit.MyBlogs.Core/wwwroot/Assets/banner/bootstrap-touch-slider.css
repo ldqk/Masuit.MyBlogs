@@ -1,7 +1,7 @@
 .bs-slider{
     overflow: hidden;
     position: relative;
-    min-height: 300px;
+    min-height: 100px;
     max-height: 75vh;
     background: transparent;
 }
