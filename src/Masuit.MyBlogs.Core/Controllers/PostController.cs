@@ -47,8 +47,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IBroadcastService BroadcastService { get; set; }
         public ISeminarService SeminarService { get; set; }
         public IPostHistoryVersionService PostHistoryVersionService { get; set; }
-
         public IInternalMessageService MessageService { get; set; }
+        public IPostMergeRequestService PostMergeRequestService { get; set; }
 
         public IWebHostEnvironment HostEnvironment { get; set; }
         public ISearchEngine<DataContext> SearchEngine { get; set; }
@@ -398,7 +398,19 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, false, "内容未被修改！");
             }
+            #region 合并验证
 
+            if (PostMergeRequestService.Any(p => p.ModifierEmail == dto.ModifierEmail && p.MergeState == MergeStatus.Block))
+            {
+                return ResultData(null, false, "由于您曾经多次恶意修改文章，已经被标记为黑名单，无法修改任何文章，如有疑问，请联系网站管理员进行处理。");
+            }
+
+            if (post.PostMergeRequests.Any(p => p.ModifierEmail == dto.ModifierEmail && p.MergeState == MergeStatus.Pending))
+            {
+                return ResultData(null, false, "您已经提交过一次修改请求正在待处理，暂不能继续提交修改请求！");
+            }
+
+            #endregion
             #region 直接合并
 
             if (post.Email.Equals(dto.ModifierEmail))

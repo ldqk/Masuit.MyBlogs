@@ -92,6 +92,31 @@
 		}).catch(swal.noop);
     }
 
+	self.block = function(row) {
+		swal({
+			title: "确认标记为恶意修改吗？",
+			text: row.Title,
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "确定",
+			cancelButtonText: "取消",
+			showLoaderOnConfirm: true,
+			animation: true,
+			allowOutsideClick: false
+		}).then(function() {
+            $scope.request("/merge/block/"+row.Id, null, function(data) {
+			    window.notie.alert({
+				    type: 1,
+				    text: data.Message,
+				    time: 4
+			    });
+			    self.stats = [];
+			    self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+		    });
+		}, function() {
+		}).catch(swal.noop);
+    }
+
 	var _timeout;
 	$scope.search = function (kw) {
 		if (_timeout) {
@@ -168,6 +193,30 @@ myApp.controller("mergecompare", ["$scope", "$http", "$timeout","$location", fun
 				    time: 4
 			    });
                 window.location.href = "#/merge/list";
+		    });
+		}, function() {
+		}).catch(swal.noop);
+    }
+
+	$scope.block = function() {
+        swal({
+			title: "确认标记为恶意修改吗？",
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "确定",
+			cancelButtonText: "取消",
+			showLoaderOnConfirm: true,
+			animation: true,
+			allowOutsideClick: false
+		}).then(function() {
+			$scope.request("/merge/block/"+$scope.id, null, function(data) {
+			    window.notie.alert({
+				    type: 1,
+				    text: data.Message,
+				    time: 4
+			    });
+			    self.stats = [];
+			    self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 		    });
 		}, function() {
 		}).catch(swal.noop);

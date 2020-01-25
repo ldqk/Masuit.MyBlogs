@@ -139,5 +139,19 @@ namespace Masuit.MyBlogs.Core.Controllers
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已被拒绝", content, merge.ModifierEmail));
             return ResultData(null, true, "合并已拒绝！");
         }
+
+        /// <summary>
+        /// 标记为恶意修改
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost("block/{id}")]
+        public ActionResult Block(int id)
+        {
+            var merge = PostMergeRequestService.GetById(id) ?? throw new NotFoundException("待合并文章未找到");
+            merge.MergeState = MergeStatus.Block;
+            var b = PostMergeRequestService.SaveChanges() > 0;
+            return b ? ResultData(null, true, "操作成功！") : ResultData(null, false, "操作失败！");
+        }
     }
 }

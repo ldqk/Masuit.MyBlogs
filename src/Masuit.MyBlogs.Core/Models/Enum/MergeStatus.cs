@@ -18,6 +18,11 @@
         /// <summary>
         /// 拒绝
         /// </summary>
-        Reject
+        Reject,
+
+        /// <summary>
+        /// 阻止恶意修改
+        /// </summary>
+        Block
     }
 }
