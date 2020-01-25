@@ -24,10 +24,7 @@ namespace Masuit.MyBlogs.Core
             opt.ListenAnyIP(port.ToInt32());
             if (bool.Parse(config["Https:Enabled"]))
             {
-                opt.ListenAnyIP(config["Https:Port"].ToInt32(), s =>
-                {
-                    s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]);
-                });
+                opt.ListenAnyIP(config["Https:Port"].ToInt32(), s => s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]));
             }
             opt.Limits.MaxRequestBodySize = null;
         }).UseIISIntegration().UseStartup<Startup>());
