@@ -50,6 +50,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                     item.ModifyDate = dic[item.Id].ModifyDate;
                     item.CommentCount = dic[item.Id].CommentCount;
                     item.TotalViewCount = dic[item.Id].TotalViewCount;
+                    item.CategoryId = dic[item.Id].CategoryId;
                 }
 
                 return item;

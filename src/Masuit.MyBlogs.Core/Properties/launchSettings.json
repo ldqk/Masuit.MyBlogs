@@ -18,7 +18,7 @@
     "Masuit.MyBlogs.Core": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": ""
       },
       "applicationUrl": "http://localhost:5000"
     }

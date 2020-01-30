@@ -4,7 +4,7 @@
     ViewBag.Title = "正在编辑：" + Model.Post.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<link href="https://cdn.bootcss.com/limonte-sweetalert2/8.11.8/sweetalert2.min.css" rel="stylesheet">
+<link href="https://cdn.staticfile.org/limonte-sweetalert2/8.11.8/sweetalert2.min.css" rel="stylesheet">
 <div class="container">
     <ol class="cd-breadcrumb triangle">
         <li>@Html.ActionLink("首页", "Index", "Home")</li>
@@ -57,7 +57,7 @@
 </div>
 <script src="~/Assets/UEditor/ueditor.config.front.min.js"></script>
 <script src="~/Assets/UEditor/ueditor.all.min.js"></script>
-<script src="https://cdn.bootcss.com/limonte-sweetalert2/8.11.8/sweetalert2.min.js"></script>
+<script src="https://cdn.staticfile.org/limonte-sweetalert2/8.11.8/sweetalert2.min.js"></script>
 <script>
     $(function () {
         if (window.UE) {

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
 using CacheManager.Core;
 using EFSecondLevelCache.Core;
 using Masuit.MyBlogs.Core.Configs;
@@ -41,8 +42,8 @@ namespace Masuit.MyBlogs.Core.Extensions
         /// <returns></returns>
         public static IServiceCollection AddMapper(this IServiceCollection services)
         {
-            var mc = new MapperConfiguration(e => e.AddProfile(new MappingProfile()));
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            var mc = new MapperConfiguration(cfg => cfg.AddExpressionMapping().AddProfile(new MappingProfile()));
+            services.AddAutoMapper(cfg => cfg.AddExpressionMapping().AddProfile(new MappingProfile()), Assembly.GetExecutingAssembly());
             services.AddSingleton(mc);
             return services;
         }
