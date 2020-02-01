@@ -31,6 +31,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using StackExchange.Profiling;
 using System;
@@ -63,12 +64,18 @@ namespace Masuit.MyBlogs.Core
         /// <param name="configuration"></param>
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
-            AppConfig.ConnString = configuration[nameof(AppConfig.ConnString)];
-            AppConfig.BaiduAK = configuration[nameof(AppConfig.BaiduAK)];
-            AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
-            configuration.Bind("Imgbed:AliyunOSS", AppConfig.AliOssConfig);
-            configuration.Bind("Imgbed:Gitlabs", AppConfig.GitlabConfigs);
+            void BindConfig()
+            {
+                Configuration = configuration;
+                AppConfig.ConnString = configuration[nameof(AppConfig.ConnString)];
+                AppConfig.BaiduAK = configuration[nameof(AppConfig.BaiduAK)];
+                AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
+                configuration.Bind("Imgbed:AliyunOSS", AppConfig.AliOssConfig);
+                configuration.Bind("Imgbed:Gitlabs", AppConfig.GitlabConfigs);
+            }
+
+            ChangeToken.OnChange(configuration.GetReloadToken, BindConfig);
+            BindConfig();
         }
 
         /// <summary>
