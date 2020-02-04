@@ -156,19 +156,19 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult Last()
         {
-            if (Request.Cookies.TryGetValue("last-notice", out var json))
-            {
-                var data = JsonConvert.DeserializeObject<NoticeOutputDto>(json);
-                if (!NoticeService.Any(n => n.Id > data.Id))
-                {
-                    return ResultData(data);
-                }
-            }
-
             var notice = NoticeService.Get(n => n.Status == Status.Display, n => n.ModifyDate, false);
             if (notice == null)
             {
                 return ResultData(null, false);
+            }
+
+            if (Request.Cookies.TryGetValue("last-notice", out var json))
+            {
+                var data = JsonConvert.DeserializeObject<NoticeOutputDto>(json);
+                if (notice.Id == data.Id)
+                {
+                    return ResultData(data);
+                }
             }
 
             notice.ViewCount += 1;

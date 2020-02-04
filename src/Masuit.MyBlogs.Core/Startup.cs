@@ -177,9 +177,6 @@ namespace Masuit.MyBlogs.Core
                 app.UseHttpsRedirection().UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
             }
 
-            app.UseSession().UseCookiePolicy().UseMiniProfiler(); //注入Session
-            app.UseRequestIntercept(); //启用网站请求拦截
-            app.UseStaticHttpContext(); //注入静态HttpContext对象
             app.UseStaticFiles(new StaticFileOptions //静态资源缓存策略
             {
                 OnPrepareResponse = context =>
@@ -189,6 +186,9 @@ namespace Masuit.MyBlogs.Core
                 },
                 ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes),
             });
+            app.UseSession().UseCookiePolicy().UseMiniProfiler(); //注入Session
+            app.UseRequestIntercept(); //启用网站请求拦截
+            app.UseStaticHttpContext(); //注入静态HttpContext对象
 
             app.UseHangfireServer().UseHangfireDashboard("/taskcenter", new DashboardOptions()
             {

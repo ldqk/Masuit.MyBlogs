@@ -25,6 +25,7 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             File.WriteAllLines(logPath, RequestLogs.OrderBy(x => x.Key).ThenByDescending(x => x.Value).Select(x => x.Value + "\t" + x.Key), Encoding.UTF8);
+            File.AppendAllLines(logPath, new[] { "", $"累计处理请求数：{RequestLogs.Sum(kv => kv.Value)}" });
             RequestLogs.Clear();
         }
     }

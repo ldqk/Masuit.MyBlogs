@@ -23,8 +23,8 @@
 
     <ItemGroup>
         <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.9.1" />
-        <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
-        <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="3.0.5" />
+        <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
+        <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="3.0.6" />
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="2.0.0-beta-1629" />
         <PackageReference Include="CacheManager.Serialization.Json" Version="2.0.0-beta-1629" />
@@ -42,7 +42,7 @@
         <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.1.0" />
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.1.0" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.0" />
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.1" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.20" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.6.0" />
         <PackageReference Include="WinInsider.System.Net.Http.Formatting" Version="1.0.14" />
