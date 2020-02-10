@@ -324,6 +324,17 @@ Custom bottom spacer
 .text-white {
     color: white;
 }
+.text-focus {
+    background-color: yellow;
+    color: red;
+    font-size: 22px !important;
+    -ms-border-radius: 5px;
+    border-radius: 5px;
+    border: dotted 3px red;
+    padding: 5px;
+    box-shadow: grey 0px 3px 15px;
+}
+
 .inline {
     display: inline !important;
 }

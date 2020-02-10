@@ -27,6 +27,7 @@ namespace Masuit.MyBlogs.Core
             {
                 opt.ListenAnyIP(sslport.ToInt32(), s => s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]));
             }
+
             opt.Limits.MaxRequestBodySize = null;
             Console.WriteLine($"应用程序监听端口：http：{port}，https：{sslport}");
         }).UseIISIntegration().UseStartup<Startup>());
