@@ -1,12 +1,15 @@
 ﻿@using System.Web
 @using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools
+@using Microsoft.AspNetCore.Mvc.Rendering
 @model IList<Masuit.MyBlogs.Core.Models.DTO.PostOutputDto>
 @{
     ViewBag.Title = "站内搜索：" + ViewBag.Keyword;
     Layout = "~/Views/Shared/_Layout.cshtml";
     List<KeywordsRank> hotSearches = ViewBag.hotSearches;
+    Advertisement ad = ViewBag.Ads;
 }
 <div class="container min-height610">
     <ol class="cd-breadcrumb triangle">
@@ -47,20 +50,36 @@
                         <div class="hr-line-dashed"></div>
                         @if (Model.Any())
                         {
-                            foreach (PostOutputDto p in Model)
+                            var rnd = new Random().Next(Model.Count > 2 ? 2 : 0, Model.Count);
+                            for (var i = 0; i < Model.Count; i++)
                             {
+                                if (rnd == i && ad != null)
+                                {
+                                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
+                                    <div class="hr-line-dashed"></div>
+                                }
+
+                                PostOutputDto p = Model[i];
                                 <div class="border padding-10 padding-bot5">
                                     <div class="search-result">
                                         <h2 class="size20">
                                             <a asp-controller="Post" asp-action="Details" asp-route-id="@p.Id" asp-route-kw="@ViewBag.Keyword" target="_blank">@Html.Raw(p.Title)</a>
                                         </h2>
                                         <div>
-                                            作者：<label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：@p.ModifyDate.ToString("yyyy-MM-dd HH:mm") | 分类：@Html.ActionLink(p.CategoryName, "Category", "Home", new { id = p.CategoryId }, null)
+                                            作者：
+                                            <label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：@(p.ModifyDate.ToString("yyyy-MM-dd HH:mm")) | 分类：@(Html.ActionLink(p.CategoryName, "Category", "Home", new { id = p.CategoryId }, null))
                                         </div>
                                         <p class="size14">@Html.Raw(p.Content)</p>
                                         <div class="row">
                                             <div class="col-md-6">
-                                                @Html.ActionLink(Context.Request.Scheme + "://" + Context.Request.Host + "/" + p.Id, "Details", "Post", new { id = p.Id }, new { @class = "search-link", target = "_blank" })
+                                                @Html.ActionLink(Context.Request.Scheme + "://" + Context.Request.Host + "/" + p.Id, "Details", "Post", new
+                                                {
+                                                    id = p.Id
+                                                }, new
+                                                {
+                                                    @class = "search-link",
+                                                    target = "_blank"
+                                                })
                                             </div>
                                             <div class="col-md-6 pull-right text-right">
                                                 @p.CommentCount 评论 | @p.TotalViewCount 浏览

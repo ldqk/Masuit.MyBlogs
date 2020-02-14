@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Mvc;
@@ -77,6 +78,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     CacheManager.Expire(key, TimeSpan.FromSeconds(10));
                 }
 
+                ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
                 ViewBag.hotSearches = new List<KeywordsRank>();
                 return View(posts.Results);
             }
