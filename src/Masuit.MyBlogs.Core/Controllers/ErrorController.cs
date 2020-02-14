@@ -5,11 +5,15 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
+using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Masuit.Tools.Systems;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Web;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -48,6 +52,34 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("ServiceUnavailable"), ResponseCache(Duration = 36000)]
         public ActionResult ServiceUnavailable()
         {
+            var feature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            string err;
+            var req = HttpContext.Request;
+            var ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            switch (feature.Error)
+            {
+                case DbUpdateConcurrencyException ex:
+                    err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
+                    LogManager.Error(err, ex);
+                    break;
+                case DbUpdateException ex:
+                    err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{ip}\t{ex?.InnerException?.Message}\t";
+                    LogManager.Error(err, ex);
+                    break;
+                case AggregateException ex:
+                    LogManager.Debug("↓↓↓" + ex.Message + "↓↓↓");
+                    ex.Handle(e =>
+                    {
+                        LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{ip}\t", e);
+                        return true;
+                    });
+                    break;
+                case NotFoundException _:
+                    return View("Index");
+                default:
+                    LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{ip}\t", feature.Error);
+                    break;
+            }
             if (Request.Method.ToLower().Equals("get"))
             {
                 Response.StatusCode = 503;

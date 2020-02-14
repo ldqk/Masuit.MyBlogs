@@ -30,7 +30,6 @@ using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using StackExchange.Profiling;
@@ -39,6 +38,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.FileProviders;
 using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -158,15 +158,8 @@ namespace Masuit.MyBlogs.Core
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext db, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
             app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For
+            app.UseExceptionHandler("/ServiceUnavailable");
             ServiceProvider = app.ApplicationServices;
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
 
             //db.Database.Migrate();
             var dic = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
@@ -180,8 +173,8 @@ namespace Masuit.MyBlogs.Core
             {
                 app.UseHttpsRedirection().UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
             }
-
-            app.UseStaticFiles(new StaticFileOptions //静态资源缓存策略
+            
+            app.UseDefaultFiles().UseStaticFiles(new StaticFileOptions //静态资源缓存策略
             {
                 OnPrepareResponse = context =>
                 {
