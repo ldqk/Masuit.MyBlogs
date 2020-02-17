@@ -1,5 +1,5 @@
 ### Masuit.MyBlogs
-masuit.com个人博客站项目源码
+masuit.com个人博客站项目源码，高性能低占用的博客系统，这也许是我写过的性能最高的web项目了。
 ### 演示站点
 [https://masuit.com](https://masuit.com)
 
