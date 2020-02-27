@@ -163,7 +163,7 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             var objectName = DateTime.Now.ToString("yyyy/MM/dd/") + file;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 3; i++)
             {
                 try
                 {

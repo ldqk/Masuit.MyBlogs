@@ -101,23 +101,25 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 支持数
         /// </summary>
-        [DefaultValue(0)]
+        [DefaultValue(0), ConcurrencyCheck]
         public int VoteUpCount { get; set; }
 
         /// <summary>
         /// 反对数
         /// </summary>
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed), DefaultValue(0)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed), DefaultValue(0), ConcurrencyCheck]
         public int VoteDownCount { get; set; }
 
         /// <summary>
         /// 每日平均访问量
         /// </summary>
+        [ConcurrencyCheck]
         public double AverageViewCount { get; set; }
 
         /// <summary>
         /// 总访问量
         /// </summary>
+        [ConcurrencyCheck]
         public int TotalViewCount { get; set; }
 
         /// <summary>

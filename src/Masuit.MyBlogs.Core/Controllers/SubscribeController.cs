@@ -79,7 +79,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Name = p.Author,
                     Email = p.Email
                 },
-                Body = p.Content.GetSummary(300, 10),
+                Body = p.Content.GetSummary(300, 50),
                 Categories = new List<string>
                 {
                     p.Category.Name

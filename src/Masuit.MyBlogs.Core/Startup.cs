@@ -38,7 +38,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Extensions.FileProviders;
 using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -161,7 +160,7 @@ namespace Masuit.MyBlogs.Core
             app.UseExceptionHandler("/ServiceUnavailable");
             ServiceProvider = app.ApplicationServices;
 
-            //db.Database.Migrate();
+            db.Database.EnsureCreated();
             var dic = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
             foreach (var (key, value) in dic)
             {
@@ -173,7 +172,7 @@ namespace Masuit.MyBlogs.Core
             {
                 app.UseHttpsRedirection().UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
             }
-            
+
             app.UseDefaultFiles().UseStaticFiles(new StaticFileOptions //静态资源缓存策略
             {
                 OnPrepareResponse = context =>
