@@ -382,14 +382,14 @@ function bindVote() {
 					});
 				}
 			}
-		});
-	}, () => {
-        window.notie.alert({
-		    type: 3,
-		    text: "请求失败，请稍候再试！",
-		    time: 4
-	    });
-    });
+		}, () => {
+            window.notie.alert({
+				type: 3,
+				text: "请求失败，请稍候再试！",
+				time: 4
+			});
+        });
+	});
 }
 
 //递归加载评论

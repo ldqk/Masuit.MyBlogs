@@ -226,12 +226,20 @@
 				}
 				$scope.CheckLogin(res.data);
 			}
-		}, function() {
-			window.notie.alert({
-				type:3,
-				text:'服务请求失败！',
-				time:4
-			});
+		}, function(e) {
+            if (e.data) {
+                window.notie.alert({
+				    type:3,
+				    text:e.data.Message,
+				    time:4
+			    });
+            } else {
+                window.notie.alert({
+				    type:3,
+				    text:'服务请求失败！',
+				    time:4
+			    });
+            }
 			$scope.loadingDone();
 		});
 	}

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.LuceneEFCore.SearchE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.Tools.Core", "..\..\Masuit.Tools\Masuit.Tools.Core\Masuit.Tools.Core.csproj", "{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Masuit.MyBlogs.Core", "Masuit.MyBlogs.Core\Masuit.MyBlogs.Core.csproj", "{2F8270E4-5E57-4CE4-AB5F-8008F9FC8C7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.MyBlogs.Core", "Masuit.MyBlogs.Core\Masuit.MyBlogs.Core.csproj", "{2F8270E4-5E57-4CE4-AB5F-8008F9FC8C7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

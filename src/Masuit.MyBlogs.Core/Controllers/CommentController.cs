@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -38,19 +39,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Put(CommentInputDto dto)
+        public async Task<ActionResult> Put(CommentInputDto dto)
         {
             if (Regex.Match(dto.Content, CommonHelper.BanRegex).Length > 0)
             {
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
 
-            Post post = PostService.GetById(dto.PostId);
-            if (post is null)
-            {
-                return ResultData(null, false, "评论失败，文章不存在！");
-            }
-
+            Post post = await PostService.GetByIdAsync(dto.PostId) ?? throw new NotFoundException("评论失败，文章未找到");
             if (post.DisableComment)
             {
                 return ResultData(null, false, "本文已禁用评论功能，不允许任何人回复！");
@@ -104,7 +100,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 if (!comment.IsMaster)
                 {
-                    MessageService.AddEntitySaved(new InternalMessage()
+                    await MessageService.AddEntitySavedAsync(new InternalMessage()
                     {
                         Title = $"来自【{comment.NickName}】的新文章评论",
                         Content = comment.Content,
@@ -153,22 +149,21 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult CommentVote(int id)
+        public async Task<ActionResult> CommentVote(int id)
         {
-            Comment cm = CommentService.Get(c => c.Id == id && c.Status == Status.Pended);
             if (HttpContext.Session.Get("cm" + id) != null)
             {
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
 
-            if (cm == null)
+            var cm = await CommentService.GetAsync(c => c.Id == id && c.Status == Status.Pended) ?? throw new NotFoundException("评论不存在！");
+            cm.VoteCount++;
+            bool b = CommentService.SaveChanges() > 0;
+            if (b)
             {
-                return ResultData(null, false, "非法操作");
+                HttpContext.Session.Set("cm" + id, id.GetBytes());
             }
 
-            cm.VoteCount++;
-            HttpContext.Session.Set("cm" + id, id.GetBytes());
-            bool b = CommentService.SaveChanges() > 0;
             return ResultData(null, b, b ? "投票成功" : "投票失败");
         }
 
@@ -227,12 +222,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Pass(int id)
+        public async Task<ActionResult> Pass(int id)
         {
-            Comment comment = CommentService.GetById(id);
+            Comment comment = await CommentService.GetByIdAsync(id) ?? throw new NotFoundException("评论不存在！");
             comment.Status = Status.Pended;
-            Post post = PostService.GetById(comment.PostId);
-            bool b = CommentService.SaveChanges() > 0;
+            Post post = await PostService.GetByIdAsync(comment.PostId);
+            bool b = await CommentService.SaveChangesAsync() > 0;
             if (b)
             {
                 var pid = comment.ParentId == 0 ? comment.Id : CommentService.GetParentCommentIdByChildId(id);

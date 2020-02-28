@@ -76,8 +76,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                             return true;
                         });
                         break;
-                    case NotFoundException _:
-                        return View("Index");
+                    case NotFoundException ex:
+                        Response.StatusCode = 404;
+                        return Request.Method.ToLower().Equals("get") ? (ActionResult)View("Index") : Json(new
+                        {
+                            StatusCode = 404,
+                            Success = false,
+                            ex.Message
+                        });
                     default:
                         LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{ip}\t", feature.Error);
                         break;

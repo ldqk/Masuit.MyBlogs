@@ -107,7 +107,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// ·´¶ÔÊý
         /// </summary>
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed), DefaultValue(0), ConcurrencyCheck]
+        [DefaultValue(0), ConcurrencyCheck]
         public int VoteDownCount { get; set; }
 
         /// <summary>

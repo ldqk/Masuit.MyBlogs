@@ -61,9 +61,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="kw"></param>
         /// <returns></returns>
         [Route("{id:int}/{kw}"), Route("{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
-        public ActionResult Details(int id, string kw)
+        public async Task<ActionResult> Details(int id, string kw)
         {
-            var post = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             ViewBag.Keyword = post.Keyword + "," + post.Label;
             var modifyDate = post.ModifyDate;
             ViewBag.Next = PostService.GetFromCache<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.Status == Status.Pended || CurrentUser.IsAdmin), p => p.ModifyDate);
@@ -96,9 +96,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("{id:int}/history"), Route("{id:int}/history/{page:int}/{size:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size" }, VaryByHeader = "Cookie")]
-        public ActionResult History(int id, int page = 1, int size = 20)
+        public async Task<ActionResult> History(int id, int page = 1, int size = 20)
         {
-            var post = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostOutputDto>() ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             ViewBag.Primary = post;
             var list = PostHistoryVersionService.GetPages(page, size, out int total, v => v.PostId == id, v => v.ModifyDate, false).ToList();
             ViewBag.Total = total;
@@ -115,11 +115,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="hid"></param>
         /// <returns></returns>
         [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "hid" }, VaryByHeader = "Cookie")]
-        public ActionResult HistoryVersion(int id, int hid)
+        public async Task<ActionResult> HistoryVersion(int id, int hid)
         {
-            var post = PostHistoryVersionService.Get(v => v.Id == hid) ?? throw new NotFoundException("文章未找到");
-            ViewBag.Next = PostHistoryVersionService.Get(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
-            ViewBag.Prev = PostHistoryVersionService.Get(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
+            var post = await PostHistoryVersionService.GetAsync(v => v.Id == hid) ?? throw new NotFoundException("文章未找到");
+            ViewBag.Next = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
+            ViewBag.Prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
             return CurrentUser.IsAdmin ? View("HistoryVersion_Admin", post) : View(post);
         }
@@ -132,11 +132,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="v2"></param>
         /// <returns></returns>
         [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "v1", "v2" }, VaryByHeader = "Cookie")]
-        public ActionResult CompareVersion(int id, int v1, int v2)
+        public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
         {
             var main = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
-            var left = v1 <= 0 ? main : PostHistoryVersionService.Get(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
-            var right = v2 <= 0 ? main : PostHistoryVersionService.Get(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
+            var left = v1 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
+            var right = v2 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
             main.Id = id;
             var diff = new HtmlDiff.HtmlDiff(right.Content, left.Content);
             var diffOutput = diff.Build();
@@ -151,24 +151,22 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult VoteDown(int id)
+        public async Task<ActionResult> VoteDown(int id)
         {
             if (HttpContext.Session.Get("post-vote" + id) != null)
             {
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
 
-            Post post = PostService.GetById(id);
-            if (post == null)
+            Post post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            post.VoteDownCount = post.VoteDownCount + 1;
+            var b = PostService.SaveChanges() > 0;
+            if (b)
             {
-                return ResultData(null, false, "非法操作");
+                HttpContext.Session.Set("post-vote" + id, id.GetBytes());
             }
 
-            HttpContext.Session.Set("post-vote" + id, id.GetBytes());
-            post.VoteDownCount += 1;
-            var b = PostService.SaveChanges() > 0;
             return ResultData(null, b, b ? "投票成功！" : "投票失败！");
-
         }
 
         /// <summary>
@@ -176,24 +174,22 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult VoteUp(int id)
+        public async Task<ActionResult> VoteUp(int id)
         {
             if (HttpContext.Session.Get("post-vote" + id) != null)
             {
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
 
-            Post post = PostService.GetById(id);
-            if (post == null)
+            Post post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            post.VoteUpCount += 1;
+            var b = await PostService.SaveChangesAsync() > 0;
+            if (b)
             {
-                return ResultData(null, false, "非法操作");
+                HttpContext.Session.Set("post-vote" + id, id.GetBytes());
             }
 
-            HttpContext.Session.Set("post-vote" + id, id.GetBytes());
-            post.VoteUpCount += 1;
-            var b = PostService.SaveChanges() > 0;
             return ResultData(null, b, b ? "投票成功！" : "投票失败！");
-
         }
 
         /// <summary>
@@ -216,7 +212,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Publish(PostInputDto post, [Required(ErrorMessage = "验证码不能为空")]string code)
         {
-            if (RedisHelper.Get("code:" + post.Email) != code)
+            if (await RedisHelper.GetAsync("code:" + post.Email) != code)
             {
                 return ResultData(null, false, "验证码错误！");
             }
@@ -245,7 +241,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "文章发表失败！");
             }
 
-            RedisHelper.Expire("code:" + p.Email, 1);
+            await RedisHelper.ExpireAsync("code:" + p.Email, 1);
             var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/publish.html")
                 .Replace("{{link}}", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
                 .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
@@ -465,7 +461,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Fixtop(int id)
         {
-            Post post = PostService.GetById(id);
+            Post post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
             post.IsFixedTop = !post.IsFixedTop;
             bool b = PostService.SaveChanges() > 0;
             return b ? ResultData(null, true, post.IsFixedTop ? "置顶成功！" : "取消置顶成功！") : ResultData(null, false, "操作失败！");
@@ -479,7 +475,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Pass(int id)
         {
-            Post post = PostService.GetById(id);
+            Post post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
             post.Status = Status.Pended;
             post.ModifyDate = DateTime.Now;
             post.PostDate = DateTime.Now;
@@ -528,7 +524,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Delete(int id)
         {
-            var post = PostService.GetById(id);
+            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
             post.Status = Status.Deleted;
             bool b = PostService.SaveChanges(true) > 0;
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
@@ -542,7 +538,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Restore(int id)
         {
-            var post = PostService.GetById(id);
+            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
             post.Status = Status.Pended;
             bool b = PostService.SaveChanges() > 0;
             SearchEngine.LuceneIndexer.Add(post);
@@ -557,12 +553,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Truncate(int id)
         {
-            var post = PostService.GetById(id);
-            if (post is null)
-            {
-                return ResultData(null, false, "文章已经被删除！");
-            }
-
+            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
             var srcs = post.Content.MatchImgSrcs();
             foreach (var path in srcs)
             {
@@ -590,7 +581,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Get(int id)
         {
-            Post post = PostService.GetById(id);
+            Post post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
             PostOutputDto model = post.Mapper<PostOutputDto>();
             model.Seminars = post.Seminar.Select(s => s.Seminar.Title).Join(",");
             return ResultData(model);
@@ -868,8 +859,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult AddSeminar(int id, int sid)
         {
-            var post = PostService.GetById(id);
-            Seminar seminar = SeminarService.GetById(sid);
+            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            Seminar seminar = SeminarService.GetById(sid) ?? throw new NotFoundException("专题未找到");
             post.Seminar.Add(new SeminarPost()
             {
                 Post = post,
@@ -890,8 +881,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult RemoveSeminar(int id, int sid)
         {
-            var post = PostService.GetById(id);
-            Seminar seminar = SeminarService.GetById(sid);
+            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            Seminar seminar = SeminarService.GetById(sid) ?? throw new NotFoundException("专题未找到");
             post.Seminar.Remove(new SeminarPost()
             {
                 Post = post,
@@ -923,12 +914,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Revert(int id)
         {
-            var history = PostHistoryVersionService.GetById(id);
-            if (history == null)
-            {
-                return ResultData(null, false, "版本不存在");
-            }
-
+            var history = PostHistoryVersionService.GetById(id) ?? throw new NotFoundException("版本不存在");
             history.Post.Category = history.Category;
             history.Post.CategoryId = history.CategoryId;
             history.Post.Content = history.Content;
@@ -959,12 +945,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult DisableComment(int id)
         {
-            var post = PostService.GetById(id);
-            if (post is null)
-            {
-                return ResultData(null, false, "文章不存在");
-            }
-
+            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
             post.DisableComment = !post.DisableComment;
             return ResultData(null, SearchEngine.SaveChanges() > 0, post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
         }

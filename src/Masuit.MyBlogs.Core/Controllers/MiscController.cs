@@ -128,12 +128,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Delete(int id)
         {
-            var post = MiscService.GetById(id);
-            if (post is null)
-            {
-                return ResultData(null, false, "杂项页已经被删除！");
-            }
-
+            var post = MiscService.GetById(id) ?? throw new NotFoundException("杂项页已被删除！");
             var srcs = post.Content.MatchImgSrcs().Where(s => s.StartsWith("/"));
             foreach (var path in srcs)
             {
@@ -158,7 +153,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Edit(Misc misc)
         {
-            var entity = MiscService.GetById(misc.Id);
+            var entity = MiscService.GetById(misc.Id) ?? throw new NotFoundException("杂项页未找到");
             entity.ModifyDate = DateTime.Now;
             entity.Title = misc.Title;
             entity.Content = await ImagebedClient.ReplaceImgSrc(misc.Content.ClearImgAttributes());

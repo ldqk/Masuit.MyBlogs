@@ -28,7 +28,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> Redirect(int id)
         {
-            var ad = AdsService.GetById(id) ?? throw new NotFoundException("广告不存在");
+            var ad = await AdsService.GetByIdAsync(id) ?? throw new NotFoundException("推广链接不存在");
             if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("ads" + id)))
             {
                 HttpContext.Session.Set("ads" + id, id.ToString());
@@ -40,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
-        /// 获取文章分页
+        /// 获取分页
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
@@ -68,7 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<IActionResult> Save(AdvertisementDto model)
         {
             model.CategoryId = model.CategoryId?.Replace("null", "");
-            var entity = AdsService.GetById(model.Id);
+            var entity = await AdsService.GetByIdAsync(model.Id);
             if (entity != null)
             {
                 Mapper.Map(model, entity);
@@ -76,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, b1, b1 ? "修改成功" : "修改失败");
             }
 
-            bool b = AdsService.AddEntitySaved(model.Mapper<Advertisement>()) != null;
+            bool b = await AdsService.AddEntitySavedAsync(model.Mapper<Advertisement>()) > 0;
             return ResultData(null, b, b ? "添加成功" : "添加失败");
         }
 
@@ -86,9 +86,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost("{id}"), HttpGet("{id}"), MyAuthorize]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            bool b = AdsService.DeleteByIdSaved(id);
+            bool b = await AdsService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
 
@@ -101,15 +101,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize, HttpPost("{id}")]
         public ActionResult ChangeState(int id)
         {
-            var ad = AdsService.GetById(id);
-            if (ad != null)
-            {
-                ad.Status = ad.Status == Status.Available ? Status.Unavailable : Status.Available;
-                return ResultData(null, AdsService.SaveChanges() > 0, ad.Status == Status.Available ? $"【{ad.Title}】已上架！" : $"【{ad.Title}】已下架！");
-            }
-
-            return ResultData(null, false, "广告不存在");
+            var ad = AdsService.GetById(id) ?? throw new NotFoundException("广告不存在！");
+            ad.Status = ad.Status == Status.Available ? Status.Unavailable : Status.Available;
+            return ResultData(null, AdsService.SaveChanges() > 0, ad.Status == Status.Available ? $"【{ad.Title}】已上架！" : $"【{ad.Title}】已下架！");
         }
-
     }
 }

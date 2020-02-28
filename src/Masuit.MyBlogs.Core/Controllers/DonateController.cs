@@ -1,9 +1,11 @@
-﻿using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+﻿using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -35,9 +37,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
-            Donate donate = DonateService.GetById(id);
+            Donate donate = await DonateService.GetByIdAsync(id) ?? throw new NotFoundException("条目不存在！");
             return ResultData(donate);
         }
 
@@ -46,13 +48,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="donate"></param>
         /// <returns></returns>
-        public ActionResult Save(Donate donate)
+        public async Task<ActionResult> Save(Donate donate)
         {
-            var entry = DonateService.GetById(donate.Id);
+            var entry = await DonateService.GetByIdAsync(donate.Id);
             bool b;
             if (entry is null)
             {
-                b = DonateService.AddEntitySaved(donate) != null;
+                b = await DonateService.AddEntitySavedAsync(donate) > 0;
             }
             else
             {
@@ -64,7 +66,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 entry.QQorWechat = donate.QQorWechat;
                 entry.QQorWechatDisplay = donate.QQorWechatDisplay;
                 entry.Via = donate.Via;
-                b = DonateService.SaveChanges() > 0;
+                b = await DonateService.SaveChangesAsync() > 0;
             }
             return ResultData(null, b, b ? "保存成功！" : "保存失败！");
         }

@@ -2,7 +2,7 @@
 @using Masuit.MyBlogs.Core.Models.Entity
 @model List<Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion>
 @{
-    var post = (PostOutputDto)ViewBag.Primary;
+    var post = (Post)ViewBag.Primary;
     ViewBag.Title = post.Title + "的历史版本";
     Layout = "~/Views/Shared/_Layout.cshtml";
     Advertisement ad = ViewBag.Ads;
@@ -35,7 +35,7 @@
                     @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null) <span class="text-red">(最新版本)</span>
                 </td>
                 <td>
-                    @Html.ActionLink(post.CategoryName, "Category", "Home", new { id = post.CategoryId }, null)
+                    @Html.ActionLink(post.Category.Name, "Category", "Home", new { id = post.CategoryId }, null)
                 </td>
                 <td>@post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
                 <td>@post.Modifier</td>
