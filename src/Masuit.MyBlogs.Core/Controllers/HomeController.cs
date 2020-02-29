@@ -160,7 +160,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取页面视图模型
         /// </summary>
         /// <returns></returns>
-        private IndexPageViewModel GetIndexPageViewModel()
+        private HomePageViewModel GetIndexPageViewModel()
         {
             var postsQuery = PostService.GetQuery<PostDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
             var notices = NoticeService.GetPagesFromCache<DateTime, NoticeDto>(1, 5, out _, n => (n.Status == Status.Display || CurrentUser.IsAdmin), n => n.ModifyDate, false).ToList(); //加载前5条公告
@@ -185,7 +185,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            return new IndexPageViewModel()
+            return new HomePageViewModel()
             {
                 Categories = cats,
                 HotSearch = hotSearches,

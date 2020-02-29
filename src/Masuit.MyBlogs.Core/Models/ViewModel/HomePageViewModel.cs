@@ -8,7 +8,7 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
     /// <summary>
     /// 首页视图模型
     /// </summary>
-    public class IndexPageViewModel
+    public class HomePageViewModel
     {
         /// <summary>
         /// 文章列表
