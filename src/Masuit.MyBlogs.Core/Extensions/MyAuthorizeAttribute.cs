@@ -29,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 #if !DEBUG
-            UserInfoOutputDto user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+            UserInfoDto user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
             if (user != null && user.IsAdmin)
             {
                 return;

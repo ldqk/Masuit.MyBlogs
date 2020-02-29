@@ -125,7 +125,7 @@ namespace Masuit.MyBlogs.Core
             {
                 options.RouteBasePath = "/profiler";
                 options.EnableServerTimingHeader = true;
-                options.ResultsAuthorize = req => req.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo)?.IsAdmin ?? false;
+                options.ResultsAuthorize = req => req.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin ?? false;
                 options.ResultsListAuthorize = options.ResultsAuthorize;
                 options.IgnoredPaths.AddRange("/Assets/", "/Content/", "/fonts/", "/images/", "/ng-views/", "/Scripts/", "/static/", "/template/", "/cloud10.png", "/favicon.ico");
                 options.PopupRenderPosition = RenderPosition.BottomLeft;
@@ -247,7 +247,7 @@ namespace Masuit.MyBlogs.Core
 #if DEBUG
             return true;
 #endif
-            var user = context.GetHttpContext().Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            var user = context.GetHttpContext().Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
             return user.IsAdmin;
         }
     }

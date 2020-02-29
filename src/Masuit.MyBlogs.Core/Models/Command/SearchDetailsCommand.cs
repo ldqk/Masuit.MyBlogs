@@ -1,14 +1,14 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.Command
 {
     /// <summary>
     /// 搜索详细记录输入模型
     /// </summary>
-    public class SearchDetailsInputDto
+    public class SearchDetailsCommand
     {
-        public SearchDetailsInputDto()
+        public SearchDetailsCommand()
         {
             SearchTime = DateTime.Now;
         }

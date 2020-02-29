@@ -55,11 +55,14 @@ namespace Masuit.MyBlogs.Core.Extensions
         /// <returns></returns>
         public static IServiceCollection AddMyMvc(this IServiceCollection services)
         {
-            services.AddMvc().AddNewtonsoftJson(options =>
+            services.AddMvc(options =>
+            {
+                options.ReturnHttpNotAcceptable = true;
+            }).AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local; // 设置时区为 UTC
-            }).AddControllersAsServices().AddViewComponentsAsServices().AddTagHelpersAsServices(); // MVC
+            }).AddXmlDataContractSerializerFormatters().AddControllersAsServices().AddViewComponentsAsServices().AddTagHelpersAsServices(); // MVC
             services.Configure<WebEncoderOptions>(options =>
             {
                 options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);

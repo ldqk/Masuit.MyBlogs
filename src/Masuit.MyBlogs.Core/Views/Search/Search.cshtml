@@ -4,7 +4,7 @@
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools
 @using Microsoft.AspNetCore.Mvc.Rendering
-@model IList<Masuit.MyBlogs.Core.Models.DTO.PostOutputDto>
+@model IList<Masuit.MyBlogs.Core.Models.DTO.PostDto>
 @{
     ViewBag.Title = "站内搜索：" + ViewBag.Keyword;
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -59,7 +59,7 @@
                                     <div class="hr-line-dashed"></div>
                                 }
 
-                                PostOutputDto p = Model[i];
+                                PostDto p = Model[i];
                                 <div class="border padding-10 padding-bot5">
                                     <div class="search-result">
                                         <h2 class="size20">

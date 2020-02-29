@@ -3,7 +3,7 @@ using System;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
 {
-    public class BroadcastOutputDto : BaseDto
+    public class BroadcastDto : BaseDto
     {
         /// <summary>
         /// 订阅接收邮箱

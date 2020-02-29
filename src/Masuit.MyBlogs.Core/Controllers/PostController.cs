@@ -34,6 +34,7 @@ using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Masuit.MyBlogs.Core.Models.Command;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -210,7 +211,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="code"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Publish(PostInputDto post, [Required(ErrorMessage = "验证码不能为空")]string code)
+        public async Task<ActionResult> Publish(PostCommand post, [Required(ErrorMessage = "验证码不能为空")]string code)
         {
             if (await RedisHelper.GetAsync("code:" + post.Email) != code)
             {
@@ -247,7 +248,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Replace("{{title}}", p.Title);
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
-            return ResultData(p.Mapper<PostOutputDto>(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
+            return ResultData(p.Mapper<PostDto>(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
         }
 
         /// <summary>
@@ -381,7 +382,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("{id}/pushmerge")]
-        public ActionResult PushMerge(PostMergeRequestInputDto dto)
+        public ActionResult PushMerge(PostMergeRequestCommand dto)
         {
             if (RedisHelper.Get("code:" + dto.ModifierEmail) != dto.Code)
             {
@@ -582,7 +583,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Get(int id)
         {
             Post post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            PostOutputDto model = post.Mapper<PostOutputDto>();
+            PostDto model = post.Mapper<PostDto>();
             model.Seminars = post.Seminar.Select(s => s.Seminar.Title).Join(",");
             return ResultData(model);
         }
@@ -593,7 +594,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Read(int id) => ResultData(PostService.GetById(id).Mapper<PostOutputDto>());
+        public ActionResult Read(int id) => ResultData(PostService.GetById(id).Mapper<PostDto>());
 
         /// <summary>
         /// 获取文章分页
@@ -650,7 +651,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="reserve"></param>
         /// <returns></returns>
         [HttpPost, MyAuthorize]
-        public async Task<ActionResult> Edit(PostInputDto post, bool notify = true, bool reserve = true)
+        public async Task<ActionResult> Edit(PostCommand post, bool notify = true, bool reserve = true)
         {
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
@@ -683,7 +684,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 var history = p.Mapper<PostHistoryVersion>();
                 p.PostHistoryVersion.Add(history);
                 p.ModifyDate = DateTime.Now;
-                var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+                var user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
                 p.Modifier = user.NickName;
                 p.ModifierEmail = user.Email;
             }
@@ -742,7 +743,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 });
             }
 #endif
-            return ResultData(p.Mapper<PostOutputDto>(), message: "文章修改成功！");
+            return ResultData(p.Mapper<PostDto>(), message: "文章修改成功！");
         }
 
         /// <summary>
@@ -753,7 +754,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="schedule"></param>
         /// <returns></returns>
         [MyAuthorize, HttpPost]
-        public async Task<ActionResult> Write(PostInputDto post, DateTime? timespan, bool schedule = false)
+        public async Task<ActionResult> Write(PostCommand post, DateTime? timespan, bool schedule = false)
         {
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
@@ -813,7 +814,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 p.PostDate = timespan.Value;
                 p.ModifyDate = timespan.Value;
                 HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.PublishPost), args: p);
-                return ResultData(p.Mapper<PostOutputDto>(), message: $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！");
+                return ResultData(p.Mapper<PostDto>(), message: $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！");
             }
 
             PostService.AddEntity(p);

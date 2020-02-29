@@ -62,7 +62,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 from = HttpUtility.UrlDecode(from);
                 Response.Cookies.Append("refer", from);
             }
-            if (HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) != null)
+            if (HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) != null)
             {
                 if (string.IsNullOrEmpty(from))
                 {
@@ -166,9 +166,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetUserInfo()
         {
-            var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+            var user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
+            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoDto>();
 #endif
 
             return ResultData(user);

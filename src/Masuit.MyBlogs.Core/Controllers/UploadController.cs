@@ -169,7 +169,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("fileuploader")]
         public ActionResult UeditorFileUploader()
         {
-            UserInfoOutputDto user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+            UserInfoDto user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
             var action = Request.Query["action"].ToString() switch //通用
             {
                 "config" => (Handler)new ConfigHandler(HttpContext),

@@ -1,15 +1,16 @@
-using Masuit.Tools.Core.Validator;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Masuit.MyBlogs.Core.Models.DTO;
+using Masuit.Tools.Core.Validator;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.Command
 {
     /// <summary>
     /// 用户信息输入模型
     /// </summary>
-    public class UserInfoInputDto : BaseDto
+    public class UserInfoCommand : BaseDto
     {
-        public UserInfoInputDto()
+        public UserInfoCommand()
         {
             IsAdmin = false;
         }

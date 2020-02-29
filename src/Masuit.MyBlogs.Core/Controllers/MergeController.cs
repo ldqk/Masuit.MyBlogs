@@ -15,6 +15,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using Masuit.MyBlogs.Core.Models.Command;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -33,7 +34,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet("{id}")]
         public ActionResult Get(int id)
         {
-            return ResultData(Mapper.Map<PostMergeRequestOutputDto>(PostMergeRequestService.GetById(id)));
+            return ResultData(Mapper.Map<PostMergeRequestDto>(PostMergeRequestService.GetById(id)));
         }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(r => r.Title.Contains(kw) || r.Content.Contains(kw) || r.Modifier.Contains(kw) || r.ModifierEmail.Contains(kw));
             }
 
-            var list = PostMergeRequestService.GetQuery(where).OrderByDescending(d => d.MergeState == MergeStatus.Pending).ThenByDescending(r => r.Id).Skip((page - 1) * size).Take(size).ProjectTo<PostMergeRequestOutputDtoBase>(MapperConfig).ToList();
+            var list = PostMergeRequestService.GetQuery(where).OrderByDescending(d => d.MergeState == MergeStatus.Pending).ThenByDescending(r => r.Id).Skip((page - 1) * size).Take(size).ProjectTo<PostMergeRequestDtoBase>(MapperConfig).ToList();
             var count = PostMergeRequestService.Count(where);
             var pageCount = Math.Ceiling(count * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, count);
@@ -72,7 +73,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string diffOutput = diffHelper.Build();
             old.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);
             newer.Content = Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty);
-            return ResultData(new { old = old.Mapper<PostMergeRequestOutputDto>(), newer = newer.Mapper<PostMergeRequestOutputDto>() });
+            return ResultData(new { old = old.Mapper<PostMergeRequestDto>(), newer = newer.Mapper<PostMergeRequestDto>() });
         }
 
         /// <summary>
@@ -109,7 +110,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Merge([FromForm]PostMergeRequestInputDtoBase dto)
+        public IActionResult Merge([FromForm]PostMergeRequestCommandBase dto)
         {
             var merge = PostMergeRequestService.GetById(dto.Id) ?? throw new NotFoundException("待合并文章未找到");
             Mapper.Map(dto, merge);

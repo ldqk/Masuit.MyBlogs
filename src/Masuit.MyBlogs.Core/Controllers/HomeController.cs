@@ -55,7 +55,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin);
             var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner).OrderBy(a => Guid.NewGuid()).ToList();
             var fastShares = FastShareService.GetAllFromCache(s => s.Sort).ToList();
-            var postsQuery = PostService.GetQuery<PostOutputDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
+            var postsQuery = PostService.GetQuery<PostDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
             var posts = postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").Take(15).Cacheable().ToList();
             var viewModel = GetIndexPageViewModel();
             viewModel.Banner = banners;
@@ -77,7 +77,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             ViewBag.Total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin && !p.IsFixedTop);
             var viewModel = GetIndexPageViewModel();
-            var postsQuery = PostService.GetQuery<PostOutputDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
+            var postsQuery = PostService.GetQuery<PostDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
             var posts = postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
             if (page == 1)
             {
@@ -100,8 +100,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("tag/{id}/{page:int?}/{size:int?}/{orderBy:int?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         public ActionResult Tag(string id, [Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 15)
         {
-            var temp = PostService.GetQuery<PostOutputDto>(p => p.Label.Contains(id) && (p.Status == Status.Pended || CurrentUser.IsAdmin));
-            var posts = temp.OrderBy($"{nameof(PostOutputDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+            var temp = PostService.GetQuery<PostDto>(p => p.Label.Contains(id) && (p.Status == Status.Pended || CurrentUser.IsAdmin));
+            var posts = temp.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
             var viewModel = GetIndexPageViewModel();
             ViewBag.Total = temp.Count();
             ViewBag.Tag = id;
@@ -123,8 +123,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             Expression<Func<Post, bool>> where = p => p.Author.Equals(author) || p.Modifier.Equals(author) || p.Email.Equals(author) || p.PostHistoryVersion.Any(v => v.Modifier.Equals(author) || v.ModifierEmail.Equals(author));
             where = where.And(p => p.Status == Status.Pended || CurrentUser.IsAdmin);
-            var temp = PostService.GetQuery<PostOutputDto>(where);
-            var posts = temp.OrderBy($"{nameof(PostOutputDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+            var temp = PostService.GetQuery<PostDto>(where);
+            var posts = temp.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
             var viewModel = GetIndexPageViewModel();
             ViewBag.Total = temp.Count();
             ViewBag.Author = author;
@@ -146,10 +146,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Category(int id, [Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 15)
         {
             var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
-            var posts = PostService.GetQuery<PostOutputDto>(p => p.CategoryId == cat.Id && (p.Status == Status.Pended || CurrentUser.IsAdmin));
+            var posts = PostService.GetQuery<PostDto>(p => p.CategoryId == cat.Id && (p.Status == Status.Pended || CurrentUser.IsAdmin));
             ViewBag.Total = posts.Count();
             var viewModel = GetIndexPageViewModel();
-            viewModel.Posts = posts.OrderBy($"{nameof(PostOutputDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+            viewModel.Posts = posts.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
             ViewBag.CategoryName = cat.Name;
             ViewBag.Desc = cat.Description;
             ViewData["page"] = new Pagination(page, size, orderBy);
@@ -162,9 +162,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         private IndexPageViewModel GetIndexPageViewModel()
         {
-            var postsQuery = PostService.GetQuery<PostOutputDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
-            var notices = NoticeService.GetPagesFromCache<DateTime, NoticeOutputDto>(1, 5, out _, n => (n.Status == Status.Display || CurrentUser.IsAdmin), n => n.ModifyDate, false).ToList(); //加载前5条公告
-            var cats = CategoryService.GetQueryFromCache<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).ToList(); //加载分类目录
+            var postsQuery = PostService.GetQuery<PostDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
+            var notices = NoticeService.GetPagesFromCache<DateTime, NoticeDto>(1, 5, out _, n => (n.Status == Status.Display || CurrentUser.IsAdmin), n => n.ModifyDate, false).ToList(); //加载前5条公告
+            var cats = CategoryService.GetQueryFromCache<string, CategoryDto>(c => c.Status == Status.Available, c => c.Name).ToList(); //加载分类目录
             var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList(); //热词统计
             var hot6Post = postsQuery.OrderBy((new Random().Next() % 3) switch
             {

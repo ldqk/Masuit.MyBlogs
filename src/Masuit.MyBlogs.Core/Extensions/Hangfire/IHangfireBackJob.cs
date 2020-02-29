@@ -15,7 +15,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="userInfo"></param>
         /// <param name="ip"></param>
         /// <param name="type"></param>
-        void LoginRecord(UserInfoOutputDto userInfo, string ip, LoginType type);
+        void LoginRecord(UserInfoDto userInfo, string ip, LoginType type);
 
         /// <summary>
         /// 文章定时发表

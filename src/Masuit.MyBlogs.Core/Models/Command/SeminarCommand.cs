@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Masuit.MyBlogs.Core.Models.DTO;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.Command
 {
     /// <summary>
     /// 文章专题输入模型
     /// </summary>
-    public partial class SeminarInputDto : BaseDto
+    public partial class SeminarCommand : BaseDto
     {
         /// <summary>
         /// 专题名称

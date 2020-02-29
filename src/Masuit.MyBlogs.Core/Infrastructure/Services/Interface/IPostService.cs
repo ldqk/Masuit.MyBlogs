@@ -7,7 +7,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 {
     public partial interface IPostService : IBaseService<Post>
     {
-        SearchResult<PostOutputDto> SearchPage(int page, int size, string keyword);
+        SearchResult<PostDto> SearchPage(int page, int size, string keyword);
 
         /// <summary>
         /// 统一保存的方法

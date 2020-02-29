@@ -5,7 +5,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     /// <summary>
     /// 留言板输出模型
     /// </summary>
-    public class LeaveMessageOutputDto : BaseDto
+    public class LeaveMessageDto : BaseDto
     {
         /// <summary>
         /// 昵称

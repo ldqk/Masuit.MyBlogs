@@ -11,6 +11,6 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 友情链接
         /// </summary>
-        public IList<LinksOutputDto> Links { get; set; }
+        public IList<LinksDto> Links { get; set; }
     }
 }

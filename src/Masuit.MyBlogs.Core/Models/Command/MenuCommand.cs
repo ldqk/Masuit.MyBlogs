@@ -1,16 +1,16 @@
-using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.MyBlogs.Core.Models.Enum;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.MyBlogs.Core.Models.Enum;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.Command
 {
     /// <summary>
     /// 导航菜单输入模型
     /// </summary>
-    public class MenuInputDto : BaseEntity
+    public class MenuCommand : BaseEntity
     {
-        public MenuInputDto()
+        public MenuCommand()
         {
             ParentId = 0;
             Status = Status.Available;

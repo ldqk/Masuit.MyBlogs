@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Masuit.MyBlogs.Core.Models.Command;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -67,7 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public ActionResult Save(MenuInputDto model)
+        public ActionResult Save(MenuCommand model)
         {
             if (string.IsNullOrEmpty(model.Icon) || !model.Icon.Contains("/"))
             {

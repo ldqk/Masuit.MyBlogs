@@ -1,17 +1,15 @@
-﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+﻿using System;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
-using Masuit.MyBlogs.Core.Infrastructure.Services;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Security;
-using System;
 
-namespace Service
+namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
     public partial class UserInfoService : BaseService<UserInfo>, IUserInfoService
     {
@@ -31,12 +29,12 @@ namespace Service
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public UserInfoOutputDto Login(string username, string password)
+        public UserInfoDto Login(string username, string password)
         {
             UserInfo userInfo = GetByUsername(username);
             if (userInfo != null)
             {
-                UserInfoOutputDto user = userInfo.Mapper<UserInfoOutputDto>();
+                UserInfoDto user = userInfo.Mapper<UserInfoDto>();
                 string key = userInfo.SaltKey;
                 string pwd = userInfo.Password;
                 password = password.MDString3(key);

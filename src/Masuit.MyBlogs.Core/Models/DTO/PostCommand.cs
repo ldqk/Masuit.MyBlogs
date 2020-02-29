@@ -9,9 +9,9 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     /// <summary>
     /// 文章输入模型
     /// </summary>
-    public class PostInputDto : BaseEntity
+    public class PostCommand : BaseEntity
     {
-        public PostInputDto()
+        public PostCommand()
         {
             Status = Status.Pending;
         }

@@ -1,6 +1,6 @@
 ﻿@using AngleSharp.Network.Default
 @using Masuit.MyBlogs.Core.Models.DTO
-@model IList<Masuit.MyBlogs.Core.Models.DTO.LinksOutputDto>
+@model IList<Masuit.MyBlogs.Core.Models.DTO.LinksDto>
 
 @{
     ViewBag.Title = "友情链接大全";
@@ -43,7 +43,7 @@
     </article>
     <section>
         <div class="button-effect">
-            @foreach (LinksOutputDto link in Model)
+            @foreach (LinksDto link in Model)
             {
                 <a class="effect effect-5" href="@link.Url" title="@link.Name" target="_blank">@link.Name</a>
             }

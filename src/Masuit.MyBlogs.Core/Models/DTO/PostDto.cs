@@ -5,7 +5,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     /// <summary>
     /// 文章实体输出模型
     /// </summary>
-    public class PostOutputDto : BaseDto
+    public class PostDto : BaseDto
     {
         /// <summary>
         /// 标题
@@ -90,7 +90,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         ///// <summary>
         ///// 评论
         ///// </summary>
-        //public virtual ICollection<CommentOutputDto> Comment { get; set; }
+        //public virtual ICollection<CommentDto> Comment { get; set; }
 
         /// <summary>
         /// 评论数

@@ -18,7 +18,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        UserInfoOutputDto Login(string username, string password);
+        UserInfoDto Login(string username, string password);
 
         /// <summary>
         /// 注册

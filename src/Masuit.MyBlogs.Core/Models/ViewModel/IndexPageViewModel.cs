@@ -13,17 +13,17 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 文章列表
         /// </summary>
-        public IList<PostOutputDto> Posts { get; set; }
+        public IList<PostDto> Posts { get; set; }
 
         /// <summary>
         /// 网站公告列表
         /// </summary>
-        public IList<NoticeOutputDto> Notices { get; set; }
+        public IList<NoticeDto> Notices { get; set; }
 
         /// <summary>
         /// 分类列表
         /// </summary>
-        public IList<CategoryOutputDto> Categories { get; set; }
+        public IList<CategoryDto> Categories { get; set; }
 
         /// <summary>
         /// 标签列表
@@ -38,12 +38,12 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 热门文章
         /// </summary>
-        public List<PostOutputDto> Top6Post { get; set; }
+        public List<PostDto> Top6Post { get; set; }
 
         /// <summary>
         /// 文章列表查询
         /// </summary>
-        public IQueryable<PostOutputDto> PostsQueryable { get; set; }
+        public IQueryable<PostDto> PostsQueryable { get; set; }
 
         /// <summary>
         /// banner文章

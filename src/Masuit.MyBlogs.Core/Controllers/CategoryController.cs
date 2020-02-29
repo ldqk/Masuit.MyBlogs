@@ -8,6 +8,7 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
+using Masuit.MyBlogs.Core.Models.Command;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -28,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600)]
         public ActionResult GetCategories()
         {
-            var list = CategoryService.GetQuery<string, CategoryOutputDto>(c => c.Status == Status.Available, c => c.Name).Cacheable().ToList();
+            var list = CategoryService.GetQuery<string, CategoryDto>(c => c.Status == Status.Available, c => c.Name).Cacheable().ToList();
             return ResultData(list);
         }
 
@@ -41,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Get(int id)
         {
             var model = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("分类不存在！");
-            return ResultData(model.Mapper<CategoryOutputDto>());
+            return ResultData(model.Mapper<CategoryDto>());
         }
 
         /// <summary>
@@ -70,7 +71,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<ActionResult> Edit(CategoryInputDto dto)
+        public async Task<ActionResult> Edit(CategoryCommand dto)
         {
             Category cat = await CategoryService.GetByIdAsync(dto.Id) ?? throw new NotFoundException("分类不存在！");
             cat.Name = dto.Name;

@@ -45,7 +45,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index(int id, [Optional]OrderBy? orderBy, int page = 1, int size = 15)
         {
             var s = SeminarService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            var temp = PostService.GetQuery<PostOutputDto>(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin));
+            var temp = PostService.GetQuery<PostDto>(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin));
             var posts = temp.OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).ToList();
             ViewBag.Total = temp.Count();
             ViewBag.Title = s.Title;
@@ -123,7 +123,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Get(int id)
         {
             Seminar seminar = SeminarService.GetById(id);
-            return ResultData(seminar.Mapper<SeminarOutputDto>());
+            return ResultData(seminar.Mapper<SeminarDto>());
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetPageData(int page, int size)
         {
-            var list = SeminarService.GetPages<int, SeminarOutputDto>(page, size, out int total, s => true, s => s.Id, false).ToList();
+            var list = SeminarService.GetPages<int, SeminarDto>(page, size, out int total, s => true, s => s.Id, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }
@@ -147,7 +147,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetAll()
         {
-            var list = SeminarService.GetAll<string, SeminarOutputDto>(s => s.Title).ToList();
+            var list = SeminarService.GetAll<string, SeminarDto>(s => s.Title).ToList();
             return ResultData(list);
         }
 

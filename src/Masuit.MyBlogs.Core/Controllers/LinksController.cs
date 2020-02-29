@@ -28,7 +28,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("links"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult Index()
         {
-            var list = LinksService.GetQueryFromCache<bool, LinksOutputDto>(l => l.Status == Status.Available, l => l.Recommend, false).ToList();
+            var list = LinksService.GetQueryFromCache<bool, LinksDto>(l => l.Status == Status.Available, l => l.Recommend, false).ToList();
             return CurrentUser.IsAdmin ? View("Index_Admin", list) : View(list);
         }
 

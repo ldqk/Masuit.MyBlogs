@@ -1,17 +1,17 @@
+using System.ComponentModel.DataAnnotations;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
 using Masuit.Tools.Core.Validator;
-using System.ComponentModel.DataAnnotations;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.Command
 {
     /// <summary>
-    /// 评论表输入模型
+    /// 留言板输入模型
     /// </summary>
-    public class CommentInputDto : BaseEntity
+    public class LeaveMessageCommand : BaseEntity
     {
-        public CommentInputDto()
+        public LeaveMessageCommand()
         {
             Status = Status.Pending;
         }
@@ -19,8 +19,14 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// <summary>
         /// 昵称
         /// </summary>
-        [Required(ErrorMessage = "既然要评论，不留名怎么行呢！"), MaxLength(36, ErrorMessage = "昵称最多只能36个字符！"), MinLength(2, ErrorMessage = "昵称至少2个字！")]
+        [Required(ErrorMessage = "昵称不能为空！"), MaxLength(36, ErrorMessage = "昵称最大支持36个字符"), MinLength(2, ErrorMessage = "昵称至少2个字")]
         public string NickName { get; set; }
+
+        /// <summary>
+        /// 内容
+        /// </summary>
+        [Required(ErrorMessage = "留言内容不能为空！"), SubmitCheck(2, 500)]
+        public string Content { get; set; }
 
         /// <summary>
         /// 邮箱
@@ -31,24 +37,12 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// <summary>
         /// QQ或微信
         /// </summary>
-        [StringLength(32, ErrorMessage = "QQ或微信不合法")]
         public string QQorWechat { get; set; }
-
-        /// <summary>
-        /// 评论内容
-        /// </summary>
-        [Required(ErrorMessage = "评论内容不能为空！"), SubmitCheck(2, 500)]
-        public string Content { get; set; }
 
         /// <summary>
         /// 父级ID
         /// </summary>
         public int ParentId { get; set; }
-
-        /// <summary>
-        /// 文章ID
-        /// </summary>
-        public int PostId { get; set; }
 
         /// <summary>
         /// 浏览器版本
@@ -65,7 +59,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// <summary>
         /// 是否已接受条款
         /// </summary>
-        [AssignTrue(ErrorMessage = "请先同意接受本站的《评论须知》")]
+        [AssignTrue(ErrorMessage = "请先同意接受本站的《留言须知》")]
         public bool Agree { get; set; }
     }
 }

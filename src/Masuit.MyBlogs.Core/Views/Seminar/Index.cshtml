@@ -2,11 +2,11 @@
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
-@model IList<Masuit.MyBlogs.Core.Models.DTO.PostOutputDto>
+@model IList<Masuit.MyBlogs.Core.Models.DTO.PostDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     Random r = new Random();
-    UserInfoOutputDto user = Context.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+    UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
     Advertisement ad = ViewBag.Ads;
 }
 <style>

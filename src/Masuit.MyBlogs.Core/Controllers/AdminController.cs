@@ -64,9 +64,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
-            var user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+            var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
+            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoDto>();
             filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
 #endif
             if (user == null && Request.Cookies.Any(x => x.Key == "username" || x.Key == "password")) //执行自动登录

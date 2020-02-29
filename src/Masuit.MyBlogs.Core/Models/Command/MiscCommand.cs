@@ -1,16 +1,16 @@
+using System.ComponentModel.DataAnnotations;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
-using System.ComponentModel.DataAnnotations;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.Command
 {
     /// <summary>
     /// 杂项页输入模型
     /// </summary>
-    public class MiscInputDto : BaseEntity
+    public class MiscCommand : BaseEntity
     {
-        public MiscInputDto()
+        public MiscCommand()
         {
             Status = Status.Display;
         }

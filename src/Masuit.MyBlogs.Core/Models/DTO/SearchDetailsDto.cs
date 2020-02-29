@@ -5,7 +5,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     /// <summary>
     /// 搜索详情输出模型
     /// </summary>
-    public class SearchDetailsOutputDto
+    public class SearchDetailsDto
     {
         /// <summary>
         /// ID

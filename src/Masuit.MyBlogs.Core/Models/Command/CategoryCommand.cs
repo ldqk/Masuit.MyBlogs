@@ -1,15 +1,15 @@
+using System.ComponentModel.DataAnnotations;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using System.ComponentModel.DataAnnotations;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.Command
 {
     /// <summary>
     /// 文章分类输入模型
     /// </summary>
-    public class CategoryInputDto : BaseEntity
+    public class CategoryCommand : BaseEntity
     {
-        public CategoryInputDto()
+        public CategoryCommand()
         {
             Status = Status.Available;
         }

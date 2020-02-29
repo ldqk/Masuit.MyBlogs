@@ -4,7 +4,7 @@
 @{
     ViewBag.Title = "留言板";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    UserInfoOutputDto user = Context.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+    UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo);
     string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
 }
 <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />

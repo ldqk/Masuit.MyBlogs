@@ -1,16 +1,16 @@
+using System;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Core.Validator;
-using System;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.Command
 {
     /// <summary>
     /// ·Ã¿Í¶©ÔÄ±í
     /// </summary>
-    public class BroadcastInputDto : BaseEntity
+    public class BroadcastCommand : BaseEntity
     {
-        public BroadcastInputDto()
+        public BroadcastCommand()
         {
             Status = Status.Subscribing;
             UpdateTime = DateTime.Now;

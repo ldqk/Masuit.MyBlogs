@@ -62,7 +62,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="userInfo"></param>
         /// <param name="ip"></param>
         /// <param name="type"></param>
-        public void LoginRecord(UserInfoOutputDto userInfo, string ip, LoginType type)
+        public void LoginRecord(UserInfoDto userInfo, string ip, LoginType type)
         {
             var result = ip.GetPhysicsAddressInfo().Result;
             if (result?.Status != 0)

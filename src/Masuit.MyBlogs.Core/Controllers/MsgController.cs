@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Masuit.MyBlogs.Core.Models.Command;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -104,7 +105,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Put(LeaveMessageInputDto dto)
+        public ActionResult Put(LeaveMessageCommand dto)
         {
             if (Regex.Match(dto.Content, CommonHelper.BanRegex).Length > 0)
             {
@@ -124,7 +125,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             msg.PostDate = DateTime.Now;
-            var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+            var user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
             if (user != null)
             {
                 msg.NickName = user.NickName;
@@ -232,7 +233,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetPendingMsgs(int page = 1, int size = 10)
         {
-            var list = LeaveMessageService.GetPages<DateTime, LeaveMessageOutputDto>(page, size, out int total, m => m.Status == Status.Pending, l => l.PostDate, false).ToList();
+            var list = LeaveMessageService.GetPages<DateTime, LeaveMessageDto>(page, size, out int total, m => m.Status == Status.Pending, l => l.PostDate, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }

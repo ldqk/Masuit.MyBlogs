@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Masuit.MyBlogs.Core.Models.Command;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -39,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Put(CommentInputDto dto)
+        public async Task<ActionResult> Put(CommentCommand dto)
         {
             if (Regex.Match(dto.Content, CommonHelper.BanRegex).Length > 0)
             {
@@ -65,7 +66,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             comment.CommentDate = DateTime.Now;
-            var user = HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+            var user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
             if (user != null)
             {
                 comment.NickName = user.NickName;
@@ -273,7 +274,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetPendingComments(int page = 1, int size = 10)
         {
-            var list = CommentService.GetPages<DateTime, CommentOutputDto>(page, size, out int total, c => c.Status == Status.Pending, c => c.CommentDate, false).ToList();
+            var list = CommentService.GetPages<DateTime, CommentDto>(page, size, out int total, c => c.Status == Status.Pending, c => c.CommentDate, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }

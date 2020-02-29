@@ -190,7 +190,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Get(int id)
         {
             var notice = MiscService.GetById(id);
-            return ResultData(notice.MapTo<MiscOutputDto>());
+            return ResultData(notice.MapTo<MiscDto>());
         }
     }
 }

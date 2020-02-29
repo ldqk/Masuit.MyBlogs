@@ -6,7 +6,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     /// <summary>
     /// 文章修改请求
     /// </summary>
-    public class PostMergeRequestOutputDtoBase : BaseDto
+    public class PostMergeRequestDtoBase : BaseDto
     {
         /// <summary>
         /// 原文id

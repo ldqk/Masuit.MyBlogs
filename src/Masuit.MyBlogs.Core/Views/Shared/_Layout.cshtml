@@ -8,8 +8,8 @@
 @inject Stopwatch stop
 @{
     string[] colors = { "success", "info", "warning", "danger", "default" };
-    IList<MenuOutputDto> menus = ViewBag.menus;
-    UserInfoOutputDto user = Context.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+    IList<MenuDto> menus = ViewBag.menus;
+    UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
     PageFootViewModel footer = ViewBag.Footer;
 }
 
@@ -107,7 +107,7 @@
                                 <ul class="cd-secondary-nav is-hidden">
                                     <li class="go-back"><a href="#">上级菜单</a></li>
                                     <li class="see-all"><a asp-controller="Post" asp-action="All">所有 @m.Name</a></li>
-                                    @foreach (MenuOutputDto m2 in menus.Where(s => s.ParentId == m.Id).OrderBy(c => c.Sort))
+                                    @foreach (MenuDto m2 in menus.Where(s => s.ParentId == m.Id).OrderBy(c => c.Sort))
                                     {
                                         if (menus.Any(mm => mm.ParentId == m2.Id))
                                         {
@@ -115,7 +115,7 @@
                                                 <a href="#">@m2.Name</a>
                                                 <ul class="is-hidden">
                                                     <li class="go-back"><a href="#">上级菜单</a></li>
-                                                    @foreach (MenuOutputDto m3 in menus.Where(s => s.ParentId == m2.Id).OrderBy(c => c.Sort))
+                                                    @foreach (MenuDto m3 in menus.Where(s => s.ParentId == m2.Id).OrderBy(c => c.Sort))
                                                     {
                                                         if (menus.Any(mmm => mmm.ParentId == m3.Id))
                                                         {
@@ -123,7 +123,7 @@
                                                                 <a href="#">@m3.Name</a>
                                                                 <ul class="is-hidden">
                                                                     <li class="go-back"><a href="#">上级菜单</a></li>
-                                                                    @foreach (MenuOutputDto m4 in menus.Where(s => s.ParentId == m3.Id).OrderBy(c => c.Sort))
+                                                                    @foreach (MenuDto m4 in menus.Where(s => s.ParentId == m3.Id).OrderBy(c => c.Sort))
                                                                     {
                                                                         if (m4.NewTab)
                                                                         {
@@ -271,7 +271,7 @@
                                 <a href="/taskcenter" target="_blank">任务管理器</a>
                                 <span> | </span>
                             }
-                            foreach (LinksOutputDto link in footer.Links)
+                            foreach (LinksDto link in footer.Links)
                             {
                                 <a href="@link.Url" target="_blank">@link.Name</a>
                                 <span> | </span>

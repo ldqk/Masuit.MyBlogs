@@ -41,7 +41,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("notice"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
         public ActionResult Index(int page = 1, int size = 10)
         {
-            var list = NoticeService.GetPages<DateTime, NoticeOutputDto>(page, size, out var total, n => n.Status == Status.Display, n => n.ModifyDate, false).ToList();
+            var list = NoticeService.GetPages<DateTime, NoticeDto>(page, size, out var total, n => n.Status == Status.Display, n => n.ModifyDate, false).ToList();
             ViewBag.Total = total;
             ViewData["page"] = new Pagination(page, size);
             return CurrentUser.IsAdmin ? View("Index_Admin", list) : View(list);
@@ -141,7 +141,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Get(int id)
         {
-            return ResultData(NoticeService.Get<NoticeOutputDto>(n => n.Id == id));
+            return ResultData(NoticeService.Get<NoticeDto>(n => n.Id == id));
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (Request.Cookies.TryGetValue("last-notice", out var json))
             {
-                var data = JsonConvert.DeserializeObject<NoticeOutputDto>(json);
+                var data = JsonConvert.DeserializeObject<NoticeDto>(json);
                 if (notice.Id == data.Id)
                 {
                     return ResultData(data);
@@ -168,7 +168,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             notice.ViewCount += 1;
             NoticeService.SaveChanges();
-            var dto = notice.Mapper<NoticeOutputDto>();
+            var dto = notice.Mapper<NoticeDto>();
             Response.Cookies.Append("last-notice", dto.ToJsonString(), new CookieOptions()
             {
                 Expires = DateTime.Now.AddMonths(1)

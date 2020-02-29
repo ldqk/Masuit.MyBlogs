@@ -22,14 +22,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
     public partial class PostService : BaseService<Post>, IPostService
     {
-        private readonly ICacheManager<SearchResult<PostOutputDto>> _cacheManager;
+        private readonly ICacheManager<SearchResult<PostDto>> _cacheManager;
 
-        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, ICacheManager<SearchResult<PostOutputDto>> cacheManager) : base(repository, searchEngine, searcher)
+        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, ICacheManager<SearchResult<PostDto>> cacheManager) : base(repository, searchEngine, searcher)
         {
             _cacheManager = cacheManager;
         }
 
-        public SearchResult<PostOutputDto> SearchPage(int page, int size, string keyword)
+        public SearchResult<PostDto> SearchPage(int page, int size, string keyword)
         {
             var cacheKey = $"search:{keyword}:{page}:{size}";
             if (_cacheManager.Exists(cacheKey))
@@ -40,10 +40,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             var searchResult = _searchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
             var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Pended).ToList();
             var ids = entities.Select(s => s.Entity.Id).ToArray();
-            var dic = GetQuery<PostOutputDto>(p => ids.Contains(p.Id)).ToDictionary(p => p.Id);
+            var dic = GetQuery<PostDto>(p => ids.Contains(p.Id)).ToDictionary(p => p.Id);
             var posts = entities.Select(s =>
             {
-                var item = s.Entity.Mapper<PostOutputDto>();
+                var item = s.Entity.Mapper<PostDto>();
                 if (dic.ContainsKey(item.Id))
                 {
                     item.CategoryName = dic[item.Id].CategoryName;
@@ -60,7 +60,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             var keywords = _searcher.CutKeywords(keyword);
             HighlightSegment(posts, keywords, highlighter);
 
-            var result = new SearchResult<PostOutputDto>()
+            var result = new SearchResult<PostDto>()
             {
                 Results = posts,
                 Elapsed = searchResult.Elapsed,
@@ -78,7 +78,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="posts"></param>
         /// <param name="keywords"></param>
         /// <param name="highlighter"></param>
-        private static void HighlightSegment(List<PostOutputDto> posts, List<string> keywords, Highlighter highlighter)
+        private static void HighlightSegment(List<PostDto> posts, List<string> keywords, Highlighter highlighter)
         {
             foreach (var p in posts)
             {

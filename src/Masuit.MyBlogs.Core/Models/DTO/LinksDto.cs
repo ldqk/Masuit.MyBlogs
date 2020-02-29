@@ -3,7 +3,7 @@
     /// <summary>
     /// 友情链接输出模型
     /// </summary>
-    public class LinksOutputDto : BaseDto
+    public class LinksDto : BaseDto
     {
         /// <summary>
         /// 名字

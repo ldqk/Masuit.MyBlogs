@@ -44,7 +44,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public IAdvertisementService AdsService { get; set; }
 
-        public UserInfoOutputDto CurrentUser => HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+        public UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
 
         /// <summary>
         /// 客户端的真实IP
@@ -94,9 +94,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             Stopwatch.Start();
             base.OnActionExecuting(filterContext);
-            var user = filterContext.HttpContext.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo);
+            var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoOutputDto>();
+            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoDto>();
             filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
 #endif
             if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true" && user?.IsAdmin != true)
@@ -157,10 +157,10 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             #region 准备页面数据模型
 
-            ViewBag.menus = MenuService.GetQueryFromCache<MenuOutputDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
+            ViewBag.menus = MenuService.GetQueryFromCache<MenuDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
             var model = new PageFootViewModel //页脚
             {
-                Links = LinksService.GetQueryFromCache<LinksOutputDto>(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(40).ToList()
+                Links = LinksService.GetQueryFromCache<LinksDto>(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(40).ToList()
             };
             ViewBag.Footer = model;
 

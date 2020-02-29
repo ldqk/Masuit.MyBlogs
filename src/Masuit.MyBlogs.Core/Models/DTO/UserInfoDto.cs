@@ -5,7 +5,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     /// <summary>
     /// 用户信息输出模型
     /// </summary>
-    public class UserInfoOutputDto : BaseDto
+    public class UserInfoDto : BaseDto
     {
         /// <summary>
         /// 用户名

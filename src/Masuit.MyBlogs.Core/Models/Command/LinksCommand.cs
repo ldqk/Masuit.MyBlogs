@@ -1,15 +1,15 @@
+using System.ComponentModel.DataAnnotations;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using System.ComponentModel.DataAnnotations;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.Command
 {
     /// <summary>
     /// ”—«È¡¥Ω”
     /// </summary>
-    public class LinksInputDto : BaseEntity
+    public class LinksCommand : BaseEntity
     {
-        public LinksInputDto()
+        public LinksCommand()
         {
             Status = Status.Available;
             Except = false;

@@ -1,12 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Validation;
 
-namespace Masuit.MyBlogs.Core.Models.DTO
+namespace Masuit.MyBlogs.Core.Models.Command
 {
     /// <summary>
     /// 文章修改请求
     /// </summary>
-    public class PostMergeRequestInputDtoBase : BaseDto
+    public class PostMergeRequestCommandBase : BaseDto
     {
         /// <summary>
         /// 标题

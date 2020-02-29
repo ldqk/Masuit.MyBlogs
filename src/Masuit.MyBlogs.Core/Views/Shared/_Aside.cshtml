@@ -38,7 +38,7 @@
                     <div class="row">
                         <div class="col-xs-12">
                             <ul class="notices">
-                                @foreach (NoticeOutputDto notice in Model.Notices)
+                                @foreach (NoticeDto notice in Model.Notices)
                                 {
                                     <li class="news-item">
                                         @Html.ActionLink(notice.Content.GetSummary(45, 2), "Details", "Notice", new { id = notice.Id }, new { @class = "tippy-scale", title = "查看详情" })
@@ -58,7 +58,7 @@
             </div>
             <div class="panel-body">
                 <ul class="list-group text-center">
-                    @foreach (CategoryOutputDto cat in Model.Categories)
+                    @foreach (CategoryDto cat in Model.Categories)
                     {
                         if (cat.PendedPostCount > 0)
                         {
@@ -92,7 +92,7 @@
             <div class="leaderboard">
                 <h1>推荐文章</h1>
                 <ol>
-                    @foreach (PostOutputDto post in Model.Top6Post)
+                    @foreach (PostDto post in Model.Top6Post)
                     {
                         <li>
                             <a asp-controller="Post" asp-action="Details" asp-route-id="@post.Id">

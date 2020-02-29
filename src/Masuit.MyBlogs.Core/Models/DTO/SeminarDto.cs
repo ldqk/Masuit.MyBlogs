@@ -3,7 +3,7 @@
     /// <summary>
     /// 文章专题输出模型
     /// </summary>
-    public partial class SeminarOutputDto : BaseDto
+    public partial class SeminarDto : BaseDto
     {
         /// <summary>
         /// 专题名称

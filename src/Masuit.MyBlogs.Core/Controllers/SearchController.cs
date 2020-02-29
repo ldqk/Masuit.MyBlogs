@@ -39,7 +39,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("s/{wd?}/{page:int?}/{size:int?}")]
         public ActionResult Search(string wd = "", int page = 1, int size = 15)
         {
-            var nul = new List<PostOutputDto>();
+            var nul = new List<PostDto>();
             ViewBag.Elapsed = 0;
             ViewBag.Total = 0;
             ViewBag.PageSize = size;
@@ -99,7 +99,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult SearchList(int page = 1, int size = 10, string search = "")
         {
             var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.KeyWords.Contains(search);
-            var list = SearchDetailsService.GetPages<DateTime, SearchDetailsOutputDto>(page, size, out int total, where, s => s.SearchTime, false).ToList();
+            var list = SearchDetailsService.GetPages<DateTime, SearchDetailsDto>(page, size, out int total, where, s => s.SearchTime, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }

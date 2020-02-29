@@ -3,7 +3,7 @@
     /// <summary>
     /// 文章分类输出模型
     /// </summary>
-    public class CategoryOutputDto : BaseDto
+    public class CategoryDto : BaseDto
     {
         /// <summary>
         /// 分类名

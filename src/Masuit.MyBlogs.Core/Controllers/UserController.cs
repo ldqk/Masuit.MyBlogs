@@ -25,7 +25,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             userInfo.Username = username;
             bool b = UserInfoService.SaveChanges() > 0;
-            return ResultData(Mapper.Map<UserInfoOutputDto>(userInfo), b, b ? $"用户名修改成功，新用户名为{username}。" : "用户名修改失败！");
+            return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? $"用户名修改成功，新用户名为{username}。" : "用户名修改失败！");
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             UserInfo userInfo = UserInfoService.GetById(id);
             userInfo.NickName = username;
             bool b = UserInfoService.SaveChanges() > 0;
-            return ResultData(Mapper.Map<UserInfoOutputDto>(userInfo), b, b ? $"昵称修改成功，新昵称为{username}。" : "昵称修改失败！");
+            return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? $"昵称修改成功，新昵称为{username}。" : "昵称修改失败！");
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             UserInfo userInfo = UserInfoService.GetById(id);
             userInfo.Avatar = path;
             bool b = UserInfoService.SaveChanges() > 0;
-            return ResultData(Mapper.Map<UserInfoOutputDto>(userInfo), b, b ? $"头像修改成功。" : "头像修改失败！");
+            return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? $"头像修改成功。" : "头像修改失败！");
         }
     }
 }

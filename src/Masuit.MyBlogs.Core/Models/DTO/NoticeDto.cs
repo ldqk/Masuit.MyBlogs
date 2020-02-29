@@ -3,9 +3,9 @@
 namespace Masuit.MyBlogs.Core.Models.DTO
 {
     /// <summary>
-    /// 杂项页输出模型
+    /// 网站公告输出模型
     /// </summary>
-    public class MiscOutputDto : BaseDto
+    public class NoticeDto : BaseDto
     {
         /// <summary>
         /// 标题
@@ -26,5 +26,10 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 修改时间
         /// </summary>
         public DateTime ModifyDate { get; set; }
+
+        /// <summary>
+        /// 访问次数
+        /// </summary>
+        public int ViewCount { get; set; }
     }
 }

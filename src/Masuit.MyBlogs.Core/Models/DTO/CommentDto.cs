@@ -5,7 +5,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     /// <summary>
     /// 文章评论输出模型
     /// </summary>
-    public class CommentOutputDto : BaseDto
+    public class CommentDto : BaseDto
     {
         /// <summary>
         /// 昵称

@@ -53,7 +53,7 @@
                     <div class="btn-group">
                         @Html.ActionLink("<<返回公告列表页", "Index", "Notice", null, new { @class = "btn btn-info" })
                         @{
-                            var user = Context.Session.Get<UserInfoOutputDto>(SessionKey.UserInfo) ?? new UserInfoOutputDto();
+                            var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
                             if (user.IsAdmin)
                             {
                                 <a class="btn btn-primary" asp-controller="Dashboard" asp-action="Index" asp-fragment="/notice/index?id=@Model.Id" target="_blank">修改</a>

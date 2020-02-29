@@ -5,7 +5,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
     /// <summary>
     /// 导航菜单输出模型
     /// </summary>
-    public class MenuOutputDto : BaseDto
+    public class MenuDto : BaseDto
     {
         /// <summary>
         /// 名字
