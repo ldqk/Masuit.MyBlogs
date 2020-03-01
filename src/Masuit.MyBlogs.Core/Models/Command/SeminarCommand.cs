@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Masuit.MyBlogs.Core.Models.DTO;
+﻿using Masuit.MyBlogs.Core.Models.DTO;
+using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.Command
 {

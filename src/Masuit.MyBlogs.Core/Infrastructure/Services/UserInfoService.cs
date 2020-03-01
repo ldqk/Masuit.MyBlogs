@@ -1,5 +1,4 @@
-﻿using System;
-using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -8,6 +7,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Security;
+using System;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {

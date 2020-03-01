@@ -1,7 +1,7 @@
-using System;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Core.Validator;
+using System;
 
 namespace Masuit.MyBlogs.Core.Models.Command
 {
