@@ -1,7 +1,9 @@
-﻿using AutoMapper.QueryableExtensions;
+﻿using AngleSharp.Text;
+using AutoMapper.QueryableExtensions;
 using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -9,6 +11,7 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -20,6 +23,8 @@ namespace Masuit.MyBlogs.Core.Controllers
     [Route("partner/[action]")]
     public class AdvertisementController : BaseController
     {
+        public ICategoryService CategoryService { get; set; }
+
         /// <summary>
         /// 前往
         /// </summary>
@@ -55,6 +60,13 @@ namespace Masuit.MyBlogs.Core.Controllers
             var query = AdsService.GetQuery(where);
             var total = query.Count();
             var list = query.OrderByDescending(p => p.Price).ThenByDescending(a => a.Weight).Skip((page - 1) * size).Take(size).ProjectTo<AdvertisementViewModel>(MapperConfig).ToList();
+            var cids = list.Where(m => !string.IsNullOrEmpty(m.CategoryIds)).SelectMany(m => m.CategoryIds.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)).Distinct().ToArray();
+            var dic = CategoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionary(c => c.Id + "", c => c.Name);
+            foreach (var ad in list.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
+            {
+                ad.CategoryNames = ad.CategoryIds.Split(",").Select(c => dic[c]).Join(",");
+            }
+
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);
         }
@@ -67,7 +79,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, MyAuthorize]
         public async Task<IActionResult> Save(AdvertisementDto model)
         {
-            model.CategoryId = model.CategoryId?.Replace("null", "");
+            model.CategoryIds = model.CategoryIds?.Replace("null", "");
             var entity = await AdsService.GetByIdAsync(model.Id);
             if (entity != null)
             {

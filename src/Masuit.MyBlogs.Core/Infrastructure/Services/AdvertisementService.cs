@@ -17,6 +17,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
     public partial class AdvertisementService : BaseService<Advertisement>, IAdvertisementService
     {
         public ICacheManager<List<Advertisement>> CacheManager { get; set; }
+        public ICacheManager<bool> ValueCacheManager { get; set; }
 
         public AdvertisementService(IBaseRepository<Advertisement> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
@@ -45,7 +46,15 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             Expression<Func<Advertisement, bool>> where = a => a.Types.Contains(type.ToString("D")) && a.Status == Status.Available;
             if (cid.HasValue)
             {
-                where = where.And(a => a.CategoryId == cid || a.CategoryId == null);
+                var scid = cid.ToString();
+                if (ValueCacheManager.GetOrAdd(scid, s => Any(a => a.CategoryIds.Contains(scid))))
+                {
+                    where = where.And(a => a.CategoryIds.Contains(scid) || a.CategoryIds == null);
+                }
+                else
+                {
+                    where = where.And(a => a.CategoryIds == null);
+                }
             }
 
             return CacheManager.GetOrAdd($"{count}{type}{cid}", _ => GetQuery(where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, a.Weight)).WeightedItems(count));
@@ -74,9 +83,16 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             Expression<Func<Advertisement, bool>> where = a => a.Types.Contains(type.ToString("D")) && a.Status == Status.Available;
             if (cid.HasValue)
             {
-                where = where.And(a => a.CategoryId == cid || a.CategoryId == null);
+                var scid = cid.ToString();
+                if (ValueCacheManager.GetOrAdd(scid, s => Any(a => a.CategoryIds.Contains(scid))))
+                {
+                    where = where.And(a => a.CategoryIds.Contains(scid) || a.CategoryIds == null);
+                }
+                else
+                {
+                    where = where.And(a => a.CategoryIds == null);
+                }
             }
-
             return CacheManager.GetOrAdd($"{count}{type}{cid}", _ => GetQuery(where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, (int)a.Price)).WeightedItems(count));
         }
     }

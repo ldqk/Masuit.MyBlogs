@@ -63,7 +63,7 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// </summary>
         public int ViewCount { get; set; }
 
-        public int? CategoryId { get; set; }
-        public string CategoryName { get; set; }
+        public string CategoryIds { get; set; }
+        public string CategoryNames { get; set; }
     }
 }

@@ -24,7 +24,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Category>().HasMany(e => e.Post).WithOne(e => e.Category).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Category>().HasMany(e => e.PostHistoryVersion).WithOne(e => e.Category).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Category>().HasMany(e => e.Advertisements).WithOne(e => e.Category).IsRequired(false).HasForeignKey(a => a.CategoryId).OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Post>().HasMany(e => e.Comment).WithOne(e => e.Post).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Post>().HasMany(e => e.PostHistoryVersion).WithOne(e => e.Post).OnDelete(DeleteBehavior.Cascade);

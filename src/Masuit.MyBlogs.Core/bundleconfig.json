@@ -70,5 +70,11 @@
     "inputFiles": [
       "wwwroot/Assets/UEditor/ueditor.config.admin.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/ng-views/controllers/partner.min.js",
+    "inputFiles": [
+      "wwwroot/ng-views/controllers/partner.js"
+    ]
   }
 ]

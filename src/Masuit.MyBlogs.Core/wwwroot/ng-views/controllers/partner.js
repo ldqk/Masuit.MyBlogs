@@ -49,7 +49,7 @@
 				$scope.cat = data.Data;
 				$('.ui.dropdown.category').dropdown({
 					onChange: function (value) {
-						$scope.partner.CategoryId = value;
+						$scope.partner.CategoryIds = value;
 					},
 					message: {
 						maxSelections: '最多选择 {maxCount} 项',
@@ -113,7 +113,7 @@
         $timeout(function () {
 		    $('.ui.dropdown.category').dropdown('clear');
 		    $('.ui.dropdown.types').dropdown('clear');
-			$('.ui.dropdown.category').dropdown('set selected', [item.CategoryId]);
+			$('.ui.dropdown.category').dropdown('set selected', (item.CategoryIds+"").split(','));
 		    $('.ui.dropdown.types').dropdown('set selected', item.Types.split(','));
 		}, 10);
 		layer.open({

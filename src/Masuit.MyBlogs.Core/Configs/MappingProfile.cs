@@ -86,8 +86,8 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<PostMergeRequest, Post>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.Status, e => e.Ignore()).ReverseMap();
             CreateMap<Post, PostMergeRequestDto>().ReverseMap();
 
-            CreateMap<Advertisement, AdvertisementViewModel>().ForMember(a => a.CategoryName, e => e.MapFrom(a => a.Category.Name));
-            CreateMap<AdvertisementDto, Advertisement>().ForMember(a => a.CategoryId, e => e.MapFrom(d => string.IsNullOrEmpty(d.CategoryId) ? null : d.CategoryId)).ForMember(a => a.Status, e => e.Ignore()).ForMember(a => a.UpdateTime, e => e.MapFrom(a => DateTime.Now));
+            CreateMap<Advertisement, AdvertisementViewModel>();
+            CreateMap<AdvertisementDto, Advertisement>().ForMember(a => a.Status, e => e.Ignore()).ForMember(a => a.UpdateTime, e => e.MapFrom(a => DateTime.Now));
         }
     }
 }

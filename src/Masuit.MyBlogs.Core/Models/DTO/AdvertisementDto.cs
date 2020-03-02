@@ -48,6 +48,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         [Required(ErrorMessage = "类型不能为空，至少需要选择一个类型")]
         public string Types { get; set; }
 
-        public string CategoryId { get; set; }
+        public string CategoryIds { get; set; }
     }
 }

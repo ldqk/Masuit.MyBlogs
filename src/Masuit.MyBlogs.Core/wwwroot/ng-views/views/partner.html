@@ -37,7 +37,7 @@
                 {{row.ViewCount}}
             </td>
             <td title="'分类'">
-                {{row.CategoryName}}
+                {{row.CategoryNames}}
             </td>
             <td title="'创建时间'">
                 {{row.CreateTime|date:'yyyy-MM-dd HH:mm:ss'}}
@@ -120,7 +120,7 @@
             <div class="form-group">
                 <div class="input-group">
                     <label for="desc" class="input-group-addon control-label">分类：</label>
-                    <div class="ui fluid top search selection dropdown category">
+                    <div class="ui fluid top search multiple selection dropdown category">
                         <input name="category" type="hidden" id="category">
                         <i class="dropdown icon"></i>
                         <div class="default text">请选择分类</div>
@@ -209,7 +209,7 @@
                             </div>
                         </div>
                     </td>
-                    <td>分类：{{partner.CategoryName}}</td>
+                    <td>分类：{{partner.CategoryNames}}</td>
                 </tr>
                 <tr>
                     <td>宣传大图片</td>

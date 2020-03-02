@@ -74,7 +74,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// </summary>
         public int ViewCount { get; set; }
 
-        public int? CategoryId { get; set; }
-        public virtual Category Category { get; set; }
+        public string CategoryIds { get; set; }
     }
 }
