@@ -485,8 +485,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
 
     public partial interface IPostHistoryVersionRepository : IBaseRepository<PostHistoryVersion> { }
 
-    public partial interface ISearchDetailsRepository : IBaseRepository<SearchDetails> { }
-
     public partial interface ISeminarRepository : IBaseRepository<Seminar> { }
 
     public partial interface ISystemSettingRepository : IBaseRepository<SystemSetting> { }

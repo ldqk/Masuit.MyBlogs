@@ -68,13 +68,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
     }
 
-    public partial class SearchDetailsService : BaseService<SearchDetails>, ISearchDetailsService
-    {
-        public SearchDetailsService(IBaseRepository<SearchDetails> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
-        {
-        }
-    }
-
     public partial class SeminarService : BaseService<Seminar>, ISeminarService
     {
         public SeminarService(IBaseRepository<Seminar> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)

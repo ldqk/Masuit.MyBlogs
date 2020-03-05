@@ -65,7 +65,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         LogManager.Error(err, ex);
                         break;
                     case DbUpdateException ex:
-                        err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{ip}\t{ex?.InnerException?.Message}\t";
+                        err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
                         LogManager.Error(err, ex);
                         break;
                     case AggregateException ex:

@@ -20,8 +20,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 
     public partial interface IPostHistoryVersionService : IBaseService<PostHistoryVersion> { }
 
-    public partial interface ISearchDetailsService : IBaseService<SearchDetails> { }
-
     public partial interface ISeminarService : IBaseService<Seminar> { }
 
     public partial interface ISystemSettingService : IBaseService<SystemSetting> { }
