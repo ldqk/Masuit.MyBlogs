@@ -235,26 +235,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// </summary>
         public void StatisticsSearchKeywords()
         {
-            var start = DateTime.Today.AddMonths(-1);
-            var temp = _searchDetailsService.GetQueryNoTracking(s => s.SearchTime > start, s => s.SearchTime, false).ToList();
-            var month = temp.GroupBy(s => s.IP + s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(30).Select(g => new
-            {
-                Keywords = g.FirstOrDefault().KeyWords,
-                Count = g.Count()
-            }).ToList();
-            var week = temp.Where(s => s.SearchTime > DateTime.Today.AddDays(-7)).GroupBy(s => s.IP + s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(30).Select(g => new
-            {
-                Keywords = g.FirstOrDefault().KeyWords,
-                Count = g.Count()
-            }).ToList();
-            var today = temp.Where(s => s.SearchTime > DateTime.Today).GroupBy(s => s.KeyWords.ToLower()).OrderByDescending(g => g.Count()).Take(30).Select(g => new
-            {
-                Keywords = g.FirstOrDefault().KeyWords,
-                Count = g.Count()
-            }).ToList();
-            RedisHelper.Set("SearchRank:Month", month);
-            RedisHelper.Set("SearchRank:Week", week);
-            RedisHelper.Set("SearchRank:Today", today);
+            RedisHelper.Set("SearchRank:Month", _searchDetailsService.GetRanks(DateTime.Today.AddMonths(-1)));
+            RedisHelper.Set("SearchRank:Week", _searchDetailsService.GetRanks(DateTime.Today.AddDays(-7)));
+            RedisHelper.Set("SearchRank:Today", _searchDetailsService.GetRanks(DateTime.Today));
         }
     }
 }

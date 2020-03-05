@@ -34,4 +34,10 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// </summary>
         public string IP { get; set; }
     }
+
+    public class SearchRank
+    {
+        public string Keywords { get; set; }
+        public int Count { get; set; }
+    }
 }

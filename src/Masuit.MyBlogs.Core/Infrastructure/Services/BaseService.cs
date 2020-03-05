@@ -17,14 +17,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
     public class BaseService<T> : IBaseService<T> where T : class, new()
     {
         public virtual IBaseRepository<T> BaseDal { get; set; }
-        protected readonly ISearchEngine<DataContext> _searchEngine;
-        protected readonly ILuceneIndexSearcher _searcher;
+        protected readonly ISearchEngine<DataContext> SearchEngine;
+        protected readonly ILuceneIndexSearcher Searcher;
 
         public BaseService(IBaseRepository<T> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher)
         {
             BaseDal = repository;
-            _searchEngine = searchEngine;
-            _searcher = searcher;
+            SearchEngine = searchEngine;
+            Searcher = searcher;
         }
 
         /// <summary>

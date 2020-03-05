@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 return _cacheManager.Get(cacheKey);
             }
 
-            var searchResult = _searchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
+            var searchResult = SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
             var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Pended).ToList();
             var ids = entities.Select(s => s.Entity.Id).ToArray();
             var dic = GetQuery<PostDto>(p => ids.Contains(p.Id)).ToDictionary(p => p.Id);
@@ -57,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             }).ToList();
             var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
             var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
-            var keywords = _searcher.CutKeywords(keyword);
+            var keywords = Searcher.CutKeywords(keyword);
             HighlightSegment(posts, keywords, highlighter);
 
             var result = new SearchResult<PostDto>()
@@ -140,7 +140,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override Post AddEntitySaved(Post t)
         {
             t = base.AddEntity(t);
-            _searchEngine.SaveChanges(t.Status == Status.Pended);
+            SearchEngine.SaveChanges(t.Status == Status.Pended);
             return t;
         }
 
@@ -152,7 +152,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override Task<int> AddEntitySavedAsync(Post t)
         {
             base.AddEntity(t);
-            return _searchEngine.SaveChangesAsync(t.Status == Status.Pended);
+            return SearchEngine.SaveChangesAsync(t.Status == Status.Pended);
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override bool DeleteByIdSaved(object id)
         {
             base.DeleteById(id);
-            return _searchEngine.SaveChanges() > 0;
+            return SearchEngine.SaveChanges() > 0;
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override bool DeleteEntitiesSaved(IEnumerable<Post> list)
         {
             base.DeleteEntities(list);
-            return _searchEngine.SaveChanges() > 0;
+            return SearchEngine.SaveChanges() > 0;
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override Task<int> DeleteByIdSavedAsync(object id)
         {
             base.DeleteById(id);
-            return _searchEngine.SaveChangesAsync();
+            return SearchEngine.SaveChangesAsync();
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override Task<int> DeleteEntitiesSavedAsync(IEnumerable<Post> list)
         {
             base.DeleteEntities(list);
-            return _searchEngine.SaveChangesAsync();
+            return SearchEngine.SaveChangesAsync();
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override int DeleteEntitySaved(Expression<Func<Post, bool>> @where)
         {
             base.DeleteEntity(@where);
-            return _searchEngine.SaveChanges();
+            return SearchEngine.SaveChanges();
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override bool DeleteEntitySaved(Post t)
         {
             base.DeleteEntity(t);
-            return _searchEngine.SaveChanges() > 0;
+            return SearchEngine.SaveChanges() > 0;
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override Task<int> DeleteEntitySavedAsync(Expression<Func<Post, bool>> @where)
         {
             base.DeleteEntity(@where);
-            return _searchEngine.SaveChangesAsync();
+            return SearchEngine.SaveChangesAsync();
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override Task<int> DeleteEntitySavedAsync(Post t)
         {
             base.DeleteEntity(t);
-            return _searchEngine.SaveChangesAsync();
+            return SearchEngine.SaveChangesAsync();
         }
 
         /// <summary>
@@ -249,7 +249,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns>受影响的行数</returns>
         public int SaveChanges(bool flushIndex)
         {
-            return flushIndex ? _searchEngine.SaveChanges() : base.SaveChanges();
+            return flushIndex ? SearchEngine.SaveChanges() : base.SaveChanges();
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns>受影响的行数</returns>
         public async Task<int> SaveChangesAsync(bool flushIndex)
         {
-            return flushIndex ? await _searchEngine.SaveChangesAsync() : await base.SaveChangesAsync();
+            return flushIndex ? await SearchEngine.SaveChangesAsync() : await base.SaveChangesAsync();
         }
     }
 }

@@ -46,6 +46,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             });
             modelBuilder.Entity<SeminarPostHistoryVersion>().Property(s => s.SeminarId).HasColumnName("Seminar_Id");
             modelBuilder.Entity<SeminarPostHistoryVersion>().Property(s => s.PostHistoryVersionId).HasColumnName("PostHistoryVersion_Id");
+            modelBuilder.Entity<SearchRank>().HasNoKey().HasNoDiscriminator();
         }
 
         public override int SaveChanges()
@@ -80,6 +81,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure
 
         public virtual DbSet<PostMergeRequest> PostMergeRequests { get; set; }
         public virtual DbSet<Advertisement> Advertisements { get; set; }
+        public virtual DbSet<SearchRank> SearchRanks { get; set; }
     }
 
     /// <summary>
