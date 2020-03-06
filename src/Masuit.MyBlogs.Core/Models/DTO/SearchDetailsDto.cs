@@ -15,7 +15,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// <summary>
         /// 关键词
         /// </summary>
-        public string KeyWords { get; set; }
+        public string Keywords { get; set; }
 
         /// <summary>
         /// 搜索时间

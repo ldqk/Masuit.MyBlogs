@@ -15,7 +15,7 @@
     <table ng-table="list.tableParams" id="interview" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
             <td title="'关键词'">
-                <a ng-href="/s/{{row.KeyWords}}" target="_blank">{{row.KeyWords}}</a>
+                <a ng-href="/s/{{row.Keywords}}" target="_blank">{{row.Keywords}}</a>
             </td>
             <td title="'搜索时间'">
                 {{row.SearchTime|date:'yyyy-MM-dd HH:mm:ss'}}
