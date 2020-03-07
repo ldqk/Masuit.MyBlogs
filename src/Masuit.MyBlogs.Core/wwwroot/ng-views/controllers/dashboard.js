@@ -48,11 +48,11 @@
 			    },
 			    error: (err) => {
 			        //console.error(err);
-			    },
+			    }
 			});
 		});
-	}
-	ifvisible.idle(function() {
+	};
+    ifvisible.idle(function() {
 		hub.stop();
 	});
 	ifvisible.blur(function() {
@@ -84,8 +84,8 @@
 			$scope.push = "停止";
 			$scope.isPush = true;
 		}
-	}
-	$scope.ClearPerfCounter = function () {
+	};
+    $scope.ClearPerfCounter = function () {
 		swal({
 			title: "清除性能计数器缓存",
 			text: "确定要清除性能计数器缓存吗？",
@@ -110,11 +110,11 @@
 					time:4
 				});
 				$scope.loadingDone();
-			})
-		}, function() {
+			});
+        }, function() {
 		}).catch(swal.noop);
-	}
-	$scope.connectWebsocket();
+	};
+    $scope.connectWebsocket();
 	$.post("/system/GetHistoryList", null, function(data) {
 		Highcharts.stockChart("cpu",{
 			subtitle: {
@@ -139,8 +139,8 @@
 							}
 						}, 2000);
 					},
-					backgroundColor: 'transparent',
-				},
+					backgroundColor: 'transparent'
+				}
 			},
 			credits: {
 				enabled: false
@@ -154,7 +154,7 @@
 					marker: {
 						enabled: false
 					}
-				},
+				}
 			},
 			legend: {
 				align: 'right',
@@ -181,7 +181,8 @@
 					title: {
 						text: 'CPU内核温度（℃）'
 					},
-					min: 40,
+					min: 30,
+					max:90,
 					opposite: true
 				}
 			],
@@ -240,7 +241,7 @@
 					return '时间点：<b>' + Highcharts.dateFormat("%H:%M:%S", this.points[0].x) + '</b><br/>' +
 						'<span style="color:' + Highcharts.getOptions().colors[0] +  '">CPU使用率：<b>' + Highcharts.numberFormat(this.points[0].y, 2) + '%</b></span><br/>' +
 						'<span style="color:' + Highcharts.getOptions().colors[1] +'">内存使用率：<b>' + Highcharts.numberFormat(this.points[1].y, 2) + '%</b></span><br/>' +
-						'<span style="color:' + Highcharts.getOptions().colors[35] +'">CPU内核温度：<b>' + Highcharts.numberFormat(this.points[2].y, 0) + '℃</b></span><br/>';
+						'<span style="color:' + Highcharts.getOptions().colors[2] +'">CPU内核温度：<b>' + Highcharts.numberFormat(this.points[2].y, 0) + '℃</b></span><br/>';
 				},
 				crosshairs: true,
 				shared: true
@@ -251,40 +252,14 @@
 				data: data.cpu,
 				tooltip: {
 					valueSuffix: ' %'
-				},
-				fillColor: {
-					linearGradient: {
-						x1: 0,
-						y1: 0,
-						x2: 0,
-						y2: 1
-					},
-					yAxis: 0,
-					stops: [
-						[0, Highcharts.getOptions().colors[0]],
-						[1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-					]
-				},
+				}
 			}, {
 				name: '内存使用率',
 				type: 'areaspline',
 				data: data.mem,
 				tooltip: {
 					valueSuffix: ' %'
-				},
-				fillColor: {
-					linearGradient: {
-						x1: 0,
-						y1: 0,
-						x2: 0,
-						y2: 1
-					},
-					yAxis: 1,
-					stops: [
-						[0, Highcharts.getOptions().colors[1]],
-						[1, Highcharts.Color(Highcharts.getOptions().colors[1]).setOpacity(0).get('rgba')]
-					]
-				},
+				}
 			}, {
 				name: 'CPU温度',
 				yAxis: 1,
@@ -292,20 +267,7 @@
 				type: 'areaspline',
 				tooltip: {
 					valueSuffix: '℃'
-				},
-				fillColor: {
-					linearGradient: {
-						x1: 0,
-						y1: 0,
-						x2: 0,
-						y2: 1
-					},
-					yAxis: 2,
-					stops: [
-						[0, Highcharts.getOptions().colors[35]],
-						[1, Highcharts.Color(Highcharts.getOptions().colors[35]).setOpacity(0).get('rgba')]
-					]
-				},
+				}
 			}]
 		});
 		Highcharts.stockChart("io",{
@@ -408,20 +370,21 @@
 				type: 'datetime',
 				tickPixelInterval: 150
 			},
-			yAxis: [{
-					title: {
-						text: '磁盘I/O速率(KBps)'
-					},
-					min: 0,
-					opposite: true
-			}, {
-					title: {
-						text: '网络速率(KBps)'
-					},
-					min: 0,
-					opposite: false
-				}, 
-			],
+            yAxis: [
+                {
+                    title: {
+                        text: '磁盘I/O速率(KBps)'
+                    },
+                    min: 0,
+                    opposite: true
+                }, {
+                    title: {
+                        text: '网络速率(KBps)'
+                    },
+                    min: 0,
+                    opposite: false
+                }
+            ],
 			tooltip: {
 				formatter: function() {
 					return '时间点：<b>' + Highcharts.dateFormat("%H:%M:%S", this.points[0].x) + '</b><br/>' +
@@ -446,20 +409,7 @@
 				yAxis:0,
 				tooltip: {
 					valueSuffix: 'KBps'
-				},
-				fillColor: {
-					linearGradient: {
-						x1: 0,
-						y1: 0,
-						x2: 0,
-						y2: 1
-					},
-					yAxis: 0,
-					stops: [
-						[0, Highcharts.getOptions().colors[0]],
-						[1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-					]
-				},
+				}
 			}, {
 				name: '磁盘写',
 				type: 'spline',
@@ -467,20 +417,7 @@
 				yAxis:0,
 				tooltip: {
 					valueSuffix: 'KBps'
-				},
-				fillColor: {
-					linearGradient: {
-						x1: 0,
-						y1: 0,
-						x2: 0,
-						y2: 1
-					},
-					yAxis: 1,
-					stops: [
-						[0, Highcharts.getOptions().colors[2]],
-						[1, Highcharts.Color(Highcharts.getOptions().colors[2]).setOpacity(0).get('rgba')]
-					]
-				},
+				}
 			}, {
 				name: '网络上行',
 				type: 'spline',
@@ -488,20 +425,7 @@
 				yAxis:1,
 				tooltip: {
 					valueSuffix: 'KBps'
-				},
-				fillColor: {
-					linearGradient: {
-						x1: 0,
-						y1: 0,
-						x2: 0,
-						y2: 1
-					},
-					yAxis: 1,
-					stops: [
-						[0, Highcharts.getOptions().colors[39]],
-						[1, Highcharts.Color(Highcharts.getOptions().colors[39]).setOpacity(0).get('rgba')]
-					]
-				},
+				}
 			}, {
 				name: '网络下行',
 				type: 'spline',
@@ -509,20 +433,7 @@
 				yAxis:1,
 				tooltip: {
 					valueSuffix: 'KBps'
-				},
-				fillColor: {
-					linearGradient: {
-						x1: 0,
-						y1: 0,
-						x2: 0,
-						y2: 1
-					},
-					yAxis: 1,
-					stops: [
-						[0, Highcharts.getOptions().colors[35]],
-						[1, Highcharts.Color(Highcharts.getOptions().colors[35]).setOpacity(0).get('rgba')]
-					]
-				},
+				}
 			}]
 		});
 		$scope.loadingDone();
@@ -657,7 +568,7 @@
 	$('#container-io').highcharts(Highcharts.merge(gaugeOptions, {
 		yAxis: {
 			min: 0,
-			max: 500000,
+			max: 10000,
 			title: {
 				text: '磁盘I/O'
 			}
@@ -672,8 +583,7 @@
 			name: '磁盘I/O',
 			data: [1],
 			dataLabels: {
-				format: '<div style="text-align:center"><span style="font-size:25px;color:' +
-					((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y:.0f}KBps</span><br/>'
+				format: '<div style="text-align:center"><span style="font-size:25px;color:' + ((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y:.0f}KBps</span><br/>'
 			},
 			tooltip: {
 				valueSuffix: ' KBps'
