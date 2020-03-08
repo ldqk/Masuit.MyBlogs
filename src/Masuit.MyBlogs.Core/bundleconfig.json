@@ -76,5 +76,11 @@
     "inputFiles": [
       "wwwroot/ng-views/controllers/partner.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/ng-views/controllers/dashboard.min.js",
+    "inputFiles": [
+      "wwwroot/ng-views/controllers/dashboard.js"
+    ]
   }
 ]

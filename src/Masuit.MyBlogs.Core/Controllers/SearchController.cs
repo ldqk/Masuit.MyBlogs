@@ -61,7 +61,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     SearchDetailsService.AddEntity(new SearchDetails
                     {
-                        KeyWords = wd,
+                        Keywords = wd,
                         SearchTime = DateTime.Now,
                         IP = ClientIP
                     });
@@ -98,7 +98,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize, HttpPost, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "search" }, VaryByHeader = "Cookie")]
         public ActionResult SearchList(int page = 1, int size = 10, string search = "")
         {
-            var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.KeyWords.Contains(search);
+            var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.Keywords.Contains(search);
             var list = SearchDetailsService.GetPages<DateTime, SearchDetailsDto>(page, size, out int total, where, s => s.SearchTime, false).ToList();
             var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
             return PageResult(list, pageCount, total);

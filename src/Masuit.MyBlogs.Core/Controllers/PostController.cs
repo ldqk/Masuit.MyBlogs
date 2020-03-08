@@ -394,10 +394,11 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var post = PostService.GetById(dto.PostId) ?? throw new NotFoundException("文章未找到");
             var diff = new HtmlDiff.HtmlDiff(post.Content.RemoveHtmlTag(), dto.Content.RemoveHtmlTag());
-            if (post.Title.Equals(dto.Title) && !diff.Build().Contains("diffmod"))
+            if (post.Title.Equals(dto.Title) && !diff.Build().Contains(new[] { "diffmod", "diffdel", "diffins" }))
             {
                 return ResultData(null, false, "内容未被修改！");
             }
+
             #region 合并验证
 
             if (PostMergeRequestService.Any(p => p.ModifierEmail == dto.ModifierEmail && p.MergeState == MergeStatus.Block))

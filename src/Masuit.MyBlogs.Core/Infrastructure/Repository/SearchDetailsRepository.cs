@@ -1,6 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +19,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
             return t;
         }
 
+        /// <summary>
+        /// 热词统计
+        /// </summary>
+        /// <param name="start"></param>
+        /// <returns></returns>
         public List<SearchRank> GetRanks(DateTime start)
         {
-            return DataContext.SearchRanks.FromSqlRaw($"SELECT KeyWords Keywords,COUNT(*) Count from (SELECT IP,KeyWords FROM `searchdetails` WHERE SearchTime>'{start:yyyy-MM-dd}' GROUP BY IP,KeyWords) as t GROUP BY KeyWords ORDER BY COUNT(1) DESC LIMIT 30").ToList();
+            return DataContext.SearchDetails.Where(s => s.SearchTime > start).Select(s => new { s.IP, s.Keywords }).Distinct().GroupBy(s => s.Keywords).Select(g => new SearchRank { Keywords = g.Key, Count = g.Count() }).OrderByDescending(s => s.Count).Take(30).ToList();
         }
     }
 }

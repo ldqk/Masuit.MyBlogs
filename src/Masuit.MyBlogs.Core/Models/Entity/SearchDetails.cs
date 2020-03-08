@@ -22,7 +22,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 关键词
         /// </summary>
         [Required(ErrorMessage = "关键词不能为空")]
-        public string KeyWords { get; set; }
+        public string Keywords { get; set; }
 
         /// <summary>
         /// 搜索时间
