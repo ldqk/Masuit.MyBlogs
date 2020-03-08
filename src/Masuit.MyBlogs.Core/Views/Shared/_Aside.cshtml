@@ -60,12 +60,12 @@
             </div>
             <div class="panel-body">
                 <ul class="list-group">
-                    @foreach (CategoryDto cat in Model.Categories)
+                    @foreach (var cat in Model.Categories)
                     {
                         if (cat.PendedPostCount > 0)
                         {
                             <li class="list-group-item">
-                                <a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Name 共(@cat.PendedPostCount 篇)</a>
+                                <a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Name (@cat.PendedPostCount)</a>
                                 <a class="pull-right" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
                                     <i class="icon-rss4"></i>
                                 </a>
@@ -133,7 +133,7 @@
     <section class="wow animated fadeIn">
         <article class="panel panel-primary">
             <div class="panel-heading">
-                <i class="icon-lightbulb"></i>标签云 @Html.ActionLink("所有标签", "All", "Post", null, new { @class = "pull-right text-white" })
+                <i class="icon-lightbulb"></i>标签云 <a asp-controller="Post" asp-action="All" class="pull-right text-white">所有标签</a>
             </div>
             <div class="panel-body text-center">
                 <div id="tagscloud">
@@ -181,7 +181,7 @@
     <section class="wow animated fadeIn">
         <article class="panel panel-primary">
             <div class="panel-heading">
-                <i class="icon-coin-yen"></i>支付宝支持本站 @Html.ActionLink("更多方式", "Donate", "Misc", null, new { @class = "pull-right text-white" })
+                <i class="icon-coin-yen"></i>支付宝支持本站 <a asp-controller="Misc" asp-action="Donate" class="pull-right text-white">更多方式</a>
             </div>
             <div class="panel-body">
                 <img class="img img-responsive img-thumbnail" src="@CommonHelper.SystemSettings["Donate"]" alt="@CommonHelper.SystemSettings["Title"]" title="@CommonHelper.SystemSettings["Title"]" />

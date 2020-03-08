@@ -26,7 +26,7 @@
 					time: 4
 				});
 			}
-		}, () => {
+		}, function() {
             window.notie.alert({
 				type: 3,
 				text: "请求失败，请稍候再试！",
@@ -65,7 +65,7 @@
 					time: 4
 				});
 			}
-		}, () => {
+		}, function() {
             window.notie.alert({
 				type: 3,
 				text: "请求失败，请稍候再试！",
@@ -169,7 +169,7 @@
 		}
 
 		localStorage.setItem("user",  JSON.stringify(formData));
-		window.post("/comment/put", formData, (data) => {
+		window.post("/comment/put", formData, function(data) {
 			loadingDone();
 			if (data.Success) {
 				window.notie.alert({
@@ -190,7 +190,7 @@
 					time: 4
 				});
 			}
-		}, () => {
+		}, function() {
             window.notie.alert({
 				type: 3,
 				text: "请求失败，请稍候再试！",
@@ -218,7 +218,7 @@
 			}, function() {
 				swal("您的打赏将会支持本站做的更好！", null, "error");
 			});
-		}, () => {
+		}, function() {
             window.notie.alert({
 				type: 3,
 				text: "请求失败，请稍候再试！",
@@ -235,7 +235,7 @@
 function submitComment(_this) {
 	loading();
 	localStorage.setItem("user", JSON.stringify($(_this).serializeObject()));
-	window.post("/comment/put", $(_this).serializeObject(), (data) => {
+	window.post("/comment/put", $(_this).serializeObject(), function(data) {
 		loadingDone();
 		if (data.Success) {
 			window.notie.alert({
@@ -254,7 +254,7 @@ function submitComment(_this) {
 				time: 4
 			});
 		}
-	}, () => {
+	}, function() {
         window.notie.alert({
 			type: 3,
 			text: "请求失败，请稍候再试！",
@@ -303,7 +303,7 @@ function bindReplyBtn() {
 //绑定评论投票
 function commentVoteBind() {
 	$(".cmvote").on("click", function(e) {
-		window.post("/comment/CommentVote", { id: $(this).data("id") }, (data) => {
+		window.post("/comment/CommentVote", { id: $(this).data("id") }, function(data) {
 			if (data) {
 				if (data.Success) {
 					console.log($(this).children("span.count"));
@@ -324,7 +324,7 @@ function commentVoteBind() {
 				}
 			}
 		});
-	}, () => {
+	}, function() {
         window.notie.alert({
 			type: 3,
 			text: "请求失败，请稍候再试！",
@@ -335,7 +335,7 @@ function commentVoteBind() {
 
 function bindVote() {
     $("#voteup").on("click", function(e) {
-        window.post("/post/voteup", { id: $("#postId").val() }, (data) => {
+        window.post("/post/voteup", { id: $("#postId").val() }, function(data) {
 			if (data) {
 				if (data.Success) {
 					$(this).children()[1].innerText = parseInt($(this).children()[1].innerText) + 1;
@@ -354,7 +354,7 @@ function bindVote() {
 					});
 				}
 			}
-		}, () => {
+		}, function() {
             window.notie.alert({
 				type: 3,
 				text: "请求失败，请稍候再试！",
@@ -363,7 +363,7 @@ function bindVote() {
         });
 	});
     $("#votedown").on("click", function(e) {
-        window.post("/post/votedown", { id: $("#postId").val() }, (data) => {
+        window.post("/post/votedown", { id: $("#postId").val() }, function(data) {
 			if (data) {
 				if (data.Success) {
 					$(this).children()[1].innerText = parseInt($(this).children()[1].innerText) + 1;
@@ -382,7 +382,7 @@ function bindVote() {
 					});
 				}
 			}
-		}, () => {
+		}, function() {
             window.notie.alert({
 				type: 3,
 				text: "请求失败，请稍候再试！",
@@ -398,7 +398,7 @@ function loadParentComments(data) {
     loading();
     var html = '';
 	if (data) {
-        var rows = Enumerable.From(data.rows).Where(c => c.ParentId === 0).ToArray();
+		var rows = Enumerable.From(data.rows).Where(function (c) {return c.ParentId === 0}).ToArray();
         var page = data.page;
         var size = data.size;
         var maxPage = Math.ceil(data.total / size);
@@ -433,7 +433,7 @@ function loadComments(data, comments, root, depth = 0) {
     var floor = 1;
     depth++;
     var html = '';
-    Enumerable.From(comments).ForEach((item, index) => {
+    Enumerable.From(comments).ForEach(function(item, index) {
 	    var color = colors[depth%5];
 		html += `<article id="${item.Id}" class="panel panel-${color}">
                         <div class="panel-heading">

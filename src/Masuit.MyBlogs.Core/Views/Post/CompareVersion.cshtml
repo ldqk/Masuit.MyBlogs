@@ -21,10 +21,10 @@
 <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
 <div class="container-fluid">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页", "Index", "Home")</li>
-        <li>@Html.ActionLink("文章列表", "Post", "Home")</li>
-        <li>@Html.ActionLink(Model[0].Title, "Details", "Post", new { id = Model[0].Id }, null)</li>
-        <li>@Html.ActionLink("历史版本", "History", "Post", new { id = Model[0].Id }, null)</li>
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
+        <li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
+        <li><a asp-controller="Post" asp-action="Details" asp-route-id="@Model[0].Id">@Model[0].Title</a></li>
+        <li><a asp-controller="Post" asp-action="History" asp-route-id="@Model[0].Id">历史版本</a></li>
         <li class="current">
             <em>版本对比</em>
         </li>
@@ -47,14 +47,14 @@
                                     <div class="row">
                                         <div class="col-sm-7">
                                             <div class="padding-bot10">
-                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Modifier</span>修改于<span class="text-success">@Model[1].ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> | 原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model[1].Category.Name, "Category", "Home", new { id = Model[1].CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })
+                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Modifier</span>修改于<span class="text-success">@Model[1].ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> | 原分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model[1].CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Category.Name</a>
                                                 @if (Model[1].Seminar.Any())
                                                 {
                                                     <span> | 原所属专题：</span>
                                                     var seminars = Model[1].Seminar;
                                                     foreach (var s in seminars)
                                                     {
-                                                        @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })<text> </text>
+                                                        <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-@colors[new Random().Next() % colors.Length]">@s.Seminar.Title</a><text> </text>
                                                     }
                                                 }
                                             </div>
@@ -133,14 +133,14 @@
                                     <div class="row">
                                         <div class="col-sm-7">
                                             <div class="padding-bot10">
-                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Modifier</span>修改于<span class="text-success">@Model[2].ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> | 原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model[2].Category.Name, "Category", "Home", new { id = Model[2].CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })
+                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Modifier</span>修改于<span class="text-success">@Model[2].ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> | 原分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model[2].CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Category.Name</a>
                                                 @if (Model[2].Seminar.Any())
                                                 {
                                                     <span> | 原所属专题：</span>
                                                     var seminars = Model[2].Seminar;
                                                     foreach (var s in seminars)
                                                     {
-                                                        @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })<text> </text>
+                                                        <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-@colors[new Random().Next() % colors.Length]">@s.Seminar.Title</a><text> </text>
                                                     }
                                                 }
                                             </div>

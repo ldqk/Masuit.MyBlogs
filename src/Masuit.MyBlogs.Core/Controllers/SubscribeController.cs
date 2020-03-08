@@ -113,7 +113,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// RSS分类订阅
         /// </summary>
         /// <returns></returns>
-        [Route("/rss/cat/{id}"), ResponseCache(Duration = 600)]
+        [Route("/cat/{id}/rss"), ResponseCache(Duration = 600)]
         public IActionResult CategoryRss(int id)
         {
             var time = DateTime.Today.AddDays(-1);
@@ -159,8 +159,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// RSS文章订阅
         /// </summary>
         /// <returns></returns>
-        [Route("/rss/{id}"), ResponseCache(Duration = 600)]
-        public IActionResult Rss(int id)
+        [Route("/{id}/rss"), ResponseCache(Duration = 600)]
+        public IActionResult PostRss(int id)
         {
             string scheme = Request.Scheme;
             var host = Request.Host;
@@ -205,7 +205,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// RSS文章评论订阅
         /// </summary>
         /// <returns></returns>
-        [Route("/rss/{id}/comments"), ResponseCache(Duration = 600)]
+        [Route("/{id}/comments/rss"), ResponseCache(Duration = 600)]
         public IActionResult CommentsRss(int id)
         {
             string scheme = Request.Scheme;

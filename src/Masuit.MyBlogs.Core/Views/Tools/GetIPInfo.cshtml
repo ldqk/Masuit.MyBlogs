@@ -12,27 +12,28 @@
 </style>
 <div class="container">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
         <li class="current">
             <em>@ViewBag.Title</em>
         </li>
     </ol>
-        <ul class="list-group">
-            <li class="list-group-item">
-                <p class="size24">
-                    如果你觉得这个工具有用，请 @Html.ActionLink("点击这里", "Donate", "Misc") 支持一下博主！
-                </p>
-            </li>
-        </ul>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <p class="size24">
+                如果你觉得这个工具有用，请 <a asp-controller="Misc" asp-action="Donate">点击这里</a> 支持一下博主！
+            </p>
+        </li>
+    </ul>
     <form method="get">
         <div class="input-group">
-            <input class="form-control" name="ip" value="@ViewBag.IP" placeholder="请输入有效的IPv4地址"/>
+            <input class="form-control" name="ip" value="@ViewBag.IP" placeholder="请输入有效的IPv4地址" />
             <span class="input-group-btn">
                 <button class="btn btn-info" type="submit">查询</button>
             </span>
         </div>
     </form>
-    @if(Model != null && Model.Status == 0) {
+    @if (Model != null && Model.Status == 0)
+    {
         int count = 0;
         <table class="table table-bordered table-condensed table-hover">
             <tr>
@@ -47,15 +48,18 @@
                 <td>经纬度：</td>
                 <td>(经度：@(Model.AddressResult.Location?.Lng),纬度：@(Model.AddressResult.Location?.Lat))</td>
             </tr>
-            @foreach(Pois poi in Model.AddressResult.Pois) {
+            @foreach (Pois poi in Model.AddressResult.Pois)
+            {
                 <tr>
                     <td>参考地理位置@(++count)：</td>
                     <td>@poi.AddressDetail</td>
                 </tr>
             }
         </table>
-        
-    } else {
+
+    }
+    else
+    {
         <span class="text-danger">@ViewBag.IP 不在国内或者不是一个有效的IPv4外网地址</span>
     }
 </div>

@@ -35,7 +35,7 @@
                     作者：<i class="icon-user-check"></i><strong class="label label-primary">
                         <a asp-controller="Home" asp-action="Author" asp-route-author="@Model.Author">@Model.Author</a>
                     </strong> <span class="text-muted">
-                        | 发表时间：<i class="fa fa-clock-o"></i> @Model.ModifyDate.ToString("yyyy-MM-dd HH:mm") | 分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.CategoryName, "Category", "Home", new { id = Model.CategoryId }, null)
+                        | 发表时间：<i class="fa fa-clock-o"></i> @Model.ModifyDate.ToString("yyyy-MM-dd HH:mm") | 分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.CategoryName</a>
                     </span>
                 </div>
                 <p>

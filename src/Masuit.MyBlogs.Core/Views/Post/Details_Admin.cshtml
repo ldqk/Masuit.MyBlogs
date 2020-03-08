@@ -25,8 +25,8 @@
 <script src="~/Assets/share/jquery.share.min.js"></script>
 <div class="container">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页", "Index", "Home")</li>
-        <li>@Html.ActionLink("文章列表", "Post", "Home")</li>
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
+        <li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
         <li class="current"><em>@ViewBag.Title</em></li>
     </ol>
     <div class="wrapper-content article">
@@ -74,19 +74,19 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 line-height24">
-                                    分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] }) | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃ | 状态：@Model.Status.GetDisplay()
+                                    分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model.Category.Name</a>  | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃ | 状态：@Model.Status.GetDisplay()
                                     @if (Model.Seminar.Any())
                                     {
                                         <span> | 所属专题：</span>
                                         var seminars = Model.Seminar;
                                         foreach (var s in seminars)
                                         {
-                                            @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })<text> </text>
+                                            <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-@colors[new Random().Next() % colors.Length]">@s.Seminar.Title</a><text> </text>
                                         }
                                     }
                                     <div class="pull-right margin-right20">
                                         <div class="btn-group">
-                                            @Html.ActionLink("刷新", "Refresh", "Post", new { id = Model.Id }, new { @class = "btn btn-info" })
+                                            <a asp-controller="Post" asp-action="Refresh" asp-route-id="@Model.Id" class="btn btn-info">刷新</a>
                                             @if (Model.IsFixedTop)
                                             {
                                                 <button class="btn btn-success" id="pin">取消置顶</button>
@@ -174,7 +174,7 @@
                             PostModelBase prev = ViewBag.Prev;
                             if (prev != null)
                             {
-                                @Html.ActionLink(prev.Title, "Details", "Post", new { id = prev.Id }, null)
+                                <a asp-controller="Post" asp-action="Details" asp-route-id="@prev.Id">@prev.Title</a>
                             }
                             else
                             {
@@ -188,7 +188,7 @@
                             PostModelBase next = ViewBag.Next;
                             if (next != null)
                             {
-                                @Html.ActionLink(next.Title, "Details", "Post", new { id = next.Id }, null)
+                                <a asp-controller="Post" asp-action="Details" asp-route-id="@next.Id">@next.Title</a>
                             }
                             else
                             {
@@ -203,7 +203,7 @@
                         <h3>文章历史版本：</h3>
                         <p>
                             修改次数：@Model.PostHistoryVersion.Count 次
-                            @Html.ActionLink("查看历史版本", "History", "Post", new { id = Model.Id }, null)
+                            <a asp-controller="Post" asp-action="History" asp-route-id="@Model.Id">查看历史版本</a>
                         </p>
                     </section>
                 }
@@ -225,8 +225,8 @@
                                 @for (int i = 1; i < count; i += 2)
                                 {
                                     <tr>
-                                        <td>@Html.ActionLink(posts[i - 1].Title, "Details", "Post", new { id = posts[i - 1].Id }, null)</td>
-                                        <td>@Html.ActionLink(posts[i].Title, "Details", "Post", new { id = posts[i].Id }, null)</td>
+                                        <td style="width: 50%"><a asp-controller="Post" asp-action="Details" asp-route-id="@posts[i - 1].Id">@posts[i - 1].Title</a></td>
+                                        <td><a asp-controller="Post" asp-action="Details" asp-route-id="@posts[i].Id">@posts[i].Title</a></td>
                                     </tr>
                                 }
                             </table>

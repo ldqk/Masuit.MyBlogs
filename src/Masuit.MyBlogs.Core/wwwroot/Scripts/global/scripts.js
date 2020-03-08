@@ -93,7 +93,7 @@ $(function() {
                         time: 4
                     });
                 }
-            }, () => {
+            }, function() {
                 window.notie.alert({
 					type: 3,
 					text: "请求失败，请稍候再试！",
@@ -249,43 +249,119 @@ function loadingDone() {
     $(".loading1").hide();
 }
 
+/**禁止复制 */
+function CopyrightProtect() {
+    setInterval(function() {
+        document.onkeydown = function(e){
+            var currKey=0,evt=e||window.event;
+            currKey=evt.keyCode||evt.which||evt.charCode;
+            if (currKey == 123||( event.ctrlKey&&currKey==67 )||( event.ctrlKey&&currKey==85 )||( event.ctrlKey&&event.shiftKey)||event.altKey ){
+                window.event.cancelBubble = true;
+                event.returnValue = false;
+                return false;
+            }
+        }
+        document.ondragstart = function(){
+            event.returnValue = false;
+            return false;
+        }
+        document.oncopy = function(){
+            event.returnValue = false;
+            return false;
+        }
+        document.oncontextmenu = function(){
+            event.returnValue = false;
+            return false;
+        }
+    },100);
+}
+
+/**禁止编辑器内复制 */
+function CopyrightProtect4Editor() {
+    setInterval(function() {
+        document.getElementById("ueditor_0").contentWindow.document.body.onkeydown = function(e){
+            var currKey=0,evt=e||window.event;
+            currKey=evt.keyCode||evt.which||evt.charCode;
+            if (currKey == 123||( event.ctrlKey&&currKey==67 )||( event.ctrlKey&&currKey==85)|| (event.ctrlKey&&currKey==88)||( event.ctrlKey&&event.shiftKey)|| event.altKey ){
+                window.event.cancelBubble = true;
+                window.event.returnValue = false;
+                return false;
+            }
+        }
+        document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function(){
+            event.returnValue = false;
+            return false;
+        }
+        document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function(){
+            event.returnValue = false;
+            return false;
+        }
+    },100);
+}
+
+/**禁止全局复制 */
+function GlobalCopyrightProtect() {
+    setInterval(function() {
+        document.onkeydown = function(e){
+            var currKey=0,evt=e||window.event;
+            currKey=evt.keyCode||evt.which||evt.charCode;
+            if (currKey == 123||( event.ctrlKey&&currKey==67 )|| (event.ctrlKey&&currKey==85)||event.ctrlKey||(event.ctrlKey&&event.shiftKey)||event.altKey ){
+                window.event.cancelBubble = true;
+                window.event.returnValue = false;
+                return false;
+            }
+        }
+        document.ondragstart = function(){
+            event.returnValue = false;
+            return false;
+        }
+        document.oncopy = function(){
+            event.returnValue = false;
+            return false;
+        }
+        document.oncontextmenu = function(){
+            event.returnValue = false;
+            return false;
+        }
+    },100);
+}
 function GetOperatingSystem(os) {
     if (os) {
         if (os.indexOf("Windows") >= 0) {
-            return `<i class="icon-windows8"></i>${os}`;
+            return '<i class="icon-windows8"></i>'+os;
         } else if (os.indexOf("Mac") >= 0) {
-            return `<i class="icon-apple"></i>${os}`;
+            return '<i class="icon-apple"></i>'+os;
         } else if (os.indexOf("Chrome") >= 0) {
-            return `<i class="icon-chrome"></i>${os}`;
+            return '<i class="icon-chrome"></i>'+os;
         } else if (os.indexOf("Android") >= 0) {
-            return `<i class="icon-android"></i>${os}`;
+            return '<i class="icon-android"></i>'+os;
         } else {
-            return `<i class="icon-stats"></i>${os}`;
+            return '<i class="icon-stats"></i>'+os;
         }
     } else {
-        return `<i class="icon-stats"></i>未知操作系统`;
+        return '<i class="icon-stats"></i>未知操作系统';
     }
 }
 
 function GetBrowser(browser) {
     if (browser) {
         if (browser.indexOf("Chrome") >= 0) {
-            return `<i class="icon-chrome"></i>${browser}`;
+            return '<i class="icon-chrome"></i>'+browser;
         } else if (browser.indexOf("Firefox") >= 0) {
-            return `<i class="icon-firefox"></i>${browser}`;
+            return '<i class="icon-firefox"></i>'+browser;
         } else if (browser.indexOf("IE") >= 0) {
-            return `<i class="icon-IE"></i>${browser}`;
+            return '<i class="icon-IE"></i>'+browser;
         } else if (browser.indexOf("Edge") >= 0) {
-            return `<i class="icon-edge"></i>${browser}`;
+            return '<i class="icon-edge"></i>'+browser;
         } else if (browser.indexOf("Opera") >= 0) {
-            return `<i class="icon-opera"></i>${browser}`;
+            return '<i class="icon-opera"></i>'+browser;
         } else if (browser.indexOf("Safari") >= 0) {
-            return `<i class="icon-safari"></i>${browser}`;
+            return '<i class="icon-safari"></i>'+browser;
         } else {
-            return `<i class="icon-browser2"></i>${browser}`;
+            return '<i class="icon-browser2"></i>'+browser;
         }
     } else {
-        return `<i class="icon-browser2"></i>未知浏览器`;
+        return '<i class="icon-browser2"></i>未知浏览器';
     }
 }
 
@@ -318,7 +394,7 @@ function popBrowserTips() {
 
 function post(url, params, callback, error) {
     var formData = new FormData();
-    Object.keys(params).forEach((key) => {
+    Object.keys(params).forEach(function(key) {
         formData.append(key, params[key]);
     });
     window.fetch(url, {
@@ -336,136 +412,6 @@ function post(url, params, callback, error) {
             error(e);
         }
     });
-}
-
-/**禁止全局复制 */
-function GlobalCopyrightProtect() {
-    setInterval(function() {
-        document.onkeydown = function(e){
-            var currKey=0,evt=e||window.event;
-            currKey=evt.keyCode||evt.which||evt.charCode;
-            if (currKey == 123) {
-                window.event.cancelBubble = true;
-                window.event.returnValue = false;
-            }
-            if( event.ctrlKey&&currKey==67 ){
-                event.returnValue = false;
-                return false;
-            }
-            if( event.ctrlKey&&currKey==85 ){
-                event.returnValue = false;
-                return false;
-            }
-            if( event.ctrlKey ){
-                event.returnValue = false;
-                return false;
-            }
-            if( event.ctrlKey&&event.shiftKey){
-                event.returnValue = false;
-                return false;
-            }
-            if ( event.altKey ){
-                event.returnValue = false;
-                return false;
-            }
-        }
-        document.ondragstart = function(){
-            event.returnValue = false;
-            return false;
-        }
-        document.oncopy = function(){
-            event.returnValue = false;
-            return false;
-        }
-        document.oncontextmenu = function(){
-            event.returnValue = false;
-            return false;
-        }
-    },100);
-}
-
-/**禁止复制 */
-function CopyrightProtect() {
-    setInterval(function() {
-        document.onkeydown = function(e){
-            var currKey=0,evt=e||window.event;
-            currKey=evt.keyCode||evt.which||evt.charCode;
-            if (currKey == 123) {
-                window.event.cancelBubble = true;
-                window.event.returnValue = false;
-            }
-            if( event.ctrlKey&&currKey==67 ){//C
-                event.returnValue = false;
-                return false;
-            }
-            if( event.ctrlKey&&currKey==85 ){//U
-                event.returnValue = false;
-                return false;
-            }
-            if( event.ctrlKey&&event.shiftKey){
-                event.returnValue = false;
-                return false;
-            }
-            if ( event.altKey ){
-                event.returnValue = false;
-                return false;
-            }
-        }
-        document.ondragstart = function(){
-            event.returnValue = false;
-            return false;
-        }
-        document.oncopy = function(){
-            event.returnValue = false;
-            return false;
-        }
-        document.oncontextmenu = function(){
-            event.returnValue = false;
-            return false;
-        }
-    },100);
-}
-
-/**禁止编辑器内复制 */
-function CopyrightProtect4Editor() {
-    setInterval(function() {
-        document.getElementById("ueditor_0").contentWindow.document.body.onkeydown = function(e){
-            var currKey=0,evt=e||window.event;
-            currKey=evt.keyCode||evt.which||evt.charCode;
-            if (currKey == 123) {
-                window.event.cancelBubble = true;
-                window.event.returnValue = false;
-            }
-            if( event.ctrlKey&&currKey==67 ){ //C
-                event.returnValue = false;
-                return false;
-            }
-            if( event.ctrlKey&&currKey==85 ){ //U
-                event.returnValue = false;
-                return false;
-            }
-            if( event.ctrlKey&&currKey==88 ){ //X
-                event.returnValue = false;
-                return false;
-            }
-            if( event.ctrlKey&&event.shiftKey){
-                event.returnValue = false;
-                return false;
-            }
-            if ( event.altKey ){
-                event.returnValue = false;
-                return false;
-            }
-        }
-        document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function(){
-            event.returnValue = false;
-            return false;
-        }
-        document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function(){
-            event.returnValue = false;
-            return false;
-        }
-    },100);
 }
 
 /**

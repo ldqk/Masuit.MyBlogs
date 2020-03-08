@@ -58,7 +58,7 @@
             if (list.Any())
             {
                 <div class="page-header">
-                    <h3>Oops！抱歉~没有找到相关的文章或资源！如果您有相关的结果，您可以 @Html.ActionLink("点击这里", "Publish", "Post", null, new { @class = "btn btn-info btn-lg" }) 投稿哦！以下是一些随机推荐：</h3>
+                    <h3>Oops！抱歉~没有找到相关的文章或资源！如果您有相关的结果，您可以 <a asp-controller="Post" asp-action="Publish" class="btn btn-info btn-lg">点击这里</a> 投稿哦！以下是一些随机推荐：</h3>
                 </div>
                 foreach (PostDto post in list)
                 {

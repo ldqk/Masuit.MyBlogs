@@ -9,8 +9,8 @@
 }
 <div class="container" style="min-height: 70vh">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页", "Index", "Home")</li>
-        <li>@Html.ActionLink("文章列表", "Post", "Home")</li>
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
+        <li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
         <li>@Html.ActionLink(post.Title.Length > 40 ? post.Title.Substring(0, 40) + "..." : post.Title, "Details", "Post", new { id = post.Id }, null)</li>
         <li class="current"><em>历史版本</em></li>
     </ol>
@@ -32,10 +32,10 @@
                     <input type="checkbox" name="vers" id="0" />
                 </td>
                 <td>
-                    @Html.ActionLink(post.Title, "Details", "Post", new { id = post.Id }, null) <span class="text-red">(最新版本)</span>
+                    <a asp-controller="Post" asp-action="Details" asp-route-id="@post.Id">@post.Title</a><span class="text-red">(最新版本)</span>
                 </td>
                 <td>
-                    @Html.ActionLink(post.Category.Name, "Category", "Home", new { id = post.CategoryId }, null)
+                    <a asp-controller="Home" asp-action="Category" asp-route-id="@post.CategoryId">@post.Category.Name</a>
                 </td>
                 <td>@post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
                 <td>@post.Modifier</td>
@@ -47,10 +47,10 @@
                         <input type="checkbox" name="vers" id="@p.Id" />
                     </td>
                     <td>
-                        @Html.ActionLink(p.Title, "HistoryVersion", "Post", new { id = p.PostId, hid = p.Id }, null)
+                        <a asp-controller="Post" asp-action="HistoryVersion" asp-route-id="@p.PostId" asp-route-hid="@p.Id">@p.Title</a>
                     </td>
                     <td>
-                        @Html.ActionLink(p.Category.Name, "Category", "Home", new { id = post.CategoryId }, null)
+                        <a asp-controller="Home" asp-action="Category" asp-route-id="@post.CategoryId">@p.Category.Name</a>
                     </td>
                     <td>@p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
                     <td>@p.Modifier</td>

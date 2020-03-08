@@ -7,8 +7,8 @@
 <link href="https://cdn.staticfile.org/limonte-sweetalert2/8.11.8/sweetalert2.min.css" rel="stylesheet">
 <div class="container">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页", "Index", "Home")</li>
-        <li>@Html.ActionLink("文章列表", "Post", "Home")</li>
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
+        <li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
         <li>@Html.ActionLink(Model.Post.Title.Length > 50 ? Model.Post.Title.Substring(0, 50) + "..." : Model.Post.Title, "Details", "Post", new { id = Model.Post.Id }, null)</li>
         <li class="current"><em>重新编辑合并请求</em></li>
     </ol>
@@ -60,6 +60,12 @@
 <script src="https://cdn.staticfile.org/limonte-sweetalert2/8.11.8/sweetalert2.min.js"></script>
 <script>
     $(function () {
+        @if(Model.Post.DisableCopy) {
+            <text>
+        debugger;
+        CopyrightProtect4Editor();
+            </text>
+        }
         if (window.UE) {
 		    window.ue = UE.getEditor('editor', {
 			    initialFrameWidth: null
@@ -173,7 +179,7 @@
                 loadingDone();
                 return;
             }
-            $.post("/@Model.Post.Id/pushmerge", $(this).serialize(), (data) => {
+            $.post("/@Model.Post.Id/pushmerge", $(this).serialize(), function(data) {
                 loadingDone();
                 if (data.Success) {
                     window.notie.alert({
@@ -193,10 +199,4 @@
             });
         });
     });
-    @if(Model.Post.DisableCopy) {
-        <text>
-    debugger;
-    CopyrightProtect4Editor();
-        </text>
-    }
 </script>

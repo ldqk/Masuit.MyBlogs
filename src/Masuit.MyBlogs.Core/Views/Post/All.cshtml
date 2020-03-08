@@ -13,7 +13,7 @@
 <link href="~/Content/common/post-all.min.css" rel="stylesheet" />
 <div class="container-fluid">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
         <li class="current"><em>@ViewBag.Title</em></li>
     </ol>
     <svg id="svg-source" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position: absolute">

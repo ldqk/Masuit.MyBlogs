@@ -12,18 +12,18 @@
 </style>
 <div class="container">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
         <li class="current">
             <em>@ViewBag.Title</em>
         </li>
     </ol>
-        <ul class="list-group">
-            <li class="list-group-item">
-                <p class="size24">
-                    如果你觉得这个工具有用，请 @Html.ActionLink("点击这里", "Donate", "Misc") 支持一下博主！
-                </p>
-            </li>
-        </ul>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <p class="size24">
+                如果你觉得这个工具有用，请 <a asp-controller="Misc" asp-action="Donate">点击这里</a> 支持一下博主！
+            </p>
+        </li>
+    </ul>
     <form method="get">
         <div class="input-group">
             <input class="form-control" name="addr" value="@ViewBag.Address" placeholder="请输入有效地理位置" />

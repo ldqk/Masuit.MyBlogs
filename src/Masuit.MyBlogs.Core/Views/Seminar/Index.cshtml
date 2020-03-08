@@ -34,7 +34,7 @@
 </style>
 <div class="container">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
         <li class="current"><em>专题_@ViewBag.Title</em></li>
     </ol>
 </div>
@@ -69,7 +69,7 @@
                 <div class="row">
                     <div class="col-md-offset-10 col-md-2">
                         <div class="btn-group pull-right">
-                            @Html.ActionLink("所有专题", "All", "Post", null, new { @class = "btn btn-info" })
+                            <a asp-controller="Post" asp-action="All" class="btn btn-info">所有专题</a>
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 排序方式<span class="caret"></span>
                             </button>
@@ -109,7 +109,7 @@
         }
         else
         {
-            <h3>Oops！抱歉~本专题没有收录相关的文章或资源！如果您有相关的结果，您可以 @Html.ActionLink("点击这里", "Publish", "Post", null, new { @class = "btn btn-info btn-lg" }) 投稿哦！</h3>
+            <h3>Oops！抱歉~本专题没有收录相关的文章或资源！如果您有相关的结果，您可以 <a asp-controller="Post" asp-action="Publish" class="btn btn-info btn-lg">点击这里</a> 投稿哦！</h3>
         }
         <div class="col-md-12 text-center">
             @{ await Html.RenderPartialAsync("_Pagination", ViewData["page"]); }

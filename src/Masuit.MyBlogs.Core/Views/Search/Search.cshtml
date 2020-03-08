@@ -13,7 +13,7 @@
 }
 <div class="container min-height610">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
         <li class="current"><em>@ViewBag.Title</em></li>
     </ol>
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -67,7 +67,7 @@
                                         </h2>
                                         <div>
                                             作者：
-                                            <label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：@(p.ModifyDate.ToString("yyyy-MM-dd HH:mm")) | 分类：@(Html.ActionLink(p.CategoryName, "Category", "Home", new { id = p.CategoryId }, null))
+                                            <label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：@(p.ModifyDate.ToString("yyyy-MM-dd HH:mm")) | 分类：<a asp-controller="Home" asp-action="Category" asp-route-id="@p.CategoryId">@p.CategoryName</a>
                                         </div>
                                         <p class="size14">@Html.Raw(p.Content)</p>
                                         <div class="row">

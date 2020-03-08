@@ -10,10 +10,10 @@
 <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
 <div class="container">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页", "Index", "Home")</li>
-        <li>@Html.ActionLink("文章列表", "Post", "Home")</li>
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
+        <li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
         <li>@Html.ActionLink(Model.Post.Title.Length > 20 ? Model.Post.Title.Substring(0, 20) + "..." : Model.Post.Title, "Details", "Post", new { id = Model.PostId }, null)</li>
-        <li>@Html.ActionLink("历史版本", "History", "Post", new { id = Model.PostId }, null)</li>
+        <li><a asp-controller="Post" asp-action="History" asp-route-id="@Model.PostId">历史版本</a></li>
         <li class="current"><em>@(Model.Title.Length > 40 ? Model.Title.Substring(0, 40) + "..." : Model.Title)</em></li>
     </ol>
     <div class="wrapper-content article">
@@ -33,14 +33,14 @@
                                 <div class="col-sm-7">
                                     <div class="padding-bot10">
                                         <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Modifier</span>修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
-                                        原分类：<i class="icon-map-pin"></i>@Html.ActionLink(Model.Category.Name, "Category", "Home", new { id = Model.CategoryId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })
+                                        原分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model.Category.Name</a>
                                         @if (Model.Seminar.Any())
                                         {
-                                        <span> | 原所属专题：</span>
+                                            <span> | 原所属专题：</span>
                                             var seminars = Model.Seminar;
                                             foreach (var s in seminars)
                                             {
-                                        @Html.ActionLink(s.Seminar.Title, "Index", "Seminar", new { id = s.SeminarId }, new { @class = "label label-" + colors[new Random().Next() % colors.Length] })<text> </text>
+                                                <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-@colors[new Random().Next() % colors.Length]">@s.Seminar.Title</a><text> </text>
                                             }
                                         }
                                         <div class="btn-group">
@@ -52,23 +52,23 @@
                                 @{
                                     if (!string.IsNullOrEmpty(Model.Label))
                                     {
-                                    <div class="pull-right margin-right20">
-                                        <div>
-                                            @foreach (string s in Model.Label.Split(',', '，', ' '))
+                                        <div class="pull-right margin-right20">
+                                            <div>
+                                                @foreach (string s in Model.Label.Split(',', '，', ' '))
                                                 {
                                                     if (!string.IsNullOrEmpty(s))
                                                     {
-                                            <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
-                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
-                                            </a>
+                                                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
+                                                            <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
+                                                        </a>
                                                     }
                                                 }
+                                            </div>
                                         </div>
-                                    </div>
                                     }
                                 }
                             </div>
-                            <p class="text-focus text-center">您目前正在查看该文章的历史版本，文章的历史版本可能无法为您提供最准确及时的资讯，不具备任何参考价值，@Html.ActionLink("点击前往", "Details", "Post", new { id = Model.PostId }, null)该文章的最新版本。</p>
+                            <p class="text-focus text-center">您目前正在查看该文章的历史版本，文章的历史版本可能无法为您提供最准确及时的资讯，不具备任何参考价值，<a asp-controller="Post" asp-action="Details" asp-route-id="@Model.PostId">点击前往</a>该文章的最新版本。</p>
                         </header>
                         <article class="article" id="article">
                             @Html.Raw(Model.Content)
@@ -90,7 +90,7 @@
                             PostHistoryVersion prev = ViewBag.Prev;
                             if (prev != null)
                             {
-                                @Html.ActionLink(prev.Title, "HistoryVersion", "Post", new { id = prev.PostId, hid = prev.Id }, null)
+                                <a asp-controller="Post" asp-action="HistoryVersion" asp-route-id="@prev.PostId" asp-route-hid="@prev.Id">@prev.Title</a>
                             }
                             else
                             {
@@ -104,7 +104,7 @@
                             PostHistoryVersion next = ViewBag.Next;
                             if (next != null)
                             {
-                                @Html.ActionLink(next.Title, "HistoryVersion", "Post", new { id = next.PostId, hid = next.Id }, null)
+                                <a asp-controller="Post" asp-action="HistoryVersion" asp-route-id="@next.PostId" asp-route-hid="@next.Id">@next.Title</a>
                             }
                             else
                             {

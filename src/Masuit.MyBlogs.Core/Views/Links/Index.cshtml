@@ -8,7 +8,7 @@
 <link href="~/Content/common/btnstyle.css" rel="stylesheet" />
 <div class="container min-height610">
     <ol class="cd-breadcrumb triangle">
-        <li>@Html.ActionLink("首页", "Index", "Home")</li>
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
         <li class="current"><em>@ViewBag.Title</em></li>
     </ol>
     <header class="page-header text-center">
@@ -37,7 +37,7 @@
             本站描述：本站是一个集精品软件、资源共享、前端技术和后端开发等互联网技术分享的博客，专注于软件绿化、系统封装、前端开发和后端技术。热衷于互联网行业，喜欢各种折腾。
         </p>
         <p>
-            PS：链接由于无法访问或您的博客没有发现本站链接等其他原因，将会暂时撤销超链接，恢复请到 @Html.ActionLink("留言板", "Index", "Msg", null, new { @class = "btn btn-info" }) 通知我，望请谅解，谢谢！
+            PS：链接由于无法访问或您的博客没有发现本站链接等其他原因，将会暂时撤销超链接，恢复请到 <a asp-controller="Msg" asp-action="Index" class="btn btn-info">留言板</a> 通知我，望请谅解，谢谢！
         </p>
         <p>或者，您也可以尝试<button type="button" class="btn btn-info" onclick="add()">自助通道</button>进行添加友情链接</p>
     </article>
