@@ -1,4 +1,4 @@
-﻿using EFSecondLevelCache.Core;
+﻿using Masuit.Tools.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -316,12 +316,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <typeparam name="TS"></typeparam>
         /// <param name="pageIndex">第几页</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="totalCount">数据总数</param>
         /// <param name="where">where Lambda条件表达式</param>
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IQueryable<T> GetPages<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc);
+        PagedList<T> GetPages<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc);
 
         /// <summary>
         /// 高效分页查询方法，取出被AutoMapper映射后的数据集合
@@ -330,12 +329,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <typeparam name="TDto"></typeparam>
         /// <param name="pageIndex">第几页</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="totalCount">数据总数</param>
         /// <param name="where">where Lambda条件表达式</param>
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IQueryable<TDto> GetPages<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc) where TDto : class;
+        PagedList<TDto> GetPages<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc) where TDto : class;
 
         /// <summary>
         /// 高效分页查询方法，优先从二级缓存读取
@@ -343,12 +341,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <typeparam name="TS"></typeparam>
         /// <param name="pageIndex">第几页</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="totalCount">数据总数</param>
         /// <param name="where">where Lambda条件表达式</param>
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        EFCachedQueryable<T> GetPagesFromCache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc);
+        PagedList<T> GetPagesFromCache<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc);
 
         /// <summary>
         /// 高效分页查询方法，优先从二级缓存读取，取出被AutoMapper映射后的数据集合
@@ -357,12 +354,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <typeparam name="TDto"></typeparam>
         /// <param name="pageIndex">第几页</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="totalCount">数据总数</param>
         /// <param name="where">where Lambda条件表达式</param>
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        EFCachedQueryable<TDto> GetPagesFromCache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc) where TDto : class;
+        PagedList<TDto> GetPagesFromCache<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc) where TDto : class;
 
         /// <summary>
         /// 高效分页查询方法（不跟踪实体）
@@ -370,12 +366,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <typeparam name="TS"></typeparam>
         /// <param name="pageIndex">第几页</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="totalCount">数据总数</param>
         /// <param name="where">where Lambda条件表达式</param>
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        IQueryable<T> GetPagesNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+        PagedList<T> GetPagesNoTracking<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
 
         /// <summary>
         /// 根据ID删除实体
@@ -455,11 +450,67 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         T AddEntity(T t);
 
         /// <summary>
+        /// 添加或更新实体
+        /// </summary>
+        /// <param name="key">更新键规则</param>
+        /// <param name="t">需要保存的实体</param>
+        /// <returns>保存成功</returns>
+        T AddOrUpdate<TKey>(Expression<Func<T, TKey>> key, T t);
+
+        /// <summary>
+        /// 添加或更新实体
+        /// </summary>
+        /// <param name="key">更新键规则</param>
+        /// <param name="entities">需要保存的实体</param>
+        /// <returns>保存成功</returns>
+        void AddOrUpdate<TKey>(Expression<Func<T, TKey>> key, params T[] entities);
+
+        /// <summary>
+        /// 添加或更新实体
+        /// </summary>
+        /// <param name="key">更新键规则</param>
+        /// <param name="entities">需要保存的实体</param>
+        /// <returns>保存成功</returns>
+        void AddOrUpdate<TKey>(Expression<Func<T, TKey>> key, IEnumerable<T> entities);
+
+        /// <summary>
         /// 添加实体并保存
         /// </summary>
         /// <param name="t">需要添加的实体</param>
         /// <returns>添加成功</returns>
         T AddEntitySaved(T t);
+
+        /// <summary>
+        /// 添加或更新实体
+        /// </summary>
+        /// <param name="key">更新键规则</param>
+        /// <param name="t">需要保存的实体</param>
+        /// <returns>保存成功</returns>
+        T AddOrUpdateSaved<TKey>(Expression<Func<T, TKey>> key, T t);
+
+        /// <summary>
+        /// 添加或更新实体
+        /// </summary>
+        /// <param name="key">更新键规则</param>
+        /// <param name="entities">需要保存的实体</param>
+        /// <returns>保存成功</returns>
+        void AddOrUpdateSaved<TKey>(Expression<Func<T, TKey>> key, params T[] entities);
+
+        /// <summary>
+        /// 添加或更新实体
+        /// </summary>
+        /// <param name="key">更新键规则</param>
+        /// <param name="t">需要保存的实体</param>
+        /// <returns>保存成功</returns>
+        Task AddOrUpdateSavedAsync<TKey>(Expression<Func<T, TKey>> key, T t);
+
+        /// <summary>
+        /// 添加或更新实体
+        /// </summary>
+        /// <param name="key">更新键规则</param>
+        /// <param name="entities">需要保存的实体</param>
+        /// <returns>保存成功</returns>
+        Task AddOrUpdateSavedAsync<TKey>(Expression<Func<T, TKey>> key, IEnumerable<T> entities);
 
         /// <summary>
         /// 添加实体并保存（异步）

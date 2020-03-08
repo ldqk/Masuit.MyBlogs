@@ -52,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "orderBy" }, VaryByHeader = "Cookie")]
         public ActionResult Index()
         {
-            ViewBag.Total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin);
+            var total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin);
             var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner).OrderBy(a => Guid.NewGuid()).ToList();
             var fastShares = FastShareService.GetAllFromCache(s => s.Sort).ToList();
             var postsQuery = PostService.GetQuery<PostDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
@@ -61,7 +61,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.Banner = banners;
             viewModel.Posts = Enumerable.AsEnumerable(postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate)).Union(posts).ToList();
             ViewBag.FastShare = fastShares;
-            ViewData["page"] = new Pagination(1, 15, OrderBy.ModifyDate);
+            ViewData["page"] = new Pagination(1, 15, total, OrderBy.ModifyDate);
             return View(viewModel);
         }
 
@@ -75,7 +75,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("p"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         public ActionResult Post([Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 15)
         {
-            ViewBag.Total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin && !p.IsFixedTop);
+            var total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin && !p.IsFixedTop);
             var viewModel = GetIndexPageViewModel();
             var postsQuery = PostService.GetQuery<PostDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
             var posts = postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
@@ -85,7 +85,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             viewModel.Posts = posts;
-            ViewData["page"] = new Pagination(page, size, orderBy);
+            ViewData["page"] = new Pagination(page, size, total, orderBy);
             return View(viewModel);
         }
 
@@ -103,10 +103,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             var temp = PostService.GetQuery<PostDto>(p => p.Label.Contains(id) && (p.Status == Status.Pended || CurrentUser.IsAdmin));
             var posts = temp.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
             var viewModel = GetIndexPageViewModel();
-            ViewBag.Total = temp.Count();
             ViewBag.Tag = id;
             viewModel.Posts = posts;
-            ViewData["page"] = new Pagination(page, size, orderBy);
+            ViewData["page"] = new Pagination(page, size, temp.Count(), orderBy);
             return View(viewModel);
         }
 
@@ -126,10 +125,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             var temp = PostService.GetQuery<PostDto>(where);
             var posts = temp.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
             var viewModel = GetIndexPageViewModel();
-            ViewBag.Total = temp.Count();
             ViewBag.Author = author;
             viewModel.Posts = posts;
-            ViewData["page"] = new Pagination(page, size, orderBy);
+            ViewData["page"] = new Pagination(page, size, temp.Count(), orderBy);
             return View(viewModel);
         }
 
@@ -147,11 +145,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
             var posts = PostService.GetQuery<PostDto>(p => p.CategoryId == cat.Id && (p.Status == Status.Pended || CurrentUser.IsAdmin));
-            ViewBag.Total = posts.Count();
             var viewModel = GetIndexPageViewModel();
             viewModel.Posts = posts.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
             ViewBag.Category = cat;
-            ViewData["page"] = new Pagination(page, size, orderBy);
+            ViewData["page"] = new Pagination(page, size, posts.Count(), orderBy);
             return View(viewModel);
         }
 
@@ -162,7 +159,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         private HomePageViewModel GetIndexPageViewModel()
         {
             var postsQuery = PostService.GetQuery<PostDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
-            var notices = NoticeService.GetPagesFromCache<DateTime, NoticeDto>(1, 5, out _, n => (n.Status == Status.Display || CurrentUser.IsAdmin), n => n.ModifyDate, false).ToList(); //加载前5条公告
+            var notices = NoticeService.GetPagesFromCache<DateTime, NoticeDto>(1, 5, n => (n.Status == Status.Display || CurrentUser.IsAdmin), n => n.ModifyDate, false); //加载前5条公告
             var cats = CategoryService.GetQueryFromCache<string, CategoryDto>(c => c.Status == Status.Available, c => c.Name).ToList(); //加载分类目录
             var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList(); //热词统计
             var hot6Post = postsQuery.OrderBy((new Random().Next() % 3) switch
@@ -188,7 +185,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 Categories = cats,
                 HotSearch = hotSearches,
-                Notices = notices,
+                Notices = notices.Data,
                 Tags = newdic,
                 Top6Post = hot6Post,
                 PostsQueryable = postsQuery,

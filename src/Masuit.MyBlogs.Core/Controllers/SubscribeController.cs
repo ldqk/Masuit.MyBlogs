@@ -7,7 +7,6 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Logging;
@@ -461,9 +460,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(b => b.Email.Contains(search));
             }
 
-            var list = BroadcastService.GetPagesFromCache(page, size, out var total, @where, b => b.UpdateTime, false).ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return Ok(new PageDataModel(list, pageCount, total));
+            var list = BroadcastService.GetPagesFromCache(page, size, @where, b => b.UpdateTime, false);
+            return Ok(list);
         }
 
         #endregion

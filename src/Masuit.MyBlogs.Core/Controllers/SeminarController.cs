@@ -47,12 +47,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             var s = SeminarService.GetById(id) ?? throw new NotFoundException("文章未找到");
             var temp = PostService.GetQuery<PostDto>(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin));
             var posts = temp.OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).ToList();
-            ViewBag.Total = temp.Count();
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
-            ViewData["page"] = new Pagination(page, size, orderBy);
+            ViewData["page"] = new Pagination(page, size, temp.Count(), orderBy);
             return View(posts);
         }
 
@@ -135,9 +134,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetPageData(int page, int size)
         {
-            var list = SeminarService.GetPages<int, SeminarDto>(page, size, out int total, s => true, s => s.Id, false).ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            var list = SeminarService.GetPages<int, SeminarDto>(page, size, s => true, s => s.Id, false);
+            return Ok(list);
         }
 
         /// <summary>

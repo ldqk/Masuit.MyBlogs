@@ -41,7 +41,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var nul = new List<PostDto>();
             ViewBag.Elapsed = 0;
-            ViewBag.Total = 0;
             ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
             string ip = ClientIP;
@@ -71,7 +70,6 @@ namespace Masuit.MyBlogs.Core.Controllers
 
                 var posts = PostService.SearchPage(page, size, wd);
                 ViewBag.Elapsed = posts.Elapsed;
-                ViewBag.Total = posts.Total;
                 if (posts.Total > 1)
                 {
                     CacheManager.AddOrUpdate(key, wd, s => wd);
@@ -84,7 +82,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             ViewBag.hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList();
-            ViewData["page"] = new Pagination(page, size);
+            ViewData["page"] = new Pagination(page, size, 0);
             return View(nul);
         }
 
@@ -99,9 +97,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult SearchList(int page = 1, int size = 10, string search = "")
         {
             var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.Keywords.Contains(search);
-            var list = SearchDetailsService.GetPages<DateTime, SearchDetailsDto>(page, size, out int total, where, s => s.SearchTime, false).ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            var pages = SearchDetailsService.GetPages<DateTime, SearchDetailsDto>(page, size, where, s => s.SearchTime, false);
+            return Ok(pages);
         }
 
         /// <summary>

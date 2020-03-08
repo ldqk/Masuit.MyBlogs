@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -45,18 +44,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Message = message,
                 Data = data
             });
-        }
-
-        /// <summary>
-        /// 分页响应结果
-        /// </summary>
-        /// <param name="data">数据</param>
-        /// <param name="pageCount">总页数</param>
-        /// <param name="total">总条数</param>
-        /// <returns></returns>
-        public ActionResult PageResult(object data, int pageCount, int total)
-        {
-            return Ok(new PageDataModel(data, pageCount, total));
         }
 
         /// <summary>在调用操作方法前调用。</summary>

@@ -1,5 +1,4 @@
-﻿using EFSecondLevelCache.Core;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -64,17 +63,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("donatelist")]
         public ActionResult DonateList(int page = 1, int size = 10)
         {
-            var list = DonateService.GetPages(page, size, out int total, d => true, d => d.DonateTime, false).Select(d => new
-            {
-                d.NickName,
-                d.EmailDisplay,
-                d.QQorWechatDisplay,
-                d.DonateTime,
-                d.Amount,
-                d.Via
-            }).Cacheable().ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            var list = DonateService.GetPagesFromCache<DateTime, DonateDtoBase>(page, size, d => true, d => d.DonateTime, false);
+            return Ok(list);
         }
 
         /// <summary>
@@ -170,15 +160,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetPageData(int page = 1, int size = 10)
         {
-            var list = MiscService.GetPagesNoTracking(page, size, out int total, n => true, n => n.ModifyDate, false).Select(m => new
-            {
-                m.Id,
-                m.Title,
-                m.ModifyDate,
-                m.PostDate
-            }).ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            var list = MiscService.GetPagesFromCache(page, size, n => true, n => n.ModifyDate, false);
+            return Ok(list);
         }
 
         /// <summary>

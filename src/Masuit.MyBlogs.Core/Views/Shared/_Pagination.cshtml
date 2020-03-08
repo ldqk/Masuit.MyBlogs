@@ -2,8 +2,7 @@
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools
 @{
-    int count = ViewBag.Total;
-    int pages = Math.Ceiling(count / (Model.Size > 0 ? Model.Size : 15.0)).ToInt32();
+    int pages = Math.Ceiling(Model.TotalCount / (Model.Size > 0 ? Model.Size : 15.0)).ToInt32();
     int current = Model.Page > 0 ? Model.Page : 1;
     int pageStart = current - 4 > 0 ? current - 4 : 1;
     int pageEnd = current + 4 >= pages ? pages : current + 4;

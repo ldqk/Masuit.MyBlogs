@@ -77,13 +77,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                 }
             }
-            var parent = LeaveMessageService.GetPagesNoTracking(page, size, out total, m => m.ParentId == 0 && (m.Status == Status.Pended || CurrentUser.IsAdmin), m => m.PostDate, false);
-            if (!parent.Any())
+            var parent = LeaveMessageService.GetPagesNoTracking(page, size, m => m.ParentId == 0 && (m.Status == Status.Pended || CurrentUser.IsAdmin), m => m.PostDate, false);
+            if (!parent.Data.Any())
             {
                 return ResultData(null, false, "没有留言");
             }
-
-            var qlist = parent.AsEnumerable().SelectMany(c => LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(c.Id)).Where(c => c.Status == Status.Pended || CurrentUser.IsAdmin);
+            total = parent.TotalCount;
+            var qlist = parent.Data.SelectMany(c => LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(c.Id)).Where(c => c.Status == Status.Pended || CurrentUser.IsAdmin);
             if (total > 0)
             {
                 return ResultData(new
@@ -233,9 +233,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetPendingMsgs(int page = 1, int size = 10)
         {
-            var list = LeaveMessageService.GetPages<DateTime, LeaveMessageDto>(page, size, out int total, m => m.Status == Status.Pending, l => l.PostDate, false).ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            var list = LeaveMessageService.GetPages<DateTime, LeaveMessageDto>(page, size, m => m.Status == Status.Pending, l => l.PostDate, false);
+            return Ok(list);
         }
 
         #region 站内消息
@@ -289,9 +288,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetInternalMsgs(int page = 1, int size = 10)
         {
-            var msgs = MessageService.GetPagesNoTracking(page, size, out int total, m => true, m => m.Time, false).ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(msgs, pageCount, total);
+            var msgs = MessageService.GetPagesNoTracking(page, size, m => true, m => m.Time, false);
+            return Ok(msgs);
         }
 
         /// <summary>

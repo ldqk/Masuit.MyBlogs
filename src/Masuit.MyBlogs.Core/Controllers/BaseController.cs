@@ -76,18 +76,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             });
         }
 
-        /// <summary>
-        /// 分页响应数据
-        /// </summary>
-        /// <param name="data">数据</param>
-        /// <param name="pageCount">总页数</param>
-        /// <param name="total">总条数</param>
-        /// <returns></returns>
-        public ActionResult PageResult(object data, int pageCount, int total)
-        {
-            return Ok(new PageDataModel(data, pageCount, total));
-        }
-
         /// <summary>在调用操作方法前调用。</summary>
         /// <param name="filterContext">有关当前请求和操作的信息。</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)

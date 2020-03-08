@@ -41,10 +41,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("notice"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
         public ActionResult Index(int page = 1, int size = 10)
         {
-            var list = NoticeService.GetPages<DateTime, NoticeDto>(page, size, out var total, n => n.Status == Status.Display, n => n.ModifyDate, false).ToList();
-            ViewBag.Total = total;
-            ViewData["page"] = new Pagination(page, size);
-            return CurrentUser.IsAdmin ? View("Index_Admin", list) : View(list);
+            var list = NoticeService.GetPages<DateTime, NoticeDto>(page, size, n => n.Status == Status.Display, n => n.ModifyDate, false);
+            ViewData["page"] = new Pagination(page, size, list.TotalCount);
+            return CurrentUser.IsAdmin ? View("Index_Admin", list.Data) : View(list.Data);
         }
 
         /// <summary>
@@ -128,9 +127,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetPageData(int page = 1, int size = 10)
         {
-            var list = NoticeService.GetPagesNoTracking(page, size, out int total, n => true, n => n.ModifyDate, false).ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            var list = NoticeService.GetPagesNoTracking(page, size, n => true, n => n.ModifyDate, false);
+            return Ok(list);
         }
 
         /// <summary>

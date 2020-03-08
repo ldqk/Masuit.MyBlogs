@@ -9,8 +9,8 @@ using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure;
+using Masuit.MyBlogs.Core.Infrastructure.Repository;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
-using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.Command;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
@@ -20,6 +20,7 @@ using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Html;
+using Masuit.Tools.Models;
 using Masuit.Tools.Security;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
@@ -101,11 +102,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             ViewBag.Primary = post;
-            var list = PostHistoryVersionService.GetPages(page, size, out int total, v => v.PostId == id, v => v.ModifyDate, false).ToList();
-            ViewBag.Total = total;
-            ViewBag.PageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
+            var list = PostHistoryVersionService.GetPages(page, size, v => v.PostId == id, v => v.ModifyDate, false);
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
-            ViewData["page"] = new Pagination(page, size);
             return View(list);
         }
 
@@ -621,8 +619,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var query = PostService.GetQuery(where);
             var total = query.Count();
             var list = query.OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").Skip((page - 1) * size).Take(size).ProjectTo<PostDataModel>(MapperConfig).ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            return Ok(new PagedList<PostDataModel>(list, page, size, total));
         }
 
         /// <summary>
@@ -641,10 +638,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(search) || p.Author.Contains(search) || p.Email.Contains(search) || p.Label.Contains(search));
             }
 
-            var temp = PostService.GetPagesNoTracking(page, size, out var total, where, p => p.Id);
-            var list = temp.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).ProjectTo<PostDataModel>(MapperConfig).ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            var pages = PostService.GetQuery(where).OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).ToPagedList<Post, PostDataModel>(page, size, MapperConfig);
+            return Ok(pages);
         }
 
         /// <summary>

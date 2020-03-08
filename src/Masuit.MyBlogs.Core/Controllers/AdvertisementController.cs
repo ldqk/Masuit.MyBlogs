@@ -10,6 +10,7 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
@@ -67,8 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ad.CategoryNames = ad.CategoryIds.Split(",").Select(c => dic[c]).Join(",");
             }
 
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            return Ok(new PagedList<AdvertisementViewModel>(list, page, size, total));
         }
 
         /// <summary>

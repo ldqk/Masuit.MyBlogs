@@ -3,6 +3,8 @@ using AutoMapper.QueryableExtensions;
 using EFSecondLevelCache.Core;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools;
+using Masuit.Tools.Core.AspNetCore;
+using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -438,26 +440,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <typeparam name="TS"></typeparam>
         /// <param name="pageIndex">第几页</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="totalCount">数据总数</param>
         /// <param name="where">where Lambda条件表达式</param>
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual IQueryable<T> GetPages<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc)
+        public virtual PagedList<T> GetPages<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc)
         {
             var temp = DataContext.Set<T>().Where(where);
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
-
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize) : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize);
+            return isAsc ? temp.OrderBy(orderby).ToPagedList(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
         }
 
         /// <summary>
@@ -466,14 +456,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <typeparam name="TS"></typeparam>
         /// <param name="pageIndex">第几页</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="totalCount">数据总数</param>
         /// <param name="where">where Lambda条件表达式</param>
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual EFCachedQueryable<T> GetPagesFromCache<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
+        public virtual PagedList<T> GetPagesFromCache<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
         {
-            return GetPages(pageIndex, pageSize, out totalCount, where, orderby, isAsc).Cacheable();
+            var temp = DataContext.Set<T>().Where(where);
+            return isAsc ? temp.OrderBy(orderby).ToCachedPagedList(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToCachedPagedList(pageIndex, pageSize);
         }
 
         /// <summary>
@@ -482,26 +472,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <typeparam name="TS"></typeparam>
         /// <param name="pageIndex">第几页</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="totalCount">数据总数</param>
         /// <param name="where">where Lambda条件表达式</param>
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual IQueryable<T> GetPagesNoTracking<TS>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
+        public virtual PagedList<T> GetPagesNoTracking<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            totalCount = temp.Count();
-            if (pageIndex * pageSize > totalCount)
-            {
-                pageIndex = (int)Math.Ceiling(totalCount / (pageSize * 1.0));
-            }
-
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            return isAsc ? temp.OrderBy(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize) : temp.OrderByDescending(orderby).Skip(pageSize * (pageIndex - 1)).Take(pageSize);
+            return isAsc ? temp.OrderBy(orderby).ToPagedList(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
         }
 
         /// <summary>
@@ -511,14 +489,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <typeparam name="TDto"></typeparam>
         /// <param name="pageIndex">第几页</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="totalCount">数据总数</param>
         /// <param name="where">where Lambda条件表达式</param>
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual IQueryable<TDto> GetPages<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
+        public virtual PagedList<TDto> GetPages<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return GetPagesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectTo<TDto>(MapperConfig);
+            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
+            return isAsc ? temp.OrderBy(orderby).ToPagedList<T, TDto>(pageIndex, pageSize, MapperConfig) : temp.OrderByDescending(orderby).ToPagedList<T, TDto>(pageIndex, pageSize, MapperConfig);
         }
 
         /// <summary>
@@ -528,14 +506,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <typeparam name="TDto"></typeparam>
         /// <param name="pageIndex">第几页</param>
         /// <param name="pageSize">每页大小</param>
-        /// <param name="totalCount">数据总数</param>
         /// <param name="where">where Lambda条件表达式</param>
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual EFCachedQueryable<TDto> GetPagesFromCache<TS, TDto>(int pageIndex, int pageSize, out int totalCount, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
+        public virtual PagedList<TDto> GetPagesFromCache<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return GetPagesNoTracking(pageIndex, pageSize, out totalCount, where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable();
+            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
+            return isAsc ? temp.OrderBy(orderby).ToCachedPagedList<T, TDto>(pageIndex, pageSize, MapperConfig) : temp.OrderByDescending(orderby).ToCachedPagedList<T, TDto>(pageIndex, pageSize, MapperConfig);
         }
 
         /// <summary>
@@ -599,6 +577,40 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="t">需要添加的实体</param>
         /// <returns>添加成功</returns>
         public abstract T AddEntity(T t);
+
+        /// <summary>
+        /// 添加或更新实体
+        /// </summary>
+        /// <param name="key">更新键规则</param>
+        /// <param name="t">需要保存的实体</param>
+        /// <returns>保存成功</returns>
+        public T AddOrUpdate<TKey>(Expression<Func<T, TKey>> key, T t)
+        {
+            DataContext.Set<T>().AddOrUpdate(key, t);
+            return t;
+        }
+
+        /// <summary>
+        /// 添加或更新实体
+        /// </summary>
+        /// <param name="key">更新键规则</param>
+        /// <param name="entities">需要保存的实体</param>
+        /// <returns>保存成功</returns>
+        public void AddOrUpdate<TKey>(Expression<Func<T, TKey>> key, params T[] entities)
+        {
+            DataContext.Set<T>().AddOrUpdate(key, entities);
+        }
+
+        /// <summary>
+        /// 添加或更新实体
+        /// </summary>
+        /// <param name="key">更新键规则</param>
+        /// <param name="entities">需要保存的实体</param>
+        /// <returns>保存成功</returns>
+        public void AddOrUpdate<TKey>(Expression<Func<T, TKey>> key, IEnumerable<T> entities)
+        {
+            DataContext.Set<T>().AddOrUpdate(key, entities);
+        }
 
         /// <summary>
         /// 统一保存数据
@@ -669,6 +681,85 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             DataContext?.Dispose();
             DataContext = null;
+        }
+    }
+
+    public static class IQueryableExt
+    {
+        /// <summary>
+        /// 生成分页集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="page">当前页</param>
+        /// <param name="size">页大小</param>
+        /// <returns></returns>
+        public static PagedList<T> ToCachedPagedList<T>(this IOrderedQueryable<T> query, int page, int size)
+        {
+            var totalCount = query.Count();
+            if (page * size > totalCount)
+            {
+                page = (int)Math.Ceiling(totalCount / (size * 1.0));
+            }
+
+            if (page <= 0)
+            {
+                page = 1;
+            }
+
+            var list = query.Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+            return new PagedList<T>(list, page, size, totalCount);
+        }
+
+        /// <summary>
+        /// 生成分页集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="page">当前页</param>
+        /// <param name="size">页大小</param>
+        /// <returns></returns>
+        public static PagedList<TDto> ToPagedList<T, TDto>(this IOrderedQueryable<T> query, int page, int size, MapperConfiguration mapper)
+        {
+            var totalCount = query.Count();
+            if (page * size > totalCount)
+            {
+                page = (int)Math.Ceiling(totalCount / (size * 1.0));
+            }
+
+            if (page <= 0)
+            {
+                page = 1;
+            }
+
+            var list = query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).ToList();
+            return new PagedList<TDto>(list, page, size, totalCount);
+        }
+        /// <summary>
+        /// 生成分页集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="page">当前页</param>
+        /// <param name="size">页大小</param>
+        /// <returns></returns>
+        public static PagedList<TDto> ToCachedPagedList<T, TDto>(this IOrderedQueryable<T> query, int page, int size, MapperConfiguration mapper)
+        {
+            var totalCount = query.Count();
+            if (page * size > totalCount)
+            {
+                page = (int)Math.Ceiling(totalCount / (size * 1.0));
+            }
+
+            if (page <= 0)
+            {
+                page = 1;
+            }
+
+            var list = query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).Cacheable().ToList();
+            return new PagedList<TDto>(list, page, size, totalCount);
         }
     }
 }

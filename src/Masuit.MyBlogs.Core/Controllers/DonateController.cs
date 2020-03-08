@@ -1,10 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.Tools;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -27,9 +24,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetPageData(int page = 1, int size = 10)
         {
-            var list = DonateService.GetPagesFromCache(page, size, out int total, d => true, d => d.DonateTime, false).ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            var list = DonateService.GetPagesFromCache(page, size, d => true, d => d.DonateTime, false);
+            return Ok(list);
         }
 
         /// <summary>

@@ -197,12 +197,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                 }
             }
-            var parent = CommentService.GetPagesFromCache(page, size, out total, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Pended || CurrentUser.IsAdmin), c => c.CommentDate, false).ToList();
-            if (!parent.Any())
+            var parent = CommentService.GetPagesFromCache(page, size, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Pended || CurrentUser.IsAdmin), c => c.CommentDate, false);
+            if (!parent.Data.Any())
             {
                 return ResultData(null, false, "没有评论");
             }
-            parent = parent.SelectMany(c => CommentService.GetSelfAndAllChildrenCommentsByParentId(c.Id).Where(x => (x.Status == Status.Pended || CurrentUser.IsAdmin))).ToList();
+            total = parent.TotalCount;
+            var result = parent.Data.SelectMany(c => CommentService.GetSelfAndAllChildrenCommentsByParentId(c.Id).Where(x => (x.Status == Status.Pended || CurrentUser.IsAdmin))).ToList();
             if (total > 0)
             {
                 return ResultData(new
@@ -211,7 +212,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     parentTotal = total,
                     page,
                     size,
-                    rows = parent.Mapper<IList<CommentViewModel>>()
+                    rows = result.Mapper<IList<CommentViewModel>>()
                 });
             }
             return ResultData(null, false, "没有评论");
@@ -274,9 +275,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetPendingComments(int page = 1, int size = 10)
         {
-            var list = CommentService.GetPages<DateTime, CommentDto>(page, size, out int total, c => c.Status == Status.Pending, c => c.CommentDate, false).ToList();
-            var pageCount = Math.Ceiling(total * 1.0 / size).ToInt32();
-            return PageResult(list, pageCount, total);
+            var pages = CommentService.GetPages<DateTime, CommentDto>(page, size, c => c.Status == Status.Pending, c => c.CommentDate, false);
+            return Ok(pages);
         }
     }
 }
