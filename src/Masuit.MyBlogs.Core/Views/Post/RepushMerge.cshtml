@@ -60,24 +60,25 @@
 <script src="https://cdn.staticfile.org/limonte-sweetalert2/8.11.8/sweetalert2.min.js"></script>
 <script>
     $(function () {
+        if (window.UE) {
+            window.ue = UE.getEditor('editor', {
+                initialFrameWidth: null
+            });
+        }
         @if(Model.Post.DisableCopy) {
             <text>
-        debugger;
+        CopyrightProtect();
         CopyrightProtect4Editor();
+        debugger;
             </text>
         }
-        if (window.UE) {
-		    window.ue = UE.getEditor('editor', {
-			    initialFrameWidth: null
-		    });
-	    }
         var user = JSON.parse(localStorage.getItem("user"));
         if (user) {
             $("[name='Modifier']").val(user.NickName);
             $("[name='ModifierEmail']").val(user.Email);
         }
 
-	    //检查草稿
+        //检查草稿
         if (localStorage.getItem("merge-post-draft-" +@Model.Post.Id)) {
             notie.confirm({
                 text: "检查到上次有未提交的草稿，是否加载？",
@@ -89,19 +90,19 @@
                     $("#title").val(post.Title);
                     ue.setContent(post.Content);
                     window.interval = setInterval(function () {
-		                localStorage.setItem("merge-post-draft-"+@Model.Post.Id,JSON.stringify($("#merge-form").serializeObject()));
-	                },5000);
+                        localStorage.setItem("merge-post-draft-"+@Model.Post.Id,JSON.stringify($("#merge-form").serializeObject()));
+                    },5000);
                 },
                 cancelCallback: function() {
                     window.interval = setInterval(function () {
-		                localStorage.setItem("merge-post-draft-"+@Model.Post.Id,JSON.stringify($("#merge-form").serializeObject()));
-	                },5000);
+                        localStorage.setItem("merge-post-draft-"+@Model.Post.Id,JSON.stringify($("#merge-form").serializeObject()));
+                    },5000);
                 }
             });
         } else {
             window.interval = setInterval(function () {
-		        localStorage.setItem("merge-post-draft-"+@Model.Post.Id,JSON.stringify($("#merge-form").serializeObject()));
-	        },5000);
+                localStorage.setItem("merge-post-draft-"+@Model.Post.Id,JSON.stringify($("#merge-form").serializeObject()));
+            },5000);
         }
 
         $("#getcode").on("click", function (e) {
@@ -112,8 +113,8 @@
             }, function (data) {
                 if (data.Success) {
                     layer.tips('验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！', '#getcode', {
-                      tips: [1, '#3595CC'],
-                      time: 5000
+                        tips: [1, '#3595CC'],
+                        time: 5000
                     });
                     user.NickName = $("[name='Modifier']").val();
                     user.Email = $("[name='ModifierEmail']").val();
@@ -131,8 +132,8 @@
                     }, 1000);
                 } else {
                     layer.tips(data.Message, '#getcode', {
-                      tips: [1, '#3595CC'],
-                      time: 5000
+                        tips: [1, '#3595CC'],
+                        time: 5000
                     });
                 }
             });

@@ -255,22 +255,22 @@ function CopyrightProtect() {
         document.onkeydown = function(e){
             var currKey=0,evt=e||window.event;
             currKey=evt.keyCode||evt.which||evt.charCode;
-            if (currKey == 123||( event.ctrlKey&&currKey==67 )||( event.ctrlKey&&currKey==85 )||( event.ctrlKey&&event.shiftKey)||event.altKey ){
-                window.event.cancelBubble = true;
-                event.returnValue = false;
+            if (currKey == 123||( evt.ctrlKey&&currKey==67 )||( evt.ctrlKey&&currKey==85 )||( evt.ctrlKey&&evt.shiftKey)||evt.altKey ){
+                evt.cancelBubble = true;
+                evt.returnValue = false;
                 return false;
             }
         }
-        document.ondragstart = function(){
-            event.returnValue = false;
+        document.ondragstart = function(e){
+            e.returnValue = false;
             return false;
         }
-        document.oncopy = function(){
-            event.returnValue = false;
+        document.oncopy = function(e){
+            e.returnValue = false;
             return false;
         }
-        document.oncontextmenu = function(){
-            event.returnValue = false;
+        document.oncontextmenu = function(e){
+            e.returnValue = false;
             return false;
         }
     },100);
@@ -282,18 +282,18 @@ function CopyrightProtect4Editor() {
         document.getElementById("ueditor_0").contentWindow.document.body.onkeydown = function(e){
             var currKey=0,evt=e||window.event;
             currKey=evt.keyCode||evt.which||evt.charCode;
-            if (currKey == 123||( event.ctrlKey&&currKey==67 )||( event.ctrlKey&&currKey==85)|| (event.ctrlKey&&currKey==88)||( event.ctrlKey&&event.shiftKey)|| event.altKey ){
-                window.event.cancelBubble = true;
-                window.event.returnValue = false;
+            if (currKey == 123||( evt.ctrlKey&&currKey==67 )||( evt.ctrlKey&&currKey==85)|| (evt.ctrlKey&&currKey==88)||( evt.ctrlKey&&evt.shiftKey)|| evt.altKey ){
+                evt.cancelBubble = true;
+                evt.returnValue = false;
                 return false;
             }
         }
-        document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function(){
-            event.returnValue = false;
+        document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function(e){
+            e.returnValue = false;
             return false;
         }
-        document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function(){
-            event.returnValue = false;
+        document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function(e){
+            e.returnValue = false;
             return false;
         }
     },100);
@@ -305,18 +305,18 @@ function GlobalCopyrightProtect() {
         document.onkeydown = function(e){
             var currKey=0,evt=e||window.event;
             currKey=evt.keyCode||evt.which||evt.charCode;
-            if (currKey == 123||( event.ctrlKey&&currKey==67 )|| (event.ctrlKey&&currKey==85)||event.ctrlKey||(event.ctrlKey&&event.shiftKey)||event.altKey ){
-                window.event.cancelBubble = true;
-                window.event.returnValue = false;
+            if (currKey == 123||( evt.ctrlKey&&currKey==67 )|| (evt.ctrlKey&&currKey==85)||evt.ctrlKey||(evt.ctrlKey&&evt.shiftKey)||evt.altKey ){
+                evt.cancelBubble = true;
+                evt.returnValue = false;
                 return false;
             }
         }
-        document.ondragstart = function(){
-            event.returnValue = false;
+        document.ondragstart = function(e){
+            e.returnValue = false;
             return false;
         }
-        document.oncopy = function(){
-            event.returnValue = false;
+        document.oncopy = function(e){
+            e.returnValue = false;
             return false;
         }
         document.oncontextmenu = function(){
