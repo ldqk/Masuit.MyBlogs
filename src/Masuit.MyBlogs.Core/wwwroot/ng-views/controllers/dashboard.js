@@ -248,14 +248,14 @@
 			},
 			series: [{
 				name: 'CPU使用率',
-				type: 'areaspline',
+				type: 'spline',
 				data: data.cpu,
 				tooltip: {
 					valueSuffix: ' %'
 				}
 			}, {
 				name: '内存使用率',
-				type: 'areaspline',
+				type: 'spline',
 				data: data.mem,
 				tooltip: {
 					valueSuffix: ' %'
@@ -264,7 +264,7 @@
 				name: 'CPU温度',
 				yAxis: 1,
 				data: data.temp,
-				type: 'areaspline',
+				type: 'spline',
 				tooltip: {
 					valueSuffix: '℃'
 				}
@@ -389,9 +389,9 @@
 				formatter: function() {
 					return '时间点：<b>' + Highcharts.dateFormat("%H:%M:%S", this.points[0].x) + '</b><br/>' +
 						'<span style="color:' + Highcharts.getOptions().colors[0] + '">磁盘读：<b>' + Highcharts.numberFormat(this.points[0].y, 0) + 'KBps</b></span><br/>' +
-						'<span style="color:' + Highcharts.getOptions().colors[2] + '">磁盘写：<b>' + Highcharts.numberFormat(this.points[1].y, 0) + 'KBps</b></span><br/>' +
-						'<span style="color:' + Highcharts.getOptions().colors[39] + '">网络上行：<b>' + Highcharts.numberFormat(this.points[2].y, 0) + 'KBps</b></span><br/>' +
-						'<span style="color:' + Highcharts.getOptions().colors[35] + '">网络下行：<b>' + Highcharts.numberFormat(this.points[3].y, 0) + 'KBps</b></span><br/>';
+						'<span style="color:' + Highcharts.getOptions().colors[1] + '">磁盘写：<b>' + Highcharts.numberFormat(this.points[1].y, 0) + 'KBps</b></span><br/>' +
+						'<span style="color:' + Highcharts.getOptions().colors[2] + '">网络上行：<b>' + Highcharts.numberFormat(this.points[2].y, 0) + 'KBps</b></span><br/>' +
+						'<span style="color:' + Highcharts.getOptions().colors[3] + '">网络下行：<b>' + Highcharts.numberFormat(this.points[3].y, 0) + 'KBps</b></span><br/>';
 				},
 				crosshairs: true,
 				shared: true
