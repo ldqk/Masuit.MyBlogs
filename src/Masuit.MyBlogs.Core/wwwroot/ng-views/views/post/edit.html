@@ -17,7 +17,7 @@
         <div style="height: 200px;" class="ueditor" ng-model="post.ProtectContent" type="text/plain"></div>
     </div>
     <div class="row">
-        <div class="col-md-4 col-sm-5">
+        <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">分类：</span>
                 <div class="ui fluid search selection dropdown category">
@@ -30,11 +30,9 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-8 col-sm-6">
+        <div class="col-md-4 col-sm-6">
             <div class="input-group">
-                <span class="input-group-addon">
-                    <label for="Label">标签：</label>
-                </span>
+                <span class="input-group-addon"><label for="Label">标签：</label></span>
                 <div class="ui fluid multiple search selection dropdown tags">
                     <input name="Label" type="hidden" id="Label">
                     <i class="dropdown icon"></i>
@@ -45,9 +43,20 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-5 col-sm-6">
+            <div class="input-group">
+                <span class="input-group-addon"><label for="keyword">文章关键词：</label></span>
+                <div class="ui fluid multiple search selection dropdown keyword">
+                    <input name="keyword" type="hidden" id="keyword">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">文章关键词</div>
+                    <div class="menu"></div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="row">
-        <div class="col-md-4 col-sm-3">
+        <div class="col-md-5 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">
                     <label>选择专题：</label>
@@ -62,28 +71,14 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-5 col-sm-3">
-            <div class="input-group">
-                <span class="input-group-addon"><label for="keyword">文章关键词：</label></span>
-                <div class="ui fluid multiple search selection dropdown keyword">
-                    <input name="keyword" type="hidden" id="keyword">
-                    <i class="dropdown icon"></i>
-                    <div class="default text">文章关键词</div>
-                    <div class="menu"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-2">
+        <div class="col-md-7 col-sm-6">
             <div class="pull-right">
                 <span class="checkboxWrapper theme4 smallCheckboxSize" ng-click="notify=!notify">
                     <input type="checkbox" id="notify" ng-model="notify">
                     <label for="notify">
                         <i>
-                            <svg version="1.1" id="Layer_notify" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
-                            <circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" />
-                            <path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534
-							S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" />
-                        </svg>
+                            <svg version="1.1" id="Layer_notify" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve"><circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" /><path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534
+							S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" /></svg>
                         </i>
                         是否广播
                     </label>
@@ -92,15 +87,32 @@
                     <input type="checkbox" id="reserve" ng-model="reserve">
                     <label for="reserve">
                         <i>
-                            <svg version="1.1" id="Layer_reserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
-                            <circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" />
-                            <path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534
-							S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" />
-                        </svg>
+                            <svg version="1.1" id="Layer_reserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve"><circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" /><path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534
+							S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" /></svg>
                         </i>
                         保留历史版本
                     </label>
                 </span>
+                <span class="checkboxWrapper theme4 smallCheckboxSize">
+                    <input type="checkbox" id="DisableCpoy" ng-model="post.DisableCpoy">
+                    <label for="DisableCpoy">
+                        <i>
+                            <svg version="1.1" id="DisableCpoy-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
+                            <circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" /><path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534 S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" />
+                            </svg>
+                        </i>
+                        禁止转载
+                    </label>
+                </span>
+                    <span class="checkboxWrapper theme4 smallCheckboxSize">
+                        <input type="checkbox" id="DisableComment" ng-model="post.DisableComment">
+                        <label for="DisableComment">
+                            <i>
+                                <svg version="1.1" id="DisableComment-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve"><circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" /><path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534 S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" /></svg>
+                            </i>
+                            禁止评论
+                        </label>
+                    </span>
                 <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)">确认修改</button>
             </div>
         </div>

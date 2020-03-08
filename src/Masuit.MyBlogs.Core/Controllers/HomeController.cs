@@ -150,8 +150,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Total = posts.Count();
             var viewModel = GetIndexPageViewModel();
             viewModel.Posts = posts.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
-            ViewBag.CategoryName = cat.Name;
-            ViewBag.Desc = cat.Description;
+            ViewBag.Category = cat;
             ViewData["page"] = new Pagination(page, size, orderBy);
             return View(viewModel);
         }

@@ -135,7 +135,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "v1", "v2" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
         {
-            var main = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
+            var post = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin));
+            var main = post.Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
             var left = v1 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
             var right = v2 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
             main.Id = id;
@@ -144,6 +145,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             right.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);
             left.Content = Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty);
             ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, main.CategoryId);
+            ViewBag.DisableCopy = post.DisableCopy;
             return View(new[] { main, left, right });
         }
 
@@ -236,6 +238,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             p.IP = ClientIP;
             p.Modifier = p.Author;
             p.ModifierEmail = p.Email;
+            p.DisableCopy = true;
             p = PostService.AddEntitySaved(p);
             if (p == null)
             {
@@ -948,7 +951,20 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
             post.DisableComment = !post.DisableComment;
-            return ResultData(null, SearchEngine.SaveChanges() > 0, post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
+            return ResultData(null, PostService.SaveChanges() > 0, post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
+        }
+
+        /// <summary>
+        /// 禁用或开启文章评论
+        /// </summary>
+        /// <param name="id">文章id</param>
+        /// <returns></returns>
+        [MyAuthorize]
+        public ActionResult DisableCopy(int id)
+        {
+            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            post.DisableCopy = !post.DisableCopy;
+            return ResultData(null, PostService.SaveChanges() > 0, post.DisableCopy ? $"已开启【{post.Title}】这篇文章的防复制功能！" : $"已关闭【{post.Title}】这篇文章的防复制功能！");
         }
 
         /// <summary>

@@ -179,6 +179,9 @@
         </div>
     </div>
 </div>
+<noscript>
+    <iframe src="*.htm"></iframe>
+</noscript>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
 <script src="~/Assets/jquery.tocify/jquery.tocify.js"></script>
@@ -223,4 +226,10 @@
             });
         });
     })
+    @if(Model.Post.DisableCopy) {
+        <text>
+    debugger;
+    GlobalCopyrightProtect();
+        </text>
+    }
 </script>

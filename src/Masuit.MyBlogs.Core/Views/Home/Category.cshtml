@@ -1,9 +1,11 @@
 ﻿@using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @{
-    ViewBag.Title = "分类_" + ViewBag.CategoryName;
+    Category cat = ViewBag.Category;
+    ViewBag.Title = "分类_" + cat.Name;
     Layout = "~/Views/Shared/_Layout.cshtml";
     Random r = new Random();
 }
@@ -39,15 +41,18 @@
 <div class="bg-title">
     <div class="header-content text-center">
         <h1 class="size48">
-            @ViewBag.CategoryName
+            @cat.Name
+            <a class="btn btn-lg btn-danger" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
+                <i class="icon-rss4"></i>
+            </a>
         </h1>
         <div class="divider"></div>
         <p class="size24">
-            @ViewBag.Desc
+            @cat.Description
         </p>
     </div>
 </div>
 @{
-    UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
+    var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
     await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
 }

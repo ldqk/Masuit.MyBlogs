@@ -64,5 +64,10 @@
         /// </summary>
         public bool DisableComment { get; set; }
 
+        /// <summary>
+        /// 禁止转载
+        /// </summary>
+        public bool DisableCopy { get; set; }
+
     }
 }

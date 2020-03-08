@@ -338,6 +338,136 @@ function post(url, params, callback, error) {
     });
 }
 
+/**禁止全局复制 */
+function GlobalCopyrightProtect() {
+    setInterval(function() {
+        document.onkeydown = function(e){
+            var currKey=0,evt=e||window.event;
+            currKey=evt.keyCode||evt.which||evt.charCode;
+            if (currKey == 123) {
+                window.event.cancelBubble = true;
+                window.event.returnValue = false;
+            }
+            if( event.ctrlKey&&currKey==67 ){
+                event.returnValue = false;
+                return false;
+            }
+            if( event.ctrlKey&&currKey==85 ){
+                event.returnValue = false;
+                return false;
+            }
+            if( event.ctrlKey ){
+                event.returnValue = false;
+                return false;
+            }
+            if( event.ctrlKey&&event.shiftKey){
+                event.returnValue = false;
+                return false;
+            }
+            if ( event.altKey ){
+                event.returnValue = false;
+                return false;
+            }
+        }
+        document.ondragstart = function(){
+            event.returnValue = false;
+            return false;
+        }
+        document.oncopy = function(){
+            event.returnValue = false;
+            return false;
+        }
+        document.oncontextmenu = function(){
+            event.returnValue = false;
+            return false;
+        }
+    },100);
+}
+
+/**禁止复制 */
+function CopyrightProtect() {
+    setInterval(function() {
+        document.onkeydown = function(e){
+            var currKey=0,evt=e||window.event;
+            currKey=evt.keyCode||evt.which||evt.charCode;
+            if (currKey == 123) {
+                window.event.cancelBubble = true;
+                window.event.returnValue = false;
+            }
+            if( event.ctrlKey&&currKey==67 ){//C
+                event.returnValue = false;
+                return false;
+            }
+            if( event.ctrlKey&&currKey==85 ){//U
+                event.returnValue = false;
+                return false;
+            }
+            if( event.ctrlKey&&event.shiftKey){
+                event.returnValue = false;
+                return false;
+            }
+            if ( event.altKey ){
+                event.returnValue = false;
+                return false;
+            }
+        }
+        document.ondragstart = function(){
+            event.returnValue = false;
+            return false;
+        }
+        document.oncopy = function(){
+            event.returnValue = false;
+            return false;
+        }
+        document.oncontextmenu = function(){
+            event.returnValue = false;
+            return false;
+        }
+    },100);
+}
+
+/**禁止编辑器内复制 */
+function CopyrightProtect4Editor() {
+    setInterval(function() {
+        document.getElementById("ueditor_0").contentWindow.document.body.onkeydown = function(e){
+            var currKey=0,evt=e||window.event;
+            currKey=evt.keyCode||evt.which||evt.charCode;
+            if (currKey == 123) {
+                window.event.cancelBubble = true;
+                window.event.returnValue = false;
+            }
+            if( event.ctrlKey&&currKey==67 ){ //C
+                event.returnValue = false;
+                return false;
+            }
+            if( event.ctrlKey&&currKey==85 ){ //U
+                event.returnValue = false;
+                return false;
+            }
+            if( event.ctrlKey&&currKey==88 ){ //X
+                event.returnValue = false;
+                return false;
+            }
+            if( event.ctrlKey&&event.shiftKey){
+                event.returnValue = false;
+                return false;
+            }
+            if ( event.altKey ){
+                event.returnValue = false;
+                return false;
+            }
+        }
+        document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function(){
+            event.returnValue = false;
+            return false;
+        }
+        document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function(){
+            event.returnValue = false;
+            return false;
+        }
+    },100);
+}
+
 /**
  * 鼠标桃心
  */

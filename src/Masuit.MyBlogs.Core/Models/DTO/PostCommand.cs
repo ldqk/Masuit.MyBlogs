@@ -66,5 +66,15 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 专题
         /// </summary>
         public string Seminars { get; set; }
+
+        /// <summary>
+        /// 禁止评论
+        /// </summary>
+        public bool DisableComment { get; set; }
+
+        /// <summary>
+        /// 禁止转载
+        /// </summary>
+        public bool DisableCopy { get; set; }
     }
 }

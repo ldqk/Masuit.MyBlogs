@@ -133,6 +133,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public bool DisableComment { get; set; }
 
         /// <summary>
+        /// ½ûÖ¹×ªÔØ
+        /// </summary>
+        public bool DisableCopy { get; set; }
+
+        /// <summary>
         /// ·ÖÀà
         /// </summary>
         public virtual Category Category { get; set; }

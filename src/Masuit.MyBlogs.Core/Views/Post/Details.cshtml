@@ -176,7 +176,10 @@
                     </div>
                     <div class="col-xs-6 text-right">
                         <div class="btn-group">
-                            <button type="button" id="donate" class="btn btn-@colors[new Random().Next() % colors.Length] btn-lg">
+                            <a class="btn btn-danger btn-lg" asp-controller="Subscribe" asp-action="Rss" asp-route-id="@Model.Id" target="_blank">
+                                <i class="icon-rss4"></i><span>订阅本文更新</span>
+                            </a>
+                            <button type="button" id="donate" class="btn btn-info btn-lg">
                                 <i class="icon-coin-yen"></i><span>支持站长</span>
                             </button>
                         </div>
@@ -290,9 +293,14 @@
                                 </div>
                                 <input type="checkbox" name="Agree" id="aggrement" value="true" /><label for="aggrement">我已接受<a asp-controller="Misc" asp-action="agreement" target="_blank">《评论须知》</a></label>
                                 <div class="form-group">
-                                    <div class="col-xs-12">
+                                    <div class="col-xs-6">
                                         <button type="submit" class="btn btn-info btn-lg">提交</button>
                                         <a class="text-red">评论框可粘贴网络图片</a>
+                                    </div>
+                                    <div class="col-xs-6 text-right">
+                                        <a class="btn btn-danger btn-lg" asp-controller="Subscribe" asp-action="CommentsRss" asp-route-id="@Model.Id" target="_blank">
+                                            <i class="icon-rss4"></i><span>订阅本文评论更新</span>
+                                        </a>
                                     </div>
                                 </div>
                             </form>
@@ -361,55 +369,64 @@
         </form>
     </div>
 </div>
+<noscript>
+    <iframe src="*.htm"></iframe>
+</noscript>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
 <script src="~/Assets/jquery.tocify/jquery.tocify.js"></script>
 <script src="~/Scripts/global/article.min.js"></script>
 <script>
-	window.onload = function() {
+    window.onload = function() {
         var keywords = @Html.Raw(ViewData["keywords"] ?? "[]");
         for (var i = 0; i < keywords.length; i++) {
             $("#article").highlight(keywords[i]);
         }
         loading();
-		$('#pageToolbar').Paging({ //异步加载评论
-			pagesize: 10,
-			count: @Model.Comment.Count(c =>c.ParentId==0&& c.Status==Status.Pended),
-			toolbar: true,
-			callback: function(page, size, count) {
-				window.post("/comment/getcomments", {
-					id: @Model.Id,
-					page: page,
-					size: size
+        $('#pageToolbar').Paging({ //异步加载评论
+            pagesize: 10,
+            count: @Model.Comment.Count(c =>c.ParentId==0&& c.Status==Status.Pended),
+            toolbar: true,
+            callback: function(page, size, count) {
+                window.post("/comment/getcomments", {
+                    id: @Model.Id,
+                    page: page,
+                    size: size
                 }, (data) => {
                     data = data.Data;
                     if (data) {
                         document.querySelector(".media-list").innerHTML = loadParentComments(data);
                         bindReplyBtn();
                         commentVoteBind(); //评论投票
-					}
-				});
-			}
-		});
+                    }
+                });
+            }
+        });
         loadingDone();
     };
 
-	/**
+    /**
    * 获取评论
    */
-	function getcomments() {
-		window.post("/comment/getcomments", {
-			id: $("#postId").val(),
-			page: 1,
+    function getcomments() {
+        window.post("/comment/getcomments", {
+            id: $("#postId").val(),
+            page: 1,
             size: 10,
             cid:@cid
-		}, (data) => {
+        }, (data) => {
             data = data.Data;
-			if (data) {
+            if (data) {
                 document.querySelector(".media-list").innerHTML = loadParentComments(data);
                 bindReplyBtn();
                 commentVoteBind(); //评论投票
-			}
-		});
-	}
+            }
+        });
+    }
+    @if(Model.DisableCopy) {
+        <text>
+    debugger;
+    GlobalCopyrightProtect();
+        </text>
+    }
 </script>

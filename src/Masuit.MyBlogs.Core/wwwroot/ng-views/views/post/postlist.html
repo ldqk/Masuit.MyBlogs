@@ -78,6 +78,12 @@
                     <span class="el-switch-style" ng-click="toggleDisableComment(row)"></span>
                 </label>
             </td>
+            <td title="'禁止转载'">
+                <label class="el-switch">
+                    <input type="checkbox" name="switch" ng-checked="row.DisableCopy">
+                    <span class="el-switch-style" ng-click="toggleDisableCopy(row)"></span>
+                </label>
+            </td>
             <td title="'操作'" style="width: 185px;">
                 <div class="btn-group">
                     <button class="btn btn-default btn-sm waves-effect" ng-click="list.pass(row)" ng-if="row.Status=='审核中'">

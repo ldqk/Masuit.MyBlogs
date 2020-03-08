@@ -39,6 +39,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public IPostService PostService { get; set; }
 
+        public ICategoryService CategoryService { get; set; }
+        public ICommentService CommentService { get; set; }
         public IWebHostEnvironment HostEnvironment { get; set; }
 
         /// <summary>
@@ -89,7 +91,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Title = p.Title,
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
-                FullHtmlContent = p.Content
+                FullHtmlContent = p.Content.GetSummary(300, 50)
             }).Cacheable().ToList();
             var feed = new Feed()
             {
@@ -99,6 +101,143 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Copyright = CommonHelper.SystemSettings["Title"],
                 Language = "zh-cn",
                 Items = posts.ToArray()
+            };
+            var rss = feed.Serialize(new SerializeOption()
+            {
+                Encoding = Encoding.UTF8
+            });
+            return Content(rss, "text/xml");
+        }
+
+        /// <summary>
+        /// RSS分类订阅
+        /// </summary>
+        /// <returns></returns>
+        [Route("/rss/cat/{id}"), ResponseCache(Duration = 600)]
+        public IActionResult CategoryRss(int id)
+        {
+            var time = DateTime.Today.AddDays(-1);
+            string scheme = Request.Scheme;
+            var host = Request.Host;
+            var category = CategoryService.GetById(id) ?? throw new NotFoundException("分类未找到");
+            var posts = PostService.GetQueryNoTracking(p => p.CategoryId == id && p.Status == Status.Pended && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
+            {
+                Author = new Author
+                {
+                    Name = p.Author,
+                    Email = p.Email
+                },
+                Body = p.Content.GetSummary(300, 50),
+                Categories = new List<string>
+                {
+                    p.Category.Name
+                },
+                Link = new Uri(scheme + "://" + host + "/" + p.Id),
+                PublishDate = p.ModifyDate,
+                Title = p.Title,
+                Permalink = scheme + "://" + host + "/" + p.Id,
+                Guid = p.Id.ToString(),
+                FullHtmlContent = p.Content.GetSummary(300, 50)
+            }).Cacheable().ToList();
+            var feed = new Feed()
+            {
+                Title = CommonHelper.SystemSettings["Domain"] + $":分类{category.Name}文章订阅",
+                Description = category.Description,
+                Link = new Uri(scheme + "://" + host + "/rss"),
+                Copyright = CommonHelper.SystemSettings["Title"],
+                Language = "zh-cn",
+                Items = posts.ToArray()
+            };
+            var rss = feed.Serialize(new SerializeOption()
+            {
+                Encoding = Encoding.UTF8
+            });
+            return Content(rss, "text/xml");
+        }
+
+        /// <summary>
+        /// RSS文章订阅
+        /// </summary>
+        /// <returns></returns>
+        [Route("/rss/{id}"), ResponseCache(Duration = 600)]
+        public IActionResult Rss(int id)
+        {
+            string scheme = Request.Scheme;
+            var host = Request.Host;
+            var p = PostService.Get(p => p.Status == Status.Pended && p.Id == id) ?? throw new NotFoundException("文章未找到");
+            var summary = p.Content.GetSummary(300, 50);
+            var item = new Item()
+            {
+                Author = new Author
+                {
+                    Name = p.Author,
+                    Email = p.Email
+                },
+                Body = summary,
+                Categories = new List<string>
+                {
+                    p.Category.Name
+                },
+                Link = new Uri(scheme + "://" + host + "/" + p.Id),
+                PublishDate = p.ModifyDate,
+                Title = p.Title,
+                Permalink = scheme + "://" + host + "/" + p.Id,
+                Guid = p.Id.ToString(),
+                FullHtmlContent = summary
+            };
+            var feed = new Feed()
+            {
+                Title = CommonHelper.SystemSettings["Domain"] + $":文章【{p.Title}】更新订阅",
+                Description = summary,
+                Link = new Uri(scheme + "://" + host + "/rss/" + id),
+                Copyright = CommonHelper.SystemSettings["Title"],
+                Language = "zh-cn",
+                Items = new List<Item>() { item }
+            };
+            var rss = feed.Serialize(new SerializeOption()
+            {
+                Encoding = Encoding.UTF8
+            });
+            return Content(rss, "text/xml");
+        }
+
+        /// <summary>
+        /// RSS文章评论订阅
+        /// </summary>
+        /// <returns></returns>
+        [Route("/rss/{id}/comments"), ResponseCache(Duration = 600)]
+        public IActionResult CommentsRss(int id)
+        {
+            string scheme = Request.Scheme;
+            var host = Request.Host;
+            var post = PostService.Get(p => p.Status == Status.Pended && p.Id == id) ?? throw new NotFoundException("文章不存在");
+            var start = DateTime.Today.AddDays(-7);
+            var comments = CommentService.GetQuery(c => c.PostId == post.Id && c.CommentDate > start).Select(c => new Item()
+            {
+                Author = new Author
+                {
+                    Name = c.NickName
+                },
+                Body = c.Content,
+                Categories = new List<string>
+                {
+                    c.Post.Title
+                },
+                Link = new Uri($"{scheme}://{host}/{post.Id}?cid={c.Id}#comment"),
+                PublishDate = c.CommentDate,
+                Title = c.NickName,
+                Permalink = $"{scheme}://{host}/{post.Id}?cid={c.Id}#comment",
+                Guid = c.Id.ToString(),
+                FullHtmlContent = c.Content
+            }).ToList();
+            var feed = new Feed()
+            {
+                Title = CommonHelper.SystemSettings["Domain"] + $":文章【{post.Title}】文章评论更新订阅",
+                Description = post.Content.GetSummary(300, 50),
+                Link = new Uri(scheme + "://" + host + "/rss/" + id + "/comments"),
+                Copyright = CommonHelper.SystemSettings["Title"],
+                Language = "zh-cn",
+                Items = comments.ToArray()
             };
             var rss = feed.Serialize(new SerializeOption()
             {

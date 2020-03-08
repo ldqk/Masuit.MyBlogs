@@ -32,7 +32,8 @@
         <section class="wow animated fadeIn">
             <article class="panel panel-default">
                 <div class="panel-heading">
-                    <i class="icon-clipboard2"></i><span>近期公告</span> @Html.ActionLink("所有公告", "Index", "Notice", null, new { @class = "pull-right text-success" })
+                    <i class="icon-clipboard2"></i><span>近期公告</span>
+                    <a class="pull-right text-success" asp-controller="Notice" asp-action="Index">所有公告</a>
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -41,7 +42,7 @@
                                 @foreach (NoticeDto notice in Model.Notices)
                                 {
                                     <li class="news-item">
-                                        @Html.ActionLink(notice.Content.GetSummary(45, 2), "Details", "Notice", new { id = notice.Id }, new { @class = "tippy-scale", title = "查看详情" })
+                                        <a class="tippy-scale" title="查看详情" asp-controller="Notice" asp-action="Details" asp-route-id="@notice.Id">@notice.Content.GetSummary(45, 2)</a>
                                     </li>
                                 }
                             </ul>
@@ -54,16 +55,20 @@
     <section class="wow animated fadeIn">
         <article class="panel panel-warning">
             <div class="panel-heading">
-                <i class="icon-lab2"></i>文章分类 @Html.ActionLink("所有分类", "All", "Post", null, new { @class = "pull-right text-success" })
+                <i class="icon-lab2"></i>文章分类
+                <a asp-controller="Post" asp-action="All" class="pull-right text-success">所有分类</a>
             </div>
             <div class="panel-body">
-                <ul class="list-group text-center">
+                <ul class="list-group">
                     @foreach (CategoryDto cat in Model.Categories)
                     {
                         if (cat.PendedPostCount > 0)
                         {
                             <li class="list-group-item">
-                                @Html.ActionLink(cat.Name + "(共" + cat.PendedPostCount + "篇)", "Category", "Home", new { id = cat.Id }, null)
+                                <a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Name 共(@cat.PendedPostCount 篇)</a>
+                                <a class="pull-right" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
+                                    <i class="icon-rss4"></i>
+                                </a>
                             </li>
                         }
                     }

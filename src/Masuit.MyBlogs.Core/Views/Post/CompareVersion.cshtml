@@ -205,6 +205,9 @@
     </div>
     <div id="cyReward" role="cylabs" data-use="reward"></div>
 </div>
+<noscript>
+    <iframe src="*.htm"></iframe>
+</noscript>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
 <script>
@@ -212,4 +215,10 @@
         SyntaxHighlighter.all();
         SyntaxHighlighter.defaults['toolbar'] = false;
     })
+    @if(ViewBag.DisableCopy) {
+        <text>
+    debugger;
+    GlobalCopyrightProtect();
+        </text>
+    }
 </script>
