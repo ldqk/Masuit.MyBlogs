@@ -209,9 +209,17 @@
                 }
                 <section class="wow padding-bot20 animated fadeIn">
                     <h3>版权声明：</h3>
-                    <p class="text-danger size16">
-                        本文仅用于学习、研究和交流目的，欢迎非商业性质转载。本文链接：<a href="@(Context.Request.Scheme + "://" +Context.Request.Host+Context.Request.Path)">@(HttpUtility.UrlDecode(Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path))</a>。
-                        @Html.Raw(CommonHelper.SystemSettings["Disclaimer"])
+                    <p class="text-red size16">
+                        @if (Model.DisableCopy)
+                        {
+                            <text>🈲⚠本文为作者原创，仅用于本站访客学习、研究和交流目的，未经授权禁止转载。️⚠🈲</text>
+                        }
+                        else
+                        {
+                            <text>本文仅用于学习、研究和交流目的，欢迎非商业性质转载。本文链接：<a asp-controller="Post" asp-action="Details" asp-route-id="@Model.Id">@HttpUtility.UrlDecode(Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path)</a>。</text>
+                            @Html.Raw(CommonHelper.SystemSettings["Disclaimer"])
+                        }
+                    </p>
                     </p>
                 </section>
                 @{
