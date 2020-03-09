@@ -39,8 +39,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("s/{wd?}/{page:int?}/{size:int?}")]
         public ActionResult Search(string wd = "", int page = 1, int size = 15)
         {
-            var nul = new List<PostDto>();
-            ViewBag.Elapsed = 0;
+            var nul = new SearchResult<PostDto>();
             ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
             string ip = ClientIP;
@@ -69,7 +68,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
 
                 var posts = PostService.SearchPage(page, size, wd);
-                ViewBag.Elapsed = posts.Elapsed;
                 if (posts.Total > 1)
                 {
                     CacheManager.AddOrUpdate(key, wd, s => wd);
@@ -78,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
                 ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
                 ViewBag.hotSearches = new List<KeywordsRank>();
-                return View(posts.Results);
+                return View(posts);
             }
 
             ViewBag.hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList();

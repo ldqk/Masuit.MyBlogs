@@ -4,7 +4,7 @@
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools
 @using Microsoft.AspNetCore.Mvc.Rendering
-@model IList<Masuit.MyBlogs.Core.Models.DTO.PostDto>
+@model SearchResult<Masuit.MyBlogs.Core.Models.DTO.PostDto>
 @{
     ViewBag.Title = "站内搜索：" + ViewBag.Keyword;
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -23,8 +23,8 @@
                     <div class="ibox-content">
                         @if (!string.IsNullOrEmpty(ViewBag.Keyword))
                         {
-                            <h3>为您找到约 @ViewBag.Total 条<span class="text-navy">“@ViewBag.Keyword”</span>匹配或相关的搜索结果。</h3>
-                            <small>搜索用时(@ViewBag.Elapsed 毫秒)</small>
+                            <h3>为您找到约 @Model.Total 条<span class="text-navy">“@ViewBag.Keyword”</span>匹配或相关的搜索结果。</h3>
+                            <small>搜索用时(@Model.Elapsed 毫秒)</small>
                         }
                         <div class="search-form">
                             <form action="/s" method="get">
@@ -48,10 +48,10 @@
                             }
                         </div>
                         <div class="hr-line-dashed"></div>
-                        @if (Model.Any())
+                        @if (Model.Results.Any())
                         {
-                            var rnd = new Random().Next(Model.Count > 2 ? 2 : 0, Model.Count);
-                            for (var i = 0; i < Model.Count; i++)
+                            var rnd = new Random().Next(Model.Results.Count > 2 ? 2 : 0, Model.Results.Count);
+                            for (var i = 0; i < Model.Results.Count; i++)
                             {
                                 if (rnd == i && ad != null)
                                 {
@@ -59,7 +59,7 @@
                                     <div class="hr-line-dashed"></div>
                                 }
 
-                                PostDto p = Model[i];
+                                PostDto p = Model.Results[i];
                                 <div class="border padding-10 padding-bot5">
                                     <div class="search-result">
                                         <h2 class="size20">
@@ -96,9 +96,8 @@
                         }
                         @*下面是分页组件*@
                         @{
-                            int count = ViewBag.Total;
                             int size = ViewBag.PageSize;
-                            int pages = Math.Ceiling(count / (size > 0 ? size : 10.0)).ToInt32();
+                            int pages = Math.Ceiling(Model.Total / (size > 0 ? size : 10.0)).ToInt32();
                             var page = Context.Request.Query["page"].ToString().ToInt32();
                             int current = page > 0 ? page : 1;
                             int pageStart = current - 4 > 0 ? current - 4 : 1;

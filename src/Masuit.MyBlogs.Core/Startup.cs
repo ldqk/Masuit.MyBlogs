@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using StackExchange.Profiling;
@@ -156,9 +157,16 @@ namespace Masuit.MyBlogs.Core
         /// <param name="luceneIndexerOptions"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext db, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
-            app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For
-            app.UseExceptionHandler("/ServiceUnavailable");
             ServiceProvider = app.ApplicationServices;
+            app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/ServiceUnavailable");
+            }
 
             db.Database.EnsureCreated();
             var dic = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
