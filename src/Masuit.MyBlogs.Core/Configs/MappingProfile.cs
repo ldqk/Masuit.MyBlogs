@@ -88,6 +88,9 @@ namespace Masuit.MyBlogs.Core.Configs
 
             CreateMap<Advertisement, AdvertisementViewModel>();
             CreateMap<AdvertisementDto, Advertisement>().ForMember(a => a.Status, e => e.Ignore()).ForMember(a => a.UpdateTime, e => e.MapFrom(a => DateTime.Now));
+
+            CreateMap<Donate, DonateDto>();
+            CreateMap<Donate, DonateDtoBase>();
         }
     }
 }
