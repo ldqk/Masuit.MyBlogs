@@ -33,10 +33,13 @@
             <td title="'权重'">
                 {{row.Weight}}
             </td>
-            <td title="'点击量'">
+            <td title="'累计点击量'">
                 {{row.ViewCount}}
             </td>
-            <td title="'分类'">
+            <td title="'日均点击量'">
+                {{row.AverageViewCount}}
+            </td>
+            <td title="'分类'" style="max-width: 220px">
                 {{row.CategoryNames}}
             </td>
             <td title="'创建时间'">
@@ -51,7 +54,7 @@
                     <span class="el-switch-style" ng-click="changeState(row)"></span>
                 </label>
             </td>
-            <td title="'操作'" style="width: 185px;">
+            <td title="'操作'" style="width: 110px;">
                 <div class="btn-group">
                     <button class="btn btn-info btn-sm waves-effect" ng-click="edit(row)">
                         <i class="icon-pencil"></i>

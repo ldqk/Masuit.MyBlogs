@@ -63,6 +63,11 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// </summary>
         public int ViewCount { get; set; }
 
+        /// <summary>
+        /// 日均点击量
+        /// </summary>
+        public int AverageViewCount => (int)(ViewCount * 1.0 / (DateTime.Now - CreateTime).TotalDays);
+
         public string CategoryIds { get; set; }
         public string CategoryNames { get; set; }
     }
