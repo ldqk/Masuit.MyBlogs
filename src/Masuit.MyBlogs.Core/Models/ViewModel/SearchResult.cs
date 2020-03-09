@@ -6,6 +6,6 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
     {
         public int Total { get; set; }
         public double Elapsed { get; set; }
-        public List<T> Results { get; set; }
+        public List<T> Results { get; set; } = new List<T>();
     }
 }
