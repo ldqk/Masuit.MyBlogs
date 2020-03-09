@@ -494,7 +494,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <param name="key">更新键规则</param>
         /// <param name="entities">需要保存的实体</param>
         /// <returns>保存成功</returns>
-        void AddOrUpdateSaved<TKey>(Expression<Func<T, TKey>> key, params T[] entities);
+        bool AddOrUpdateSaved<TKey>(Expression<Func<T, TKey>> key, params T[] entities);
 
         /// <summary>
         /// 添加或更新实体
@@ -502,7 +502,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <param name="key">更新键规则</param>
         /// <param name="t">需要保存的实体</param>
         /// <returns>保存成功</returns>
-        Task AddOrUpdateSavedAsync<TKey>(Expression<Func<T, TKey>> key, T t);
+        Task<int> AddOrUpdateSavedAsync<TKey>(Expression<Func<T, TKey>> key, T t);
 
         /// <summary>
         /// 添加或更新实体
@@ -510,7 +510,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <param name="key">更新键规则</param>
         /// <param name="entities">需要保存的实体</param>
         /// <returns>保存成功</returns>
-        Task AddOrUpdateSavedAsync<TKey>(Expression<Func<T, TKey>> key, IEnumerable<T> entities);
+        Task<int> AddOrUpdateSavedAsync<TKey>(Expression<Func<T, TKey>> key, IEnumerable<T> entities);
 
         /// <summary>
         /// 添加实体并保存（异步）

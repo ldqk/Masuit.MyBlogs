@@ -684,8 +684,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public T AddOrUpdateSaved<TKey>(Expression<Func<T, TKey>> key, T t)
         {
             BaseDal.AddOrUpdate(key, t);
-            BaseDal.SaveChanges();
-            return t;
+            var b = BaseDal.SaveChanges() > 0;
+            return b ? t : null;
         }
 
         /// <summary>
@@ -694,10 +694,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="key">更新键规则</param>
         /// <param name="entities">需要保存的实体</param>
         /// <returns>保存成功</returns>
-        public void AddOrUpdateSaved<TKey>(Expression<Func<T, TKey>> key, params T[] entities)
+        public bool AddOrUpdateSaved<TKey>(Expression<Func<T, TKey>> key, params T[] entities)
         {
             AddOrUpdate(key, entities);
-            SaveChanges();
+            return SaveChanges() > 0;
         }
 
         /// <summary>
@@ -706,10 +706,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="key">更新键规则</param>
         /// <param name="t">需要保存的实体</param>
         /// <returns>保存成功</returns>
-        public async Task AddOrUpdateSavedAsync<TKey>(Expression<Func<T, TKey>> key, T t)
+        public async Task<int> AddOrUpdateSavedAsync<TKey>(Expression<Func<T, TKey>> key, T t)
         {
             AddOrUpdate(key, t);
-            await SaveChangesAsync();
+            return await SaveChangesAsync();
         }
 
         /// <summary>
@@ -718,10 +718,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="key">更新键规则</param>
         /// <param name="entities">需要保存的实体</param>
         /// <returns>保存成功</returns>
-        public async Task AddOrUpdateSavedAsync<TKey>(Expression<Func<T, TKey>> key, IEnumerable<T> entities)
+        public async Task<int> AddOrUpdateSavedAsync<TKey>(Expression<Func<T, TKey>> key, IEnumerable<T> entities)
         {
             AddOrUpdate(key, entities);
-            await SaveChangesAsync();
+            return await SaveChangesAsync();
         }
 
         /// <summary>

@@ -252,26 +252,30 @@ function loadingDone() {
 /**禁止复制 */
 function CopyrightProtect() {
     setInterval(function() {
-        document.onkeydown = function(e){
-            var currKey=0,evt=e||window.event;
-            currKey=evt.keyCode||evt.which||evt.charCode;
-            if (currKey == 123||( evt.ctrlKey&&currKey==67 )||( evt.ctrlKey&&currKey==85 )||( evt.ctrlKey&&evt.shiftKey)||evt.altKey ){
-                evt.cancelBubble = true;
-                evt.returnValue = false;
+        try {
+            document.onkeydown = function (e) {
+                var currKey = 0, evt = e || window.event;
+                currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
+                    evt.cancelBubble = true;
+                    evt.returnValue = false;
+                    return false;
+                }
+            }
+            document.ondragstart = function (e) {
+                e.returnValue = false;
                 return false;
             }
-        }
-        document.ondragstart = function(e){
-            e.returnValue = false;
-            return false;
-        }
-        document.oncopy = function(e){
-            e.returnValue = false;
-            return false;
-        }
-        document.oncontextmenu = function(e){
-            e.returnValue = false;
-            return false;
+            document.oncopy = function (e) {
+                e.returnValue = false;
+                return false;
+            }
+            document.oncontextmenu = function (e) {
+                e.returnValue = false;
+                return false;
+            }
+        } catch (ex) {
+            console.error(ex);
         }
     },100);
 }
@@ -279,22 +283,26 @@ function CopyrightProtect() {
 /**禁止编辑器内复制 */
 function CopyrightProtect4Editor() {
     setInterval(function() {
-        document.getElementById("ueditor_0").contentWindow.document.body.onkeydown = function(e){
-            var currKey=0,evt=e||window.event;
-            currKey=evt.keyCode||evt.which||evt.charCode;
-            if (currKey == 123||( evt.ctrlKey&&currKey==67 )||( evt.ctrlKey&&currKey==85)|| (evt.ctrlKey&&currKey==88)||( evt.ctrlKey&&evt.shiftKey)|| evt.altKey ){
-                evt.cancelBubble = true;
-                evt.returnValue = false;
+        try {
+            document.getElementById("ueditor_0").contentWindow.document.body.onkeydown = function (e) {
+                var currKey = 0, evt = e || window.event;
+                currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && currKey == 88) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
+                    evt.cancelBubble = true;
+                    evt.returnValue = false;
+                    return false;
+                }
+            }
+            document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function (e) {
+                e.returnValue = false;
                 return false;
             }
-        }
-        document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function(e){
-            e.returnValue = false;
-            return false;
-        }
-        document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function(e){
-            e.returnValue = false;
-            return false;
+            document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function (e) {
+                e.returnValue = false;
+                return false;
+            }
+        } catch (ex) {
+            console.error(ex);
         }
     },100);
 }
@@ -302,26 +310,30 @@ function CopyrightProtect4Editor() {
 /**禁止全局复制 */
 function GlobalCopyrightProtect() {
     setInterval(function() {
-        document.onkeydown = function(e){
-            var currKey=0,evt=e||window.event;
-            currKey=evt.keyCode||evt.which||evt.charCode;
-            if (currKey == 123||( evt.ctrlKey&&currKey==67 )|| (evt.ctrlKey&&currKey==85)||evt.ctrlKey||(evt.ctrlKey&&evt.shiftKey)||evt.altKey ){
-                evt.cancelBubble = true;
-                evt.returnValue = false;
+        try {
+            document.onkeydown = function (e) {
+                var currKey = 0, evt = e || window.event;
+                currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 85) || evt.ctrlKey || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
+                    evt.cancelBubble = true;
+                    evt.returnValue = false;
+                    return false;
+                }
+            }
+            document.ondragstart = function (e) {
+                e.returnValue = false;
                 return false;
             }
-        }
-        document.ondragstart = function(e){
-            e.returnValue = false;
-            return false;
-        }
-        document.oncopy = function(e){
-            e.returnValue = false;
-            return false;
-        }
-        document.oncontextmenu = function(){
-            event.returnValue = false;
-            return false;
+            document.oncopy = function (e) {
+                e.returnValue = false;
+                return false;
+            }
+            document.oncontextmenu = function () {
+                event.returnValue = false;
+                return false;
+            }
+        } catch (ex) {
+            console.error(ex);
         }
     },100);
 }

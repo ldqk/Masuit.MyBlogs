@@ -46,7 +46,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie"), Route("msg")]
         public ActionResult Index()
         {
-            ViewBag.TotalCount = LeaveMessageService.GetQueryNoTracking(m => m.ParentId == 0 && m.Status == Status.Pended).Count();
+            ViewBag.TotalCount = LeaveMessageService.Count(m => m.ParentId == 0 && m.Status == Status.Pended);
             return CurrentUser.IsAdmin ? View("Index_Admin") : View();
         }
 

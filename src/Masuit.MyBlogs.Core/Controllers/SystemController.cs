@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -147,24 +148,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="sets"></param>
         /// <returns></returns>
-        public ActionResult Save(string sets)
+        public async Task<ActionResult> Save(string sets)
         {
-            SystemSetting[] settings = JsonConvert.DeserializeObject<List<SystemSetting>>(sets).ToArray();
-            foreach (var set in settings)
-            {
-                var entry = SystemSettingService.Get(s => s.Name.Equals(set.Name));
-                if (entry is null)
-                {
-                    SystemSettingService.AddEntity(set);
-                }
-                else
-                {
-                    entry.Value = set.Value;
-                }
-            }
-
-            var b = SystemSettingService.SaveChanges() > 0;
-            var dic = SystemSettingService.GetAll().ToDictionary(s => s.Name, s => s.Value); //同步设置
+            var settings = JsonConvert.DeserializeObject<List<SystemSetting>>(sets).ToArray();
+            var b = await SystemSettingService.AddOrUpdateSavedAsync(s => s.Name, settings) > 0;
+            var dic = settings.ToDictionary(s => s.Name, s => s.Value); //同步设置
             foreach (var (key, value) in dic)
             {
                 CommonHelper.SystemSettings.AddOrUpdate(key, value);

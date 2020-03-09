@@ -42,8 +42,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             if (ip.IsInDenyArea() && !tokenValid)
             {
                 AccessDeny(ip, request, "访问地区限制");
-                context.Result = new RedirectToActionResult("AccessDeny", "Error", null);
-                return;
+                throw new AccessDenyException("访问地区限制");
             }
 
             if (Regex.IsMatch(request.Method, "OPTIONS|HEAD", RegexOptions.IgnoreCase) || request.IsRobot())
@@ -65,7 +64,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 AccessDeny(ip, request, "访问频次限制");
             }
 
-            context.Result = new RedirectResult("/tempdeny");
+            throw new TempDenyException("访问地区限制");
         }
 
         private void AccessDeny(string ip, HttpRequest request, string remark)

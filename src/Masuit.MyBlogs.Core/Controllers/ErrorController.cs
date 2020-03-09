@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Web;
 
@@ -32,12 +33,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("error"), Route("{*url}", Order = 99999), ResponseCache(Duration = 36000)]
         public ActionResult Index()
         {
-            if (Request.Method.ToLower().Equals("get"))
-            {
-                Response.StatusCode = 404;
-                return View();
-            }
-            return Json(new
+            Response.StatusCode = 404;
+            return Request.Method.ToLower().Equals("get") ? (ActionResult)View() : Json(new
             {
                 StatusCode = 404,
                 Success = false,
@@ -61,18 +58,18 @@ namespace Masuit.MyBlogs.Core.Controllers
                 switch (feature.Error)
                 {
                     case DbUpdateConcurrencyException ex:
-                        err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
+                        err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
                         LogManager.Error(err, ex);
                         break;
                     case DbUpdateException ex:
-                        err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
+                        err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
                         LogManager.Error(err, ex);
                         break;
                     case AggregateException ex:
                         LogManager.Debug("↓↓↓" + ex.Message + "↓↓↓");
                         ex.Handle(e =>
                         {
-                            LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{ip}\t", e);
+                            LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t", e);
                             return true;
                         });
                         break;
@@ -84,50 +81,25 @@ namespace Masuit.MyBlogs.Core.Controllers
                             Success = false,
                             ex.Message
                         });
+                    case AccessDenyException _:
+                        Response.StatusCode = 403;
+                        return View("AccessDeny");
+                    case TempDenyException _:
+                        Response.StatusCode = 403;
+                        return View("TempDeny");
                     default:
-                        LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers["User-Agent"]}，客户端IP：{ip}\t", feature.Error);
+                        LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(req.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t", feature.Error);
                         break;
                 }
             }
 
-            if (Request.Method.ToLower().Equals("get"))
-            {
-                Response.StatusCode = 503;
-                return View();
-            }
-            return Json(new
+            Response.StatusCode = 503;
+            return Request.Method.ToLower().Equals("get") ? (ActionResult)View() : Json(new
             {
                 StatusCode = 503,
                 Success = false,
                 Message = "服务器发生错误！"
             });
-        }
-
-        /// <summary>
-        /// 访问被拒绝
-        /// </summary>
-        /// <returns></returns>
-        [Route("AccessDeny"), ResponseCache(Duration = 360000)]
-        public ActionResult AccessDeny()
-        {
-            if (Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Request.Cookies["FullAccessToken"]))
-            {
-                return Redirect("/");
-            }
-
-            Response.StatusCode = 403;
-            return View();
-        }
-
-        /// <summary>
-        /// 临时被拒绝
-        /// </summary>
-        /// <returns></returns>
-        [Route("TempDeny"), ResponseCache(Duration = 360000)]
-        public ActionResult TempDeny()
-        {
-            Response.StatusCode = 403;
-            return View();
         }
 
         /// <summary>
