@@ -220,7 +220,6 @@
                             @Html.Raw(CommonHelper.SystemSettings["Disclaimer"])
                         }
                     </p>
-                    </p>
                 </section>
                 @{
                     var posts = Model.Category.Post.Where(p => p.Status == Status.Pended && p.Id != Model.Id).OrderBy(p => Guid.NewGuid()).ToList();
@@ -334,8 +333,8 @@
         });
     }
 	window.onload = function() {
-        var keywords = @Html.Raw(ViewData["keywords"] ?? "[]");
-        for (var i = 0; i < keywords.length; i++) {
+        const keywords = @Html.Raw(ViewData["keywords"] ?? "[]");
+        for (let i = 0; i < keywords.length; i++) {
             $("#article").highlight(keywords[i]);
         }
 		loading();
