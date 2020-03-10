@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -22,7 +23,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        public ActionResult GetPageData(int page = 1, int size = 10)
+        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
         {
             var list = DonateService.GetPagesFromCache(page, size, d => true, d => d.DonateTime, false);
             return Ok(list);

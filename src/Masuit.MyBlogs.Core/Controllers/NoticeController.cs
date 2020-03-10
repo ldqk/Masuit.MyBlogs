@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("notice"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
-        public ActionResult Index(int page = 1, int size = 10)
+        public ActionResult Index([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
         {
             var list = NoticeService.GetPages<DateTime, NoticeDto>(page, size, n => n.Status == Status.Display, n => n.ModifyDate, false);
             ViewData["page"] = new Pagination(page, size, list.TotalCount);
@@ -125,7 +126,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        public ActionResult GetPageData(int page = 1, int size = 10)
+        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
         {
             var list = NoticeService.GetPagesNoTracking(page, size, n => true, n => n.ModifyDate, false);
             return Ok(list);

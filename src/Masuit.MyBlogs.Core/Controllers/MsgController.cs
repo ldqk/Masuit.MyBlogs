@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -57,7 +58,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="cid"></param>
         /// <returns></returns>
-        public ActionResult GetMsgs(int page = 1, int size = 10, int cid = 0)
+        public ActionResult GetMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15, int cid = 0)
         {
             int total;
             if (cid != 0)
@@ -231,7 +232,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPendingMsgs(int page = 1, int size = 10)
+        public ActionResult GetPendingMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
         {
             var list = LeaveMessageService.GetPages<DateTime, LeaveMessageDto>(page, size, m => m.Status == Status.Pending, l => l.PostDate, false);
             return Ok(list);
@@ -286,7 +287,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetInternalMsgs(int page = 1, int size = 10)
+        public ActionResult GetInternalMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
         {
             var msgs = MessageService.GetPagesNoTracking(page, size, m => true, m => m.Time, false);
             return Ok(msgs);

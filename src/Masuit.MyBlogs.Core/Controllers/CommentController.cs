@@ -17,6 +17,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -177,7 +178,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="cid"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult GetComments(int? id, int page = 1, int size = 5, int cid = 0)
+        public ActionResult GetComments(int? id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15, int cid = 0)
         {
             int total; //总条数，用于前台分页
             if (cid != 0)
@@ -273,7 +274,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPendingComments(int page = 1, int size = 10)
+        public ActionResult GetPendingComments([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
         {
             var pages = CommentService.GetPages<DateTime, CommentDto>(page, size, c => c.Status == Status.Pending, c => c.CommentDate, false);
             return Ok(pages);

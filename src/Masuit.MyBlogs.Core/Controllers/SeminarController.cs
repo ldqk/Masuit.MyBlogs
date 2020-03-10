@@ -11,6 +11,7 @@ using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Runtime.InteropServices;
@@ -43,7 +44,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="orderBy"></param>
         /// <returns></returns>
         [Route("c/{id:int}/{page:int?}/{size:int?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
-        public ActionResult Index(int id, [Optional]OrderBy? orderBy, int page = 1, int size = 15)
+        public ActionResult Index(int id, [Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
         {
             var s = SeminarService.GetById(id) ?? throw new NotFoundException("文章未找到");
             var posts = PostService.GetQuery<PostDto>(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin)).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedList(page, size);
@@ -132,7 +133,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPageData(int page, int size)
+        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
         {
             var list = SeminarService.GetPages<int, SeminarDto>(page, size, s => true, s => s.Id, false);
             return Ok(list);

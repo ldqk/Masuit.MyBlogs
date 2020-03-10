@@ -96,7 +96,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("{id:int}/history"), Route("{id:int}/history/{page:int}/{size:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size" }, VaryByHeader = "Cookie")]
-        public async Task<ActionResult> History(int id, int page = 1, int size = 20)
+        public async Task<ActionResult> History(int id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 20)
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             ViewBag.Primary = post;
@@ -626,7 +626,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="search"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPending(int page = 1, int size = 10, string search = "")
+        public ActionResult GetPending([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15, string search = "")
         {
             Expression<Func<Post, bool>> where = p => p.Status == Status.Pending;
             if (!string.IsNullOrEmpty(search))
