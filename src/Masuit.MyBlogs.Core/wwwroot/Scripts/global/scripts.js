@@ -253,6 +253,7 @@ function loadingDone() {
 function CopyrightProtect() {
     setInterval(function() {
         try {
+            disableDevTools();
             $(".article-content").on("keydown",function (e) {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
@@ -284,6 +285,7 @@ function CopyrightProtect() {
 function CopyrightProtect4Editor() {
     setInterval(function() {
         try {
+            disableDevTools();
             document.getElementById("ueditor_0").contentWindow.document.body.onkeydown = function (e) {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
@@ -306,11 +308,11 @@ function CopyrightProtect4Editor() {
         }
     },100);
 }
-
 /**禁止全局复制 */
 function GlobalCopyrightProtect() {
     setInterval(function() {
         try {
+            disableDevTools();
             $(".article-content").on("keydown",function (e) {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
@@ -336,6 +338,21 @@ function GlobalCopyrightProtect() {
             console.error(ex);
         }
     },100);
+}
+var disableDevTools=function() {
+    function doCheck(a) {
+        if (("" + a / a)["length"] !== 1 || a % 20 === 0) {
+            (function() {}
+            ["constructor"]("debugger")());
+        } else {
+            (function() {}
+            ["constructor"]("debugger")());
+        }
+        doCheck(++a);
+    }
+    try {
+        doCheck(0);
+    } catch (err) {}
 }
 function GetOperatingSystem(os) {
     if (os) {
