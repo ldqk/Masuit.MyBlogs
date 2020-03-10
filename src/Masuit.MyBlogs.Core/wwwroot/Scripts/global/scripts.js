@@ -253,7 +253,7 @@ function loadingDone() {
 function CopyrightProtect() {
     setInterval(function() {
         try {
-            document.onkeydown = function (e) {
+            $(".article-content").on("keydown",function (e) {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
                 if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
@@ -261,15 +261,15 @@ function CopyrightProtect() {
                     evt.returnValue = false;
                     return false;
                 }
-            }
-            document.ondragstart = function (e) {
+            });
+            $(".article-content").on("dragstart",function (e) {
                 e.returnValue = false;
                 return false;
-            }
-            document.oncopy = function (e) {
+            });
+            $(".article-content").on("copy",function (e) {
                 e.returnValue = false;
                 return false;
-            }
+            });
             document.oncontextmenu = function (e) {
                 e.returnValue = false;
                 return false;
@@ -311,7 +311,7 @@ function CopyrightProtect4Editor() {
 function GlobalCopyrightProtect() {
     setInterval(function() {
         try {
-            document.onkeydown = function (e) {
+            $(".article-content").on("keydown",function (e) {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
                 if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 85) || evt.ctrlKey || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
@@ -319,15 +319,15 @@ function GlobalCopyrightProtect() {
                     evt.returnValue = false;
                     return false;
                 }
-            }
-            document.ondragstart = function (e) {
+            });
+            $(".article-content").on("dragstart",function (e) {
                 e.returnValue = false;
                 return false;
-            }
-            document.oncopy = function (e) {
+            });
+            $(".article-content").on("copy",function (e) {
                 e.returnValue = false;
                 return false;
-            }
+            });
             document.oncontextmenu = function () {
                 event.returnValue = false;
                 return false;
