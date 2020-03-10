@@ -1,16 +1,14 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Infrastructure.Repository;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Command;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.Tools;
-using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -54,9 +52,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(r => r.Title.Contains(kw) || r.Content.Contains(kw) || r.Modifier.Contains(kw) || r.ModifierEmail.Contains(kw));
             }
 
-            var list = PostMergeRequestService.GetQuery(where).OrderByDescending(d => d.MergeState == MergeStatus.Pending).ThenByDescending(r => r.Id).Skip((page - 1) * size).Take(size).ProjectTo<PostMergeRequestDtoBase>(MapperConfig).ToList();
-            var count = PostMergeRequestService.Count(where);
-            return Ok(new PagedList<PostMergeRequestDtoBase>(list, page, size, count));
+            var list = PostMergeRequestService.GetQuery(where).OrderByDescending(d => d.MergeState == MergeStatus.Pending).ThenByDescending(r => r.Id).ToCachedPagedList<PostMergeRequest, PostMergeRequestDtoBase>(page, size, MapperConfig);
+            return Ok(list);
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
-@model IList<Masuit.MyBlogs.Core.Models.DTO.PostDto>
+@model Masuit.Tools.Models.PagedList<Masuit.MyBlogs.Core.Models.DTO.PostDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     Random r = new Random();
@@ -63,7 +63,7 @@
         </div>
     </div>
     <div class="wrapper-content  animated bounceInUp blog">
-        @if (Model.Any())
+        @if (Model.Data.Any())
         {
             <div class="orderby">
                 <div class="row">
@@ -95,15 +95,15 @@
                     </div>
                 </div>
             </div>
-            var rnd = new Random().Next(2, Model.Count);
-            for (var i = 0; i < Model.Count; i++)
+            var rnd = new Random().Next(2, Model.CurrentCount);
+            for (var i = 0; i < Model.CurrentCount; i++)
             {
                 if (rnd == i && ad != null)
                 {
                     await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
                 }
 
-                var post = Model[i];
+                var post = Model.Data[i];
                 await Html.RenderPartialAsync(user.IsAdmin ? "_ArticleListItem_Admin" : "_ArticleListItem", post);
             }
         }

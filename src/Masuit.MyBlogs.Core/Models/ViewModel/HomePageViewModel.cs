@@ -1,5 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.Tools.Models;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +14,7 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 文章列表
         /// </summary>
-        public IList<PostDto> Posts { get; set; }
+        public PagedList<PostDto> Posts { get; set; }
 
         /// <summary>
         /// 网站公告列表
@@ -59,5 +60,10 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// 列表内广告
         /// </summary>
         public Advertisement ListAdvertisement { get; set; }
+
+        /// <summary>
+        /// 分页参数
+        /// </summary>
+        public Pagination PageParams { get; set; }
     }
 }

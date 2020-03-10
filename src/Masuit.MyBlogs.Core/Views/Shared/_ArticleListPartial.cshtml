@@ -2,12 +2,12 @@
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 <div class="col-md-9 box-left">
     <div class="wrapper-content  animated fadeIn blog">
-        @if (Model.Posts.Any())
+        @if (Model.Posts.Data.Any())
         {
             <div class="orderby">
                 <div class="row">
                     <div class="col-md-10 text-center">
-                        @{ await Html.RenderPartialAsync("_Pagination", ViewData["page"]); }
+                        @{ await Html.RenderPartialAsync("_Pagination", Model.PageParams); }
                     </div>
                     <div class="col-md-2">
                         <div class="btn-group pull-right">
@@ -40,15 +40,15 @@
                 </div>
             </div>
 
-            var rnd = new Random().Next(Model.Posts.Count > 2 ? 2 : 0, Model.Posts.Count);
-            for (var index = 0; index < Model.Posts.Count; index++)
+            var rnd = new Random().Next(Model.Posts.CurrentCount > 2 ? 2 : 0, Model.Posts.CurrentCount);
+            for (var index = 0; index < Model.Posts.CurrentCount; index++)
             {
                 if (rnd == index && Model.ListAdvertisement != null)
                 {
                     await Html.RenderPartialAsync("_ArticleListAdvertisement", Model.ListAdvertisement);
                 }
 
-                var post = Model.Posts[index];
+                var post = Model.Posts.Data[index];
                 await Html.RenderPartialAsync("_ArticleListItem", post);
             }
         }
@@ -67,7 +67,7 @@
             }
         }
         <div class="col-md-12 text-center">
-            @{ await Html.RenderPartialAsync("_Pagination", ViewData["page"]); }
+            @{ await Html.RenderPartialAsync("_Pagination", Model.PageParams); }
         </div>
     </div>
 </div>

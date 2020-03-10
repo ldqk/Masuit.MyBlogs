@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
+using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -45,13 +46,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index(int id, [Optional]OrderBy? orderBy, int page = 1, int size = 15)
         {
             var s = SeminarService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            var temp = PostService.GetQuery<PostDto>(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin));
-            var posts = temp.OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).ToList();
+            var posts = PostService.GetQuery<PostDto>(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin)).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedList(page, size);
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
-            ViewData["page"] = new Pagination(page, size, temp.Count(), orderBy);
+            ViewData["page"] = new Pagination(page, size, posts.TotalCount, orderBy);
             return View(posts);
         }
 

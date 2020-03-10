@@ -1,6 +1,7 @@
 ﻿using EFSecondLevelCache.Core;
 using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Infrastructure.Repository;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -52,16 +53,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "orderBy" }, VaryByHeader = "Cookie")]
         public ActionResult Index()
         {
-            var total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin);
             var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner).OrderBy(a => Guid.NewGuid()).ToList();
             var fastShares = FastShareService.GetAllFromCache(s => s.Sort).ToList();
             var postsQuery = PostService.GetQuery<PostDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
-            var posts = postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").Take(15).Cacheable().ToList();
+            var posts = postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ToCachedPagedList(1, 15);
+            posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ToList());
             var viewModel = GetIndexPageViewModel();
             viewModel.Banner = banners;
-            viewModel.Posts = Enumerable.AsEnumerable(postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate)).Union(posts).ToList();
+            viewModel.Posts = posts;
             ViewBag.FastShare = fastShares;
-            ViewData["page"] = new Pagination(1, 15, total, OrderBy.ModifyDate);
+            viewModel.PageParams = new Pagination(1, 15, posts.TotalCount, OrderBy.ModifyDate);
             return View(viewModel);
         }
 
@@ -75,17 +76,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("p"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         public ActionResult Post([Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 15)
         {
-            var total = PostService.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin && !p.IsFixedTop);
             var viewModel = GetIndexPageViewModel();
             var postsQuery = PostService.GetQuery<PostDto>(p => (p.Status == Status.Pended || CurrentUser.IsAdmin)); //准备文章的查询
-            var posts = postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+            var posts = postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").ToCachedPagedList(page, size);
             if (page == 1)
             {
-                posts = Enumerable.AsEnumerable(postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate)).Union(posts).ToList();
+                posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ToList());
             }
 
             viewModel.Posts = posts;
-            ViewData["page"] = new Pagination(page, size, total, orderBy);
+            viewModel.PageParams = new Pagination(1, 15, posts.TotalCount, OrderBy.ModifyDate);
             return View(viewModel);
         }
 
@@ -100,12 +100,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("tag/{id}/{page:int?}/{size:int?}/{orderBy:int?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         public ActionResult Tag(string id, [Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 15)
         {
-            var temp = PostService.GetQuery<PostDto>(p => p.Label.Contains(id) && (p.Status == Status.Pended || CurrentUser.IsAdmin));
-            var posts = temp.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+            var posts = PostService.GetQuery<PostDto>(p => p.Label.Contains(id) && (p.Status == Status.Pended || CurrentUser.IsAdmin)).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedList(page, size);
             var viewModel = GetIndexPageViewModel();
             ViewBag.Tag = id;
             viewModel.Posts = posts;
-            ViewData["page"] = new Pagination(page, size, temp.Count(), orderBy);
+            viewModel.PageParams = new Pagination(1, 15, posts.TotalCount, OrderBy.ModifyDate);
             return View(viewModel);
         }
 
@@ -122,12 +121,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             Expression<Func<Post, bool>> where = p => p.Author.Equals(author) || p.Modifier.Equals(author) || p.Email.Equals(author) || p.PostHistoryVersion.Any(v => v.Modifier.Equals(author) || v.ModifierEmail.Equals(author));
             where = where.And(p => p.Status == Status.Pended || CurrentUser.IsAdmin);
-            var temp = PostService.GetQuery<PostDto>(where);
-            var posts = temp.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+            var posts = PostService.GetQuery<PostDto>(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedList(page, size);
             var viewModel = GetIndexPageViewModel();
             ViewBag.Author = author;
             viewModel.Posts = posts;
-            ViewData["page"] = new Pagination(page, size, temp.Count(), orderBy);
+            viewModel.PageParams = new Pagination(1, 15, posts.TotalCount, OrderBy.ModifyDate);
             return View(viewModel);
         }
 
@@ -144,11 +142,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Category(int id, [Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 15)
         {
             var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
-            var posts = PostService.GetQuery<PostDto>(p => p.CategoryId == cat.Id && (p.Status == Status.Pended || CurrentUser.IsAdmin));
+            var posts = PostService.GetQuery<PostDto>(p => p.CategoryId == cat.Id && (p.Status == Status.Pended || CurrentUser.IsAdmin)).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedList(page, size);
             var viewModel = GetIndexPageViewModel();
-            viewModel.Posts = posts.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").Skip(size * (page - 1)).Take(size).Cacheable().ToList();
+            viewModel.Posts = posts;
             ViewBag.Category = cat;
-            ViewData["page"] = new Pagination(page, size, posts.Count(), orderBy);
+            viewModel.PageParams = new Pagination(1, 15, posts.TotalCount, OrderBy.ModifyDate);
             return View(viewModel);
         }
 

@@ -1,8 +1,8 @@
 ﻿using AngleSharp.Text;
-using AutoMapper.QueryableExtensions;
 using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Infrastructure.Repository;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
@@ -10,7 +10,6 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
-using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
@@ -58,17 +57,15 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(kw) || p.Description.Contains(kw));
             }
 
-            var query = AdsService.GetQuery(where);
-            var total = query.Count();
-            var list = query.OrderByDescending(p => p.Price).ThenByDescending(a => a.Weight).Skip((page - 1) * size).Take(size).ProjectTo<AdvertisementViewModel>(MapperConfig).ToList();
-            var cids = list.Where(m => !string.IsNullOrEmpty(m.CategoryIds)).SelectMany(m => m.CategoryIds.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)).Distinct().ToArray();
+            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Price).ThenByDescending(a => a.Weight).ToCachedPagedList<Advertisement, AdvertisementViewModel>(page, size, MapperConfig);
+            var cids = list.Data.Where(m => !string.IsNullOrEmpty(m.CategoryIds)).SelectMany(m => m.CategoryIds.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)).Distinct().ToArray();
             var dic = CategoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionary(c => c.Id + "", c => c.Name);
-            foreach (var ad in list.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
+            foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
             {
                 ad.CategoryNames = ad.CategoryIds.Split(",").Select(c => dic[c]).Join(",");
             }
 
-            return Ok(new PagedList<AdvertisementViewModel>(list, page, size, total));
+            return Ok(list);
         }
 
         /// <summary>

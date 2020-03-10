@@ -1,5 +1,4 @@
-﻿using AutoMapper.QueryableExtensions;
-using EFSecondLevelCache.Core;
+﻿using EFSecondLevelCache.Core;
 using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine.Extensions;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
@@ -20,7 +19,6 @@ using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Html;
-using Masuit.Tools.Models;
 using Masuit.Tools.Security;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
@@ -616,10 +614,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(kw) || p.Author.Contains(kw) || p.Email.Contains(kw) || p.Label.Contains(kw) || p.Content.Contains(kw));
             }
 
-            var query = PostService.GetQuery(where);
-            var total = query.Count();
-            var list = query.OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").Skip((page - 1) * size).Take(size).ProjectTo<PostDataModel>(MapperConfig).ToList();
-            return Ok(new PagedList<PostDataModel>(list, page, size, total));
+            var list = PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToCachedPagedList<Post, PostDataModel>(page, size, MapperConfig);
+            return Ok(list);
         }
 
         /// <summary>
