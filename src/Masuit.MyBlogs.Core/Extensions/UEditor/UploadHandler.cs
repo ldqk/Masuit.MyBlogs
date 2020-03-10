@@ -61,7 +61,6 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                         {
                             Directory.CreateDirectory(Path.GetDirectoryName(localPath));
                         }
-
                         File.WriteAllBytes(localPath, stream.ToArray());
                         Result.Url = savePath;
                     }

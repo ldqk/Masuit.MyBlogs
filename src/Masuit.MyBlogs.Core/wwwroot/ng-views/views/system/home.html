@@ -36,6 +36,12 @@
             </div>
         </div>
         <div class="input-group">
+            <span class="input-group-addon">上传图片水印：</span>
+            <div class="fg-line">
+                <input type="text" class="form-control" ng-model="Settings.Watermark" placeholder="留空则上传图片时不添加水印"/>
+            </div>
+        </div>
+        <div class="input-group">
             <span class="input-group-addon el-switch" style="text-align: left">
                 <span>闭站保护：</span>
                 <input type="checkbox" name="switch" ng-checked="Settings.CloseSite=='true'">

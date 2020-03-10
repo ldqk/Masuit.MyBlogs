@@ -8,6 +8,7 @@ using Masuit.Tools.Systems;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -50,7 +51,17 @@ namespace Masuit.MyBlogs.Core.Common
         public async Task<(string url, bool success)> UploadImage(Stream stream, string file)
         {
             file = SnowFlake.NewId + Path.GetExtension(file);
-            for (int i = 0; i < 3; i++)
+            if (!string.IsNullOrEmpty(CommonHelper.SystemSettings.GetOrAdd("Watermark", string.Empty)))
+            {
+                var watermarker = new ImageWatermarker(stream)
+                {
+                    SkipWatermarkForSmallImages = true,
+                    SmallImagePixelsThreshold = 40000
+                };
+                stream = watermarker.AddWatermark(CommonHelper.SystemSettings["Watermark"], Color.LightGray, WatermarkPosition.BottomRight, 30);
+            }
+
+            for (var i = 0; i < 3; i++)
             {
                 try
                 {

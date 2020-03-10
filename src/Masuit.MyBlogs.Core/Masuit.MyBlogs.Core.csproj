@@ -29,7 +29,7 @@
         <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="2.0.0-beta-1629" />
         <PackageReference Include="CacheManager.Serialization.Json" Version="2.0.0-beta-1629" />
         <PackageReference Include="CSRedisCore" Version="3.4.5" />
-        <PackageReference Include="DocxToHtml" Version="1.0.4" />
+        <PackageReference Include="DocxToHtml_ldqk" Version="1.0.4" />
         <PackageReference Include="EFSecondLevelCache.Core" Version="2.9.1" />
         <PackageReference Include="Hangfire" Version="1.7.9" />
         <PackageReference Include="Hangfire.Autofac" Version="2.3.1" />
