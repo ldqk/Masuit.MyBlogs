@@ -33,10 +33,15 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             using var brush = new SolidBrush(color);
+            if (img.Width / fontSize > 50)
+            {
+                fontSize = img.Width / 50;
+            }
+
             using var f = font ?? new Font(FontFamily.GenericSansSerif, fontSize, FontStyle.Bold, GraphicsUnit.Pixel);
             var textSize = graphic.MeasureString(watermarkText, f);
             int x, y;
-
+            textPadding += (img.Width - 1000) / 100;
             switch (watermarkPosition)
             {
                 case WatermarkPosition.TopLeft:
