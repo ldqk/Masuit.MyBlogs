@@ -4,6 +4,7 @@ using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
+using Masuit.Tools.Media;
 using Masuit.Tools.Systems;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -53,12 +54,19 @@ namespace Masuit.MyBlogs.Core.Common
             file = SnowFlake.NewId + Path.GetExtension(file);
             if (!string.IsNullOrEmpty(CommonHelper.SystemSettings.GetOrAdd("Watermark", string.Empty)))
             {
-                var watermarker = new ImageWatermarker(stream)
+                try
                 {
-                    SkipWatermarkForSmallImages = true,
-                    SmallImagePixelsThreshold = 40000
-                };
-                stream = watermarker.AddWatermark(CommonHelper.SystemSettings["Watermark"], Color.LightGray, WatermarkPosition.BottomRight, 30);
+                    var watermarker = new ImageWatermarker(stream)
+                    {
+                        SkipWatermarkForSmallImages = true,
+                        SmallImagePixelsThreshold = 40000
+                    };
+                    stream = watermarker.AddWatermark(CommonHelper.SystemSettings["Watermark"], Color.LightGray, WatermarkPosition.BottomRight, 30);
+                }
+                catch
+                {
+                    // ignore
+                }
             }
 
             for (var i = 0; i < 3; i++)
