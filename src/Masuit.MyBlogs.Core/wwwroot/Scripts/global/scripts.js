@@ -257,7 +257,16 @@ function CopyrightProtect() {
             $(".article-content").on("keydown",function (e) {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
-                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
+                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 85)) { //禁止F12，Ctrl+C，Ctrl+U
+                    evt.cancelBubble = true;
+                    evt.returnValue = false;
+                    return false;
+                }
+            });
+            $("body").on("keydown",function (e) {
+                var evt = e || window.event;
+                var currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) { //禁止F12，Ctrl+A，Ctrl+U
                     evt.cancelBubble = true;
                     evt.returnValue = false;
                     return false;
@@ -316,7 +325,16 @@ function GlobalCopyrightProtect() {
             $(".article-content").on("keydown",function (e) {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
-                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 85) || evt.ctrlKey || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
+                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 85)) { //禁止F12，Ctrl+C，Ctrl+U
+                    evt.cancelBubble = true;
+                    evt.returnValue = false;
+                    return false;
+                }
+            });
+            $("body").on("keydown",function (e) {
+                var evt = e || window.event;
+                var currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) { //禁止F12，Ctrl+A，Ctrl+U
                     evt.cancelBubble = true;
                     evt.returnValue = false;
                     return false;
