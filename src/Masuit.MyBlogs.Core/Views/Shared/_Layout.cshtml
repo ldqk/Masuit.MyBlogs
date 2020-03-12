@@ -29,19 +29,24 @@
     <link href="https://cdn.staticfile.org/notie/4.3.1/notie.min.css" rel="stylesheet">
     <link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="https://cdn.staticfile.org/animate.css/3.7.0/animate.min.css" rel="stylesheet">
-    <link href="~/Content/bootstrap.min.css" rel="stylesheet">
     <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
-    <link href="~/fonts/icomoon.min.css" rel="stylesheet" />
-    <link href="~/Content/jquery.paging.css" rel="stylesheet" />
-    <link href="~/Content/common/reset.css" rel="stylesheet" />
-    <link href="~/Content/common/loading.css" rel="stylesheet" />
-    <link href="~/Content/common/style.css" rel="stylesheet" />
-    <link href="~/Content/common/articlestyle.css" rel="stylesheet" />
-    <link href="~/Content/common/leaderboard.css" rel="stylesheet" />
-    <link href="~/Content/microtip.min.css" rel="stylesheet" />
-    <link href="~/Assets/breadcrumb/style.css" rel="stylesheet" />
-    <link href="~/Assets/nav/css/style.css" rel="stylesheet" />
-    <link href="~/Assets/tippy/tippy.css" rel="stylesheet" />
+    <environment names="Development">
+        <link href="~/Content/bootstrap.min.css" rel="stylesheet">
+        <link href="~/fonts/icomoon.min.css" rel="stylesheet" />
+        <link href="~/Content/jquery.paging.css" rel="stylesheet" />
+        <link href="~/Content/common/reset.css" rel="stylesheet" />
+        <link href="~/Content/common/loading.css" rel="stylesheet" />
+        <link href="~/Content/common/style.css" rel="stylesheet" />
+        <link href="~/Content/common/articlestyle.css" rel="stylesheet" />
+        <link href="~/Content/common/leaderboard.css" rel="stylesheet" />
+        <link href="~/Content/microtip.min.css" rel="stylesheet" />
+        <link href="~/Assets/breadcrumb/style.css" rel="stylesheet" />
+        <link href="~/Assets/nav/css/style.css" rel="stylesheet" />
+        <link href="~/Assets/tippy/tippy.css" rel="stylesheet" />
+    </environment>
+    <environment names="Stage,Production">
+        @await Styles.RenderAsync("~/bundles/main.css")
+    </environment>
     <script src="https://cdn.staticfile.org/bluebird/3.5.3/bluebird.min.js"></script>
     <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/modernizr/2010.07.06dev/modernizr.min.js"></script>
@@ -54,19 +59,24 @@
     <script src="https://cdn.staticfile.org/wow/1.1.2/wow.min.js"></script>
     <script src="https://cdn.staticfile.org/ifvisible/1.0.6/ifvisible.min.js"></script>
     <script src="https://cdn.staticfile.org/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
-    <script src="~/Scripts/bootstrap.min.js"></script>
     <script src="~/Scripts/layer/layer.js"></script>
     <script src="~/Assets/layui/layui.min.js"></script>
-    <script src="~/Scripts/bootstrap-suggest.min.js"></script>
-    <script src="~/Scripts/jquery.query.js"></script>
-    <script src="~/Scripts/jquery.paging.js"></script>
-    <script src="~/Scripts/ripplet.js"></script>
-    <script src="~/Scripts/global/scripts.js"></script>
-    <script src="~/Assets/tippy/tippy.js"></script>
-    <script src="~/Assets/newsbox/jquery.bootstrap.newsbox.js"></script>
-    <script src="~/Assets/tagcloud/js/tagcloud.js"></script>
-    <script src="~/Assets/scrolltop/js/scrolltop.js"></script>
-    <script src="~/Assets/nav/js/main.js"></script>
+    <environment names="Development">
+        <script src="~/Scripts/bootstrap.min.js"></script>
+        <script src="~/Scripts/bootstrap-suggest.min.js"></script>
+        <script src="~/Scripts/jquery.query.js"></script>
+        <script src="~/Scripts/jquery.paging.js"></script>
+        <script src="~/Scripts/ripplet.js"></script>
+        <script src="~/Scripts/global/scripts.js"></script>
+        <script src="~/Assets/tippy/tippy.js"></script>
+        <script src="~/Assets/newsbox/jquery.bootstrap.newsbox.js"></script>
+        <script src="~/Assets/tagcloud/js/tagcloud.js"></script>
+        <script src="~/Assets/scrolltop/js/scrolltop.js"></script>
+        <script src="~/Assets/nav/js/main.js"></script>
+    </environment>
+    <environment names="Stage,Production">
+        @await Scripts.RenderAsync("~/bundles/main.js")
+    </environment>
 </head>
 <body>
     <div id="toc" style="display: none;">

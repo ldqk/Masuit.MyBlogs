@@ -15,14 +15,20 @@
     string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
     Advertisement ad = ViewBag.Ads;
 }
-<link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
-<link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
-<script src="~/Assets/layui/layui.all.js"></script>
-<link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
-<link href="~/Assets/highlight/css/highlight.css" rel="stylesheet" />
-<link href="~/Assets/share/share.css" rel="stylesheet" />
-<script src="~/Assets/share/jquery.qrcode.min.js"></script>
-<script src="~/Assets/share/jquery.share.min.js"></script>
+<script src="https://cdn.staticfile.org/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<environment names="Development">
+    <link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
+    <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
+    <link href="~/Assets/share/share.css" rel="stylesheet" />
+    <link href="~/Assets/highlight/css/highlight.css" rel="stylesheet" />
+    <script src="~/Assets/share/jquery.qrcode.min.js"></script>
+    <script src="~/Assets/share/jquery.share.min.js"></script>
+    <script src="~/Assets/highlight/js/highlight.js"></script>
+</environment>
+<environment names="Stage,Production">
+    @await Styles.RenderAsync("/bundles/article.css")
+    @await Scripts.RenderAsync("/bundles/article.js")
+</environment>
 <div class="container">
     <ol class="cd-breadcrumb triangle">
         <li><a asp-controller="Home" asp-action="Index">首页</a></li>
@@ -312,12 +318,6 @@
         </form>
     </div>
 </div>
-<script src="https://cdn.staticfile.org/jqueryui/1.12.1/jquery-ui.min.js"></script>
-<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
-<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
-<script src="~/Assets/jquery.tocify/jquery.tocify.js"></script>
-<script src="~/Scripts/global/article.js"></script>
-<script src="~/Assets/highlight/js/highlight.js"></script>
 <script>
     function getcomments() {
         window.post("/comment/getcomments",{

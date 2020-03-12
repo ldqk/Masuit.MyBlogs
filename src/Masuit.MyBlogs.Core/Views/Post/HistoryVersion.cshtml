@@ -8,8 +8,19 @@
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
     Advertisement ad = ViewBag.Ads;
 }
-<link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
-<link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
+<environment names="Development">
+    <link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
+    <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
+    <link href="~/Assets/share/share.css" rel="stylesheet" />
+    <link href="~/Assets/highlight/css/highlight.css" rel="stylesheet" />
+    <script src="~/Assets/share/jquery.qrcode.min.js"></script>
+    <script src="~/Assets/share/jquery.share.min.js"></script>
+    <script src="~/Assets/highlight/js/highlight.js"></script>
+</environment>
+<environment names="Stage,Production">
+    @await Styles.RenderAsync("/bundles/article.css")
+    @await Scripts.RenderAsync("/bundles/article.js")
+</environment>
 <div class="container">
     <ol class="cd-breadcrumb triangle">
         <li><a asp-controller="Home" asp-action="Index">首页</a></li>
@@ -183,9 +194,6 @@
 <noscript>
     <iframe src="*.htm"></iframe>
 </noscript>
-<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
-<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
-<script src="~/Assets/jquery.tocify/jquery.tocify.js"></script>
 <script>
     $(function () {
         @if(Model.Post.DisableCopy) {

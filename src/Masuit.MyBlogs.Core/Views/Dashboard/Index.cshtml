@@ -23,16 +23,20 @@
     <link href="https://cdn.staticfile.org/notie/4.3.1/notie.min.css" rel="stylesheet">
     <link href="https://cdn.staticfile.org/izitoast/1.4.0/css/iziToast.min.css" rel="stylesheet">
     <link href="https://cdn.staticfile.org/node-waves/0.7.6/waves.min.css" rel="stylesheet">
-    <link href="~/fonts/icomoon.min.css" rel="stylesheet" />
-    <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
-    <link href="~/Assets/jedate/jedate.min.css" rel="stylesheet" />
-    <link href="~/Assets/fileupload/filestyle.min.css" rel="stylesheet" />
-    <link href="~/Assets/select3/bundle.min.css" rel="stylesheet" />
-    <link href="~/Content/ng-table.min.css" rel="stylesheet" />
-    <link href="~/Content/common/loading.min.css" rel="stylesheet" />
-    <link href="~/Content/microtip.min.css" rel="stylesheet" />
-    <link href="~/Content/checkbox.min.css" rel="stylesheet" />
-    <link href="~/ng-views/css/app.css" rel="stylesheet" />
+    <environment names="Development">
+        <link href="~/fonts/icomoon.min.css" rel="stylesheet" />
+        <link href="~/Assets/jedate/jedate.min.css" rel="stylesheet" />
+        <link href="~/Assets/fileupload/filestyle.min.css" rel="stylesheet" />
+        <link href="~/Assets/select3/bundle.min.css" rel="stylesheet" />
+        <link href="~/Content/ng-table.min.css" rel="stylesheet" />
+        <link href="~/Content/common/loading.min.css" rel="stylesheet" />
+        <link href="~/Content/microtip.min.css" rel="stylesheet" />
+        <link href="~/Content/checkbox.min.css" rel="stylesheet" />
+        <link href="~/ng-views/css/app.css" rel="stylesheet" />
+    </environment>
+    <environment names="Stage,Production">
+        @await Styles.RenderAsync("/bundles/dashboard.css")
+    </environment>
 
     <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://img.highcharts.com.cn/highstock/highstock.js"></script>
@@ -60,7 +64,6 @@
     <script src="https://cdn.staticfile.org/izitoast/1.4.0/js/iziToast.min.js"></script>
     <script src="https://cdn.staticfile.org/node-waves/0.7.6/waves.min.js"></script>
     <script src="~/Scripts/ng-file-upload.min.js"></script>
-    <script src="~/Scripts/layer/layer.js"></script>
     <script src="~/Scripts/tm.pagination.js"></script>
     <script src="~/Scripts/ng-table.min.js"></script>
     <script src="~/Scripts/signalr.js"></script>
@@ -74,7 +77,6 @@
     <script src="~/ng-views/app/template.min.js"></script>
     <script src="~/ng-views/app/form.js"></script>
     <script src="~/ng-views/controllers/main.js"></script>
-
 </head>
 <body data-ng-controller="main as mactrl" data-ng-class="{ 'sw-toggled': mactrl.layoutType === '1'}">
     <header id="header" data-current-skin={{mactrl.currentSkin}} data-ng-include="'/ng-views/template/header.html'"></header>
@@ -89,4 +91,4 @@
     <div data-ng-include="'/ng-views/template/loading.html'"></div>
 </body>
 </html>
-<mini-profiler max-traces="5"/>
+<mini-profiler max-traces="5" />

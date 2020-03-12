@@ -58,13 +58,15 @@ namespace Masuit.MyBlogs.Core
         /// 配置中心
         /// </summary>
         public IConfiguration Configuration { get; set; }
-
+        private readonly IWebHostEnvironment _env;
         /// <summary>
         /// asp.net core核心配置
         /// </summary>
         /// <param name="configuration"></param>
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
+            _env = env;
+
             void BindConfig()
             {
                 Configuration = configuration;
@@ -133,6 +135,7 @@ namespace Masuit.MyBlogs.Core
                 options.PopupShowTimeWithChildren = true;
                 options.PopupShowTrivial = true;
             }).AddEntityFramework();
+            services.AddBundling().UseDefaults(_env).UseNUglify().EnableCacheHeader(TimeSpan.FromHours(1));
             services.AddMapper().AddAutofac().AddMyMvc().Configure<ForwardedHeadersOptions>(options => // X-Forwarded-For
             {
                 options.ForwardLimit = null;
@@ -174,7 +177,7 @@ namespace Masuit.MyBlogs.Core
             {
                 CommonHelper.SystemSettings.TryAdd(key, value);
             }
-
+            app.UseBundles();
             UseLuceneSearch(env, hangfire, luceneIndexerOptions);
             if (bool.Parse(Configuration["Https:Enabled"]))
             {

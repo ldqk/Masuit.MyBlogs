@@ -99,5 +99,101 @@ namespace Masuit.MyBlogs.Core.Extensions
             });
             return services;
         }
+
+        /// <summary>
+        /// 添加静态资源打包
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseBundles(this IApplicationBuilder app)
+        {
+            app.UseBundling(bundles =>
+            {
+                bundles.AddCss("/main.css")
+                    .Include("/Content/bootstrap.min.css")
+                    .Include("/fonts/icomoon.min.css")
+                    .Include("/Content/jquery.paging.css")
+                    .Include("/Content/common/reset.css")
+                    .Include("/Content/common/loading.css")
+                    .Include("/Content/common/style.css")
+                    .Include("/Content/common/articlestyle.css")
+                    .Include("/Content/common/leaderboard.css")
+                    .Include("/Content/microtip.min.css")
+                    .Include("/Assets/breadcrumb/style.css")
+                    .Include("/Assets/nav/css/style.css")
+                    .Include("/Assets/tippy/tippy.css");
+                bundles.AddCss("/filemanager.css")
+                    .Include("/Content/bootswatch.min.css")
+                    .Include("/fonts/icomoon.min.css")
+                    .Include("/ng-views/filemanager/css/animations.css")
+                    .Include("/ng-views/filemanager/css/dialogs.css")
+                    .Include("/ng-views/filemanager/css/main.css")
+                    .Include("/Content/common/loading.min.css");
+                bundles.AddCss("/dashboard.css")
+                    .Include("/Assets/jedate/jedate.min.css")
+                    .Include("/Assets/fileupload/filestyle.min.css")
+                    .Include("/Assets/select3/bundle.min.css")
+                    .Include("/Content/ng-table.min.css")
+                    .Include("/Content/common/loading.min.css")
+                    .Include("/Content/microtip.min.css")
+                    .Include("/Content/checkbox.min.css")
+                    .Include("/ng-views/css/app.css");
+                bundles.AddCss("/article.css")
+                    .Include("/Assets/jquery.tocify/jquery.tocify.min.css")
+                    .Include("/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css")
+                    .Include("/Assets/share/share.css")
+                    .Include("/Assets/highlight/css/highlight.css");
+
+                bundles.AddJs("/main.js").Include("/Scripts/bootstrap.min.js")
+                    .Include("/Scripts/bootstrap-suggest.min.js")
+                    .Include("/Scripts/jquery.query.js")
+                    .Include("/Scripts/jquery.paging.js")
+                    .Include("/Scripts/ripplet.js")
+                    .Include("/Scripts/global/scripts.js")
+                    .Include("/Assets/tippy/tippy.js")
+                    .Include("/Assets/newsbox/jquery.bootstrap.newsbox.js")
+                    .Include("/Assets/tagcloud/js/tagcloud.js")
+                    .Include("/Assets/scrolltop/js/scrolltop.js")
+                    .Include("/Assets/nav/js/main.js");
+                bundles.AddJs("/filemanager.js")
+                    .Include("/Scripts/ng-file-upload.min.js")
+                    .Include("/Scripts/bootstrap.min.js")
+                    .Include("/ng-views/filemanager/js/app.js")
+                    .Include("/ng-views/filemanager/js/directives/directives.js")
+                    .Include("/ng-views/filemanager/js/filters/filters.js")
+                    .Include("/ng-views/filemanager/js/providers/config.js")
+                    .Include("/ng-views/filemanager/js/entities/chmod.js")
+                    .Include("/ng-views/filemanager/js/entities/item.js")
+                    .Include("/ng-views/filemanager/js/services/apihandler.js")
+                    .Include("/ng-views/filemanager/js/services/apimiddleware.js")
+                    .Include("/ng-views/filemanager/js/services/filenavigator.js")
+                    .Include("/ng-views/filemanager/js/providers/translations.js")
+                    .Include("/ng-views/filemanager/js/controllers/main.js")
+                    .Include("/ng-views/filemanager/js/controllers/selector-controller.js");
+                bundles.AddJs("/dashboard.js")
+                    .Include("/Scripts/ng-file-upload.js")
+                    .Include("/Scripts/tm.pagination.js")
+                    .Include("/Scripts/ng-table.js")
+                    .Include("/Scripts/signalr.js")
+                    .Include("/Assets/select3/select3-full.js")
+                    .Include("/Assets/jedate/jquery.jedate.js")
+                    .Include("/ng-views/app/app.config.js")
+                    .Include("/ng-views/app/route.config.js")
+                    .Include("/ng-views/app/angular-ueditor.js")
+                    .Include("/ng-views/app/template.js")
+                    .Include("/ng-views/app/form.js")
+                    .Include("/ng-views/controllers/main.js");
+                bundles.AddJs("/article.js")
+                    .Include("/Assets/share/jquery.qrcode.min.js")
+                    .Include("/Assets/share/jquery.share.min.js")
+                    .Include("/Assets/highlight/js/highlight.js")
+                    .Include("/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js")
+                    .Include("/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js")
+                    .Include("/Assets/jquery.tocify/jquery.tocify.js")
+                    .Include("/Scripts/global/article.js")
+                    .Include("/Assets/highlight/js/highlight.js");
+            });
+            return app;
+        }
     }
 }
