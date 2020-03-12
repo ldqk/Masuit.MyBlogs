@@ -263,15 +263,15 @@ function CopyrightProtect() {
                     return false;
                 }
             });
-            $("body").on("keydown",function (e) {
-                var evt = e || window.event;
-                var currKey = evt.keyCode || evt.which || evt.charCode;
-                if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) { //禁止F12，Ctrl+A，Ctrl+U
+            document.onkeydown = function (e) {
+                var currKey = 0, evt = e || window.event;
+                currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
                     evt.cancelBubble = true;
                     evt.returnValue = false;
                     return false;
                 }
-            });
+            }
             $(".article-content").on("dragstart",function (e) {
                 e.returnValue = false;
                 return false;
@@ -331,15 +331,15 @@ function GlobalCopyrightProtect() {
                     return false;
                 }
             });
-            $("body").on("keydown",function (e) {
-                var evt = e || window.event;
-                var currKey = evt.keyCode || evt.which || evt.charCode;
-                if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) { //禁止F12，Ctrl+A，Ctrl+U
+            document.onkeydown = function (e) {
+                var currKey = 0, evt = e || window.event;
+                currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
                     evt.cancelBubble = true;
                     evt.returnValue = false;
                     return false;
                 }
-            });
+            }
             $(".article-content").on("dragstart",function (e) {
                 e.returnValue = false;
                 return false;
