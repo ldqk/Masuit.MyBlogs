@@ -124,6 +124,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var posts = PostService.GetQuery<PostDto>(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedList(page, size);
             var viewModel = GetIndexPageViewModel();
             ViewBag.Author = author;
+            ViewBag.Total = posts.TotalCount;
             viewModel.Posts = posts;
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, OrderBy.ModifyDate);
             return View(viewModel);

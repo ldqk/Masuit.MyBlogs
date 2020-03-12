@@ -130,6 +130,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/ng-views/filemanager/css/main.css")
                     .Include("/Content/common/loading.min.css");
                 bundles.AddCss("/dashboard.css")
+                    .Include("/fonts/icomoon.min.css")
                     .Include("/Assets/jedate/jedate.min.css")
                     .Include("/Assets/fileupload/filestyle.min.css")
                     .Include("/Assets/select3/bundle.min.css")
