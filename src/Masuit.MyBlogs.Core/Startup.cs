@@ -135,7 +135,7 @@ namespace Masuit.MyBlogs.Core
                 options.PopupShowTimeWithChildren = true;
                 options.PopupShowTrivial = true;
             }).AddEntityFramework();
-            services.AddBundling().UseDefaults(_env).UseNUglify().EnableCacheHeader(TimeSpan.FromHours(1));
+            services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
             services.AddMapper().AddAutofac().AddMyMvc().Configure<ForwardedHeadersOptions>(options => // X-Forwarded-For
             {
                 options.ForwardLimit = null;
