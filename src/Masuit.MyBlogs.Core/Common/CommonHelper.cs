@@ -9,11 +9,13 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using Masuit.Tools.Media;
 #if !DEBUG
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Models;
@@ -291,6 +293,32 @@ namespace Masuit.MyBlogs.Core.Common
         public static string TrimQuery(this string path)
         {
             return path.Split('&').Where(s => s.Split('=', StringSplitOptions.RemoveEmptyEntries).Length == 2).Join("&");
+        }
+
+        /// <summary>
+        /// 添加水印
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static Stream AddWatermark(this Stream stream)
+        {
+            if (!string.IsNullOrEmpty(SystemSettings.GetOrAdd("Watermark", string.Empty)))
+            {
+                try
+                {
+                    var watermarker = new ImageWatermarker(stream)
+                    {
+                        SkipWatermarkForSmallImages = true,
+                        SmallImagePixelsThreshold = 40000
+                    };
+                    return watermarker.AddWatermark(SystemSettings["Watermark"], Color.LightGray, WatermarkPosition.BottomRight, 30);
+                }
+                catch
+                {
+                    //
+                }
+            }
+            return stream;
         }
     }
 }

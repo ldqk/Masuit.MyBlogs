@@ -50,6 +50,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(uploadFileName).ToLower()))
                 {
                     var stream = file.OpenReadStream();
+                    stream = stream.AddWatermark();
                     var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath).Result;
                     if (success)
                     {
@@ -65,6 +66,8 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                         Result.Url = savePath;
                     }
                     Result.State = UploadState.Success;
+                    stream.Close();
+                    stream.Dispose();
                 }
                 else
                 {

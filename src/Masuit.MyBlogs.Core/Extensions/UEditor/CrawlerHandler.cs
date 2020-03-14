@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -28,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 return WriteJson(new
                 {
                     state = "SUCCESS",
-                    list = sources.AsParallel().Select(s => new Crawler(s).Fetch()).Select(x => new
+                    list = sources.AsParallel().Select(s => new Crawler(s).Fetch().Result).Select(x => new
                     {
                         state = x.State,
                         source = x.SourceUrl,
@@ -59,7 +60,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             SourceUrl = sourceUrl;
         }
 
-        public Crawler Fetch()
+        public async Task<Crawler> Fetch()
         {
             if (!SourceUrl.IsExternalAddress())
             {
@@ -68,7 +69,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             }
             try
             {
-                var response = _httpClient.GetAsync(SourceUrl).Result;
+                using var response = _httpClient.GetAsync(SourceUrl).Result;
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
                     State = "Url returns " + response.StatusCode;
@@ -76,8 +77,9 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 }
 
                 ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), UeditorConfig.GetString("catcherPathFormat"));
-                using var stream = response.Content.ReadAsStreamAsync().Result;
+                var stream = response.Content.ReadAsStreamAsync().Result;
                 var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
+                stream = stream.AddWatermark();
                 var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath).Result;
                 if (success)
                 {
@@ -94,7 +96,8 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     stream.CopyTo(ms);
                     File.WriteAllBytes(savePath, ms.GetBuffer());
                 }
-
+                stream.Close();
+                await stream.DisposeAsync();
                 State = "SUCCESS";
             }
             catch (Exception e)

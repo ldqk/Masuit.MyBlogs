@@ -15,15 +15,15 @@
     string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
     Advertisement ad = ViewBag.Ads;
 }
-<script src="https://cdn.staticfile.org/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdn.staticfile.org/jqueryui/1.12.1/jquery-ui.min.js" async defer></script>
 <environment names="Development">
     <link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
     <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
     <link href="~/Assets/share/share.css" rel="stylesheet" />
     <link href="~/Assets/highlight/css/highlight.css" rel="stylesheet" />
-    <script src="~/Assets/share/jquery.qrcode.min.js"></script>
-    <script src="~/Assets/share/jquery.share.min.js"></script>
-    <script src="~/Assets/highlight/js/highlight.js"></script>
+    <script src="~/Assets/share/jquery.qrcode.min.js" async defer></script>
+    <script src="~/Assets/share/jquery.share.min.js" async defer></script>
+    <script src="~/Assets/highlight/js/highlight.js" async defer></script>
 </environment>
 <environment names="Stage,Production">
     @await Styles.RenderAsync("/bundles/article.css")
