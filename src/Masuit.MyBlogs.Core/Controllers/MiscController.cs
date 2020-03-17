@@ -160,7 +160,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetPageData(int page = 1, int size = 10)
         {
-            var list = MiscService.GetPagesFromCache(page, size, n => true, n => n.ModifyDate, false);
+            var list = MiscService.GetPages(page, size, n => true, n => n.ModifyDate, false);
             return Ok(list);
         }
 

@@ -19,6 +19,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using WilderMinds.RssSyndication;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -389,22 +390,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Save(Broadcast model)
+        public async Task<ActionResult> Save(Broadcast model)
         {
             model.UpdateTime = DateTime.Now;
-            var entry = BroadcastService.Get(c => c.Email.Equals(model.Email));
-            bool b;
-            if (entry is null)
-            {
-                b = BroadcastService.AddEntitySaved(model) != null;
-            }
-            else
-            {
-                entry.Email = model.Email;
-                entry.SubscribeType = model.SubscribeType;
-                entry.UpdateTime = DateTime.Now;
-                b = BroadcastService.SaveChanges() > 0;
-            }
+            var b = await BroadcastService.AddOrUpdateSavedAsync(c => c.Id, model) > 0;
             return ResultData(model, b, b ? "更新订阅成功！" : "更新订阅失败！");
         }
 
@@ -460,7 +449,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(b => b.Email.Contains(search));
             }
 
-            var list = BroadcastService.GetPagesFromCache(page, size, @where, b => b.UpdateTime, false);
+            var list = BroadcastService.GetPagesNoTracking(page, size, @where, b => b.UpdateTime, false);
             return Ok(list);
         }
 

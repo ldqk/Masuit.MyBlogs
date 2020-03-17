@@ -30,7 +30,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id">广告id</param>
         /// <returns></returns>
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int}"), ResponseCache(Duration = 3600)]
         public async Task<IActionResult> Redirect(int id)
         {
             var ad = await AdsService.GetByIdAsync(id) ?? throw new NotFoundException("推广链接不存在");
@@ -57,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(kw) || p.Description.Contains(kw));
             }
 
-            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Price).ThenByDescending(a => a.Weight).ToCachedPagedList<Advertisement, AdvertisementViewModel>(page, size, MapperConfig);
+            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Price).ThenByDescending(a => a.Weight).ToPagedList<Advertisement, AdvertisementViewModel>(page, size, MapperConfig);
             var cids = list.Data.Where(m => !string.IsNullOrEmpty(m.CategoryIds)).SelectMany(m => m.CategoryIds.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)).Distinct().ToArray();
             var dic = CategoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionary(c => c.Id + "", c => c.Name);
             foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
@@ -77,16 +77,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<IActionResult> Save(AdvertisementDto model)
         {
             model.CategoryIds = model.CategoryIds?.Replace("null", "");
-            var entity = await AdsService.GetByIdAsync(model.Id);
-            if (entity != null)
-            {
-                Mapper.Map(model, entity);
-                bool b1 = await AdsService.SaveChangesAsync() > 0;
-                return ResultData(null, b1, b1 ? "修改成功" : "修改失败");
-            }
-
-            bool b = await AdsService.AddEntitySavedAsync(model.Mapper<Advertisement>()) > 0;
-            return ResultData(null, b, b ? "添加成功" : "添加失败");
+            var b = await AdsService.AddOrUpdateSavedAsync(a => a.Id, model.Mapper<Advertisement>()) > 0;
+            return ResultData(null, b, b ? "保存成功" : "保存失败");
         }
 
         /// <summary>

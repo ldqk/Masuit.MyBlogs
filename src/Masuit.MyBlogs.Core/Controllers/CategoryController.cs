@@ -1,5 +1,4 @@
-﻿using EFSecondLevelCache.Core;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Command;
@@ -29,7 +28,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600)]
         public ActionResult GetCategories()
         {
-            var list = CategoryService.GetQuery<string, CategoryDto>(c => c.Status == Status.Available, c => c.Name).Cacheable().ToList();
+            var list = CategoryService.GetQuery<string, CategoryDto>(c => c.Status == Status.Available, c => c.Name).ToList();
             return ResultData(list);
         }
 
@@ -73,7 +72,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public async Task<ActionResult> Edit(CategoryCommand dto)
         {
-            Category cat = await CategoryService.GetByIdAsync(dto.Id) ?? throw new NotFoundException("分类不存在！");
+            var cat = await CategoryService.GetByIdAsync(dto.Id) ?? throw new NotFoundException("分类不存在！");
             cat.Name = dto.Name;
             cat.Description = dto.Description;
             bool b = await CategoryService.SaveChangesAsync() > 0;

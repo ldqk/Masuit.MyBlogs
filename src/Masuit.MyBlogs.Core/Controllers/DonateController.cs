@@ -25,7 +25,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
         {
-            var list = DonateService.GetPagesFromCache(page, size, d => true, d => d.DonateTime, false);
+            var list = DonateService.GetPages(page, size, d => true, d => d.DonateTime, false);
             return Ok(list);
         }
 
@@ -47,24 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public async Task<ActionResult> Save(Donate donate)
         {
-            var entry = await DonateService.GetByIdAsync(donate.Id);
-            bool b;
-            if (entry is null)
-            {
-                b = await DonateService.AddEntitySavedAsync(donate) > 0;
-            }
-            else
-            {
-                entry.NickName = donate.NickName;
-                entry.Amount = donate.Amount;
-                entry.DonateTime = donate.DonateTime;
-                entry.Email = donate.Email;
-                entry.EmailDisplay = donate.EmailDisplay;
-                entry.QQorWechat = donate.QQorWechat;
-                entry.QQorWechatDisplay = donate.QQorWechatDisplay;
-                entry.Via = donate.Via;
-                b = await DonateService.SaveChangesAsync() > 0;
-            }
+            var b = await DonateService.AddOrUpdateSavedAsync(d => d.Id, donate) > 0;
             return ResultData(null, b, b ? "保存成功！" : "保存失败！");
         }
 
