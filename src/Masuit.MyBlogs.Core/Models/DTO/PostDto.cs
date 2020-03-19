@@ -58,6 +58,16 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public bool IsFixedTop { get; set; }
 
         /// <summary>
+        /// 禁止评论
+        /// </summary>
+        public bool DisableComment { get; set; }
+
+        /// <summary>
+        /// 禁止转载
+        /// </summary>
+        public bool DisableCopy { get; set; }
+
+        /// <summary>
         /// 作者邮箱
         /// </summary>
         public string Email { get; set; }
