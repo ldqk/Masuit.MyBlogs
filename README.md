@@ -10,11 +10,11 @@ masuit.com个人博客站项目源码，高性能低占用的博客系统，这�
 ### 前端请求支援
 目前网站前端页面的代码比较零乱，到处都是，大家想吐槽的尽管吐槽吧，也想找个人帮忙设计下整体的前端页面，有兴趣愿意贡献代码的的小伙伴，欢迎Pull Request吧！😂😂
 ### 开发环境
-操作系统：Windows 10 1903  
+操作系统：Windows 10 1909  
 IDE：Visual Studio 2019 Enterprise 16.5  
 数据库：SQL Server 2017/MySQL 8.0  
 Redis：redis-server-windows 3.2  
-运行时：.NET Core 3.1
+运行时：必须是.NET Core 3.1 
 ### 当前运行环境
 操作系统：Windows Server 2008 R2/Linux+docker  
 数据库：SQL Server 2012 express/MySQL 8.0  
