@@ -1,4 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools.Core.AspNetCore;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -46,6 +47,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 创建时间
         /// </summary>
+        [UpdateIgnore]
         public DateTime CreateTime { get; set; }
 
         /// <summary>
@@ -72,6 +74,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 访问次数
         /// </summary>
+        [UpdateIgnore]
         public int ViewCount { get; set; }
 
         public string CategoryIds { get; set; }
