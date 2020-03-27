@@ -1,5 +1,4 @@
-﻿using EFSecondLevelCache.Core;
-using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+﻿using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -49,20 +48,20 @@ namespace Masuit.MyBlogs.Core.Controllers
                 p.Title,
                 p.PostDate,
                 p.Author
-            }).Cacheable();
+            }).ToList();
             var msgs = LeaveMessageService.GetQuery(m => m.Status == Status.Pending).Select(p => new
             {
                 p.Id,
                 p.PostDate,
                 p.NickName
-            }).Cacheable();
+            }).ToList();
             var comments = CommentService.GetQuery(c => c.Status == Status.Pending).Select(p => new
             {
                 p.Id,
                 p.CommentDate,
                 p.PostId,
                 p.NickName
-            }).Cacheable();
+            }).ToList();
             return ResultData(new
             {
                 post,

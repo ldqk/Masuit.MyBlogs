@@ -28,11 +28,6 @@ namespace Masuit.MyBlogs.Core.Hubs
         public double CpuLoad { get; set; }
 
         /// <summary>
-        /// CPU核心温度
-        /// </summary>
-        public double Temperature { get; set; }
-
-        /// <summary>
         /// 内存使用率
         /// </summary>
         public double MemoryUsage { get; set; }
@@ -190,7 +185,6 @@ namespace Masuit.MyBlogs.Core.Hubs
             {
                 Time = time,
                 CpuLoad = load,
-                Temperature = temperature,
                 MemoryUsage = mem,
                 DiskRead = read,
                 DiskWrite = write,

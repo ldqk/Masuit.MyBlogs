@@ -2,10 +2,12 @@
 using Masuit.MyBlogs.Core.Hubs;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core
 {
@@ -13,6 +15,10 @@ namespace Masuit.MyBlogs.Core
     {
         public static void Main(string[] args)
         {
+            QueryCacheManager.DefaultMemoryCacheEntryOptions = new MemoryCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            };
             MyHub.Init();
             CreateWebHostBuilder(args).Build().Run();
         }

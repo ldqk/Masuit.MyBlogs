@@ -1,5 +1,4 @@
-﻿using EFSecondLevelCache.Core;
-using Hangfire;
+﻿using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine.Extensions;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.LuceneEFCore.SearchEngine.Linq;
@@ -197,7 +196,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult Publish()
         {
-            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().Cacheable().AsParallel().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
+            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().ToList().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
             ViewBag.Category = CategoryService.GetQueryFromCache(c => c.Status == Status.Available).ToList();
             return View(list);
         }
@@ -257,7 +256,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult GetTag()
         {
-            var list = Enumerable.AsEnumerable(PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().Cacheable()).SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
+            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().ToList().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
             return ResultData(list);
         }
 
@@ -268,20 +267,20 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("all"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult All()
         {
-            var tags = Enumerable.AsEnumerable(PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Cacheable()).SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToList(); //tag
+            var tags = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).ToList().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToList(); //tag
             ViewBag.tags = tags.GroupBy(t => t).OrderByDescending(g => g.Count()).ThenBy(g => g.Key);
             ViewBag.cats = CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
                 Id = c.Id,
                 Name = c.Name,
                 Count = c.Post.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin)
-            }).Cacheable().ToList(); //category
+            }).ToList(); //category
             ViewBag.seminars = SeminarService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
                 Id = c.Id,
                 Name = c.Title,
                 Count = c.Post.Count(p => p.Post.Status == Status.Pended || CurrentUser.IsAdmin)
-            }).Cacheable().ToList(); //seminars
+            }).ToList(); //seminars
             return View();
         }
 

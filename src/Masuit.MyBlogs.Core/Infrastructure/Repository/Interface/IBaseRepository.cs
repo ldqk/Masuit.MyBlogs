@@ -1,5 +1,4 @@
-﻿using EFSecondLevelCache.Core;
-using Masuit.MyBlogs.Core.Models.Entity;
+﻿using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools.Models;
 using System;
 using System.Collections.Generic;
@@ -27,7 +26,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// 从二级缓存获取所有实体
         /// </summary>
         /// <returns>还未执行的SQL语句</returns>
-        EFCachedDbSet<T> GetAllFromCache();
+        IEnumerable<T> GetAllFromCache();
 
         /// <summary>
         /// 获取所有实体

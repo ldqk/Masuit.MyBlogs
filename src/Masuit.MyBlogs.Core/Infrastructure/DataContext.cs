@@ -1,9 +1,6 @@
-﻿using EFSecondLevelCache.Core;
-using EFSecondLevelCache.Core.Contracts;
-using Masuit.MyBlogs.Core.Models.Entity;
+﻿using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Masuit.MyBlogs.Core.Infrastructure
 {
@@ -46,15 +43,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             });
             modelBuilder.Entity<SeminarPostHistoryVersion>().Property(s => s.SeminarId).HasColumnName("Seminar_Id");
             modelBuilder.Entity<SeminarPostHistoryVersion>().Property(s => s.PostHistoryVersionId).HasColumnName("PostHistoryVersion_Id");
-        }
-
-        public override int SaveChanges()
-        {
-            ChangeTracker.DetectChanges();
-            var changedEntityNames = this.GetChangedEntityNames();
-            var result = base.SaveChanges();
-            this.GetService<IEFCacheServiceProvider>().InvalidateCacheDependencies(changedEntityNames);
-            return result;
         }
 
         public virtual DbSet<Broadcast> Broadcast { get; set; }

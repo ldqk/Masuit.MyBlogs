@@ -89,11 +89,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                     c.Time,
                     c.MemoryUsage
                 }),
-                temp = MyHub.PerformanceCounter.Select(c => new[]
-                {
-                    c.Time,
-                    c.Temperature
-                }),
                 read = MyHub.PerformanceCounter.Select(c => new[]
                 {
                     c.Time,

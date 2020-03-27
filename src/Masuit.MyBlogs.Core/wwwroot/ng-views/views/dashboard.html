@@ -24,9 +24,11 @@
                             </tr>
                             <tr>
                                 <td>CPU型号</td>
-                                <th colspan="2">{{cpu.Type}}</th>
-                                <td>CPU位宽</td>
-                                <th colspan="2">{{cpu.DataWidth}} 位</th>
+                                <th>{{cpu.Type}}</th>
+                                <td>CPU基础频率</td>
+                                <th>{{cpu.CurrentClockSpeed}} MHz</th>
+                                <td>CPU睿频</td>
+                                <th>{{cpu.MaxClockSpeed}} MHz</th>
                             </tr>
                             <tr>
                                 <td>CPU个数</td>
@@ -35,14 +37,6 @@
                                 <th>{{cpu.NumberOfCores}} 核心</th>
                                 <td>CPU线程数</td>
                                 <th>{{cpu.NumberOfLogicalProcessors}} 线程</th>
-                            </tr>
-                            <tr>
-                                <td>CPU基础频率</td>
-                                <th>{{cpu.CurrentClockSpeed}} MHz</th>
-                                <td>CPU睿频</td>
-                                <th>{{cpu.MaxClockSpeed}} MHz</th>
-                                <td>CPU温度</td>
-                                <th>{{cpu.Temperature}} ℃</th>
                             </tr>
                             <tr>
                                 <td>CPU当前频率</td>
@@ -101,10 +95,9 @@
             <h3 class="text-center">性能实时监控</h3>
         </div>
         <div class="row">
-            <div id="container-speed" class="col-md-3" style="height: 200px;"></div>
-            <div id="container-rpm" class="col-md-3" style="height: 200px;"></div>
-            <div id="container-temp" class="col-md-3" style="height: 200px;"></div>
-            <div id="container-io" class="col-md-3" style="height: 200px;"></div>
+            <div id="container-speed" class="col-md-4" style="height: 200px;"></div>
+            <div id="container-rpm" class="col-md-4" style="height: 200px;"></div>
+            <div id="container-io" class="col-md-4" style="height: 200px;"></div>
         </div>
     </div>
     <div>

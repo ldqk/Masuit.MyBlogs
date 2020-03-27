@@ -16,16 +16,6 @@
     }
 })(jQuery);
 $(function() {
-    window.ifvisible.blur(function() {
-        $("body").animate({
-                opacity: 0.5
-            }, 100);
-    });
-    window.ifvisible.wakeup(function(e) {
-        $("body").animate({
-                opacity: 1
-            }, 100);
-    });
     popBrowserTips();
     $("img").lazyload({
         effect: "fadeIn", //渐现，show(直接显示),fadeIn(淡入),slideDown(下拉)

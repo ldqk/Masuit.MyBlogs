@@ -1,5 +1,4 @@
-﻿using EFSecondLevelCache.Core;
-using Masuit.LuceneEFCore.SearchEngine.Linq;
+﻿using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Repository;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -18,6 +17,7 @@ using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -166,9 +166,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 1 => nameof(OrderBy.VoteUpCount),
                 2 => nameof(OrderBy.AverageViewCount),
                 _ => nameof(OrderBy.TotalViewCount)
-            } + " desc").Skip(0).Take(5).Cacheable().ToList(); //热门文章
+            } + " desc").Skip(0).Take(5).FromCache().ToList(); //热门文章
             var newdic = new Dictionary<string, int>(); //标签云最终结果
-            var tagdic = postsQuery.Where(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().Cacheable().AsParallel().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).ToDictionary(g => g.Key, g => g.Count()); //统计标签
+            var tagdic = postsQuery.Where(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().FromCache().AsParallel().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).ToDictionary(g => g.Key, g => g.Count()); //统计标签
 
             if (tagdic.Any())
             {

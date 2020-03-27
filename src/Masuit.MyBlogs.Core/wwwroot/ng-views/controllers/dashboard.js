@@ -6,7 +6,6 @@
 	var iodata = [];
 	var currentCpuLoad = 0;
 	var currentMemUsage = 0;
-	var currentTemper = 0;
 	var currentRead = 0;
 	var currentWrite = 0;
 	var currentUp = 0;
@@ -25,13 +24,11 @@
 		window.hub.start().then(() => {
 		    window.hub.stream("Counter", 5000).subscribe({
 			    next: (item) => {
-			        loadsdata.push([item.time,item.cpuLoad,item.memoryUsage,item.temperature]);
+			        loadsdata.push([item.time,item.cpuLoad,item.memoryUsage]);
 					currentCpuLoad = item.cpuLoad;
 					currentMemUsage = item.memoryUsage;
-					currentTemper = item.temperature;
 					$scope.cpu.CpuLoad = currentCpuLoad;
 					$scope.memory.MemoryUsage = currentMemUsage;
-					$scope.cpu.Temperature = currentTemper;
 
 					iodata.push([item.time,item.diskRead,item.diskWrite]);
 					currentRead = item.diskRead;
@@ -177,13 +174,6 @@
 					},
 					min: 0,
 					opposite: false
-				}, {
-					title: {
-						text: 'CPU内核温度（℃）'
-					},
-					min: 30,
-					max:90,
-					opposite: true
 				}
 			],
 			exporting: {
@@ -240,8 +230,7 @@
 				formatter: function() {
 					return '时间点：<b>' + Highcharts.dateFormat("%H:%M:%S", this.points[0].x) + '</b><br/>' +
 						'<span style="color:' + Highcharts.getOptions().colors[0] +  '">CPU使用率：<b>' + Highcharts.numberFormat(this.points[0].y, 2) + '%</b></span><br/>' +
-						'<span style="color:' + Highcharts.getOptions().colors[1] +'">内存使用率：<b>' + Highcharts.numberFormat(this.points[1].y, 2) + '%</b></span><br/>' +
-						'<span style="color:' + Highcharts.getOptions().colors[2] +'">CPU内核温度：<b>' + Highcharts.numberFormat(this.points[2].y, 0) + '℃</b></span><br/>';
+						'<span style="color:' + Highcharts.getOptions().colors[1] +'">内存使用率：<b>' + Highcharts.numberFormat(this.points[1].y, 2) + '%</b></span><br/>';
 				},
 				crosshairs: true,
 				shared: true
@@ -260,14 +249,6 @@
 				tooltip: {
 					valueSuffix: ' %'
 				}
-			}, {
-				name: 'CPU温度',
-				yAxis: 1,
-				data: data.temp,
-				type: 'spline',
-				tooltip: {
-					valueSuffix: '℃'
-				}
 			}]
 		});
 		Highcharts.stockChart("io",{
@@ -283,8 +264,7 @@
 					load: function() {
 						var series1 = this.series[0],
 							series2 = this.series[1],
-							series3 = this.series[2],
-							series4 = this.series[3];
+							series3 = this.series[2];
 						setInterval(function() {
 							let io = iodata.pop();
 							let net = netdata.pop();
@@ -292,7 +272,6 @@
 								series1.addPoint([io[0], io[1]], true, true);
 								series2.addPoint([io[0], io[2]], true, true);
 								series3.addPoint([net[0], net[2]], true, true);
-								series4.addPoint([net[0], net[2]], true, true);
 							}
 						}, 2000);
 					}
@@ -539,32 +518,6 @@
 			}
 		}]
 	}));
-	$('#container-temp').highcharts(Highcharts.merge(gaugeOptions, {
-		yAxis: {
-			min: 0,
-			max: 100,
-			title: {
-				text: 'CPU当前温度'
-			}
-		},
-		boost: {
-			useGPUTranslations: true
-		},
-		credits: {
-			enabled: false
-		},
-		series: [{
-			name: 'CPU当前温度',
-			data: [1],
-			dataLabels: {
-				format: '<div style="text-align:center"><span style="font-size:25px;color:' +
-					((Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black') + '">{y}℃</span><br/>'
-			},
-			tooltip: {
-				valueSuffix: ' ℃'
-			}
-		}]
-	}));
 	$('#container-io').highcharts(Highcharts.merge(gaugeOptions, {
 		yAxis: {
 			min: 0,
@@ -600,11 +553,6 @@
 		if (chart) {
 			point = chart.series[0].points[0];
 			point.update(currentMemUsage);
-		}
-		chart = $('#container-temp').highcharts();
-		if (chart) {
-			point = chart.series[0].points[0];
-			point.update(currentTemper);
 		}
 		chart = $('#container-io').highcharts();
 		if (chart) {

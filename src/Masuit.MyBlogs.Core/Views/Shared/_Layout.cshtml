@@ -24,12 +24,12 @@
     <meta name="keywords" content="@(CommonHelper.SystemSettings["Keyword"]+","+ViewBag.Keyword)" />
     <meta name="description" content="@(CommonHelper.SystemSettings["Description"]+","+ViewBag.Keyword)" />
     @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Styles", ""))
-    <link href="https://cdn.staticfile.org/normalize/8.0.1/normalize.min.css" rel="stylesheet">
-    <link href="https://cdn.staticfile.org/limonte-sweetalert2/6.11.5/sweetalert2.min.css" rel="stylesheet">
-    <link href="https://cdn.staticfile.org/notie/4.3.1/notie.min.css" rel="stylesheet">
-    <link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="https://cdn.staticfile.org/animate.css/3.7.0/animate.min.css" rel="stylesheet">
-    <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
+    <link href="https://cdn.staticfile.org/normalize/8.0.1/normalize.min.css" rel="stylesheet" async>
+    <link href="https://cdn.staticfile.org/limonte-sweetalert2/6.11.5/sweetalert2.min.css" rel="stylesheet" async>
+    <link href="https://cdn.staticfile.org/notie/4.3.1/notie.min.css" rel="stylesheet" async>
+    <link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" async>
+    <link href="https://cdn.staticfile.org/animate.css/3.7.0/animate.min.css" rel="stylesheet" async>
+    <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" async>
     <environment names="Development">
         <link href="~/Content/bootstrap.min.css" rel="stylesheet">
         <link href="~/fonts/icomoon.min.css" rel="stylesheet" />
@@ -56,9 +56,7 @@
     <script src="https://cdn.staticfile.org/jquery.form/4.2.2/jquery.form.min.js" async defer></script>
     <script src="https://cdn.staticfile.org/jquery-mobile/1.4.5/jquery.mobile.min.js"></script>
     <script src="https://cdn.staticfile.org/linq.js/2.2.0.2/linq.min.js" async defer></script>
-    <script src="https://cdn.staticfile.org/wow/1.1.2/wow.min.js" async defer></script>
-    <script src="https://cdn.staticfile.org/ifvisible/1.0.6/ifvisible.min.js" async defer></script>
-    <script src="https://cdn.staticfile.org/jquery_lazyload/1.9.7/jquery.lazyload.min.js" async defer></script>
+    <script src="https://cdn.staticfile.org/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
     <script src="~/Scripts/layer/layer.js"></script>
     <script src="~/Assets/layui/layui.min.js"></script>
     <environment names="Development">
