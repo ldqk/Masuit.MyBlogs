@@ -16,11 +16,7 @@
 	};
 	this.GetPageData = function(page, size) {
 		$scope.loading();
-		$http.get("/merge", {
-			page,
-			size,
-			search:$scope.kw
-		}).then(function(res) {
+		$http.get("/merge?page="+page+"&size="+size+"&kw="+$scope.kw).then(function(res) {
 			$scope.paginationConf.currentPage = page;
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$("div[ng-table-pagination]").remove();

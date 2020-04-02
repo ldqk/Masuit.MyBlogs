@@ -10841,7 +10841,7 @@ a.lv-footer:hover {
 .table.table-inner {
   border: 0;
 }
-.table > thead > tr > th:first-child,
+/*.table > thead > tr > th:first-child,
 .table > tbody > tr > th:first-child,
 .table > tfoot > tr > th:first-child,
 .table > thead > tr > td:first-child,
@@ -10856,7 +10856,7 @@ a.lv-footer:hover {
 .table > tbody > tr > td:last-child,
 .table > tfoot > tr > td:last-child {
   padding-right: 30px;
-}
+}*/
 .table > tbody > tr.active > td,
 .table > tfoot > tr.active > td,
 .table > tbody > tr.info > td,

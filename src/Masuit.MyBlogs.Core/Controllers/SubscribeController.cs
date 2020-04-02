@@ -73,7 +73,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var posts = PostService.GetQueryNoTracking(p => p.Status == Status.Pended && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
+            var posts = PostService.GetQueryNoTracking(p => p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
             {
                 Author = new Author
                 {
@@ -119,7 +119,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string scheme = Request.Scheme;
             var host = Request.Host;
             var category = CategoryService.GetById(id) ?? throw new NotFoundException("分类未找到");
-            var posts = PostService.GetQueryNoTracking(p => p.CategoryId == id && p.Status == Status.Pended && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
+            var posts = PostService.GetQueryNoTracking(p => p.CategoryId == id && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
             {
                 Author = new Author
                 {
@@ -163,7 +163,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var p = PostService.Get(p => p.Status == Status.Pended && p.Id == id) ?? throw new NotFoundException("文章未找到");
+            var p = PostService.Get(p => p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章未找到");
             var summary = p.Content.GetSummary(300, 50);
             var item = new Item()
             {
@@ -209,7 +209,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var post = PostService.Get(p => p.Status == Status.Pended && p.Id == id) ?? throw new NotFoundException("文章不存在");
+            var post = PostService.Get(p => p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章不存在");
             var start = DateTime.Today.AddDays(-7);
             var comments = CommentService.GetQuery(c => c.PostId == post.Id && c.CommentDate > start).Select(c => new Item()
             {

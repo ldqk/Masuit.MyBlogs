@@ -1,4 +1,5 @@
-﻿@using Masuit.MyBlogs.Core.Common
+﻿@using System.Diagnostics
+@using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.Entity
 @model Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion[]
 @{
@@ -86,7 +87,7 @@
                             @if (ads.Any())
                             {
                                 <section class="protected">
-                                    <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ads[0].Id" target="_blank">
+                                    <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ads[0].Id" target="_blank" id="@Stopwatch.GetTimestamp()">
                                         <h3>
                                             @ads[0].Title
                                             <span class="text-red">[推广]</span>
@@ -172,7 +173,7 @@
                             @if (ads.Count > 1)
                             {
                                 <section class="protected">
-                                    <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ads[1].Id" target="_blank">
+                                    <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ads[1].Id" target="_blank" id="@Stopwatch.GetTimestamp()">
                                         <h3>
                                             @ads[1].Title
                                             <span class="text-red">[推广]</span>

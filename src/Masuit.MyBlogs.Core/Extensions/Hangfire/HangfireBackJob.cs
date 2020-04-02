@@ -97,7 +97,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="p"></param>
         public void PublishPost(Post p)
         {
-            p.Status = Status.Pended;
+            p.Status = Status.Published;
             p.PostDate = DateTime.Now;
             p.ModifyDate = DateTime.Now;
             var post = _postService.GetById(p.Id);
@@ -107,7 +107,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             }
             else
             {
-                post.Status = Status.Pended;
+                post.Status = Status.Published;
                 post.PostDate = DateTime.Now;
                 post.ModifyDate = DateTime.Now;
                 _postService.SaveChanges();
@@ -226,7 +226,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             {
                 nameof(DataContext.Post),
             });
-            var list = _searchEngine.Context.Post.Where(i => i.Status != Status.Pended).ToList();
+            var list = _searchEngine.Context.Post.Where(i => i.Status != Status.Published).ToList();
             _searchEngine.LuceneIndexer.Delete(list);
         }
 

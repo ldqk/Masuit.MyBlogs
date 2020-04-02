@@ -1,4 +1,5 @@
-﻿@using Masuit.MyBlogs.Core.Common
+﻿@using System.Diagnostics
+@using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
@@ -14,7 +15,7 @@
 <link href="~/Assets/banner/bootstrap-touch-slider.min.css" rel="stylesheet" />
 @if (Model.Banner.Any())
 {
-    <div id="bootstrap-touch-slider" class="carousel bs-slider fade  control-round indicators-line" data-ride="carousel" data-pause="hover" data-interval="5000">
+    <div id="bootstrap-touch-slider" class="carousel bs-slider fade  control-round indicators-line" data-ride="carousel" data-pause="hover" data-interval="5000" id="@Stopwatch.GetTimestamp()">
         <ol class="carousel-indicators">
             @for (int i = 0; i < Model.Banner.Count; i++)
             {
@@ -28,13 +29,13 @@
                 }
             }
         </ol>
-        <div class="carousel-inner" role="listbox">
+        <div class="carousel-inner" role="listbox" id="@Stopwatch.GetTimestamp()">
             @for (int i = 0; i < Model.Banner.Count; i++)
             {
                 var p = Model.Banner[i];
                 string[] ani = { "zoomInRight", "flipInX", "fadeInLeft", "lightSpeedIn", "fadeInUp", "zoomInLeft", "fadeInRight" };
                 Random r = new Random();
-                <div class="item @(i == 0 ? "active" : "")" class="img-responsive">
+                <div class="item @(i == 0 ? "active" : "")" class="img-responsive" id="@Stopwatch.GetTimestamp()">
                     <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@p.Id" target="_blank" data-animation="animated @ani[r.Next(ani.Length)]">
                         <img src="@p.ImageUrl" title="@p.Title" alt="@p.Description" />
                     </a>

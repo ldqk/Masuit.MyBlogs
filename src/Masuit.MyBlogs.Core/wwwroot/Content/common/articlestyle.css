@@ -170,8 +170,12 @@ article table > tbody > tr > th.danger:hover,
 article table > tbody > tr.danger:hover > td,
 article table > tbody > tr:hover > .danger,
 article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
-
-.label a { color: white; }
+.syntaxhighlighter table {
+    margin-bottom: 0 !important;
+}
+.label a {
+    color: white;
+}
 
 .border {
     border: #ccc 1px solid;

@@ -35,7 +35,7 @@ namespace Masuit.MyBlogs.Core.Models.Enum
         /// <summary>
         /// 已发表
         /// </summary>
-        [Display(Name = "已发表")] Pended,
+        [Display(Name = "已发表")] Published,
 
         /// <summary>
         /// 订阅中

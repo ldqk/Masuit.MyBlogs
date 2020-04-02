@@ -47,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie"), Route("msg")]
         public ActionResult Index()
         {
-            ViewBag.TotalCount = LeaveMessageService.Count(m => m.ParentId == 0 && m.Status == Status.Pended);
+            ViewBag.TotalCount = LeaveMessageService.Count(m => m.ParentId == 0 && m.Status == Status.Published);
             return CurrentUser.IsAdmin ? View("Index_Admin") : View();
         }
 
@@ -78,13 +78,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                 }
             }
-            var parent = LeaveMessageService.GetPagesNoTracking(page, size, m => m.ParentId == 0 && (m.Status == Status.Pended || CurrentUser.IsAdmin), m => m.PostDate, false);
+            var parent = LeaveMessageService.GetPagesNoTracking(page, size, m => m.ParentId == 0 && (m.Status == Status.Published || CurrentUser.IsAdmin), m => m.PostDate, false);
             if (!parent.Data.Any())
             {
                 return ResultData(null, false, "没有留言");
             }
             total = parent.TotalCount;
-            var qlist = parent.Data.SelectMany(c => LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(c.Id)).Where(c => c.Status == Status.Pended || CurrentUser.IsAdmin);
+            var qlist = parent.Data.SelectMany(c => LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(c.Id)).Where(c => c.Status == Status.Published || CurrentUser.IsAdmin);
             if (total > 0)
             {
                 return ResultData(new
@@ -122,7 +122,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var msg = dto.Mapper<LeaveMessage>();
             if (Regex.Match(dto.Content, CommonHelper.ModRegex).Length <= 0)
             {
-                msg.Status = Status.Pended;
+                msg.Status = Status.Published;
             }
 
             msg.PostDate = DateTime.Now;
@@ -134,7 +134,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 msg.Email = user.Email;
                 if (user.IsAdmin)
                 {
-                    msg.Status = Status.Pended;
+                    msg.Status = Status.Published;
                     msg.IsMaster = true;
                 }
             }
@@ -152,7 +152,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             HttpContext.Session.Set("msg", msg.Content.RemoveHtmlTag().Trim());
             var email = CommonHelper.SystemSettings["ReceiveEmail"];
             var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/notify.html").Replace("{{title}}", "网站留言板").Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Replace("{{nickname}}", msg.NickName).Replace("{{content}}", msg.Content);
-            if (msg.Status == Status.Pended)
+            if (msg.Status == Status.Published)
             {
                 if (!msg.IsMaster)
                 {
@@ -200,7 +200,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Pass(int id)
         {
             var msg = LeaveMessageService.GetById(id);
-            msg.Status = Status.Pended;
+            msg.Status = Status.Published;
             bool b = LeaveMessageService.SaveChanges() > 0;
 #if !DEBUG
             var pid = msg.ParentId == 0 ? msg.Id : LeaveMessageService.GetParentMessageIdByChildId(id);

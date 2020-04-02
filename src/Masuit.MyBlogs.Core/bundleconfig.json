@@ -82,5 +82,11 @@
     "inputFiles": [
       "wwwroot/ng-views/controllers/dashboard.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/ng-views/css/app.min.css",
+    "inputFiles": [
+      "wwwroot/ng-views/css/app.css"
+    ]
   }
 ]

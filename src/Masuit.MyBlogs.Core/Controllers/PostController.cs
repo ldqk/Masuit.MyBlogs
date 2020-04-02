@@ -62,11 +62,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/{kw}"), Route("{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Details(int id, string kw)
         {
-            var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             ViewBag.Keyword = post.Keyword + "," + post.Label;
             var modifyDate = post.ModifyDate;
-            ViewBag.Next = PostService.GetFromCache<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.Status == Status.Pended || CurrentUser.IsAdmin), p => p.ModifyDate);
-            ViewBag.Prev = PostService.GetFromCache<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.Status == Status.Pended || CurrentUser.IsAdmin), p => p.ModifyDate, false);
+            ViewBag.Next = PostService.GetFromCache<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate);
+            ViewBag.Prev = PostService.GetFromCache<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate, false);
             if (!string.IsNullOrEmpty(kw))
             {
                 ViewData["keywords"] = post.Content.Contains(kw) ? $"['{kw}']" : SearchEngine.LuceneIndexSearcher.CutKeywords(kw).ToJsonString();
@@ -97,7 +97,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history"), Route("{id:int}/history/{page:int}/{size:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> History(int id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 20)
         {
-            var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             ViewBag.Primary = post;
             var list = PostHistoryVersionService.GetPages(page, size, v => v.PostId == id, v => v.ModifyDate, false);
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
@@ -130,7 +130,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "v1", "v2" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
         {
-            var post = PostService.Get(p => p.Id == id && (p.Status == Status.Pended || CurrentUser.IsAdmin));
+            var post = PostService.Get(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
             var main = post.Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
             var left = v1 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
             var right = v2 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
@@ -273,13 +273,13 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 Id = c.Id,
                 Name = c.Name,
-                Count = c.Post.Count(p => p.Status == Status.Pended || CurrentUser.IsAdmin)
+                Count = c.Post.Count(p => p.Status == Status.Published || CurrentUser.IsAdmin)
             }).ToList(); //category
             ViewBag.seminars = SeminarService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
                 Id = c.Id,
                 Name = c.Title,
-                Count = c.Post.Count(p => p.Post.Status == Status.Pended || CurrentUser.IsAdmin)
+                Count = c.Post.Count(p => p.Post.Status == Status.Published || CurrentUser.IsAdmin)
             }).ToList(); //seminars
             return View();
         }
@@ -476,7 +476,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Pass(int id)
         {
             Post post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            post.Status = Status.Pended;
+            post.Status = Status.Published;
             post.ModifyDate = DateTime.Now;
             post.PostDate = DateTime.Now;
             bool b = PostService.SaveChanges() > 0;
@@ -539,7 +539,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Restore(int id)
         {
             var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            post.Status = Status.Pended;
+            post.Status = Status.Published;
             bool b = PostService.SaveChanges() > 0;
             SearchEngine.LuceneIndexer.Add(post);
             return ResultData(null, b, b ? "恢复成功！" : "恢复失败！");
@@ -641,8 +641,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 编辑
         /// </summary>
         /// <param name="post"></param>
-        /// <param name="notify"></param>
-        /// <param name="reserve"></param>
+        /// <param name="notify">是否通知订阅</param>
+        /// <param name="reserve">是否保留历史版本</param>
         /// <returns></returns>
         [HttpPost, MyAuthorize]
         public async Task<ActionResult> Edit(PostCommand post, bool notify = true, bool reserve = true)
@@ -673,7 +673,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             Post p = PostService.GetById(post.Id);
-            if (reserve)
+            if (reserve && p.Status == Status.Published)
             {
                 var history = p.Mapper<PostHistoryVersion>();
                 p.PostHistoryVersion.Add(history);
@@ -775,7 +775,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 post.ProtectContent = null;
             }
 
-            post.Status = Status.Pended;
+            post.Status = Status.Published;
             Post p = post.Mapper<Post>();
             p.Modifier = p.Author;
             p.ModifierEmail = p.Email;

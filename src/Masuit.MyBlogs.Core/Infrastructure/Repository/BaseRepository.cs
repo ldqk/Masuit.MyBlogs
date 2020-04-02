@@ -52,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             return DataContext.Set<T>().FromCache(new MemoryCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
         }
 
@@ -75,7 +75,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCache(new MemoryCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
         }
 
@@ -114,7 +114,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             return GetAll(orderby, isAsc).FromCache(new MemoryCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
         }
 
@@ -143,7 +143,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache(new MemoryCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
         }
 
@@ -179,7 +179,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             return DataContext.Set<T>().Where(@where).FromCache(new MemoryCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
         }
 
@@ -195,7 +195,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             return GetQuery(where, orderby, isAsc).FromCache(new MemoryCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
         }
 
@@ -255,7 +255,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             return DataContext.Set<T>().Where(@where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCache(new MemoryCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
         }
 
@@ -272,7 +272,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             return GetQueryNoTracking(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache(new MemoryCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             });
         }
 
@@ -731,7 +731,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
 
             var list = query.Skip(size * (page - 1)).Take(size).FromCache(new MemoryCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             }).ToList();
             return new PagedList<T>(list, page, size, totalCount);
         }
@@ -788,7 +788,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
 
             var list = query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).FromCache(new MemoryCacheEntryOptions()
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
             }).ToList();
             return new PagedList<TDto>(list, page, size, totalCount);
         }

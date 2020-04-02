@@ -1,4 +1,5 @@
-﻿@using Masuit.MyBlogs.Core.Models.Entity
+﻿@using System.Diagnostics
+@using Masuit.MyBlogs.Core.Models.Entity
 @model Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion
 @{
     ViewBag.Title = Model.Post.Title + "于" + Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss") + "的历史版本：" + Model.Title;
@@ -127,7 +128,7 @@
                 @if (ad != null)
                 {
                     <section class="protected">
-                        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank">
+                        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
                             <h3>
                                 @ad.Title
                                 <span class="text-red">[推广]</span>

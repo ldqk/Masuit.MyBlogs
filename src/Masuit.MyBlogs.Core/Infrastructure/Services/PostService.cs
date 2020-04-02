@@ -38,7 +38,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             }
 
             var searchResult = SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
-            var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Pended).ToList();
+            var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).ToList();
             var ids = entities.Select(s => s.Entity.Id).ToArray();
             var dic = GetQuery<PostDto>(p => ids.Contains(p.Id)).ToDictionary(p => p.Id);
             var posts = entities.Select(s =>
@@ -140,7 +140,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override Post AddEntitySaved(Post t)
         {
             t = base.AddEntity(t);
-            SearchEngine.SaveChanges(t.Status == Status.Pended);
+            SearchEngine.SaveChanges(t.Status == Status.Published);
             return t;
         }
 
@@ -152,7 +152,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override Task<int> AddEntitySavedAsync(Post t)
         {
             base.AddEntity(t);
-            return SearchEngine.SaveChangesAsync(t.Status == Status.Pended);
+            return SearchEngine.SaveChangesAsync(t.Status == Status.Published);
         }
 
         /// <summary>

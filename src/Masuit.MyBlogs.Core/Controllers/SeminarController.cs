@@ -47,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index(int id, [Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
         {
             var s = SeminarService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            var posts = PostService.GetQuery<PostDto>(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Pended || CurrentUser.IsAdmin)).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedList(page, size);
+            var posts = PostService.GetQuery<PostDto>(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Published || CurrentUser.IsAdmin)).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedList(page, size);
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;

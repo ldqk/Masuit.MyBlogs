@@ -1,4 +1,5 @@
-﻿@using System.Web
+﻿@using System.Diagnostics
+@using System.Web
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
@@ -129,7 +130,7 @@
                 @if (ad != null)
                 {
                     <section class="protected">
-                        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank">
+                        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
                             <h3>
                                 @ad.Title
                                 <span class="text-red">[推广]</span>
@@ -228,7 +229,7 @@
                     </p>
                 </section>
                 @{
-                    var posts = Model.Category.Post.Where(p => p.Status == Status.Pended && p.Id != Model.Id).OrderBy(p => Guid.NewGuid()).ToList();
+                    var posts = Model.Category.Post.Where(p => p.Status == Status.Published && p.Id != Model.Id).OrderBy(p => Guid.NewGuid()).ToList();
                     int count = posts.Count >= 10 ? 10 : posts.Count;
                     if (posts.Any())
                     {
@@ -270,7 +271,7 @@
                             </div>
                         </form>
                         <ul class="wow media-list"></ul>
-                        @if (Model.Comment.Any(c => c.Status == Status.Pended))
+                        @if (Model.Comment.Any(c => c.Status == Status.Published))
                         {
                             <div class="row">
                                 <div class="col-md-12 text-center">
@@ -340,7 +341,7 @@
 		loading();
 		$('#pageToolbar').Paging({ //异步加载评论
 			pagesize: 10,
-			count: @Model.Comment.Count(c =>c.ParentId==0&& c.Status==Status.Pended),
+			count: @Model.Comment.Count(c =>c.ParentId==0&& c.Status==Status.Published),
 			toolbar: true,
 			callback: function(page, size, count) {
 				window.post("/comment/getcomments", {

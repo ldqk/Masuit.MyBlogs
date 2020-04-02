@@ -1,4 +1,5 @@
-﻿@using Masuit.MyBlogs.Core.Common
+﻿@using System.Diagnostics
+@using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.Tools.Html
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
@@ -83,8 +84,8 @@
                 <div class="panel-heading">
                     @ad.Title
                 </div>
-                <div class="panel-body">
-                    <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank">
+                <div class="panel-body" id="@Stopwatch.GetTimestamp()">
+                    <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
                         <img class="img img-responsive" src="@ad.ThumbImgUrl" alt="@ad.Title" title="@ad.Title" />
                     </a>
                 </div>

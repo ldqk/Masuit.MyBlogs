@@ -63,7 +63,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var comment = dto.Mapper<Comment>();
             if (Regex.Match(dto.Content, CommonHelper.ModRegex).Length <= 0)
             {
-                comment.Status = Status.Pended;
+                comment.Status = Status.Published;
             }
 
             comment.CommentDate = DateTime.Now;
@@ -75,7 +75,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 comment.Email = user.Email;
                 if (user.IsAdmin)
                 {
-                    comment.Status = Status.Pended;
+                    comment.Status = Status.Published;
                     comment.IsMaster = true;
                 }
             }
@@ -98,7 +98,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Replace("{{nickname}}", comment.NickName)
                 .Replace("{{content}}", comment.Content);
-            if (comment.Status == Status.Pended)
+            if (comment.Status == Status.Published)
             {
                 if (!comment.IsMaster)
                 {
@@ -158,7 +158,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
 
-            var cm = await CommentService.GetAsync(c => c.Id == id && c.Status == Status.Pended) ?? throw new NotFoundException("评论不存在！");
+            var cm = await CommentService.GetAsync(c => c.Id == id && c.Status == Status.Published) ?? throw new NotFoundException("评论不存在！");
             cm.VoteCount++;
             bool b = CommentService.SaveChanges() > 0;
             if (b)
@@ -198,13 +198,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                 }
             }
-            var parent = CommentService.GetPagesFromCache(page, size, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Pended || CurrentUser.IsAdmin), c => c.CommentDate, false);
+            var parent = CommentService.GetPagesFromCache(page, size, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Published || CurrentUser.IsAdmin), c => c.CommentDate, false);
             if (!parent.Data.Any())
             {
                 return ResultData(null, false, "没有评论");
             }
             total = parent.TotalCount;
-            var result = parent.Data.SelectMany(c => CommentService.GetSelfAndAllChildrenCommentsByParentId(c.Id).Where(x => (x.Status == Status.Pended || CurrentUser.IsAdmin))).ToList();
+            var result = parent.Data.SelectMany(c => CommentService.GetSelfAndAllChildrenCommentsByParentId(c.Id).Where(x => (x.Status == Status.Published || CurrentUser.IsAdmin))).ToList();
             if (total > 0)
             {
                 return ResultData(new
@@ -228,7 +228,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Pass(int id)
         {
             Comment comment = await CommentService.GetByIdAsync(id) ?? throw new NotFoundException("评论不存在！");
-            comment.Status = Status.Pended;
+            comment.Status = Status.Published;
             Post post = await PostService.GetByIdAsync(comment.PostId);
             bool b = await CommentService.SaveChangesAsync() > 0;
             if (b)

@@ -1,13 +1,14 @@
-﻿@model Masuit.MyBlogs.Core.Models.Entity.Advertisement
+﻿@using System.Diagnostics
+@model Masuit.MyBlogs.Core.Models.Entity.Advertisement
 <div class="ibox">
-    <div class="ibox-content">
-        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank">
+    <div class="ibox-content" id="@Stopwatch.GetTimestamp()">
+        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
             <h4>
                 <i class="text-red size18">[荐]</i>
                 @Model.Title
             </h4>
         </a>
-        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank">
+        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
             <div class="row padding-bot10">
                 @{
                     string imgSrc = Model.ThumbImgUrl;
