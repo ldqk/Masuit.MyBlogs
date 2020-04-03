@@ -1,10 +1,12 @@
 ﻿@using Masuit.MyBlogs.Core.Common
+@using Masuit.MyBlogs.Core.Models.Entity
 @model List<Masuit.MyBlogs.Core.Models.Entity.Donate>
 
 @{
     ViewBag.Title = "网站打赏";
     Layout = "~/Views/Shared/_Layout.cshtml";
     Random r = new Random();
+    List<Advertisement> ads = ViewBag.Ads;
 }
 <style>
     .bg-title {
@@ -49,6 +51,14 @@
             您的捐助就是给我最大的鼓励
         </p>
     </div>
+</div>
+<div class="container">
+    <p class="text-red size20">
+        如果你现在正好需要一台显示器，可以到我的<a href="https://shop123472283.taobao.com/" target="_blank">淘宝店铺</a>进行选购以表支持本站发展。
+    </p>
+    <p class="text-red size20">
+        或点击本站任意形式的广告链接，如果是你需要的软件或服务，也可以购买表示对本站的支持！
+    </p>
 </div>
 <div class="container-fluid">
     <div class="row">
@@ -130,6 +140,23 @@
     </table>
     <tm-pagination conf="paginationConf"></tm-pagination>
 </div>
+@if (ads.Count == 2)
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                @{
+                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[0]);
+                }
+            </div>
+            <div class="col-md-6">
+                @{
+                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[1]);
+                }
+            </div>
+        </div>
+    </div>
+}
 <script>
     var app = angular.module('myApp', ["ngTable", "tm.pagination"]);
     app.config(["$httpProvider", function ($httpProvider) {

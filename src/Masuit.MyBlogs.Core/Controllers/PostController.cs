@@ -23,7 +23,6 @@ using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -228,7 +227,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
             post.Status = Status.Pending;
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes());
-            ViewBag.CategoryId = new SelectList(CategoryService.GetQueryNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
+            //ViewBag.CategoryId = new SelectList(CategoryService.GetQueryNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
             Post p = post.Mapper<Post>();
             p.IP = ClientIP;
             p.Modifier = p.Author;

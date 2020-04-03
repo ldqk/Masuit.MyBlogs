@@ -3,6 +3,7 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
@@ -51,6 +52,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("donate")]
         public ActionResult Donate()
         {
+            ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage);
             return CurrentUser.IsAdmin ? View("Donate_Admin") : View();
         }
 
