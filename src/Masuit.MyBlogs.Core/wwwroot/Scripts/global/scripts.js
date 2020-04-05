@@ -195,7 +195,7 @@ $(function() {
     var nid = window.localStorage.getItem("notice") || '0';
     window.fetch("/notice/last", {
         credentials: 'include',
-        method: 'POST',
+        method: 'GET',
         mode: 'cors'
     }).then(function(response) {
         return response.json();
@@ -238,16 +238,22 @@ function loading() {
 function loadingDone() {
     $(".loading1").hide();
 }
+var clearSelect= "getSelection" in window ? function(){
+ window.getSelection().removeAllRanges();
+} : function(){
+ document.selection.empty();
+};
 
 /**禁止复制 */
 function CopyrightProtect() {
     setInterval(function() {
         try {
-            disableDevTools();
+            (function() {}["constructor"]("debugger")());
             $(".article-content").on("keydown",function (e) {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
                 if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85)) { //禁止F12，Ctrl+C，Ctrl+U
+                    clearSelect();
                     evt.cancelBubble = true;
                     evt.returnValue = false;
                     return false;
@@ -257,15 +263,15 @@ function CopyrightProtect() {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
                 if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
+                    clearSelect();
                     evt.cancelBubble = true;
                     evt.returnValue = false;
                     return false;
                 }
             }
-            $(".article-content").on("dragstart",function (e) {
-                e.returnValue = false;
+            document.ondragstart=function () {
                 return false;
-            });
+            }
             $(".article-content").on("copy",function (e) {
                 e.returnValue = false;
                 return false;
@@ -277,18 +283,19 @@ function CopyrightProtect() {
         } catch (ex) {
             console.error(ex);
         }
-    },100);
+    },500);
 }
 
 /**禁止编辑器内复制 */
 function CopyrightProtect4Editor() {
     setInterval(function() {
         try {
-            disableDevTools();
+            (function() {}["constructor"]("debugger")());
             document.getElementById("ueditor_0").contentWindow.document.body.onkeydown = function (e) {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
                 if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && currKey == 88) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
+                    clearSelect();
                     evt.cancelBubble = true;
                     evt.returnValue = false;
                     return false;
@@ -305,17 +312,18 @@ function CopyrightProtect4Editor() {
         } catch (ex) {
             console.error(ex);
         }
-    },100);
+    },500);
 }
 /**禁止全局复制 */
 function GlobalCopyrightProtect() {
     setInterval(function() {
         try {
-            disableDevTools();
+            (function() {}["constructor"]("debugger")());
             $(".article-content").on("keydown",function (e) {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
                 if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83)|| (evt.ctrlKey && currKey == 85)) { //禁止F12，Ctrl+C，Ctrl+U
+                    clearSelect();
                     evt.cancelBubble = true;
                     evt.returnValue = false;
                     return false;
@@ -325,15 +333,15 @@ function GlobalCopyrightProtect() {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
                 if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
+                    clearSelect();
                     evt.cancelBubble = true;
                     evt.returnValue = false;
                     return false;
                 }
             }
-            $(".article-content").on("dragstart",function (e) {
-                e.returnValue = false;
+            document.ondragstart=function () {
                 return false;
-            });
+            }
             $(".article-content").on("copy",function (e) {
                 e.returnValue = false;
                 return false;
@@ -345,23 +353,9 @@ function GlobalCopyrightProtect() {
         } catch (ex) {
             console.error(ex);
         }
-    },100);
+    },500);
 }
-var disableDevTools=function() {
-    function doCheck(a) {
-        if (("" + a / a)["length"] !== 1 || a % 20 === 0) {
-            (function() {}
-            ["constructor"]("debugger")());
-        } else {
-            (function() {}
-            ["constructor"]("debugger")());
-        }
-        doCheck(++a);
-    }
-    try {
-        doCheck(0);
-    } catch (err) {}
-}
+
 function GetOperatingSystem(os) {
     if (os) {
         if (os.indexOf("Windows") >= 0) {

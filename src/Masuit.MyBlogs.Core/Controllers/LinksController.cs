@@ -194,6 +194,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="state"></param>
         /// <returns></returns>
         [HttpPost]
+        [MyAuthorize]
         public ActionResult ToggleWhitelist(int id, bool state)
         {
             Links link = LinksService.GetById(id);
@@ -209,6 +210,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="state"></param>
         /// <returns></returns>
         [HttpPost]
+        [MyAuthorize]
         public ActionResult ToggleRecommend(int id, bool state)
         {
             Links link = LinksService.GetById(id);
@@ -224,6 +226,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="state"></param>
         /// <returns></returns>
         [HttpPost]
+        [MyAuthorize]
         public ActionResult Toggle(int id, bool state)
         {
             Links link = LinksService.GetById(id);
