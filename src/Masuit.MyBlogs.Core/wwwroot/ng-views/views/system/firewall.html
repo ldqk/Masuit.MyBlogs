@@ -64,6 +64,22 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <span class="input-group-addon">UA标识限制：</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.UserAgentBlocked" ng-readonly="Settings.EnableDenyArea=='false'" placeholder="禁止的UserAgent，逗号分隔(MicroMessenger,QQ)" type="text" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <span class="input-group-addon">UA限制提示语：</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.UserAgentBlockedMsg" ng-readonly="Settings.EnableDenyArea=='false'" placeholder="当前浏览器不支持访问本站" type="text" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

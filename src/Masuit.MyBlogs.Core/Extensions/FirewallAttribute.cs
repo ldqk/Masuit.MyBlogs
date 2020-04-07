@@ -4,16 +4,17 @@ using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 
 namespace Masuit.MyBlogs.Core.Extensions
 {
@@ -36,6 +37,18 @@ namespace Masuit.MyBlogs.Core.Extensions
 
             if (CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true") == "false" || context.Filters.Any(m => m.ToString().Contains(nameof(AllowAccessFirewallAttribute))) || tokenValid)
             {
+                return;
+            }
+
+            if (request.Headers[HeaderNames.UserAgent].ToString().Contains(CommonHelper.SystemSettings.GetOrAdd("UserAgentBlocked", "").Split(new[] { ',', '|' }, StringSplitOptions.RemoveEmptyEntries)))
+            {
+                AccessDeny(ip, request, "UA黑名单");
+                context.Result = new ContentResult()
+                {
+                    Content = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlockedMsg", "当前浏览器不支持访问本站"),
+                    ContentType = ContentType.Html,
+                    StatusCode = 403
+                };
                 return;
             }
 
