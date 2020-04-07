@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using EFCoreSecondLevelCacheInterceptor;
+using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
@@ -19,7 +20,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using WilderMinds.RssSyndication;
-using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -91,7 +91,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
                 FullHtmlContent = p.Content.GetSummary(300, 50)
-            }).FromCache().ToList();
+            }).Cacheable().ToList();
             var feed = new Feed()
             {
                 Title = CommonHelper.SystemSettings["Title"],
@@ -137,7 +137,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
                 FullHtmlContent = p.Content.GetSummary(300, 50)
-            }).FromCache().ToList();
+            }).Cacheable().ToList();
             var feed = new Feed()
             {
                 Title = CommonHelper.SystemSettings["Domain"] + $":分类{category.Name}文章订阅",

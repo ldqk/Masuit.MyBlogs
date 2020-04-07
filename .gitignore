@@ -269,3 +269,4 @@ Test
 /Masuit.Tools
 /src/Masuit.MyBlogs.Core/lucene
 /src/Masuit.MyBlogs.Core/appsettings.prod.json
+/src/Masuit.MyBlogs.Core/Controllers/TestController.cs

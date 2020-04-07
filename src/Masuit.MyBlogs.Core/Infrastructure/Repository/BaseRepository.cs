@@ -1,18 +1,17 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository
 {
@@ -50,10 +49,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetAllFromCache()
         {
-            return DataContext.Set<T>().FromCache(new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            });
+            return DataContext.Set<T>().Cacheable();
         }
 
         /// <summary>
@@ -73,10 +69,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetAllFromCache<TDto>() where TDto : class
         {
-            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCache(new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            });
+            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig).Cacheable();
         }
 
         /// <summary>
@@ -112,10 +105,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetAllFromCache<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return GetAll(orderby, isAsc).FromCache(new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            });
+            return GetAll(orderby, isAsc).Cacheable();
         }
 
         /// <summary>
@@ -141,10 +131,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache(new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            });
+            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable();
         }
 
         /// <summary>
@@ -177,10 +164,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetQueryFromCache(Expression<Func<T, bool>> @where)
         {
-            return DataContext.Set<T>().Where(@where).FromCache(new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            });
+            return DataContext.Set<T>().Where(@where).Cacheable();
         }
 
         /// <summary>
@@ -193,10 +177,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return GetQuery(where, orderby, isAsc).FromCache(new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            });
+            return GetQuery(where, orderby, isAsc).Cacheable();
         }
 
         /// <summary>
@@ -253,10 +234,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体集合</returns>
         public virtual IEnumerable<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> @where) where TDto : class
         {
-            return DataContext.Set<T>().Where(@where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCache(new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            });
+            return DataContext.Set<T>().Where(@where).AsNoTracking().ProjectTo<TDto>(MapperConfig).Cacheable();
         }
 
         /// <summary>
@@ -270,10 +248,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return GetQueryNoTracking(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache(new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            });
+            return GetQueryNoTracking(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable();
         }
 
         /// <summary>
@@ -293,7 +268,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual T GetFromCache(Expression<Func<T, bool>> @where)
         {
-            return DataContext.Set<T>().Where(where).DeferredFirstOrDefault().Execute();
+            return DataContext.Set<T>().Where(where).Cacheable().FirstOrDefault();
         }
 
         /// <summary>
@@ -319,7 +294,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual T GetFromCache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).Where(where).DeferredFirstOrDefault().Execute() : DataContext.Set<T>().OrderByDescending(orderby).Where(where).DeferredFirstOrDefault().Execute();
+            return isAsc ? DataContext.Set<T>().OrderBy(orderby).Where(where).Cacheable().FirstOrDefault() : DataContext.Set<T>().OrderByDescending(orderby).Where(where).Cacheable().FirstOrDefault();
         }
 
         /// <summary>
@@ -333,7 +308,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>映射实体</returns>
         public virtual TDto GetFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ProjectTo<TDto>(MapperConfig).DeferredFirstOrDefault().Execute() : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ProjectTo<TDto>(MapperConfig).DeferredFirstOrDefault().Execute();
+            return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ProjectTo<TDto>(MapperConfig).Cacheable().FirstOrDefault() : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ProjectTo<TDto>(MapperConfig).Cacheable().FirstOrDefault();
         }
 
         /// <summary>
@@ -399,7 +374,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual TDto GetFromCache<TDto>(Expression<Func<T, bool>> @where) where TDto : class
         {
-            return DataContext.Set<T>().Where(where).ProjectTo<TDto>(MapperConfig).DeferredFirstOrDefault().Execute();
+            return DataContext.Set<T>().Where(where).ProjectTo<TDto>(MapperConfig).Cacheable().FirstOrDefault();
         }
 
         /// <summary>
@@ -729,10 +704,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
                 page = 1;
             }
 
-            var list = query.Skip(size * (page - 1)).Take(size).FromCache(new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            }).ToList();
+            var list = query.Skip(size * (page - 1)).Take(size).Cacheable().ToList();
             return new PagedList<T>(list, page, size, totalCount);
         }
 
@@ -786,10 +758,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
                 page = 1;
             }
 
-            var list = query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).FromCache(new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-            }).ToList();
+            var list = query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).Cacheable().ToList();
             return new PagedList<TDto>(list, page, size, totalCount);
         }
     }

@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Models.Entity;
+﻿using EFCoreSecondLevelCacheInterceptor;
+using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -14,6 +15,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.UseLazyLoadingProxies().UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+            optionsBuilder.AddInterceptors(new SecondLevelCacheInterceptor());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
