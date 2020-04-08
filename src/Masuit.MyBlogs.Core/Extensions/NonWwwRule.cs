@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Rewrite;
-using System;
 
 namespace Masuit.MyBlogs.Core.Extensions
 {
@@ -9,15 +8,15 @@ namespace Masuit.MyBlogs.Core.Extensions
         {
             var req = context.HttpContext.Request;
             var currentHost = req.Host;
-            if (currentHost.Host.Equals("127.0.0.1") || currentHost.Host.Equals("localhost", StringComparison.InvariantCultureIgnoreCase))
+            if (currentHost.Host.Equals("127.0.0.1") || currentHost.Host.Equals("localhost"))
             {
                 context.Result = RuleResult.ContinueRules;
                 return;
             }
 
-            if (req.Scheme.Equals("http") || currentHost.Host.Contains("www."))
+            if (req.Scheme.Equals("http") || currentHost.Host.StartsWith("www."))
             {
-                context.HttpContext.Response.Redirect("https://" + currentHost.Value.Replace("www.", string.Empty) + req.PathBase + req.Path + req.QueryString);
+                context.HttpContext.Response.Redirect("https://" + currentHost.Value[4..] + req.PathBase + req.Path + req.QueryString, true);
                 context.Result = RuleResult.EndResponse;
             }
         }
