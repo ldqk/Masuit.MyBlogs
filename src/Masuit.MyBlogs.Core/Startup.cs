@@ -98,7 +98,7 @@ namespace Masuit.MyBlogs.Core
                 opt.UseMySql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(3)).EnableDetailedErrors().EnableSensitiveDataLogging();
                 //opt.UseSqlServer(AppConfig.ConnString);
             }); //配置数据库
-            services.AddCors(opt => opt.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin())); //配置跨域
+            //services.AddCors(opt => opt.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin())); //配置跨域
             services.Configure<FormOptions>(options =>
             {
                 options.MultipartBodyLengthLimit = 104857600; // 100MB
@@ -204,7 +204,7 @@ namespace Masuit.MyBlogs.Core
                     new MyRestrictiveAuthorizationFilter()
                 }
             }); //配置hangfire
-            app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()); //配置跨域
+            //app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()); //配置跨域
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
             app.UseRouting(); // 放在 UseStaticFiles 之后
             app.UseEndpoints(endpoints =>
@@ -216,7 +216,7 @@ namespace Masuit.MyBlogs.Core
             HangfireJobInit.Start(); //初始化定时任务
         }
 
-        private static void UseLuceneSearch(IWebHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
+        private static void UseLuceneSearch(IHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
             Task.Run(() =>
             {

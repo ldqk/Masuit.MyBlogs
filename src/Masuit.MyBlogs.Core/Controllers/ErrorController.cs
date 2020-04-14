@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Linq;
 using System.Web;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -58,16 +59,16 @@ namespace Masuit.MyBlogs.Core.Controllers
                 switch (feature.Error)
                 {
                     case DbUpdateConcurrencyException ex:
-                        err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
+                        err = $"数据库并发更新异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
                         LogManager.Error(err, ex);
                         break;
                     case DbUpdateException ex:
-                        err = $"异常源：{ex.Source}，异常类型：{ex.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
+                        err = $"数据库更新时异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
                         LogManager.Error(err, ex);
                         break;
                     case AggregateException ex:
                         LogManager.Debug("↓↓↓" + ex.Message + "↓↓↓");
-                        ex.Handle(e =>
+                        ex.Flatten().Handle(e =>
                         {
                             LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t", e);
                             return true;

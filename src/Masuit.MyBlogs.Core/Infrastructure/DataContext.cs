@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Infrastructure
 {
@@ -45,6 +46,33 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             });
             modelBuilder.Entity<SeminarPostHistoryVersion>().Property(s => s.SeminarId).HasColumnName("Seminar_Id");
             modelBuilder.Entity<SeminarPostHistoryVersion>().Property(s => s.PostHistoryVersionId).HasColumnName("PostHistoryVersion_Id");
+        }
+
+        public override int SaveChanges()
+        {
+            DbUpdateConcurrencyException ex = null;
+            for (int i = 0; i < 5; i++)
+            {
+                try
+                {
+                    return base.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException e)
+                {
+                    ex = e;
+                    var entry = e.Entries.Single();
+                    var databaseValues = entry.GetDatabaseValues();
+                    var resolvedValues = databaseValues.Clone();
+                    entry.OriginalValues.SetValues(databaseValues);
+                    entry.CurrentValues.SetValues(resolvedValues);
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+
+            throw ex;
         }
 
         public virtual DbSet<Broadcast> Broadcast { get; set; }

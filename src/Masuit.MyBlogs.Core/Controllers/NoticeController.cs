@@ -5,13 +5,11 @@ using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -156,21 +154,17 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false);
             }
 
-            if (Request.Cookies.TryGetValue("last-notice", out var json))
+            if (Request.Cookies.TryGetValue("last-notice", out var id) && notice.Id.ToString() == id)
             {
-                var data = JsonConvert.DeserializeObject<NoticeDto>(json);
-                if (notice.Id == data.Id)
-                {
-                    return ResultData(data);
-                }
+                return ResultData(null, false);
             }
 
             notice.ViewCount += 1;
             NoticeService.SaveChanges();
             var dto = notice.Mapper<NoticeDto>();
-            Response.Cookies.Append("last-notice", dto.ToJsonString(), new CookieOptions()
+            Response.Cookies.Append("last-notice", dto.Id.ToString(), new CookieOptions()
             {
-                Expires = DateTime.Now.AddMonths(1)
+                Expires = DateTime.Now.AddYears(1)
             });
             return ResultData(dto);
         }

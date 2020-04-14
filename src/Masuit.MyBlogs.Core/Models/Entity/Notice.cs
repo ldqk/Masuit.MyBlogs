@@ -44,6 +44,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// ‰Ø¿¿»À ˝
         /// </summary>
+        [ConcurrencyCheck]
         public int ViewCount { get; set; }
     }
 }
