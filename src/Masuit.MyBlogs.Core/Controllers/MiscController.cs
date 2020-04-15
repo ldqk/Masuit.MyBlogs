@@ -65,7 +65,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("donatelist")]
         public ActionResult DonateList(int page = 1, int size = 10)
         {
-            var list = DonateService.GetPagesFromCache<DateTime, DonateDtoBase>(page, size, d => true, d => d.DonateTime, false);
+            var list = DonateService.GetPagesFromCache<DateTime, DonateDto>(page, size, d => true, d => d.DonateTime, false);
+            if (!CurrentUser.IsAdmin)
+            {
+                foreach (var item in list.Data)
+                {
+                    item.QQorWechat = item.QQorWechat.Mask();
+                    item.Email = item.Email.MaskEmail();
+                }
+            }
             return Ok(list);
         }
 

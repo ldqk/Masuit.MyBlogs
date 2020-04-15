@@ -25,16 +25,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string QQorWechat { get; set; }
 
         /// <summary>
-        /// 打赏人的显式邮箱
-        /// </summary>
-        public string EmailDisplay { get; set; }
-
-        /// <summary>
-        /// 打赏人的显式QQ或微信
-        /// </summary>
-        public string QQorWechatDisplay { get; set; }
-
-        /// <summary>
         /// 打赏金额
         /// </summary>
         public string Amount { get; set; }
