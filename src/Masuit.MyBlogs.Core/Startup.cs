@@ -214,6 +214,7 @@ namespace Masuit.MyBlogs.Core
                 endpoints.MapHub<MyHub>("/hubs");
             });
             HangfireJobInit.Start(); //初始化定时任务
+            Console.WriteLine("网站启动完成");
         }
 
         private static void UseLuceneSearch(IHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)

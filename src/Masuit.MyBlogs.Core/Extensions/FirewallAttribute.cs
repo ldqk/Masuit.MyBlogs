@@ -40,7 +40,9 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 
-            if (request.Headers[HeaderNames.UserAgent].ToString().Contains(CommonHelper.SystemSettings.GetOrAdd("UserAgentBlocked", "").Split(new[] { ',', '|' }, StringSplitOptions.RemoveEmptyEntries)))
+            var ua = request.Headers[HeaderNames.UserAgent] + "";
+            var blocked = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlocked", "").Split(new[] { ',', '|' }, StringSplitOptions.RemoveEmptyEntries);
+            if (ua.Contains(blocked))
             {
                 AccessDeny(ip, request, "UA黑名单");
                 context.Result = new ContentResult()
