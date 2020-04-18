@@ -129,7 +129,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "v1", "v2" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
         {
-            var post = PostService.Get(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
+            var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
             var main = post.Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
             var left = v1 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
             var right = v2 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
@@ -157,7 +157,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             Post post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             post.VoteDownCount = post.VoteDownCount + 1;
-            var b = PostService.SaveChanges() > 0;
+            var b = await PostService.SaveChangesAsync() > 0;
             if (b)
             {
                 HttpContext.Session.Set("post-vote" + id, id.GetBytes());
@@ -240,7 +240,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             await RedisHelper.ExpireAsync("code:" + p.Email, 1);
-            var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/publish.html")
+            var content = (await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/publish.html"))
                 .Replace("{{link}}", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
                 .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Replace("{{title}}", p.Title);
@@ -671,7 +671,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 post.ProtectContent = null;
             }
 
-            Post p = PostService.GetById(post.Id);
+            Post p = await PostService.GetByIdAsync(post.Id);
             if (reserve && p.Status == Status.Published)
             {
                 var history = p.Mapper<PostHistoryVersion>();
@@ -688,9 +688,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 var tmp = post.Seminars.Split(',').Distinct();
                 p.Seminar.Clear();
-                tmp.ForEach(s =>
+                foreach (var s in tmp)
                 {
-                    var seminar = SeminarService.Get(e => e.Title.Equals(s));
+                    var seminar = await SeminarService.GetAsync(e => e.Title.Equals(s));
                     if (seminar != null)
                     {
                         p.Seminar.Add(new SeminarPost()
@@ -701,10 +701,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                             SeminarId = seminar.Id
                         });
                     }
-                });
+                }
             }
 
-            bool b = SearchEngine.SaveChanges() > 0;
+            bool b = await SearchEngine.SaveChangesAsync() > 0;
             if (!b)
             {
                 return ResultData(null, false, "文章修改失败！");
@@ -782,10 +782,10 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (!string.IsNullOrEmpty(post.Seminars))
             {
                 var tmp = post.Seminars.Split(',').Distinct();
-                tmp.ForEach(s =>
+                foreach (var s in tmp)
                 {
                     var id = s.ToInt32();
-                    Seminar seminar = SeminarService.GetById(id);
+                    Seminar seminar = await SeminarService.GetByIdAsync(id);
                     p.Seminar.Add(new SeminarPost()
                     {
                         Post = p,
@@ -793,7 +793,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         Seminar = seminar,
                         SeminarId = seminar.Id
                     });
-                });
+                }
             }
 
             if (schedule)
@@ -811,7 +811,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             PostService.AddEntity(p);
-            bool b = SearchEngine.SaveChanges() > 0;
+            bool b = await SearchEngine.SaveChangesAsync() > 0;
             if (!b)
             {
                 return ResultData(null, false, "文章发表失败！");

@@ -138,7 +138,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            file.CopyTo(fs);
+            await file.CopyToAsync(fs);
         }
 
         #endregion
@@ -244,25 +244,24 @@ namespace Masuit.MyBlogs.Core.Controllers
             switch (file.ContentType)
             {
                 case var _ when file.ContentType.StartsWith("image"):
-                    var (url, success) = await ImagebedClient.UploadImage(file.OpenReadStream(), file.FileName);
-                    if (success)
                     {
-                        return ResultData(url);
-                    }
+                        var (url, success) = await ImagebedClient.UploadImage(file.OpenReadStream(), file.FileName);
+                        if (success)
+                        {
+                            return ResultData(url);
+                        }
 
-                    path = Path.Combine(HostEnvironment.WebRootPath, "upload", "images", filename);
-                    var dir = Path.GetDirectoryName(path);
-                    if (!Directory.Exists(dir))
-                    {
-                        Directory.CreateDirectory(dir);
-                    }
+                        path = Path.Combine(HostEnvironment.WebRootPath, "upload", "images", filename);
+                        var dir = Path.GetDirectoryName(path);
+                        if (!Directory.Exists(dir))
+                        {
+                            Directory.CreateDirectory(dir);
+                        }
 
-                    await using (var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                    {
-                        file.CopyTo(fs);
+                        await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                        await file.CopyToAsync(fs);
+                        break;
                     }
-
-                    break;
                 case var _ when file.ContentType.StartsWith("audio") || file.ContentType.StartsWith("video"):
                     path = Path.Combine(HostEnvironment.WebRootPath, "upload", "media", filename);
                     break;

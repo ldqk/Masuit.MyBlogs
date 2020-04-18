@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.Extensions.ExpressionMapping;
 using CacheManager.Core;
-using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Configs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -27,7 +26,6 @@ namespace Masuit.MyBlogs.Core.Extensions
         /// <returns></returns>
         public static IServiceCollection AddCacheConfig(this IServiceCollection services)
         {
-            services.AddEFSecondLevelCache(options => options.UseCacheManagerCoreProvider().DisableLogging(true));
             services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
             services.AddSingleton(new ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5)).Build());
             return services;

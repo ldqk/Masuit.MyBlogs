@@ -110,11 +110,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Edit(Notice notice)
         {
-            var entity = NoticeService.GetById(notice.Id) ?? throw new NotFoundException("公告已经被删除！");
+            var entity = await NoticeService.GetByIdAsync(notice.Id) ?? throw new NotFoundException("公告已经被删除！");
             entity.ModifyDate = DateTime.Now;
             entity.Title = notice.Title;
             entity.Content = await ImagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes());
-            bool b = NoticeService.SaveChanges() > 0;
+            bool b = await NoticeService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }
 

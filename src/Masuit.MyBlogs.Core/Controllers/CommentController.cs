@@ -93,7 +93,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var emails = new HashSet<string>();
             var email = CommonHelper.SystemSettings["ReceiveEmail"]; //站长邮箱
             emails.Add(email);
-            var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/notify.html")
+            var content = (await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/notify.html"))
                 .Replace("{{title}}", post.Title)
                 .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Replace("{{nickname}}", comment.NickName)
@@ -160,7 +160,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var cm = await CommentService.GetAsync(c => c.Id == id && c.Status == Status.Published) ?? throw new NotFoundException("评论不存在！");
             cm.VoteCount++;
-            bool b = CommentService.SaveChanges() > 0;
+            bool b = await CommentService.SaveChangesAsync() > 0;
             if (b)
             {
                 HttpContext.Session.Set("cm" + id, id.GetBytes());
@@ -177,7 +177,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="cid"></param>
         /// <returns></returns>
-        [HttpPost]
         public ActionResult GetComments(int? id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15, int cid = 0)
         {
             int total; //总条数，用于前台分页
@@ -198,7 +197,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                 }
             }
-            var parent = CommentService.GetPagesFromCache(page, size, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Published || CurrentUser.IsAdmin), c => c.CommentDate, false);
+            var parent = CommentService.GetPagesNoTracking(page, size, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Published || CurrentUser.IsAdmin), c => c.CommentDate, false);
             if (!parent.Data.Any())
             {
                 return ResultData(null, false, "没有评论");
@@ -235,7 +234,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 var pid = comment.ParentId == 0 ? comment.Id : CommentService.GetParentCommentIdByChildId(id);
 #if !DEBUG
-                var content = System.IO.File.ReadAllText(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html"))
+                var content = (await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")))
                     .Replace("{{title}}", post.Title)
                     .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                     .Replace("{{nickname}}", comment.NickName)

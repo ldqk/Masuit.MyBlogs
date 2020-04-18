@@ -87,20 +87,15 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
 
         private string GetStateString()
         {
-            switch (_state)
+            return _state switch
             {
-                case ResultState.Success:
-                    return "SUCCESS";
-                case ResultState.InvalidParam:
-                    return "参数不正确";
-                case ResultState.PathNotFound:
-                    return "路径不存在";
-                case ResultState.AuthorizError:
-                    return "文件系统权限不足";
-                case ResultState.IOError:
-                    return "文件系统读取错误";
-            }
-            return "未知错误";
+                ResultState.Success => "SUCCESS",
+                ResultState.InvalidParam => "参数不正确",
+                ResultState.PathNotFound => "路径不存在",
+                ResultState.AuthorizError => "文件系统权限不足",
+                ResultState.IOError => "文件系统读取错误",
+                _ => "未知错误"
+            };
         }
     }
 }

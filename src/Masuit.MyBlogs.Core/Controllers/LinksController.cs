@@ -71,7 +71,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     return ResultData(null, false, $"添加失败！检测到您的网站上未将本站设置成友情链接，请先将本站主域名：{CommonHelper.SystemSettings["Domain"]}在您的网站设置为友情链接，并且能够展示后，再次尝试添加即可！");
                 }
 
-                var entry = LinksService.Get(l => l.Url.Equals(links.Url));
+                var entry = await LinksService.GetAsync(l => l.Url.Equals(links.Url));
                 bool b;
                 if (entry is null)
                 {
@@ -83,7 +83,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     entry.Except = links.Except;
                     entry.Name = links.Name;
                     entry.Recommend = links.Recommend;
-                    b = LinksService.SaveChanges() > 0;
+                    b = await LinksService.SaveChangesAsync() > 0;
                 }
 
                 return ResultData(null, b, b ? "添加成功！这可能有一定的延迟，如果没有看到您的链接，请稍等几分钟后刷新页面即可，如有疑问，请联系站长。" : "添加失败！这可能是由于网站服务器内部发生了错误，如有疑问，请联系站长。");

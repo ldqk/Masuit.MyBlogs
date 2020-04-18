@@ -10,7 +10,7 @@ namespace Masuit.MyBlogs.Core.Common
     /// </summary>
     public static class HangfireHelper
     {
-        private static BackgroundJobClient Client { get; set; } = new BackgroundJobClient();
+        private static BackgroundJobClient Client { get; } = new BackgroundJobClient();
 
         /// <summary>
         /// 创建任务

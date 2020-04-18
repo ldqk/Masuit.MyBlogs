@@ -153,11 +153,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Edit(Misc misc)
         {
-            var entity = MiscService.GetById(misc.Id) ?? throw new NotFoundException("杂项页未找到");
+            var entity = await MiscService.GetByIdAsync(misc.Id) ?? throw new NotFoundException("杂项页未找到");
             entity.ModifyDate = DateTime.Now;
             entity.Title = misc.Title;
             entity.Content = await ImagebedClient.ReplaceImgSrc(misc.Content.ClearImgAttributes());
-            bool b = MiscService.SaveChanges() > 0;
+            bool b = await MiscService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }
 

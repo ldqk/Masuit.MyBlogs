@@ -72,7 +72,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             UserInfo userInfo = UserInfoService.GetById(id);
             userInfo.Avatar = path;
             bool b = UserInfoService.SaveChanges() > 0;
-            return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? $"头像修改成功。" : "头像修改失败！");
+            return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? "头像修改成功。" : "头像修改失败！");
         }
     }
 }
