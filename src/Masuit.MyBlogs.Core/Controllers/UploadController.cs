@@ -1,9 +1,9 @@
-﻿using HtmlAgilityPack;
+﻿using DocumentFormat.OpenXml.Packaging;
+using HtmlAgilityPack;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.UEditor;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
@@ -14,11 +14,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using OpenXmlPowerTools;
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -74,8 +77,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "文件格式不支持，只能上传doc或者docx的文档!");
             }
 
-            await using var ms = file.OpenReadStream().SaveAsMemoryStream();
-            var html = await SaveAsHtml(ms, file);
+            var html = await SaveAsHtml(file);
             if (html.Length < 10)
             {
                 return ResultData(null, false, "读取文件内容失败，请检查文件的完整性，建议另存后重新上传！");
@@ -92,10 +94,43 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Content = html
             });
         }
-
-        private async Task<string> SaveAsHtml(MemoryStream ms, IFormFile file)
+        private string ConvertToHtml(IFormFile file)
         {
-            var html = DocxToHtml.Docx.ConvertToHtml(ms);
+            using var ms = file.OpenReadStream();
+            using var fs = new FileStream(Path.Combine(Environment.GetEnvironmentVariable("temp") ??
+                "upload", file.FileName), FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            ms.CopyTo(fs);
+            using var doc = WordprocessingDocument.Open(fs, true);
+            var pageTitle = file.FileName;
+            var part = doc.CoreFilePropertiesPart;
+            if (part != null)
+            {
+                pageTitle ??= (string)part.GetXDocument().Descendants(DC.title).FirstOrDefault();
+            }
+
+            var settings = new HtmlConverterSettings()
+            {
+                PageTitle = pageTitle,
+                FabricateCssClasses = false,
+                RestrictToSupportedLanguages = false,
+                RestrictToSupportedNumberingFormats = false,
+                ImageHandler = imageInfo =>
+                {
+                    var stream = new MemoryStream();
+                    imageInfo.Bitmap.Save(stream, imageInfo.Bitmap.RawFormat);
+                    var base64String = Convert.ToBase64String(stream.ToArray());
+                    return new XElement(Xhtml.img, new XAttribute(NoNamespace.src, $"data:{imageInfo.ContentType};base64," + base64String), imageInfo.ImgStyleAttribute, imageInfo.AltText != null ? new XAttribute(NoNamespace.alt, imageInfo.AltText) : null);
+                }
+            };
+            var htmlElement = HtmlConverter.ConvertToHtml(doc, settings);
+            var html = new XDocument(new XDocumentType("html", null, null, null), htmlElement);
+            var htmlString = html.ToString(SaveOptions.DisableFormatting);
+            return htmlString;
+        }
+
+        private async Task<string> SaveAsHtml(IFormFile file)
+        {
+            var html = ConvertToHtml(file);
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
             var body = doc.DocumentNode.SelectSingleNode("//body");
