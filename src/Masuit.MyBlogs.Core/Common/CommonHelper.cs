@@ -2,6 +2,7 @@
 using HtmlAgilityPack;
 using IP2Region;
 using Masuit.Tools;
+using Masuit.Tools.Media;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +16,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using Masuit.Tools.Media;
 #if !DEBUG
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Models;
@@ -157,9 +157,9 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public static bool IsInDenyArea(this string ips)
         {
-            if (SystemSettings.GetOrAdd("EnableDenyArea", "false") == "true")
+            var denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries);
+            if (denyAreas.Any())
             {
-                var denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(',', '，');
                 foreach (var item in ips.Split(','))
                 {
                     var pos = GetIPLocation(item);

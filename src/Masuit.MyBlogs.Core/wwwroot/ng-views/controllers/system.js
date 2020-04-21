@@ -331,14 +331,6 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 		}).catch(swal.noop);
 	}
 
-	$scope.EnableDenyAreaPolicy= function() {
-		if($scope.Settings.EnableDenyArea=="true") {
-			$scope.Settings.EnableDenyArea="false";
-		} else {
-			$scope.Settings.EnableDenyArea="true";
-		}
-	}
-
 	$scope.EnableFirewall= function() {
 		if($scope.Settings.FirewallEnabled=="true") {
             swal({

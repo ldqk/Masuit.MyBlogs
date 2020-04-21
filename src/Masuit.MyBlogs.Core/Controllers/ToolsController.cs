@@ -1,9 +1,9 @@
-﻿using Masuit.MyBlogs.Core.Configs;
+﻿using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -39,6 +39,13 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             ViewBag.IP = ip;
             PhysicsAddress address = await ip.GetPhysicsAddressInfo();
+            if (address != null && address.Status != 0)
+            {
+                address.AddressResult.Pois.Add(new Pois()
+                {
+                    AddressDetail = ip.GetIPLocation()
+                });
+            }
             if (Request.Method.ToLower().Equals("get"))
             {
                 return View(address);
