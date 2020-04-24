@@ -49,6 +49,11 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public async Task<(string url, bool success)> UploadImage(Stream stream, string file)
         {
+            if (stream.Length < 51200)
+            {
+                return (null, false);
+            }
+
             file = SnowFlake.NewId + Path.GetExtension(file);
             for (var i = 0; i < 3; i++)
             {

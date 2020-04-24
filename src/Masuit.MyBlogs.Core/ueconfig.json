@@ -53,7 +53,11 @@
         "git.lug.ustc.edu.cn",
         "alicdn.com",
         "kuaizhan.com",
-        "qpic.cn"
+        "qpic.cn",
+        "s-msft.com",
+        "geekbang.org",
+        "jetbrains.com",
+        "oz-code.com"
     ],
     "catcherActionName": "catchimage", /* 执行抓取远程图片的action名称 */
     "catcherFieldName": "source", /* 提交的图片列表表单名称 */

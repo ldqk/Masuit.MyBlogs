@@ -4,6 +4,7 @@ using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -17,6 +18,8 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
     /// </summary>
     public class CrawlerHandler : Handler
     {
+        private static readonly HashSet<string> _queue = new HashSet<string>();
+
         public CrawlerHandler(HttpContext context) : base(context)
         {
         }
@@ -24,16 +27,24 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
         public override string Process()
         {
             string[] sources = Request.Form["source[]"];
-            if (sources?.Length > 0)
+            if (sources?.Length > 0 || sources?.Length <= 10)
             {
                 return WriteJson(new
                 {
                     state = "SUCCESS",
-                    list = sources.AsParallel().Select(s => new Crawler(s).Fetch().Result).Select(x => new
+                    list = sources.Except(_queue).AsParallel().Select(s =>
                     {
-                        state = x.State,
-                        source = x.SourceUrl,
-                        url = x.ServerUrl
+                        _queue.Add(s);
+                        return new Crawler(s).Fetch().Result;
+                    }).Select(x =>
+                    {
+                        _queue.Remove(x.SourceUrl);
+                        return new
+                        {
+                            state = x.State,
+                            source = x.SourceUrl,
+                            url = x.ServerUrl
+                        };
                     })
                 });
             }
