@@ -1,5 +1,6 @@
 ﻿@using Masuit.Tools
 @using Microsoft.Net.Http.Headers
+@using Masuit.MyBlogs.Core.Common
 
 @{
     Layout = null;
@@ -58,7 +59,15 @@
                     <span class="STYLE1">Sorry!访问被拒绝&nbsp;</span>
                 </em>
             </h3>
-            <h4>您所在的地区暂时不允许访问本站，如有疑问，请联系站长！或者请联系站长开通本站的访问权限！</h4>
+            @if (string.IsNullOrEmpty(CommonHelper.SystemSettings.GetOrAdd("AccessDenyTips", "")))
+            {
+                <h4>遇到了什么问题？</h4>
+                <h4>基于主观因素考虑，您所在的地区暂时不允许访问本站，如有疑问，请联系站长！或者请联系站长开通本站的访问权限！</h4>
+            }
+            else
+            {
+                @Html.Raw(CommonHelper.SystemSettings["AccessDenyTips"])
+            }
             <form action="/" method="post" class="form-inline" id="code-token">
                 @Html.AntiForgeryToken()
                 <div class="input-group">
