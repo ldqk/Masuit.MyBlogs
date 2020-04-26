@@ -63,19 +63,19 @@
                                 @{
                                     if (!string.IsNullOrEmpty(Model.Label))
                                     {
-                                    <div class="pull-right margin-right20">
-                                        <div>
-                                            @foreach (string s in Model.Label.Split(',', '，'))
+                                        <div class="pull-right margin-right20">
+                                            <div>
+                                                @foreach (string s in Model.Label.Split(',', '，'))
                                                 {
                                                     if (!string.IsNullOrEmpty(s))
                                                     {
-                                            <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
-                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
-                                            </a>
+                                                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
+                                                            <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
+                                                        </a>
                                                     }
                                                 }
+                                            </div>
                                         </div>
-                                    </div>
                                     }
                                 }
                             </div>
@@ -84,11 +84,11 @@
                                     分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model.Category.Name</a>  | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃ | 状态：@Model.Status.GetDisplay()
                                     @if (Model.Seminar.Any())
                                     {
-                                    <span> | 所属专题：</span>
+                                        <span> | 所属专题：</span>
                                         var seminars = Model.Seminar;
                                         foreach (var s in seminars)
                                         {
-                                    <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-@colors[new Random().Next() % colors.Length]">@s.Seminar.Title</a><text> </text>
+                                            <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-@colors[new Random().Next() % colors.Length]">@s.Seminar.Title</a><text> </text>
                                         }
                                     }
                                     <div class="pull-right margin-right20">
@@ -96,15 +96,15 @@
                                             <a asp-controller="Post" asp-action="Refresh" asp-route-id="@Model.Id" class="btn btn-info">刷新</a>
                                             @if (Model.IsFixedTop)
                                             {
-                                            <button class="btn btn-success" id="pin">取消置顶</button>
+                                                <button class="btn btn-success" id="pin">取消置顶</button>
                                             }
                                             else
                                             {
-                                            <button class="btn btn-success" id="pin">置顶</button>
+                                                <button class="btn btn-success" id="pin">置顶</button>
                                             }
                                             @if (Model.Status == Status.Pending)
                                             {
-                                            <button class="btn btn-primary" id="pass">通过</button>
+                                                <button class="btn btn-primary" id="pass">通过</button>
                                             }
                                             <a asp-controller="Dashboard" asp-action="Index" asp-fragment="/post/edit?id=@Model.Id" class="btn btn-primary" target="_blank">修改</a>
                                             <button class="btn btn-danger" id="del">删除</button>
@@ -112,8 +112,9 @@
                                     </div>
                                 </div>
                             </div>
-                            @if(DateTime.Now-Model.ModifyDate>TimeSpan.FromDays(365)) {
-                            <p class="text-focus text-center">该文章已经超过1年未更新，可能无法为您提供及时准确的资讯，请根据当下实际情况，酌情参考本文内容。</p>
+                            @if (DateTime.Now - Model.ModifyDate > TimeSpan.FromDays(365))
+                            {
+                                <p class="text-focus text-center">该文章已经超过1年未更新，可能无法为您提供及时准确的资讯，请根据当下实际情况，酌情参考本文内容。</p>
                             }
                         </header>
                         <article class="article" id="article">
@@ -166,13 +167,6 @@
                             </button>
                             <button type="button" id="votedown" class="btn btn-danger btn-lg">
                                 <i class="icon-thumbsdown"></i><span>@Model.VoteDownCount</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 text-right">
-                        <div class="btn-group">
-                            <button type="button" id="donate" class="btn btn-@colors[new Random().Next() % colors.Length] btn-lg">
-                                <i class="icon-coin-yen"></i><span>支持站长</span>
                             </button>
                         </div>
                     </div>

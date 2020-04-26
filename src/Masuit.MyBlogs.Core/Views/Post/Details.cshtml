@@ -61,19 +61,19 @@
                                 @{
                                     if (!string.IsNullOrEmpty(Model.Label))
                                     {
-                                    <div class="pull-right margin-right20">
-                                        <div>
-                                            @foreach (string s in Model.Label.Split(',', '，'))
+                                        <div class="pull-right margin-right20">
+                                            <div>
+                                                @foreach (string s in Model.Label.Split(',', '，'))
                                                 {
                                                     if (!string.IsNullOrEmpty(s))
                                                     {
-                                            <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
-                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
-                                            </a>
+                                                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
+                                                            <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
+                                                        </a>
                                                     }
                                                 }
+                                            </div>
                                         </div>
-                                    </div>
                                     }
                                 }
                             </div>
@@ -82,12 +82,12 @@
                                     分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model.Category.Name</a> | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃
                                     @if (Model.Seminar.Any())
                                     {
-                                    <span> | 所属专题：</span>
+                                        <span> | 所属专题：</span>
                                         var seminars = Model.Seminar;
                                         foreach (var s in seminars)
                                         {
-                                    <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-@colors[new Random().Next() % colors.Length]">@s.Seminar.Title</a>
-                                    <text> </text>
+                                            <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-@colors[new Random().Next() % colors.Length]">@s.Seminar.Title</a>
+                                            <text> </text>
                                         }
                                     }
                                     <div class="pull-right margin-right20">
@@ -95,8 +95,9 @@
                                     </div>
                                 </div>
                             </div>
-                            @if(DateTime.Now-Model.ModifyDate>TimeSpan.FromDays(365)) {
-                            <p class="text-focus text-center">该文章已经超过1年未更新，可能无法为您提供及时准确的资讯，请根据当下实际情况，酌情参考本文内容。</p>
+                            @if (DateTime.Now - Model.ModifyDate > TimeSpan.FromDays(365))
+                            {
+                                <p class="text-focus text-center">该文章已经超过1年未更新，可能无法为您提供及时准确的资讯，请根据当下实际情况，酌情参考本文内容。</p>
                             }
                         </header>
                         <article class="article" id="article">
@@ -188,9 +189,6 @@
                             <a class="btn btn-danger btn-lg" asp-controller="Subscribe" asp-action="PostRss" asp-route-id="@Model.Id" target="_blank">
                                 <i class="icon-rss4"></i><span>订阅本文更新</span>
                             </a>
-                            <button type="button" id="donate" class="btn btn-info btn-lg">
-                                <i class="icon-coin-yen"></i><span>支持站长</span>
-                            </button>
                         </div>
                     </div>
                 </section>

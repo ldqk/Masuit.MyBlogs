@@ -154,7 +154,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     }
                     else
                     {
-                        var path = Path.Combine(HostEnvironment.WebRootPath, "upload", "images", imgFile);
+                        var path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "images", imgFile);
                         await SaveFile(file, path);
                         img.Attributes["src"].Value = path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/");
                     }
@@ -188,7 +188,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Download(string path)
         {
             if (string.IsNullOrEmpty(path)) return Content("null");
-            var file = Path.Combine(HostEnvironment.WebRootPath + "/upload", path.Trim('.', '/', '\\'));
+            var file = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), path.Trim('.', '/', '\\'));
             if (System.IO.File.Exists(file))
             {
                 return this.ResumePhysicalFile(file, Path.GetFileName(file));
@@ -211,7 +211,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 "uploadimage" => new UploadHandler(HttpContext, new UploadConfig()
                 {
                     AllowExtensions = UeditorConfig.GetStringList("imageAllowFiles"),
-                    PathFormat = UeditorConfig.GetString("imagePathFormat"),
+                    PathFormat = "/" + CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\') + UeditorConfig.GetString("imagePathFormat"),
                     SizeLimit = UeditorConfig.GetInt("imageMaxSize"),
                     UploadFieldName = UeditorConfig.GetString("imageFieldName")
                 }),
@@ -221,7 +221,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     {
                         ".png"
                     },
-                    PathFormat = UeditorConfig.GetString("scrawlPathFormat"),
+                    PathFormat = "/" + CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\') + UeditorConfig.GetString("scrawlPathFormat"),
                     SizeLimit = UeditorConfig.GetInt("scrawlMaxSize"),
                     UploadFieldName = UeditorConfig.GetString("scrawlFieldName"),
                     Base64 = true,
@@ -239,7 +239,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     //    action = new UploadHandler(context, new UploadConfig()
                     //    {
                     //        AllowExtensions = UeditorConfig.GetStringList("videoAllowFiles"),
-                    //        PathFormat = UeditorConfig.GetString("videoPathFormat"),
+                    //        PathFormat =  "/" + CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload") + UeditorConfig.GetString("videoPathFormat"),
                     //        SizeLimit = UeditorConfig.GetInt("videoMaxSize"),
                     //        UploadFieldName = UeditorConfig.GetString("videoFieldName")
                     //    });
@@ -248,16 +248,16 @@ namespace Masuit.MyBlogs.Core.Controllers
                         action = new UploadHandler(HttpContext, new UploadConfig()
                         {
                             AllowExtensions = UeditorConfig.GetStringList("fileAllowFiles"),
-                            PathFormat = UeditorConfig.GetString("filePathFormat"),
+                            PathFormat = "/" + CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\') + UeditorConfig.GetString("filePathFormat"),
                             SizeLimit = UeditorConfig.GetInt("fileMaxSize"),
                             UploadFieldName = UeditorConfig.GetString("fileFieldName")
                         });
                         break;
                         //case "listimage":
-                        //    action = new ListFileManager(context, UeditorConfig.GetString("imageManagerListPath"), UeditorConfig.GetStringList("imageManagerAllowFiles"));
+                        //    action = new ListFileManager(context, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "/upload") + UeditorConfig.GetString("imageManagerListPath"), UeditorConfig.GetStringList("imageManagerAllowFiles"));
                         //    break;
                         //case "listfile":
-                        //    action = new ListFileManager(context, UeditorConfig.GetString("fileManagerListPath"), UeditorConfig.GetStringList("fileManagerAllowFiles"));
+                        //    action = new ListFileManager(context, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "/upload") + UeditorConfig.GetString("fileManagerListPath"), UeditorConfig.GetStringList("fileManagerAllowFiles"));
                         //    break;
                 }
             }
@@ -286,7 +286,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                             return ResultData(url);
                         }
 
-                        path = Path.Combine(HostEnvironment.WebRootPath, "upload", "images", filename);
+                        path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "images", filename);
                         var dir = Path.GetDirectoryName(path);
                         if (!Directory.Exists(dir))
                         {
@@ -298,13 +298,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                         break;
                     }
                 case var _ when file.ContentType.StartsWith("audio") || file.ContentType.StartsWith("video"):
-                    path = Path.Combine(HostEnvironment.WebRootPath, "upload", "media", filename);
+                    path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "media", filename);
                     break;
                 case var _ when file.ContentType.StartsWith("text") || (ContentType.Doc + "," + ContentType.Xls + "," + ContentType.Ppt + "," + ContentType.Pdf).Contains(file.ContentType):
-                    path = Path.Combine(HostEnvironment.WebRootPath, "upload", "docs", filename);
+                    path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "docs", filename);
                     break;
                 default:
-                    path = Path.Combine(HostEnvironment.WebRootPath, "upload", "files", filename);
+                    path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "files", filename);
                     break;
             }
             try

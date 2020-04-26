@@ -198,34 +198,6 @@
 			});
         });
 	});
-
-	$("#donate").on("click", function (e) {
-		window.post("/system/getsetting", { name: "Donate" }, function (data) {
-			swal({
-				title: "支付宝扫一扫付款打赏！",
-				html:"<a href='/donate'>更多方式</a>",
-				showCancelButton: true,
-				confirmButtonColor: "#DD6B55",
-				confirmButtonText: "确定",
-				cancelButtonText: "取消",
-				showLoaderOnConfirm: true,
-				imageUrl: data.Data.Value,
-				imageWidth: 400,
-				animation: true,
-				allowOutsideClick: false
-			}).then(function() {
-
-			}, function() {
-				swal("您的打赏将会支持本站做的更好！", null, "error");
-			});
-		}, function() {
-            window.notie.alert({
-				type: 3,
-				text: "请求失败，请稍候再试！",
-				time: 4
-			});
-        });
-	});
 });
 
 /**

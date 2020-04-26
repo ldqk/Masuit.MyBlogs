@@ -64,6 +64,12 @@
                 <button type="button" class="btn btn-info" ng-click="pathtest()">检查路径</button>
             </span>
         </div>
+        <div class="input-group">
+            <span class="input-group-addon">文件上传目录：</span>
+            <div class="fg-line">
+                <input type="text" class="form-control" ng-model="Settings.UploadPath" placeholder="/upload" />
+            </div>
+        </div>
     </div>
     <div class="row">
         <h3>自定义脚本和样式</h3>
@@ -164,28 +170,8 @@
         </div>
     </div>
     <div class="row">
-        <h2>打赏二维码</h2>
-        <div class="col-md-2 col-xs-6">
-            <h3>支付宝：</h3>
-            <img class="img img-responsive img-thumbnail img-rounded" ng-src="{{Settings.Donate}}" style="max-height: 300px;" ng-click="setImage('Donate')" />
-            <span class="input-group-btn">
-                <button type="button" class="btn btn-danger waves-effect" ng-click="setImage('Donate')">修改</button>
-            </span>
-        </div>
-        <div class="col-md-2 col-xs-6">
-            <h3>微信：</h3>
-            <img class="img img-responsive img-thumbnail img-rounded" ng-src="{{Settings.DonateWechat}}" style="max-height: 300px;" ng-click="setImage('DonateWechat')" />
-            <span class="input-group-btn">
-                <button type="button" class="btn btn-danger waves-effect" ng-click="setImage('DonateWechat')">修改</button>
-            </span>
-        </div>
-        <div class="col-md-2 col-xs-6">
-            <h3>QQ：</h3>
-            <img class="img img-responsive img-thumbnail img-rounded" ng-src="{{Settings.DonateQQ}}" style="max-height: 300px;" ng-click="setImage('DonateQQ')" />
-            <span class="input-group-btn">
-                <button type="button" class="btn btn-danger waves-effect" ng-click="setImage('DonateQQ')">修改</button>
-            </span>
-        </div>
+        <h2>打赏页</h2>
+        <div style="height: 300px;" class="ueditor" ng-model="Settings.DonateHtml" type="text/plain"></div>
     </div>
 </div>
 <div style="position: absolute;left: -20000px">

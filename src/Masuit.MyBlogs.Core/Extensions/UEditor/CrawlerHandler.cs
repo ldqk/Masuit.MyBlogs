@@ -87,7 +87,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     return this;
                 }
 
-                ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), UeditorConfig.GetString("catcherPathFormat"));
+                ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\') + UeditorConfig.GetString("catcherPathFormat"));
                 var stream = response.Content.ReadAsStreamAsync().Result;
                 var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
                 stream = stream.AddWatermark();
@@ -104,8 +104,8 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     }
 
                     var ms = new MemoryStream();
-                    stream.CopyTo(ms);
-                    File.WriteAllBytes(savePath, ms.GetBuffer());
+                    await stream.CopyToAsync(ms);
+                    await File.WriteAllBytesAsync(savePath, ms.GetBuffer());
                 }
                 stream.Close();
                 await stream.DisposeAsync();
