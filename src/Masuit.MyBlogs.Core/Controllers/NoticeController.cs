@@ -164,7 +164,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             var dto = notice.Mapper<NoticeDto>();
             Response.Cookies.Append("last-notice", dto.Id.ToString(), new CookieOptions()
             {
-                Expires = DateTime.Now.AddYears(1)
+                Expires = DateTime.Now.AddYears(1),
+                SameSite = SameSiteMode.Lax
             });
             return ResultData(dto);
         }

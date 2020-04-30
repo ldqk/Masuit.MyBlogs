@@ -106,11 +106,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     Response.Cookies.Append("username", name, new CookieOptions
                     {
-                        Expires = DateTime.Now.AddDays(7)
+                        Expires = DateTime.Now.AddDays(7),
+                        SameSite = SameSiteMode.Lax
                     });
                     Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions
                     {
-                        Expires = DateTime.Now.AddDays(7)
+                        Expires = DateTime.Now.AddDays(7),
+                        SameSite = SameSiteMode.Lax
                     });
                     filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
                 }

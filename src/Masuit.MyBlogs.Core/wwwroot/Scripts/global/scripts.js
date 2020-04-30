@@ -200,6 +200,9 @@ $(function() {
     }).then(function(response) {
         return response.json();
     }).then(function(data) {
+        if (!data.Success) {
+            return ;
+        }
         data = data.Data;
         if (nid != data.Id) {
             //公告层
@@ -433,6 +436,22 @@ function post(url, params, callback, error) {
         method: 'POST',
         mode: 'cors',
         body: formData
+    }).then(function(response) {
+        return response.json();
+    }).then(function(data) {
+        callback(data);
+    }).catch(function(e) {
+        loadingDone();
+        if (error) {
+            error(e);
+        }
+    });
+}
+function get(url, callback, error) {
+    window.fetch(url, {
+        credentials: 'include',
+        method: 'GET',
+        mode: 'cors'
     }).then(function(response) {
         return response.json();
     }).then(function(data) {

@@ -44,8 +44,16 @@ namespace Masuit.MyBlogs.Core.Extensions
                 var userInfo = (Startup.ServiceProvider.GetRequiredService<IUserInfoService>()).Login(name, pwd);
                 if (userInfo != null)
                 {
-                    filterContext.HttpContext.Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                    filterContext.HttpContext.Response.Cookies.Append("password", filterContext.HttpContext.Request.Cookies["password"], new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                    filterContext.HttpContext.Response.Cookies.Append("username", name, new CookieOptions()
+                    {
+                        Expires = DateTime.Now.AddDays(7),
+                        SameSite = SameSiteMode.Lax
+                    });
+                    filterContext.HttpContext.Response.Cookies.Append("password", filterContext.HttpContext.Request.Cookies["password"], new CookieOptions()
+                    {
+                        Expires = DateTime.Now.AddDays(7),
+                        SameSite = SameSiteMode.Lax
+                    });
                     filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
                 }
                 else

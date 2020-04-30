@@ -77,8 +77,16 @@ namespace Masuit.MyBlogs.Core.Controllers
                 var userInfo = UserInfoService.Login(name, pwd);
                 if (userInfo != null)
                 {
-                    Response.Cookies.Append("username", name, new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                    Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                    Response.Cookies.Append("username", name, new CookieOptions()
+                    {
+                        Expires = DateTime.Now.AddDays(7),
+                        SameSite = SameSiteMode.Lax
+                    });
+                    Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions()
+                    {
+                        Expires = DateTime.Now.AddDays(7),
+                        SameSite = SameSiteMode.Lax
+                    });
                     HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
                     HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, ClientIP, LoginType.Default);
                     if (string.IsNullOrEmpty(from))
@@ -123,8 +131,16 @@ namespace Masuit.MyBlogs.Core.Controllers
             HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
             if (remem.Trim().Contains(new[] { "on", "true" })) //是否记住登录
             {
-                Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
-                Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.BaiduAK), new CookieOptions() { Expires = DateTime.Now.AddDays(7) });
+                Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()), new CookieOptions()
+                {
+                    Expires = DateTime.Now.AddDays(7),
+                    SameSite = SameSiteMode.Lax
+                });
+                Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.BaiduAK), new CookieOptions()
+                {
+                    Expires = DateTime.Now.AddDays(7),
+                    SameSite = SameSiteMode.Lax
+                });
             }
             HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, ClientIP, LoginType.Default);
             string refer = Request.Cookies["refer"];

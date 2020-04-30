@@ -16,6 +16,7 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
 using System.Web;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -135,11 +136,13 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             Response.Cookies.Append("Email", email, new CookieOptions
             {
-                Expires = DateTime.Now.AddYears(1)
+                Expires = DateTime.Now.AddYears(1),
+                SameSite = SameSiteMode.Lax
             });
             Response.Cookies.Append("FullAccessToken", email.MDString3(AppConfig.BaiduAK), new CookieOptions
             {
-                Expires = DateTime.Now.AddYears(1)
+                Expires = DateTime.Now.AddYears(1),
+                SameSite = SameSiteMode.Lax
             });
             return ResultData(null);
         }

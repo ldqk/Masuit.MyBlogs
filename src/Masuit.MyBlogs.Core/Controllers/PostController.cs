@@ -303,11 +303,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                 HttpContext.Session.Set("AccessViewToken", token);
                 Response.Cookies.Append("Email", email, new CookieOptions
                 {
-                    Expires = DateTime.Now.AddYears(1)
+                    Expires = DateTime.Now.AddYears(1),
+                    SameSite = SameSiteMode.Lax
                 });
                 Response.Cookies.Append("PostAccessToken", email.MDString3(AppConfig.BaiduAK), new CookieOptions
                 {
-                    Expires = DateTime.Now.AddYears(1)
+                    Expires = DateTime.Now.AddYears(1),
+                    SameSite = SameSiteMode.Lax
                 });
                 return ResultData(null);
             }

@@ -318,12 +318,7 @@
 </div>
 <script>
     function getcomments() {
-        window.post("/comment/getcomments",{
-			id: $("#postId").val(),
-			page: 1,
-			size: 10,
-			cid: @cid
-		},function(data) {
+        window.get("/comment/getcomments?id=" + $("#postId").val()+"&page=1&size=10&cid="+@cid,function(data) {
             data = data.Data;
 			document.querySelector(".media-list").innerHTML = loadParentComments(data);
 			bindReplyBtn();
@@ -341,11 +336,7 @@
 			count: @Model.Comment.Count(c =>c.ParentId==0&& c.Status==Status.Published),
 			toolbar: true,
 			callback: function(page, size, count) {
-				window.post("/comment/getcomments", {
-					id: @Model.Id,
-					page: page,
-					size: size
-				}, (data) => {
+                window.get("/comment/getcomments?id=" +@Model.Id+"&page=" + page + "&size=" + size, function (data) {
 					data = data.Data;
 					if (data) {
 						document.querySelector(".media-list").innerHTML = loadParentComments(data);
