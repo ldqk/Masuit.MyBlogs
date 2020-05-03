@@ -85,7 +85,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             viewModel.Posts = posts;
-            viewModel.PageParams = new Pagination(page, size, posts.TotalCount, OrderBy.ModifyDate);
+            viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             return View(viewModel);
         }
 
@@ -104,7 +104,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var viewModel = GetIndexPageViewModel();
             ViewBag.Tag = id;
             viewModel.Posts = posts;
-            viewModel.PageParams = new Pagination(page, size, posts.TotalCount, OrderBy.ModifyDate);
+            viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             return View(viewModel);
         }
 
@@ -126,7 +126,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Author = author;
             ViewBag.Total = posts.TotalCount;
             viewModel.Posts = posts;
-            viewModel.PageParams = new Pagination(page, size, posts.TotalCount, OrderBy.ModifyDate);
+            viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             return View(viewModel);
         }
 
@@ -147,7 +147,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var viewModel = GetIndexPageViewModel();
             viewModel.Posts = posts;
             ViewBag.Category = cat;
-            viewModel.PageParams = new Pagination(page, size, posts.TotalCount, OrderBy.ModifyDate);
+            viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             return View(viewModel);
         }
 
