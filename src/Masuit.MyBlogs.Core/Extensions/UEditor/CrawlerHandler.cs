@@ -80,7 +80,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             }
             try
             {
-                using var response = _httpClient.GetAsync(SourceUrl).Result;
+                using var response = await _httpClient.GetAsync(SourceUrl);
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
                     State = "Url returns " + response.StatusCode;
@@ -88,10 +88,10 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 }
 
                 ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\') + UeditorConfig.GetString("catcherPathFormat"));
-                var stream = response.Content.ReadAsStreamAsync().Result;
-                var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
+                var stream = await response.Content.ReadAsStreamAsync();
+                var savePath = Path.Combine(AppContext.BaseDirectory + "wwwroot", ServerUrl);
                 stream = stream.AddWatermark();
-                var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath).Result;
+                var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath);
                 if (success)
                 {
                     ServerUrl = url;

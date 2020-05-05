@@ -117,8 +117,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
 
         private bool CheckFileType(string filename)
         {
-            var fileExtension = Path.GetExtension(filename).ToLower();
-            return UploadConfig.AllowExtensions.Select(x => x.ToLower()).Contains(fileExtension);
+            return UploadConfig.AllowExtensions.Any(x => x.Equals(Path.GetExtension(filename), StringComparison.CurrentCultureIgnoreCase));
         }
 
         private bool CheckFileSize(long size)

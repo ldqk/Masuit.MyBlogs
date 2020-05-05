@@ -58,7 +58,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 }
                 else
                 {
-                    if (filterContext.HttpContext.Request.Method.ToLower().Equals("get"))
+                    if (filterContext.HttpContext.Request.Method.Equals(HttpMethods.Get))
                     {
                         filterContext.Result = new RedirectResult("/passport/login?from=" + HttpUtility.UrlEncode(filterContext.HttpContext.Request.Path.ToString())?.Replace("#", "%23"));
                     }
@@ -70,7 +70,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             }
             else
             {
-                if (filterContext.HttpContext.Request.Method.ToLower().Equals("get"))
+                if (filterContext.HttpContext.Request.Method.Equals(HttpMethods.Get))
                 {
                     filterContext.Result = new RedirectResult("/passport/login?from=" + HttpUtility.UrlEncode(filterContext.HttpContext.Request.Path.ToString()));
                 }

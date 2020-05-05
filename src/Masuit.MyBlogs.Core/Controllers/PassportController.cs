@@ -62,14 +62,17 @@ namespace Masuit.MyBlogs.Core.Controllers
                 from = HttpUtility.UrlDecode(from);
                 Response.Cookies.Append("refer", from);
             }
+
             if (HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) != null)
             {
                 if (string.IsNullOrEmpty(from))
                 {
                     return RedirectToAction("Index", "Home");
                 }
-                return Redirect(from);
+
+                return LocalRedirect(from);
             }
+
             if (Request.Cookies.Count > 2)
             {
                 string name = Request.Cookies["username"];
@@ -94,7 +97,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         return RedirectToAction("Index", "Home");
                     }
 
-                    return Redirect(from);
+                    return LocalRedirect(from);
                 }
             }
 
@@ -117,11 +120,13 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, false, "验证码错误");
             }
+
             HttpContext.Session.Remove("valid"); //验证成功就销毁验证码Session，非常重要
             if (string.IsNullOrEmpty(username.Trim()) || string.IsNullOrEmpty(password.Trim()))
             {
                 return ResultData(null, false, "用户名或密码不能为空");
             }
+
             var userInfo = UserInfoService.Login(username, password);
             if (userInfo == null)
             {
@@ -200,7 +205,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Response.Cookies.Delete("username");
             Response.Cookies.Delete("password");
             HttpContext.Session.Clear();
-            return Request.Method.ToLower().Equals("get") ? RedirectToAction("Index", "Home") : ResultData(null, message: "注销成功！");
+            return Request.Method.Equals(HttpMethods.Get) ? RedirectToAction("Index", "Home") : ResultData(null, message: "注销成功！");
         }
     }
 }

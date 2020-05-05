@@ -1,10 +1,11 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using System;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -47,7 +48,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     AddressDetail = ip.GetIPLocation() + "（本地数据库）"
                 });
             }
-            if (Request.Method.ToLower().Equals("get"))
+            if (Request.Method.Equals(HttpMethods.Get))
             {
                 return View(address);
             }
@@ -98,7 +99,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 if (address?.Status == 0)
                 {
                     ViewBag.Address = address.AddressResult.FormattedAddress;
-                    if (Request.Method.ToLower().Equals("get"))
+                    if (Request.Method.Equals(HttpMethods.Get))
                     {
                         return View(address.AddressResult.Location);
                     }
@@ -110,7 +111,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Address = addr;
             var s = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?output=json&address={addr}&ak={AppConfig.BaiduAK}");
             var physicsAddress = JsonConvert.DeserializeObject<PhysicsAddress>(s);
-            if (Request.Method.ToLower().Equals("get"))
+            if (Request.Method.Equals(HttpMethods.Get))
             {
                 return View(physicsAddress?.AddressResult?.Location);
             }

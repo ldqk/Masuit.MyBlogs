@@ -36,7 +36,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index()
         {
             Response.StatusCode = 404;
-            return Request.Method.ToLower().Equals("get") ? (ActionResult)View() : Json(new
+            return Request.Method.Equals(HttpMethods.Get) ? (ActionResult)View() : Json(new
             {
                 StatusCode = 404,
                 Success = false,
@@ -77,7 +77,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         break;
                     case NotFoundException ex:
                         Response.StatusCode = 404;
-                        return Request.Method.ToLower().Equals("get") ? (ActionResult)View("Index") : Json(new
+                        return Request.Method.Equals(HttpMethods.Get) ? (ActionResult)View("Index") : Json(new
                         {
                             StatusCode = 404,
                             Success = false,
@@ -96,7 +96,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             Response.StatusCode = 503;
-            return Request.Method.ToLower().Equals("get") ? (ActionResult)View() : Json(new
+            return Request.Method.Equals(HttpMethods.Get) ? (ActionResult)View() : Json(new
             {
                 StatusCode = 503,
                 Success = false,

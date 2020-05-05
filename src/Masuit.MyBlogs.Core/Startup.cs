@@ -98,12 +98,11 @@ namespace Masuit.MyBlogs.Core
                 opt.UseMySql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(3)).EnableDetailedErrors().EnableSensitiveDataLogging();
                 //opt.UseSqlServer(AppConfig.ConnString);
             }); //配置数据库
-            //services.AddCors(opt => opt.AddDefaultPolicy(p => p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin())); //配置跨域
             services.Configure<FormOptions>(options =>
             {
                 options.MultipartBodyLengthLimit = 104857600; // 100MB
             }); //配置请求长度
-            services.AddSession(); //注入Session
+            services.AddSession().AddAntiforgery(); //注入Session
             services.AddWebSockets(opt => opt.ReceiveBufferSize = 4096 * 1024).AddSignalR().AddNewtonsoftJsonProtocol();
             services.AddHttpsRedirection(options =>
             {
@@ -204,7 +203,6 @@ namespace Masuit.MyBlogs.Core
                     new MyRestrictiveAuthorizationFilter()
                 }
             }); //配置hangfire
-            //app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()); //配置跨域
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
             app.UseRouting(); // 放在 UseStaticFiles 之后
             app.UseEndpoints(endpoints =>
