@@ -68,7 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var list = DonateService.GetPagesFromCache<DateTime, DonateDto>(page, size, d => true, d => d.DonateTime, false);
             if (!CurrentUser.IsAdmin)
             {
-                foreach (var item in list.Data)
+                foreach (var item in list.Data.Where(item => !(item.QQorWechat + item.Email).Contains("匿名")))
                 {
                     item.QQorWechat = item.QQorWechat.Mask();
                     item.Email = item.Email.MaskEmail();
