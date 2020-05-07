@@ -57,8 +57,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Login()
         {
             var keys = RsaCrypt.GenerateRsaKeys(RsaKeyType.PEM);
-            Response.Cookies.Append("PublicKey", keys.PublicKey);
-            HttpContext.Session.Set("PrivateKey", keys.PrivateKey);
+            Response.Cookies.Append(nameof(keys.PublicKey), keys.PublicKey);
+            HttpContext.Session.Set(nameof(keys.PrivateKey), keys.PrivateKey);
             string from = Request.Query["from"];
             if (!string.IsNullOrEmpty(from))
             {
@@ -130,7 +130,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "用户名或密码不能为空");
             }
 
-            password = password.RSADecrypt(HttpContext.Session.Get<string>("PrivateKey"));
+            password = password.RSADecrypt(HttpContext.Session.Get<string>(nameof(RsaKey.PrivateKey)));
             var userInfo = UserInfoService.Login(username, password);
             if (userInfo == null)
             {
