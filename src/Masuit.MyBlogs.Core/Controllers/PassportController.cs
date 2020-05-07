@@ -153,6 +153,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, ClientIP, LoginType.Default);
             string refer = Request.Cookies["refer"];
+            Response.Cookies.Delete(nameof(RsaKey.PublicKey));
+            Response.Cookies.Delete("refer");
+            HttpContext.Session.Remove(nameof(RsaKey.PrivateKey));
             return ResultData(null, true, string.IsNullOrEmpty(refer) ? "/" : refer);
         }
 
