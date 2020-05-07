@@ -140,7 +140,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }).FromCache().ToList();
             var feed = new Feed()
             {
-                Title = CommonHelper.SystemSettings["Domain"] + $":分类{category.Name}文章订阅",
+                Title = Request.Host + $":分类{category.Name}文章订阅",
                 Description = category.Description,
                 Link = new Uri(scheme + "://" + host + "/rss"),
                 Copyright = CommonHelper.SystemSettings["Title"],
@@ -186,7 +186,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             };
             var feed = new Feed()
             {
-                Title = CommonHelper.SystemSettings["Domain"] + $":文章【{p.Title}】更新订阅",
+                Title = Request.Host + $":文章【{p.Title}】更新订阅",
                 Description = summary,
                 Link = new Uri(scheme + "://" + host + "/rss/" + id),
                 Copyright = CommonHelper.SystemSettings["Title"],
@@ -231,7 +231,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }).ToList();
             var feed = new Feed()
             {
-                Title = CommonHelper.SystemSettings["Domain"] + $":文章【{post.Title}】文章评论更新订阅",
+                Title = Request.Host + $":文章【{post.Title}】文章评论更新订阅",
                 Description = post.Content.GetSummary(300, 50),
                 Link = new Uri(scheme + "://" + host + "/rss/" + id + "/comments"),
                 Copyright = CommonHelper.SystemSettings["Title"],

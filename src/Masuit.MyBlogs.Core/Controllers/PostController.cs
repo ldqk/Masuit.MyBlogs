@@ -343,7 +343,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var token = SnowFlake.GetInstance().GetUniqueShortId(6);
             RedisHelper.Set("token:" + email, token, 86400);
-            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "博客访问验证码", $"{CommonHelper.SystemSettings["Domain"]}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email));
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email));
             RedisHelper.Set("get:" + email, token, 120);
             return ResultData(null);
 

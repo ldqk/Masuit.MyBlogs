@@ -1,5 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Extensions;
+﻿using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -66,9 +65,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
 
                 var s = await res.Content.ReadAsStringAsync();
-                if (!s.Contains(CommonHelper.SystemSettings["Domain"]))
+                if (!s.Contains(Request.Host.Host))
                 {
-                    return ResultData(null, false, $"添加失败！检测到您的网站上未将本站设置成友情链接，请先将本站主域名：{CommonHelper.SystemSettings["Domain"]}在您的网站设置为友情链接，并且能够展示后，再次尝试添加即可！");
+                    return ResultData(null, false, $"添加失败！检测到您的网站上未将本站设置成友情链接，请先将本站主域名：{Request.Host}在您的网站设置为友情链接，并且能够展示后，再次尝试添加即可！");
                 }
 
                 var entry = await LinksService.GetAsync(l => l.Url.Equals(links.Url));
@@ -140,7 +139,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
 
                 var s = await res.Content.ReadAsStringAsync();
-                if (s.Contains(CommonHelper.SystemSettings["Domain"]))
+                if (s.Contains(Request.Host.Host))
                 {
                     return ResultData(null, true, "友情链接正常！");
                 }

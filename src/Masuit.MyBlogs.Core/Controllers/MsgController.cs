@@ -167,7 +167,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 if (msg.ParentId == 0)
                 {
                     //新评论，只通知博主
-                    BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "|博客新留言：", content.Replace("{{link}}", Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)), email));
+                    BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言：", content.Replace("{{link}}", Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)), email));
                 }
                 else
                 {
@@ -177,14 +177,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                     string link = Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme);
                     foreach (var s in emails)
                     {
-                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{CommonHelper.SystemSettings["Domain"]}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Replace("{{link}}", link), s));
+                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Replace("{{link}}", link), s));
                     }
                 }
 #endif
                 return ResultData(null, true, "留言发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将会显示到列表中！");
             }
 
-            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Domain"] + "|博客新留言(待审核)：", content.Replace("{{link}}", Url.Action("Index", "Msg", new
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言(待审核)：", content.Replace("{{link}}", Url.Action("Index", "Msg", new
             {
                 cid = msg.Id
             }, Request.Scheme)) + "<p style='color:red;'>(待审核)</p>", email));
