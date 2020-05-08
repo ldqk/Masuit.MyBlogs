@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult Login()
         {
-            var keys = RsaCrypt.GenerateRsaKeys(RsaKeyType.PEM);
+            var keys = RsaCrypt.GenerateRsaKeys(RsaKeyType.PKCS1);
             Response.Cookies.Append(nameof(keys.PublicKey), keys.PublicKey);
             HttpContext.Session.Set(nameof(keys.PrivateKey), keys.PrivateKey);
             string from = Request.Query["from"];
