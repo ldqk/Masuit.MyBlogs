@@ -84,8 +84,8 @@
 	bindVote();//绑定文章投票按钮
 	window.getcomments();//获取评论
 	commentVoteBind(); //评论投票
-	$("#OperatingSystem").val(platform.os.toString());
-    $("#Browser").val(platform.name + " " + platform.version);
+	$("#OperatingSystem").val(DeviceInfo.OS.toString());
+    $("#Browser").val(DeviceInfo.browserInfo.Name+" "+DeviceInfo.browserInfo.Version);
 
 	//异步提交评论表单
 	$("#comment").on("submit", function(e) {
@@ -249,8 +249,8 @@ function bindReplyBtn() {
 		var href = $(this).attr("href");
 		var uid = href.substring(href.indexOf("uid") + 4);
 		$("#uid").val(uid);
-		$("#OperatingSystem2").val(platform.os.toString());
-		$("#Browser2").val(platform.name + " " + platform.version);
+		$("#OperatingSystem2").val(DeviceInfo.OS.toString());
+        $("#Browser2").val(DeviceInfo.browserInfo.Name+" "+DeviceInfo.browserInfo.Version);
 		layui.use("layer", function() {
 			var layer = layui.layer;
 			layer.open({

@@ -147,6 +147,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Scripts/jquery.paging.js")
                     .Include("/Scripts/ripplet.js")
                     .Include("/Scripts/global/scripts.js")
+                    .Include("/Scripts/platform.js")
                     .Include("/Assets/tippy/tippy.js")
                     .Include("/Assets/newsbox/jquery.bootstrap.newsbox.js")
                     .Include("/Assets/tagcloud/js/tagcloud.js")

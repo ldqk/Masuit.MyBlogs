@@ -5,8 +5,8 @@
 			height: 150
         });
     });
-	$("#OperatingSystem").val(platform.os.toString());
-	$("#Browser").val(platform.name + " " + platform.version);
+	$("#OperatingSystem").val(DeviceInfo.OS.toString());
+    $("#Browser").val(DeviceInfo.browserInfo.Name+" "+DeviceInfo.browserInfo.Version);
 	window.getmsgs();
 	var user = JSON.parse(localStorage.getItem("user"));
 	if (user) {
@@ -170,8 +170,8 @@ function bindReplyBtn() {
 		var href = $(this).attr("href");
 		var uid = href.substring(href.indexOf("uid") + 4);
 		$("#uid").val(uid);
-		$("#OperatingSystem2").val(platform.os.toString());
-		$("#Browser2").val(platform.name + " " + platform.version);
+        $("#OperatingSystem2").val(DeviceInfo.OS.toString());
+        $("#Browser2").val(DeviceInfo.browserInfo.Name+" "+DeviceInfo.browserInfo.Version);
 		layui.use("layer", function() {
 			var layer = layui.layer;
 			layer.open({
