@@ -192,19 +192,15 @@ $(function() {
         });
     }
 
-    var nid = window.localStorage.getItem("notice") || '0';
-    window.fetch("/notice/last", {
-        credentials: 'include',
-        method: 'GET',
-        mode: 'cors'
-    }).then(function(response) {
+    window.fetch("/notice/last").then(function(response) {
         return response.json();
     }).then(function(data) {
         if (!data.Success) {
             return ;
         }
         data = data.Data;
-        if (nid != data.Id) {
+        var nid = [].concat(JSON.parse(window.localStorage.getItem("notice") || '[]'));
+        if (nid.indexOf(data.Id)==-1) {
             //公告层
             layer.open({
                 title: '网站公告：' + data.Title,
@@ -213,18 +209,17 @@ $(function() {
                 shade: 0.6,
                 closeBtn: true,
                 content: data.Content,
-                btn: ["查看详情", '知道了', '哦'],
+                btn: ["查看详情", '知道了'],
                 btn1: function(layero) {
-                    window.localStorage.setItem("notice", data.Id);
+                    nid.push(data.Id);
+                    window.localStorage.setItem("notice", JSON.stringify(nid));
                     window.location.href = "/n/" + data.Id;
                     loading();
                 },
                 btn2: function(index) {
-                    window.localStorage.setItem("notice", data.Id);
+                    nid.push(data.Id);
+                    window.localStorage.setItem("notice", JSON.stringify(nid));
                     layer.closeAll();
-                },
-                btn3: function(index) {
-                    //return true;
                 }
             });
         }

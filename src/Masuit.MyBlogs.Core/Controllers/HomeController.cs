@@ -50,7 +50,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 首页
         /// </summary>
         /// <returns></returns>
-        [HttpGet, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "orderBy" }, VaryByHeader = "Cookie")]
+        [HttpGet, ResponseCache(Duration = 600, VaryByHeader = "Cookie", Location = ResponseCacheLocation.Any)]
         public ActionResult Index()
         {
             var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner).OrderBy(a => Guid.NewGuid()).ToList();
