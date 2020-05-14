@@ -2,18 +2,18 @@
     <div class="page-header">
         <h2 class="text-center">最近一个月登陆记录</h2>
     </div>
-    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
-        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'登录时间'" sortable="'LoginTime'">
+    <table class="table table-bordered table-condensed table-hover" disable-filter="list.isAdding" ng-form="list.tableForm" ng-table="list.tableParams" tracked-table="list.tableTracker">
+        <tr ng-form="rowForm" ng-repeat="row in $data" tracked-table-row="row">
+            <td sortable="'LoginTime'" title="'登录时间'">
                 {{row.LoginTime|date:"yyyy-MM-dd HH:mm:ss"}}
             </td>
-            <td title="'IP'" sortable="'IP'">
+            <td sortable="'IP'" title="'IP'">
                 {{row.IP}}
             </td>
-            <td title="'省份'" sortable="'Province'">
+            <td sortable="'Province'" title="'省份'">
                 {{row.Province}}
             </td>
-            <td title="'详细地址'" sortable="'PhysicAddress'">
+            <td sortable="'PhysicAddress'" title="'详细地址'">
                 {{row.PhysicAddress}}
             </td>
         </tr>
