@@ -43,8 +43,8 @@ namespace Masuit.MyBlogs.Core.Extensions
 
             var ip = context.Connection.RemoteIpAddress.MapToIPv4().ToString();
             RedisHelper.SAddAsync("Share:" + mail, ip).ContinueWith(task => RedisHelper.Expire("Share:" + mail, TimeSpan.FromDays(8)));
-            var query = req.Query.Where(x => x.Key != "share").Select(x => x.Key + "=" + x.Value).Join("&");
-            context.Response.Redirect((req.Path + "?" + query).Trim('?'));
+            //var query = req.Query.Where(x => x.Key != "share").Select(x => x.Key + "=" + x.Value).Join("&");
+            //context.Response.Redirect((req.Path + "?" + query).Trim('?'));
         }
     }
 }
