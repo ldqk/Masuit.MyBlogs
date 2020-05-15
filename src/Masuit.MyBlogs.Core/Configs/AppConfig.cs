@@ -31,5 +31,10 @@ namespace Masuit.MyBlogs.Core.Configs
         /// gitlab图床配置
         /// </summary>
         public static List<GitlabConfig> GitlabConfigs { get; set; } = new List<GitlabConfig>();
+
+        /// <summary>
+        /// 真实客户端IP转发标头
+        /// </summary>
+        public static string TrueClientIPHeader { get; set; }
     }
 }

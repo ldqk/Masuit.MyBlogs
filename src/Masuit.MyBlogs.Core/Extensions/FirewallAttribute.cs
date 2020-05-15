@@ -27,10 +27,10 @@ namespace Masuit.MyBlogs.Core.Extensions
         {
             var request = context.HttpContext.Request;
             var ip = context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
-            var trueip = request.Headers["CF-Connecting-IP"].ToString();
+            var trueip = request.Headers[AppConfig.TrueClientIPHeader].ToString();
             if (!string.IsNullOrEmpty(trueip) && ip != trueip)
             {
-                AccessDeny(ip, request, "客户端请求不合法");
+                AccessDeny(trueip, request, "客户端请求不合法，伪造IP：" + ip);
                 context.Result = new BadRequestObjectResult("您当前所在的网络环境不支持访问本站！");
                 return;
             }

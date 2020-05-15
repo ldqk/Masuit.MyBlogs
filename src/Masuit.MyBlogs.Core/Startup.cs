@@ -73,6 +73,7 @@ namespace Masuit.MyBlogs.Core
                 AppConfig.ConnString = configuration[nameof(AppConfig.ConnString)];
                 AppConfig.BaiduAK = configuration[nameof(AppConfig.BaiduAK)];
                 AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
+                AppConfig.TrueClientIPHeader = configuration[nameof(AppConfig.TrueClientIPHeader)] ?? "CF-Connecting-IP";
                 configuration.Bind("Imgbed:AliyunOSS", AppConfig.AliOssConfig);
                 configuration.Bind("Imgbed:Gitlabs", AppConfig.GitlabConfigs);
             }
