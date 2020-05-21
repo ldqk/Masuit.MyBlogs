@@ -106,7 +106,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Put(LeaveMessageCommand dto)
+        public ActionResult Submit(LeaveMessageCommand dto)
         {
             if (Regex.Match(dto.Content, CommonHelper.BanRegex).Length > 0)
             {

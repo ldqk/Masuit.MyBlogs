@@ -20,7 +20,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public IEnumerable<LeaveMessage> GetSelfAndAllChildrenMessagesByParentId(int id)
         {
-            var msg = GetFromCache(m => m.Id == id);
+            var msg = Get(m => m.Id == id);
             if (msg != null)
             {
                 var msgs = new List<LeaveMessage>() { msg };
@@ -38,7 +38,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         private void GetSelfAndAllChildrenMessagesByParentId(LeaveMessage msg, List<LeaveMessage> list)
         {
-            var msgs = GetQueryFromCache(x => x.ParentId == msg.Id).ToList();
+            var msgs = GetQuery(x => x.ParentId == msg.Id).ToList();
             if (msgs.Any())
             {
                 list.AddRange(msgs);
@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public int GetParentMessageIdByChildId(int id)
         {
-            LeaveMessage msg = GetFromCache(m => m.Id == id);
+            LeaveMessage msg = Get(m => m.Id == id);
             if (msg != null)
             {
                 return GetParentMessageIdByChildId(msg);

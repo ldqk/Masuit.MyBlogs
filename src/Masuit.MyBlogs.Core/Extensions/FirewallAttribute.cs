@@ -31,7 +31,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             if (!string.IsNullOrEmpty(trueip) && ip != trueip)
             {
                 AccessDeny(trueip, request, "客户端请求不合法，伪造IP：" + ip);
-                context.Result = new BadRequestObjectResult("当前请求已被非法篡改，本站阻止访问！");
+                context.Result = new BadRequestObjectResult("当前请求已被非法篡改，本站阻止访问！如果你不知道发生了什么，请尝试关闭如adguard隐身模式、代理软件、可能会修改http请求的浏览器扩展等再进行重试！");
                 return;
             }
 

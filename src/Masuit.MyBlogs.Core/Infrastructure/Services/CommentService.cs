@@ -20,7 +20,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public List<Comment> GetSelfAndAllChildrenCommentsByParentId(int id)
         {
-            //return SqlQuery("exec sp_getChildrenCommentByParentId " + id);
             var c = GetById(id);
             if (c != null)
             {
@@ -40,7 +39,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         private void GetSelfAndAllChildrenCommentsByParentId(Comment comment, List<Comment> list)
         {
-            var comments = GetQueryFromCache(x => x.ParentId == comment.Id).ToList();
+            var comments = GetQuery(x => x.ParentId == comment.Id).ToList();
             if (comments.Any())
             {
                 list.AddRange(comments);

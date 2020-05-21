@@ -103,7 +103,7 @@
             return;
         }
 		localStorage.setItem("user", JSON.stringify($(this).serializeObject()));
-		window.post("/Msg/Put", $(this).serializeObject(), (data) => {
+		window.post("/Msg/submit", $(this).serializeObject(), (data) => {
             loadingDone();
             if (data && data.Success) {
 		        window.notie.alert({
@@ -134,7 +134,7 @@
 function submitComment(_this) {
     loading();
 	localStorage.setItem("user", JSON.stringify($(_this).serializeObject()));
-    window.post("/Msg/Put", $(_this).serializeObject(), (data) => {
+    window.post("/Msg/submit", $(_this).serializeObject(), (data) => {
         loadingDone();
         if (data && data.Success) {
 			window.notie.alert({

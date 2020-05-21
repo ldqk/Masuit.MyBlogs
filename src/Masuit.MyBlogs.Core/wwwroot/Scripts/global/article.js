@@ -169,7 +169,7 @@
 		}
 
 		localStorage.setItem("user",  JSON.stringify(formData));
-		window.post("/comment/put", formData, function(data) {
+		window.post("/comment/submit", formData, function(data) {
 			loadingDone();
 			if (data.Success) {
 				window.notie.alert({
@@ -207,7 +207,7 @@
 function submitComment(_this) {
 	loading();
 	localStorage.setItem("user", JSON.stringify($(_this).serializeObject()));
-	window.post("/comment/put", $(_this).serializeObject(), function(data) {
+	window.post("/comment/submit", $(_this).serializeObject(), function(data) {
 		loadingDone();
 		if (data.Success) {
 			window.notie.alert({

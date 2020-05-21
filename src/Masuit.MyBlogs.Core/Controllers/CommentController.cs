@@ -41,7 +41,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Put(CommentCommand dto)
+        public async Task<ActionResult> Submit(CommentCommand dto)
         {
             if (Regex.Match(dto.Content, CommonHelper.BanRegex).Length > 0)
             {
