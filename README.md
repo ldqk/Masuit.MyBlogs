@@ -34,13 +34,13 @@ Redis：redis-server-windows 3.2
 #### 服务器性能监控
 可直接在线实时监控服务器的运行状态，包括CPU、网络带宽、磁盘使用率、内存占用等情况，可记录最近一天的服务器健康状态，通过websocket进行数据的推送，仅支持Windows，且需要Windows安装最新的更新。
 #### 文章管理
-包含文章审核、文章合并、文章列表的增删查改、分类管理、专题管理；
-文章审核：当用户在前台页进行投稿后，会进入审核状态，审核通过后，才会在前台页的文章列表中展示出来。
-文章合并：当用户在前台页进行了文章的编辑后，会创建出文章的合并请求，当后台管理进行相应的合并操作后，前台用户的修改才会正式生效，可以直接合并、编辑并合并和拒绝合并，拒绝时，修改人会收到相应的邮件通知。
-文章操作：可对文章进行修改、新增、置顶、临时删除(下架)、还原、永久删除、禁止评论等操作。
-分类管理：对文章的分类进行增删查改和文章的移动等操作，与文章的关系：一对多。
-专题管理：对文章的专题进行管理，与文章的关系：多对多。
-快速分享：首页快速分享栏目的管理。
+- 包含文章审核、文章合并、文章列表的增删查改、分类管理、专题管理；
+- 文章审核：当用户在前台页进行投稿后，会进入审核状态，审核通过后，才会在前台页的文章列表中展示出来。
+- 文章合并：当用户在前台页进行了文章的编辑后，会创建出文章的合并请求，当后台管理进行相应的合并操作后，前台用户的修改才会正式生效，可以直接合并、编辑并合并和拒绝合并，拒绝时，修改人会收到相应的邮件通知。
+- 文章操作：可对文章进行修改、新增、置顶、临时删除(下架)、还原、永久删除、禁止评论等操作。
+- 分类管理：对文章的分类进行增删查改和文章的移动等操作，与文章的关系：一对多。
+- 专题管理：对文章的专题进行管理，与文章的关系：多对多。
+- 快速分享：首页快速分享栏目的管理。
 #### 评论和留言管理
 对前台用户提交的留言和评论进行审核，当前台用户提交的内容可能包含有敏感词时，会进入人工审核，审核成功才会在前台页中展示。
 #### 消息通知
@@ -50,17 +50,17 @@ Redis：redis-server-windows 3.2
 #### 杂项页管理
 一些通用的页面管理，可自由灵活的创建静态页面。
 #### 系统设置
-包含系统的全局设置、防火墙管理、网站运行日志记录、友链管理、邮件模板的管理。
-全局设置：网站的一些基本配置和SEO相关操作等；
-防火墙：对网站的所有请求进行全局流量的拦截，让规则内的请求阻止掉，支持黑名单、白名单、IP地址段、国家或地区、关键词审查等规则；
+- 包含系统的全局设置、防火墙管理、网站运行日志记录、友链管理、邮件模板的管理。
+- 全局设置：网站的一些基本配置和SEO相关操作等；
+- 防火墙：对网站的所有请求进行全局流量的拦截，让规则内的请求阻止掉，支持黑名单、白名单、IP地址段、国家或地区、关键词审查等规则；
 #### 广告管理
 主动式的广告投放管理，支持竞价排名，支持在banner、边栏、页内、列表内的广告展示，竞价或权重的高低决定广告出现的概率。
 #### 赞助管理
 对网站打赏进行增删查改操作，手动掩码。
 #### 订阅管理
-对订阅者邮箱进行管理，支持更新订阅和权限订阅；
-更新订阅：当网站有文章更新或添加时，并且网站全局开启了邮箱订阅通知，才会在更新时往所有邮箱进行推送。
-权限订阅：当一些处于防火墙规则中的用户并且不能白名单模式的，需要访问网站，则需要通过权限订阅的模式获取访问验证码，来进行网站的访问。
+- 对订阅者邮箱进行管理，支持更新订阅和权限订阅；
+- 更新订阅：当网站有文章更新或添加时，并且网站全局开启了邮箱订阅通知，才会在更新时往所有邮箱进行推送。
+- 权限订阅：当一些处于防火墙规则中的用户并且不能白名单模式的，需要访问网站，则需要通过权限订阅的模式获取访问验证码，来进行网站的访问。
 #### 搜索统计
 当前台用户每Session周期内的关键词搜索，不重复的关键词将会被记录，用于热词统计，仅记录最近一个月内的所有搜索关键词，用于统计当月、7天以及当天的搜索热词。
 #### 任务管理
@@ -69,8 +69,8 @@ hangfire的可视化管理页面
 服务器文件的在线管理，支持浏览、预览、压缩、解压缩、创建文件夹、上传、下载、打包下载等文件的基本操作。
 
 ### 项目架构
-项目采用单体架构，方便部署和配置，传统的MVC模式，ASP.NET Core MVC+EF Core的简单架构。  
-Controller→Service→Repository→DbContext  
+- 项目采用单体架构，方便部署和配置，传统的MVC模式，ASP.NET Core MVC+EF Core的简单架构。  
+- Controller→Service→Repository→DbContext  
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbcc714c3db.jpg)  
 ### 项目文件夹定义：
 App_Data：存放网站的一些常规数据，以文本的形式存在，这类数据不需要频繁更新的。  
@@ -113,18 +113,18 @@ notie提示栏+sweetyalert弹窗+layui组件
 angularjs  
 
 ##### 后台管理页：
-angularjs单一页面应用程序  
-material布局风格  
-highchart+echart图表组件  
-ng-table表格插件  
-material风格angular-filemanager文件管理器  
+- angularjs单一页面应用程序  
+- material布局风格  
+- highchart+echart图表组件  
+- ng-table表格插件  
+- material风格angular-filemanager文件管理器  
 #### 性能和安全相关
-通过url的敏感词检查过滤恶意流量；  
-限制客户端的请求频次；  
-表单的AntiForgeryToken防止恶意提交；  
-hangfire实现分布式任务调度；  
-Redis分布式Session和缓存；  
-Z.EntityFramework.Plus实现数据访问层的高性能数据库批量操作；  
+- 通过url的敏感词检查过滤恶意流量；  
+- 限制客户端的请求频次；  
+- 表单的AntiForgeryToken防止恶意提交；  
+- hangfire实现分布式任务调度；  
+- Redis分布式Session和缓存；  
+- Z.EntityFramework.Plus实现数据访问层的高性能数据库批量操作；  
 ### 项目部署
 #### 编译：
 编译需要将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目也一起clone下来，和本项目平级目录存放，才能正常编译，否则，将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目移除，通过nuget安装也是可以的。  
@@ -142,13 +142,9 @@ docker：自行爬文。
 网站默认会以5000和5001端口运行，如果需要指定端口，需要在程序启动时从控制台带入参数，或者从环境变量获取  
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbf30c977ee.jpg)  
 ### 后台管理：
-初始用户名：masuit  
-初始密码：123abc@#$
-### 截图欣赏
-![](https://git.imweb.io/ldqk/imgbed/raw/master/87c01ec7gy1ft52pqlf52j21kw0fzdhw.jpg)  
-![](https://git.imweb.io/ldqk/imgbed/raw/master/87c01ec7gy1ft52q0crg7j21880wn0wz.jpg)  
-![](https://git.imweb.io/ldqk/imgbed/raw/master/87c01ec7gy1ft52q28m4dj21kw0pkdk3.jpg)  
-![](https://git.imweb.io/ldqk/imgbed/raw/master/87c01ec7gy1ft52q427zzj21kw0ltjwk.jpg)  
+- 初始用户名：masuit  
+- 初始密码：123abc@#$
+
 ### 推荐项目
 基于EntityFrameworkCore和Lucene.NET实现的全文检索搜索引擎：[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine "Masuit.LuceneEFCore.SearchEngine")
 
