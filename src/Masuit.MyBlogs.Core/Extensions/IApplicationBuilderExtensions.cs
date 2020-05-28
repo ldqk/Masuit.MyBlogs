@@ -8,9 +8,9 @@ namespace Masuit.MyBlogs.Core.Extensions
         {
             return builder.UseMiddleware<RequestInterceptMiddleware>();
         }
-        public static IApplicationBuilder UseActivity(this IApplicationBuilder builder)
-        {
-            return builder.UseMiddleware<ActivityMiddleware>();
-        }
+        //public static IApplicationBuilder UseActivity(this IApplicationBuilder builder)
+        //{
+        //    return builder.UseMiddleware<ActivityMiddleware>();
+        //}
     }
 }

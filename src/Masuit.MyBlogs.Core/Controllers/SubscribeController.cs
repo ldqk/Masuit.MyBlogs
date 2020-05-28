@@ -86,7 +86,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     p.Category.Name
                 },
                 Link = new Uri(scheme + "://" + host + "/" + p.Id),
-                PublishDate = p.ModifyDate,
+                PublishDate = p.ModifyDate.ToUniversalTime(),
                 Title = p.Title,
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
@@ -132,7 +132,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     p.Category.Name
                 },
                 Link = new Uri(scheme + "://" + host + "/" + p.Id),
-                PublishDate = p.ModifyDate,
+                PublishDate = p.ModifyDate.ToUniversalTime(),
                 Title = p.Title,
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
@@ -178,7 +178,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     p.Category.Name
                 },
                 Link = new Uri(scheme + "://" + host + "/" + p.Id),
-                PublishDate = p.ModifyDate,
+                PublishDate = p.ModifyDate.ToUniversalTime(),
                 Title = p.Title,
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
@@ -223,7 +223,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     c.Post.Title
                 },
                 Link = new Uri($"{scheme}://{host}/{post.Id}?cid={c.Id}#comment"),
-                PublishDate = c.CommentDate,
+                PublishDate = c.CommentDate.ToUniversalTime(),
                 Title = c.NickName,
                 Permalink = $"{scheme}://{host}/{post.Id}?cid={c.Id}#comment",
                 Guid = c.Id.ToString(),

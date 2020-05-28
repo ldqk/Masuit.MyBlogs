@@ -194,7 +194,7 @@ namespace Masuit.MyBlogs.Core
                 ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes),
             });
             app.UseSession().UseCookiePolicy().UseMiniProfiler(); //注入Session
-            app.UseRequestIntercept().UseActivity(); //启用网站请求拦截
+            app.UseRequestIntercept(); //启用网站请求拦截
             app.UseStaticHttpContext(); //注入静态HttpContext对象
 
             app.UseHangfireServer().UseHangfireDashboard("/taskcenter", new DashboardOptions()
