@@ -78,6 +78,7 @@
 	            $(':input', '#article-form').not(':button,:submit,:reset,:hidden').val('').removeAttr('checked').removeAttr('checked'); //评论成功清空表单
 	            ue.setContent("");
 				clearInterval(window.interval);
+				localStorage.removeItem("write-post-draft");
             } else {
 				window.notie.alert({
 		            type: 3,
