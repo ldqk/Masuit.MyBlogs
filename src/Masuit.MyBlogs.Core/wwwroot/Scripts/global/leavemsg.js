@@ -18,10 +18,10 @@
     $("#msg-form").on("submit", function(e) {
         e.preventDefault();
         layui.layedit.sync(1);
-        if ($("#name").val().trim().length <= 0 || $("#name").val().trim().length > 36) {
+        if ($("#name").val().trim().length <= 0 || $("#name").val().trim().length > 24) {
 	        window.notie.alert({
 		        type: 3,
-		        text: '昵称要求2-36个字符！',
+		        text: '昵称要求2-24个字符！',
 		        time: 4
 	        });
             loadingDone();
@@ -84,10 +84,10 @@
     $("#reply-form").on("submit", function(e) {
         e.preventDefault();
         layui.layedit.sync(window.currentEditor);
-        if ($("#name2").val().trim().length <= 0 || $("#name").val().trim().length > 36) {
+        if ($("#name2").val().trim().length <= 0 || $("#name").val().trim().length > 24) {
 	        window.notie.alert({
 		        type: 3,
-                text: "昵称要求2-36个字符！",
+                text: "昵称要求2-24个字符！",
 		        time: 4
 	        });
             loadingDone();

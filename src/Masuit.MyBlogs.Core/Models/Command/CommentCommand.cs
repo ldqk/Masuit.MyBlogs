@@ -19,7 +19,7 @@ namespace Masuit.MyBlogs.Core.Models.Command
         /// <summary>
         /// 昵称
         /// </summary>
-        [Required(ErrorMessage = "既然要评论，不留名怎么行呢！"), MaxLength(36, ErrorMessage = "昵称最多只能36个字符！"), MinLength(2, ErrorMessage = "昵称至少2个字！")]
+        [Required(ErrorMessage = "昵称不能为空！"), MaxLength(36, ErrorMessage = "昵称最多只能24个字符！"), MinLength(2, ErrorMessage = "昵称至少2个字！")]
         public string NickName { get; set; }
 
         /// <summary>

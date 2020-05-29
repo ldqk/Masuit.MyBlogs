@@ -214,7 +214,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "验证码错误！");
             }
 
-            if (Regex.Match(post.Title + post.Content, CommonHelper.BanRegex).Length > 0)
+            if (Regex.Match(post.Title + post.Author + post.Content, CommonHelper.BanRegex).Length > 0)
             {
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
@@ -437,7 +437,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var b = PostService.SaveChanges() > 0;
             if (!b)
             {
-                return ResultData(null, b, b ? "您的修改请求已提交，已进入审核状态，感谢您的参与！" : "操作失败！");
+                return ResultData(null, false, "操作失败！");
             }
 
             RedisHelper.Expire("code:" + dto.ModifierEmail, 1);
@@ -449,7 +449,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             });
             var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-request.html").Replace("{{title}}", post.Title).Replace("{{link}}", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id);
             BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
-            return ResultData(null, b, b ? "您的修改请求已提交，已进入审核状态，感谢您的参与！" : "操作失败！");
+            return ResultData(null, true, "您的修改请求已提交，已进入审核状态，感谢您的参与！");
         }
 
         #region 后端管理

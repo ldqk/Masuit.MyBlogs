@@ -18,7 +18,6 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -43,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Submit(CommentCommand dto)
         {
-            if (Regex.Match(dto.Content, CommonHelper.BanRegex).Length > 0)
+            if (Regex.Match(dto.NickName + dto.Content, CommonHelper.BanRegex).Length > 0)
             {
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
@@ -61,7 +60,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var comment = dto.Mapper<Comment>();
-            if (Regex.Match(dto.Content, CommonHelper.ModRegex).Length <= 0)
+            if (Regex.Match(dto.NickName + dto.Content, CommonHelper.ModRegex).Length <= 0)
             {
                 comment.Status = Status.Published;
             }

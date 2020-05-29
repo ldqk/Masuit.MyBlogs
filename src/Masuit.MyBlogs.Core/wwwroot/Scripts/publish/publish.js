@@ -40,10 +40,10 @@
             loadingDone();
             return;
         }
-        if ($("#Author").val().trim().length <= 0 || $("#Author").val().trim().length > 36) {
+        if ($("#Author").val().trim().length <= 1 || $("#Author").val().trim().length > 24) {
 	        window.notie.alert({
 		        type: 3,
-                text: '再怎么你也应该留个合理的名字吧，非主流的我可不喜欢！',
+                text: '昵称不能少于2个字符或超过36个字符！',
 		        time: 4
 	        });
             loadingDone();

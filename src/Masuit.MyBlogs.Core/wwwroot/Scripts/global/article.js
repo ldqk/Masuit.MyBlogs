@@ -91,10 +91,10 @@
 	$("#comment").on("submit", function(e) {
 		e.preventDefault();
 		layui.layedit.sync(1);
-		if ($("#name").val().trim().length <= 1 || $("#name").val().trim().length > 36) {
+		if ($("#name").val().trim().length <= 1 || $("#name").val().trim().length > 24) {
 			window.notie.alert({
 				type: 3,
-				text: '昵称要求2-36个字符！',
+				text: '昵称要求2-24个字符！',
 				time: 4
 			});
 			return;
@@ -148,10 +148,10 @@
         layui.layedit.sync(window.currentEditor);
 		loading();
         var formData = $("#reply-form").serializeObject();
-		if (formData["NickName"].trim().length <= 0 ||formData["NickName"].trim().length > 36) {
+		if (formData["NickName"].trim().length <= 0 ||formData["NickName"].trim().length > 24) {
 			window.notie.alert({
 				type: 3,
-				text: "昵称要求2-36个字符！",
+				text: "昵称要求2-24个字符！",
 				time: 4
 			});
 			loadingDone();
