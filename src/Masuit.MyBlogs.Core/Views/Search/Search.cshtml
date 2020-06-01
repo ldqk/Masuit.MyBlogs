@@ -50,7 +50,7 @@
                         <div class="hr-line-dashed"></div>
                         @if (Model.Results.Any())
                         {
-                            var rnd = new Random().Next(Model.Results.Count > 2 ? 2 : 0, Model.Results.Count);
+                            var rnd = new Random().Next(Model.Results.Count > 2 ? 2 : 1, Model.Results.Count);
                             for (var i = 0; i < Model.Results.Count; i++)
                             {
                                 if (rnd == i && ad != null)
