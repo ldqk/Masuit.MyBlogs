@@ -1,6 +1,8 @@
-﻿using IP2Region;
+﻿using Hangfire;
+using IP2Region;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -8,6 +10,8 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.DateTimeExt;
+using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
@@ -30,8 +34,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         private readonly ISearchDetailsService _searchDetailsService;
         private readonly ILinksService _linksService;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IWebHostEnvironment _HostEnvironment;
+        private readonly IWebHostEnvironment _hostEnvironment;
         private readonly ISearchEngine<DataContext> _searchEngine;
+        private readonly IBroadcastService _broadcastService;
 
         /// <summary>
         /// hangfire后台任务
@@ -44,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="httpClientFactory"></param>
         /// <param name="HostEnvironment"></param>
         /// <param name="searchEngine"></param>
-        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IWebHostEnvironment HostEnvironment, ISearchEngine<DataContext> searchEngine)
+        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IWebHostEnvironment HostEnvironment, ISearchEngine<DataContext> searchEngine, IBroadcastService broadcastService)
         {
             _userInfoService = userInfoService;
             _postService = postService;
@@ -52,8 +57,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             _searchDetailsService = searchDetailsService;
             _linksService = linksService;
             _httpClientFactory = httpClientFactory;
-            _HostEnvironment = HostEnvironment;
+            _hostEnvironment = HostEnvironment;
             _searchEngine = searchEngine;
+            _broadcastService = broadcastService;
         }
 
         /// <summary>
@@ -83,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             var u = _userInfoService.GetByUsername(userInfo.Username);
             u.LoginRecord.Add(record);
             _userInfoService.SaveChanges();
-            var content = File.ReadAllText(Path.Combine(_HostEnvironment.WebRootPath, "template", "login.html"))
+            var content = File.ReadAllText(Path.Combine(_hostEnvironment.WebRootPath, "template", "login.html"))
                 .Replace("{{name}}", u.Username)
                 .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Replace("{{ip}}", record.IP)
@@ -238,6 +244,29 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             RedisHelper.Set("SearchRank:Month", _searchDetailsService.GetRanks(DateTime.Today.AddMonths(-1)));
             RedisHelper.Set("SearchRank:Week", _searchDetailsService.GetRanks(DateTime.Today.AddDays(-7)));
             RedisHelper.Set("SearchRank:Today", _searchDetailsService.GetRanks(DateTime.Today));
+        }
+
+        /// <summary>
+        /// 文章订阅广播
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="link"></param>
+        public void BroadcastPostPublished(int id, string link)
+        {
+            var post = _postService.GetById(id);
+            _broadcastService.GetQuery(c => c.Status == Status.Subscribed).AsParallel().ForEach(c =>
+            {
+                var ts = DateTime.Now.GetTotalMilliseconds();
+                var uri = new Uri(link);
+                string content = File.ReadAllText(Path.Combine(_hostEnvironment.WebRootPath, "template", "broadcast.html"))
+                    .Replace("{{link}}", link + "?email=" + c.Email)
+                    .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
+                    .Replace("{{title}}", post.Title)
+                    .Replace("{{author}}", post.Author)
+                    .Replace("{{content}}", post.Content.GetSummary())
+                    .Replace("{{cancel}}", $"{uri.Scheme}://{uri.Authority}/Subscribe/Subscribe?email={c.Email}&act=cancel&validate={c.ValidateCode}&timespan={ts}&hash={(c.Email + "cancel" + c.ValidateCode + ts).MDString(AppConfig.BaiduAK)}");
+                BackgroundJob.Schedule(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客有新文章发布了", content, c.Email), post.ModifyDate - DateTime.Now);
+            });
         }
     }
 }

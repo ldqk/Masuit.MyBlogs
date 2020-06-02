@@ -54,5 +54,12 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// 搜索统计
         /// </summary>
         void StatisticsSearchKeywords();
+
+        /// <summary>
+        /// 文章订阅广播
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="link"></param>
+        void BroadcastPostPublished(int id, string link);
     }
 }

@@ -715,27 +715,8 @@ namespace Masuit.MyBlogs.Core.Controllers
 #if !DEBUG
             if (notify && "false" == CommonHelper.SystemSettings["DisabledEmailBroadcast"])
             {
-                var cast = BroadcastService.GetQuery(c => c.Status == Status.Subscribed).ToList();
                 string link = Request.Scheme + "://" + Request.Host + "/" + p.Id;
-                cast.ForEach(c =>
-                {
-                    var ts = DateTime.Now.GetTotalMilliseconds();
-                    string content = System.IO.File.ReadAllText(Path.Combine(HostEnvironment.WebRootPath, "template", "broadcast.html"))
-                        .Replace("{{link}}", link + "?email=" + c.Email)
-                        .Replace("{{time}}", p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
-                        .Replace("{{title}}", post.Title)
-                        .Replace("{{author}}", post.Author)
-                        .Replace("{{content}}", post.Content.GetSummary())
-                        .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
-                        {
-                            c.Email,
-                            act = "cancel",
-                            validate = c.ValidateCode,
-                            timespan = ts,
-                            hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
-                        }, Request.Scheme));
-                    BackgroundJob.Schedule(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
-                });
+                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.BroadcastPostPublished), "", p.Id, link);
             }
 #endif
             return ResultData(p.Mapper<PostDto>(), message: "文章修改成功！");
@@ -823,26 +804,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, true, "文章发表成功！");
             }
-            var cast = BroadcastService.GetQuery(c => c.Status == Status.Subscribed).ToList();
             string link = Request.Scheme + "://" + Request.Host + "/" + p.Id;
-            cast.ForEach(c =>
-            {
-                var ts = DateTime.Now.GetTotalMilliseconds();
-                string content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/broadcast.html")
-                    .Replace("{{link}}", link + "?email=" + c.Email)
-                    .Replace("{{time}}", p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
-                    .Replace("{{title}}", post.Title).Replace("{{author}}", post.Author)
-                    .Replace("{{content}}", post.Content.GetSummary(250, 50))
-                    .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
-                    {
-                        c.Email,
-                        act = "cancel",
-                        validate = c.ValidateCode,
-                        timespan = ts,
-                        hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
-                    }, Request.Scheme));
-                BackgroundJob.Schedule(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客有新文章发布了", content, c.Email), (p.ModifyDate - DateTime.Now));
-            });
+            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.BroadcastPostPublished), "", p.Id, link);
             return ResultData(null, true, "文章发表成功！");
         }
 

@@ -287,7 +287,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     act = "verify",
                     validate = guid,
                     timespan = ts,
-                    hash = (email + "verify" + guid + ts).AESEncrypt(AppConfig.BaiduAK)
+                    hash = (email + "verify" + guid + ts).MDString(AppConfig.BaiduAK)
                 }, "http");
                 BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客订阅：" + Request.Host, System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/subscribe.html").Replace("{{link}}", link), email));
                 BroadcastService.SaveChanges();
@@ -330,7 +330,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 act = "cancel",
                 validate = c.ValidateCode,
                 timespan = ts,
-                hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
+                hash = (c.Email + "cancel" + c.ValidateCode + ts).MDString(AppConfig.BaiduAK)
             }, Request.Scheme);
             BackgroundJob.Enqueue(() => CommonHelper.SendMail("取消本站订阅", $"请<a href=\"{url}\">点击这里</a>取消订阅本站更新。", email));
             return Content("取消订阅的链接已经发送到了您的邮箱，请到您的邮箱内进行取消订阅");
@@ -352,7 +352,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return Content("链接已失效");
             }
-            var hash2 = (email + act + validate + timespan).AESEncrypt(AppConfig.BaiduAK);
+            var hash2 = (email + act + validate + timespan).MDString(AppConfig.BaiduAK);
             if (!hash2.Equals(hash))
             {
                 return Content("操作失败，链接已被非法篡改");
