@@ -254,7 +254,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void BroadcastPostPublished(int id, string link)
         {
             var post = _postService.GetById(id);
-            _broadcastService.GetQuery(c => c.Status == Status.Subscribed).AsParallel().ForEach(c =>
+            _broadcastService.GetQuery(c => c.Status == Status.Subscribed && c.SubscribeType == SubscribeType.Broadcast).AsParallel().ForEach(c =>
             {
                 var ts = DateTime.Now.GetTotalMilliseconds();
                 var uri = new Uri(link);
