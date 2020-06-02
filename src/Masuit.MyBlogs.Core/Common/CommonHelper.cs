@@ -3,6 +3,7 @@ using HtmlAgilityPack;
 using IP2Region;
 using Masuit.Tools;
 using Masuit.Tools.Media;
+using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
