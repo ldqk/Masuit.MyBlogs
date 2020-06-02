@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hangfire;
 using HtmlAgilityPack;
 using IP2Region;
 using Masuit.Tools;
@@ -192,6 +193,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="title">标题</param>
         /// <param name="content">内容</param>
         /// <param name="tos">收件人</param>
+        [AutomaticRetry(Attempts = 1)]
         public static void SendMail(string title, string content, string tos)
         {
 #if !DEBUG

@@ -251,6 +251,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// </summary>
         /// <param name="id"></param>
         /// <param name="link"></param>
+        [AutomaticRetry(Attempts = 1)]
         public void BroadcastPostPublished(int id, string link)
         {
             var post = _postService.GetById(id);

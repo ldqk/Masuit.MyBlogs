@@ -111,7 +111,11 @@ namespace Masuit.MyBlogs.Core
             });
 
             services.AddResponseCache().AddCacheConfig();
-            services.AddHangfire(x => x.UseMemoryStorage()); //配置hangfire
+            services.AddHangfire((provider, configuration) =>
+            {
+                configuration.UseFilter(new AutomaticRetryAttribute());
+                configuration.UseMemoryStorage();
+            }); //配置hangfire
 
             services.AddSevenZipCompressor().AddResumeFileResult().AddSearchEngine<DataContext>(new LuceneIndexerOptions()
             {
