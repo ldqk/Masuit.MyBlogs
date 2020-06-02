@@ -130,6 +130,13 @@
             </div>
         </div>
         <div class="input-group">
+            <span class="input-group-addon el-switch" style="text-align: left">
+                <span>启用SSL：</span>
+                <input type="checkbox" name="switch" ng-checked="Settings.EnableSsl=='true'">
+                <span class="el-switch-style" ng-click="EmailEnableSsl()"></span>
+            </span>
+        </div>
+        <div class="input-group">
             <span class="input-group-addon">接收网站通知邮箱：</span>
             <div class="fg-line">
                 <input type="text" class="form-control" ng-model="Settings.ReceiveEmail" />

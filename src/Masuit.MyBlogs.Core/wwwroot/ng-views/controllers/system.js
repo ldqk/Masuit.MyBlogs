@@ -86,7 +86,8 @@
 			user: $scope.Settings.EmailFrom,
 			pwd: $scope.Settings.EmailPwd,
 			port: $scope.Settings.SmtpPort,
-			to: $scope.Settings.ReceiveEmail
+			to: $scope.Settings.ReceiveEmail,
+			ssl:$scope.Settings.EnableSsl
 		}).then(function(res) {
 			if (res.data.Success) {
 				swal(res.data.Message,'','success');
@@ -132,6 +133,14 @@
 			$scope.Settings.DisabledEmailBroadcast="false";
 		} else {
 			$scope.Settings.DisabledEmailBroadcast="true";
+		}
+	}
+
+	$scope.EmailEnableSsl= function() {
+		if($scope.Settings.EnableSsl=="true") {
+			$scope.Settings.EnableSsl="false";
+		} else {
+			$scope.Settings.EnableSsl="true";
 		}
 	}
 

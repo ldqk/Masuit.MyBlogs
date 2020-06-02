@@ -185,13 +185,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="port"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public ActionResult MailTest(string smtp, string user, string pwd, int port, string to)
+        public ActionResult MailTest(string smtp, string user, string pwd, int port, string to, bool ssl)
         {
             try
             {
                 new Email()
                 {
-                    EnableSsl = true,
+                    EnableSsl = ssl,
                     Body = "发送成功，网站邮件配置正确！",
                     SmtpServer = smtp,
                     Username = user,

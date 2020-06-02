@@ -16,9 +16,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+
 #if !DEBUG
-using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools.Models;
 #endif
 
 namespace Masuit.MyBlogs.Core.Common
@@ -197,11 +196,11 @@ namespace Masuit.MyBlogs.Core.Common
 #if !DEBUG
             new Email()
             {
-                EnableSsl = true,
+                EnableSsl = bool.Parse(SystemSettings.GetOrAdd("EnableSsl", "true")),
                 Body = content,
-                SmtpServer = EmailConfig.Smtp,
-                Username = EmailConfig.SendFrom,
-                Password = EmailConfig.EmailPwd,
+                SmtpServer = SystemSettings["SMTP"],
+                Username = SystemSettings["EmailFrom"],
+                Password = SystemSettings["EmailPwd"],
                 SmtpPort = SystemSettings["SmtpPort"].ToInt32(),
                 Subject = title,
                 Tos = tos

@@ -94,5 +94,11 @@
     "inputFiles": [
       "wwwroot/Scripts/jquery_3.4.1.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/ng-views/controllers/system.min.js",
+    "inputFiles": [
+      "wwwroot/ng-views/controllers/system.js"
+    ]
   }
 ]
