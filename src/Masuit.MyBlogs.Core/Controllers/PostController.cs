@@ -72,6 +72,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
+            ViewBag.Related = PostService.ScoreSearch(1, 10, string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label);
             if (CurrentUser.IsAdmin)
             {
                 return View("Details_Admin", post);
@@ -94,7 +95,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("{id:int}/history"), Route("{id:int}/history/{page:int}/{size:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size" }, VaryByHeader = "Cookie")]
-        public async Task<ActionResult> History(int id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 20)
+        public async Task<ActionResult> History(int id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             ViewBag.Primary = post;
@@ -207,7 +208,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="code"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Publish(PostCommand post, [Required(ErrorMessage = "验证码不能为空")]string code)
+        public async Task<ActionResult> Publish(PostCommand post, [Required(ErrorMessage = "验证码不能为空")] string code)
         {
             if (await RedisHelper.GetAsync("code:" + post.Email) != code)
             {
@@ -601,7 +602,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
+        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
         {
             Expression<Func<Post, bool>> where = p => true;
             if (cid.HasValue)
@@ -626,7 +627,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="search"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPending([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15, string search = "")
+        public ActionResult GetPending([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string search = "")
         {
             Expression<Func<Post, bool>> where = p => p.Status == Status.Pending;
             if (!string.IsNullOrEmpty(search))

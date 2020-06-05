@@ -2,6 +2,7 @@
 @using System.Web
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Configs
+@using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
@@ -247,14 +248,13 @@
                     </section>
                 }
                 @{
-                    var posts = Model.Category.Post.Where(p => p.Status == Status.Published && p.Id != Model.Id).OrderBy(p => Guid.NewGuid()).ToList();
-                    int count = posts.Count >= 10 ? 10 : posts.Count;
+                    var posts = (List<Post>)ViewBag.Related;
                     if (posts.Any())
                     {
                         <section class="wow margintop20 animated fadeIn">
                             <h3>相关推荐：</h3>
                             <table class="table table-condensed size16">
-                                @for (int i = 1; i < count; i += 2)
+                                @for (int i = 1; i < posts.Count; i += 2)
                                 {
                                     <tr>
                                         <td style="width: 50%"><a asp-controller="Post" asp-action="Details" asp-route-id="@posts[i - 1].Id">@posts[i - 1].Title</a></td>

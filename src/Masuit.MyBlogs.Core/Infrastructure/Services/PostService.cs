@@ -23,10 +23,22 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
     public partial class PostService : BaseService<Post>, IPostService
     {
         private readonly ICacheManager<SearchResult<PostDto>> _cacheManager;
+        private readonly ICacheManager<List<Post>> _searchCacheManager;
 
-        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, ICacheManager<SearchResult<PostDto>> cacheManager) : base(repository, searchEngine, searcher)
+        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, ICacheManager<SearchResult<PostDto>> cacheManager, ICacheManager<List<Post>> searchCacheManager) : base(repository, searchEngine, searcher)
         {
             _cacheManager = cacheManager;
+            _searchCacheManager = searchCacheManager;
+        }
+
+        public List<Post> ScoreSearch(int page, int size, string keyword)
+        {
+            var cacheKey = $"scoreSearch:{keyword}:{page}:{size}";
+            return _searchCacheManager.GetOrAdd(cacheKey, s =>
+            {
+                _searchCacheManager.Expire(cacheKey, TimeSpan.FromHours(1));
+                return SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword)).Results.Select(r => r.Entity).ToList();
+            });
         }
 
         public SearchResult<PostDto> SearchPage(int page, int size, string keyword)
