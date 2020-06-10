@@ -72,7 +72,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
-            ViewBag.Related = PostService.ScoreSearch(1, 10, string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label);
+            var related = PostService.ScoreSearch(1, 11, string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label);
+            related.RemoveAll(p => p.Id == id);
+            ViewBag.Related = related;
             if (CurrentUser.IsAdmin)
             {
                 return View("Details_Admin", post);

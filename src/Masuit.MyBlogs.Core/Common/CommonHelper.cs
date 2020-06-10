@@ -90,43 +90,6 @@ namespace Masuit.MyBlogs.Core.Common
         public static ConcurrentDictionary<string, string> SystemSettings { get; set; } = new ConcurrentDictionary<string, string>();
 
         /// <summary>
-        /// 访问量
-        /// </summary>
-        public static double InterviewCount
-        {
-            get
-            {
-                try
-                {
-                    return RedisHelper.Get<double>("Interview:ViewCount");
-                }
-                catch
-                {
-                    return 1;
-                }
-            }
-            set => RedisHelper.IncrBy("Interview:ViewCount");
-        }
-
-        /// <summary>
-        /// 平均访问量
-        /// </summary>
-        public static double AverageCount
-        {
-            get
-            {
-                try
-                {
-                    return RedisHelper.Get<double>("Interview:ViewCount") / RedisHelper.Get<double>("Interview:RunningDays");
-                }
-                catch
-                {
-                    return 1;
-                }
-            }
-        }
-
-        /// <summary>
         /// 网站启动时间
         /// </summary>
         public static DateTime StartupTime { get; set; } = DateTime.Now;

@@ -52,7 +52,6 @@ namespace Masuit.MyBlogs.Core.Extensions
             if (!context.Session.TryGetValue("session", out _) && !context.Request.IsRobot())
             {
                 context.Session.Set("session", 0);
-                CommonHelper.InterviewCount++;
                 var referer = context.Request.Headers[HeaderNames.Referer].ToString();
                 if (!string.IsNullOrEmpty(referer))
                 {
