@@ -37,22 +37,20 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("s/{wd?}/{page:int?}/{size:int?}")]
-        public ActionResult Search(string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
+        public ActionResult Search(string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            var nul = new SearchResult<PostDto>();
+            wd = wd?.Trim();
             ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
-            string ip = ClientIP;
-            string key = "Search:" + ip;
+            string key = "Search:" + ClientIP;
             if (CacheManager.Exists(key) && CacheManager.Get(key) != wd)
             {
                 var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList();
                 ViewBag.hotSearches = hotSearches;
                 ViewBag.ErrorMsg = "10秒内只能搜索1次！";
-                return View(nul);
+                return View(new SearchResult<PostDto>());
             }
 
-            wd = wd?.Trim().Replace("+", " ");
             if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
             {
                 if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !HttpContext.Request.IsRobot())
@@ -80,7 +78,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             ViewBag.hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList();
-            return View(nul);
+            return View(new SearchResult<PostDto>());
         }
 
         /// <summary>
@@ -91,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="search"></param>
         /// <returns></returns>
         [MyAuthorize, HttpPost, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "search" }, VaryByHeader = "Cookie")]
-        public ActionResult SearchList([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15, string search = "")
+        public ActionResult SearchList([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string search = "")
         {
             var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.Keywords.Contains(search);
             var pages = SearchDetailsService.GetPages<DateTime, SearchDetailsDto>(page, size, where, s => s.SearchTime, false);

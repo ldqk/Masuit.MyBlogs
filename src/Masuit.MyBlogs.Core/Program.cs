@@ -15,7 +15,7 @@ namespace Masuit.MyBlogs.Core
     {
         public static void Main(string[] args)
         {
-            QueryCacheManager.DefaultMemoryCacheEntryOptions = new MemoryCacheEntryOptions()
+            QueryCacheManager.DefaultMemoryCacheEntryOptions = new MemoryCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             };
