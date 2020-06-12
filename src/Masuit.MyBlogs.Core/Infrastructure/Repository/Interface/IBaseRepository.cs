@@ -479,8 +479,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         void Dispose(bool disposing);
     }
 
-    public partial interface IBroadcastRepository : IBaseRepository<Broadcast> { }
-
     public partial interface ICategoryRepository : IBaseRepository<Category> { }
 
     public partial interface ICommentRepository : IBaseRepository<Comment> { }

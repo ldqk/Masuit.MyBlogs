@@ -1,6 +1,10 @@
 ﻿using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq.Expressions;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -62,6 +66,18 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
+        /// 重置密码
+        /// </summary>
+        /// <param name="name">用户名</param>
+        /// <param name="pwd"></param>
+        /// <returns></returns>
+        public ActionResult ResetPassword(string name, string pwd)
+        {
+            bool b = UserInfoService.ResetPassword(name, pwd);
+            return ResultData(null, b, b ? $"密码重置成功，新密码为：{pwd}！" : "密码重置失败！");
+        }
+
+        /// <summary>
         /// 修改头像
         /// </summary>
         /// <param name="id"></param>
@@ -73,6 +89,63 @@ namespace Masuit.MyBlogs.Core.Controllers
             userInfo.Avatar = path;
             bool b = UserInfoService.SaveChanges() > 0;
             return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? "头像修改成功。" : "头像修改失败！");
+        }
+
+        /// <summary>
+        /// 手动添加或修改用户
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Save(UserInfoDto model)
+        {
+            var userInfo = UserInfoService.GetByUsername(model.Username);
+            if (userInfo is null)
+            {
+                userInfo = Mapper.Map<UserInfo>(model);
+                userInfo.Password = "123456";
+                UserInfoService.Register(userInfo);
+                return ResultData(null, true, "用户保存成功");
+            }
+
+            Mapper.Map(model, userInfo);
+            var b = await UserInfoService.SaveChangesAsync() > 0;
+            return ResultData(null, b, b ? "用户保存成功" : "用户保存失败");
+        }
+
+        /// <summary>
+        /// 删除用户
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await UserInfoService.DeleteByIdSavedAsync(id);
+            return ResultData(null);
+        }
+
+        /// <summary>
+        /// 获取用户列表
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <param name="search"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public IActionResult GetUsers(int page, int size, string search)
+        {
+            Expression<Func<UserInfo, bool>> where = info => true;
+            if (!string.IsNullOrEmpty(search))
+            {
+                where = u => u.Username.Contains(search) || u.NickName.Contains(search) || u.Email.Contains(search) || u.QQorWechat.Contains(search);
+            }
+
+            var pages = UserInfoService.GetPages<int, UserInfoDto>(page, size, where, u => u.Id, false);
+            return Ok(pages);
         }
     }
 }

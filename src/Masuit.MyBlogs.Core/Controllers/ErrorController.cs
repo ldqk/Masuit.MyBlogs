@@ -2,8 +2,7 @@
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
-using Masuit.MyBlogs.Core.Infrastructure.Services;
-using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.Tools;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
@@ -26,7 +25,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorController : Controller
     {
-        public BroadcastService BroadcastService { get; set; }
+        public IUserInfoService UserInfoService { get; set; }
 
         /// <summary>
         /// 404
@@ -166,7 +165,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "发送频率限制，请在2分钟后重新尝试发送邮件！请检查你的邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！");
             }
 
-            if (!BroadcastService.Any(b => b.Email.Equals(email) && b.SubscribeType == SubscribeType.ArticleToken))
+            if (!UserInfoService.Any(b => b.Email == email))
             {
                 return ResultData(null, false, "您目前没有权限访问这个链接，请联系站长开通访问权限！");
             }

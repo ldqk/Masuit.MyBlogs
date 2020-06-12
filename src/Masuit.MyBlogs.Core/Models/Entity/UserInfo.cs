@@ -63,11 +63,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// </summary>
         public string Avatar { get; set; }
 
-        /// <summary>
-        /// AccessToken，接入第三方登陆时用
-        /// </summary>
-        public string AccessToken { get; set; }
-
         public virtual ICollection<LoginRecord> LoginRecord { get; set; }
     }
 }

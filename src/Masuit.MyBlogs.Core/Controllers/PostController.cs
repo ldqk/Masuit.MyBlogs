@@ -16,7 +16,6 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
-using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Html;
 using Masuit.Tools.Security;
 using Masuit.Tools.Systems;
@@ -42,7 +41,6 @@ namespace Masuit.MyBlogs.Core.Controllers
     {
         public IPostService PostService { get; set; }
         public ICategoryService CategoryService { get; set; }
-        public IBroadcastService BroadcastService { get; set; }
         public ISeminarService SeminarService { get; set; }
         public IPostHistoryVersionService PostHistoryVersionService { get; set; }
         public IInternalMessageService MessageService { get; set; }
@@ -339,7 +337,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "发送频率限制，请在2分钟后重新尝试发送邮件！请检查你的邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！");
             }
 
-            if (!BroadcastService.Any(b => b.Email.Equals(email) && b.SubscribeType == SubscribeType.ArticleToken))
+            if (!UserInfoService.Any(b => b.Email.Equals(email)))
             {
                 return ResultData(null, false, "您目前没有权限访问这个链接，请联系站长开通访问权限！");
             }
@@ -495,28 +493,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, true, "审核通过！");
             }
 
-            var cast = BroadcastService.GetQuery(c => c.Status == Status.Subscribed).ToList();
-            var link = Request.Scheme + "://" + Request.Host + "/" + id;
-            cast.ForEach(c =>
-            {
-                var ts = DateTime.Now.GetTotalMilliseconds();
-                var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/broadcast.html")
-                    .Replace("{{link}}", link + "?email=" + c.Email)
-                    .Replace("{{time}}", post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))
-                    .Replace("{{title}}", post.Title)
-                    .Replace("{{author}}", post.Author)
-                    .Replace("{{content}}", post.Content.GetSummary(250, 50))
-                    .Replace("{{cancel}}", Url.Action("Subscribe", "Subscribe", new
-                    {
-                        c.Email,
-                        act = "cancel",
-                        validate = c.ValidateCode,
-                        timespan = ts,
-                        hash = (c.Email + "cancel" + c.ValidateCode + ts).AESEncrypt(AppConfig.BaiduAK)
-                    }, Request.Scheme));
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客有新文章发布了", content, c.Email));
-            });
-
             return ResultData(null, true, "审核通过！");
         }
 
@@ -645,11 +621,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 编辑
         /// </summary>
         /// <param name="post"></param>
-        /// <param name="notify">是否通知订阅</param>
         /// <param name="reserve">是否保留历史版本</param>
         /// <returns></returns>
         [HttpPost, MyAuthorize]
-        public async Task<ActionResult> Edit(PostCommand post, bool notify = true, bool reserve = true)
+        public async Task<ActionResult> Edit(PostCommand post, bool reserve = true)
         {
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
@@ -715,13 +690,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "文章修改失败！");
             }
 
-#if !DEBUG
-            if (notify && "false" == CommonHelper.SystemSettings["DisabledEmailBroadcast"])
-            {
-                string link = Request.Scheme + "://" + Request.Host + "/" + p.Id;
-                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.BroadcastPostPublished), "", p.Id, link);
-            }
-#endif
             return ResultData(p.Mapper<PostDto>(), message: "文章修改成功！");
         }
 
@@ -803,12 +771,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "文章发表失败！");
             }
 
-            if ("true" == CommonHelper.SystemSettings["DisabledEmailBroadcast"])
-            {
-                return ResultData(null, true, "文章发表成功！");
-            }
-            string link = Request.Scheme + "://" + Request.Host + "/" + p.Id;
-            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.BroadcastPostPublished), "", p.Id, link);
             return ResultData(null, true, "文章发表成功！");
         }
 

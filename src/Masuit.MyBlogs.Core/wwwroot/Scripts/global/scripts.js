@@ -65,62 +65,6 @@ $(function() {
             }, 60000);
     });
 
-    function subscribe() {
-        loading();
-        window.post("/subscribe/subscribe", $("#subscribe").serializeObject(), function(data) {
-                loadingDone();
-                if (data && data.Success) {
-                    window.notie.alert({
-                        type: 1,
-                        text: data.Message,
-                        time: 4
-                    });
-                    $(':input', '#article-form').not(':button,:submit,:reset,:hidden').val('').removeAttr('checked').removeAttr('checked');
-                } else {
-                    window.notie.alert({
-                        type: 3,
-                        text: data.Message,
-                        time: 4
-                    });
-                }
-            }, function() {
-                window.notie.alert({
-					type: 3,
-					text: "请求失败，请稍候再试！",
-					time: 4
-				});
-            });
-    }
-
-    //订阅表单验证
-    $("#subscribe").on("submit", function(e) {
-            e.preventDefault();
-            if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($(".email").val().trim())) {
-                window.notie.alert(3, "请输入正确的邮箱格式！", 4);
-                return;
-            }
-            if ($(".email").val().trim().indexOf("163") > 1 || $(".email").val().trim().indexOf("126") > 1) {
-                swal({
-                    title: '邮箱确认',
-                    text: "检测到您输入的邮箱是网易邮箱，本站的邮件服务器可能会因为您的反垃圾设置而无法将邮件正常发送到您的邮箱，建议使用您的其他邮箱，或者检查反垃圾设置后，再点击确定按钮继续！",
-                    type: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: '确定',
-                    cancelButtonText: '换个邮箱',
-                    confirmButtonClass: 'btn btn-success btn-lg',
-                    cancelButtonClass: 'btn btn-danger btn-lg',
-                    buttonsStyling: false
-                }).then(function(isConfirm) {
-                    if (isConfirm === true) {
-                        subscribe();
-                    }
-                });
-                return;
-            }
-            subscribe();
-        });
     //new WOW().init();//滚动加载
     var nav = $(".cd-main-header");
     if (document.documentElement.scrollTop || document.body.scrollTop > 0) {

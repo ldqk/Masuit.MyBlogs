@@ -5,13 +5,6 @@ using Masuit.MyBlogs.Core.Models.Entity;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
-    public partial class BroadcastService : BaseService<Broadcast>, IBroadcastService
-    {
-        public BroadcastService(IBaseRepository<Broadcast> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
-        {
-        }
-    }
-
     public partial class DonateService : BaseService<Donate>, IDonateService
     {
         public DonateService(IBaseRepository<Donate> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)

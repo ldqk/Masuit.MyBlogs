@@ -73,7 +73,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             throw ex;
         }
 
-        public virtual DbSet<Broadcast> Broadcast { get; set; }
         public virtual DbSet<Category> Category { get; set; }
         public virtual DbSet<Comment> Comment { get; set; }
         public virtual DbSet<LeaveMessage> LeaveMessage { get; set; }

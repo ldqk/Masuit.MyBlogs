@@ -1,33 +1,11 @@
 ﻿@using System.Diagnostics
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
-@using Masuit.Tools.Html
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @{
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
 }
 <aside class="col-md-3 box-right">
-    @if ("false" == CommonHelper.SystemSettings["DisabledEmailBroadcast"])
-    {
-        <section class="wow animated fadeIn">
-            <article class="panel panel-primary">
-                <div class="panel-heading">
-                    <i class="icon-rss4"></i>输入邮箱 订阅本站更新
-                </div>
-                <div class="panel-body">
-                    <form id="subscribe">
-                        @Html.AntiForgeryToken()
-                        <div class="input-group">
-                            <input type="email" class="email form-control" placeholder="输入邮箱 订阅本站更新" name="email" required />
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-info">订阅</button>
-                            </span>
-                        </div>
-                    </form>
-                </div>
-            </article>
-        </section>
-    }
     @if (Model.Notices.Any())
     {
         <section class="wow animated fadeIn">
