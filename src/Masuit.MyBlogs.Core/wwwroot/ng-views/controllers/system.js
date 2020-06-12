@@ -128,14 +128,6 @@
 		}).catch(swal.noop);
 	}
 
-	$scope.DisabledEmailBroadcast= function() {
-		if($scope.Settings.DisabledEmailBroadcast=="true") {
-			$scope.Settings.DisabledEmailBroadcast="false";
-		} else {
-			$scope.Settings.DisabledEmailBroadcast="true";
-		}
-	}
-
 	$scope.EmailEnableSsl= function() {
 		if($scope.Settings.EnableSsl=="true") {
 			$scope.Settings.EnableSsl="false";
