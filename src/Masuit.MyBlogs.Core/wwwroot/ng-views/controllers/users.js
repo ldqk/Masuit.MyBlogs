@@ -3,7 +3,7 @@
 	var self = this;
 	$scope.isAdd = true;
 	$scope.allowUpload=false;
-	$scope.loading();
+	
 	$scope.userinfo = {};
 	$scope.kw = "";
 	$scope.paginationConf = {
@@ -17,7 +17,7 @@
 		}
 	};
 	this.GetPageData = function (page, size) {
-		$scope.loading();
+		
 		 window.fetch("/user/getusers?page="+page+"&size="+size+"&search="+$scope.kw).then(function(response) {
             return response.json();
         }).then(function(data) {
@@ -30,7 +30,7 @@
 				dataset: data.Data
 			});
 			self.data = data.Data;
-			$scope.loadingDone();
+			
          });
 	}
     $('.ui.dropdown.types').dropdown({
@@ -51,7 +51,7 @@
 			cancelButtonText: '取消'
 		}).then(function(isConfirm) {
 			if (isConfirm) {
-				$scope.loading();
+				
 				$scope.request("/user/delete?id="+userinfo.Id, null, function(data) {
 					swal(data.Message, null, 'success');
 			        self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);

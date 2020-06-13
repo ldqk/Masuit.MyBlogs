@@ -1,6 +1,5 @@
 ﻿myApp.controller("dashboard", ["$scope", "$http", "$timeout", "$location", function ($scope, $http, $timeout, $location) {
-	$scope.loading();
-	$scope.distinct = true;
+    $scope.distinct = true;
 	var loadsdata = [];
 	var netdata = [];
 	var iodata = [];
@@ -106,7 +105,6 @@
 					text:'服务请求失败！',
 					time:4
 				});
-				$scope.loadingDone();
 			});
         }, function() {
 		}).catch(swal.noop);
@@ -415,7 +413,6 @@
 				}
 			}]
 		});
-		$scope.loadingDone();
 	});
 
 	var gaugeOptions = {

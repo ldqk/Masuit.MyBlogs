@@ -184,22 +184,6 @@
 		}
 	}
 
-	//两个全局加载动画
-	$scope.isloading = false;
-	$scope.loading = function() {
-		if($scope.isloading) {
-			return;
-		}
-		$scope.isloading = true;
-		let r = new Date().getMilliseconds();
-		$(".loading" + (r % 2 + 1)).show();
-	}
-
-	$scope.loadingDone = function() {
-		$scope.isloading = false;
-		$(".loading1").hide();
-		$(".loading2").hide();
-	}
 	$http.post("/passport/getuserinfo", null).then(function(res) {
 		if(res.data.Success) {
 			$scope.user = res.data.Data;
@@ -207,11 +191,9 @@
 	});
 
 	$scope.request = function(url, data, success, error) {
-		$scope.loading();
 		$http.post(url, data, {
 			'Content-Type':'application/x-www-form-urlencoded'
 		}).then(function(res) {
-			$scope.loadingDone();
 			if(res.data.Success && res.data.IsLogin) {
 				success(res.data);
 			} else {
@@ -240,7 +222,6 @@
 				    time:4
 			    });
             }
-			$scope.loadingDone();
 		});
 	}
 
@@ -396,7 +377,6 @@
 		}).catch(swal.noop);
 	}
 	$scope.submit = function() {
-		$scope.loading();
         var form = new FormData(document.getElementById("fileform"));
 		$http({
             url: "upload",
@@ -413,14 +393,11 @@
 			}).then(function(res2) {
 				swal("头像修改成功", "", "success");
 				layer.closeAll();
-				$scope.loadingDone();
 			}, function(error) {
 				swal("头像修改失败", "请求失败，错误码：" + error.status, "error");
-				$scope.loadingDone();
 			});
         }, function(response) {
 			swal("头像修改失败", "", "error");
-			$scope.loadingDone();
         });
     };
 	

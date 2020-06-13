@@ -1,7 +1,6 @@
 ﻿myApp.controller("miscAdd", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
 	window.hub.stop();
 	$scope.misc = {};
-	$scope.loading();
 	$scope.misc.Id = $location.search()['id'];
 	if ($scope.misc.Id) {
 		$scope.request("/misc/get", { id: $scope.misc.Id }, function (res) {
@@ -10,7 +9,6 @@
 	}
 	//异步提交表单开始
 	$scope.submit = function (misc) {
-		$scope.loading();
 		var url = "/misc/write";
 		if (misc.Id) {
 			url = "/misc/edit";
@@ -22,7 +20,6 @@
 		}
 		$http.post(url, misc).then(function (res) {
 			var data = res.data;
-			$scope.loadingDone();
 			if (data.Success) {
 				window.notie.alert({
 					type: 1,
@@ -41,12 +38,10 @@
 		});
 	}
 	//异步提交表单结束
-	$scope.loadingDone();
 }]);
 myApp.controller("miscList", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
 	window.hub.stop();
 	var self = this;
-	$scope.loading();
 	$scope.paginationConf = {
 		currentPage: $scope.currentPage ? $scope.currentPage : 1,
 		//totalItems: $scope.total,
@@ -59,7 +54,6 @@ myApp.controller("miscList", ["$scope", "$http", "NgTableParams", function ($sco
 		}
 	};
 	this.GetPageData = function (page, size) {
-		$scope.loading();
 		$http.post("/misc/getpagedata", {
 			page,
 			size
@@ -73,7 +67,6 @@ myApp.controller("miscList", ["$scope", "$http", "NgTableParams", function ($sco
 					filterDelay: 0,
 					dataset: res.data.Data
 				});
-			$scope.loadingDone();
 		});
 	};
 	self.del = function (row) {
@@ -109,6 +102,4 @@ myApp.controller("miscList", ["$scope", "$http", "NgTableParams", function ($sco
 		}, function () {
 		}).catch(swal.noop);
 	}
-	$scope.loadingDone();
-
 }]);

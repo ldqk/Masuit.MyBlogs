@@ -2,16 +2,13 @@
 	window.hub.stop();
 	var self = this;
 	var source = [];
-	$scope.loading();
 	this.load = function() {
-		$scope.loading();
 		$http.post("/links/get", null).then(function(res) {
 			self.tableParams = new NgTableParams({}, {
 				filterDelay: 0,
 				dataset: res.data.Data
 			});
 			source = res.data.Data;
-			$scope.loadingDone();
 		});
 	};
 	this.load();

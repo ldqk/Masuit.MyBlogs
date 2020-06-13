@@ -2,7 +2,6 @@
 	window.hub.stop();
 	var self = this;
 	var source = [];
-	$scope.loading();
 	$scope.paginationConf = {
 		currentPage: 1,
 		itemsPerPage: 10,
@@ -14,7 +13,6 @@
 		}
 	};
 	this.GetPageData = function(page, size) {
-		$scope.loading();
 		$http.post("/donate/getpagedata", {
 			page,
 			size
@@ -28,7 +26,6 @@
 				dataset: res.data.Data
 			});
 			source = angular.copy(res.data.Data);
-			$scope.loadingDone();
 		});
 	};
 	self.del = function(row) {
@@ -127,5 +124,4 @@
 			}
 		});
 	}
-	$scope.loadingDone();
 }]);

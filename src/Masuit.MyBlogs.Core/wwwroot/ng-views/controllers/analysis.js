@@ -2,7 +2,6 @@
 	function($scope, $http, NgTableParams, $timeout) {
 		window.hub.stop();
 		var self = this;
-		$scope.loading();
 		$scope.query = "";
 		$scope.currentPage = 1;
 		var _timeout;
@@ -44,7 +43,6 @@
 			}, 1000);
 		}
 		this.GetPageData = function(page, size) {
-			$scope.loading();
 			$http.post("/search/SearchList", {
 				page,
 				size,
@@ -68,7 +66,6 @@
 						time:4
 					});
 				}
-				$scope.loadingDone();
 			});
 		};
 		self.del = function(row) {

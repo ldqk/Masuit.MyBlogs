@@ -1,6 +1,5 @@
 ﻿myApp.controller("menu", ["$scope", "$http", "$timeout", function($scope, $http, $timeout) {
 	window.hub.stop();
-	$scope.loading();
 	$scope.menu = {};
 	$scope.init = function() {
 		$scope.request("/menu/getmenus", null, function(data) {
@@ -307,12 +306,10 @@
 		}
 	}
 	$scope.uploadImage = function() {
-		$scope.loading();
         $("#uploadform").ajaxSubmit({
 			url: "/Upload",
 			type: "post",
 			success: function(data) {
-				$scope.loadingDone();
 				document.getElementById("uploadform").reset();
 				$scope.$apply(function () {
 			     　$scope.allowUpload=false;

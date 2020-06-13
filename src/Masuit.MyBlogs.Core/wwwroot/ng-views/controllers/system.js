@@ -13,12 +13,12 @@
 		$scope.Settings = settings;
 	});
 	$scope.uploadImage = function() {
-		$scope.loading();
+		
         $("#setImageForm").ajaxSubmit({
 			url: "/Upload",
 			type: "post",
 			success: function(data) {
-				$scope.loadingDone();
+				
 				document.getElementById("setImageForm").reset();
 				$scope.$apply(function () {
 			     　$scope.Settings[$scope.property] = data.Data;

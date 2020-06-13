@@ -1,7 +1,6 @@
 ﻿myApp.controller("mergelist", ["$scope", "$http", "NgTableParams", "$timeout", function ($scope, $http, NgTableParams, $timeout) {
 	window.hub.stop();
 	var self = this;
-	$scope.loading();
 	$scope.kw = "";
 	$scope.orderby = 1;
 	$scope.paginationConf = {
@@ -15,7 +14,6 @@
 		}
 	};
 	this.GetPageData = function(page, size) {
-		$scope.loading();
 		$http.get("/merge?page="+page+"&size="+size+"&kw="+$scope.kw).then(function(res) {
 			$scope.paginationConf.currentPage = page;
 			$scope.paginationConf.totalItems = res.data.TotalCount;
@@ -26,7 +24,6 @@
 				filterDelay: 0,
 				dataset: res.data.Data
 			});
-			$scope.loadingDone();
 		});
 	};
 	self.pass = function(row) {
@@ -124,18 +121,15 @@
 			_timeout = null;
 		}, 500);
 	}
-	$scope.loadingDone();
 }]);
 myApp.controller("mergecompare", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
 	window.hub.stop();
 	clearInterval(window.interval);
-	$scope.loading();
 	$scope.id = $location.search()['id'];
 	$scope.get("/merge/compare/"+$scope.id, function(res) {
 		var data = res.Data;
         $scope.old=data.old;
         $scope.newer=data.newer;
-	    $scope.loadingDone();
 	});
     
 	$scope.pass = function() {
@@ -222,21 +216,18 @@ myApp.controller("mergecompare", ["$scope", "$http", "$timeout","$location", fun
 myApp.controller("mergeedit", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
 	window.hub.stop();
 	clearInterval(window.interval);
-	$scope.loading();
 	$scope.id = $location.search()['id'];
 	$scope.get("/merge/"+$scope.id, function(res) {
 		$scope.post= res.Data;
-	    $scope.loadingDone();
+	    
 	});
     $scope.merge= function() {
-	    $scope.loading();
         $scope.request("/merge",$scope.post, function(res) {
 		    window.notie.alert({
 				type: 1,
 				text: res.Message,
 				time: 4
 			});
-	        $scope.loadingDone();
             window.location.href = "#/merge/list";
 	    });
     }

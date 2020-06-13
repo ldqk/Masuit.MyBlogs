@@ -1,7 +1,6 @@
 ﻿myApp.controller("comment", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
 	window.hub.stop();
 	var self = this;
-	$scope.loading();
 	$scope.paginationConf = {
 		currentPage: $scope.currentPage ? $scope.currentPage : 1,
 		//totalItems: $scope.total,
@@ -14,7 +13,6 @@
 		}
 	};
 	this.GetPageData = function (page, size) {
-		$scope.loading();
 		$http.post("/comment/GetPendingComments", {
 			page,
 			size
@@ -28,7 +26,6 @@
 					filterDelay: 0,
 					dataset: res.data.Data
 				});
-			$scope.loadingDone();
 		});
 	};
 	self.del = function (row) {
@@ -75,6 +72,4 @@
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 		});
 	}
-	$scope.loadingDone();
-
 }]);

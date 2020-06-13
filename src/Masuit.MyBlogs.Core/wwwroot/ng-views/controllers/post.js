@@ -1,6 +1,5 @@
 ﻿myApp.controller("postlist", ["$scope", "$http", "NgTableParams", "$timeout", function ($scope, $http, NgTableParams, $timeout) {
 	window.hub.stop();
-	$scope.loading();
 	var self = this;
 	self.stats = [];
 	self.data = {};
@@ -28,7 +27,6 @@
 	});
 
 	$http.post("/category/getcategories", null).then(function (res) {
-		$scope.loadingDone();
 		var data = res.data;
 		if (data.Success) {
 			$scope.cat = data.Data;
@@ -62,7 +60,6 @@
 	});
 
 	this.GetPageData = function (page, size) {
-		$scope.loading();
 		var params={ page, size, kw: $scope.kw, orderby:$scope.orderby, cid:$scope.CategoryId };
 		$http.post("/post/getpagedata", params).then(function(res) {
 			$scope.paginationConf.totalItems = res.data.TotalCount;
@@ -79,7 +76,7 @@
 				});
 			});
 			self.stats = Enumerable.From(self.stats).Distinct().ToArray();
-			$scope.loadingDone();
+			
 			localStorage.setItem("postlist-params",JSON.stringify(params));
 		});
 	}
@@ -190,7 +187,7 @@
 			_timeout = null;
 		}, 500);
 	}
-	$scope.loadingDone();
+	
     $scope.toggleDisableComment= function(row) {
         $scope.request("/post/DisableComment", {
 			id: row.Id
@@ -226,13 +223,13 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 		Seminars: "",
 		Keyword:""
 	};
-	$scope.loading();
+	
 	$scope.post.Author = $scope.user.NickName || $scope.user.Username;
 	$scope.post.Email = $scope.user.Email;
 	$scope.getCategory = function () {
-		$scope.loading();
+		
 		$http.post("/category/getcategories", null).then(function (res) {
-			$scope.loadingDone();
+			
 			var data = res.data;
 			if (data.Success) {
 				$scope.cat = data.Data;
@@ -289,12 +286,12 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 	});
 	//上传Word文档
 	$scope.upload = function() {
-		$scope.loading();
+		
 		$("#docform").ajaxSubmit({
 			url: "/Upload/UploadWord",
 			type: "post",
 			success: function(data) {
-				$scope.loadingDone();
+				
 				console.log(data);
 				if (data.Success) {
 					window.notie.alert({
@@ -333,7 +330,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 	}
 	//异步提交表单开始
 	$scope.submit = function(post) {
-		$scope.loading();
+		
 		if (!post.Label) {
 			post.Label = null;
 		}
@@ -343,12 +340,12 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 				text: '文章标题必须在2到128个字符以内！',
 				time: 4
 			});
-			$scope.loadingDone();
+			
 			return;
 		}
 		$http.post("/Post/write", post).then(function(res) {
 			var data = res.data;
-			$scope.loadingDone();
+			
 			if (data.Success) {
 				window.notie.alert({
 					type: 1,
@@ -423,7 +420,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
 	window.hub.stop();
 	$scope.id = $location.search()['id'];
-	$scope.loading();
+	
 	$scope.reserve = true;
 	$scope.request("/post/get", {
 		id: $scope.id
@@ -472,9 +469,9 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 		$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
 	});
 	$scope.getCategory = function () {
-		$scope.loading();
+		
 		$http.post("/category/getcategories", null).then(function (res) {
-			$scope.loadingDone();
+			
 			var data = res.data;
 			if (data.Success) {
 				$scope.cat = data.Data;
@@ -501,12 +498,12 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 	}
 	//上传Word文档
 	$scope.upload = function () {
-		$scope.loading();
+		
 		$("#docform").ajaxSubmit({
 			url: "/Upload/UploadWord",
 			type: "post",
 			success: function (data) {
-				$scope.loadingDone();
+				
 				console.log(data);
 				if (data.Success) {
 					window.notie.alert({
@@ -545,7 +542,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 
 	//异步提交表单开始
 	$scope.submit = function (post) {
-		$scope.loading();
+		
 		if (!post.Label) {
 			post.Label = null;
 		}
@@ -555,7 +552,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 				text: '文章标题必须在2到128个字符以内！',
 				time: 4
 			});
-			$scope.loadingDone();
+			
 			return;
 		}
 		if (post.Author.trim().length <= 0 || post.Author.trim().length > 20) {
@@ -564,7 +561,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 				text: '再怎么你也应该留个合理的名字吧，非主流的我可不喜欢！',
 				time: 4
 			});
-			$scope.loadingDone();
+			
 			return;
 		}
 		if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
@@ -574,7 +571,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 				text: '请输入正确的邮箱格式！',
 				time: 4
 			});
-			$scope.loadingDone();
+			
 			return;
 		}
 		if (post.Content.length < 200 || post.Content.length > 1000000) {
@@ -583,13 +580,13 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 				text: '文章内容过短或者超长的，我都认为你是在制造垃圾！',
 				time: 4
 			});
-			$scope.loadingDone();
+			
 			return;
 		}
 		post.reserve = $scope.reserve;
 		$http.post("/Post/edit", post).then(function (res) {
 			var data = res.data;
-			$scope.loadingDone();
+			
 			if (data.Success) {
 				window.notie.alert({
 					type: 1,
@@ -790,7 +787,7 @@ myApp.controller("category", ["$scope", "$http", "NgTableParams", function ($sco
 myApp.controller("postpending", ["$scope", "$http", "NgTableParams", "$timeout", function ($scope, $http, NgTableParams, $timeout) {
 	window.hub.stop();
 	var self = this;
-	$scope.loading();
+	
 	$scope.kw = "";
 	$scope.orderby = 1;
 	$scope.paginationConf = {
@@ -805,7 +802,7 @@ myApp.controller("postpending", ["$scope", "$http", "NgTableParams", "$timeout",
 		}
 	};
 	this.GetPageData = function(page, size) {
-		$scope.loading();
+		
 		$http.post("/post/GetPending", {
 			page,
 			size,
@@ -820,7 +817,7 @@ myApp.controller("postpending", ["$scope", "$http", "NgTableParams", "$timeout",
 				filterDelay: 0,
 				dataset: res.data.Data
 			});
-			$scope.loadingDone();
+			
 		});
 	};
 	self.del = function(row) {
@@ -879,7 +876,7 @@ myApp.controller("postpending", ["$scope", "$http", "NgTableParams", "$timeout",
 			_timeout = null;
 		}, 500);
 	}
-	$scope.loadingDone();
+	
 
 }]);
 

@@ -3,7 +3,6 @@
 	var self = this;
 	$scope.isAdd = true;
 	$scope.allowUpload=false;
-	$scope.loading();
 	$scope.partner = {};
 	$scope.kw = "";
 	$scope.paginationConf = {
@@ -17,7 +16,6 @@
 		}
 	};
 	this.GetPageData = function (page, size) {
-		$scope.loading();
 		$http.post("/partner/getpagedata", {
 			page,
 			size,
@@ -32,7 +30,6 @@
 				dataset: res.data.Data
 			});
 			self.data = res.data.Data;
-			$scope.loadingDone();
 		});
 	}
     $('.ui.dropdown.types').dropdown({
@@ -41,9 +38,7 @@
 		}
 	});
     $scope.getCategory = function () {
-		$scope.loading();
 		$http.post("/category/getcategories", null).then(function (res) {
-			$scope.loadingDone();
 			var data = res.data;
 			if (data.Success) {
 				$scope.cat = data.Data;
@@ -79,7 +74,6 @@
 			cancelButtonText: '取消'
 		}).then(function(isConfirm) {
 			if (isConfirm) {
-				$scope.loading();
 				$scope.request("/partner/delete/"+partner.Id, null, function(data) {
 					swal(data.Message, null, 'success');
 			        self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
@@ -153,12 +147,10 @@
 		});
 	}
 	$scope.uploadImage = function(field) {
-		$scope.loading();
         $("#uploadform").ajaxSubmit({
 			url: "/Upload",
 			type: "post",
 			success: function(data) {
-				$scope.loadingDone();
 				document.getElementById("uploadform").reset();
 				$scope.$apply(function () {
 					$scope.partner[field] = data.Data;
