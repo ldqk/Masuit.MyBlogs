@@ -49,11 +49,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 var scid = cid.ToString();
                 if (ValueCacheManager.GetOrAdd(scid, s => Any(a => a.CategoryIds.Contains(scid))))
                 {
-                    where = where.And(a => a.CategoryIds.Contains(scid) || a.CategoryIds == null);
+                    where = where.And(a => a.CategoryIds.Contains(scid) || string.IsNullOrEmpty(a.CategoryIds));
                 }
                 else
                 {
-                    where = where.And(a => a.CategoryIds == null);
+                    where = where.And(a => string.IsNullOrEmpty(a.CategoryIds));
                 }
             }
 
@@ -86,11 +86,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 var scid = cid.ToString();
                 if (ValueCacheManager.GetOrAdd(scid, s => Any(a => a.CategoryIds.Contains(scid))))
                 {
-                    where = where.And(a => a.CategoryIds.Contains(scid) || a.CategoryIds == null);
+                    where = where.And(a => a.CategoryIds.Contains(scid) || string.IsNullOrEmpty(a.CategoryIds));
                 }
                 else
                 {
-                    where = where.And(a => a.CategoryIds == null);
+                    where = where.And(a => string.IsNullOrEmpty(a.CategoryIds));
                 }
             }
             return CacheManager.GetOrAdd($"{count}{type}{cid}", _ => GetQuery(where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, (int)a.Price)).WeightedItems(count));
