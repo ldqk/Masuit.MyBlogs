@@ -38,7 +38,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             {
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
                 {
-                    IP = context.Connection.RemoteIpAddress.MapToIPv4().ToString(),
+                    IP = context.Connection.RemoteIpAddress.ToString(),
                     RequestUrl = requestUrl,
                     Time = DateTime.Now,
                     UserAgent = request.Headers[HeaderNames.UserAgent],

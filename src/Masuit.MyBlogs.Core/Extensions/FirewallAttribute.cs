@@ -26,7 +26,7 @@ namespace Masuit.MyBlogs.Core.Extensions
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var request = context.HttpContext.Request;
-            var ip = context.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+            var ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
             var trueip = request.Headers[AppConfig.TrueClientIPHeader].ToString();
             if (!string.IsNullOrEmpty(trueip) && ip != trueip)
             {

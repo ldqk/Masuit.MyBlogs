@@ -31,7 +31,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 客户端的真实IP
         /// </summary>
-        public string ClientIP => HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+        public string ClientIP => HttpContext.Connection.RemoteIpAddress.ToString();
 
         /// <summary>
         /// 

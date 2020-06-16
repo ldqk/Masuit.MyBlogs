@@ -55,7 +55,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 string err;
                 var req = HttpContext.Request;
-                var ip = HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+                var ip = HttpContext.Connection.RemoteIpAddress.ToString();
                 switch (feature.Error)
                 {
                     case DbUpdateConcurrencyException ex:

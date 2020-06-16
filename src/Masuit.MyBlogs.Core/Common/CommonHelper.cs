@@ -5,6 +5,7 @@ using IP2Region;
 using Masuit.Tools;
 using Masuit.Tools.Media;
 using Masuit.Tools.Models;
+using MaxMind.GeoIP2;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
@@ -134,12 +136,21 @@ namespace Masuit.MyBlogs.Core.Common
             return false;
         }
 
-        private static readonly DbSearcher Searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
-        public static string GetIPLocation(this IPAddress ip) => GetIPLocation(ip.MapToIPv4().ToString());
+        private static readonly DbSearcher IPSearcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
+        private static readonly DatabaseReader MaxmindReader = new DatabaseReader(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-City.mmdb"));
 
         public static string GetIPLocation(this string ips)
         {
-            return ips.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => Searcher.MemorySearch(s.Trim())?.Region).Join(" , ");
+            return ips.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s =>
+            {
+                var ip = IPAddress.Parse(s.Trim());
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return IPSearcher.MemorySearch(ip.ToString())?.Region;
+                }
+                var response = MaxmindReader.City(ip);
+                return response.Country.Names.GetValueOrDefault("zh-CN") + response.City.Names.GetValueOrDefault("zh-CN");
+            }).Join(" , ");
         }
 
         /// <summary>
