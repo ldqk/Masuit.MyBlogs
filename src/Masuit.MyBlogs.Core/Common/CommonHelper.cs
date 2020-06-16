@@ -144,12 +144,17 @@ namespace Masuit.MyBlogs.Core.Common
             return ips.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s =>
             {
                 var ip = IPAddress.Parse(s.Trim());
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                switch (ip.AddressFamily)
                 {
-                    return IPSearcher.MemorySearch(ip.ToString())?.Region;
+                    case AddressFamily.InterNetwork when ip.IsPrivateIP():
+                    case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
+                        return "内网IP";
+                    case AddressFamily.InterNetwork:
+                        return IPSearcher.MemorySearch(ip.ToString())?.Region;
+                    default:
+                        var response = MaxmindReader.City(ip);
+                        return response.Country.Names.GetValueOrDefault("zh-CN") + response.City.Names.GetValueOrDefault("zh-CN");
                 }
-                var response = MaxmindReader.City(ip);
-                return response.Country.Names.GetValueOrDefault("zh-CN") + response.City.Names.GetValueOrDefault("zh-CN");
             }).Join(" , ");
         }
 
