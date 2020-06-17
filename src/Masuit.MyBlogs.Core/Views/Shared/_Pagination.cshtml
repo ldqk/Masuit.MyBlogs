@@ -39,7 +39,7 @@
         else
         {
             <li>
-                <a href="@($"{Context.Request.Path}?orderby={Model.OrderBy}".TrimQuery())" aria-label="Previous">
+                <a href="@(Context.Request.Path+$"?orderby={Model.OrderBy}".TrimQuery())" aria-label="Previous">
                     首页
                 </a>
             </li>

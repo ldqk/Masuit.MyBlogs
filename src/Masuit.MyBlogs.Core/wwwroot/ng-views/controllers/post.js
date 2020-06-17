@@ -301,7 +301,6 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 					});
 					$scope.$apply(function() {
 						$scope.post.Content = data.Data.Content;
-						$scope.post.ResourceName = data.Data.ResourceName;
 						$scope.post.Title = data.Data.Title;
 					});
 					layer.closeAll();
