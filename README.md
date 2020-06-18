@@ -10,7 +10,7 @@ masuit.com个人博客站项目源码，高性能低占用的博客系统，这�
 ### 前端请求支援
 目前网站前端页面的代码比较零乱，到处都是，大家想吐槽的尽管吐槽吧，也想找个人帮忙设计下整体的前端页面，有兴趣愿意贡献代码的的小伙伴，欢迎Pull Request吧！😂😂
 ### 开发环境
-操作系统：Windows 10 1909  
+操作系统：Windows 10 2004  
 IDE：Visual Studio 2019 Enterprise 16.5  
 数据库：SQL Server 2017/MySQL 8.0  
 Redis：redis-server-windows 3.2  
@@ -20,15 +20,15 @@ Redis：redis-server-windows 3.2
 数据库：SQL Server 2012 express/MySQL 8.0  
 Redis：redis-server-windows 3.2  
 运行时：.NET Framework 4.7.2/.NET Core 3.1  
-服务器配置：2核+2GB+5M，香港云  
-`请勿使用阿里云、腾讯云、百度云等活动超卖机运行本程序，否则卡出翔！！！`  
+服务器配置：2核+4GB+1M
+`请勿使用阿里云、百度云等活动超卖机运行本程序，否则卡出翔！！！`  
 `如何判断服务器商是否有超卖：给你的服务器跑个分，如果跑分接近于网络上该处理器公布的分数，则不是超卖的机器，计算公式：总分/核心数进行比较，由于是虚拟机，如果单独比较单核跑分，没有参考意义`
 ### 硬件要求
 ||最低配置|推荐配置|豪华配置|
 | --------   | -----:   | :----: | :----: |
 |CPU|1核|2核|4核|
 |内存|1GB|2GB|4GB|
-|带宽|1Mbps|2Mbps|5Mbps|
+|带宽|1Mbps|1Mbps|5Mbps|
 |数据库|SQL Server 2008/MySQL 5|SQL Server 2012/MySQL 8|SQL Server 2016/MySQL 8|
 ### 主要功能
 #### 服务器性能监控
@@ -37,7 +37,7 @@ Redis：redis-server-windows 3.2
 - 包含文章审核、文章合并、文章列表的增删查改、分类管理、专题管理；
 - 文章审核：当用户在前台页进行投稿后，会进入审核状态，审核通过后，才会在前台页的文章列表中展示出来。
 - 文章合并：当用户在前台页进行了文章的编辑后，会创建出文章的合并请求，当后台管理进行相应的合并操作后，前台用户的修改才会正式生效，可以直接合并、编辑并合并和拒绝合并，拒绝时，修改人会收到相应的邮件通知。
-- 文章操作：可对文章进行修改、新增、置顶、临时删除(下架)、还原、永久删除、禁止评论等操作。
+- 文章操作：可对文章进行修改、新增、置顶、临时删除(下架)、还原、永久删除、禁止评论等操作，编辑后的文章会生成历史版本。
 - 分类管理：对文章的分类进行增删查改和文章的移动等操作，与文章的关系：一对多。
 - 专题管理：对文章的专题进行管理，与文章的关系：多对多。
 - 快速分享：首页快速分享栏目的管理。
@@ -56,11 +56,7 @@ Redis：redis-server-windows 3.2
 #### 广告管理
 主动式的广告投放管理，支持竞价排名，支持在banner、边栏、页内、列表内的广告展示，竞价或权重的高低决定广告出现的概率。
 #### 赞助管理
-对网站打赏进行增删查改操作，手动掩码。
-#### 订阅管理
-- 对订阅者邮箱进行管理，支持更新订阅和权限订阅；
-- 更新订阅：当网站有文章更新或添加时，并且网站全局开启了邮箱订阅通知，才会在更新时往所有邮箱进行推送。
-- 权限订阅：当一些处于防火墙规则中的用户并且不能白名单模式的，需要访问网站，则需要通过权限订阅的模式获取访问验证码，来进行网站的访问。
+对网站打赏进行增删查改操作，自动掩码。
 #### 搜索统计
 当前台用户每Session周期内的关键词搜索，不重复的关键词将会被记录，用于热词统计，仅记录最近一个月内的所有搜索关键词，用于统计当月、7天以及当天的搜索热词。
 #### 任务管理
@@ -74,6 +70,15 @@ hangfire的可视化管理页面
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbcc714c3db.jpg)  
 ### 项目文件夹定义：
 App_Data：存放网站的一些常规数据，以文本的形式存在，这类数据不需要频繁更新的。  
+┠─cert文件夹：存放https证书  
+┠─ban.txt：敏感词库  
+┠─CustomKeywords.txt：搜索分词词库  
+┠─denyip.txt：IP地址黑名单  
+┠─DenyIPRange.txt：IP地址段黑名单  
+┠─GeoLite2-City.mmdb：MaxMind地址库  
+┠─ip2region.db：ip2region地址库  
+┠─mod.txt：审查词库  
+┠─whitelist.txt：IP地址白名单  
 Common：之前老项目的Common项目；  
 Configs：项目的一些配置对象  
 Controllers：控制器  
@@ -119,20 +124,23 @@ angularjs
 - ng-table表格插件  
 - material风格angular-filemanager文件管理器  
 #### 性能和安全相关
-- 通过url的敏感词检查过滤恶意流量；  
-- 限制客户端的请求频次；  
-- 表单的AntiForgeryToken防止恶意提交；  
-- hangfire实现分布式任务调度；  
-- Redis分布式Session和缓存；  
-- Z.EntityFramework.Plus实现数据访问层的高性能数据库批量操作；  
+- hangfire实现分布式任务调度；
+- Z.EntityFramework.Plus实现数据访问层的高性能数据库批量操作；
+- Lucene.NET实现高性能站内检索；
+- 通过url的敏感词检查过滤恶意流量；
+- 限制客户端的请求频次；
+- 表单的AntiForgeryToken防止恶意提交；
+- ip2region+MaxMind地址库实现请求来源审查；
+- 用户信息采用端到端RSA非对称加密进行数据传输；
 ### 项目部署
 #### 编译：
 编译需要将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目也一起clone下来，和本项目平级目录存放，才能正常编译，否则，将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目移除，通过nuget安装也是可以的。  
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/20191019/6370710386639200004363431.png)  
 #### 配置文件：
 主要需要配置的是https证书、数据库连接字符、redis、BaiduAK以及图床配置；
-![](https://git.imweb.io/ldqk/imgbed/raw/master/20191019/6370710399219040001324167.png)  
-同时，BaiduAK参与了数据库的加密，如果你没有BaiduAK，自行到百度地图开放平台申请，免费的。  
+![](https://git.imweb.io/guomo/imgbed/raw/master/2020/06/18/stp9vjccxgxs.png)  
+同时，BaiduAK参与了数据库的加密，如果你没有BaiduAK，自行到百度地图开放平台申请，`免费的`。  
+如果你使用了CDN，需要配置TrueClientIPHeader选项为真实IP请求转发头，如cloudflare的叫CF-Connecting-IP。
 如果Redis不在本机，需要在配置文件中的Redis节下配置，固定为Redis，值的格式：127.0.0.1:6379,allowadmin=true，若未正确配置，将按默认值“127.0.0.1:6379,allowadmin=true,abortConnect=false”。  
 IIS：部署时必须将应用程序池的标识设置为LocalSystem，否则无法监控服务器硬件，同时需要安装.NET Core Hosting运行时环境，IIS程序池改为无托管代码。  
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbf30b6a083.jpg)  
@@ -140,7 +148,7 @@ IIS：部署时必须将应用程序池的标识设置为LocalSystem，否则无
 docker：自行爬文。  
 #### 运行参数：
 网站默认会以5000和5001端口运行，如果需要指定端口，需要在程序启动时从控制台带入参数，或者从环境变量获取  
-![](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbf30c977ee.jpg)  
+![](https://masuit.com/static/images/20200618/6372807437703808603501981.png)  
 ### 后台管理：
 - 初始用户名：masuit  
 - 初始密码：123abc@#$
