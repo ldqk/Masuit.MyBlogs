@@ -307,7 +307,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult SetIpBlackList(string content)
         {
-            CommonHelper.DenyIP = content;
+            CommonHelper.DenyIP = content + "";
             System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
             return ResultData(null);
         }
@@ -319,7 +319,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult SetIpWhiteList(string content)
         {
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), content, Encoding.UTF8);
+            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "App_Data", "whitelist.txt"), content, Encoding.UTF8);
             CommonHelper.IPWhiteList.Add(content);
             return ResultData(null);
         }
@@ -334,7 +334,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             return ResultData(new
             {
                 interceptCount = RedisHelper.Get("interceptCount"),
-                list
+                list,
+                ranking = list.GroupBy(i => i.IP).Select(g => new { g.Key, Count = g.Count() }).OrderByDescending(a => a.Count).Take(30)
             });
         }
 

@@ -77,7 +77,7 @@
                     <div class="input-group">
                         <span class="input-group-addon">UA限制提示语：</span>
                         <div class="fg-line">
-                            <textarea class="form-control" ng-model="Settings.UserAgentBlockedMsg" placeholder="当前浏览器不支持访问本站" rows="4" ></textarea>
+                            <textarea class="form-control" ng-model="Settings.UserAgentBlockedMsg" placeholder="当前浏览器不支持访问本站" rows="4"></textarea>
                         </div>
                     </div>
                 </div>
@@ -115,5 +115,29 @@
                 {{row.Remark}}
             </td>
         </tr>
+    </table>
+</div>
+<div>
+    <div class="page-header">
+        <h3 class="text-center">拦截次数排行榜</h3>
+    </div>
+    <table class="table table-bordered table-condensed table-responsive">
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>IP</th>
+                <th>次数</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="item in ranking">
+                <td>{{$index+1}}</td>
+                <td>
+                    <a ng-href="http://ip.bczs.net/{{item.Key}}" target="_blank">{{item.Key}}</a>
+                    <button class="badge btn btn-primary pull-right" ng-click="addToBlackList(item.Key)">添加到黑名单</button>
+                </td>
+                <td>{{item.Count}}</td>
+            </tr>
+        </tbody>
     </table>
 </div>

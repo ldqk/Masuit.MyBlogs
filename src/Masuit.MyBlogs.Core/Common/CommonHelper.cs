@@ -113,7 +113,8 @@ namespace Masuit.MyBlogs.Core.Common
                 return false;
             }
 
-            return DenyIP.Contains(ip) || DenyIPRange.AsParallel().Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
+            return DenyIP.Contains(ip) ||
+                DenyIPRange.AsParallel().Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
         }
 
         /// <summary>
