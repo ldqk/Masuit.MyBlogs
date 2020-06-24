@@ -33,11 +33,6 @@
 			
          });
 	}
-    $('.ui.dropdown.types').dropdown({
-		onChange: function (value) {
-			$scope.userinfo.Types = value;
-		}
-	});
 	$scope.remove = function(userinfo) {
 		layer.closeAll();
 		swal({
@@ -74,7 +69,7 @@
 			}
 		});
 	}
-	$scope.edit = function () {
+	$scope.edit = function (userinfo) {
 		layer.open({
 			type: 1,
 			zIndex: 20,
@@ -88,6 +83,7 @@
 				return true;
 			}
 		});
+		$scope.userinfo=userinfo;
 	}
 	$scope.closeAll= function() {
 		layer.closeAll();
