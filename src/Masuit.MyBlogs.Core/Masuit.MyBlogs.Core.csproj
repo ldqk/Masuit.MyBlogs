@@ -39,9 +39,9 @@
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.5" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.1.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.5" />
-        <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.1.0" />
+        <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.1" />
         <PackageReference Include="OpenXmlPowerTools-NetStandard" Version="4.4.21" />
-        <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.1.0" />
+        <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.1" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.1" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.1.5" />

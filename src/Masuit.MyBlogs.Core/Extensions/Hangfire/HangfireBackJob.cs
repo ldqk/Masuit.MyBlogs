@@ -222,6 +222,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// </summary>
         public void CreateLuceneIndex()
         {
+            _searchEngine.LuceneIndexer.DeleteAll();
             _searchEngine.CreateIndex(new List<string>()
             {
                 nameof(DataContext.Post),
