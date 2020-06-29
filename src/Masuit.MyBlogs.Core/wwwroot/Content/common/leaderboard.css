@@ -27,12 +27,12 @@ Body
   border-radius: 10px;
   box-shadow: 0 7px 30px rgba(62, 9, 11, 0.3);
 }
-.leaderboard h1 {
+.leaderboard h2 {
   font-size: 18px;
   color: #e1e1e1;
   padding: 12px 13px 18px;
 }
-.leaderboard h1 svg {
+.leaderboard h2 svg {
   width: 25px;
   height: 26px;
   position: relative;
