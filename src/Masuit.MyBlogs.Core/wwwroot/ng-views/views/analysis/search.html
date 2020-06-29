@@ -21,7 +21,7 @@
                 {{row.SearchTime|date:'yyyy-MM-dd HH:mm:ss'}}
             </td>
             <td title="'客户端IP'">
-                <a ng-href="/tools/ip?ip={{row.IP}}" target="_blank" style="font-size: 20px;" data-microtip="查看{{row.IP}}的详细信息" data-microtip-position="bottom">{{row.IP}}</a>
+                <a ng-href="/tools/ip?ip={{row.IP}}" target="_blank" style="font-size: 20px;" data-microtip="查看{{row.IP}}的详细信息" data-microtip-position="bottom">{{row.IP}}</a> ({{row.Region}})
                 <button class="badge btn btn-primary pull-right" ng-click="addToBlackList(row.IP)">黑名单</button>
             </td>
             <td title="'操作'" style="width: 185px;">

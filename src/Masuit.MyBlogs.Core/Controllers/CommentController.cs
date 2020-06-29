@@ -82,7 +82,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             comment.Content = dto.Content.HtmlSantinizerStandard().ClearImgAttributes();
             comment.Browser = dto.Browser ?? Request.Headers[HeaderNames.UserAgent];
             comment.IP = ClientIP;
-            comment.Location = comment.IP.GetIPLocation().Split("|").Where(s => !int.TryParse(s, out _)).ToHashSet().Join("|");
+            comment.Location = comment.IP.GetIPLocation();
             comment = CommentService.AddEntitySaved(comment);
             if (comment == null)
             {
@@ -177,7 +177,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="cid"></param>
         /// <returns></returns>
-        public ActionResult GetComments(int? id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15, int cid = 0)
+        public ActionResult GetComments(int? id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, int cid = 0)
         {
             int total; //总条数，用于前台分页
             if (cid != 0)
@@ -273,7 +273,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPendingComments([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
+        public ActionResult GetPendingComments([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var pages = CommentService.GetPages<DateTime, CommentDto>(page, size, c => c.Status == Status.Pending, c => c.CommentDate, false);
             return Ok(pages);

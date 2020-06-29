@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Masuit.MyBlogs.Core.Common;
+using System;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
 {
@@ -26,5 +27,10 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 访问者IP
         /// </summary>
         public string IP { get; set; }
+
+        /// <summary>
+        /// 地区
+        /// </summary>
+        public string Region => IP.GetIPLocation();
     }
 }

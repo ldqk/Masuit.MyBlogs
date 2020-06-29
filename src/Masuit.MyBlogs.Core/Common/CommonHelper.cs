@@ -151,7 +151,7 @@ namespace Masuit.MyBlogs.Core.Common
                     case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
                         return "内网IP";
                     case AddressFamily.InterNetwork:
-                        return IPSearcher.MemorySearch(ip.ToString())?.Region;
+                        return IPSearcher.MemorySearch(ip.ToString())?.Region.Replace("|0", string.Empty).Split("|").ToHashSet().Join("|");
                     default:
                         var response = MaxmindReader.City(ip);
                         return response.Country.Names.GetValueOrDefault("zh-CN") + response.City.Names.GetValueOrDefault("zh-CN");
