@@ -15,7 +15,6 @@ namespace Masuit.MyBlogs.Core.Configs
             builder.RegisterType<BackgroundJobClient>().SingleInstance();
             builder.RegisterType<FirewallAttribute>().PropertiesAutowired().AsSelf().InstancePerDependency();
             builder.RegisterType<HangfireBackJob>().As<IHangfireBackJob>().PropertiesAutowired(PropertyWiringOptions.PreserveSetValues).InstancePerDependency();
-            builder.Register(c => new Stopwatch()).As<Stopwatch>().AsSelf().PropertiesAutowired(PropertyWiringOptions.PreserveSetValues).InstancePerLifetimeScope();
         }
     }
 }

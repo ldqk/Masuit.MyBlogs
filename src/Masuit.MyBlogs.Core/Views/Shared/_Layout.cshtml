@@ -5,7 +5,6 @@
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools
 @using Masuit.Tools.Core.Net
-@inject Stopwatch stop
 @{
     string[] colors = { "success", "info", "warning", "danger", "default" };
     IList<MenuDto> menus = ViewBag.menus;
@@ -263,7 +262,6 @@
             <div class="cd-overlay"></div>
             <footer class="footer wow fadeIn">
                 <div class="container">
-                    <span class="counter">数据耗时：@ViewData["ActionElapsed"]，页面耗时：@(stop.ElapsedMilliseconds)ms</span>
                     <section>
                         友情链接：
                         @{
