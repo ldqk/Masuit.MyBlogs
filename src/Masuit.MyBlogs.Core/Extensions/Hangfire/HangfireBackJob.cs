@@ -175,7 +175,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             client.Timeout = TimeSpan.FromSeconds(10);
             Parallel.ForEach(links, link =>
             {
-                client.GetAsync(link.Url).ContinueWith(async t =>
+                var prev = link.Status;
+                client.GetStringAsync(link.Url).ContinueWith(t =>
                 {
                     if (t.IsCanceled || t.IsFaulted)
                     {
@@ -183,14 +184,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                         return;
                     }
 
-                    var res = await t;
-                    if (res.IsSuccessStatusCode)
+                    link.Status = !t.Result.Contains(CommonHelper.SystemSettings["Domain"]) ? Status.Unavailable : Status.Available;
+                    if (link.Status != prev)
                     {
-                        link.Status = !(await res.Content.ReadAsStringAsync()).Contains(CommonHelper.SystemSettings["Domain"]) ? Status.Unavailable : Status.Available;
-                    }
-                    else
-                    {
-                        link.Status = Status.Unavailable;
+                        link.UpdateTime = DateTime.Now;
                     }
                 }).Wait();
             });

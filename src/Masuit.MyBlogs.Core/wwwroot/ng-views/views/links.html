@@ -30,6 +30,9 @@
             <td title="'来源次数'" sortable="'Weight'">
                 {{row.Weight}}
             </td>
+            <td title="'更新时间'" sortable="'UpdateTime'">
+                {{row.UpdateTime|date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
             <td title="'白名单'">
                 <label class="el-switch">
                     <input type="checkbox" name="switch" ng-checked="row.Except">

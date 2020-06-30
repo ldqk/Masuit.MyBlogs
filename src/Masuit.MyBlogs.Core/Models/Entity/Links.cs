@@ -1,4 +1,5 @@
 using Masuit.MyBlogs.Core.Models.Enum;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -42,5 +43,10 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 友链权重
         /// </summary>
         public int Weight { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdateTime { get; set; }
     }
 }

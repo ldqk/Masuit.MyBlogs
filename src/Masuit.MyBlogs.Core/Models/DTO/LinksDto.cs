@@ -1,4 +1,6 @@
-﻿namespace Masuit.MyBlogs.Core.Models.DTO
+﻿using System;
+
+namespace Masuit.MyBlogs.Core.Models.DTO
 {
     /// <summary>
     /// 友情链接输出模型
@@ -29,5 +31,10 @@
         /// 友链权重
         /// </summary>
         public int Weight { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdateTime { get; set; }
     }
 }
