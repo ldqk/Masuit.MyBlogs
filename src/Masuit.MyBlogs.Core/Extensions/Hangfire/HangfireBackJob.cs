@@ -138,14 +138,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         {
             RedisHelper.IncrBy("interceptCount");
             var result = s.IP.GetPhysicsAddressInfo().Result;
-            if (result?.Status == 0)
-            {
-                s.Address = result.AddressResult.FormattedAddress;
-            }
-            else
-            {
-                s.Address = s.IP.GetIPLocation();
-            }
+            s.Address = result?.Status == 0 ? result.AddressResult.FormattedAddress : s.IP.GetIPLocation();
             RedisHelper.LPush("intercept", s);
         }
 
