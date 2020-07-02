@@ -1,5 +1,4 @@
-﻿using IP2Region;
-using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -145,8 +144,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             }
             else
             {
-                using var searcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
-                s.Address = searcher.MemorySearch(s.IP).Region;
+                s.Address = s.IP.GetIPLocation();
             }
             RedisHelper.LPush("intercept", s);
         }
