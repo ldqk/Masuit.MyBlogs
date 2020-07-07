@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="kw"></param>
         /// <returns></returns>
-        [Route("{id:int}/{kw}"), Route("{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
+        [Route("{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Details(int id, string kw)
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
