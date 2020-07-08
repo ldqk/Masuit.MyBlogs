@@ -172,10 +172,12 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                     if (t.IsCanceled || t.IsFaulted)
                     {
                         link.Status = Status.Unavailable;
-                        return;
+                    }
+                    else
+                    {
+                        link.Status = !t.Result.Contains(CommonHelper.SystemSettings["Domain"]) ? Status.Unavailable : Status.Available;
                     }
 
-                    link.Status = !t.Result.Contains(CommonHelper.SystemSettings["Domain"]) ? Status.Unavailable : Status.Available;
                     if (link.Status != prev)
                     {
                         link.UpdateTime = DateTime.Now;

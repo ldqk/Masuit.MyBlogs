@@ -185,7 +185,17 @@ namespace Masuit.MyBlogs.Core
             UseLuceneSearch(env, hangfire, luceneIndexerOptions);
             if (bool.Parse(Configuration["Https:Enabled"]))
             {
-                app.UseHttpsRedirection().UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
+                app.UseHttpsRedirection();
+            }
+
+            switch (Configuration["UseRewriter"])
+            {
+                case "NonWww":
+                    app.UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
+                    break;
+                case "WWW":
+                    app.UseRewriter(new RewriteOptions().AddRedirectToWww(301)); // URL重写
+                    break;
             }
 
             app.UseDefaultFiles().UseStaticFiles(new StaticFileOptions //静态资源缓存策略
