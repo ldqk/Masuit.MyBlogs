@@ -9,6 +9,7 @@ using Masuit.MyBlogs.Core.Models.Command;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -95,7 +96,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             string link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id;
-            string content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-pass.html").Replace("{{link}}", link).Replace("{{title}}", merge.Post.Title);
+            string content = new Template(System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-pass.html")).Set("link", link).Set("title", merge.Post.Title).Render();
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已通过", content, merge.ModifierEmail));
             return ResultData(null, true, "文章合并完成！");
 
@@ -107,7 +108,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Merge([FromForm]PostMergeRequestCommandBase dto)
+        public IActionResult Merge([FromForm] PostMergeRequestCommandBase dto)
         {
             var merge = PostMergeRequestService.GetById(dto.Id) ?? throw new NotFoundException("待合并文章未找到");
             Mapper.Map(dto, merge);
@@ -133,7 +134,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id + "/merge/" + id;
-            var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-reject.html").Replace("{{link}}", link).Replace("{{title}}", merge.Post.Title).Replace("{{reason}}", reason);
+            var content = new Template(System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-reject.html")).Set("link", link).Set("title", merge.Post.Title).Set("reason", reason).Render();
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已被拒绝", content, merge.ModifierEmail));
             return ResultData(null, true, "合并已拒绝！");
         }

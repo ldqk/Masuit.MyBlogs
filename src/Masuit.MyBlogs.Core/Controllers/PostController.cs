@@ -18,6 +18,7 @@ using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Masuit.Tools.Security;
+using Masuit.Tools.Strings;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -241,10 +242,10 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             await RedisHelper.ExpireAsync("code:" + p.Email, 1);
-            var content = (await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/publish.html"))
-                .Replace("{{link}}", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
-                .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                .Replace("{{title}}", p.Title);
+            var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/publish.html"))
+                .Set("link", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
+                .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                .Set("title", p.Title).Render();
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
             return ResultData(p.Mapper<PostDto>(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
         }
@@ -448,7 +449,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Content = dto.Title,
                 Link = "#/merge/compare?id=" + merge.Id
             });
-            var content = System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-request.html").Replace("{{title}}", post.Title).Replace("{{link}}", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id);
+            var content = new Template(System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-request.html")).Set("title", post.Title).Set("link", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id).Render();
             BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
             return ResultData(null, true, "您的修改请求已提交，已进入审核状态，感谢您的参与！");
         }

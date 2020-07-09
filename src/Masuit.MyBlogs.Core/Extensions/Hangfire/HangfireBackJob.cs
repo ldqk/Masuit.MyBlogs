@@ -7,6 +7,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
@@ -82,11 +83,11 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             var u = _userInfoService.GetByUsername(userInfo.Username);
             u.LoginRecord.Add(record);
             _userInfoService.SaveChanges();
-            var content = File.ReadAllText(Path.Combine(_hostEnvironment.WebRootPath, "template", "login.html"))
-                .Replace("{{name}}", u.Username)
-                .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                .Replace("{{ip}}", record.IP)
-                .Replace("{{address}}", record.PhysicAddress);
+            var content = new Template(File.ReadAllText(Path.Combine(_hostEnvironment.WebRootPath, "template", "login.html")))
+                .Set("name", u.Username)
+                .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                .Set("ip", record.IP)
+                .Set("address", record.PhysicAddress).Render();
             CommonHelper.SendMail(_settingService.Get(s => s.Name.Equals("Title")).Value + "账号登录通知", content, _settingService.Get(s => s.Name.Equals("ReceiveEmail")).Value);
         }
 

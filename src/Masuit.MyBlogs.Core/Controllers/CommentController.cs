@@ -10,6 +10,7 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
+using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -93,11 +94,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             var emails = new HashSet<string>();
             var email = CommonHelper.SystemSettings["ReceiveEmail"]; //站长邮箱
             emails.Add(email);
-            var content = (await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/notify.html"))
-                .Replace("{{title}}", post.Title)
-                .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                .Replace("{{nickname}}", comment.NickName)
-                .Replace("{{content}}", comment.Content);
+            var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/notify.html"))
+                .Set("title", post.Title)
+                .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                .Set("nickname", comment.NickName)
+                .Set("content", comment.Content);
             if (comment.Status == Status.Published)
             {
                 if (!comment.IsMaster)
@@ -117,7 +118,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     //新评论，只通知博主和楼主
                     foreach (var s in emails)
                     {
-                        BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论：", content.Replace("{{link}}", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment"), s));
+                        BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(), s));
                     }
                 }
                 else
@@ -130,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     string link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment";
                     foreach (var s in emails)
                     {
-                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Replace("{{link}}", link), s));
+                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(), s));
                     }
                 }
 #endif
@@ -139,7 +140,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             foreach (var s in emails)
             {
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论(待审核)：", content.Replace("{{link}}", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment") + "<p style='color:red;'>(待审核)</p>", s));
+                BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论(待审核)：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render() + "<p style='color:red;'>(待审核)</p>", s));
             }
 
             return ResultData(null, true, "评论成功，待站长审核通过以后将显示");
@@ -234,11 +235,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 var pid = comment.ParentId == 0 ? comment.Id : CommentService.GetParentCommentIdByChildId(id);
 #if !DEBUG
-                var content = (await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")))
-                    .Replace("{{title}}", post.Title)
-                    .Replace("{{time}}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
-                    .Replace("{{nickname}}", comment.NickName)
-                    .Replace("{{content}}", comment.Content);
+                var content = new Template(await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")))
+                    .Set("title", post.Title)
+                    .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                    .Set("nickname", comment.NickName)
+                    .Set("content", comment.Content);
                 var emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Append(post.ModifierEmail).Except(new List<string> { comment.Email, CurrentUser.Email }).ToHashSet();
                 var link = Url.Action("Details", "Post", new
                 {
@@ -247,7 +248,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }, Request.Scheme) + "#comment";
                 foreach (var email in emails)
                 {
-                    BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Replace("{{link}}", link), email));
+                    BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(), email));
                 }
 #endif
                 return ResultData(null, true, "审核通过！");
