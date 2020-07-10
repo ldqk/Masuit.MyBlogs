@@ -12,10 +12,10 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
+using System.Net;
 using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -91,15 +91,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                             ex.Message
                         });
                     case AccessDenyException _:
-                        var parts = ip.GetIPLocation().Split('|');
-                        var network = "未知";
-                        var location = parts.Join("");
-                        if (parts.Length > 2)
-                        {
-                            network = parts[^1];
-                            location = parts[..^1].Join("");
-                        }
-
+                        var (location, network) = IPAddress.Parse(ip).GetIPLocation();
                         var tips = new Template(CommonHelper.SystemSettings.GetOrAdd("AccessDenyTips", @"<h4>遇到了什么问题？</h4>
                 <h4>基于主观因素考虑，您所在的地区暂时不允许访问本站，如有疑问，请联系站长！或者请联系站长开通本站的访问权限！</h4>")).Set("clientip", ip).Set(nameof(location), location).Set(nameof(network), network).Render();
                         Response.StatusCode = 403;

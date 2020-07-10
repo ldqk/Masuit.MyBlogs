@@ -144,19 +144,27 @@ namespace Masuit.MyBlogs.Core.Common
         {
             return ips.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s =>
             {
-                var ip = IPAddress.Parse(s.Trim());
-                switch (ip.AddressFamily)
-                {
-                    case AddressFamily.InterNetwork when ip.IsPrivateIP():
-                    case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
-                        return "内网IP";
-                    case AddressFamily.InterNetwork:
-                        return IPSearcher.MemorySearch(ip.ToString())?.Region.Replace("|0", string.Empty).Split("|").ToHashSet().Join("|");
-                    default:
-                        var response = MaxmindReader.City(ip);
-                        return response.Country.Names.GetValueOrDefault("zh-CN") + response.City.Names.GetValueOrDefault("zh-CN");
-                }
+                var (location, network) = GetIPLocation(IPAddress.Parse(s.Trim()));
+                return location + "|" + network;
             }).Join(" , ");
+        }
+
+        public static (string location, string network) GetIPLocation(this IPAddress ip)
+        {
+            switch (ip.AddressFamily)
+            {
+                case AddressFamily.InterNetwork when ip.IsPrivateIP():
+                case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
+                    return ("内网", "内网IP");
+                case AddressFamily.InterNetwork:
+                    var parts = IPSearcher.MemorySearch(ip.ToString()).Region.Split('|');
+                    var network = parts[^1] == "0" ? "未知" : parts[^1];
+                    var location = parts[..^1].Where(s => s != "0").Distinct().Join("");
+                    return (location, network);
+                default:
+                    var response = MaxmindReader.City(ip);
+                    return (response.Country.Names.GetValueOrDefault("zh-CN") + response.City.Names.GetValueOrDefault("zh-CN"), "未知");
+            }
         }
 
         /// <summary>

@@ -118,7 +118,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     //新评论，只通知博主和楼主
                     foreach (var s in emails)
                     {
-                        BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(), s));
+                        BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false), s));
                     }
                 }
                 else
@@ -131,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     string link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment";
                     foreach (var s in emails)
                     {
-                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(), s));
+                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), s));
                     }
                 }
 #endif
@@ -140,7 +140,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             foreach (var s in emails)
             {
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论(待审核)：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render() + "<p style='color:red;'>(待审核)</p>", s));
+                BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论(待审核)：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false) + "<p style='color:red;'>(待审核)</p>", s));
             }
 
             return ResultData(null, true, "评论成功，待站长审核通过以后将显示");
@@ -248,7 +248,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }, Request.Scheme) + "#comment";
                 foreach (var email in emails)
                 {
-                    BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(), email));
+                    BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), email));
                 }
 #endif
                 return ResultData(null, true, "审核通过！");

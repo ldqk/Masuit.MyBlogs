@@ -168,7 +168,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 if (msg.ParentId == 0)
                 {
                     //新评论，只通知博主
-                    BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言：", content.Set("link", Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)).Render(), email));
+                    BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言：", content.Set("link", Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)).Render(false), email));
                 }
                 else
                 {
@@ -178,7 +178,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     string link = Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme);
                     foreach (var s in emails)
                     {
-                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(), s));
+                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(false), s));
                     }
                 }
 #endif
@@ -188,7 +188,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言(待审核)：", content.Set("link", Url.Action("Index", "Msg", new
             {
                 cid = msg.Id
-            }, Request.Scheme)).Render() + "<p style='color:red;'>(待审核)</p>", email));
+            }, Request.Scheme)).Render(false) + "<p style='color:red;'>(待审核)</p>", email));
             return ResultData(null, true, "留言发表成功，待站长审核通过以后将显示到列表中！");
         }
 
@@ -210,7 +210,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var link = Url.Action("Index", "Msg", new { cid = pid }, Request.Scheme);
             foreach (var s in emails)
             {
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(), s));
+                BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(false), s));
             }
 #endif
             return ResultData(null, b, b ? "审核通过！" : "审核失败！");
