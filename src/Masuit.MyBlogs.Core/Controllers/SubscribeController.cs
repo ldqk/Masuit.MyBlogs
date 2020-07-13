@@ -3,6 +3,7 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,7 +51,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// RSS订阅
         /// </summary>
         /// <returns></returns>
-        [Route("/rss"), ResponseCache(Duration = 600)]
+        [Route("/rss"), ResponseCache(Duration = 3600)]
         public IActionResult Rss()
         {
             var time = DateTime.Today.AddDays(-1);
@@ -74,7 +75,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
                 FullHtmlContent = p.Content.GetSummary(300, 50)
-            }).FromCache().ToList();
+            }).FromCache(new MemoryCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+            }).ToList();
             var feed = new Feed()
             {
                 Title = CommonHelper.SystemSettings["Title"],
@@ -95,7 +99,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// RSS分类订阅
         /// </summary>
         /// <returns></returns>
-        [Route("/cat/{id}/rss"), ResponseCache(Duration = 600)]
+        [Route("/cat/{id}/rss"), ResponseCache(Duration = 3600)]
         public IActionResult CategoryRss(int id)
         {
             var time = DateTime.Today.AddDays(-1);
@@ -120,7 +124,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
                 FullHtmlContent = p.Content.GetSummary(300, 50)
-            }).FromCache().ToList();
+            }).FromCache(new MemoryCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+            }).ToList();
             var feed = new Feed()
             {
                 Title = Request.Host + $":分类{category.Name}文章订阅",
@@ -141,7 +148,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// RSS文章订阅
         /// </summary>
         /// <returns></returns>
-        [Route("/{id}/rss"), ResponseCache(Duration = 600)]
+        [Route("/{id}/rss"), ResponseCache(Duration = 3600)]
         public IActionResult PostRss(int id)
         {
             string scheme = Request.Scheme;
@@ -211,6 +218,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Permalink = $"{scheme}://{host}/{post.Id}?cid={c.Id}#comment",
                 Guid = c.Id.ToString(),
                 FullHtmlContent = c.Content
+            }).FromCache(new MemoryCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
             }).ToList();
             var feed = new Feed()
             {
