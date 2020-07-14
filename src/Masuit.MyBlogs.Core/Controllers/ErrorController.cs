@@ -165,7 +165,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" })]
         public ActionResult GetViewToken(string email)
         {
-            if (string.IsNullOrEmpty(email) || !email.MatchEmail())
+            if (string.IsNullOrEmpty(email) || !email.MatchEmail().isMatch)
             {
                 return ResultData(null, false, "请输入正确的邮箱！");
             }
