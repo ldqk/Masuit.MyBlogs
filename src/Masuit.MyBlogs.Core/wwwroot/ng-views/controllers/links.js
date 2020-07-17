@@ -135,7 +135,7 @@
 			id:row.Id,
 			state:row.Except
 		}, function (data) {
-			self.load();
+			
 		});
 	}
 	$scope.toggleState= function(row) {
@@ -143,7 +143,7 @@
 			id:row.Id,
 			state:row.Status==1
 		}, function (data) {
-			self.load();
+			
 		});
 	}
 
@@ -152,7 +152,7 @@
 			id:row.Id,
 			state:row.Recommend
 		}, function (data) {
-			self.load();
+			
 		});
 	}
 }]);

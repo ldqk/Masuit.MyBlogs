@@ -181,7 +181,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="title">标题</param>
         /// <param name="content">内容</param>
         /// <param name="tos">收件人</param>
-        [AutomaticRetry(Attempts = 1)]
+        [AutomaticRetry(Attempts = 1,OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         public static void SendMail(string title, string content, string tos)
         {
 #if !DEBUG

@@ -100,5 +100,11 @@
     "inputFiles": [
       "wwwroot/ng-views/controllers/system.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/ng-views/controllers/links.min.js",
+    "inputFiles": [
+      "wwwroot/ng-views/controllers/links.js"
+    ]
   }
 ]
