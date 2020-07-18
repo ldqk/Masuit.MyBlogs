@@ -23,12 +23,12 @@
     <meta name="keywords" content="@(CommonHelper.SystemSettings["Keyword"]+","+ViewBag.Keyword)" />
     <meta name="description" content="@(CommonHelper.SystemSettings["Description"]+","+ViewBag.Keyword)" />
     @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Styles", ""))
-    <link href="https://cdn.staticfile.org/normalize/8.0.1/normalize.min.css" rel="stylesheet" async>
-    <link href="https://cdn.staticfile.org/limonte-sweetalert2/6.11.5/sweetalert2.min.css" rel="stylesheet" async>
-    <link href="https://cdn.staticfile.org/notie/4.3.1/notie.min.css" rel="stylesheet" async>
-    <link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" async>
-    <link href="https://cdn.staticfile.org/animate.css/3.7.0/animate.min.css" rel="stylesheet" async>
-    <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" async>
+    <link href="https://cdn.staticfile.org/normalize/8.0.1/normalize.min.css" rel="stylesheet" async defer>
+    <link href="https://cdn.staticfile.org/limonte-sweetalert2/6.11.5/sweetalert2.min.css" rel="stylesheet" async defer>
+    <link href="https://cdn.staticfile.org/notie/4.3.1/notie.min.css" rel="stylesheet" async defer>
+    <link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" async defer>
+    <link href="https://cdn.staticfile.org/animate.css/3.7.0/animate.min.css" rel="stylesheet" async defer>
+    <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" async defer>
     <environment names="Development">
         <link href="~/Content/bootstrap.min.css" rel="stylesheet">
         <link href="~/fonts/icomoon.min.css" rel="stylesheet" />
