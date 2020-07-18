@@ -3,8 +3,7 @@
 	var self = this;
 	$scope.isAdd = true;
 	$scope.allowUpload=false;
-	
-	$scope.userinfo = {};
+    $scope.userinfo = {};
 	$scope.kw = "";
 	$scope.paginationConf = {
 		currentPage:  1,
@@ -16,9 +15,9 @@
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 		}
 	};
+
 	this.GetPageData = function (page, size) {
-		
-		 window.fetch("/user/getusers?page="+page+"&size="+size+"&search="+$scope.kw).then(function(response) {
+        window.fetch("/user/getusers?page="+page+"&size="+size+"&search="+$scope.kw).then(function(response) {
             return response.json();
         }).then(function(data) {
 			$scope.paginationConf.totalItems = data.TotalCount;
@@ -30,9 +29,9 @@
 				dataset: data.Data
 			});
 			self.data = data.Data;
-			
-         });
+        });
 	}
+
 	$scope.remove = function(userinfo) {
 		layer.closeAll();
 		swal({
@@ -46,14 +45,14 @@
 			cancelButtonText: '取消'
 		}).then(function(isConfirm) {
 			if (isConfirm) {
-				
-				$scope.request("/user/delete?id="+userinfo.Id, null, function(data) {
+                $scope.request("/user/delete?id="+userinfo.Id, null, function(data) {
 					swal(data.Message, null, 'success');
 			        self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 				});
 			}
 		}).catch(swal.noop);
 	}
+
 	$scope.add = function() {
 		layer.open({
 			type: 1,
@@ -69,6 +68,7 @@
 			}
 		});
 	}
+
 	$scope.edit = function (userinfo) {
 		layer.open({
 			type: 1,
@@ -85,12 +85,14 @@
 		});
 		$scope.userinfo=userinfo;
 	}
+
 	$scope.closeAll= function() {
 		layer.closeAll();
 		setTimeout(function() {
 			$("#edit").css("display", "none");
 		}, 500);
 	}
+
 	$scope.submit = function(userinfo) {
 		$scope.request("/user/save", userinfo, function(data) {
 			$scope.closeAll();
@@ -114,6 +116,7 @@
 			_timeout = null;
 		}, 500);
 	}
+
 	$scope.resetPwd = function (row) {
 		swal({
 			title: '重置密码', 

@@ -106,5 +106,11 @@
     "inputFiles": [
       "wwwroot/ng-views/controllers/links.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/ng-views/app/route.config.min.js",
+    "inputFiles": [
+      "wwwroot/ng-views/app/route.config.js"
+    ]
   }
 ]
