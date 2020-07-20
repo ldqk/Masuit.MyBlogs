@@ -1,9 +1,4 @@
-/*--------------------
-Body
---------------------*/
-*,
-*::before,
-*::after {
+*,*:before,*:after {
   box-sizing: border-box;
 }
 
@@ -17,11 +12,8 @@ Body
   position: absolute;
   top: 50%;
   left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
-  /*width: 285px;*/
-    min-width: 100%;
-    /*height: 350px;*/
+  transform: translate(-50%, -50%);
+  min-width: 100%;
   background: -webkit-linear-gradient(top, #3a404d, #181c26);
   background: linear-gradient(to bottom, #3a404d, #181c26);
   border-radius: 10px;
@@ -50,12 +42,10 @@ Body
   counter-increment: leaderboard;
   padding: 18px 10px 18px 50px;
   cursor: pointer;
-  -webkit-backface-visibility: hidden;
-          backface-visibility: hidden;
-  -webkit-transform: translateZ(0) scale(1, 1);
-          transform: translateZ(0) scale(1, 1);
+  backface-visibility: hidden;
+  transform: translateZ(0) scale(1, 1);
 }
-.leaderboard ol li::before {
+.leaderboard ol li:before {
   content: counter(leaderboard);
   position: absolute;
   z-index: 2;
@@ -84,7 +74,7 @@ Body
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.leaderboard ol li mark::before, .leaderboard ol li mark::after {
+.leaderboard ol li mark:before, .leaderboard ol li mark:after {
   content: '';
   position: absolute;
   z-index: 1;
@@ -92,7 +82,6 @@ Body
   left: -9px;
   border-top: 10px solid #c24448;
   border-left: 10px solid transparent;
-  -webkit-transition: all .1s ease-in-out;
   transition: all .1s ease-in-out;
   opacity: 0;
 }
@@ -108,7 +97,7 @@ Body
   display: block;
   text-align: right;
 }
-.leaderboard ol li::after {
+.leaderboard ol li:after {
   content: '';
   position: absolute;
   z-index: 1;
@@ -118,7 +107,6 @@ Body
   height: 100%;
   background: #fa6855;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
-  -webkit-transition: all .3s ease-in-out;
   transition: all .3s ease-in-out;
   opacity: 0;
 }
@@ -184,11 +172,9 @@ Body
 }
 .leaderboard ol li:hover::after {
   opacity: 1;
-  -webkit-transform: scaleX(1.06) scaleY(1.03);
           transform: scaleX(1.06) scaleY(1.03);
 }
-.leaderboard ol li:hover mark::before, .leaderboard ol li:hover mark::after {
+.leaderboard ol li:hover mark:before, .leaderboard ol li:hover mark:after {
   opacity: 1;
-  -webkit-transition: all .35s ease-in-out;
   transition: all .35s ease-in-out;
 }

@@ -170,6 +170,9 @@ article table > tbody > tr > th.danger:hover,
 article table > tbody > tr.danger:hover > td,
 article table > tbody > tr:hover > .danger,
 article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
+#article li {
+    margin-left: 20px;
+}
 .syntaxhighlighter table {
     margin-bottom: 0 !important;
 }

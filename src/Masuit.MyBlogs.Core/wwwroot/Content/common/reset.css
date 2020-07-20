@@ -4,7 +4,8 @@ a, abbr, acronym, address, big, cite, code,
 del, dfn, em, img, ins, kbd, q, s, samp,
 small, strike, sub, sup, tt, var,
 b, u, i, center,
-dl, dt, dd, fieldset, form, label, legend,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td,
 article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup,
@@ -17,8 +18,11 @@ time, mark, audio, video {
     font: inherit;
     vertical-align: baseline;
 }
+
 article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section, main { display: block; }
+footer, header, hgroup, menu, nav, section, main {
+    display: block;
+}
 
 body {
     line-height: 1;
@@ -27,23 +31,30 @@ body {
     min-width: 320px;
     font-family: "Î¢ÈíÑÅºÚ","Microsoft Yahei", sans-serif;
 }
-ol, ul { list-style: none; }
 
-blockquote, q { quotes: none; }
-
-blockquote:before, blockquote:after,
-q:before, q:after {
-    content: '';
-    content: none;
+ol, ul {
+    list-style: none;
 }
+
+blockquote, q {
+    quotes: none;
+}
+
+    blockquote:before, blockquote:after,
+    q:before, q:after {
+        content: '';
+        content: none;
+    }
 
 table {
     border-collapse: collapse;
     border-spacing: 0;
 }
+
 .notie-container {
     z-index: 2147483647 !important;
 }
+
 .layui-layer-content {
     max-height: 60vh;
 }
