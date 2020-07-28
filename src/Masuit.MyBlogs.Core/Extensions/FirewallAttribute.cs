@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Security;
+using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -50,16 +51,17 @@ namespace Masuit.MyBlogs.Core.Extensions
             var blocked = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlocked", "").Split(new[] { ',', '|' }, StringSplitOptions.RemoveEmptyEntries);
             if (ua.Contains(blocked))
             {
-                AccessDeny(ip, request, "UA黑名单");
+                var agent = UserAgent.Parse(ua);
+                AccessDeny(ip, request, $"UA黑名单({agent.Browser} {agent.BrowserVersion}/{agent.Platform})");
+                var msg = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlockedMsg", "当前浏览器不支持访问本站");
                 context.Result = new ContentResult()
                 {
-                    Content = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlockedMsg", "当前浏览器不支持访问本站"),
+                    Content = Template.Create(msg).Set("browser", agent.Browser + " " + agent.BrowserVersion).Set("os", agent.Platform).Render(),
                     ContentType = ContentType.Html,
                     StatusCode = 403
                 };
                 return;
             }
-
             if (ip.IsInDenyArea() && !tokenValid)
             {
                 AccessDeny(ip, request, "访问地区限制");

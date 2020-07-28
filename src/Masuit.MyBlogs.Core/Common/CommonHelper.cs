@@ -157,7 +157,7 @@ namespace Masuit.MyBlogs.Core.Common
                 case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
                     return ("内网", "内网IP");
                 case AddressFamily.InterNetwork:
-                    var parts = IPSearcher.MemorySearch(ip.ToString()).Region.Split('|');
+                    var parts = IPSearcher.MemorySearch(ip.ToString())?.Region.Split('|') ?? new[] { "未知", "未知" };
                     var network = parts[^1] == "0" ? "未知" : parts[^1];
                     var location = parts[..^1].Where(s => s != "0").Distinct().Join("");
                     return (location, network);
@@ -181,7 +181,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="title">标题</param>
         /// <param name="content">内容</param>
         /// <param name="tos">收件人</param>
-        [AutomaticRetry(Attempts = 1,OnAttemptsExceeded = AttemptsExceededAction.Delete)]
+        [AutomaticRetry(Attempts = 1, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         public static void SendMail(string title, string content, string tos)
         {
 #if !DEBUG
