@@ -34,7 +34,8 @@ namespace Masuit.MyBlogs.Core.Extensions
             var request = context.Request;
             var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
             var requestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path);
-            if (Regex.Match(path ?? "", CommonHelper.BanRegex).Length > 0)
+            var match = Regex.Match(path ?? "", CommonHelper.BanRegex);
+            if (match.Length > 0)
             {
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
                 {
@@ -42,7 +43,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     RequestUrl = requestUrl,
                     Time = DateTime.Now,
                     UserAgent = request.Headers[HeaderNames.UserAgent],
-                    Remark = "检测到敏感词拦截"
+                    Remark = $"检测到敏感词拦截：{match.Value}"
                 }));
                 context.Response.StatusCode = 400;
                 await context.Response.WriteAsync("参数不合法！", Encoding.UTF8);

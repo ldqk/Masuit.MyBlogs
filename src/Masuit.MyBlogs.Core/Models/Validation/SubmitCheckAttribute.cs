@@ -1,7 +1,7 @@
-﻿using Masuit.Tools.Html;
-using System;
+﻿using Masuit.MyBlogs.Core.Common;
+using Masuit.Tools.Html;
+using Masuit.Tools.Logging;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core.Models.Validation
@@ -76,8 +76,10 @@ namespace Masuit.MyBlogs.Core.Models.Validation
                 }
             }
 
-            if (_checkContent && Regex.Match(content, File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "ban.txt"))).Length > 0)
+            var match = Regex.Match(content, CommonHelper.BanRegex);
+            if (_checkContent && match.Success)
             {
+                LogManager.Info($"提交内容：{content}，敏感词：{match.Value}");
                 ErrorMessage = "您提交的内容包含有非法的词汇，被禁止发表，请检查您要提交的内容！";
                 return false;
             }

@@ -10,6 +10,7 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
+using Masuit.Tools.Logging;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -44,8 +45,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Submit(CommentCommand dto)
         {
-            if (Regex.Match(dto.NickName + dto.Content, CommonHelper.BanRegex).Length > 0)
+            var match = Regex.Match(dto.NickName + dto.Content, CommonHelper.BanRegex);
+            if (match.Success)
             {
+                LogManager.Info($"提交内容：{dto.NickName}/{dto.Content}，敏感词：{match.Value}");
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
 
