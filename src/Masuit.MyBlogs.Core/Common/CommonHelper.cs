@@ -157,10 +157,15 @@ namespace Masuit.MyBlogs.Core.Common
                 case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
                     return ("内网", "内网IP");
                 case AddressFamily.InterNetwork:
-                    var parts = IPSearcher.MemorySearch(ip.ToString())?.Region.Split('|') ?? new[] { "未知", "未知" };
-                    var network = parts[^1] == "0" ? "未知" : parts[^1];
-                    var location = parts[..^1].Where(s => s != "0").Distinct().Join("");
-                    return (location, network);
+                    var parts = IPSearcher.MemorySearch(ip.ToString())?.Region.Split('|');
+                    if (parts != null)
+                    {
+                        var network = parts[^1] == "0" ? "未知" : parts[^1];
+                        var location = parts[..^1].Where(s => s != "0").Distinct().Join("");
+                        return (location, network);
+                    }
+
+                    goto default;
                 default:
                     var response = MaxmindReader.City(ip);
                     return (response.Country.Names.GetValueOrDefault("zh-CN") + response.City.Names.GetValueOrDefault("zh-CN"), "未知");
