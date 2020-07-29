@@ -1,5 +1,6 @@
 ﻿using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools.Core.AspNetCore;
 using System.ComponentModel;
 
 namespace Masuit.MyBlogs.Core.Models.Entity
@@ -9,7 +10,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
     /// </summary>
     public class BaseEntity : LuceneIndexableBaseEntity
     {
-        [DefaultValue(Status.Default), LuceneIndex]
+        [DefaultValue(Status.Default), LuceneIndex, UpdateIgnore]
         public Status Status { get; set; }
     }
 }
