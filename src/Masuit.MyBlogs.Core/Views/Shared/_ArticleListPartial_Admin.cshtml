@@ -1,49 +1,10 @@
 ﻿@using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.Tools.Systems
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 <div class="col-md-9 padding-clear">
     <div class="animated fadeIn blog">
         @if (Model.Posts.Data.Any())
         {
-            <div class="orderby">
-                <div class="row">
-                    <div class="col-md-9 text-center">
-                        @{ await Html.RenderPartialAsync("_Pagination", Model.PageParams); }
-                    </div>
-                    <div class="col-md-3">
-                        <div class="btn-group pull-right">
-                            <a class="btn btn-info" asp-controller="Dashboard" asp-action="Index" asp-fragment="/writeblog" target="_blank">
-                                <i class="icon icon-pencil"></i>
-                                写文章
-                            </a>
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                排序方式<span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="@Context.Request.Path">最后修改日期</a>
-                                </li>
-                                <li>
-                                    <a href="@Context.Request.Path?orderby=0">最后发表日期</a>
-                                </li>
-                                <li role="separator" class="divider"></li>
-                                <li>
-                                    <a href="@Context.Request.Path?orderby=3">评论最多</a>
-                                </li>
-                                <li>
-                                    <a href="@Context.Request.Path?orderby=2">访问量最多</a>
-                                </li>
-                                <li>
-                                    <a href="@Context.Request.Path?orderby=4">支持最多</a>
-                                </li>
-                                <li>
-                                    <a href="@Context.Request.Path?orderby=5">最热门</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             var rnd = new Random().Next(Model.Posts.CurrentCount > 2 ? 2 : 0, Model.Posts.CurrentCount);
             for (var index = 0; index < Model.Posts.CurrentCount; index++)
             {
@@ -70,8 +31,37 @@
                 }
             }
         }
-        <div class="col-md-12 text-center">
+        <div class="pull-left">
             @{ await Html.RenderPartialAsync("_Pagination", Model.PageParams); }
+        </div>
+        <div class="pull-right">
+            <div class="btn-group dropup">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    @(Model.PageParams.OrderBy?.GetDescription()??"排序方式")
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="@Context.Request.Path">最后修改日期</a>
+                    </li>
+                    <li>
+                        <a href="@Context.Request.Path?orderby=0">最后发表日期</a>
+                    </li>
+                    <li role="separator" class="divider"></li>
+                    <li>
+                        <a href="@Context.Request.Path?orderby=3">评论最多</a>
+                    </li>
+                    <li>
+                        <a href="@Context.Request.Path?orderby=2">访问量最多</a>
+                    </li>
+                    <li>
+                        <a href="@Context.Request.Path?orderby=4">支持最多</a>
+                    </li>
+                    <li>
+                        <a href="@Context.Request.Path?orderby=5">最热门</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

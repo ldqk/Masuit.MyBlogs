@@ -32,10 +32,13 @@
             }
             <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
                 <div class="small padding-bot10">
-                    作者：<i class="icon-user-check"></i><strong class="label label-primary">
+                    作者：<i class="icon-user-check"></i>
+                    <strong class="label label-primary">
                         <a asp-controller="Home" asp-action="Author" asp-route-author="@(Model.Modifier??Model.Author)">@(Model.Modifier??Model.Author)</a>
-                    </strong> <span class="text-muted">
-                        | 发表时间：<i class="fa fa-clock-o"></i> @Model.ModifyDate.ToString("yyyy-MM-dd HH:mm") | 分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.CategoryName</a>
+                    </strong>
+                    <span class="text-muted">
+                        | 发表时间：<i class="fa fa-clock-o"></i> @Model.ModifyDate.ToString("yyyy-MM-dd HH:mm") | 分类：<i class="icon-map-pin"></i>
+                        <a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.CategoryName</a>
                     </span>
                 </div>
                 <p>
@@ -46,11 +49,12 @@
         <div class="row">
             @if (!string.IsNullOrEmpty(Model.Label))
             {
+                var tags = Model.Label.Split(',', '，');
                 <div class="col-md-6">
-                    @foreach (string s in Model.Label.Split(',', '，'))
+                    @for (var i = 0; i < tags.Length; i++)
                     {
-                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@s" target="_blank">
-                            <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
+                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@tags[i]" target="_blank">
+                            <span class="label label-@colors[i]">@tags[i]</span>
                         </a>
                     }
                 </div>

@@ -2,12 +2,15 @@
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
+@using Masuit.MyBlogs.Core.Models
+@using Masuit.Tools.Systems
 @model Masuit.Tools.Models.PagedList<Masuit.MyBlogs.Core.Models.DTO.PostDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     Random r = new Random();
     UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
     Advertisement ad = ViewBag.Ads;
+    Pagination page = ViewData["page"] as Pagination;
 }
 <style>
     .bg-title {
@@ -65,36 +68,6 @@
     <div class="wrapper-content  animated bounceInUp blog">
         @if (Model.Data.Any())
         {
-            <div class="orderby">
-                <div class="row">
-                    <div class="col-md-offset-10 col-md-2">
-                        <div class="btn-group pull-right">
-                            <a asp-controller="Post" asp-action="All" class="btn btn-info">所有专题</a>
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                排序方式<span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="@Context.Request.Path">最后修改日期</a>
-                                </li>
-                                <li>
-                                    <a href="@Context.Request.Path?orderby=0">最后发表日期</a>
-                                </li>
-                                <li role="separator" class="divider"></li>
-                                <li>
-                                    <a href="@Context.Request.Path?orderby=3">评论最多</a>
-                                </li>
-                                <li>
-                                    <a href="@Context.Request.Path?orderby=2">访问量最多</a>
-                                </li>
-                                <li>
-                                    <a href="@Context.Request.Path?orderby=4">支持最多</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
             var rnd = new Random().Next(2, Model.CurrentCount);
             for (var i = 0; i < Model.CurrentCount; i++)
             {
@@ -111,8 +84,33 @@
         {
             <h3>Oops！抱歉~本专题没有收录相关的文章或资源！如果您有相关的结果，您可以 <a asp-controller="Post" asp-action="Publish" class="btn btn-info btn-lg">点击这里</a> 投稿哦！</h3>
         }
-        <div class="col-md-12 text-center">
-            @{ await Html.RenderPartialAsync("_Pagination", ViewData["page"]); }
+        <div class="pull-left">
+            @{ await Html.RenderPartialAsync("_Pagination", page); }
+        </div>
+        <div class="btn-group pull-right dropup">
+            <a asp-controller="Post" asp-action="All" class="btn btn-info">所有专题</a>
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                @(page.OrderBy?.GetDescription()??"排序方式")
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="@Context.Request.Path">最后修改日期</a>
+                </li>
+                <li>
+                    <a href="@Context.Request.Path?orderby=0">最后发表日期</a>
+                </li>
+                <li role="separator" class="divider"></li>
+                <li>
+                    <a href="@Context.Request.Path?orderby=3">评论最多</a>
+                </li>
+                <li>
+                    <a href="@Context.Request.Path?orderby=2">访问量最多</a>
+                </li>
+                <li>
+                    <a href="@Context.Request.Path?orderby=4">支持最多</a>
+                </li>
+            </ul>
         </div>
     </div>
 </div>

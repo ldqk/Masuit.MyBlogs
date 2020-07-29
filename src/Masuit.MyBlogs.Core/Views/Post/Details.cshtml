@@ -2,7 +2,6 @@
 @using System.Web
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Configs
-@using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
@@ -51,10 +50,10 @@
                             <div class="row">
                                 <div class="col-sm-8">
                                     <div class="padding-bot10">
-                                        <span class="label label-@colors[new Random().Next() % colors.Length]">
+                                        <span class="label label-info">
                                             <a asp-controller="Home" asp-action="Author" asp-route-author="@Model.Author">@Model.Author</a>
                                         </span>发表于<span class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</span> |
-                                        <span class="label label-@colors[new Random().Next() % colors.Length]">
+                                        <span class="label label-info">
                                             <a asp-controller="Home" asp-action="Author" asp-route-author="@Model.Modifier">@Model.Modifier</a>
                                         </span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</span>
                                     </div>
@@ -80,18 +79,20 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 line-height24">
-                                    分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model.Category.Name</a> | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃
+                                    分类：<i class="icon-map-pin"></i>
+                                    <a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId" class="label label-info">@Model.Category.Name</a>
+                                    | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃
                                     @if (Model.Seminar.Any())
                                     {
                                         <span> | 所属专题：</span>
                                         var seminars = Model.Seminar;
                                         foreach (var s in seminars)
                                         {
-                                            <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-@colors[new Random().Next() % colors.Length]">@s.Seminar.Title</a>
+                                            <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-info">@s.Seminar.Title</a>
                                             <text> </text>
                                         }
                                     }
-                                    <div class="pull-right margin-right20">
+                                    <div class="pull-right">
                                         <a asp-controller="Post" asp-action="PushMerge" asp-route-id="@Model.Id" class="btn btn-danger">我要编辑</a>
                                     </div>
                                 </div>

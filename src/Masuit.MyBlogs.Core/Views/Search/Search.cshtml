@@ -19,147 +19,136 @@
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
             <div class="col-sm-12">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-content">
-                        @if (!string.IsNullOrEmpty(ViewBag.Keyword))
-                        {
-                            <h3>为您找到约 @Model.Total 条<span class="text-navy">“@ViewBag.Keyword”</span>匹配或相关的搜索结果。</h3>
-                            <small>搜索用时(@Model.Elapsed 毫秒)</small>
-                        }
-                        <div class="search-form">
-                            <form action="/s" method="get">
-                                <div class="input-group">
-                                    <input type="text" placeholder="你要查找的关键词，支持部分指令：intitle，content，如：intitle:会声会影 content:懒得勤快，指令支持组合" id="search" name="wd" maxlength="32" value="@ViewBag.Keyword" class="form-control input-lg">
-                                    <div class="input-group-btn">
-                                        <button type="button" class="sr-only btn btn-default dropdown-toggle" data-toggle="dropdown" style="display: none"><span class="caret"></span></button>
-                                        <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
-                                        <button class="btn btn-lg btn-primary" type="submit">搜索</button>
-                                        <a class="baidu btn btn-lg btn-info">百度一下</a>
-                                    </div>
-                                </div>
-                            </form>
-                            @if (hotSearches.Any())
-                            {
-                                <span>搜索推荐：</span>
-                                foreach (var item in hotSearches)
-                                {
-                                    @Html.ActionLink(item.Keywords + "(" + item.Count + ")", "Search", new { wd = item.Keywords }, new { @class = "label label-danger" }) <span>  </span>
-                                }
-                            }
+                @if (!string.IsNullOrEmpty(ViewBag.Keyword))
+                {
+                    <h3>为您找到约 @Model.Total 条<span class="text-navy">“@ViewBag.Keyword”</span>匹配或相关的搜索结果。</h3>
+                    <small>搜索用时(@Model.Elapsed 毫秒)</small>
+                }
+                <div class="search-form">
+                    <form asp-action="Search" method="get">
+                        <div class="input-group">
+                            <input type="text" placeholder="你要查找的关键词，支持部分指令：intitle，content，如：intitle:会声会影 content:懒得勤快，指令支持组合" id="search" name="wd" maxlength="32" value="@ViewBag.Keyword" class="form-control input-lg">
+                            <div class="input-group-btn">
+                                <button type="button" class="sr-only btn btn-default dropdown-toggle" data-toggle="dropdown" style="display: none"><span class="caret"></span></button>
+                                <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
+                                <button class="btn btn-lg btn-primary" type="submit">搜索</button>
+                                <a class="baidu btn btn-lg btn-info">百度一下</a>
+                            </div>
                         </div>
-                        <div class="hr-line-dashed"></div>
-                        @if (Model.Results.Any())
+                    </form>
+                    @if (hotSearches.Any())
+                    {
+                        <span>搜索推荐：</span>
+                        foreach (var item in hotSearches)
                         {
-                            var rnd = new Random().Next(Model.Results.Count > 2 ? 2 : 1, Model.Results.Count);
-                            for (var i = 0; i < Model.Results.Count; i++)
-                            {
-                                if (rnd == i && ad != null)
-                                {
-                                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
-                                    <div class="hr-line-dashed"></div>
-                                }
+                            @Html.ActionLink(item.Keywords + "(" + item.Count + ")", "Search", new { wd = item.Keywords }, new { @class = "label label-danger" }) <span>  </span>
+                        }
+                    }
+                </div>
+                @if (Model.Results.Any())
+                {
+                    <div class="hr-line-dashed"></div>
+                    var rnd = new Random().Next(Model.Results.Count > 2 ? 2 : 1, Model.Results.Count);
+                    for (var i = 0; i < Model.Results.Count; i++)
+                    {
+                        if (rnd == i && ad != null)
+                        {
+                            await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
+                        }
 
-                                PostDto p = Model.Results[i];
-                                <div class="border padding-10 padding-bot5">
-                                    <div class="search-result">
-                                        <h2 class="size20">
-                                            <a asp-controller="Post" asp-action="Details" asp-route-id="@p.Id" asp-route-kw="@ViewBag.Keyword" target="_blank">@Html.Raw(p.Title)</a>
-                                        </h2>
-                                        <div>
-                                            作者：
-                                            <label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：@(p.ModifyDate.ToString("yyyy-MM-dd HH:mm")) | 分类：<a asp-controller="Home" asp-action="Category" asp-route-id="@p.CategoryId">@p.CategoryName</a>
-                                        </div>
-                                        <p class="size14">@Html.Raw(p.Content)</p>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                @Html.ActionLink(Context.Request.Scheme + "://" + Context.Request.Host + "/" + p.Id, "Details", "Post", new
-                                                {
-                                                    id = p.Id
-                                                }, new
-                                                {
-                                                    @class = "search-link",
-                                                    target = "_blank"
-                                                })
-                                            </div>
-                                            <div class="col-md-6 pull-right text-right">
-                                                @p.CommentCount 评论 | @p.TotalViewCount 浏览
-                                            </div>
-                                        </div>
+                        var p = Model.Results[i];
+                        <div class="ibox">
+                            <div class="ibox-content">
+                                <a asp-controller="Post" asp-action="Details" asp-route-id="@p.Id" asp-route-kw="@ViewBag.Keyword" target="_blank">
+                                    <h2 class="size20 margin-bot10">
+                                        @Html.Raw(p.Title)
+                                    </h2>
+                                </a>
+                                <div>
+                                    作者：
+                                    <label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：@(p.ModifyDate.ToString("yyyy-MM-dd HH:mm")) | 分类：<a asp-controller="Home" asp-action="Category" asp-route-id="@p.CategoryId">@p.CategoryName</a>
+                                </div>
+                                <p class="size14">@Html.Raw(p.Content)</p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <a asp-controller="Post" asp-action="Details" asp-route-id="@p.Id" class="search-link" target="_blank">@(Context.Request.Scheme + "://" + Context.Request.Host + "/" + p.Id)</a>
+                                    </div>
+                                    <div class="col-md-6 pull-right text-right">
+                                        @p.CommentCount 评论 | @p.TotalViewCount 浏览
                                     </div>
                                 </div>
-                                <div class="hr-line-dashed"></div>
-                            }
-                        }
-                        @if (!string.IsNullOrEmpty((string)ViewBag.ErrorMsg))
+                            </div>
+                        </div>
+                    }
+                }
+                @if (!string.IsNullOrEmpty((string)ViewBag.ErrorMsg))
+                {
+                    <h3>@ViewBag.ErrorMsg</h3>
+                }
+                @*下面是分页组件*@
+                @{
+                    int size = ViewBag.PageSize;
+                    int pages = Math.Ceiling(Model.Total / (size > 0 ? size : 10.0)).ToInt32();
+                    var page = Context.Request.Query["page"].ToString().ToInt32();
+                    int current = page > 0 ? page : 1;
+                    int pageStart = current - 4 > 0 ? current - 4 : 1;
+                    int pageEnd = current + 4 >= pages ? pages : current + 4;
+                    if (pageEnd - pageStart < 9)
+                    {
+                        if (pageStart == 1)
                         {
-                            <h3>@ViewBag.ErrorMsg</h3>
+                            pageEnd = pageStart + 8 >= pages ? pages : pageStart + 8;
                         }
-                        @*下面是分页组件*@
-                        @{
-                            int size = ViewBag.PageSize;
-                            int pages = Math.Ceiling(Model.Total / (size > 0 ? size : 10.0)).ToInt32();
-                            var page = Context.Request.Query["page"].ToString().ToInt32();
-                            int current = page > 0 ? page : 1;
-                            int pageStart = current - 4 > 0 ? current - 4 : 1;
-                            int pageEnd = current + 4 >= pages ? pages : current + 4;
-                            if (pageEnd - pageStart < 9)
+                        else
+                        {
+                            pageStart = pageEnd - 8 > 0 ? pageEnd - 8 : 1;
+                        }
+                    }
+                }
+                @if (pages > 1)
+                {
+                    <ul class="pagination margin-clear">
+                        @if (current == 1)
+                        {
+                            <li class="disabled"><a>首页</a></li>
+                            <li class="disabled"><a aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                        }
+                        else
+                        {
+                            <li><a href="@Context.Request.Path?wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Previous">首页</a></li>
+                            <li><a href="@Context.Request.Path?page=@(Context.Request.Query["page"].ToString().ToInt32() - 1 <= 0 ? 1 : Context.Request.Query["page"].ToString().ToInt32() - 1)&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                        }
+                        @if (pageStart > 1)
+                        {
+                            <li class="disabled"><a aria-label="Previous"><span aria-hidden="true">...</span></a></li>
+                        }
+                        @for (int i = pageStart; i <= pageEnd; i++)
+                        {
+                            if (i == current)
                             {
-                                if (pageStart == 1)
-                                {
-                                    pageEnd = pageStart + 8 >= pages ? pages : pageStart + 8;
-                                }
-                                else
-                                {
-                                    pageStart = pageEnd - 8 > 0 ? pageEnd - 8 : 1;
-                                }
+                                <li class="disabled"><a>@i</a></li>
+                            }
+                            else
+                            {
+                                <li><a href="@Context.Request.Path?page=@i&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])">@i</a></li>
                             }
                         }
-                        @if (pages > 1)
+                        @if (pageEnd < pages)
                         {
-                            <ul class="pagination">
-                                @if (current == 1)
-                                {
-                                    <li class="disabled"><a>首页</a></li>
-                                    <li class="disabled"><a aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-                                }
-                                else
-                                {
-                                    <li><a href="@Context.Request.Path?wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Previous">首页</a></li>
-                                    <li><a href="@Context.Request.Path?page=@(Context.Request.Query["page"].ToString().ToInt32() - 1 <= 0 ? 1 : Context.Request.Query["page"].ToString().ToInt32() - 1)&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-                                }
-                                @if (pageStart > 1)
-                                {
-                                    <li class="disabled"><a aria-label="Previous"><span aria-hidden="true">...</span></a></li>
-                                }
-                                @for (int i = pageStart; i <= pageEnd; i++)
-                                {
-                                    if (i == current)
-                                    {
-                                        <li class="disabled"><a>@i</a></li>
-                                    }
-                                    else
-                                    {
-                                        <li><a href="@Context.Request.Path?page=@i&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])">@i</a></li>
-                                    }
-                                }
-                                @if (pageEnd < pages)
-                                {
-                                    <li class="disabled"><a aria-label="Previous"><span aria-hidden="true">...</span></a></li>
-                                }
-                                @if (current == pages)
-                                {
-                                    <li class="disabled"><a><span aria-hidden="true">&raquo;</span></a></li>
-                                    <li class="disabled"><a>末页</a></li>
-                                }
-                                else
-                                {
-                                    <li><a href="@Context.Request.Path?page=@(current + 1)&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
-                                    <li><a href="@Context.Request.Path?page=@pages&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Next">末页</a></li>
-                                }
-                            </ul>
+                            <li class="disabled"><a aria-label="Previous"><span aria-hidden="true">...</span></a></li>
                         }
-                    </div>
-                </div>
+                        @if (current == pages)
+                        {
+                            <li class="disabled"><a><span aria-hidden="true">&raquo;</span></a></li>
+                            <li class="disabled"><a>末页</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="@Context.Request.Path?page=@(current + 1)&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+                            <li><a href="@Context.Request.Path?page=@pages&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Next">末页</a></li>
+                        }
+                    </ul>
+                }
             </div>
         </div>
     </div>

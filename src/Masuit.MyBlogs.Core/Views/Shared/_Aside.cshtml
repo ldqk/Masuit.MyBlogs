@@ -9,7 +9,7 @@
     @if (Model.Notices.Any())
     {
         <section class="wow animated fadeIn">
-            <article class="panel panel-default">
+            <article class="panel panel-info">
                 <div class="panel-heading">
                     <i class="icon-clipboard2"></i><span>近期公告</span>
                     <a class="pull-right text-success" asp-controller="Notice" asp-action="Index">所有公告</a>
@@ -32,7 +32,7 @@
         </section>
     }
     <section class="wow animated fadeIn">
-        <article class="panel panel-warning">
+        <article class="panel panel-info">
             <div class="panel-heading">
                 <i class="icon-lab2"></i>文章分类
                 <a asp-controller="Post" asp-action="All" class="pull-right text-success">所有分类</a>
@@ -58,7 +58,7 @@
     @foreach (var ad in Model.SidebarAds)
     {
         <section>
-            <article class="panel panel-danger">
+            <article class="panel panel-info">
                 <div class="panel-heading">
                     @ad.Title
                 </div>
@@ -110,17 +110,16 @@
         </div>
     </section>
     <section class="wow animated fadeIn">
-        <article class="panel panel-primary">
+        <article class="panel panel-info">
             <div class="panel-heading">
-                <i class="icon-lightbulb"></i>标签云 <a asp-controller="Post" asp-action="All" class="pull-right text-white">所有标签</a>
+                <i class="icon-lightbulb"></i>标签云 <a asp-controller="Post" asp-action="All" class="pull-right text-success">所有标签</a>
             </div>
             <div class="panel-body text-center">
                 <div id="tagscloud">
                     @if (Model.Tags.Any())
                     {
                         var tags = Model.Tags.OrderBy(s => Guid.NewGuid()).Take(20);
-                        foreach (KeyValuePair<string, int>
-                            s in tags)
+                        foreach (var s in tags)
                         {
                             <a asp-controller="Home" asp-action="Tag" asp-route-id="@s.Key" class="tagc-@(new Random().Next(100) % 10)" style="font-size: @(s.Value)px; line-height: @(s.Value * 1.2)px;">@s.Key</a>
                         }
@@ -135,7 +134,7 @@
     </section>
 
     <section class="wow animated fadeIn">
-        <article class="panel panel-primary">
+        <article class="panel panel-info">
             <div class="panel-heading">
                 <i class="icon-fire"></i>近期热搜 Top10
             </div>

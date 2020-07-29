@@ -96,7 +96,16 @@
                     if (user.IsAdmin)
                     {
                         <li>
+                            <a asp-controller="Dashboard" asp-action="Index" asp-fragment="/writeblog" target="_blank">
+                                <i class="icon icon-pencil"></i>
+                                写文章
+                            </a>
+                        </li>
+                        <li>
                             <a asp-action="Index" asp-controller="Dashboard" target="_blank">控制面板</a>
+                        </li>
+                        <li>
+                            <a> | </a>
                         </li>
                     }
                     var parent = menus.Where(m => m.ParentId == 0);

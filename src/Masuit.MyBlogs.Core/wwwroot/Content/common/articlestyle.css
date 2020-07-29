@@ -196,13 +196,16 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     box-shadow: #f5deb3 0px 0px 3px inset;
 }
 
-.box-right { padding-right: 0; }
+.box-right {
+    padding-right: 0;
+    padding-left: 10px;
+}
 
 .box-right .panel {
     background-color: transparent;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-shadow: 0 0 3px;
+    margin-bottom: 5px;
+    /*border-radius: 8px;
+    box-shadow: 0 0 3px;*/
 }
 
 .box-right .panel .panel-body { padding: 2px; }
@@ -296,8 +299,8 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     border-image: none;
     border-style: solid solid none;
     border-width: 1px;
-    border-radius: 10px;
-    box-shadow: #c4c4c4 0 0 10px;
+    border-radius: 4px;
+    box-shadow: #c4c4c4 0 0 5px;
     word-wrap: break-word;
     word-break: break-all;
 }
