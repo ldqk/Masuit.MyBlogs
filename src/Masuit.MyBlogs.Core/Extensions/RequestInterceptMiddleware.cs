@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
@@ -32,6 +33,11 @@ namespace Masuit.MyBlogs.Core.Extensions
         public async Task Invoke(HttpContext context)
         {
             var request = context.Request;
+            if (!AppConfig.EnableIPDirect && request.Host.Host.MatchInetAddress() && !request.Host.Host.IsPrivateIP())
+            {
+                return;
+            }
+
             var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
             var requestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path);
             var match = Regex.Match(path ?? "", CommonHelper.BanRegex);

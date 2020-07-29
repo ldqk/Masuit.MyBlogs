@@ -36,5 +36,11 @@ namespace Masuit.MyBlogs.Core.Configs
         /// 真实客户端IP转发标头
         /// </summary>
         public static string TrueClientIPHeader { get; set; }
+
+        /// <summary>
+        /// 是否允许IP直接访问 
+        /// </summary>
+        public static bool EnableIPDirect { get; set; }
+
     }
 }

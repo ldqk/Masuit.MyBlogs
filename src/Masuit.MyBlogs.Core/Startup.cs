@@ -74,6 +74,7 @@ namespace Masuit.MyBlogs.Core
                 AppConfig.BaiduAK = configuration[nameof(AppConfig.BaiduAK)];
                 AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
                 AppConfig.TrueClientIPHeader = configuration[nameof(AppConfig.TrueClientIPHeader)] ?? "CF-Connecting-IP";
+                AppConfig.EnableIPDirect = bool.Parse(configuration[nameof(AppConfig.EnableIPDirect)] ?? "false");
                 configuration.Bind("Imgbed:AliyunOSS", AppConfig.AliOssConfig);
                 configuration.Bind("Imgbed:Gitlabs", AppConfig.GitlabConfigs);
             }
@@ -176,11 +177,7 @@ namespace Masuit.MyBlogs.Core
             }
 
             db.Database.EnsureCreated();
-            var dic = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
-            foreach (var (key, value) in dic)
-            {
-                CommonHelper.SystemSettings.TryAdd(key, value);
-            }
+            InitSettings(db);
             app.UseBundles();
             UseLuceneSearch(env, hangfire, luceneIndexerOptions);
             if (bool.Parse(Configuration["Https:Enabled"]))
@@ -228,6 +225,15 @@ namespace Masuit.MyBlogs.Core
             });
             HangfireJobInit.Start(); //初始化定时任务
             Console.WriteLine("网站启动完成");
+        }
+
+        private static void InitSettings(DataContext db)
+        {
+            var dic = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
+            foreach (var (key, value) in dic)
+            {
+                CommonHelper.SystemSettings.TryAdd(key, value);
+            }
         }
 
         private static void UseLuceneSearch(IHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)

@@ -129,10 +129,10 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="stream"></param>
         /// <param name="file"></param>
         /// <returns></returns>
-        private async Task<(string url, bool success)> UploadGitee(GitlabConfig config, Stream stream, string file)
+        private Task<(string url, bool success)> UploadGitee(GitlabConfig config, Stream stream, string file)
         {
             var path = $"{DateTime.Now:yyyy/MM/dd}/{file}";
-            return await _httpClient.PostAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path), new
+            return _httpClient.PostAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path), new
             {
                 access_token = config.AccessToken,
                 content = Convert.ToBase64String(stream.ToArray()),
