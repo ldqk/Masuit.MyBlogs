@@ -7,14 +7,12 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
@@ -70,6 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 if (single.Any())
                 {
                     total = 1;
+                    single[0].PostDate = single[0].PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                     return ResultData(new
                     {
                         total,
@@ -86,7 +85,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "没有留言");
             }
             total = parent.TotalCount;
-            var qlist = parent.Data.SelectMany(c => LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(c.Id)).Where(c => c.Status == Status.Published || CurrentUser.IsAdmin);
+            var qlist = parent.Data.SelectMany(c => LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(c.Id)).Where(c => c.Status == Status.Published || CurrentUser.IsAdmin).Select(m =>
+            {
+                m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                return m;
+            });
             if (total > 0)
             {
                 return ResultData(new
@@ -239,6 +242,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult GetPendingMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var list = LeaveMessageService.GetPages<DateTime, LeaveMessageDto>(page, size, m => m.Status == Status.Pending, l => l.PostDate, false);
+            foreach (var m in list.Data)
+            {
+                m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
+
             return Ok(list);
         }
 

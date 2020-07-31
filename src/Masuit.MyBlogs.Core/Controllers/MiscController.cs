@@ -4,7 +4,9 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +44,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index(int id)
         {
             var misc = MiscService.GetFromCache(m => m.Id == id) ?? throw new NotFoundException("页面未找到");
+            misc.ModifyDate = misc.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            misc.PostDate = misc.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             return View(misc);
         }
 
@@ -171,6 +175,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult GetPageData(int page = 1, int size = 10)
         {
             var list = MiscService.GetPages(page, size, n => true, n => n.ModifyDate, false);
+            foreach (var item in list.Data)
+            {
+                item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
+
             return Ok(list);
         }
 
@@ -182,8 +192,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Get(int id)
         {
-            var notice = MiscService.GetById(id);
-            return ResultData(notice.MapTo<MiscDto>());
+            var misc = MiscService.GetById(id);
+            if (misc != null)
+            {
+                misc.ModifyDate = misc.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                misc.PostDate = misc.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
+            return ResultData(misc.MapTo<MiscDto>());
         }
     }
 }

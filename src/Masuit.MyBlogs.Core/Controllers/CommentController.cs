@@ -99,7 +99,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             emails.Add(email);
             var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/notify.html"))
                 .Set("title", post.Title)
-                .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                .Set("time", DateTime.Now.ToTimeZoneF(HttpContext.Session.Get<string>(SessionKey.TimeZone)))
                 .Set("nickname", comment.NickName)
                 .Set("content", comment.Content);
             if (comment.Status == Status.Published)
@@ -191,6 +191,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 if (single.Any())
                 {
                     total = 1;
+                    single[0].CommentDate = single[0].CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                     return ResultData(new
                     {
                         total,
@@ -207,7 +208,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "没有评论");
             }
             total = parent.TotalCount;
-            var result = parent.Data.SelectMany(c => CommentService.GetSelfAndAllChildrenCommentsByParentId(c.Id).Where(x => (x.Status == Status.Published || CurrentUser.IsAdmin))).ToList();
+            var result = parent.Data.SelectMany(c => CommentService.GetSelfAndAllChildrenCommentsByParentId(c.Id).Where(x => (x.Status == Status.Published || CurrentUser.IsAdmin))).Select(c =>
+            {
+                c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                return c;
+            }).ToList();
             if (total > 0)
             {
                 return ResultData(new
@@ -240,7 +245,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 #if !DEBUG
                 var content = new Template(await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")))
                     .Set("title", post.Title)
-                    .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
+                    .Set("time", DateTime.Now.ToTimeZoneF(HttpContext.Session.Get<string>(SessionKey.TimeZone)))
                     .Set("nickname", comment.NickName)
                     .Set("content", comment.Content);
                 var emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Append(post.ModifierEmail).Except(new List<string> { comment.Email, CurrentUser.Email }).ToHashSet();
@@ -280,6 +285,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult GetPendingComments([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var pages = CommentService.GetPages<DateTime, CommentDto>(page, size, c => c.Status == Status.Pending, c => c.CommentDate, false);
+            foreach (var item in pages.Data)
+            {
+                item.CommentDate = item.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
+
             return Ok(pages);
         }
     }

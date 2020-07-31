@@ -9,6 +9,8 @@ using Masuit.MyBlogs.Core.Models.Command;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +36,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet("{id}")]
         public ActionResult Get(int id)
         {
-            return ResultData(Mapper.Map<PostMergeRequestDto>(PostMergeRequestService.GetById(id)));
+            var p = Mapper.Map<PostMergeRequestDto>(PostMergeRequestService.GetById(id));
+            if (p != null)
+            {
+                p.SubmitTime = p.SubmitTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
+
+            return ResultData(p);
         }
 
         /// <summary>
@@ -54,6 +62,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var list = PostMergeRequestService.GetQuery(where).OrderByDescending(d => d.MergeState == MergeStatus.Pending).ThenByDescending(r => r.Id).ToPagedList<PostMergeRequest, PostMergeRequestDtoBase>(page, size, MapperConfig);
+            foreach (var item in list.Data)
+            {
+                item.SubmitTime = item.SubmitTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
+
             return Ok(list);
         }
 

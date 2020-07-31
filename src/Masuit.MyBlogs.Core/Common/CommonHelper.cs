@@ -20,6 +20,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using TimeZoneConverter;
 
 #if !DEBUG
 #endif
@@ -138,7 +139,7 @@ namespace Masuit.MyBlogs.Core.Common
         }
 
         private static readonly DbSearcher IPSearcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
-        private static readonly DatabaseReader MaxmindReader = new DatabaseReader(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-City.mmdb"));
+        public static readonly DatabaseReader MaxmindReader = new DatabaseReader(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-City.mmdb"));
 
         public static string GetIPLocation(this string ips)
         {
@@ -169,6 +170,19 @@ namespace Masuit.MyBlogs.Core.Common
                 default:
                     var response = MaxmindReader.City(ip);
                     return (response.Country.Names.GetValueOrDefault("zh-CN") + response.City.Names.GetValueOrDefault("zh-CN"), "未知");
+            }
+        }
+
+        public static string GetClientTimeZone(this IPAddress ip)
+        {
+            switch (ip.AddressFamily)
+            {
+                case AddressFamily.InterNetwork when ip.IsPrivateIP():
+                case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
+                    return "Asia/Shanghai";
+                default:
+                    var response = MaxmindReader.City(ip);
+                    return response.Location.TimeZone ?? "Asia/Shanghai";
             }
         }
 
@@ -314,6 +328,29 @@ namespace Masuit.MyBlogs.Core.Common
                 }
             }
             return stream;
+        }
+
+        /// <summary>
+        /// 转换时区
+        /// </summary>
+        /// <param name="time">UTC时间</param>
+        /// <param name="zone">时区id</param>
+        /// <returns></returns>
+        public static DateTime ToTimeZone(this DateTime time, string zone)
+        {
+            return TimeZoneInfo.ConvertTime(time, TZConvert.GetTimeZoneInfo(zone));
+        }
+
+        /// <summary>
+        /// 转换时区
+        /// </summary>
+        /// <param name="time">UTC时间</param>
+        /// <param name="zone">时区id</param>
+        /// <param name="format">时间格式字符串</param>
+        /// <returns></returns>
+        public static string ToTimeZoneF(this DateTime time, string zone, string format = "yyyy-MM-dd HH:mm:ss")
+        {
+            return ToTimeZone(time, zone).ToString(format);
         }
     }
 }

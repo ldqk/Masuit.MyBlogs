@@ -200,7 +200,7 @@ namespace Masuit.MyBlogs.Core
                 OnPrepareResponse = context =>
                 {
                     context.Context.Response.Headers[HeaderNames.CacheControl] = "public,no-cache";
-                    context.Context.Response.Headers[HeaderNames.Expires] = DateTime.UtcNow.AddDays(7).ToString("R");
+                    context.Context.Response.Headers[HeaderNames.Expires] = DateTime.Now.AddDays(7).ToString("R");
                 },
                 ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes),
             });

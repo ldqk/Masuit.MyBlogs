@@ -1,4 +1,6 @@
-﻿namespace Masuit.MyBlogs.Core.Models.ViewModel
+﻿using System;
+
+namespace Masuit.MyBlogs.Core.Models.ViewModel
 {
     /// <summary>
     /// 文章数据模型
@@ -20,12 +22,12 @@
         /// <summary>
         /// 发表时间
         /// </summary>
-        public string PostDate { get; set; }
+        public DateTime PostDate { get; set; }
 
         /// <summary>
         /// 修改时间
         /// </summary>
-        public string ModifyDate { get; set; }
+        public DateTime ModifyDate { get; set; }
 
         /// <summary>
         /// 是否置顶

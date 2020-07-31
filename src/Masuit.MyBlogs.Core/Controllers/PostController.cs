@@ -75,6 +75,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             var related = PostService.ScoreSearch(1, 11, string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label);
             related.RemoveAll(p => p.Id == id);
             ViewBag.Related = related;
+            post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             if (CurrentUser.IsAdmin)
             {
                 return View("Details_Admin", post);
@@ -102,6 +104,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             ViewBag.Primary = post;
             var list = PostHistoryVersionService.GetPages(page, size, v => v.PostId == id, v => v.ModifyDate, false);
+            foreach (var item in list.Data)
+            {
+                item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
+
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
             return View(list);
         }
@@ -116,8 +123,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> HistoryVersion(int id, int hid)
         {
             var post = await PostHistoryVersionService.GetAsync(v => v.Id == hid) ?? throw new NotFoundException("文章未找到");
-            ViewBag.Next = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
-            ViewBag.Prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
+            var next = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
+            var prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
+            ViewBag.Next = next;
+            ViewBag.Prev = prev;
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
             return CurrentUser.IsAdmin ? View("HistoryVersion_Admin", post) : View(post);
         }
@@ -232,7 +241,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
             post.Status = Status.Pending;
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes());
-            //ViewBag.CategoryId = new SelectList(CategoryService.GetQueryNoTracking(c => c.Status == Status.Available), "Id", "Name", post.CategoryId);
             Post p = post.Mapper<Post>();
             p.IP = ClientIP;
             p.Modifier = p.Author;
@@ -572,13 +580,13 @@ namespace Masuit.MyBlogs.Core.Controllers
             return ResultData(model);
         }
 
-        /// <summary>
-        /// 文章详情
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [MyAuthorize]
-        public ActionResult Read(int id) => ResultData(PostService.GetById(id).Mapper<PostDto>());
+        ///// <summary>
+        ///// 文章详情
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //[MyAuthorize]
+        //public ActionResult Read(int id) => ResultData(PostService.GetById(id).Mapper<PostDto>());
 
         /// <summary>
         /// 获取文章分页
@@ -599,6 +607,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var list = PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToPagedList<Post, PostDataModel>(page, size, MapperConfig);
+            foreach (var item in list.Data)
+            {
+                item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
+
             return Ok(list);
         }
 
@@ -619,6 +633,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var pages = PostService.GetQuery(where).OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).ToPagedList<Post, PostDataModel>(page, size, MapperConfig);
+            foreach (var item in pages.Data)
+            {
+                item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
+
             return Ok(pages);
         }
 
@@ -763,8 +783,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
 
                 p.Status = Status.Schedule;
-                p.PostDate = timespan.Value;
-                p.ModifyDate = timespan.Value;
+                p.PostDate = timespan.Value.ToUniversalTime();
+                p.ModifyDate = timespan.Value.ToUniversalTime();
                 HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.PublishPost), args: p);
                 return ResultData(p.Mapper<PostDto>(), message: $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！");
             }

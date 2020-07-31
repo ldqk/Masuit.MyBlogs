@@ -2,11 +2,15 @@
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
+using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -19,6 +23,7 @@ namespace Masuit.MyBlogs.Core.Extensions
     /// </summary>
     public class RequestInterceptMiddleware
     {
+
         private readonly RequestDelegate _next;
 
         /// <summary>
@@ -79,8 +84,22 @@ namespace Masuit.MyBlogs.Core.Extensions
                 }
             }
 
-            TrackData.RequestLogs.AddOrUpdate(requestUrl, 1, (s, i) => i + 1);
-            await _next.Invoke(context);
+            if (!context.Request.IsRobot())
+            {
+                if (request.QueryString.HasValue)
+                {
+                    var q = request.QueryString.Value.Trim('?');
+                    requestUrl = requestUrl.Replace(q, q.Split('&').Where(s => !s.StartsWith("cid") && !s.StartsWith("uid")).Join("&"));
+                }
+                TrackData.RequestLogs.AddOrUpdate(requestUrl, 1, (s, i) => i + 1);
+            }
+
+            if (string.IsNullOrEmpty(context.Session.Get<string>(SessionKey.TimeZone)))
+            {
+                context.Session.Set(SessionKey.TimeZone, context.Connection.RemoteIpAddress.GetClientTimeZone());
+            }
+
+            await _next(context);
         }
     }
 }

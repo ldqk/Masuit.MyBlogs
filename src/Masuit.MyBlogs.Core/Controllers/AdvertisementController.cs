@@ -47,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")]int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")]int size = 10, string kw = "")
+        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, string kw = "")
         {
             Expression<Func<Advertisement, bool>> where = p => true;
             if (!string.IsNullOrEmpty(kw))
@@ -61,6 +61,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
             {
                 ad.CategoryNames = ad.CategoryIds.Split(",").Select(c => dic[c]).Join(",");
+                ad.CreateTime = ad.CreateTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                ad.UpdateTime = ad.UpdateTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             }
 
             return Ok(list);
