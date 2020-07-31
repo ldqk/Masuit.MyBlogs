@@ -191,7 +191,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 if (single.Any())
                 {
                     total = 1;
-                    single[0].CommentDate = single[0].CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                    foreach (var c in single)
+                    {
+                        c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                    }
+
                     return ResultData(new
                     {
                         total,
