@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.10.0" />
+        <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.11.0" />
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
         <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="4.0.0" />
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
