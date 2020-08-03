@@ -77,6 +77,12 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         [UpdateIgnore]
         public int ViewCount { get; set; }
 
+        /// <summary>
+        /// 曝光量
+        /// </summary>
+        [UpdateIgnore]
+        public int DisplayCount { get; set; }
+
         public string CategoryIds { get; set; }
     }
 }

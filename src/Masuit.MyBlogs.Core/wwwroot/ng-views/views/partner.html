@@ -33,20 +33,23 @@
             <td title="'权重'">
                 {{row.Weight}}
             </td>
-            <td title="'累计点击量'">
+            <td title="'曝光量'">
+                {{row.DisplayCount}}
+            </td>
+            <td title="'累计点击'">
                 {{row.ViewCount}}
             </td>
-            <td title="'日均点击量'">
+            <td title="'日均点击'">
                 {{row.AverageViewCount}}
             </td>
             <td title="'分类'" style="max-width: 220px">
                 {{row.CategoryNames}}
             </td>
             <td title="'创建时间'">
-                {{row.CreateTime|date:'yyyy-MM-dd HH:mm:ss'}}
+                {{row.CreateTime|date:'yyyy-MM-dd HH:mm'}}
             </td>
             <td title="'修改时间'">
-                {{row.UpdateTime|date:'yyyy-MM-dd HH:mm:ss'}}
+                {{row.UpdateTime|date:'yyyy-MM-dd HH:mm'}}
             </td>
             <td title="'状态'">
                 <label class="el-switch">

@@ -57,7 +57,17 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 }
             }
 
-            return CacheManager.GetOrAdd($"{count}{type}{cid}", _ => GetQuery(where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, a.Weight)).WeightedItems(count));
+            return CacheManager.GetOrAdd($"{count}{type}{cid}", _ =>
+            {
+                var list = GetQuery(@where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, a.Weight)).WeightedItems(count);
+                foreach (var item in list)
+                {
+                    item.DisplayCount += 1;
+                }
+
+                SaveChanges();
+                return list;
+            });
         }
 
         /// <summary>
@@ -93,7 +103,17 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                     where = where.And(a => string.IsNullOrEmpty(a.CategoryIds));
                 }
             }
-            return CacheManager.GetOrAdd($"{count}{type}{cid}", _ => GetQuery(where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, (int)a.Price)).WeightedItems(count));
+            return CacheManager.GetOrAdd($"{count}{type}{cid}", _ =>
+            {
+                var list = GetQuery(@where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, (int)a.Price)).WeightedItems(count);
+                foreach (var item in list)
+                {
+                    item.DisplayCount += 1;
+                }
+
+                SaveChanges();
+                return list;
+            });
         }
     }
 }
