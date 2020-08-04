@@ -516,3 +516,8 @@ Custom bottom spacer
             color: #fff;
             background: #0099ff;
         }
+.container p,.container-fluid p {
+    font-size: 16px;
+    line-height: 22px;
+    word-break: break-all;
+}
