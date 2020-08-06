@@ -15,6 +15,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         {
             Status = Status.Available;
             Except = false;
+            UpdateTime = DateTime.Now;
         }
 
         /// <summary>

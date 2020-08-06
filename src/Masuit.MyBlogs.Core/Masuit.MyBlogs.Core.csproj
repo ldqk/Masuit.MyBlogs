@@ -48,7 +48,7 @@
         <PackageReference Include="TimeZoneConverter" Version="3.2.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.6.0" />
         <PackageReference Include="WinInsider.System.Net.Http.Formatting" Version="1.0.14" />
-        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="3.0.56" />
+        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="3.0.57" />
     </ItemGroup>
     <ItemGroup>
         <Content Update="appsettings.json">
