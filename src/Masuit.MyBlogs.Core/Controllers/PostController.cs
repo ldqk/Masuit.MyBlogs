@@ -76,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             related.RemoveAll(p => p.Id == id);
             if (related.Count <= 1)
             {
-                related = PostService.GetPages(1, 10, p => p.Id != id && p.CategoryId == post.CategoryId, p => p.TotalViewCount, false).Data;
+                related = PostService.GetPagesFromCache(1, 10, p => p.Id != id && p.CategoryId == post.CategoryId, p => p.TotalViewCount, false).Data;
             }
 
             ViewBag.Related = related;
