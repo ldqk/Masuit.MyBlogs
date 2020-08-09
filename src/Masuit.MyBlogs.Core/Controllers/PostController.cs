@@ -74,6 +74,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
             var related = PostService.ScoreSearch(1, 11, string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label);
             related.RemoveAll(p => p.Id == id);
+            if (related.Count <= 1)
+            {
+                related = PostService.GetPages(1, 10, p => p.Id != id && p.CategoryId == post.CategoryId, p => p.TotalViewCount, false).Data;
+            }
+
             ViewBag.Related = related;
             post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));

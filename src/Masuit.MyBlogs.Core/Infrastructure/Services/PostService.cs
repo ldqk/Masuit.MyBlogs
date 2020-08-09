@@ -9,6 +9,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools;
 using Microsoft.EntityFrameworkCore.Internal;
 using PanGu;
 using PanGu.HighLight;
@@ -50,7 +51,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             }
 
             var searchResult = SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
-            var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).ToList();
+            var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).DistinctBy(s => s.Entity.Id).ToList();
             var ids = entities.Select(s => s.Entity.Id).ToArray();
             var dic = GetQuery<PostDto>(p => ids.Contains(p.Id)).ToDictionary(p => p.Id);
             var posts = entities.Select(s =>
