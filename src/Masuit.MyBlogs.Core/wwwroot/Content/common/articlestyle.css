@@ -318,8 +318,10 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
 }
 
 .ibox-content div.col-sm-3 { text-align: center; }
+.ibox-content div.col-sm-2 { text-align: center; }
 
 .ibox-content div.col-md-3 { text-align: center; }
+.ibox-content div.col-md-2 { text-align: center; }
 
 .article > .ibox > .ibox-content > main header.page-header a h2 {
     font-size: 24px;

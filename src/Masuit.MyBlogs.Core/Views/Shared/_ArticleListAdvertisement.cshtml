@@ -14,12 +14,12 @@
                     string imgSrc = Model.ThumbImgUrl;
                     if (!string.IsNullOrEmpty(imgSrc))
                     {
-                        <div class="col-md-3">
+                        <div class="col-md-2 paddingright-clear">
                             <img class="img-thumbnail img-responsive thumb" src="@imgSrc" alt="@Model.Title" title="@Model.Title">
                         </div>
                     }
                 }
-                <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
+                <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 10)">
                     <p>
                         @Model.Description
                     </p>
