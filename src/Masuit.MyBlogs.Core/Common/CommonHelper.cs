@@ -318,7 +318,7 @@ namespace Masuit.MyBlogs.Core.Common
                     var watermarker = new ImageWatermarker(stream)
                     {
                         SkipWatermarkForSmallImages = true,
-                        SmallImagePixelsThreshold = 40000
+                        SmallImagePixelsThreshold = 90000
                     };
                     return watermarker.AddWatermark(SystemSettings["Watermark"], Color.LightGray, WatermarkPosition.BottomRight, 30);
                 }
