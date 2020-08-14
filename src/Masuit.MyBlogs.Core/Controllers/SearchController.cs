@@ -71,9 +71,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     CacheManager.AddOrUpdate(key, wd, s => wd);
                     CacheManager.Expire(key, TimeSpan.FromSeconds(10));
+                    ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
                 }
 
-                ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
                 ViewBag.hotSearches = new List<KeywordsRank>();
                 return View(posts);
             }

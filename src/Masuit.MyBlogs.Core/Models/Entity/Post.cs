@@ -47,6 +47,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 受保护的内容
         /// </summary>
+        [LuceneIndex(IsHtml = true)]
         public string ProtectContent { get; set; }
 
         /// <summary>
@@ -79,11 +80,13 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 修改人名字
         /// </summary>
+        [LuceneIndex]
         public string Modifier { get; set; }
 
         /// <summary>
         /// 修改人邮箱
         /// </summary>
+        [LuceneIndex]
         public string ModifierEmail { get; set; }
 
         /// <summary>
