@@ -1,4 +1,5 @@
-﻿using Masuit.LuceneEFCore.SearchEngine.Linq;
+﻿using JiebaNet.Segmenter.Common;
+using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Repository;
@@ -9,7 +10,6 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -60,7 +60,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var dic = CategoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionary(c => c.Id + "", c => c.Name);
             foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
             {
-                ad.CategoryNames = ad.CategoryIds.Split(",").Select(c => dic[c]).Join(",");
+                ad.CategoryNames = ad.CategoryIds.Split(",").Select(c => dic.GetValueOrDefault(c)).Join(",");
                 ad.CreateTime = ad.CreateTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 ad.UpdateTime = ad.UpdateTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             }
