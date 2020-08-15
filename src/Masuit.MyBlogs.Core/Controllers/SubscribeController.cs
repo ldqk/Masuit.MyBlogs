@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using WilderMinds.RssSyndication;
 using Z.EntityFramework.Plus;
 
@@ -54,12 +55,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("/rss"), ResponseCache(Duration = 3600)]
-        public IActionResult Rss()
+        public async Task<IActionResult> Rss()
         {
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var posts = PostService.GetQueryNoTracking(p => p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
+            var posts = await PostService.GetQueryNoTracking(p => p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
             {
                 Author = new Author
                 {
@@ -77,10 +78,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
                 FullHtmlContent = p.Content.GetSummary(300, 50)
-            }).FromCache(new MemoryCacheEntryOptions()
+            }).FromCacheAsync(new MemoryCacheEntryOptions()
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
-            }).ToList();
+            });
             var feed = new Feed()
             {
                 Title = CommonHelper.SystemSettings["Title"],
@@ -102,13 +103,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("/cat/{id}/rss"), ResponseCache(Duration = 3600)]
-        public IActionResult CategoryRss(int id)
+        public async Task<IActionResult> CategoryRss(int id)
         {
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var category = CategoryService.GetById(id) ?? throw new NotFoundException("分类未找到");
-            var posts = PostService.GetQueryNoTracking(p => p.CategoryId == id && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
+            var category = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("分类未找到");
+            var posts = await PostService.GetQueryNoTracking(p => p.CategoryId == id && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
             {
                 Author = new Author
                 {
@@ -126,10 +127,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
                 FullHtmlContent = p.Content.GetSummary(300, 50)
-            }).FromCache(new MemoryCacheEntryOptions()
+            }).FromCacheAsync(new MemoryCacheEntryOptions()
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
-            }).ToList();
+            });
             var feed = new Feed()
             {
                 Title = Request.Host + $":分类{category.Name}文章订阅",
@@ -151,11 +152,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("/{id}/rss"), ResponseCache(Duration = 3600)]
-        public IActionResult PostRss(int id)
+        public async Task<IActionResult> PostRss(int id)
         {
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var p = PostService.Get(p => p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章未找到");
+            var p = await PostService.GetAsync(p => p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章未找到");
             var summary = p.Content.GetSummary(300, 50);
             var item = new Item()
             {
@@ -197,13 +198,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("/{id}/comments/rss"), ResponseCache(Duration = 600)]
-        public IActionResult CommentsRss(int id)
+        public async Task<IActionResult> CommentsRss(int id)
         {
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var post = PostService.Get(p => p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章不存在");
+            var post = await PostService.GetAsync(p => p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章不存在");
             var start = DateTime.Today.AddDays(-7);
-            var comments = CommentService.GetQuery(c => c.PostId == post.Id && c.CommentDate > start).Select(c => new Item()
+            var comments = await CommentService.GetQuery(c => c.PostId == post.Id && c.CommentDate > start).Select(c => new Item()
             {
                 Author = new Author
                 {
@@ -220,10 +221,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Permalink = $"{scheme}://{host}/{post.Id}?cid={c.Id}#comment",
                 Guid = c.Id.ToString(),
                 FullHtmlContent = c.Content
-            }).FromCache(new MemoryCacheEntryOptions()
+            }).FromCacheAsync(new MemoryCacheEntryOptions()
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
-            }).ToList();
+            });
             var feed = new Feed()
             {
                 Title = Request.Host + $":文章【{post.Title}】文章评论更新订阅",

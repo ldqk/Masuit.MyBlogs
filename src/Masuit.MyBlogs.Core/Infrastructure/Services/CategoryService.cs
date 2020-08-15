@@ -3,6 +3,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -18,10 +19,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="id"></param>
         /// <param name="mid"></param>
         /// <returns></returns>
-        public bool Delete(int id, int mid)
+        public async Task<bool> Delete(int id, int mid)
         {
-            var category = GetById(id);
-            var moveCat = GetById(mid);
+            var category = await GetByIdAsync(id);
+            var moveCat = await GetByIdAsync(mid);
             for (var j = 0; j < category.Post.Count; j++)
             {
                 var p = category.Post.ElementAt(j);
@@ -39,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 moveCat.PostHistoryVersion.Add(p);
             }
 
-            bool b = DeleteByIdSaved(id);
+            bool b = await DeleteByIdSavedAsync(id) > 0;
             return b;
         }
     }

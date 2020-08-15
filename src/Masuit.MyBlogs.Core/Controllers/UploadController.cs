@@ -94,12 +94,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Content = html
             });
         }
-        private string ConvertToHtml(IFormFile file)
+        private async Task<string> ConvertToHtml(IFormFile file)
         {
-            using var ms = file.OpenReadStream();
-            using var fs = new FileStream(Path.Combine(Environment.GetEnvironmentVariable("temp") ??
+            await using var ms = file.OpenReadStream();
+            await using var fs = new FileStream(Path.Combine(Environment.GetEnvironmentVariable("temp") ??
                 "upload", file.FileName), FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            ms.CopyTo(fs);
+            await ms.CopyToAsync(fs);
             using var doc = WordprocessingDocument.Open(fs, true);
             var pageTitle = file.FileName;
             var part = doc.CoreFilePropertiesPart;
@@ -130,7 +130,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private async Task<string> SaveAsHtml(IFormFile file)
         {
-            var html = ConvertToHtml(file);
+            var html = await ConvertToHtml(file);
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
             var body = doc.DocumentNode.SelectSingleNode("//body");

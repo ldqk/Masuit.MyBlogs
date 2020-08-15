@@ -20,6 +20,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -115,7 +116,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Submit(LeaveMessageCommand dto)
+        public async Task<ActionResult> Submit(LeaveMessageCommand dto)
         {
             var match = Regex.Match(dto.NickName + dto.Content, CommonHelper.BanRegex);
             if (match.Success)
@@ -162,12 +163,12 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             HttpContext.Session.Set("msg", msg.Content.RemoveHtmlTag().Trim());
             var email = CommonHelper.SystemSettings["ReceiveEmail"];
-            var content = new Template(System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/notify.html")).Set("title", "网站留言板").Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
+            var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/notify.html")).Set("title", "网站留言板").Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
             if (msg.Status == Status.Published)
             {
                 if (!msg.IsMaster)
                 {
-                    MessageService.AddEntitySaved(new InternalMessage()
+                    await MessageService.AddEntitySavedAsync(new InternalMessage()
                     {
                         Title = $"来自【{msg.NickName}】的新留言",
                         Content = msg.Content,
@@ -208,14 +209,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Pass(int id)
+        public async Task<ActionResult> Pass(int id)
         {
-            var msg = LeaveMessageService.GetById(id);
+            var msg = await LeaveMessageService.GetByIdAsync(id);
             msg.Status = Status.Published;
-            bool b = LeaveMessageService.SaveChanges() > 0;
+            bool b = await LeaveMessageService.SaveChangesAsync() > 0;
 #if !DEBUG
             var pid = msg.ParentId == 0 ? msg.Id : LeaveMessageService.GetParentMessageIdByChildId(id);
-            var content = new Template(System.IO.File.ReadAllText(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html"))).Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
+            var content = new Template(await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html"))).Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
             var emails = LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Except(new List<string> { msg.Email, CurrentUser.Email }).ToHashSet();
             var link = Url.Action("Index", "Msg", new { cid = pid }, Request.Scheme);
             foreach (var s in emails)
@@ -262,11 +263,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Read(int id)
+        public async Task<ActionResult> Read(int id)
         {
-            var msg = MessageService.GetById(id);
+            var msg = await MessageService.GetByIdAsync(id);
             msg.Read = true;
-            MessageService.SaveChanges();
+            await MessageService.SaveChangesAsync();
             return Content("ok");
         }
 
@@ -276,11 +277,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Unread(int id)
+        public async Task<ActionResult> Unread(int id)
         {
-            var msg = MessageService.GetById(id);
+            var msg = await MessageService.GetByIdAsync(id);
             msg.Read = false;
-            MessageService.SaveChanges();
+            await MessageService.SaveChangesAsync();
             return Content("ok");
         }
 
@@ -290,9 +291,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult DeleteMsg(int id)
+        public async Task<ActionResult> DeleteMsg(int id)
         {
-            bool b = MessageService.DeleteByIdSaved(id);
+            bool b = await MessageService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "站内消息删除成功！" : "站内消息删除失败！");
         }
 
@@ -325,9 +326,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult ClearMsgs()
+        public async Task<ActionResult> ClearMsgs()
         {
-            MessageService.DeleteEntitySaved(m => m.Read);
+            await MessageService.DeleteEntitySavedAsync(m => m.Read);
             return ResultData(null, true, "站内消息清除成功！");
         }
 

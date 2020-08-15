@@ -305,10 +305,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public ActionResult SetIpBlackList(string content)
+        public async Task<ActionResult> SetIpBlackList(string content)
         {
             CommonHelper.DenyIP = content + "";
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
+            await System.IO.File.WriteAllTextAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
             return ResultData(null);
         }
 
@@ -317,9 +317,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public ActionResult SetIpWhiteList(string content)
+        public async Task<ActionResult> SetIpWhiteList(string content)
         {
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "App_Data", "whitelist.txt"), content, Encoding.UTF8);
+            await System.IO.File.WriteAllTextAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "App_Data", "whitelist.txt"), content, Encoding.UTF8);
             CommonHelper.IPWhiteList.Add(content);
             return ResultData(null);
         }
@@ -354,17 +354,18 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="ip"></param>
         /// <returns></returns>
-        public ActionResult AddToWhiteList(string ip)
+        public async Task<ActionResult> AddToWhiteList(string ip)
         {
             if (!ip.MatchInetAddress())
             {
                 return ResultData(null, false);
             }
 
-            string ips = System.IO.File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"));
+            var basedir = AppDomain.CurrentDomain.BaseDirectory ?? Environment.CurrentDirectory;
+            string ips = await System.IO.File.ReadAllTextAsync(Path.Combine(basedir, "App_Data", "whitelist.txt"));
             List<string> list = ips.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
             list.Add(ip);
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), string.Join(",", list.Distinct()), Encoding.UTF8);
+            await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "whitelist.txt"), string.Join(",", list.Distinct()), Encoding.UTF8);
             CommonHelper.IPWhiteList = list;
             return ResultData(null);
         }
@@ -374,7 +375,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="ip"></param>
         /// <returns></returns>
-        public ActionResult AddToBlackList(string ip)
+        public async Task<ActionResult> AddToBlackList(string ip)
         {
             if (!ip.MatchInetAddress())
             {
@@ -382,9 +383,10 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             CommonHelper.DenyIP += "," + ip;
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
+            var basedir = AppDomain.CurrentDomain.BaseDirectory ?? Environment.CurrentDirectory;
+            await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
             CommonHelper.IPWhiteList.Remove(ip);
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt"), string.Join(",", CommonHelper.IPWhiteList.Distinct()), Encoding.UTF8);
+            await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "whitelist.txt"), string.Join(",", CommonHelper.IPWhiteList.Distinct()), Encoding.UTF8);
             return ResultData(null);
         }
 

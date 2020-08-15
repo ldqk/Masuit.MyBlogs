@@ -212,7 +212,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "没有评论");
             }
             total = parent.TotalCount;
-            var result = parent.Data.SelectMany(c => CommentService.GetSelfAndAllChildrenCommentsByParentId(c.Id).Where(x => (x.Status == Status.Published || CurrentUser.IsAdmin))).Select(c =>
+            var result = parent.Data.SelectMany(c => CommentService.GetSelfAndAllChildrenCommentsByParentId(c.Id).Where(x => x.Status == Status.Published || CurrentUser.IsAdmin)).Select(c =>
             {
                 c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 return c;

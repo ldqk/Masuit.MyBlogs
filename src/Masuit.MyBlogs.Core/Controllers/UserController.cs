@@ -19,16 +19,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="username"></param>
         /// <returns></returns>
-        public ActionResult ChangeUsername(int id, string username)
+        public async Task<ActionResult> ChangeUsername(int id, string username)
         {
-            UserInfo userInfo = UserInfoService.GetById(id);
+            UserInfo userInfo = await UserInfoService.GetByIdAsync(id);
             if (!username.Equals(userInfo.Username) && UserInfoService.UsernameExist(username))
             {
                 return ResultData(null, false, $"用户名{username}已经存在，请尝试更换其他用户名！");
             }
 
             userInfo.Username = username;
-            bool b = UserInfoService.SaveChanges() > 0;
+            bool b = await UserInfoService.SaveChangesAsync() > 0;
             return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? $"用户名修改成功，新用户名为{username}。" : "用户名修改失败！");
         }
 
@@ -38,11 +38,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="username"></param>
         /// <returns></returns>
-        public ActionResult ChangeNickName(int id, string username)
+        public async Task<ActionResult> ChangeNickName(int id, string username)
         {
-            UserInfo userInfo = UserInfoService.GetById(id);
+            UserInfo userInfo = await UserInfoService.GetByIdAsync(id);
             userInfo.NickName = username;
-            bool b = UserInfoService.SaveChanges() > 0;
+            bool b = await UserInfoService.SaveChangesAsync() > 0;
             return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? $"昵称修改成功，新昵称为{username}。" : "昵称修改失败！");
         }
 
@@ -83,11 +83,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public ActionResult ChangeAvatar(int id, string path)
+        public async Task<ActionResult> ChangeAvatar(int id, string path)
         {
-            UserInfo userInfo = UserInfoService.GetById(id);
+            UserInfo userInfo = await UserInfoService.GetByIdAsync(id);
             userInfo.Avatar = path;
-            bool b = UserInfoService.SaveChanges() > 0;
+            bool b = await UserInfoService.SaveChangesAsync() > 0;
             return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? "头像修改成功。" : "头像修改失败！");
         }
 

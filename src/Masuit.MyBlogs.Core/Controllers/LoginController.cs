@@ -4,7 +4,7 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -14,21 +14,22 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ILoginRecordService LoginRecordService { get; set; }
 
         [Route("delete/{id:int}/{ids}")]
-        public ActionResult Delete(int id, string ids)
+        public async Task<ActionResult> Delete(int id, string ids)
         {
             if (!string.IsNullOrWhiteSpace(ids))
             {
-                bool b = LoginRecordService.DeleteEntitySaved(r => r.UserInfoId == id && ids.Contains(r.Id.ToString())) > 0;
+                bool b = await LoginRecordService.DeleteEntitySavedAsync(r => r.UserInfoId == id && ids.Contains(r.Id.ToString())) > 0;
                 return ResultData(null, b, b ? "删除成功！" : "删除失败");
             }
+
             return ResultData(null, false, "数据不合法");
         }
 
         [Route("getrecent/{id:int}")]
-        public ActionResult GetRecentRecord(int id)
+        public async Task<ActionResult> GetRecentRecord(int id)
         {
             var time = DateTime.Now.AddMonths(-1);
-            var list = LoginRecordService.GetQueryFromCache<DateTime, LoginRecordViewModel>(r => r.UserInfoId == id && r.LoginTime >= time, r => r.LoginTime, false).ToList();
+            var list = await LoginRecordService.GetQueryFromCacheAsync<DateTime, LoginRecordViewModel>(r => r.UserInfoId == id && r.LoginTime >= time, r => r.LoginTime, false);
             foreach (var item in list)
             {
                 item.LoginTime = item.LoginTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));

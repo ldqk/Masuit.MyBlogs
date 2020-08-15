@@ -18,6 +18,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -34,9 +35,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public ActionResult Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
-            var p = Mapper.Map<PostMergeRequestDto>(PostMergeRequestService.GetById(id));
+            var p = Mapper.Map<PostMergeRequestDto>(await PostMergeRequestService.GetByIdAsync(id));
             if (p != null)
             {
                 p.SubmitTime = p.SubmitTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -76,9 +77,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="mid"></param>
         /// <returns></returns>
         [HttpGet("compare/{mid}")]
-        public IActionResult MergeCompare(int mid)
+        public async Task<IActionResult> MergeCompare(int mid)
         {
-            var newer = PostMergeRequestService.GetById(mid) ?? throw new NotFoundException("待合并文章未找到");
+            var newer = await PostMergeRequestService.GetByIdAsync(mid) ?? throw new NotFoundException("待合并文章未找到");
             var old = newer.Post;
             var diffHelper = new HtmlDiff.HtmlDiff(old.Content, newer.Content);
             string diffOutput = diffHelper.Build();
@@ -93,26 +94,25 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost("{id}")]
-        public IActionResult Merge(int id)
+        public async Task<IActionResult> Merge(int id)
         {
-            var merge = PostMergeRequestService.GetById(id) ?? throw new NotFoundException("待合并文章未找到");
+            var merge = await PostMergeRequestService.GetByIdAsync(id) ?? throw new NotFoundException("待合并文章未找到");
             var history = merge.Post.Mapper<PostHistoryVersion>();
             history.Id = 0;
             merge.Post = Mapper.Map(merge, merge.Post);
             merge.Post.PostHistoryVersion.Add(history);
             merge.Post.ModifyDate = DateTime.Now;
             merge.MergeState = MergeStatus.Merged;
-            var b = PostMergeRequestService.SaveChanges() > 0;
+            var b = await PostMergeRequestService.SaveChangesAsync() > 0;
             if (!b)
             {
                 return ResultData(null, false, "文章合并失败！");
             }
 
             string link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id;
-            string content = new Template(System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-pass.html")).Set("link", link).Set("title", merge.Post.Title).Render();
+            string content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/merge-pass.html")).Set("link", link).Set("title", merge.Post.Title).Render();
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已通过", content, merge.ModifierEmail));
             return ResultData(null, true, "文章合并完成！");
-
         }
 
         /// <summary>
@@ -121,12 +121,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Merge([FromForm] PostMergeRequestCommandBase dto)
+        public async Task<IActionResult> Merge([FromForm] PostMergeRequestCommandBase dto)
         {
-            var merge = PostMergeRequestService.GetById(dto.Id) ?? throw new NotFoundException("待合并文章未找到");
+            var merge = await PostMergeRequestService.GetByIdAsync(dto.Id) ?? throw new NotFoundException("待合并文章未找到");
             Mapper.Map(dto, merge);
-            var b = PostMergeRequestService.SaveChanges() > 0;
-            return b ? Merge(merge.Id) : ResultData(null, false, "文章合并失败！");
+            var b = await PostMergeRequestService.SaveChangesAsync() > 0;
+            return b ? await Merge(merge.Id) : ResultData(null, false, "文章合并失败！");
         }
 
         /// <summary>
@@ -136,18 +136,18 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="reason"></param>
         /// <returns></returns>
         [HttpPost("reject/{id}")]
-        public ActionResult Reject(int id, string reason)
+        public async Task<ActionResult> Reject(int id, string reason)
         {
-            var merge = PostMergeRequestService.GetById(id) ?? throw new NotFoundException("待合并文章未找到");
+            var merge = await PostMergeRequestService.GetByIdAsync(id) ?? throw new NotFoundException("待合并文章未找到");
             merge.MergeState = MergeStatus.Reject;
-            var b = PostMergeRequestService.SaveChanges() > 0;
+            var b = await PostMergeRequestService.SaveChangesAsync() > 0;
             if (!b)
             {
                 return ResultData(null, false, "操作失败！");
             }
 
             var link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id + "/merge/" + id;
-            var content = new Template(System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-reject.html")).Set("link", link).Set("title", merge.Post.Title).Set("reason", reason).Render();
+            var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/merge-reject.html")).Set("link", link).Set("title", merge.Post.Title).Set("reason", reason).Render();
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已被拒绝", content, merge.ModifierEmail));
             return ResultData(null, true, "合并已拒绝！");
         }
@@ -158,11 +158,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost("block/{id}")]
-        public ActionResult Block(int id)
+        public async Task<ActionResult> Block(int id)
         {
-            var merge = PostMergeRequestService.GetById(id) ?? throw new NotFoundException("待合并文章未找到");
+            var merge = await PostMergeRequestService.GetByIdAsync(id) ?? throw new NotFoundException("待合并文章未找到");
             merge.MergeState = MergeStatus.Block;
-            var b = PostMergeRequestService.SaveChanges() > 0;
+            var b = await PostMergeRequestService.SaveChangesAsync() > 0;
             return b ? ResultData(null, true, "操作成功！") : ResultData(null, false, "操作失败！");
         }
     }

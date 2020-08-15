@@ -55,6 +55,15 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
+        /// 从二级缓存获取所有实体
+        /// </summary>
+        /// <returns>还未执行的SQL语句</returns>
+        public Task<IEnumerable<T>> GetAllFromCacheAsync()
+        {
+            return BaseDal.GetAllFromCacheAsync();
+        }
+
+        /// <summary>
         /// 获取所有实体
         /// </summary>
         /// <typeparam name="TDto">映射实体</typeparam>
@@ -72,6 +81,16 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public virtual IEnumerable<TDto> GetAllFromCache<TDto>() where TDto : class
         {
             return BaseDal.GetAllFromCache<TDto>();
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <returns>还未执行的SQL语句</returns>
+        public Task<IEnumerable<TDto>> GetAllFromCacheAsync<TDto>() where TDto : class
+        {
+            return BaseDal.GetAllFromCacheAsync<TDto>();
         }
 
         /// <summary>
@@ -114,6 +133,18 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// 获取所有实体
         /// </summary>
         /// <typeparam name="TS">排序</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public Task<IEnumerable<T>> GetAllFromCacheAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
+        {
+            return BaseDal.GetAllFromCacheAsync(orderby, isAsc);
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
         /// <typeparam name="TDto">映射实体</typeparam>
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
@@ -134,6 +165,19 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public virtual IEnumerable<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
             return BaseDal.GetAllFromCache<TS, TDto>(orderby, isAsc);
+        }
+
+        /// <summary>
+        /// 获取所有实体
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public Task<IEnumerable<TDto>> GetAllFromCacheAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
+        {
+            return BaseDal.GetAllFromCacheAsync<TS, TDto>(orderby, isAsc);
         }
 
         /// <summary>
@@ -197,6 +241,16 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <summary>
         /// 基本查询方法，获取一个集合，优先从二级缓存读取
         /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public Task<IEnumerable<T>> GetQueryFromCacheAsync(Expression<Func<T, bool>> @where)
+        {
+            return BaseDal.GetQueryFromCacheAsync(where);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从二级缓存读取
+        /// </summary>
         /// <typeparam name="TS">排序字段</typeparam>
         /// <param name="where">查询条件</param>
         /// <param name="orderby">排序方式</param>
@@ -205,6 +259,19 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public virtual IEnumerable<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return BaseDal.GetQueryFromCache(where, orderby, isAsc);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个集合，优先从二级缓存读取
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public Task<IEnumerable<T>> GetQueryFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
+        {
+            return BaseDal.GetQueryFromCacheAsync(where, orderby, isAsc);
         }
 
         /// <summary>
@@ -220,6 +287,16 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取
         /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public Task<IEnumerable<TDto>> GetQueryFromCacheAsync<TDto>(Expression<Func<T, bool>> @where) where TDto : class
+        {
+            return BaseDal.GetQueryFromCacheAsync<TDto>(where);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取
+        /// </summary>
         /// <typeparam name="TS">排序字段</typeparam>
         /// <typeparam name="TDto">输出类型</typeparam>
         /// <param name="where">查询条件</param>
@@ -229,6 +306,20 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public virtual IEnumerable<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
             return BaseDal.GetQueryFromCache<TS, TDto>(where, orderby, isAsc);
+        }
+
+        /// <summary>
+        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取
+        /// </summary>
+        /// <typeparam name="TS">排序字段</typeparam>
+        /// <typeparam name="TDto">输出类型</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序方式</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public Task<IEnumerable<TDto>> GetQueryFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
+        {
+            return BaseDal.GetQueryFromCacheAsync<TS, TDto>(where, orderby, isAsc);
         }
 
         /// <summary>
@@ -277,6 +368,16 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <summary>
         /// 获取第一条数据
         /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <returns>实体</returns>
+        public Task<T> GetFromCacheAsync(Expression<Func<T, bool>> @where)
+        {
+            return BaseDal.GetFromCacheAsync(where);
+        }
+
+        /// <summary>
+        /// 获取第一条数据
+        /// </summary>
         /// <typeparam name="TS">排序</typeparam>
         /// <param name="where">查询条件</param>
         /// <param name="orderby">排序字段</param>
@@ -298,6 +399,19 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public T GetFromCache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
             return BaseDal.GetFromCache(where, orderby, isAsc);
+        }
+
+        /// <summary>
+        /// 获取第一条数据
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>实体</returns>
+        public Task<T> GetFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
+        {
+            return BaseDal.GetFromCacheAsync(where, orderby, isAsc);
         }
 
         /// <summary>
@@ -323,6 +437,16 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <summary>
         /// 获取第一条被AutoMapper映射后的数据
         /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <returns>实体</returns>
+        public Task<TDto> GetFromCacheAsync<TDto>(Expression<Func<T, bool>> @where) where TDto : class
+        {
+            return BaseDal.GetFromCacheAsync<TDto>(where);
+        }
+
+        /// <summary>
+        /// 获取第一条被AutoMapper映射后的数据
+        /// </summary>
         /// <typeparam name="TS">排序</typeparam>
         /// <typeparam name="TDto">映射实体</typeparam>
         /// <param name="where">查询条件</param>
@@ -343,9 +467,37 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>映射实体</returns>
+        public Task<TDto> GetAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
+        {
+            return BaseDal.GetAsync<TS, TDto>(where, orderby, isAsc);
+        }
+
+        /// <summary>
+        /// 获取第一条被AutoMapper映射后的数据
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>映射实体</returns>
         public TDto GetFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
             return BaseDal.GetFromCache<TS, TDto>(where, orderby, isAsc);
+        }
+
+        /// <summary>
+        /// 获取第一条被AutoMapper映射后的数据
+        /// </summary>
+        /// <typeparam name="TS">排序</typeparam>
+        /// <typeparam name="TDto">映射实体</typeparam>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderby">排序字段</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns>映射实体</returns>
+        public Task<TDto> GetFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
+        {
+            return BaseDal.GetFromCacheAsync<TS, TDto>(where, orderby, isAsc);
         }
 
         /// <summary>
@@ -484,6 +636,21 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
+        /// 高效分页查询方法，优先从二级缓存读取
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public Task<PagedList<T>> GetPagesFromCacheAsync<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
+        {
+            return BaseDal.GetPagesFromCacheAsync(pageIndex, pageSize, where, orderby, isAsc);
+        }
+
+        /// <summary>
         /// 高效分页查询方法，优先从二级缓存读取，取出被AutoMapper映射后的数据集合
         /// </summary>
         /// <typeparam name="TS">排序字段</typeparam>
@@ -497,6 +664,22 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public virtual PagedList<TDto> GetPagesFromCache<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc) where TDto : class
         {
             return BaseDal.GetPagesFromCache<TS, TDto>(pageIndex, pageSize, where, orderby, isAsc);
+        }
+
+        /// <summary>
+        /// 高效分页查询方法，优先从二级缓存读取，取出被AutoMapper映射后的数据集合
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public Task<PagedList<TDto>> GetPagesFromCacheAsync<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc) where TDto : class
+        {
+            return BaseDal.GetPagesFromCacheAsync<TS, TDto>(pageIndex, pageSize, where, orderby, isAsc);
         }
 
         /// <summary>
