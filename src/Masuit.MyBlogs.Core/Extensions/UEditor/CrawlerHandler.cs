@@ -1,5 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -88,9 +89,15 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 }
 
                 ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\') + UeditorConfig.GetString("catcherPathFormat"));
+                var mediaType = response.Content.Headers.ContentType.MediaType;
                 var stream = await response.Content.ReadAsStreamAsync();
                 var savePath = Path.Combine(AppContext.BaseDirectory + "wwwroot", ServerUrl);
-                stream = stream.AddWatermark();
+                if (string.IsNullOrEmpty(Path.GetExtension(savePath)))
+                {
+                    savePath = savePath + MimeMapper.ExtTypes[mediaType];
+                    ServerUrl = ServerUrl + MimeMapper.ExtTypes[mediaType];
+                }
+
                 var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath);
                 if (success)
                 {
