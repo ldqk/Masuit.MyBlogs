@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -38,7 +39,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("s/{wd?}/{page:int?}/{size:int?}")]
-        public ActionResult Search(string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        public async Task<ActionResult> Search(string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             wd = wd?.Trim();
             ViewBag.PageSize = size;
@@ -62,7 +63,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         SearchTime = DateTime.Now,
                         IP = ClientIP
                     });
-                    SearchDetailsService.SaveChanges();
+                    await SearchDetailsService.SaveChangesAsync();
                     HttpContext.Session.Set("search:" + wd, wd.ToByteArray());
                 }
 
@@ -71,9 +72,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     CacheManager.AddOrUpdate(key, wd, s => wd);
                     CacheManager.Expire(key, TimeSpan.FromSeconds(10));
+                    ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
                 }
 
-                ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
                 ViewBag.hotSearches = new List<KeywordsRank>();
                 return View(posts);
             }
@@ -123,9 +124,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost, MyAuthorize]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            bool b = SearchDetailsService.DeleteByIdSaved(id);
+            bool b = await SearchDetailsService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
     }

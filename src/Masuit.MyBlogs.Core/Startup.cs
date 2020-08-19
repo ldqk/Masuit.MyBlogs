@@ -18,6 +18,7 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.AspNetCore;
+using Masuit.Tools.Core.Config;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Builder;
@@ -77,6 +78,7 @@ namespace Masuit.MyBlogs.Core
                 AppConfig.EnableIPDirect = bool.Parse(configuration[nameof(AppConfig.EnableIPDirect)] ?? "false");
                 configuration.Bind("Imgbed:AliyunOSS", AppConfig.AliOssConfig);
                 configuration.Bind("Imgbed:Gitlabs", AppConfig.GitlabConfigs);
+                configuration.AddToMasuitTools();
             }
 
             ChangeToken.OnChange(configuration.GetReloadToken, BindConfig);

@@ -1,4 +1,5 @@
-﻿using Masuit.LuceneEFCore.SearchEngine.Linq;
+﻿using JiebaNet.Segmenter.Common;
+using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Repository;
@@ -9,7 +10,7 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, string kw = "")
+        public async Task<ActionResult> GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, string kw = "")
         {
             Expression<Func<Advertisement, bool>> where = p => true;
             if (!string.IsNullOrEmpty(kw))
@@ -55,12 +56,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(kw) || p.Description.Contains(kw));
             }
 
-            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Price).ThenByDescending(a => a.Weight).ToPagedList<Advertisement, AdvertisementViewModel>(page, size, MapperConfig);
+            var list = await AdsService.GetQuery(where).OrderByDescending(p => p.Price).ThenByDescending(a => a.Weight).ToCachedPagedListAsync<Advertisement, AdvertisementViewModel>(page, size, MapperConfig);
             var cids = list.Data.Where(m => !string.IsNullOrEmpty(m.CategoryIds)).SelectMany(m => m.CategoryIds.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)).Distinct().ToArray();
-            var dic = CategoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionary(c => c.Id + "", c => c.Name);
+            var dic = await CategoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionaryAsync(c => c.Id + "", c => c.Name);
             foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
             {
-                ad.CategoryNames = ad.CategoryIds.Split(",").Select(c => dic[c]).Join(",");
+                ad.CategoryNames = ad.CategoryIds.Split(",").Select(c => dic.GetValueOrDefault(c)).Join(",");
                 ad.CreateTime = ad.CreateTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 ad.UpdateTime = ad.UpdateTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             }
@@ -100,11 +101,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id">文章id</param>
         /// <returns></returns>
         [MyAuthorize, HttpPost("{id}")]
-        public ActionResult ChangeState(int id)
+        public async Task<ActionResult> ChangeState(int id)
         {
-            var ad = AdsService.GetById(id) ?? throw new NotFoundException("广告不存在！");
+            var ad = await AdsService.GetByIdAsync(id) ?? throw new NotFoundException("广告不存在！");
             ad.Status = ad.Status == Status.Available ? Status.Unavailable : Status.Available;
-            return ResultData(null, AdsService.SaveChanges() > 0, ad.Status == Status.Available ? $"【{ad.Title}】已上架！" : $"【{ad.Title}】已下架！");
+            return ResultData(null, await AdsService.SaveChangesAsync() > 0, ad.Status == Status.Available ? $"【{ad.Title}】已上架！" : $"【{ad.Title}】已下架！");
         }
     }
 }

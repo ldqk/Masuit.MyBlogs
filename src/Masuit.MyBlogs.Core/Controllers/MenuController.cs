@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -55,10 +56,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var menus = MenuService.GetChildrenMenusByParentId(id);
-            bool b = MenuService.DeleteEntitiesSaved(menus);
+            bool b = await MenuService.DeleteEntitiesSavedAsync(menus) > 0;
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
 
@@ -67,21 +68,20 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public ActionResult Save(MenuCommand model)
+        public async Task<ActionResult> Save(MenuCommand model)
         {
             if (string.IsNullOrEmpty(model.Icon) || !model.Icon.Contains("/"))
             {
                 model.Icon = null;
             }
-            var m = MenuService.GetById(model.Id);
+            var m = await MenuService.GetByIdAsync(model.Id);
             if (m == null)
             {
-                var menu = MenuService.AddEntitySaved(model.Mapper<Menu>());
-                return menu != null ? ResultData(menu, true, "添加成功") : ResultData(null, false, "添加失败");
+                return await MenuService.AddEntitySavedAsync(model.Mapper<Menu>()) > 0 ? ResultData(model, true, "添加成功") : ResultData(null, false, "添加失败");
             }
 
             Mapper.Map(model, m);
-            bool b = MenuService.SaveChanges() > 0;
+            bool b = await MenuService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }
     }

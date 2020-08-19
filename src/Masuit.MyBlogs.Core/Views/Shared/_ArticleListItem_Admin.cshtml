@@ -22,16 +22,16 @@
         </a>
         <div class="row padding-bot10">
             @{
-                //随机取合适大小的图片
-                string imgSrc = Model.Content.MatchRandomImgSrc();
+                //取第一张图片
+                string imgSrc = Model.Content.MatchFirstImgSrc();
                 if (!string.IsNullOrEmpty(imgSrc))
                 {
-                    <div class="col-sm-3">
+                    <div class="col-sm-2 paddingright-clear">
                         <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@Model.Title">
                     </div>
                 }
             }
-            <div class="col-sm-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
+            <div class="col-sm-@(string.IsNullOrEmpty(imgSrc) ? 12 : 10)">
                 <div class="small padding-bot10">
                     作者：<i class="icon-user-check"></i>
                     <strong class="label label-primary">

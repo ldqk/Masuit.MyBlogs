@@ -1,12 +1,12 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Infrastructure.Repository;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
-using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -15,6 +15,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -44,10 +45,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="orderBy"></param>
         /// <returns></returns>
         [Route("c/{id:int}/{page:int?}/{size:int?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
-        public ActionResult Index(int id, [Optional]OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
+        public async Task<ActionResult> Index(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            var s = SeminarService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            var posts = PostService.GetQuery<PostDto>(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Published || CurrentUser.IsAdmin)).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedList(page, size);
+            var s = await SeminarService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            var posts = await PostService.GetQuery<PostDto>(p => p.Seminar.Any(x => x.SeminarId == id) && (p.Status == Status.Published || CurrentUser.IsAdmin)).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync(page, size);
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;
@@ -108,9 +109,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            bool b = SeminarService.DeleteByIdSaved(id);
+            bool b = await SeminarService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
 
@@ -120,9 +121,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
-            Seminar seminar = SeminarService.GetById(id);
+            Seminar seminar = await SeminarService.GetByIdAsync(id);
             return ResultData(seminar.Mapper<SeminarDto>());
         }
 
@@ -133,7 +134,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
+        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var list = SeminarService.GetPages<int, SeminarDto>(page, size, s => true, s => s.Id, false);
             return Ok(list);
@@ -157,10 +158,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="pid"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult AddPost(int id, int pid)
+        public async Task<ActionResult> AddPost(int id, int pid)
         {
-            Seminar seminar = SeminarService.GetById(id);
-            Post post = PostService.GetById(pid);
+            Seminar seminar = await SeminarService.GetByIdAsync(id);
+            Post post = await PostService.GetByIdAsync(pid);
             seminar.Post.Add(new SeminarPost()
             {
                 Post = post,
@@ -168,7 +169,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 PostId = post.Id,
                 SeminarId = id
             });
-            bool b = SeminarService.SaveChanges() > 0;
+            bool b = await SeminarService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? $"已成功将【{post.Title}】添加到专题【{seminar.Title}】" : "添加失败！");
         }
 
@@ -179,11 +180,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="pid"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult RemovePost(int id, int pid)
+        public async Task<ActionResult> RemovePost(int id, int pid)
         {
-            Seminar seminar = SeminarService.GetById(id);
-            Post post = PostService.GetById(pid);
-            bool b = SeminarPostService.DeleteEntitySaved(s => s.SeminarId == id && s.PostId == pid) > 0;
+            Seminar seminar = await SeminarService.GetByIdAsync(id);
+            Post post = await PostService.GetByIdAsync(pid);
+            bool b = await SeminarPostService.DeleteEntitySavedAsync(s => s.SeminarId == id && s.PostId == pid) > 0;
             return ResultData(null, b, b ? $"已成功将【{post.Title}】从专题【{seminar.Title}】移除" : "添加失败！");
         }
 

@@ -1,4 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Models.Entity;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 {
@@ -10,6 +11,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <param name="id"></param>
         /// <param name="mid"></param>
         /// <returns></returns>
-        bool Delete(int id, int mid);
+        Task<bool> Delete(int id, int mid);
     }
 }

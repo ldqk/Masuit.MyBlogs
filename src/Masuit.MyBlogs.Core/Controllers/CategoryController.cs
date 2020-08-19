@@ -85,9 +85,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="cid"></param>
         /// <returns></returns>
-        public ActionResult Delete(int id, int cid = 1)
+        public async Task<ActionResult> Delete(int id, int cid = 1)
         {
-            bool b = CategoryService.Delete(id, cid);
+            bool b = await CategoryService.Delete(id, cid);
             return ResultData(null, b, b ? "分类删除成功" : "分类删除失败");
         }
     }

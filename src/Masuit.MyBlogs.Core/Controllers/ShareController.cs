@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -43,9 +44,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult Remove(int id)
+        public async Task<ActionResult> Remove(int id)
         {
-            bool b = FastShareService.DeleteByIdSaved(id);
+            bool b = await FastShareService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
 
@@ -55,13 +56,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult Update(FastShare model)
+        public async Task<ActionResult> Update(FastShare model)
         {
-            FastShare share = FastShareService.GetById(model.Id);
+            FastShare share = await FastShareService.GetByIdAsync(model.Id);
             share.Title = model.Title;
             share.Link = model.Link;
             share.Sort = model.Sort;
-            bool b = FastShareService.SaveChanges() > 0;
+            bool b = await FastShareService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? "更新成功" : "更新失败");
         }
     }

@@ -76,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             related.RemoveAll(p => p.Id == id);
             if (related.Count <= 1)
             {
-                related = PostService.GetPagesFromCache(1, 10, p => p.Id != id && p.CategoryId == post.CategoryId, p => p.TotalViewCount, false).Data;
+                related = (await PostService.GetPagesFromCacheAsync(1, 10, p => p.Id != id && p.CategoryId == post.CategoryId, p => p.TotalViewCount, false)).Data;
             }
 
             ViewBag.Related = related;
@@ -210,10 +210,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 投稿页
         /// </summary>
         /// <returns></returns>
-        public ActionResult Publish()
+        public async Task<ActionResult> Publish()
         {
             var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().ToList().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
-            ViewBag.Category = CategoryService.GetQueryFromCache(c => c.Status == Status.Available).ToList();
+            ViewBag.Category = await CategoryService.GetQueryFromCacheAsync(c => c.Status == Status.Available);
             return View(list);
         }
 
@@ -373,9 +373,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}/merge")]
-        public ActionResult PushMerge(int id)
+        public async Task<ActionResult> PushMerge(int id)
         {
-            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             return View(post);
         }
 
@@ -386,9 +386,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="mid"></param>
         /// <returns></returns>
         [HttpGet("{id}/merge/{mid}")]
-        public ActionResult RepushMerge(int id, int mid)
+        public async Task<ActionResult> RepushMerge(int id, int mid)
         {
-            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             var merge = post.PostMergeRequests.FirstOrDefault(p => p.Id == mid && p.MergeState != MergeStatus.Merged) ?? throw new NotFoundException("待合并文章未找到");
             return View(merge);
         }
@@ -399,14 +399,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("{id}/pushmerge")]
-        public ActionResult PushMerge(PostMergeRequestCommand dto)
+        public async Task<ActionResult> PushMerge(PostMergeRequestCommand dto)
         {
-            if (RedisHelper.Get("code:" + dto.ModifierEmail) != dto.Code)
+            if (await RedisHelper.GetAsync("code:" + dto.ModifierEmail) != dto.Code)
             {
                 return ResultData(null, false, "验证码错误！");
             }
 
-            var post = PostService.GetById(dto.PostId) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetByIdAsync(dto.PostId) ?? throw new NotFoundException("文章未找到");
             var diff = new HtmlDiff.HtmlDiff(post.Content.RemoveHtmlTag(), dto.Content.RemoveHtmlTag());
             if (post.Title.Equals(dto.Title) && !diff.Build().Contains(new[] { "diffmod", "diffdel", "diffins" }))
             {
@@ -435,7 +435,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Mapper.Map(dto, post);
                 post.PostHistoryVersion.Add(history);
                 post.ModifyDate = DateTime.Now;
-                return PostService.SaveChanges() > 0 ? ResultData(null, true, "你是文章原作者，无需审核，文章已自动更新并在首页展示！") : ResultData(null, false, "操作失败！");
+                return await PostService.SaveChangesAsync() > 0 ? ResultData(null, true, "你是文章原作者，无需审核，文章已自动更新并在首页展示！") : ResultData(null, false, "操作失败！");
             }
 
             #endregion
@@ -453,20 +453,20 @@ namespace Masuit.MyBlogs.Core.Controllers
                 post.PostMergeRequests.Add(merge);
             }
 
-            var b = PostService.SaveChanges() > 0;
+            var b = await PostService.SaveChangesAsync() > 0;
             if (!b)
             {
                 return ResultData(null, false, "操作失败！");
             }
 
-            RedisHelper.Expire("code:" + dto.ModifierEmail, 1);
-            MessageService.AddEntitySaved(new InternalMessage()
+            await RedisHelper.ExpireAsync("code:" + dto.ModifierEmail, 1);
+            await MessageService.AddEntitySavedAsync(new InternalMessage()
             {
                 Title = $"来自【{dto.Modifier}】的文章修改合并请求",
                 Content = dto.Title,
                 Link = "#/merge/compare?id=" + merge.Id
             });
-            var content = new Template(System.IO.File.ReadAllText(HostEnvironment.WebRootPath + "/template/merge-request.html")).Set("title", post.Title).Set("link", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id).Render();
+            var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/merge-request.html")).Set("title", post.Title).Set("link", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id).Render();
             BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
             return ResultData(null, true, "您的修改请求已提交，已进入审核状态，感谢您的参与！");
         }
@@ -479,11 +479,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Fixtop(int id)
+        public async Task<ActionResult> Fixtop(int id)
         {
-            Post post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            Post post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             post.IsFixedTop = !post.IsFixedTop;
-            bool b = PostService.SaveChanges() > 0;
+            bool b = await PostService.SaveChangesAsync() > 0;
             return b ? ResultData(null, true, post.IsFixedTop ? "置顶成功！" : "取消置顶成功！") : ResultData(null, false, "操作失败！");
         }
 
@@ -493,13 +493,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Pass(int id)
+        public async Task<ActionResult> Pass(int id)
         {
-            Post post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            Post post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             post.Status = Status.Published;
             post.ModifyDate = DateTime.Now;
             post.PostDate = DateTime.Now;
-            bool b = PostService.SaveChanges() > 0;
+            bool b = await PostService.SaveChangesAsync() > 0;
             if (!b)
             {
                 SearchEngine.LuceneIndexer.Add(post);
@@ -520,11 +520,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             post.Status = Status.Deleted;
-            bool b = PostService.SaveChanges(true) > 0;
+            bool b = await PostService.SaveChangesAsync(true) > 0;
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 
@@ -534,11 +534,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Restore(int id)
+        public async Task<ActionResult> Restore(int id)
         {
-            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             post.Status = Status.Published;
-            bool b = PostService.SaveChanges() > 0;
+            bool b = await PostService.SaveChangesAsync() > 0;
             SearchEngine.LuceneIndexer.Add(post);
             return ResultData(null, b, b ? "恢复成功！" : "恢复失败！");
         }
@@ -549,9 +549,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Truncate(int id)
+        public async Task<ActionResult> Truncate(int id)
         {
-            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             var srcs = post.Content.MatchImgSrcs();
             foreach (var path in srcs)
             {
@@ -567,7 +567,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            bool b = PostService.DeleteByIdSaved(id);
+            bool b = await PostService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 
@@ -577,28 +577,20 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
-            Post post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            Post post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             PostDto model = post.Mapper<PostDto>();
             model.Seminars = post.Seminar.Select(s => s.Seminar.Title).Join(",");
             return ResultData(model);
         }
-
-        ///// <summary>
-        ///// 文章详情
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //[MyAuthorize]
-        //public ActionResult Read(int id) => ResultData(PostService.GetById(id).Mapper<PostDto>());
 
         /// <summary>
         /// 获取文章分页
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
+        public async Task<ActionResult> GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
         {
             Expression<Func<Post, bool>> where = p => true;
             if (cid.HasValue)
@@ -611,7 +603,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(kw) || p.Author.Contains(kw) || p.Email.Contains(kw) || p.Label.Contains(kw) || p.Content.Contains(kw));
             }
 
-            var list = PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToPagedList<Post, PostDataModel>(page, size, MapperConfig);
+            var list = await PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDataModel>(page, size, MapperConfig);
             foreach (var item in list.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -629,7 +621,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="search"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPending([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string search = "")
+        public async Task<ActionResult> GetPending([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string search = "")
         {
             Expression<Func<Post, bool>> where = p => p.Status == Status.Pending;
             if (!string.IsNullOrEmpty(search))
@@ -637,7 +629,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(search) || p.Author.Contains(search) || p.Email.Contains(search) || p.Label.Contains(search));
             }
 
-            var pages = PostService.GetQuery(where).OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).ToPagedList<Post, PostDataModel>(page, size, MapperConfig);
+            var pages = await PostService.GetQuery(where).OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).ToCachedPagedListAsync<Post, PostDataModel>(page, size, MapperConfig);
             foreach (var item in pages.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -811,10 +803,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="sid"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult AddSeminar(int id, int sid)
+        public async Task<ActionResult> AddSeminar(int id, int sid)
         {
-            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            Seminar seminar = SeminarService.GetById(sid) ?? throw new NotFoundException("专题未找到");
+            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            Seminar seminar = await SeminarService.GetByIdAsync(sid) ?? throw new NotFoundException("专题未找到");
             post.Seminar.Add(new SeminarPost()
             {
                 Post = post,
@@ -822,7 +814,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 SeminarId = seminar.Id,
                 PostId = post.Id
             });
-            bool b = PostService.SaveChanges() > 0;
+            bool b = await PostService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? $"已将文章【{post.Title}】添加到专题【{seminar.Title}】" : "添加失败");
         }
 
@@ -833,10 +825,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="sid"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult RemoveSeminar(int id, int sid)
+        public async Task<ActionResult> RemoveSeminar(int id, int sid)
         {
-            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
-            Seminar seminar = SeminarService.GetById(sid) ?? throw new NotFoundException("专题未找到");
+            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            Seminar seminar = await SeminarService.GetByIdAsync(sid) ?? throw new NotFoundException("专题未找到");
             post.Seminar.Remove(new SeminarPost()
             {
                 Post = post,
@@ -844,7 +836,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 SeminarId = seminar.Id,
                 PostId = post.Id
             });
-            bool b = PostService.SaveChanges() > 0;
+            bool b = await PostService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? $"已将文章【{post.Title}】从【{seminar.Title}】专题移除" : "添加失败");
         }
 
@@ -854,9 +846,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult DeleteHistory(int id)
+        public async Task<ActionResult> DeleteHistory(int id)
         {
-            bool b = PostHistoryVersionService.DeleteByIdSaved(id);
+            bool b = await PostHistoryVersionService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "历史版本文章删除成功！" : "历史版本文章删除失败！");
         }
 
@@ -866,9 +858,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Revert(int id)
+        public async Task<ActionResult> Revert(int id)
         {
-            var history = PostHistoryVersionService.GetById(id) ?? throw new NotFoundException("版本不存在");
+            var history = await PostHistoryVersionService.GetByIdAsync(id) ?? throw new NotFoundException("版本不存在");
             history.Post.Category = history.Category;
             history.Post.CategoryId = history.CategoryId;
             history.Post.Content = history.Content;
@@ -886,8 +878,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                     SeminarId = s.SeminarId
                 });
             }
-            bool b = SearchEngine.SaveChanges() > 0;
-            PostHistoryVersionService.DeleteByIdSaved(id);
+            bool b = await SearchEngine.SaveChangesAsync() > 0;
+            await PostHistoryVersionService.DeleteByIdSavedAsync(id);
             return ResultData(null, b, b ? "回滚成功" : "回滚失败");
         }
 
@@ -897,11 +889,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id">文章id</param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult DisableComment(int id)
+        public async Task<ActionResult> DisableComment(int id)
         {
-            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             post.DisableComment = !post.DisableComment;
-            return ResultData(null, PostService.SaveChanges() > 0, post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
+            return ResultData(null, await PostService.SaveChangesAsync() > 0, post.DisableComment ? $"已禁用【{post.Title}】这篇文章的评论功能！" : $"已启用【{post.Title}】这篇文章的评论功能！");
         }
 
         /// <summary>
@@ -910,11 +902,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id">文章id</param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult DisableCopy(int id)
+        public async Task<ActionResult> DisableCopy(int id)
         {
-            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             post.DisableCopy = !post.DisableCopy;
-            return ResultData(null, PostService.SaveChanges() > 0, post.DisableCopy ? $"已开启【{post.Title}】这篇文章的防复制功能！" : $"已关闭【{post.Title}】这篇文章的防复制功能！");
+            return ResultData(null, await PostService.SaveChangesAsync() > 0, post.DisableCopy ? $"已开启【{post.Title}】这篇文章的防复制功能！" : $"已关闭【{post.Title}】这篇文章的防复制功能！");
         }
 
         /// <summary>
@@ -923,11 +915,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id">文章id</param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Refresh(int id)
+        public async Task<ActionResult> Refresh(int id)
         {
-            var post = PostService.GetById(id) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             post.ModifyDate = DateTime.Now;
-            PostService.SaveChanges();
+            await PostService.SaveChangesAsync();
             return RedirectToAction("Details", new { id });
         }
 

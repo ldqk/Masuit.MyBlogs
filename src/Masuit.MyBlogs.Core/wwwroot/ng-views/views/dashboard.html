@@ -16,17 +16,17 @@
                         <tbody>
                             <tr>
                                 <td>网站开机时长</td>
-                                <th>{{RunningTime}}</th>
+                                <th colspan="2">{{RunningTime}}</th>
                                 <td>服务器开机时长</td>
-                                <th>{{BootTime}}</th>
+                                <th colspan="2">{{BootTime}}</th>
                                 <td>操作系统</td>
                                 <th>{{osVersion}}</th>
                             </tr>
                             <tr>
                                 <td>CPU型号</td>
-                                <th>{{cpu.Type}}</th>
+                                <th colspan="2">{{cpu.Type}}</th>
                                 <td>CPU基础频率</td>
-                                <th>{{cpu.CurrentClockSpeed}} MHz</th>
+                                <th colspan="2">{{cpu.CurrentClockSpeed}} MHz</th>
                                 <td>CPU睿频</td>
                                 <th>{{cpu.MaxClockSpeed}} MHz</th>
                             </tr>
@@ -37,20 +37,16 @@
                                 <th>{{cpu.NumberOfCores}} 核心</th>
                                 <td>CPU线程数</td>
                                 <th>{{cpu.NumberOfLogicalProcessors}} 线程</th>
-                            </tr>
-                            <tr>
-                                <td>CPU当前频率</td>
-                                <th>{{cpu.CpuLoad*cpu.MaxClockSpeed/100|number:2}} MHz</th>
                                 <td>CPU使用率</td>
                                 <th>{{cpu.CpuLoad|number:2}} %</th>
-                                <td>物理总内存</td>
-                                <th>{{memory.PhysicalMemory/1048576|number:2}} MB</th>
                             </tr>
                             <tr>
+                                <td>物理总内存</td>
+                                <th>{{memory.PhysicalMemory/1048576|number:2}} MB({{memory.PhysicalMemory/1073741824|number:2}} GB)</th>
                                 <td>物理内存已使用</td>
-                                <th>{{(memory.PhysicalMemory*memory.MemoryUsage/104857600)|number:2}} MB</th>
+                                <th>{{(memory.PhysicalMemory*memory.MemoryUsage/104857600)|number:2}} MB({{(memory.PhysicalMemory*memory.MemoryUsage/107374182400)|number:2}} GB)</th>
                                 <td>物理内存剩余</td>
-                                <th>{{(memory.PhysicalMemory*(100-memory.MemoryUsage)/104857600)|number:2}} MB</th>
+                                <th>{{(memory.PhysicalMemory*(100-memory.MemoryUsage)/104857600)|number:2}} MB({{(memory.PhysicalMemory*(100-memory.MemoryUsage)/107374182400)|number:2}} GB)</th>
                                 <td>内存使用率</td>
                                 <th>{{memory.MemoryUsage|number:2}} %</th>
                             </tr>
@@ -60,25 +56,21 @@
                                 <td>虚拟内存已使用</td>
                                 <th>{{(memory.TotalPageFile-memory.AvailablePageFile)/1048576|number:2}} MB</th>
                                 <td>虚拟内存可用</td>
-                                <th>{{memory.AvailablePageFile/1048576|number:2}} MB</th>
+                                <th colspan="3">{{memory.AvailablePageFile/1048576|number:2}} MB</th>
                             </tr>
                             <tr>
-                                <td colspan="1">磁盘总空间</td>
-                                <th colspan="5">{{disk.total}}</th>
-                            </tr>
-                            <tr>
-                                <td colspan="1">磁盘剩余空间</td>
-                                <th colspan="5">{{disk.free}}</th>
-                            </tr>
-                            <tr>
-                                <td colspan="1">磁盘使用率</td>
-                                <th colspan="5">{{disk.usage}}</th>
+                                <td>磁盘总空间</td>
+                                <th colspan="2">{{disk.total}}</th>
+                                <td>磁盘剩余空间</td>
+                                <th colspan="2">{{disk.free}}</th>
+                                <td>磁盘使用率</td>
+                                <th>{{disk.usage}}</th>
                             </tr>
                             <tr ng-repeat="item in netInfo.mac">
                                 <td>MAC地址-{{$index}}</td>
                                 <th colspan="2">{{item}}</th>
                                 <td>IP地址-{{$index}}</td>
-                                <th colspan="2">{{netInfo.ips[$index]}}</th>
+                                <th colspan="4">{{netInfo.ips[$index]}}</th>
                             </tr>
                         </tbody>
                     </table>

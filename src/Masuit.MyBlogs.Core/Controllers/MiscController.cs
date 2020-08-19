@@ -41,9 +41,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [Route("misc/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
-        public ActionResult Index(int id)
+        public async Task<ActionResult> Index(int id)
         {
-            var misc = MiscService.GetFromCache(m => m.Id == id) ?? throw new NotFoundException("页面未找到");
+            var misc = await MiscService.GetFromCacheAsync(m => m.Id == id) ?? throw new NotFoundException("页面未找到");
             misc.ModifyDate = misc.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             misc.PostDate = misc.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             return View(misc);
@@ -67,9 +67,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("donatelist")]
-        public ActionResult DonateList(int page = 1, int size = 10)
+        public async Task<ActionResult> DonateList(int page = 1, int size = 10)
         {
-            var list = DonateService.GetPagesFromCache<DateTime, DonateDto>(page, size, d => true, d => d.DonateTime, false);
+            var list = await DonateService.GetPagesFromCacheAsync<DateTime, DonateDto>(page, size, d => true, d => d.DonateTime, false);
             if (!CurrentUser.IsAdmin)
             {
                 foreach (var item in list.Data.Where(item => !(item.QQorWechat + item.Email).Contains("匿名")))
@@ -78,6 +78,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     item.Email = item.Email.MaskEmail();
                 }
             }
+
             return Ok(list);
         }
 
@@ -130,9 +131,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var post = MiscService.GetById(id) ?? throw new NotFoundException("杂项页已被删除！");
+            var post = await MiscService.GetByIdAsync(id) ?? throw new NotFoundException("杂项页已被删除！");
             var srcs = post.Content.MatchImgSrcs().Where(s => s.StartsWith("/"));
             foreach (var path in srcs)
             {
@@ -145,7 +146,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            bool b = MiscService.DeleteByIdSaved(id);
+            bool b = await MiscService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
 
@@ -190,14 +191,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
-            var misc = MiscService.GetById(id);
+            var misc = await MiscService.GetByIdAsync(id);
             if (misc != null)
             {
                 misc.ModifyDate = misc.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 misc.PostDate = misc.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             }
+
             return ResultData(misc.MapTo<MiscDto>());
         }
     }

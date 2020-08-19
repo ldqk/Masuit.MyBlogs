@@ -39,9 +39,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("notice"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
-        public ActionResult Index([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        public async Task<ActionResult> Index([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            var list = NoticeService.GetPages<DateTime, NoticeDto>(page, size, n => n.Status == Status.Display, n => n.ModifyDate, false);
+            var list = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(page, size, n => n.Status == Status.Display, n => n.ModifyDate, false);
             ViewData["page"] = new Pagination(page, size, list.TotalCount);
             foreach (var n in list.Data)
             {
@@ -58,15 +58,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [Route("n/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int id)
         {
-            var notice = NoticeService.GetById(id) ?? throw new NotFoundException("页面未找到");
+            var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("页面未找到");
             notice.ModifyDate = notice.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             notice.PostDate = notice.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             if (!HttpContext.Session.TryGetValue("notice" + id, out _))
             {
                 notice.ViewCount += 1;
-                NoticeService.SaveChanges();
+                await NoticeService.SaveChangesAsync();
                 HttpContext.Session.Set("notice" + id, notice.Title);
             }
 
@@ -92,9 +92,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var notice = NoticeService.GetById(id) ?? throw new NotFoundException("公告已经被删除！");
+            var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("公告已经被删除！");
             var srcs = notice.Content.MatchImgSrcs().Where(s => s.StartsWith("/"));
             foreach (var path in srcs)
             {
@@ -107,7 +107,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            bool b = NoticeService.DeleteByIdSaved(id);
+            bool b = await NoticeService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
 
@@ -168,9 +168,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
-        public ActionResult Last()
+        public async Task<ActionResult> Last()
         {
-            var notice = NoticeService.Get(n => n.Status == Status.Display, n => n.ModifyDate, false);
+            var notice = await NoticeService.GetAsync(n => n.Status == Status.Display, n => n.ModifyDate, false);
             if (notice == null)
             {
                 return ResultData(null, false);
@@ -182,7 +182,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             notice.ViewCount += 1;
-            NoticeService.SaveChanges();
+            await NoticeService.SaveChangesAsync();
             var dto = notice.Mapper<NoticeDto>();
             Response.Cookies.Append("last-notice", dto.Id.ToString(), new CookieOptions()
             {
