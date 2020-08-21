@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(kw) || p.Description.Contains(kw));
             }
 
-            var list = await AdsService.GetQuery(where).OrderByDescending(p => p.Price).ThenByDescending(a => a.Weight).ToCachedPagedListAsync<Advertisement, AdvertisementViewModel>(page, size, MapperConfig);
+            var list = await AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ToCachedPagedListAsync<Advertisement, AdvertisementViewModel>(page, size, MapperConfig);
             var cids = list.Data.Where(m => !string.IsNullOrEmpty(m.CategoryIds)).SelectMany(m => m.CategoryIds.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)).Distinct().ToArray();
             var dic = await CategoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionaryAsync(c => c.Id + "", c => c.Name);
             foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
