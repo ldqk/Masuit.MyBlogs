@@ -200,7 +200,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 misc.PostDate = misc.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             }
 
-            return ResultData(misc.MapTo<MiscDto>());
+            return ResultData(misc.Mapper<MiscDto>());
         }
     }
 }
