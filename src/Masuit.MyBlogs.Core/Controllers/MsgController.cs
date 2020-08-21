@@ -46,10 +46,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie"), Route("msg")]
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             ViewBag.TotalCount = LeaveMessageService.Count(m => m.ParentId == 0 && m.Status == Status.Published);
-            return CurrentUser.IsAdmin ? View("Index_Admin") : View();
+            var text = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "agreement.html"));
+            return CurrentUser.IsAdmin ? View("Index_Admin", text) : View(model: text);
         }
 
         /// <summary>

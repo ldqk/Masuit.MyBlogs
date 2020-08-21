@@ -32,7 +32,7 @@
     <ItemGroup>
         <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.11.0" />
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
-        <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="4.0.0" />
+        <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="4.0.1" />
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
         <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="2.0.0-beta-1629" />
         <PackageReference Include="CacheManager.Serialization.Json" Version="2.0.0-beta-1629" />
@@ -52,11 +52,11 @@
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.1" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.2" />
-        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.1" />
+        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.2" />
         <PackageReference Include="TimeZoneConverter" Version="3.2.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.6.0" />
         <PackageReference Include="WinInsider.System.Net.Http.Formatting" Version="1.0.14" />
-        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="3.0.58" />
+        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="3.0.59" />
     </ItemGroup>
     <ItemGroup>
         <Content Update="appsettings.json">

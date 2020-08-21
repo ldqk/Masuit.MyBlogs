@@ -3,8 +3,10 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -18,6 +20,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class LinksController : BaseController
     {
         public IHttpClientFactory HttpClientFactory { get; set; }
+        public IWebHostEnvironment HostEnvironment { get; set; }
         private HttpClient HttpClient => HttpClientFactory.CreateClient();
 
         /// <summary>
@@ -28,6 +31,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Index()
         {
             var list = await LinksService.GetQueryFromCacheAsync<bool, LinksDto>(l => l.Status == Status.Available, l => l.Recommend, false);
+            ViewBag.Html = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "links.html"));
             return CurrentUser.IsAdmin ? View("Index_Admin", list) : View(list);
         }
 
