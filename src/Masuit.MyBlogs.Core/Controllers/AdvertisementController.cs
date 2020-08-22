@@ -30,7 +30,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id">广告id</param>
         /// <returns></returns>
         [HttpGet("{id:int}"), ResponseCache(Duration = 3600)]
-        public async Task<IActionResult> RedirectTo(int id)
+        public async Task<IActionResult> Redirect(int id)
         {
             var ad = await AdsService.GetByIdAsync(id) ?? throw new NotFoundException("推广链接不存在");
             if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("ads" + id)))
