@@ -1,11 +1,12 @@
-﻿using System;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -32,26 +33,44 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="ip"></param>
         /// <returns></returns>
-        [Route("ip/{ip?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "ip" }, VaryByHeader = "Cookie")]
+        [Route("ip/{ip?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[]
+        {
+            "ip"
+        }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> GetIpInfo(string ip)
         {
             if (string.IsNullOrEmpty(ip))
             {
                 ip = ClientIP;
             }
+
             ViewBag.IP = ip;
-            PhysicsAddress address = await ip.GetPhysicsAddressInfo();
-            if (address != null && address.Status == 0)
+            var address = await ip.GetPhysicsAddressInfo() ?? new PhysicsAddress()
             {
-                address.AddressResult.Pois.Add(new Pois()
+                Status = 0,
+                AddressResult = new AddressResult()
                 {
-                    AddressDetail = ip.GetIPLocation() + "（本地数据库）"
-                });
-            }
+                    Pois = new List<Pois>()
+                    {
+                        new Pois()
+                        {
+                            AddressDetail = ip.GetIPLocation() + "（本地数据库）"
+                        }
+                    },
+                    AddressComponent = new AddressComponent(),
+                    FormattedAddress = ip.GetIPLocation(),
+                    Location = new Location()
+                    {
+                        Lng = CommonHelper.MaxmindReader.City(ip).Location.Longitude.Value,
+                        Lat = CommonHelper.MaxmindReader.City(ip).Location.Latitude.Value
+                    }
+                }
+            };
             if (Request.Method.Equals(HttpMethods.Get))
             {
                 return View(address);
             }
+
             return Json(address);
         }
 
@@ -61,7 +80,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="lat"></param>
         /// <param name="lng"></param>
         /// <returns></returns>
-        [HttpGet("pos"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "lat", "lng" }, VaryByHeader = "Cookie")]
+        [HttpGet("pos"), ResponseCache(Duration = 600, VaryByQueryKeys = new[]
+        {
+            "lat",
+            "lng"
+        }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Position(string lat, string lng)
         {
             if (string.IsNullOrEmpty(lat) || string.IsNullOrEmpty(lng))
@@ -85,7 +108,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="addr"></param>
         /// <returns></returns>
-        [Route("addr"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "addr" }, VaryByHeader = "Cookie")]
+        [Route("addr"), ResponseCache(Duration = 600, VaryByQueryKeys = new[]
+        {
+            "addr"
+        }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Address(string addr)
         {
             if (string.IsNullOrEmpty(addr))
