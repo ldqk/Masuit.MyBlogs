@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using CacheManager.Core;
+using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -36,6 +37,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IPostService PostService { get; set; }
         public IInternalMessageService MessageService { get; set; }
         public IWebHostEnvironment HostEnvironment { get; set; }
+        public ICacheManager<int> CommentFeq { get; set; }
 
         /// <summary>
         /// 发表评论
@@ -45,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Submit(CommentCommand dto)
         {
-            var match = Regex.Match(dto.NickName + dto.Content, CommonHelper.BanRegex);
+            var match = Regex.Match(dto.NickName + dto.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
             if (match.Success)
             {
                 LogManager.Info($"提交内容：{dto.NickName}/{dto.Content}，敏感词：{match.Value}");
@@ -59,9 +61,10 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             dto.Content = dto.Content.Trim().Replace("<p><br></p>", string.Empty);
-            if (dto.Content.RemoveHtmlTag().Trim().Equals(HttpContext.Session.Get<string>("comment" + dto.PostId)))
+            if (CommentFeq.GetOrAdd("Comments:" + ClientIP, 1) > 2)
             {
-                return ResultData(null, false, "您刚才已经在这篇文章发表过一次评论了，换一篇文章吧，或者换一下评论内容吧！");
+                CommentFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
+                return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
             }
 
             var comment = dto.Mapper<Comment>();
@@ -93,7 +96,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "评论失败");
             }
 
-            HttpContext.Session.Set("comment" + comment.PostId, comment.Content.RemoveHtmlTag().Trim());
+            CommentFeq.AddOrUpdate("Comments:" + ClientIP, 1, i => i + 1, 5);
+            CommentFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
             var emails = new HashSet<string>();
             var email = CommonHelper.SystemSettings["ReceiveEmail"]; //站长邮箱
             emails.Add(email);

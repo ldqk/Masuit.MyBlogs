@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using CacheManager.Core;
+using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -40,6 +41,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IInternalMessageService MessageService { get; set; }
 
         public IWebHostEnvironment HostEnvironment { get; set; }
+
+        public ICacheManager<int> MsgFeq { get; set; }
 
         /// <summary>
         /// 留言板
@@ -119,7 +122,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Submit(LeaveMessageCommand dto)
         {
-            var match = Regex.Match(dto.NickName + dto.Content, CommonHelper.BanRegex);
+            var match = Regex.Match(dto.NickName + dto.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
             if (match.Success)
             {
                 LogManager.Info($"提交内容：{dto.NickName}/{dto.Content}，敏感词：{match.Value}");
@@ -127,9 +130,10 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             dto.Content = dto.Content.Trim().Replace("<p><br></p>", string.Empty);
-            if (dto.Content.RemoveHtmlTag().Trim().Equals(HttpContext.Session.Get<string>("msg")))
+            if (MsgFeq.GetOrAdd("Comments:" + ClientIP, 1) > 2)
             {
-                return ResultData(null, false, "您刚才已经发表过一次留言了！");
+                MsgFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
+                return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
             }
 
             var msg = dto.Mapper<LeaveMessage>();
@@ -162,7 +166,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "留言发表失败！");
             }
 
-            HttpContext.Session.Set("msg", msg.Content.RemoveHtmlTag().Trim());
+            MsgFeq.AddOrUpdate("Comments:" + ClientIP, 1, i => i + 1, 5);
+            MsgFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
             var email = CommonHelper.SystemSettings["ReceiveEmail"];
             var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/notify.html")).Set("title", "网站留言板").Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
             if (msg.Status == Status.Published)
