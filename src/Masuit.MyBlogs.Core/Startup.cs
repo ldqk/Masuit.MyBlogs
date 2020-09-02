@@ -218,6 +218,7 @@ namespace Masuit.MyBlogs.Core
                 }
             }); //配置hangfire
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
+            app.UseActivity();// 抽奖活动
             app.UseRouting(); // 放在 UseStaticFiles 之后
             app.UseEndpoints(endpoints =>
             {
