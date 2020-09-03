@@ -52,6 +52,7 @@
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.1" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.2" />
+        <PackageReference Include="Svg" Version="3.1.1" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.2" />
         <PackageReference Include="TimeZoneConverter" Version="3.2.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.6.0" />

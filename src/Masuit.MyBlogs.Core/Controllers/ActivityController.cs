@@ -1,8 +1,15 @@
-﻿using Masuit.MyBlogs.Core.Extensions;
+﻿using Castle.Core.Internal;
+using Masuit.MyBlogs.Core.Extensions;
+using Masuit.Tools;
+using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Svg;
 using System;
+using System.Drawing;
+using System.IO;
+using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -30,16 +37,73 @@ namespace Masuit.MyBlogs.Core.Controllers
             return Ok(RedisHelper.SMembers("Share:" + email).Length);
         }
 
-        public ActionResult GetActivityUsers()
+        public ActionResult Users(string type = "json")
         {
-            var keys = RedisHelper.Keys("Share:*");
-            return Json(keys);
+            var keys = RedisHelper.Keys("Share:*").Select(s => s[6..].MaskEmail()).ToList();
+            switch (type)
+            {
+                case "svg":
+                    var svg = new SvgDocument();
+                    var svgText = new SvgText();
+                    for (var i = 0; i < keys.Count; i++)
+                    {
+                        var s = keys[i];
+                        svgText.Children.Add(new SvgTextSpan()
+                        {
+                            Text = s,
+                            Fill = new SvgColourServer(Color.Red),
+                            FontWeight = SvgFontWeight.Bold,
+                            Y = new SvgUnitCollection()
+                            {
+                                new SvgUnit(18*(i+1))
+                            },
+                            X = new SvgUnitCollection()
+                            {
+                                new SvgUnit(0)
+                            },
+                            FontSize = 16
+                        });
+                    }
+
+                    svg.Children.Add(svgText);
+                    using (var stream = new MemoryStream())
+                    {
+                        svg.Write(stream);
+                        return File(stream.ToArray(), ContentType.Svg);
+                    }
+                default:
+                    return Json(keys);
+            }
         }
 
-        public ActionResult Count()
+        public ActionResult Count(int? count)
         {
             var keys = RedisHelper.Keys("Share:*");
-            return Ok(keys.Length);
+            if (count.HasValue)
+            {
+                keys = keys.FindAll(s => RedisHelper.SMembers(s).Length >= count);
+            }
+
+            using var stream = new MemoryStream();
+            new SvgDocument()
+            {
+                Height = 20,
+                Width = 13 * keys.Length.ToString().Length,
+                Children =
+                {
+                    new SvgText(keys.Length.ToString())
+                    {
+                        Fill = new SvgColourServer(Color.Red),
+                        FontWeight = SvgFontWeight.Bold,
+                        Y = new SvgUnitCollection()
+                        {
+                            new SvgUnit(18)
+                        },
+                        FontSize = 20
+                    }
+                }
+            }.Write(stream);
+            return File(stream.ToArray(), ContentType.Svg);
         }
     }
 }
