@@ -62,6 +62,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Details(int id, string kw)
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
+            CheckPermission(post);
             ViewBag.Keyword = post.Keyword + "," + post.Label;
             var modifyDate = post.ModifyDate;
             ViewBag.Next = PostService.GetFromCache<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate);
@@ -96,6 +97,28 @@ namespace Masuit.MyBlogs.Core.Controllers
             return View(post);
         }
 
+        private void CheckPermission(Post post)
+        {
+            var location = ClientIP.GetIPLocation();
+            switch (post.LimitMode)
+            {
+                case PostLimitMode.AllowRegion:
+                    if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                    {
+                        throw new NotFoundException("文章未找到");
+                    }
+
+                    break;
+                case PostLimitMode.ForbidRegion:
+                    if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                    {
+                        throw new NotFoundException("文章未找到");
+                    }
+
+                    break;
+            }
+        }
+
         /// <summary>
         /// 文章历史版本
         /// </summary>
@@ -107,6 +130,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> History(int id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
+            CheckPermission(post);
             ViewBag.Primary = post;
             var list = PostHistoryVersionService.GetPages(page, size, v => v.PostId == id, v => v.ModifyDate, false);
             foreach (var item in list.Data)
@@ -128,6 +152,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> HistoryVersion(int id, int hid)
         {
             var post = await PostHistoryVersionService.GetAsync(v => v.Id == hid) ?? throw new NotFoundException("文章未找到");
+            CheckPermission(post.Post);
             var next = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
             var prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
             ViewBag.Next = next;
@@ -147,6 +172,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
+            CheckPermission(post);
             var main = post.Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
             var left = v1 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
             var right = v2 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
@@ -651,7 +677,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
-                return ResultData(null, message: "请选择一个分类");
+                return ResultData(null, false, "请选择一个分类");
+            }
+
+            if (post.LimitMode > 0 && string.IsNullOrEmpty(post.Regions))
+            {
+                return ResultData(null, false, "请输入投放的地区");
             }
 
             if (string.IsNullOrEmpty(post.Label?.Trim()) || post.Label.Equals("null"))

@@ -96,36 +96,46 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
         private async Task<string> ConvertToHtml(IFormFile file)
         {
-            await using var ms = file.OpenReadStream();
-            await using var fs = new FileStream(Path.Combine(Environment.GetEnvironmentVariable("temp") ??
-                "upload", file.FileName), FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            await ms.CopyToAsync(fs);
-            using var doc = WordprocessingDocument.Open(fs, true);
-            var pageTitle = file.FileName;
-            var part = doc.CoreFilePropertiesPart;
-            if (part != null)
+            var docfile = Path.Combine(Environment.GetEnvironmentVariable("temp") ?? "upload", file.FileName);
+            try
             {
-                pageTitle ??= (string)part.GetXDocument().Descendants(DC.title).FirstOrDefault();
-            }
-
-            var settings = new HtmlConverterSettings()
-            {
-                PageTitle = pageTitle,
-                FabricateCssClasses = false,
-                RestrictToSupportedLanguages = false,
-                RestrictToSupportedNumberingFormats = false,
-                ImageHandler = imageInfo =>
+                await using var ms = file.OpenReadStream();
+                await using var fs = new FileStream(docfile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                await ms.CopyToAsync(fs);
+                using var doc = WordprocessingDocument.Open(fs, true);
+                var pageTitle = file.FileName;
+                var part = doc.CoreFilePropertiesPart;
+                if (part != null)
                 {
-                    var stream = new MemoryStream();
-                    imageInfo.Bitmap.Save(stream, imageInfo.Bitmap.RawFormat);
-                    var base64String = Convert.ToBase64String(stream.ToArray());
-                    return new XElement(Xhtml.img, new XAttribute(NoNamespace.src, $"data:{imageInfo.ContentType};base64," + base64String), imageInfo.ImgStyleAttribute, imageInfo.AltText != null ? new XAttribute(NoNamespace.alt, imageInfo.AltText) : null);
+                    pageTitle ??= (string)part.GetXDocument().Descendants(DC.title).FirstOrDefault();
                 }
-            };
-            var htmlElement = HtmlConverter.ConvertToHtml(doc, settings);
-            var html = new XDocument(new XDocumentType("html", null, null, null), htmlElement);
-            var htmlString = html.ToString(SaveOptions.DisableFormatting);
-            return htmlString;
+
+                var settings = new HtmlConverterSettings()
+                {
+                    PageTitle = pageTitle,
+                    FabricateCssClasses = false,
+                    RestrictToSupportedLanguages = false,
+                    RestrictToSupportedNumberingFormats = false,
+                    ImageHandler = imageInfo =>
+                    {
+                        var stream = new MemoryStream();
+                        imageInfo.Bitmap.Save(stream, imageInfo.Bitmap.RawFormat);
+                        var base64String = Convert.ToBase64String(stream.ToArray());
+                        return new XElement(Xhtml.img, new XAttribute(NoNamespace.src, $"data:{imageInfo.ContentType};base64," + base64String), imageInfo.ImgStyleAttribute, imageInfo.AltText != null ? new XAttribute(NoNamespace.alt, imageInfo.AltText) : null);
+                    }
+                };
+                var htmlElement = HtmlConverter.ConvertToHtml(doc, settings);
+                var html = new XDocument(new XDocumentType("html", null, null, null), htmlElement);
+                var htmlString = html.ToString(SaveOptions.DisableFormatting);
+                return htmlString;
+            }
+            finally
+            {
+                if (System.IO.File.Exists(docfile))
+                {
+                    System.IO.File.Delete(docfile);
+                }
+            }
         }
 
         private async Task<string> SaveAsHtml(IFormFile file)
@@ -147,17 +157,16 @@ namespace Masuit.MyBlogs.Core.Controllers
                     var ext = strs[0].Split(";")[0].Split("/")[1];
                     await using var image = new MemoryStream(bytes);
                     var imgFile = $"{SnowFlake.NewId}.{ext}";
-                    var (url, success) = await ImagebedClient.UploadImage(image, imgFile);
-                    if (success)
+                    var path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "images", imgFile);
+                    var dir = Path.GetDirectoryName(path);
+                    if (!Directory.Exists(dir))
                     {
-                        img.Attributes["src"].Value = url;
+                        Directory.CreateDirectory(dir);
                     }
-                    else
-                    {
-                        var path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "images", imgFile);
-                        await SaveFile(file, path);
-                        img.Attributes["src"].Value = path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/");
-                    }
+
+                    await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    await image.CopyToAsync(fs);
+                    img.Attributes["src"].Value = path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/");
                 }
             }
 

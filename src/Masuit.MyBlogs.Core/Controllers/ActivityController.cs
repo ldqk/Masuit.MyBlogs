@@ -37,21 +37,24 @@ namespace Masuit.MyBlogs.Core.Controllers
             return Ok(RedisHelper.SMembers("Share:" + email).Length);
         }
 
-        public ActionResult Users(string type = "json")
+        public ActionResult Users(string type = "json", int count = 5)
         {
-            var keys = RedisHelper.Keys("Share:*").Select(s => s[6..].MaskEmail()).ToList();
+            var keys = RedisHelper.Keys("Share:*").ToDictionary(s => s[6..].MaskEmail(), s => RedisHelper.SMembers(s).Length).OrderByDescending(p => p.Value).ToList();
             switch (type)
             {
                 case "svg":
-                    var svg = new SvgDocument();
+                    var svg = new SvgDocument()
+                    {
+                        Height = keys.Count * 19
+                    };
                     var svgText = new SvgText();
                     for (var i = 0; i < keys.Count; i++)
                     {
                         var s = keys[i];
                         svgText.Children.Add(new SvgTextSpan()
                         {
-                            Text = s,
-                            Fill = new SvgColourServer(Color.Red),
+                            Text = s.Key,
+                            Fill = new SvgColourServer(s.Value >= count ? Color.Red : Color.Black),
                             FontWeight = SvgFontWeight.Bold,
                             Y = new SvgUnitCollection()
                             {

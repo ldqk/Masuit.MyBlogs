@@ -1,4 +1,5 @@
 ﻿using Masuit.LuceneEFCore.SearchEngine.Linq;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Repository;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -7,6 +8,8 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools;
+using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -58,12 +61,24 @@ namespace Masuit.MyBlogs.Core.Controllers
             var postsQuery = PostService.GetQuery<PostDto>(p => (p.Status == Status.Published || CurrentUser.IsAdmin)); //准备文章的查询
             var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ToCachedPagedListAsync(1, 15);
             posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ToList());
+            CheckPermission(posts);
             var viewModel = await GetIndexPageViewModel();
             viewModel.Banner = banners;
             viewModel.Posts = posts;
             ViewBag.FastShare = fastShares.ToList();
             viewModel.PageParams = new Pagination(1, 15, posts.TotalCount, OrderBy.ModifyDate);
             return View(viewModel);
+        }
+
+        private void CheckPermission(PagedList<PostDto> posts)
+        {
+            var location = ClientIP.GetIPLocation();
+            posts.Data.RemoveAll(p => p.LimitMode switch
+            {
+                PostLimitMode.AllowRegion => !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid,
+                PostLimitMode.ForbidRegion => location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid,
+                _ => false
+            });
         }
 
         /// <summary>
@@ -84,6 +99,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ToList());
             }
 
+            CheckPermission(posts);
             viewModel.Posts = posts;
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             return View(viewModel);
@@ -101,6 +117,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Tag(string id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var posts = await PostService.GetQuery<PostDto>(p => p.Label.Contains(id) && (p.Status == Status.Published || CurrentUser.IsAdmin)).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync(page, size);
+            CheckPermission(posts);
             var viewModel = await GetIndexPageViewModel();
             ViewBag.Tag = id;
             viewModel.Posts = posts;
@@ -122,6 +139,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Expression<Func<Post, bool>> where = p => p.Author.Equals(author) || p.Modifier.Equals(author) || p.Email.Equals(author) || p.PostHistoryVersion.Any(v => v.Modifier.Equals(author) || v.ModifierEmail.Equals(author));
             where = where.And(p => p.Status == Status.Published || CurrentUser.IsAdmin);
             var posts = PostService.GetQuery<PostDto>(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedList(page, size);
+            CheckPermission(posts);
             var viewModel = await GetIndexPageViewModel();
             ViewBag.Author = author;
             ViewBag.Total = posts.TotalCount;
@@ -144,6 +162,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
             var posts = PostService.GetQuery<PostDto>(p => p.CategoryId == cat.Id && (p.Status == Status.Published || CurrentUser.IsAdmin)).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedList(page, size);
+            CheckPermission(posts);
             var viewModel = await GetIndexPageViewModel();
             viewModel.Posts = posts;
             ViewBag.Category = cat;

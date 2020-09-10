@@ -1,5 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
+using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Http;
@@ -39,6 +40,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (string.IsNullOrEmpty(ip))
             {
                 ip = ClientIP;
+            }
+
+            if (ip.IsPrivateIP())
+            {
+                return Ok("内网IP");
             }
 
             ViewBag.IP = ip;

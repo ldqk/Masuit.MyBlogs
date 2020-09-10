@@ -141,6 +141,16 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public bool DisableCopy { get; set; }
 
         /// <summary>
+        /// 限制模式
+        /// </summary>
+        public PostLimitMode? LimitMode { get; set; }
+
+        /// <summary>
+        /// 地区，逗号分隔
+        /// </summary>
+        public string Regions { get; set; }
+
+        /// <summary>
         /// 分类
         /// </summary>
         public virtual Category Category { get; set; }
@@ -164,5 +174,18 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 文章修改请求
         /// </summary>
         public virtual ICollection<PostMergeRequest> PostMergeRequests { get; set; }
+    }
+
+    /// <summary>
+    /// 地区限制
+    /// </summary>
+    public enum PostLimitMode
+    {
+        [Description("不限")]
+        All,
+        [Description("指定地区可见")]
+        AllowRegion,
+        [Description("指定地区不可见")]
+        ForbidRegion
     }
 }

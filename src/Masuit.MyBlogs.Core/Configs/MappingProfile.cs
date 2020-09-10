@@ -49,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<NoticeCommand, NoticeDto>().ReverseMap();
             CreateMap<Notice, NoticeViewModel>().ForMember(c => c.PostDate, e => e.MapFrom(c => c.PostDate.ToString("yyyy-MM-dd HH:mm:ss"))).ForMember(c => c.ModifyDate, e => e.MapFrom(c => c.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
 
-            CreateMap<Post, PostCommand>().ReverseMap();
+            CreateMap<PostCommand, Post>().ReverseMap();
             CreateMap<Post, PostModelBase>();
             CreateMap<Post, PostHistoryVersion>().ForMember(p => p.Id, e => e.Ignore()).ForMember(v => v.PostId, e => e.MapFrom(p => p.Id));
             CreateMap<Post, PostDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ForMember(p => p.CommentCount, e => e.MapFrom(p => p.Comment.Count(c => c.Status == Status.Published))).ReverseMap();

@@ -46,7 +46,25 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 客户端的真实IP
         /// </summary>
-        public string ClientIP => HttpContext.Connection.RemoteIpAddress.ToString();
+        public string ClientIP
+        {
+            get
+            {
+                var ip = HttpContext.Connection.RemoteIpAddress.ToString();
+                var trueip = Request.Headers[AppConfig.TrueClientIPHeader].ToString();
+                if (!string.IsNullOrEmpty(trueip) && ip != trueip)
+                {
+                    ip = trueip;
+                }
+                return ip;
+            }
+        }
+
+        /// <summary>
+        /// 普通访客是否token合法
+        /// </summary>
+        public bool VisitorTokenValid => Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Request.Cookies["FullAccessToken"]);
+
 
         public IMapper Mapper { get; set; }
         public MapperConfiguration MapperConfig { get; set; }

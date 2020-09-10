@@ -329,7 +329,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 	}
 	//异步提交表单开始
 	$scope.submit = function(post) {
-		
+		Object.keys(post).forEach(key => post[key] == undefined||post[key] == null ? delete post[key] : '');
 		if (!post.Label) {
 			post.Label = null;
 		}
@@ -541,6 +541,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 
 	//异步提交表单开始
 	$scope.submit = function (post) {
+		Object.keys(post).forEach(key => post[key] == undefined||post[key] == null ? delete post[key] : '');
 		
 		if (!post.Label) {
 			post.Label = null;
