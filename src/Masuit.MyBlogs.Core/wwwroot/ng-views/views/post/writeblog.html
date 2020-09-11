@@ -94,54 +94,24 @@
             </div>
         </div>
         <div class="col-md-4 text-right">
-            <span class="checkboxWrapper theme4 smallCheckboxSize">
-                <input type="checkbox" id="DisableCopy" ng-model="post.DisableCopy">
-                <label for="DisableCopy">
-                    <i>
-                        <svg version="1.1" id="DisableCopy-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
-                        <circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" />
-
-
-
-                        <path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534 S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" />
-
-
-
-                        </svg>
-                    </i>
-                    禁止转载
-                </label>
-            </span>
-            <span class="checkboxWrapper theme4 smallCheckboxSize">
-                <input type="checkbox" id="DisableComment" ng-model="post.DisableComment">
-                <label for="DisableComment">
-                    <i>
-                        <svg version="1.1" id="DisableComment-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
-                        <circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" />
-
-
-
-                        <path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534 S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" />
-
-
-
-                        </svg>
-                    </i>
-                    禁止评论
-                </label>
-            </span>
-            <span class="checkboxWrapper theme4 smallCheckboxSize" ng-click="Scheduled()">
-                <input type="checkbox" id="sample9" ng-model="post.schedule">
-                <label for="sample9">
-                    <i>
-                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
-                        <circle fill="none" stroke="#B7B7B7" stroke-width="3" stroke-miterlimit="10" cx="25.11" cy="24.883" r="23.519" />
-                        <path fill="none" stroke-width="3" stroke-miterlimit="10" d="M48.659,25c0,12.998-10.537,23.534-23.534,23.534 S1.591,37.998,1.591,25S12.127,1.466,25.125,1.466c9.291,0,17.325,5.384,21.151,13.203L19,36l-9-14" /></svg>
-                    </i>
-                    定时发表&nbsp;&nbsp;&nbsp;
-                </label>
-            </span>
-            <div class="pull-right">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <label class="checkbox checkbox-inline m-r-20">
+                        <input type="checkbox" id="DisableCopy" ng-model="post.DisableCopy">
+                        <i class="input-helper"></i>
+                        禁止转载
+                    </label>
+                    <label class="checkbox checkbox-inline m-r-20">
+                        <input type="checkbox" id="DisableComment" ng-model="post.DisableComment">
+                        <i class="input-helper"></i>
+                        禁止评论
+                    </label>
+                    <label class="checkbox checkbox-inline m-r-20">
+                        <input type="checkbox" ng-model="post.schedule">
+                        <i class="input-helper"></i>
+                        定时发表&nbsp;&nbsp;&nbsp;
+                    </label>
+                </span>
                 <button type="button" class="btn btn-info" ng-click="submit(post)">发布</button>
             </div>
         </div>

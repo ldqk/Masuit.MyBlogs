@@ -75,8 +75,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             var location = ClientIP.GetIPLocation();
             posts.Data.RemoveAll(p => p.LimitMode switch
             {
-                PostLimitMode.AllowRegion => !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid,
-                PostLimitMode.ForbidRegion => location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid,
+                PostLimitMode.AllowRegion => !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot(),
+                PostLimitMode.ForbidRegion => location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot(),
                 _ => false
             });
         }

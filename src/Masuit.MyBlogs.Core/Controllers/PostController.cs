@@ -103,14 +103,14 @@ namespace Masuit.MyBlogs.Core.Controllers
             switch (post.LimitMode)
             {
                 case PostLimitMode.AllowRegion:
-                    if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                    if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
                     {
                         throw new NotFoundException("文章未找到");
                     }
 
                     break;
                 case PostLimitMode.ForbidRegion:
-                    if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                    if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
                     {
                         throw new NotFoundException("文章未找到");
                     }
