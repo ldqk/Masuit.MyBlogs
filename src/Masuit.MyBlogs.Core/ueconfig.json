@@ -1,4 +1,4 @@
-/* 前后端通信相关的配置,注释只允许使用多行方式 */
+﻿/* 前后端通信相关的配置,注释只允许使用多行方式 */
 {
     /* 上传图片配置项 */
     "imageActionName": "uploadimage", /* 执行上传图片的action名称 */
@@ -59,8 +59,10 @@
         "jetbrains.com",
         "oz-code.com",
         "zhimg.com",
-        "bcebos.com",
-        "pstatp.com"
+        "pstatp.com",
+        "ax1x.com",
+        "sohucs.com",
+        "csdnimg.cn"
     ],
     "catcherActionName": "catchimage", /* 执行抓取远程图片的action名称 */
     "catcherFieldName": "source", /* 提交的图片列表表单名称 */
