@@ -127,7 +127,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Content/common/loading.min.css");
                 bundles.AddCss("/dashboard.css")
                     .Include("/fonts/icomoon.min.css")
-                    .Include("/Assets/jedate/jedate.min.css")
+                    .Include("/Assets/jedate/jedate.css")
                     .Include("/Assets/fileupload/filestyle.min.css")
                     .Include("/Assets/select3/bundle.min.css")
                     .Include("/Content/ng-table.min.css")
@@ -174,7 +174,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Scripts/ng-table.js")
                     .Include("/Scripts/signalr.js")
                     .Include("/Assets/select3/select3-full.js")
-                    .Include("/Assets/jedate/jquery.jedate.js")
+                    .Include("/Assets/jedate/jedate.js")
                     .Include("/ng-views/app/app.config.js")
                     .Include("/ng-views/app/route.config.js")
                     .Include("/ng-views/app/angular-ueditor.js")

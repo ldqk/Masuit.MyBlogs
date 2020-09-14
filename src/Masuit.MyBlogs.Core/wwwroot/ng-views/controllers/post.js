@@ -227,8 +227,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 	$scope.post.Author = $scope.user.NickName || $scope.user.Username;
 	$scope.post.Email = $scope.user.Email;
 	$scope.getCategory = function () {
-		
-		$http.post("/category/getcategories", null).then(function (res) {
+        $http.post("/category/getcategories", null).then(function (res) {
 			
 			var data = res.data;
 			if (data.Success) {
@@ -286,13 +285,11 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 	});
 	//上传Word文档
 	$scope.upload = function() {
-		
-		$("#docform").ajaxSubmit({
+        $("#docform").ajaxSubmit({
 			url: "/Upload/UploadWord",
 			type: "post",
 			success: function(data) {
-				
-				console.log(data);
+                console.log(data);
 				if (data.Success) {
 					window.notie.alert({
 						type: 1,
@@ -315,6 +312,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 		});
 		$scope.selectFile = false;
 	}
+
 	//文件上传
 	$scope.showupload = function() {
 		layui.use("layer", function() {
@@ -327,6 +325,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 			});
 		});
 	}
+
 	//异步提交表单开始
 	$scope.submit = function(post) {
 		Object.keys(post).forEach(key => post[key] == undefined||post[key] == null ? delete post[key] : '');
@@ -344,8 +343,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 		}
 		$http.post("/Post/write", post).then(function(res) {
 			var data = res.data;
-			
-			if (data.Success) {
+            if (data.Success) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
@@ -364,11 +362,11 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 			}
 		});
 	}
-	//异步提交表单结束
+
+	// 定时发布
 	$scope.Scheduled= function() {
-		$scope.post.schedule = !$scope.post.schedule;
 		$timeout(function () {
-			$('#timespan').jeDate({
+			jeDate('#timespan',{
 				isinitVal: true,
 				festival: true,
 				isTime: true,
@@ -376,8 +374,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 				format: 'YYYY-MM-DD hh:mm:ss',
 				minDate: new Date().Format("yyyy-MM-dd 00:00:00"),
 				maxDate: '2099-06-16 23:59:59',
-				okfun: function (obj) {
-					$(obj.elem).val(obj.val);
+				donefun: function (obj) {
 					$scope.post.timespan = obj.val;
 				}
 			});

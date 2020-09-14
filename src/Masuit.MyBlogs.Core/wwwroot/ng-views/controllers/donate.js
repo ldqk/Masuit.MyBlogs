@@ -116,10 +116,10 @@
 				}
 			}
 		}).catch(swal.noop);
-		$(".date").jeDate({
+		jeDate(".date",{
 			isinitVal: true,
 			format: "YYYY-MM-DD",
-			okfun: function (elem) {
+			donefun: function (elem) {
 				$("#date").val(elem.val);
 			}
 		});
