@@ -181,11 +181,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                         Link = Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)
                     });
                 }
-#if !DEBUG
                 if (msg.ParentId == 0)
                 {
                     //新评论，只通知博主
-                    BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言：", content.Set("link", Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)).Render(false), email));
+                    BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言：", content.Set("link", Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)).Render(false), email, ClientIP));
                 }
                 else
                 {
@@ -195,17 +194,16 @@ namespace Masuit.MyBlogs.Core.Controllers
                     string link = Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme);
                     foreach (var s in emails)
                     {
-                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(false), s));
+                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(false), s, ClientIP));
                     }
                 }
-#endif
                 return ResultData(null, true, "留言发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将会显示到列表中！");
             }
 
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言(待审核)：", content.Set("link", Url.Action("Index", "Msg", new
             {
                 cid = msg.Id
-            }, Request.Scheme)).Render(false) + "<p style='color:red;'>(待审核)</p>", email));
+            }, Request.Scheme)).Render(false) + "<p style='color:red;'>(待审核)</p>", email, ClientIP));
             return ResultData(null, true, "留言发表成功，待站长审核通过以后将显示到列表中！");
         }
 
@@ -220,16 +218,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             var msg = await LeaveMessageService.GetByIdAsync(id);
             msg.Status = Status.Published;
             bool b = await LeaveMessageService.SaveChangesAsync() > 0;
-#if !DEBUG
             var pid = msg.ParentId == 0 ? msg.Id : LeaveMessageService.GetParentMessageIdByChildId(id);
             var content = new Template(await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html"))).Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
             var emails = LeaveMessageService.GetSelfAndAllChildrenMessagesByParentId(pid).Select(c => c.Email).Except(new List<string> { msg.Email, CurrentUser.Email }).ToHashSet();
             var link = Url.Action("Index", "Msg", new { cid = pid }, Request.Scheme);
             foreach (var s in emails)
             {
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(false), s));
+                BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(false), s, ClientIP));
             }
-#endif
+
             return ResultData(null, b, b ? "审核通过！" : "审核失败！");
         }
 

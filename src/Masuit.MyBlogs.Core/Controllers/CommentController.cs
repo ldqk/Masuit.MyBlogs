@@ -117,7 +117,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                         Link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment"
                     });
                 }
-#if !DEBUG
                 if (comment.ParentId == 0)
                 {
                     emails.Add(post.Email);
@@ -125,7 +124,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     //新评论，只通知博主和楼主
                     foreach (var s in emails)
                     {
-                        BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false), s));
+                        BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false), s, ClientIP));
                     }
                 }
                 else
@@ -138,16 +137,15 @@ namespace Masuit.MyBlogs.Core.Controllers
                     string link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment";
                     foreach (var s in emails)
                     {
-                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), s));
+                        BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), s, ClientIP));
                     }
                 }
-#endif
                 return ResultData(null, true, "评论发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将显示到评论列表中");
             }
 
             foreach (var s in emails)
             {
-                BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论(待审核)：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false) + "<p style='color:red;'>(待审核)</p>", s));
+                BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论(待审核)：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false) + "<p style='color:red;'>(待审核)</p>", s, ClientIP));
             }
 
             return ResultData(null, true, "评论成功，待站长审核通过以后将显示");
@@ -250,7 +248,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (b)
             {
                 var pid = comment.ParentId == 0 ? comment.Id : CommentService.GetParentCommentIdByChildId(id);
-#if !DEBUG
                 var content = new Template(await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")))
                     .Set("title", post.Title)
                     .Set("time", DateTime.Now.ToTimeZoneF(HttpContext.Session.Get<string>(SessionKey.TimeZone)))
@@ -264,9 +261,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }, Request.Scheme) + "#comment";
                 foreach (var email in emails)
                 {
-                    BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), email));
+                    BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), email, ClientIP));
                 }
-#endif
                 return ResultData(null, true, "审核通过！");
             }
 

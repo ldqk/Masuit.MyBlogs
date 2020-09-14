@@ -26,6 +26,7 @@
             </td>
             <td title="'作者邮箱'">
                 {{row.Email}}
+                <button class="badge btn btn-primary" ng-click="addToBlock(row)">标记为恶意提交</button>
             </td>
             <td title="'标签'">
                 {{row.Label}}

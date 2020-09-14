@@ -321,6 +321,16 @@ myApp.config([
                     }
                 ]
             }
+        }).state("sendbox", {
+            url: "/system/sendbox",
+            templateUrl: vpath + "/system/sendbox.html",
+            controller: "sendbox as list",
+            resolve: {
+                deps: ["$ocLazyLoad", function($ocLazyLoad) {
+                        return $ocLazyLoad.load([cpath + "/system.js"]);
+                    }
+                ]
+            }
         }).state("search", {
             url: "/search",
             templateUrl: vpath + "/analysis/search.html",

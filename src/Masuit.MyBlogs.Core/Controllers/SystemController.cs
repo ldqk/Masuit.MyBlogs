@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -245,6 +246,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             MyHub.PerformanceCounter.Clear();
             return Ok();
+        }
+
+        /// <summary>
+        /// 发件箱记录
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult<List<JObject>> SendBox()
+        {
+            return RedisHelper.Keys("Email:*").SelectMany(key => RedisHelper.SMembers(key).Select(JObject.Parse)).ToList();
         }
 
         #region 网站防火墙

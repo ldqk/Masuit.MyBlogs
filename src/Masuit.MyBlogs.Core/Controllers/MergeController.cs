@@ -111,7 +111,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             string link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id;
             string content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/merge-pass.html")).Set("link", link).Set("title", merge.Post.Title).Render();
-            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已通过", content, merge.ModifierEmail));
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已通过", content, merge.ModifierEmail, "127.0.0.1"));
             return ResultData(null, true, "文章合并完成！");
         }
 
@@ -148,7 +148,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id + "/merge/" + id;
             var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/merge-reject.html")).Set("link", link).Set("title", merge.Post.Title).Set("reason", reason).Render();
-            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已被拒绝", content, merge.ModifierEmail));
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已被拒绝", content, merge.ModifierEmail, "127.0.0.1"));
             return ResultData(null, true, "合并已拒绝！");
         }
 

@@ -257,6 +257,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "验证码错误！");
             }
 
+            if (PostService.Any(p => p.Status == Status.Forbidden && p.Email == post.Email))
+            {
+                return ResultData(null, false, "由于您曾经恶意投稿，该邮箱已经被标记为黑名单，无法进行投稿，如有疑问，请联系网站管理员进行处理。");
+            }
+
             var match = Regex.Match(post.Title + post.Author + post.Content, CommonHelper.BanRegex);
             if (match.Success)
             {
@@ -288,7 +293,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 .Set("link", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
                 .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Set("title", p.Title).Render();
-            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, CommonHelper.SystemSettings["ReceiveEmail"], ClientIP));
             return ResultData(p.Mapper<PostDto>(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
         }
 
@@ -387,7 +392,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var token = SnowFlake.GetInstance().GetUniqueShortId(6);
             RedisHelper.Set("token:" + email, token, 86400);
-            BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email));
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, ClientIP));
             RedisHelper.Set("get:" + email, token, 120);
             return ResultData(null);
 
@@ -493,7 +498,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Link = "#/merge/compare?id=" + merge.Id
             });
             var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/merge-request.html")).Set("title", post.Title).Set("link", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id).Render();
-            BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"], ClientIP));
             return ResultData(null, true, "您的修改请求已提交，已进入审核状态，感谢您的参与！");
         }
 
@@ -954,6 +959,20 @@ namespace Masuit.MyBlogs.Core.Controllers
             return RedirectToAction("Details", new { id });
         }
 
+        /// <summary>
+        /// 标记为恶意修改
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [MyAuthorize]
+        [HttpPost("post/block/{id}")]
+        public async Task<ActionResult> Block(int id)
+        {
+            var merge = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            merge.Status = Status.Forbidden;
+            var b = await PostService.SaveChangesAsync() > 0;
+            return b ? ResultData(null, true, "操作成功！") : ResultData(null, false, "操作失败！");
+        }
         #endregion
     }
 }

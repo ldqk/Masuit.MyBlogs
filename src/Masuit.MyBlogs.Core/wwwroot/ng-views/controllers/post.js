@@ -874,7 +874,34 @@ myApp.controller("postpending", ["$scope", "$http", "NgTableParams", "$timeout",
 		}, 500);
 	}
 	
-
+	$scope.addToBlock= function(row) {
+		swal({
+			title: "确认添加恶意名单吗？",
+			text: "将"+row.Email+"添加到恶意名单",
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "确定",
+			cancelButtonText: "取消",
+			animation: true,
+			allowOutsideClick: false,
+			showLoaderOnConfirm: true,
+			preConfirm: function () {
+				return new Promise(function (resolve, reject) {
+					$http.post("/post/block/"+row.Id).then(function(res) {
+						resolve(res.data);
+					}, function() {
+						reject("请求服务器失败！");
+					});
+				});
+			}
+		}).then(function (data) {
+			if (data.Success) {
+				swal("添加成功",'','success');
+			} else {
+				swal("添加失败",'','error');
+			}
+		}).catch(swal.noop);
+	}
 }]);
 
 myApp.controller("share", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
