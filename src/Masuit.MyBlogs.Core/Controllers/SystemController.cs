@@ -254,7 +254,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult<List<JObject>> SendBox()
         {
-            return RedisHelper.Keys("Email:*").SelectMany(key => RedisHelper.SMembers(key).Select(JObject.Parse)).ToList();
+            return RedisHelper.Keys("Email:*").SelectMany(key => RedisHelper.SMembers(key).Select(JObject.Parse)).Reverse().ToList();
         }
 
         #region 网站防火墙
