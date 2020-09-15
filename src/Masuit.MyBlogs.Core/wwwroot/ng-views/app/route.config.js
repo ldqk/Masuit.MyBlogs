@@ -341,7 +341,7 @@ myApp.config([
                             {
                                 files: [
                                     "/assets/jedate/jedate.min.css", "/Assets/semantic/semantic.css",
-                                    "/assets/jedate/jquery.jedate.min.js", "/Scripts/boost.js",
+                                    "/assets/jedate/jedate.js", "/Scripts/boost.js",
                                     "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"
                                 ],
                                 cache: true
@@ -428,7 +428,7 @@ myApp.config([
                 deps: ["$ocLazyLoad", function($ocLazyLoad) {
                         return $ocLazyLoad.load([
                             {
-                                files: ["/assets/jedate/jedate.min.css", "/assets/jedate/jquery.jedate.min.js"],
+                                files: ["/assets/jedate/jedate.min.css", "/assets/jedate/jedate.js"],
                                 cache: true
                             }, cpath + "/donate.js"
                         ]);
