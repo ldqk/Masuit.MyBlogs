@@ -88,7 +88,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Set("ip", record.IP)
                 .Set("address", record.PhysicAddress).Render();
-            CommonHelper.SendMail(_settingService.Get(s => s.Name.Equals("Title")).Value + "账号登录通知", content, _settingService.Get(s => s.Name.Equals("ReceiveEmail")).Value);
+            CommonHelper.SendMail(_settingService.Get(s => s.Name.Equals("Title")).Value + "账号登录通知", content, _settingService.Get(s => s.Name.Equals("ReceiveEmail")).Value, "127.0.0.1");
         }
 
         /// <summary>

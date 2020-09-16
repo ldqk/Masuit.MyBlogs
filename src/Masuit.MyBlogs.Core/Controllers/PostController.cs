@@ -62,6 +62,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Details(int id, string kw)
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
+            CheckPermission(post);
             ViewBag.Keyword = post.Keyword + "," + post.Label;
             var modifyDate = post.ModifyDate;
             ViewBag.Next = PostService.GetFromCache<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate);
@@ -96,6 +97,28 @@ namespace Masuit.MyBlogs.Core.Controllers
             return View(post);
         }
 
+        private void CheckPermission(Post post)
+        {
+            var location = ClientIP.GetIPLocation();
+            switch (post.LimitMode)
+            {
+                case PostLimitMode.AllowRegion:
+                    if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
+                    {
+                        throw new NotFoundException("文章未找到");
+                    }
+
+                    break;
+                case PostLimitMode.ForbidRegion:
+                    if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
+                    {
+                        throw new NotFoundException("文章未找到");
+                    }
+
+                    break;
+            }
+        }
+
         /// <summary>
         /// 文章历史版本
         /// </summary>
@@ -107,6 +130,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> History(int id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
+            CheckPermission(post);
             ViewBag.Primary = post;
             var list = PostHistoryVersionService.GetPages(page, size, v => v.PostId == id, v => v.ModifyDate, false);
             foreach (var item in list.Data)
@@ -127,7 +151,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "hid" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> HistoryVersion(int id, int hid)
         {
-            var post = await PostHistoryVersionService.GetAsync(v => v.Id == hid) ?? throw new NotFoundException("文章未找到");
+            var post = await PostHistoryVersionService.GetAsync(v => v.Id == hid && (v.Post.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
+            CheckPermission(post.Post);
             var next = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
             var prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
             ViewBag.Next = next;
@@ -147,6 +172,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
+            CheckPermission(post);
             var main = post.Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
             var left = v1 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
             var right = v2 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
@@ -231,6 +257,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "验证码错误！");
             }
 
+            if (PostService.Any(p => p.Status == Status.Forbidden && p.Email == post.Email))
+            {
+                return ResultData(null, false, "由于您曾经恶意投稿，该邮箱已经被标记为黑名单，无法进行投稿，如有疑问，请联系网站管理员进行处理。");
+            }
+
             var match = Regex.Match(post.Title + post.Author + post.Content, CommonHelper.BanRegex);
             if (match.Success)
             {
@@ -262,7 +293,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 .Set("link", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
                 .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Set("title", p.Title).Render();
-            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, CommonHelper.SystemSettings["ReceiveEmail"], ClientIP));
             return ResultData(p.Mapper<PostDto>(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
         }
 
@@ -361,7 +392,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var token = SnowFlake.GetInstance().GetUniqueShortId(6);
             RedisHelper.Set("token:" + email, token, 86400);
-            BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email));
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, ClientIP));
             RedisHelper.Set("get:" + email, token, 120);
             return ResultData(null);
 
@@ -467,7 +498,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Link = "#/merge/compare?id=" + merge.Id
             });
             var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/merge-request.html")).Set("title", post.Title).Set("link", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id).Render();
-            BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"]));
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"], ClientIP));
             return ResultData(null, true, "您的修改请求已提交，已进入审核状态，感谢您的参与！");
         }
 
@@ -590,7 +621,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
+        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
         {
             Expression<Func<Post, bool>> where = p => true;
             if (cid.HasValue)
@@ -603,7 +634,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(kw) || p.Author.Contains(kw) || p.Email.Contains(kw) || p.Label.Contains(kw) || p.Content.Contains(kw));
             }
 
-            var list = await PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDataModel>(page, size, MapperConfig);
+            var list = PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToPagedList<Post, PostDataModel>(page, size, MapperConfig);
             foreach (var item in list.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -651,7 +682,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
             if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
             {
-                return ResultData(null, message: "请选择一个分类");
+                return ResultData(null, false, "请选择一个分类");
+            }
+
+            if (post.LimitMode > 0 && string.IsNullOrEmpty(post.Regions))
+            {
+                return ResultData(null, false, "请输入投放的地区");
             }
 
             if (string.IsNullOrEmpty(post.Label?.Trim()) || post.Label.Equals("null"))
@@ -923,6 +959,20 @@ namespace Masuit.MyBlogs.Core.Controllers
             return RedirectToAction("Details", new { id });
         }
 
+        /// <summary>
+        /// 标记为恶意修改
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [MyAuthorize]
+        [HttpPost("post/block/{id}")]
+        public async Task<ActionResult> Block(int id)
+        {
+            var merge = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            merge.Status = Status.Forbidden;
+            var b = await PostService.SaveChangesAsync() > 0;
+            return b ? ResultData(null, true, "操作成功！") : ResultData(null, false, "操作失败！");
+        }
         #endregion
     }
 }

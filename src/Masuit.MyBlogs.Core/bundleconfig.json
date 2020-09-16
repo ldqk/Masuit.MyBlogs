@@ -112,5 +112,23 @@
     "inputFiles": [
       "wwwroot/ng-views/app/route.config.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/ng-views/controllers/analysis.min.js",
+    "inputFiles": [
+      "wwwroot/ng-views/controllers/analysis.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/Assets/jedate/jedate.min.css",
+    "inputFiles": [
+      "wwwroot/Assets/jedate/jedate.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/Assets/jedate/jedate.min.js",
+    "inputFiles": [
+      "wwwroot/Assets/jedate/jedate.js"
+    ]
   }
 ]

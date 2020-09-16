@@ -208,7 +208,6 @@ namespace Masuit.MyBlogs.Core
             });
             app.UseSession().UseCookiePolicy().UseMiniProfiler(); //注入Session
             app.UseRequestIntercept(); //启用网站请求拦截
-            app.UseStaticHttpContext(); //注入静态HttpContext对象
 
             app.UseHangfireServer().UseHangfireDashboard("/taskcenter", new DashboardOptions()
             {
@@ -218,6 +217,7 @@ namespace Masuit.MyBlogs.Core
                 }
             }); //配置hangfire
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
+            app.UseActivity();// 抽奖活动
             app.UseRouting(); // 放在 UseStaticFiles 之后
             app.UseEndpoints(endpoints =>
             {

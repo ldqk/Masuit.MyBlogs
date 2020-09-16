@@ -1,0 +1,25 @@
+﻿<div class="row">
+    <div class="card">
+        <div class="listview lv-bordered lv-lg">
+            <div class="lv-header-alt clearfix">
+                <h2 class="lvh-label hidden-xs" style="font-size: 20px">发件箱</h2>
+            </div>
+
+            <div class="lv-body">
+                <div class="lv-item media" ng-repeat="m in Mails">
+                    <div class="media-body">
+                            <h2 class="lv-title">{{m.title}}</h2>
+                            <small class="lv-small" ng-bind-html="m.content|htmlString"></small>
+                        <ul class="lv-attrs">
+                            <li>收件人：{{m.tos}}</li>
+                            <li>发送日期：{{m.time|date:'yyyy-MM-dd HH:mm:ss'}}</li>
+                            <li>
+                                <a ng-click="addToBlackList(m.clientip)">请求IP：{{m.clientip}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

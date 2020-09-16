@@ -201,7 +201,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="content">内容</param>
         /// <param name="tos">收件人</param>
         [AutomaticRetry(Attempts = 1, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        public static void SendMail(string title, string content, string tos)
+        public static void SendMail(string title, string content, string tos, string clientip)
         {
 #if !DEBUG
             new Email()
@@ -216,6 +216,8 @@ namespace Masuit.MyBlogs.Core.Common
                 Tos = tos
             }.Send();
 #endif
+            RedisHelper.SAdd($"Email:{DateTime.Now:yyyyMMdd}", new { title, content, tos, time = DateTime.Now, clientip });
+            RedisHelper.Expire($"Email:{DateTime.Now:yyyyMMdd}", 86400);
         }
 
         /// <summary>

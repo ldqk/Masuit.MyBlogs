@@ -76,5 +76,15 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 禁止转载
         /// </summary>
         public bool DisableCopy { get; set; }
+
+        /// <summary>
+        /// 限制模式
+        /// </summary>
+        public PostLimitMode? LimitMode { get; set; }
+
+        /// <summary>
+        /// 地区，逗号分隔
+        /// </summary>
+        public string Regions { get; set; }
     }
 }

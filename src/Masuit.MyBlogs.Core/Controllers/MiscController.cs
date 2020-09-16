@@ -54,10 +54,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("donate")]
-        public ActionResult Donate()
+        public async Task<ActionResult> Donate()
         {
             ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage);
-            return CurrentUser.IsAdmin ? View("Donate_Admin") : View();
+            var text = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "donate.html"));
+            return CurrentUser.IsAdmin ? View("Donate_Admin", text) : View(model: text);
         }
 
         /// <summary>
@@ -87,9 +88,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("about"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
-        public ActionResult About()
+        public async Task<ActionResult> About()
         {
-            return View();
+            var text = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "about.html"));
+            return View(model: text);
         }
 
         /// <summary>
@@ -97,9 +99,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("agreement"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
-        public ActionResult Agreement()
+        public async Task<ActionResult> Agreement()
         {
-            return View();
+            var text = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "agreement.html"));
+            return View(model: text);
         }
 
         /// <summary>
@@ -107,9 +110,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("disclaimer"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
-        public ActionResult Disclaimer()
+        public async Task<ActionResult> Disclaimer()
         {
-            return View();
+            var text = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "disclaimer.html"));
+            return View(model: text);
         }
 
         /// <summary>
@@ -200,7 +204,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 misc.PostDate = misc.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             }
 
-            return ResultData(misc.MapTo<MiscDto>());
+            return ResultData(misc.Mapper<MiscDto>());
         }
     }
 }

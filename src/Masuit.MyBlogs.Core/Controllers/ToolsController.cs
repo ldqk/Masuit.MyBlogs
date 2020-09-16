@@ -1,13 +1,15 @@
-﻿using System;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
+using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using TimeZoneConverter;
 
 #if DEBUG
 #endif
@@ -39,19 +41,37 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 ip = ClientIP;
             }
-            ViewBag.IP = ip;
-            PhysicsAddress address = await ip.GetPhysicsAddressInfo();
-            if (address != null && address.Status == 0)
+
+            if (ip.IsPrivateIP())
             {
-                address.AddressResult.Pois.Add(new Pois()
-                {
-                    AddressDetail = ip.GetIPLocation() + "（本地数据库）"
-                });
+                return Ok("内网IP");
             }
+
+            ViewBag.IP = ip;
+            var location = CommonHelper.MaxmindReader.City(ip).Location;
+            var address = await ip.GetPhysicsAddressInfo() ?? new PhysicsAddress()
+            {
+                Status = 0,
+                AddressResult = new AddressResult()
+                {
+                    AddressComponent = new AddressComponent(),
+                    FormattedAddress = ip.GetIPLocation(),
+                    Location = new Location()
+                    {
+                        Lng = location.Longitude.Value,
+                        Lat = location.Latitude.Value
+                    }
+                }
+            };
+            address.AddressResult.Pois.Add(new Pois
+            {
+                AddressDetail = $"{ip.GetIPLocation()}（UTC{TZConvert.GetTimeZoneInfo(location.TimeZone).BaseUtcOffset.Hours:+#;-#;0}，本地数据库）"
+            });
             if (Request.Method.Equals(HttpMethods.Get))
             {
                 return View(address);
             }
+
             return Json(address);
         }
 

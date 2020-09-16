@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Masuit.MyBlogs.Core.Models.Entity;
+using System;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
 {
@@ -121,6 +122,16 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 每日平均访问量
         /// </summary>
         public double AverageViewCount { get; set; }
+
+        /// <summary>
+        /// 限制模式
+        /// </summary>
+        public PostLimitMode? LimitMode { get; set; }
+
+        /// <summary>
+        /// 地区，逗号分隔
+        /// </summary>
+        public string Regions { get; set; }
 
     }
 }

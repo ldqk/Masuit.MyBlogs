@@ -113,6 +113,12 @@
                                         </div>
                                     </div>
                                 </div>
+                                @if (Model.LimitMode > 0)
+                                {
+                                    <div class="col-md-12 text-red">
+                                        本文 @Model.LimitMode.GetDescription()：@Model.Regions
+                                    </div>
+                                }
                             </div>
                             @if (DateTime.Now - Model.ModifyDate > TimeSpan.FromDays(365))
                             {

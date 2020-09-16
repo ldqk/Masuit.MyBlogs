@@ -30,7 +30,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             string code = SnowFlake.GetInstance().GetUniqueShortId(6);
             await RedisHelper.SetAsync("code:" + email, code, 86400);
-            BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{code}</span>，有效期为24h，请按时使用！", email));
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{code}</span>，有效期为24h，请按时使用！", email, ClientIP));
             await RedisHelper.SetAsync("get:" + email, code, 120);
 #if !DEBUG
             return ResultData(null, true, "验证码发送成功！");

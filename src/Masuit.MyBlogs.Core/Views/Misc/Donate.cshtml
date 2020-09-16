@@ -1,6 +1,5 @@
-﻿@using Masuit.MyBlogs.Core.Common
+﻿@model string
 @using Masuit.MyBlogs.Core.Models.Entity
-@model List<Masuit.MyBlogs.Core.Models.Entity.Donate>
 
 @{
     ViewBag.Title = "网站打赏";
@@ -52,7 +51,7 @@
         </p>
     </div>
 </div>
-@Html.Raw(CommonHelper.SystemSettings.GetOrAdd("DonateHtml", ""))
+@Html.Raw(Model)
 <div class="container-fluid" ng-app="myApp" ng-controller="home as list">
     <div class="page-header margin-clear">
         <h2 class="size24">
