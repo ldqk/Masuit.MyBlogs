@@ -71,7 +71,14 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 日均点击量
         /// </summary>
-        public int AverageViewCount => (int)(ViewCount * 1.0 / (DateTime.Now - CreateTime).TotalDays);
+        public int AverageViewCount
+        {
+            get
+            {
+                var month = DateTime.Today.AddDays(-DateTime.Today.Day);
+                return (int)(ViewCount * 1.0 / ((CreateTime > month ? CreateTime : DateTime.Now) - month).TotalDays);
+            }
+        }
 
         public string CategoryIds { get; set; }
         public string CategoryNames { get; set; }

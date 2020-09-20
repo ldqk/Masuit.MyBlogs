@@ -18,6 +18,7 @@ namespace Masuit.MyBlogs.Core.Configs
             RecurringJob.AddOrUpdate(() => CheckLinks(), "0 */5 * * *"); //每5h检查友链
             RecurringJob.AddOrUpdate(() => EverydayJob(), Cron.Daily(5), TimeZoneInfo.Local); //每天的任务
             RecurringJob.AddOrUpdate(() => EveryweekJob(), Cron.Weekly(DayOfWeek.Monday, 5), TimeZoneInfo.Local); //每周的任务
+            RecurringJob.AddOrUpdate(() => EverymonthJob(), Cron.Monthly(1, 0, 0), TimeZoneInfo.Local); //每月的任务
             RecurringJob.AddOrUpdate(() => EveryHourJob(), Cron.Hourly); //每小时的任务
             BackgroundJob.Enqueue(() => HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.StatisticsSearchKeywords), "default"));
         }
@@ -36,6 +37,14 @@ namespace Masuit.MyBlogs.Core.Configs
         public static void EverydayJob()
         {
             HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.EverydayJob), "default");
+        }
+
+        /// <summary>
+        /// 每日任务
+        /// </summary>
+        public static void EverymonthJob()
+        {
+            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.EverymonthJob), "default");
         }
 
         /// <summary>

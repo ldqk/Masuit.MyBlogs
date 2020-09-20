@@ -35,6 +35,11 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         void EverydayJob();
 
         /// <summary>
+        /// 每月的任务
+        /// </summary>
+        void EverymonthJob();
+
+        /// <summary>
         /// 友链检查
         /// </summary>
         void CheckLinks();

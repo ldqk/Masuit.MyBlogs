@@ -2,11 +2,11 @@
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TimeZoneConverter;
@@ -35,7 +35,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="ip"></param>
         /// <returns></returns>
         [Route("ip/{ip?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "ip" }, VaryByHeader = "Cookie")]
-        public async Task<ActionResult> GetIpInfo(string ip)
+        public async Task<ActionResult> GetIpInfo([IsIPAddress] string ip)
         {
             if (string.IsNullOrEmpty(ip))
             {
