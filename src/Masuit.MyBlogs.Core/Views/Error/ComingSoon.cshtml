@@ -88,17 +88,19 @@
             statusBarAlign: 'center',
             credit: 'masuit.com'
         });
-        try {
-            $('body').ripples({
-                resolution: 512,
-                dropRadius: 20, //px
-                perturbance: 0.04,
-            });
-        }
-        catch (e) {
-            $('.error').show().text(e);
-        }
 
+        setTimeout(function () {
+            try {
+                $('body').ripples({
+                    resolution: 512,
+                    dropRadius: 20, //px
+                    perturbance: 0.04,
+                });
+            }
+            catch (e) {
+                $('.error').show().text(e);
+            }
+        }, 100);
     });
 </script>
 <script src="~/Scripts/notify.min.js"></script>
