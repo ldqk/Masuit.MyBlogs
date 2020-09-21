@@ -79,12 +79,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="https://cdn.staticfile.org/normalize/8.0.1/normalize.min.css" rel="stylesheet">
     <link href="https://cdn.staticfile.org/animate.css/3.7.0/animate.min.css" rel="stylesheet">
-    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/jquery.ripples/0.5.3/jquery.ripples.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/idiotWu/smooth-scrollbar/dist/smooth-scrollbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
+    <script src="~/Assets/catchcat/catch-the-cat.js"></script>
 </head>
-<body id="main-scrollbar" data-scrollbar>
+<body>
     <main>
         <div class="container">
             <header id="header" class="page-header text-center">
@@ -114,9 +115,7 @@
                             <li>将猫困在一个深色圆点围成的圈子里面就算成功了！</li>
                         </ul>
                     </dd>
-                    <div class="games">
-                        <embed type="application/x-shockwave-flash" width="600" height="400" src="~/Assets/shenjingmao.swf" wmode="transparent" quality="high" scale="noborder" flashvars="width=600&amp;height=400" allowscriptaccess="sameDomain"></embed>
-                    </div>
+                    <div id="games"></div>
                 </dl>
             </div>
         </div>
@@ -125,7 +124,15 @@
 </html>
 <script>
     $(document).ready(function () {
-        Scrollbar.init(document.querySelector('#main-scrollbar'));
+        window.game = new CatchTheCatGame({
+            w: 11,
+            h: 11,
+            r: 20,
+            backgroundColor: 0xffffff,
+            parent: 'games',
+            statusBarAlign: 'center',
+            credit: 'masuit.com'
+        });
         try {
             $('body').ripples({
                 resolution: 512,
