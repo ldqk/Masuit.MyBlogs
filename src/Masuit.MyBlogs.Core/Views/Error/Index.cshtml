@@ -79,11 +79,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="https://cdn.staticfile.org/normalize/8.0.1/normalize.min.css" rel="stylesheet">
     <link href="https://cdn.staticfile.org/animate.css/3.7.0/animate.min.css" rel="stylesheet">
-    <link href="https://cdn.staticfile.org/smooth-scrollbar/7.4.1/smooth-scrollbar.css" rel="stylesheet">
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/jquery.ripples/0.5.3/jquery.ripples.min.js"></script>
-    <script src="https://cdn.staticfile.org/smooth-scrollbar/7.4.1/smooth-scrollbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/idiotWu/smooth-scrollbar/dist/smooth-scrollbar.js"></script>
 </head>
 <body id="main-scrollbar" data-scrollbar>
     <main>
@@ -126,11 +125,7 @@
 </html>
 <script>
     $(document).ready(function () {
-        Scrollbar.initAll({
-            speed: 3,
-            overscrollEffect: 'bounce',
-            overscrollEffectColor: '#d2527f'
-        });
+        Scrollbar.init(document.querySelector('#main-scrollbar'));
         try {
             $('body').ripples({
                 resolution: 512,
@@ -141,16 +136,6 @@
         catch (e) {
             $('.error').show().text(e);
         }
-
-        //setInterval(function () {
-        //    var $el = $('body');
-        //    var x = Math.random() * $el.outerWidth();
-        //    var y = Math.random() * $el.outerHeight();
-        //    var dropRadius = 20;
-        //    var strength = 0.04 + Math.random() * 0.04;
-
-        //    $el.ripples('drop', x, y, dropRadius, strength);
-        //}, 400);
     });
 </script>
 <script src="~/Scripts/notify.min.js"></script>
@@ -164,17 +149,3 @@
         </script>
     }
 }
-<script>
-    (function () {
-        var bp = document.createElement('script');
-        var curProtocol = window.location.protocol.split(':')[0];
-        if (curProtocol === 'https') {
-            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-        }
-        else {
-            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-        }
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(bp, s);
-    })();
-</script>
