@@ -393,9 +393,15 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
                 $scope.$apply();
                 $timeout(function () {
                     $('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
-                    $('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
-                    $('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
-                    $('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
+                    if ($scope.post.Label) {
+                        $('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
+                    }
+                    if ($scope.post.Keyword) {
+						$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
+                    }
+                    if ($scope.post.Seminars) {
+                        $('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
+                    }
                 }, 10);
                 window.interval = setInterval(function () {
 		            localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
@@ -536,7 +542,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 		});
 	}
 
-	//异步提交表单开始
+	//发布
 	$scope.submit = function (post) {
 		Object.keys(post).forEach(key => post[key] == undefined||post[key] == null ? delete post[key] : '');
 		
@@ -602,7 +608,6 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 			}
 		});
 	}
-	//异步提交表单结束
 	
 	//检查草稿
     if (localStorage.getItem("post-draft-" + $scope.id)) {
@@ -616,9 +621,15 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
                 $scope.$apply();
                 $timeout(function () {
                     $('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
-                    $('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
-                    $('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
-                    $('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
+					if ($scope.post.Label) {
+                        $('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
+                    }
+                    if ($scope.post.Keyword) {
+						$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
+                    }
+                    if ($scope.post.Seminars) {
+                        $('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
+                    }
                 }, 10);
                 window.interval = setInterval(function () {
 			        localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));

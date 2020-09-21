@@ -27,7 +27,6 @@
 	});
 	$('.ui.dropdown.category').dropdown("set selected" , 1);
 
-    //异步提交表单开始
     $("#submit").on("click", function (e) {
         e.preventDefault();
         loading();
@@ -88,7 +87,6 @@
             }
         });
     });
-    //异步提交表单结束
     
     $("#getcode").on("click", function (e) {
         e.preventDefault();
@@ -123,6 +121,11 @@
             }
         });
     });
+
+    $("#search").on("click", function (e) {
+        e.preventDefault();
+        window.open("/s/"+$("#article").val());
+    });
 	
 	//检查草稿
 	if (localStorage.getItem("write-post-draft")) {
@@ -136,7 +139,11 @@
 				$("#article").val(post.Title);
 				ue.setContent(post.Content);
 				$('.ui.dropdown.category').dropdown('set selected', [post.CategoryId]);
-				$('.ui.dropdown.tags').dropdown('set selected', post.Label.split(","));
+                if (post.Label) {
+                    $('.ui.dropdown.tags').dropdown('set selected', post.Label.split(","));
+                }
+                $("[name='Author']").val(post.Author);
+                $("[name='Email']").val(post.Email);
                 window.interval = setInterval(function () {
 		            localStorage.setItem("write-post-draft",JSON.stringify($("#article-form").serializeObject()));
 	            },5000);

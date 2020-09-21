@@ -16,6 +16,7 @@
         <li><a asp-controller="Home" asp-action="Index">首页</a></li>
         <li class="current"><em>@ViewBag.Title</em></li>
     </ol>
+    <p class="text-red size20">投稿须知：投稿前请先站内搜索同类文章进行编辑修改操作，本页的重复投稿将不会接受，作直接删除处理！</p>
     <hr />
     <form class="form-group" id="article-form" method="post" onsubmit="return false">
         @*文章表单*@
@@ -23,6 +24,11 @@
         <div class="input-group">
             <span class="input-group-addon size18"><label for="article">文章标题：</label></span>
             <input type="text" id="article" class="form-control input-lg" name="Title" required placeholder="请输入文章标题">
+            <span class="input-group-btn">
+                <button type="button" id="search" class="btn btn-info btn-lg">
+                    检索同类资源
+                </button>
+            </span>
         </div>
         <!-- 加载编辑器的容器 -->
         <div class="form-group overlay animated bounceInDown">
