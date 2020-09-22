@@ -143,6 +143,15 @@ namespace Masuit.MyBlogs.Core
                 options.PopupShowTrivial = true;
             }).AddEntityFramework();
             services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
+            switch (Configuration["MailSender"])
+            {
+                case "Mailgun":
+                    services.AddSingleton<IMailSender, MailgunSender>();
+                    break;
+                default:
+                    services.AddSingleton<IMailSender, SmtpSender>();
+                    break;
+            }
             services.AddMapper().AddAutofac().AddMyMvc().Configure<ForwardedHeadersOptions>(options => // X-Forwarded-For
             {
                 options.ForwardLimit = null;

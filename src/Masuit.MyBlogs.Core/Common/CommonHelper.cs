@@ -4,7 +4,6 @@ using HtmlAgilityPack;
 using IP2Region;
 using Masuit.Tools;
 using Masuit.Tools.Media;
-using Masuit.Tools.Models;
 using MaxMind.GeoIP2;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -203,19 +202,20 @@ namespace Masuit.MyBlogs.Core.Common
         [AutomaticRetry(Attempts = 1, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         public static void SendMail(string title, string content, string tos, string clientip)
         {
-#if !DEBUG
-            new Email()
-            {
-                EnableSsl = bool.Parse(SystemSettings.GetOrAdd("EnableSsl", "true")),
-                Body = content,
-                SmtpServer = SystemSettings["SMTP"],
-                Username = SystemSettings["EmailFrom"],
-                Password = SystemSettings["EmailPwd"],
-                SmtpPort = SystemSettings["SmtpPort"].ToInt32(),
-                Subject = title,
-                Tos = tos
-            }.Send();
-#endif
+            //#if !DEBUG
+            //            new Email()
+            //            {
+            //                EnableSsl = bool.Parse(SystemSettings.GetOrAdd("EnableSsl", "true")),
+            //                Body = content,
+            //                SmtpServer = SystemSettings["SMTP"],
+            //                Username = SystemSettings["EmailFrom"],
+            //                Password = SystemSettings["EmailPwd"],
+            //                SmtpPort = SystemSettings["SmtpPort"].ToInt32(),
+            //                Subject = title,
+            //                Tos = tos
+            //            }.Send();
+            //#endif
+            Startup.ServiceProvider.GetRequiredService<IMailSender>().Send(title, content, tos);
             RedisHelper.SAdd($"Email:{DateTime.Now:yyyyMMdd}", new { title, content, tos, time = DateTime.Now, clientip });
             RedisHelper.Expire($"Email:{DateTime.Now:yyyyMMdd}", 86400);
         }
