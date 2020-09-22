@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Masuit.Tools.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -20,14 +21,15 @@ namespace Masuit.MyBlogs.Core.Common
         public void Send(string title, string content, string tos)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"api:{_configuration["MailgunConfig:apikey"]}")));
+            EmailAddress email = _configuration["MailgunConfig:from"];
             var form = new MultipartFormDataContent
             {
-                { new StringContent(_configuration["MailgunConfig:from"],Encoding.UTF8), "from" },
+                { new StringContent(email,Encoding.UTF8), "from" },
                 { new StringContent(tos,Encoding.UTF8), "to" },
                 { new StringContent(title,Encoding.UTF8), "subject" },
                 { new StringContent(content,Encoding.UTF8), "html" }
             };
-            _httpClient.PostAsync("https://api.mailgun.net/v3/mail.masuit.com/messages", form).Wait();
+            _httpClient.PostAsync($"https://api.mailgun.net/v3/{email.Domain}/messages", form).Wait();
         }
     }
 }
