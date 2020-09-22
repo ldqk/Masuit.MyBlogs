@@ -40,6 +40,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             var request = context.Request;
             if (!AppConfig.EnableIPDirect && request.Host.Host.MatchInetAddress() && !request.Host.Host.IsPrivateIP())
             {
+                context.Response.StatusCode = 404;
                 return;
             }
 
