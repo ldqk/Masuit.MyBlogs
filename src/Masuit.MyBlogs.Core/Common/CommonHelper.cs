@@ -199,22 +199,10 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="title">标题</param>
         /// <param name="content">内容</param>
         /// <param name="tos">收件人</param>
+        /// <param name="clientip"></param>
         [AutomaticRetry(Attempts = 1, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         public static void SendMail(string title, string content, string tos, string clientip)
         {
-            //#if !DEBUG
-            //            new Email()
-            //            {
-            //                EnableSsl = bool.Parse(SystemSettings.GetOrAdd("EnableSsl", "true")),
-            //                Body = content,
-            //                SmtpServer = SystemSettings["SMTP"],
-            //                Username = SystemSettings["EmailFrom"],
-            //                Password = SystemSettings["EmailPwd"],
-            //                SmtpPort = SystemSettings["SmtpPort"].ToInt32(),
-            //                Subject = title,
-            //                Tos = tos
-            //            }.Send();
-            //#endif
             Startup.ServiceProvider.GetRequiredService<IMailSender>().Send(title, content, tos);
             RedisHelper.SAdd($"Email:{DateTime.Now:yyyyMMdd}", new { title, content, tos, time = DateTime.Now, clientip });
             RedisHelper.Expire($"Email:{DateTime.Now:yyyyMMdd}", 86400);
@@ -225,17 +213,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        public static bool IsRobot(this HttpRequest req)
-        {
-            return req.Headers[HeaderNames.UserAgent].ToString().Contains(new[]
-            {
-                "DNSPod",
-                "Baidu",
-                "spider",
-                "Python",
-                "bot"
-            });
-        }
+        public static bool IsRobot(this HttpRequest req) => UserAgent.Parse(req.Headers[HeaderNames.UserAgent].ToString()).IsRobot;
 
         /// <summary>
         /// 清理html的img标签的除src之外的其他属性

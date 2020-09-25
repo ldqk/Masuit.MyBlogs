@@ -197,6 +197,10 @@ namespace Masuit.MyBlogs.Core.Common
             {"MJ12bot", "Majestic-12"},
             {"Uptimebot", "Uptimebot"},
             {"Sogou web spider", "Sogou Web Spider"},
+            {"TelegramBot", "Telegram Bot"},
+            {"DNSPod", "DNSPod"},
+            {"spider", "other spider"},
+            {"bot", "other bot"}
         };
 
         protected string agent;

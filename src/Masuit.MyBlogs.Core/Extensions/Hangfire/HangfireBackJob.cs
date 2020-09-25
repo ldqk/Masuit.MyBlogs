@@ -151,7 +151,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void EverydayJob()
         {
             CommonHelper.IPErrorTimes.RemoveWhere(kv => kv.Value < 100); //将访客访问出错次数少于100的移开
-            RedisHelper.IncrBy("Interview:RunningDays");
             DateTime time = DateTime.Now.AddMonths(-1);
             _searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
             TrackData.DumpLog();

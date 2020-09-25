@@ -48,10 +48,10 @@ namespace Masuit.MyBlogs.Core.Extensions
             }
 
             var ua = request.Headers[HeaderNames.UserAgent] + "";
+            var agent = UserAgent.Parse(ua);
             var blocked = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlocked", "").Split(new[] { ',', '|' }, StringSplitOptions.RemoveEmptyEntries);
             if (ua.Contains(blocked))
             {
-                var agent = UserAgent.Parse(ua);
                 AccessDeny(ip, request, $"UA黑名单({agent.Browser} {agent.BrowserVersion}/{agent.Platform})");
                 var msg = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlockedMsg", "当前浏览器不支持访问本站");
                 context.Result = new ContentResult()
@@ -68,7 +68,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 throw new AccessDenyException("访问地区限制");
             }
 
-            if (Regex.IsMatch(request.Method, "OPTIONS|HEAD", RegexOptions.IgnoreCase) || request.IsRobot())
+            if (Regex.IsMatch(request.Method, "OPTIONS|HEAD", RegexOptions.IgnoreCase) || agent.IsRobot)
             {
                 return;
             }
