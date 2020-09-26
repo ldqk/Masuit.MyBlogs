@@ -44,6 +44,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 
+            var ip = context.Connection.RemoteIpAddress.ToString();
             var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
             var requestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path);
             var match = Regex.Match(path ?? "", CommonHelper.BanRegex);
@@ -51,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             {
                 BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
                 {
-                    IP = context.Connection.RemoteIpAddress.ToString(),
+                    IP = ip,
                     RequestUrl = requestUrl,
                     Time = DateTime.Now,
                     UserAgent = request.Headers[HeaderNames.UserAgent],
@@ -92,7 +93,18 @@ namespace Masuit.MyBlogs.Core.Extensions
                     var q = request.QueryString.Value.Trim('?');
                     requestUrl = requestUrl.Replace(q, q.Split('&').Where(s => !s.StartsWith("cid") && !s.StartsWith("uid")).Join("&"));
                 }
-                TrackData.RequestLogs.AddOrUpdate(requestUrl, 1, (s, i) => i + 1);
+                TrackData.RequestLogs.AddOrUpdate(ip, new RequestLog()
+                {
+                    Count = 1,
+                    RequestUrls = { requestUrl },
+                    UserAgents = { request.Headers[HeaderNames.UserAgent] }
+                }, (s, i) =>
+                {
+                    i.UserAgents.Add(request.Headers[HeaderNames.UserAgent]);
+                    i.RequestUrls.Add(requestUrl);
+                    i.Count++;
+                    return i;
+                });
             }
 
             if (string.IsNullOrEmpty(context.Session.Get<string>(SessionKey.TimeZone)))

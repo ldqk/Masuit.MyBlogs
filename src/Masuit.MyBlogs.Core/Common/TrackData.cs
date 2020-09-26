@@ -1,32 +1,57 @@
-﻿using System;
+﻿using Masuit.Tools;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace Masuit.MyBlogs.Core.Common
 {
-    public class TrackData
+    public static class TrackData
     {
         /// <summary>
         /// 请求日志
         /// </summary>
-        public static ConcurrentDictionary<string, int> RequestLogs { get; } = new ConcurrentDictionary<string, int>();
+        public static ConcurrentDictionary<string, RequestLog> RequestLogs { get; } = new ConcurrentDictionary<string, RequestLog>();
 
         /// <summary>
         /// 刷写日志
         /// </summary>
         public static void DumpLog()
         {
-            var logPath = Path.Combine(AppContext.BaseDirectory + "logs", "req" + DateTime.Now.ToString("yyyyMMdd") + ".txt");
-            if (!File.Exists(logPath))
-            {
-                File.Create(logPath).Dispose();
-            }
+            var logPath = Path.Combine(AppContext.BaseDirectory + "logs", DateTime.Now.ToString("yyyyMMdd"), "req.txt").CreateFileIfNotExist();
+            File.WriteAllLines(logPath, RequestLogs.Values.SelectMany(g => g.RequestUrls).GroupBy(s => s).ToDictionary(x => x.Key, x => x.Count()).OrderBy(x => x.Key).ThenByDescending(x => x.Value).Select(g => g.Value + "\t" + g.Key), Encoding.UTF8);
+            File.AppendAllLines(logPath, new[] { "", $"累计处理请求数：{RequestLogs.Sum(kv => kv.Value.Count)}" });
 
-            File.WriteAllLines(logPath, RequestLogs.OrderBy(x => x.Key).ThenByDescending(x => x.Value).Select(x => x.Value + "\t" + x.Key), Encoding.UTF8);
-            File.AppendAllLines(logPath, new[] { "", $"累计处理请求数：{RequestLogs.Sum(kv => kv.Value)}" });
+            logPath = Path.Combine(AppContext.BaseDirectory + "logs", DateTime.Now.ToString("yyyyMMdd"), "ua.txt").CreateFileIfNotExist();
+            File.WriteAllLines(logPath, RequestLogs.Values.SelectMany(g => g.UserAgents).GroupBy(s => s).ToDictionary(x => x.Key, x => x.Count()).OrderBy(x => x.Key).ThenByDescending(x => x.Value).Select(g => g.Value + "\t" + g.Key), Encoding.UTF8);
+
+            logPath = Path.Combine(AppContext.BaseDirectory + "logs", DateTime.Now.ToString("yyyyMMdd"), "ip.txt").CreateFileIfNotExist();
+            File.WriteAllLines(logPath, RequestLogs.Keys.Select(s => new { s, loc = s.GetIPLocation() }).OrderBy(x => x.loc).Select(g => g.s + "\t" + g.loc), Encoding.UTF8);
+
+            logPath = Path.Combine(AppContext.BaseDirectory + "logs", DateTime.Now.ToString("yyyyMMdd"), "raw.json").CreateFileIfNotExist();
+            File.WriteAllText(logPath, RequestLogs.ToJsonString(new JsonSerializerSettings() { Formatting = Formatting.Indented }), Encoding.UTF8);
             RequestLogs.Clear();
         }
+
+        private static string CreateFileIfNotExist(this string filepath)
+        {
+            var fileInfo = new FileInfo(filepath);
+            if (!fileInfo.Exists)
+            {
+                fileInfo.Directory.Create();
+            }
+
+            return filepath;
+        }
+    }
+
+    public class RequestLog
+    {
+        public HashSet<string> UserAgents { get; } = new HashSet<string>();
+        public HashSet<string> RequestUrls { get; } = new HashSet<string>();
+        public int Count { get; set; }
     }
 }

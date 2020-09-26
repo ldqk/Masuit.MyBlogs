@@ -744,9 +744,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>删除成功</returns>
         public virtual int DeleteEntity(Expression<Func<T, bool>> where)
         {
-            var query = DataContext.Set<T>().Where(where);
-            DataContext.RemoveRange(query);
-            return DataContext.SaveChanges();
+            return DataContext.Set<T>().Where(where).Delete();
         }
 
         /// <summary>
@@ -756,9 +754,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>删除成功</returns>
         public virtual async Task<int> DeleteEntityAsync(Expression<Func<T, bool>> where)
         {
-            var query = DataContext.Set<T>().Where(where);
-            DataContext.RemoveRange(query);
-            return await DataContext.SaveChangesAsync();
+            return await DataContext.Set<T>().Where(where).DeleteAsync().ConfigureAwait(false);
         }
 
         /// <summary>
