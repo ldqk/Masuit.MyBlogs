@@ -210,8 +210,8 @@ function loadParentMsgs(data) {
 			html += `<li class="msg-list media animated fadeInRight" id='${rows[i].Id}'>
 						   <div class="media-body">
 								<article class="panel panel-info">
-									<header class="panel-heading">${startfloor}# ${rows[i].IsMaster? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows  [i].IsMaster ? `(管理员)` : ""}
-										<span class="pull-right" style="font-size: 10px;">${rows[i].PostDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span></span>
+									<header class="panel-heading">${startfloor}# ${rows[i].IsMaster? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows  [i].IsMaster ? `(管理员)` : ""} | ${rows[i].PostDate}
+										<span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span>
 									</header>
 									<div class="panel-body">
 										${rows[i].Content}
@@ -237,7 +237,7 @@ function loadMsgs(data, msg, root, depth = 0) {
 		var color = colors[depth % 5];
 		html += `<article id="${item.Id}" class="panel panel-${color}">
 						<div class="panel-heading">
-							${depth}-${floor++}# ${item.IsMaster ? `<i class="icon icon-user"></i>` : ""}${item.NickName}${item.IsMaster ? `(管理员)` : ""}<span class="pull-right" style="font-size: 10px;">${item.PostDate}<span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span>
+							${depth}-${floor++}# ${item.IsMaster ? `<i class="icon icon-user"></i>` : ""}${item.NickName}${item.IsMaster ? `(管理员)` : ""} | ${item.PostDate}<span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}
 							</span>
 						</div>
 						<div class="panel-body">

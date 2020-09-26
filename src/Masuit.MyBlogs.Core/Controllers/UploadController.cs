@@ -159,11 +159,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     var imgFile = $"{SnowFlake.NewId}.{ext}";
                     var path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "images", imgFile);
                     var dir = Path.GetDirectoryName(path);
-                    if (!Directory.Exists(dir))
-                    {
-                        Directory.CreateDirectory(dir);
-                    }
-
+                    Directory.CreateDirectory(dir);
                     await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                     await image.CopyToAsync(fs);
                     img.Attributes["src"].Value = path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/");
@@ -176,11 +172,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         private static async Task SaveFile(IFormFile file, string path)
         {
             var dir = Path.GetDirectoryName(path);
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-
+            Directory.CreateDirectory(dir);
             await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             await file.CopyToAsync(fs);
         }
@@ -297,11 +289,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
                         path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "images", filename);
                         var dir = Path.GetDirectoryName(path);
-                        if (!Directory.Exists(dir))
-                        {
-                            Directory.CreateDirectory(dir);
-                        }
-
+                        Directory.CreateDirectory(dir);
                         await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                         await file.CopyToAsync(fs);
                         break;

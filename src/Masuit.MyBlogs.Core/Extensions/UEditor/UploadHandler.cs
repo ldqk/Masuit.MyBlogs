@@ -58,10 +58,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     }
                     else
                     {
-                        if (!Directory.Exists(Path.GetDirectoryName(localPath)))
-                        {
-                            Directory.CreateDirectory(Path.GetDirectoryName(localPath));
-                        }
+                        Directory.CreateDirectory(Path.GetDirectoryName(localPath));
                         File.WriteAllBytes(localPath, stream.ToArray());
                         Result.Url = savePath;
                     }

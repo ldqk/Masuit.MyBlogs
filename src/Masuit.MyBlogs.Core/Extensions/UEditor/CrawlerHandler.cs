@@ -90,12 +90,12 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
 
                 ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\') + UeditorConfig.GetString("catcherPathFormat"));
                 var mediaType = response.Content.Headers.ContentType.MediaType;
-                var stream = await response.Content.ReadAsStreamAsync();
+                await using var stream = await response.Content.ReadAsStreamAsync();
                 var savePath = Path.Combine(AppContext.BaseDirectory + "wwwroot", ServerUrl);
                 if (string.IsNullOrEmpty(Path.GetExtension(savePath)))
                 {
-                    savePath = savePath + MimeMapper.ExtTypes[mediaType];
-                    ServerUrl = ServerUrl + MimeMapper.ExtTypes[mediaType];
+                    savePath += MimeMapper.ExtTypes[mediaType];
+                    ServerUrl += MimeMapper.ExtTypes[mediaType];
                 }
 
                 var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath);
@@ -105,17 +105,9 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 }
                 else
                 {
-                    if (!Directory.Exists(Path.GetDirectoryName(savePath)))
-                    {
-                        Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-                    }
-
-                    var ms = new MemoryStream();
-                    await stream.CopyToAsync(ms);
-                    await File.WriteAllBytesAsync(savePath, ms.GetBuffer());
+                    Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+                    await File.WriteAllBytesAsync(savePath, stream.ToArray());
                 }
-                stream.Close();
-                await stream.DisposeAsync();
                 State = "SUCCESS";
             }
             catch (Exception e)
