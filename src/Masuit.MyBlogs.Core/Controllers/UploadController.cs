@@ -100,7 +100,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             try
             {
                 await using var ms = file.OpenReadStream();
-                await using var fs = new FileStream(docfile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                await using var fs = System.IO.File.Create(docfile, 1024, FileOptions.DeleteOnClose);
                 await ms.CopyToAsync(fs);
                 using var doc = WordprocessingDocument.Open(fs, true);
                 var pageTitle = file.FileName;

@@ -288,9 +288,7 @@ function commentVoteBind() {
 				}
 			}
 		});
-	}, function() {
-        window.notie.alert({ type: 3, text: "请求失败，请稍候再试！", time: 4 });
-    });
+	});
 }
 
 function bindVote() {

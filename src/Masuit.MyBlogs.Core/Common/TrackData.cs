@@ -26,7 +26,7 @@ namespace Masuit.MyBlogs.Core.Common
             File.AppendAllLines(logPath, new[] { "", $"累计处理请求数：{RequestLogs.Sum(kv => kv.Value.Count)}" });
 
             logPath = Path.Combine(AppContext.BaseDirectory + "logs", DateTime.Now.ToString("yyyyMMdd"), "ua.txt").CreateFileIfNotExist();
-            File.WriteAllLines(logPath, RequestLogs.Values.SelectMany(g => g.UserAgents).GroupBy(s => s).ToDictionary(x => x.Key, x => x.Count()).OrderBy(x => x.Key).ThenByDescending(x => x.Value).Select(g => g.Value + "\t" + g.Key), Encoding.UTF8);
+            File.WriteAllLines(logPath, RequestLogs.Values.SelectMany(g => g.UserAgents).Where(s => !string.IsNullOrEmpty(s)).GroupBy(s => s).ToDictionary(x => x.Key, x => x.Count()).OrderBy(x => x.Key).ThenByDescending(x => x.Value).Select(g => g.Value + "\t" + g.Key), Encoding.UTF8);
 
             logPath = Path.Combine(AppContext.BaseDirectory + "logs", DateTime.Now.ToString("yyyyMMdd"), "ip.txt").CreateFileIfNotExist();
             File.WriteAllLines(logPath, RequestLogs.Keys.Select(s => new { s, loc = s.GetIPLocation() }).OrderBy(x => x.loc).Select(g => g.s + "\t" + g.loc), Encoding.UTF8);

@@ -88,7 +88,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 foreach (var t in Request.Form.Files)
                 {
                     string path = Path.Combine(HostEnvironment.ContentRootPath, CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/'), destination.TrimStart('\\', '/'), t.FileName);
-                    using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    using var fs = new FileStream(path, FileMode.Create, FileAccess.ReadWrite);
                     t.CopyTo(fs);
                 }
             }
@@ -104,7 +104,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult Handle([FromBody]FileRequest req)
+        public ActionResult Handle([FromBody] FileRequest req)
         {
             var list = new List<object>();
             var root = Path.Combine(HostEnvironment.ContentRootPath, CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/'));
