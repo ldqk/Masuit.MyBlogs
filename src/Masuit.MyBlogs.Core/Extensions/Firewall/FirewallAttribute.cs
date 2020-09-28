@@ -86,8 +86,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             if (times > limit * 1.2)
             {
                 CacheManager.Expire("Frequency:" + ip, ExpirationMode.Sliding, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
-                FirewallRepoter.ReportAsync(IPAddress.Parse(ip));
-                AccessDeny(ip, request, "访问频次限制，已上报至：" + FirewallRepoter.ReporterName);
+                FirewallRepoter.ReportAsync(IPAddress.Parse(ip)).ContinueWith(_ => AccessDeny(ip, request, "访问频次限制，已上报至：" + FirewallRepoter.ReporterName));
             }
 
             throw new TempDenyException("访问地区限制");

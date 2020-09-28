@@ -43,10 +43,12 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 }
             }).ContinueWith(t =>
             {
-                if (!t.Result.IsSuccessStatusCode)
+                if (t.IsFaulted || t.IsCanceled || !t.Result.IsSuccessStatusCode)
                 {
                     LogManager.Info("cloudflare请求出错");
                 }
+
+                return Task.CompletedTask;
             });
         }
     }
