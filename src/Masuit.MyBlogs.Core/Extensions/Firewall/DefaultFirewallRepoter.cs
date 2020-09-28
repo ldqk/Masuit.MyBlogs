@@ -1,10 +1,12 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 
-namespace Masuit.MyBlogs.Core.Extensions
+namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
     public class DefaultFirewallRepoter : IFirewallRepoter
     {
+        public string ReporterName { get; set; }
+
         /// <summary>
         /// 上报IP
         /// </summary>

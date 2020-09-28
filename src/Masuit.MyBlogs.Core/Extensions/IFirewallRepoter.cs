@@ -5,6 +5,8 @@ namespace Masuit.MyBlogs.Core.Extensions
 {
     public interface IFirewallRepoter
     {
+        string ReporterName { get; set; }
+
         /// <summary>
         /// 上报IP
         /// </summary>

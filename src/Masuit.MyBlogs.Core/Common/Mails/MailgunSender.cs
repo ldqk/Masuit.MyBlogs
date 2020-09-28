@@ -1,11 +1,11 @@
-﻿using Masuit.Tools.Models;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using Masuit.Tools.Models;
+using Microsoft.Extensions.Configuration;
 
-namespace Masuit.MyBlogs.Core.Common
+namespace Masuit.MyBlogs.Core.Common.Mails
 {
     public class MailgunSender : IMailSender
     {

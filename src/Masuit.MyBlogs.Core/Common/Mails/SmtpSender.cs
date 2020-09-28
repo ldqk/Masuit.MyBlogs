@@ -1,7 +1,7 @@
 ﻿using Masuit.Tools;
 using Masuit.Tools.Models;
 
-namespace Masuit.MyBlogs.Core.Common
+namespace Masuit.MyBlogs.Core.Common.Mails
 {
     public class SmtpSender : IMailSender
     {

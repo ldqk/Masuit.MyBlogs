@@ -39,6 +39,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Masuit.MyBlogs.Core.Common.Mails;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -127,6 +129,8 @@ namespace Masuit.MyBlogs.Core
             services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)); //注入HttpClient
             services.AddHttpClient<ImagebedClient>();
             services.AddHttpContextAccessor(); //注入静态HttpContext
+            services.AddMailSender(Configuration).AddFirewallReporter(Configuration);
+            services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
             services.AddMiniProfiler(options =>
             {
                 options.RouteBasePath = "/profiler";
@@ -138,31 +142,6 @@ namespace Masuit.MyBlogs.Core
                 options.PopupShowTimeWithChildren = true;
                 options.PopupShowTrivial = true;
             }).AddEntityFramework();
-            services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
-            switch (Configuration["MailSender"])
-            {
-                case "Mailgun":
-                    services.AddHttpClient<IMailSender, MailgunSender>();
-                    break;
-                default:
-                    services.AddSingleton<IMailSender, SmtpSender>();
-                    break;
-            }
-            switch (Configuration["FirewallService:type"])
-            {
-                case "Cloudflare":
-                case "cloudflare":
-                case "cf":
-                    services.AddHttpClient<IFirewallRepoter, CloudflareRepoter>().ConfigureHttpClient(c =>
-                    {
-                        c.DefaultRequestHeaders.Add("X-Auth-Email", Configuration["FirewallService:Cloudflare:AuthEmail"]);
-                        c.DefaultRequestHeaders.Add("X-Auth-Key", Configuration["FirewallService:Cloudflare:AuthKey"]);
-                    });
-                    break;
-                default:
-                    services.AddSingleton<IFirewallRepoter, DefaultFirewallRepoter>();
-                    break;
-            }
             services.AddMapper().AddAutofac().AddMyMvc().Configure<ForwardedHeadersOptions>(options => // X-Forwarded-For
             {
                 options.ForwardLimit = null;

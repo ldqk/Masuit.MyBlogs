@@ -1,4 +1,4 @@
-﻿namespace Masuit.MyBlogs.Core.Common
+﻿namespace Masuit.MyBlogs.Core.Common.Mails
 {
     public interface IMailSender
     {

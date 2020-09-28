@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace Masuit.MyBlogs.Core.Extensions
+namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
     public class CloudflareRepoter : IFirewallRepoter
     {
@@ -18,6 +18,8 @@ namespace Masuit.MyBlogs.Core.Extensions
             _httpClient = httpClient;
             _configuration = configuration;
         }
+
+        public string ReporterName { get; set; } = "cloudflare";
 
         public void Report(IPAddress ip)
         {
