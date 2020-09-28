@@ -129,7 +129,7 @@ namespace Masuit.MyBlogs.Core
             {
                 ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
             }); //注入HttpClient
-            services.AddTransient<ImagebedClient>();
+            services.AddHttpClient<ImagebedClient>();
             services.AddHttpContextAccessor(); //注入静态HttpContext
             services.AddMiniProfiler(options =>
             {
@@ -146,7 +146,7 @@ namespace Masuit.MyBlogs.Core
             switch (Configuration["MailSender"])
             {
                 case "Mailgun":
-                    services.AddSingleton<IMailSender, MailgunSender>();
+                    services.AddHttpClient<IMailSender, MailgunSender>();
                     break;
                 default:
                     services.AddSingleton<IMailSender, SmtpSender>();

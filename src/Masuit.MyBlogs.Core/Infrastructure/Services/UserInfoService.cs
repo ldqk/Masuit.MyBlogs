@@ -20,7 +20,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public UserInfo GetByUsername(string name)
         {
-            return Get(u => u.Username.Equals(name));
+            return Get(u => u.Username.Equals(name) || u.Email.Equals(name));
         }
 
         /// <summary>

@@ -28,12 +28,12 @@ namespace Masuit.MyBlogs.Core.Common
         /// <summary>
         /// 图床客户端
         /// </summary>
-        /// <param name="httpClientFactory"></param>
+        /// <param name="httpClient"></param>
         /// <param name="config"></param>
-        public ImagebedClient(IHttpClientFactory httpClientFactory, IConfiguration config)
+        public ImagebedClient(HttpClient httpClient, IConfiguration config)
         {
             _config = config;
-            _httpClient = httpClientFactory.CreateClient();
+            _httpClient = httpClient;
         }
 
         /// <summary>

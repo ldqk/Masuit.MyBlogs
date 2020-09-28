@@ -12,10 +12,10 @@ namespace Masuit.MyBlogs.Core.Common
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
 
-        public MailgunSender(IHttpClientFactory httpClient, IConfiguration configuration)
+        public MailgunSender(HttpClient httpClient, IConfiguration configuration)
         {
             _configuration = configuration;
-            _httpClient = httpClient.CreateClient();
+            _httpClient = httpClient;
         }
 
         public void Send(string title, string content, string tos)

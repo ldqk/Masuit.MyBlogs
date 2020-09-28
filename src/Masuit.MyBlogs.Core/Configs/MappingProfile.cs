@@ -64,7 +64,7 @@ namespace Masuit.MyBlogs.Core.Configs
 
             CreateMap<UserInfo, UserInfoCommand>().ReverseMap();
             CreateMap<UserInfo, UserInfoDto>();
-            CreateMap<UserInfoDto, UserInfo>().ForMember(u => u.Id, e => e.Ignore());
+            CreateMap<UserInfoDto, UserInfo>().ForMember(u => u.Id, e => e.Ignore()).ForMember(u => u.Password, e => e.Ignore()).ForMember(u => u.SaltKey, e => e.Ignore());
             CreateMap<UserInfoCommand, UserInfoDto>().ReverseMap();
 
             CreateMap<LoginRecord, LoginRecordViewModel>().ReverseMap();
