@@ -1,4 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Hubs;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -19,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,6 +36,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 系统设置
         /// </summary>
         public ISystemSettingService SystemSettingService { get; set; }
+
+        public IFirewallRepoter FirewallRepoter { get; set; }
 
         /// <summary>
         /// 获取硬件基本信息
@@ -397,6 +401,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
             CommonHelper.IPWhiteList.Remove(ip);
             await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "whitelist.txt"), string.Join(",", CommonHelper.IPWhiteList.Distinct()), Encoding.UTF8);
+            await FirewallRepoter.ReportAsync(IPAddress.Parse(ip));
             return ResultData(null);
         }
 

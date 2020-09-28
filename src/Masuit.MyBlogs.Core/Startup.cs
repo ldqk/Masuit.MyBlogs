@@ -38,7 +38,6 @@ using StackExchange.Profiling;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
@@ -125,10 +124,7 @@ namespace Masuit.MyBlogs.Core
                 Path = "lucene"
             }); // 配置7z和断点续传和Redis和Lucene搜索引擎
 
-            services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)).ConfigurePrimaryHttpMessageHandler(provider => new HttpClientHandler
-            {
-                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-            }); //注入HttpClient
+            services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)); //注入HttpClient
             services.AddHttpClient<ImagebedClient>();
             services.AddHttpContextAccessor(); //注入静态HttpContext
             services.AddMiniProfiler(options =>
@@ -150,6 +146,21 @@ namespace Masuit.MyBlogs.Core
                     break;
                 default:
                     services.AddSingleton<IMailSender, SmtpSender>();
+                    break;
+            }
+            switch (Configuration["FirewallService:type"])
+            {
+                case "Cloudflare":
+                case "cloudflare":
+                case "cf":
+                    services.AddHttpClient<IFirewallRepoter, CloudflareRepoter>().ConfigureHttpClient(c =>
+                    {
+                        c.DefaultRequestHeaders.Add("X-Auth-Email", Configuration["FirewallService:Cloudflare:AuthEmail"]);
+                        c.DefaultRequestHeaders.Add("X-Auth-Key", Configuration["FirewallService:Cloudflare:AuthKey"]);
+                    });
+                    break;
+                default:
+                    services.AddSingleton<IFirewallRepoter, DefaultFirewallRepoter>();
                     break;
             }
             services.AddMapper().AddAutofac().AddMyMvc().Configure<ForwardedHeadersOptions>(options => // X-Forwarded-For

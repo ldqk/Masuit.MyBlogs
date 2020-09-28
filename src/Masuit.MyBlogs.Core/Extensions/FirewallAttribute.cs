@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -22,6 +23,7 @@ namespace Masuit.MyBlogs.Core.Extensions
     public class FirewallAttribute : ActionFilterAttribute
     {
         public ICacheManager<int> CacheManager { get; set; }
+        public IFirewallRepoter FirewallRepoter { get; set; }
 
         /// <inheritdoc />
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -84,6 +86,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             if (times > limit * 1.2)
             {
                 CacheManager.Expire("Frequency:" + ip, ExpirationMode.Sliding, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
+                FirewallRepoter.ReportAsync(IPAddress.Parse(ip));
                 AccessDeny(ip, request, "访问频次限制");
             }
 

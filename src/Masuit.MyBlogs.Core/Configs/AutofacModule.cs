@@ -2,7 +2,6 @@
 using Hangfire;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using System.Diagnostics;
 using System.Reflection;
 
 namespace Masuit.MyBlogs.Core.Configs
