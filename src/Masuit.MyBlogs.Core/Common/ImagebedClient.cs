@@ -6,6 +6,7 @@ using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Systems;
 using Microsoft.Extensions.Configuration;
+using Polly;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,19 +56,9 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             file = SnowFlake.NewId + Path.GetExtension(file);
-            for (var i = 0; i < 3; i++)
-            {
-                try
-                {
-                    return await UploadGitlab(stream, file);
-                }
-                catch (Exception e)
-                {
-                    LogManager.Error(e);
-                }
-            }
-
-            return UploadOss(stream, file);
+            var fallbackPolicy = Policy<(string url, bool success)>.Handle<Exception>().FallbackAsync(async _ => UploadOss(stream, file));
+            var retryPolicy = Policy<(string url, bool success)>.Handle<Exception>().RetryAsync(3);
+            return await fallbackPolicy.WrapAsync(retryPolicy).ExecuteAsync(() => UploadGitlab(stream, file));
         }
 
         private readonly List<string> _failedList = new List<string>();
@@ -168,19 +159,13 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             var objectName = DateTime.Now.ToString("yyyy/MM/dd/") + file;
-            for (int i = 0; i < 3; i++)
+            var fallbackPolicy = Policy<(string url, bool success)>.Handle<Exception>().Fallback(_ => (null, false));
+            var retryPolicy = Policy<(string url, bool success)>.Handle<Exception>().Retry(3);
+            return fallbackPolicy.Wrap(retryPolicy).Execute(() =>
             {
-                try
-                {
-                    return OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, stream).HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : (null, false);
-                }
-                catch (Exception e)
-                {
-                    LogManager.Info($"图片上传到oss失败，重试{i}：" + e.Message);
-                }
-            }
-
-            return (null, false);
+                var result = OssClient.PutObject(AppConfig.AliOssConfig.BucketName, objectName, stream);
+                return result.HttpStatusCode == HttpStatusCode.OK ? (AppConfig.AliOssConfig.BucketDomain + "/" + objectName, true) : throw new Exception("上传oss失败");
+            });
         }
 
         /// <summary>

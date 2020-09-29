@@ -1,6 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.Tools.Logging;
 using Microsoft.Extensions.Configuration;
+using Polly;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -13,13 +14,14 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
 
+        public string ReporterName { get; set; } = "cloudflare";
+
+
         public CloudflareRepoter(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _configuration = configuration;
         }
-
-        public string ReporterName { get; set; } = "cloudflare";
 
         public void Report(IPAddress ip)
         {
@@ -28,10 +30,18 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
 
         public Task ReportAsync(IPAddress ip)
         {
-            return _httpClient.PostAsJsonAsync($"https://api.cloudflare.com/client/v4/zones/{_configuration["FirewallService:Cloudflare:ZoneId"]}/firewall/access_rules/rules", new
+            var scope = _configuration["FirewallService:Cloudflare:Scope"];
+            var zoneid = _configuration["FirewallService:Cloudflare:ZoneId"];
+            var fallbackPolicy = Policy.HandleInner<HttpRequestException>().FallbackAsync(_ =>
+            {
+                LogManager.Info($"cloudflare请求出错，{ip}上报失败！");
+                return Task.CompletedTask;
+            });
+            var retryPolicy = Policy.HandleInner<HttpRequestException>().RetryAsync(3);
+            return fallbackPolicy.WrapAsync(retryPolicy).ExecuteAsync(() => _httpClient.PostAsJsonAsync($"https://api.cloudflare.com/client/v4/{scope}/{zoneid}/firewall/access_rules/rules", new
             {
                 mode = "block",
-                notes = $"恶意请求IP({ip.GetIPLocation()})",
+                notes = $"恶意请求IP{ip.GetIPLocation()}",
                 configuration = new
                 {
                     target = ip.AddressFamily switch
@@ -43,13 +53,11 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 }
             }).ContinueWith(t =>
             {
-                if (t.IsFaulted || t.IsCanceled || !t.Result.IsSuccessStatusCode)
+                if (!t.Result.IsSuccessStatusCode)
                 {
-                    LogManager.Info("cloudflare请求出错");
+                    throw new HttpRequestException("请求失败");
                 }
-
-                return Task.CompletedTask;
-            });
+            }));
         }
     }
 }

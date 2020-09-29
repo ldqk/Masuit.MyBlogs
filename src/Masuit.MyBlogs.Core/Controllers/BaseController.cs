@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -15,7 +16,6 @@ using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Linq;
 using System.Net;
-using Masuit.MyBlogs.Core.Extensions.Firewall;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -149,22 +149,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="filterContext">有关当前请求和操作的信息。</param>
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
-            base.OnActionExecuted(filterContext);
-            if (filterContext.HttpContext.Request.Method.Equals("POST", StringComparison.InvariantCultureIgnoreCase))
+            if (filterContext.Result is ViewResult)
             {
-                if (filterContext.Result is ViewResult)
+                ViewBag.menus = MenuService.GetQueryFromCache<MenuDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
+                var model = new PageFootViewModel //页脚
                 {
-                    filterContext.Result = ResultData(null, false, "该URL仅支持Get请求方式", false, HttpStatusCode.MethodNotAllowed);
-                }
-                return;
+                    Links = LinksService.GetQueryFromCache<LinksDto>(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(30).ToList()
+                };
+                ViewBag.Footer = model;
             }
-
-            ViewBag.menus = MenuService.GetQueryFromCache<MenuDto>(m => m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
-            var model = new PageFootViewModel //页脚
-            {
-                Links = LinksService.GetQueryFromCache<LinksDto>(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Weight).ThenByDescending(l => new Random().Next()).Take(30).ToList()
-            };
-            ViewBag.Footer = model;
+            base.OnActionExecuted(filterContext);
         }
     }
 }

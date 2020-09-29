@@ -1,5 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -20,7 +21,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 登录授权
     /// </summary>
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [ApiExplorerSettings(IgnoreApi = true), ServiceFilter(typeof(FirewallAttribute))]
     public class PassportController : Controller
     {
         /// <summary>
