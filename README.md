@@ -141,18 +141,16 @@ angularjs
 编译需要将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目也一起clone下来，和本项目平级目录存放，才能正常编译，否则，将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目移除，通过nuget安装也是可以的。  
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/20191019/6370710386639200004363431.png)  
 #### 配置文件：
-主要需要配置的是https证书、数据库连接字符、redis、BaiduAK以及图床配置；
-![](https://git.imweb.io/guomo/imgbed/raw/master/2020/06/18/stp9vjccxgxs.png)  
+主要需要配置的是https证书、数据库连接字符、redis、BaiduAK以及图床配置，其他配置均为可选项，不配置则表示不启用；
+![](https://p.pstatp.com/origin/1381c000155b45481aeec)  
 同时，BaiduAK参与了数据库的加密，如果你没有BaiduAK，自行到百度地图开放平台申请，`免费的`。  
 如果你使用了CDN，需要配置TrueClientIPHeader选项为真实IP请求转发头，如cloudflare的叫CF-Connecting-IP。
 如果Redis不在本机，需要在配置文件中的Redis节下配置，固定为Redis，值的格式：127.0.0.1:6379,allowadmin=true，若未正确配置，将按默认值“127.0.0.1:6379,allowadmin=true,abortConnect=false”。  
 IIS：部署时必须将应用程序池的标识设置为LocalSystem，否则无法监控服务器硬件，同时需要安装.NET Core Hosting运行时环境，IIS程序池改为无托管代码。  
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbf30b6a083.jpg)  
-独立运行：配置好环境和配置文件后，可直接通过dotnet Masuit.MyBlogs.Core.dll --port 80 --sslport 443命令运行。  
+独立运行：配置好环境和配置文件后，可直接通过dotnet Masuit.MyBlogs.Core.dll命令或直接双击Masuit.MyBlogs.Core.exe运行，也可以通过nssm挂在为Windows服务运行，或者你也可以尝试在Linux下部署。  
 docker：自行爬文。  
-#### 运行参数：
-网站默认会以5000和5001端口运行，如果需要指定端口，需要在程序启动时从控制台带入参数，或者从环境变量获取  
-![](https://masuit.com/static/images/20200618/6372807437703808603501981.png)  
+
 ### 后台管理：
 - 初始用户名：masuit  
 - 初始密码：123abc@#$
