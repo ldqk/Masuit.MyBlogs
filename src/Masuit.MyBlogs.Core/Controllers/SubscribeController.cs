@@ -1,6 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
-using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
@@ -21,7 +20,6 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 订阅服务
     /// </summary>
-    [ServiceFilter(typeof(FirewallAttribute))]
     public class SubscribeController : Controller
     {
         /// <summary>

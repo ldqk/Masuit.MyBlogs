@@ -2,6 +2,7 @@
 using Hangfire;
 using HtmlAgilityPack;
 using IP2Region;
+using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.Tools;
 using Masuit.Tools.Media;
 using MaxMind.GeoIP2;
@@ -19,7 +20,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using Masuit.MyBlogs.Core.Common.Mails;
 using TimeZoneConverter;
 
 #if !DEBUG
@@ -140,6 +140,7 @@ namespace Masuit.MyBlogs.Core.Common
 
         private static readonly DbSearcher IPSearcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
         public static readonly DatabaseReader MaxmindReader = new DatabaseReader(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-City.mmdb"));
+        public static readonly DatabaseReader MaxmindAsnReader = new DatabaseReader(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-ASN.mmdb"));
 
         public static string GetIPLocation(this string ips)
         {
@@ -157,19 +158,24 @@ namespace Masuit.MyBlogs.Core.Common
                 case AddressFamily.InterNetwork when ip.IsPrivateIP():
                 case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
                     return ("内网", "内网IP");
+                case AddressFamily.InterNetworkV6 when ip.IsIPv4MappedToIPv6:
+                    ip = ip.MapToIPv4();
+                    goto case AddressFamily.InterNetwork;
                 case AddressFamily.InterNetwork:
                     var parts = IPSearcher.MemorySearch(ip.ToString())?.Region.Split('|');
                     if (parts != null)
                     {
-                        var network = parts[^1] == "0" ? "未知" : parts[^1];
+                        var asn = MaxmindAsnReader.Asn(ip);
+                        var network = parts[^1] == "0" ? asn.AutonomousSystemOrganization : parts[^1];
                         var location = parts[..^1].Where(s => s != "0").Distinct().Join("");
-                        return (location, network);
+                        return (location, network + $"(AS{asn.AutonomousSystemNumber})");
                     }
 
                     goto default;
                 default:
                     var response = MaxmindReader.City(ip);
-                    return (response.Country.Names.GetValueOrDefault("zh-CN") + response.City.Names.GetValueOrDefault("zh-CN"), "未知");
+                    var asnResp = MaxmindAsnReader.Asn(ip);
+                    return (response.Country.Names.GetValueOrDefault("zh-CN") + response.City.Names.GetValueOrDefault("zh-CN"), asnResp.AutonomousSystemOrganization + $"(AS{asnResp.AutonomousSystemNumber})");
             }
         }
 
