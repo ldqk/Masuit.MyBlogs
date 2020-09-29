@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Masuit.MyBlogs.Core.Extensions.Firewall;
+using Microsoft.AspNetCore.Builder;
 
 namespace Masuit.MyBlogs.Core.Extensions
 {

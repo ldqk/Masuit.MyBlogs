@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 
-namespace Masuit.MyBlogs.Core.Extensions
+namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
     public interface IFirewallRepoter
     {

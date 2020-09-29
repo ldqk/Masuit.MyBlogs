@@ -9,14 +9,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Net.Http.Headers;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Masuit.MyBlogs.Core.Extensions
+namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
     /// <summary>
     /// 请求拦截器

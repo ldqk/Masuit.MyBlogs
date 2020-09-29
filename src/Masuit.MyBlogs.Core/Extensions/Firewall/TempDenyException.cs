@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Masuit.MyBlogs.Core.Extensions
+namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
     public class TempDenyException : Exception
     {

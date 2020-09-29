@@ -16,6 +16,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire
 {

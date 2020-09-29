@@ -33,6 +33,7 @@ using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {

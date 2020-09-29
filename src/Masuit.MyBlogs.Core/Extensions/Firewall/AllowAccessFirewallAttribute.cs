@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-using System;
+﻿using System;
+using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Masuit.MyBlogs.Core.Extensions
+namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class AllowAccessFirewallAttribute : Attribute, IFilterFactory, IOrderedFilter

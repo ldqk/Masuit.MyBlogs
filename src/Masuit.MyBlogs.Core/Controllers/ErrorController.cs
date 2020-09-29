@@ -17,6 +17,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Web;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
