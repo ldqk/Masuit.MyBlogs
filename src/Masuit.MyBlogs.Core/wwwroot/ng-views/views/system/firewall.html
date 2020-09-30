@@ -127,6 +127,10 @@
                 <th>序号</th>
                 <th>IP</th>
                 <th>次数</th>
+                <th>地理位置</th>
+                <th>拦截开始时间</th>
+                <th>拦截截止时间</th>
+                <th>持续时长</th>
             </tr>
         </thead>
         <tbody>
@@ -137,6 +141,10 @@
                     <button class="badge btn btn-primary pull-right" ng-click="addToBlackList(item.Key)">添加到黑名单</button>
                 </td>
                 <td>{{item.Count}}</td>
+                <td>{{item.Address}}</td>
+                <td>{{item.Start|date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                <td>{{item.End|date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                <td>{{item.Continue}}</td>
             </tr>
         </tbody>
     </table>

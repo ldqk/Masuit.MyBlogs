@@ -1,11 +1,11 @@
 ﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Extensions;
-using Masuit.MyBlogs.Core.Extensions.Hangfire;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Hubs;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
+using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Hardware;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Models;
@@ -24,7 +24,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using Masuit.MyBlogs.Core.Extensions.Firewall;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -350,7 +349,20 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 interceptCount = RedisHelper.Get("interceptCount"),
                 list,
-                ranking = list.GroupBy(i => i.IP).Select(g => new { g.Key, Count = g.Count() }).OrderByDescending(a => a.Count).Take(30)
+                ranking = list.GroupBy(i => i.IP).Where(g => g.Count() > 1).Select(g =>
+                {
+                    var start = g.Min(t => t.Time);
+                    var end = g.Max(t => t.Time);
+                    return new
+                    {
+                        g.Key,
+                        g.First().Address,
+                        Start = start,
+                        End = end,
+                        Continue = start.GetDiffTime(end),
+                        Count = g.Count()
+                    };
+                }).OrderByDescending(a => a.Count).Take(30)
             });
         }
 
