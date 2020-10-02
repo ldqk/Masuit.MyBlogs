@@ -53,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Expression<Func<Advertisement, bool>> where = p => true;
             if (!string.IsNullOrEmpty(kw))
             {
-                where = where.And(p => p.Title.Contains(kw) || p.Description.Contains(kw));
+                where = where.And(p => p.Title.Contains(kw) || p.Description.Contains(kw) || p.Url.Contains(kw));
             }
 
             var list = AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ToPagedList<Advertisement, AdvertisementViewModel>(page, size, MapperConfig);

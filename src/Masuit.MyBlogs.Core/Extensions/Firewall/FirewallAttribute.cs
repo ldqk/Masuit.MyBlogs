@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Http;
@@ -87,16 +88,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             {
                 CacheManager.Expire("Frequency:" + ip, ExpirationMode.Sliding, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
                 AccessDeny(ip, request, "访问频次限制");
-                return;
             }
 
-            if (times > limit * 1.5)
-            {
-                FirewallRepoter.ReportAsync(IPAddress.Parse(ip)).ContinueWith(_ => AccessDeny(ip, request, "访问频次限制，已上报至：" + FirewallRepoter.ReporterName)).ConfigureAwait(false);
-                return;
-            }
-
-            throw new TempDenyException("访问地区限制");
+            throw new TempDenyException("访问频次限制");
         }
 
         private void AccessDeny(string ip, HttpRequest request, string remark)
@@ -110,6 +104,15 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 UserAgent = request.Headers[HeaderNames.UserAgent],
                 Remark = remark
             }));
+            var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPRequestTimes", "90").ToInt32();
+            RedisHelper.LRangeAsync<IpIntercepter>("intercept", 0, -1).ContinueWith(async t =>
+            {
+                if (t.Result.Count(x => x.IP == ip) >= 0.5 * limit)
+                {
+                    LogManager.Info($"准备上报IP{ip}到{FirewallRepoter.ReporterName}");
+                    await FirewallRepoter.ReportAsync(IPAddress.Parse(ip)).ContinueWith(_ => LogManager.Info($"访问频次限制，已上报IP{ip}至：" + FirewallRepoter.ReporterName));
+                }
+            }).ConfigureAwait(false);
         }
     }
 }
