@@ -6,10 +6,13 @@ using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.Tools;
 using Masuit.Tools.Media;
 using MaxMind.GeoIP2;
+using MaxMind.GeoIP2.Exceptions;
+using MaxMind.GeoIP2.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
+using Polly;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -165,7 +168,7 @@ namespace Masuit.MyBlogs.Core.Common
                     var parts = IPSearcher.MemorySearch(ip.ToString())?.Region.Split('|');
                     if (parts != null)
                     {
-                        var asn = MaxmindAsnReader.Asn(ip);
+                        var asn = Policy<AsnResponse>.Handle<AddressNotFoundException>().Fallback(new AsnResponse()).Execute(() => MaxmindAsnReader.Asn(ip));
                         var network = parts[^1] == "0" ? asn.AutonomousSystemOrganization : parts[^1];
                         var location = parts[..^1].Where(s => s != "0").Distinct().Join("");
                         return (location, network + $"(AS{asn.AutonomousSystemNumber})");
@@ -173,9 +176,9 @@ namespace Masuit.MyBlogs.Core.Common
 
                     goto default;
                 default:
-                    var response = MaxmindReader.City(ip);
-                    var asnResp = MaxmindAsnReader.Asn(ip);
-                    return (response.Country.Names.GetValueOrDefault("zh-CN") + response.City.Names.GetValueOrDefault("zh-CN"), asnResp.AutonomousSystemOrganization + $"(AS{asnResp.AutonomousSystemNumber})");
+                    var cityResp = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(new CityResponse()).Execute(() => MaxmindReader.City(ip));
+                    var asnResp = Policy<AsnResponse>.Handle<AddressNotFoundException>().Fallback(new AsnResponse()).Execute(() => MaxmindAsnReader.Asn(ip));
+                    return (cityResp.Country.Names.GetValueOrDefault("zh-CN") + cityResp.City.Names.GetValueOrDefault("zh-CN"), asnResp.AutonomousSystemOrganization + $"(AS{asnResp.AutonomousSystemNumber})");
             }
         }
 
@@ -187,8 +190,8 @@ namespace Masuit.MyBlogs.Core.Common
                 case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
                     return "Asia/Shanghai";
                 default:
-                    var response = MaxmindReader.City(ip);
-                    return response.Location.TimeZone ?? "Asia/Shanghai";
+                    var resp = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(new CityResponse()).Execute(() => MaxmindReader.City(ip));
+                    return resp.Location.TimeZone ?? "Asia/Shanghai";
             }
         }
 
