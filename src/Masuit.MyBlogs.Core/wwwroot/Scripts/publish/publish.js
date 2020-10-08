@@ -124,7 +124,7 @@
 
     $("#search").on("click", function (e) {
         e.preventDefault();
-        window.open("/s/"+$("#article").val());
+        window.open("/s?wd="+$("#article").val());
     });
 	
 	//检查草稿
