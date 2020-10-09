@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -34,6 +35,7 @@ using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -100,7 +102,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private void CheckPermission(Post post)
         {
-            var location = ClientIP.GetIPLocation();
+            var location = ClientIP.GetIPLocation() + "|" + Request.Headers[HeaderNames.UserAgent];
             switch (post.LimitMode)
             {
                 case PostLimitMode.AllowRegion:
