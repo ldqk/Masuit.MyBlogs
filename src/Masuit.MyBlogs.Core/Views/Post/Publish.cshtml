@@ -1,9 +1,8 @@
-﻿@model IEnumerable<string>
+﻿@model IEnumerable<Category>
 @using Masuit.MyBlogs.Core.Models.Entity
 @{
     ViewBag.Title = "投稿";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    IEnumerable<Category> cats = ViewBag.Category;
 }
 <link href="~/Assets/fileupload/filestyle.css" rel="stylesheet" />
 <link href="~/Assets/semantic/semantic.min.css" rel="stylesheet" />
@@ -35,7 +34,7 @@
             <textarea id="editor" style="height: calc(100vh - 350px);" class="ueditor" name="Content" type="text/plain"></textarea>
         </div>
         <div class="row">
-            <div class="col-md-4 col-sm-6">
+            <div class="col-md-6 col-sm-6">
                 <div class="input-group">
                     <span class="input-group-addon">分类：</span>
                     <div class="ui fluid search selection dropdown category">
@@ -43,7 +42,7 @@
                         <i class="dropdown icon"></i>
                         <div class="default text">选择分类</div>
                         <div class="menu">
-                            @foreach (var s in cats)
+                            @foreach (var s in Model)
                             {
                                 <div class="item" data-value="@s.Id">@s.Name</div>
                             }
@@ -51,26 +50,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-sm-6">
+            <div class="col-md-6 col-sm-6">
                 <div class="input-group">
                     <span class="input-group-addon"><label for="Author">作者：</label></span>
-                    <input type="text" class="form-control" id="Author" name="Author" required placeholder="投稿人真名或网名(非常重要)">
-                </div>
-            </div>
-            <div class="col-md-4 col-sm-6">
-                <div class="input-group">
-                    <span class="input-group-addon"><label for="Label">标签：</label></span>
-                    <div class="ui fluid multiple search selection dropdown tags">
-                        <input name="Label" type="hidden" id="Label">
-                        <i class="dropdown icon"></i>
-                        <div class="default text">标签(选择或输入新标签)</div>
-                        <div class="menu">
-                            @foreach (var s in Model)
-                            {
-                                <div class="item" data-value="@s">@s</div>
-                            }
-                        </div>
-                    </div>
+                    <input type="text" class="form-control" id="Author" name="Author" required placeholder="投稿人名字(非常重要)">
                 </div>
             </div>
             <div class="col-md-6 col-sm-6">

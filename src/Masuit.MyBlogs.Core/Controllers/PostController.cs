@@ -241,8 +241,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public async Task<ActionResult> Publish()
         {
-            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().ToList().SelectMany(s => s.Split(',', '，')).OrderBy(s => s).ToHashSet();
-            ViewBag.Category = await CategoryService.GetQueryFromCacheAsync(c => c.Status == Status.Available);
+            var list = await CategoryService.GetQueryFromCacheAsync(c => c.Status == Status.Available).ConfigureAwait(false);
             return View(list);
         }
 
@@ -279,7 +278,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
             post.Status = Status.Pending;
-            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes());
+            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes()).ConfigureAwait(false);
             Post p = post.Mapper<Post>();
             p.IP = ClientIP;
             p.Modifier = p.Author;
