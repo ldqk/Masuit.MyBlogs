@@ -61,8 +61,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Details(int id)
         {
             var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("页面未找到");
-            notice.ModifyDate = notice.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-            notice.PostDate = notice.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             if (!HttpContext.Session.TryGetValue("notice" + id, out _))
             {
                 notice.ViewCount += 1;
@@ -70,6 +68,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 HttpContext.Session.Set("notice" + id, notice.Title);
             }
 
+            notice.ModifyDate = notice.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            notice.PostDate = notice.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             return View(notice);
         }
 
