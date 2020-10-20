@@ -46,7 +46,11 @@
                         <div class="fg-line">
                             <input class="form-control" ng-model="Settings.BanIPTimespan" type="text" />
                         </div>
-                        <span class="input-group-addon">分钟</span>
+                        <span class="input-group-addon">分钟，拦截次数达到</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.LimitIPInterceptTimes" type="text" />
+                        </div>
+                        <span class="input-group-addon">次，上报防火墙永久冻结该IP。</span>
                     </div>
                 </div>
                 <div class="col-md-12">

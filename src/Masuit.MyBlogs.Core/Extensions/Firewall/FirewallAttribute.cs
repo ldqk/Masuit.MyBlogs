@@ -104,10 +104,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 UserAgent = request.Headers[HeaderNames.UserAgent],
                 Remark = remark
             }));
-            var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPRequestTimes", "90").ToInt32();
+            var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPInterceptTimes", "30").ToInt32();
             RedisHelper.LRangeAsync<IpIntercepter>("intercept", 0, -1).ContinueWith(async t =>
             {
-                if (t.Result.Count(x => x.IP == ip) >= 0.5 * limit)
+                if (t.Result.Count(x => x.IP == ip) >= limit)
                 {
                     LogManager.Info($"准备上报IP{ip}到{FirewallRepoter.ReporterName}");
                     await FirewallRepoter.ReportAsync(IPAddress.Parse(ip)).ContinueWith(_ => LogManager.Info($"访问频次限制，已上报IP{ip}至：" + FirewallRepoter.ReporterName));
