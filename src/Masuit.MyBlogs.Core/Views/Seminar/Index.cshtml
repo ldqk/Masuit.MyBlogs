@@ -68,10 +68,10 @@
     <div class="wrapper-content  animated bounceInUp blog">
         @if (Model.Data.Any())
         {
-            var rnd = new Random().Next(2, Model.CurrentCount);
+            var rnd = new Random().Next(Model.CurrentCount > 2 ? 2 : 0, Model.CurrentCount);
             for (var i = 0; i < Model.CurrentCount; i++)
             {
-                if (rnd == i && ad != null)
+                if (rnd > 2 && rnd == i && ad != null)
                 {
                     await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
                 }

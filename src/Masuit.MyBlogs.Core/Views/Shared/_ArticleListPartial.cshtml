@@ -8,7 +8,7 @@
             var rnd = new Random().Next(Model.Posts.CurrentCount > 2 ? 2 : 0, Model.Posts.CurrentCount);
             for (var index = 0; index < Model.Posts.CurrentCount; index++)
             {
-                if (rnd == index && Model.ListAdvertisement != null)
+                if (rnd > 2 && rnd == index && Model.ListAdvertisement != null)
                 {
                     await Html.RenderPartialAsync("_ArticleListAdvertisement", Model.ListAdvertisement);
                 }
