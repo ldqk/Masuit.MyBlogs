@@ -105,13 +105,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             }
             return CacheManager.GetOrAdd($"{count}{type}{cid}", _ =>
             {
-                var list = GetQuery(@where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, (int)a.Price)).WeightedItems(count);
-                foreach (var item in list)
+                var list = GetQuery(where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, (int)a.Price)).WeightedItems(count);
+                var ids = list.Select(a => a.Id).ToArray();
+                GetQuery(a => ids.Contains(a.Id)).UpdateFromQuery(a => new Advertisement()
                 {
-                    item.DisplayCount += 1;
-                }
+                    DisplayCount = a.DisplayCount + 1
+                });
 
-                SaveChanges();
                 return list;
             });
         }

@@ -1,5 +1,6 @@
 ﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -16,7 +17,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Masuit.MyBlogs.Core.Extensions.Firewall;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire
 {
@@ -209,17 +209,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void UpdateLinkWeight(string referer)
         {
             var uri = new Uri(referer);
-            var query = _linksService.GetQuery(l => l.Url.Contains(uri.Host));
-            if (query.Any())
+            _linksService.GetQuery(l => l.Url.Contains(uri.Host)).UpdateFromQuery(link => new Links()
             {
-                var list = query.ToList();
-                foreach (var link in list)
-                {
-                    link.Weight += 1;
-                }
-
-                _linksService.SaveChanges();
-            }
+                Weight = link.Weight + 1
+            });
         }
 
         /// <summary>
