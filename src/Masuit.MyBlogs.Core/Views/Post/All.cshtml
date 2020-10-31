@@ -1,10 +1,8 @@
-﻿@using System.Web
-@using Masuit.MyBlogs.Core.Models.ViewModel
-@using Masuit.Tools.Win32
+﻿@using Masuit.MyBlogs.Core.Models.ViewModel
 @{
     ViewBag.Title = "分类云_标签云_专题云";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    IOrderedEnumerable<IGrouping<string, string>> tags = ViewBag.tags;
+    List<IGrouping<string, string>> tags = ViewBag.tags;
     List<TagCloudViewModel> cats = ViewBag.cats;
     List<TagCloudViewModel> seminars = ViewBag.seminars;
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
