@@ -20,7 +20,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])</title>
     <meta name="keywords" content="@(CommonHelper.SystemSettings["Keyword"]+","+ViewBag.Keyword)" />
-    <meta name="description" content="@(CommonHelper.SystemSettings["Description"]+","+ViewBag.Keyword)" />
+    <meta name="description" content="@ViewBag.Desc" />
     @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Styles", ""))
     <link href="https://cdn.staticfile.org/normalize/8.0.1/normalize.min.css" rel="stylesheet" async defer>
     <link href="https://cdn.staticfile.org/limonte-sweetalert2/6.11.5/sweetalert2.min.css" rel="stylesheet" async defer>

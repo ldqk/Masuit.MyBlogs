@@ -96,6 +96,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
+            ViewBag.Desc = CommonHelper.SystemSettings["Description"];
             var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
             user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoDto>();
