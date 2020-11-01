@@ -30,13 +30,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var request = context.HttpContext.Request;
-            var ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
-            var trueip = request.Headers[AppConfig.TrueClientIPHeader].ToString();
-            if (!string.IsNullOrEmpty(trueip) && ip != trueip)
-            {
-                ip = trueip;
-            }
-
+            var ip = context.HttpContext.GetTrueIP();
             var tokenValid = request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]);
             if (ip.IsDenyIpAddress() && !tokenValid)
             {

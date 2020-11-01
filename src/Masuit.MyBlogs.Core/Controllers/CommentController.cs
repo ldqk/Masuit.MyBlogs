@@ -89,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             comment.Content = dto.Content.HtmlSantinizerStandard().ClearImgAttributes();
             comment.Browser = dto.Browser ?? Request.Headers[HeaderNames.UserAgent];
             comment.IP = ClientIP;
-            comment.Location = comment.IP.GetIPLocation();
+            comment.Location = Request.Location();
             comment = CommentService.AddEntitySaved(comment);
             if (comment == null)
             {

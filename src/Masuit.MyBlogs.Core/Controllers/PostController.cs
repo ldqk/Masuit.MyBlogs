@@ -103,7 +103,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private void CheckPermission(Post post)
         {
-            var location = ClientIP.GetIPLocation() + "|" + Request.Headers[HeaderNames.UserAgent];
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
             switch (post.LimitMode)
             {
                 case PostLimitMode.AllowRegion:

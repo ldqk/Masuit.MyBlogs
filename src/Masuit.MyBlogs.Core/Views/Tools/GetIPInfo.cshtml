@@ -1,5 +1,5 @@
 ﻿@using Masuit.Tools.Models
-@model PhysicsAddress
+@model (PhysicsAddress address, MaxMind.GeoIP2.Responses.AsnResponse asn)
 @{
     ViewBag.Title = "获取IP地址详细地理位置信息";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -32,23 +32,39 @@
             </span>
         </div>
     </form>
-    @if (Model != null && Model.Status == 0)
+    @if (Model.address != null && Model.address.Status == 0)
     {
         int count = 0;
         <table class="table table-bordered table-condensed table-hover">
             <tr>
+                <td>IP路由信息：</td>
+                <td>@Model.asn.Network?.ToString()</td>
+            </tr>
+            <tr>
+                <td>IP机房信息：</td>
+                <td>@Model.asn.AutonomousSystemOrganization</td>
+            </tr>
+            <tr>
+                <td>ASN：</td>
+                <td>@Model.asn.AutonomousSystemNumber</td>
+            </tr>
+            <tr>
+                <td>-</td>
+                <td>-</td>
+            </tr>
+            <tr>
                 <td>参考地理位置：</td>
-                <td>@Model.AddressResult.FormattedAddress</td>
+                <td>@Model.address.AddressResult.FormattedAddress</td>
             </tr>
             <tr>
                 <td>标志性商业街：</td>
-                <td>@Model.AddressResult.Business</td>
+                <td>@Model.address.AddressResult.Business</td>
             </tr>
             <tr>
                 <td>经纬度：</td>
-                <td>(经度：@(Model.AddressResult.Location?.Lng),纬度：@(Model.AddressResult.Location?.Lat))</td>
+                <td>(经度：@(Model.address.AddressResult.Location?.Lng),纬度：@(Model.address.AddressResult.Location?.Lat))</td>
             </tr>
-            @foreach (Pois poi in Model.AddressResult.Pois)
+            @foreach (Pois poi in Model.address.AddressResult.Pois)
             {
                 <tr>
                     <td>参考地理位置@(++count)：</td>
@@ -64,17 +80,17 @@
     }
 </div>
 <div class="container-fluid">
-    @if (Model != null && Model.Status == 0)
+    @if (Model.address != null && Model.address.Status == 0)
     {
         <div id="allmap"></div>
         <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=89772e94509a9b903724e247cbc175c2"></script>
         <script>
 	    var map = new BMap.Map("allmap"); // 创建Map实例,设置地图允许的最小/大级别
 
-	    map.centerAndZoom(new BMap.Point(@(Model.AddressResult.Location?.Lng), @(Model.AddressResult.Location?.Lat)), 16);
+	    map.centerAndZoom(new BMap.Point(@(Model.address.AddressResult.Location?.Lng), @(Model.address.AddressResult.Location?.Lat)), 16);
 	    map.enableScrollWheelZoom(true);
 	    map.clearOverlays();
-	    var new_point = new BMap.Point(@(Model.AddressResult.Location?.Lng), @(Model.AddressResult.Location?.Lat));
+	    var new_point = new BMap.Point(@(Model.address.AddressResult.Location?.Lng), @(Model.address.AddressResult.Location?.Lat));
 	    var marker = new BMap.Marker(new_point); // 创建标注
 	    map.addOverlay(marker); // 将标注添加到地图中
 	    marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画

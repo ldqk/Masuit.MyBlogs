@@ -5,6 +5,7 @@ using Masuit.Tools.Core.Net;
 using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Models;
 using MaxMind.GeoIP2.Exceptions;
+using MaxMind.GeoIP2.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -13,7 +14,6 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TimeZoneConverter;
-using Location = MaxMind.GeoIP2.Model.Location;
 
 #if DEBUG
 #endif
@@ -52,7 +52,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             ViewBag.IP = ip;
-            var location = Policy<Location>.Handle<AddressNotFoundException>().Fallback(() => new Location()).Execute(() => CommonHelper.MaxmindReader.City(ip).Location);
+            var location = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
+            var asn = ip.GetIPAsn();
             var address = await ip.GetPhysicsAddressInfo() ?? new PhysicsAddress()
             {
                 Status = 0,
@@ -60,23 +61,23 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     AddressComponent = new AddressComponent(),
                     FormattedAddress = ip.GetIPLocation(),
-                    Location = new Tools.Models.Location()
+                    Location = new Location()
                     {
-                        Lng = location.Longitude ?? 0,
-                        Lat = location.Latitude ?? 0
+                        Lng = location.Location.Longitude ?? 0,
+                        Lat = location.Location.Latitude ?? 0
                     }
                 }
             };
             address.AddressResult.Pois.Add(new Pois
             {
-                AddressDetail = $"{ip.GetIPLocation()}（UTC{TZConvert.GetTimeZoneInfo(location.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}，本地数据库）"
+                AddressDetail = $"{ip.GetIPLocation()}（UTC{TZConvert.GetTimeZoneInfo(location.Location.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}，本地数据库）"
             });
             if (Request.Method.Equals(HttpMethods.Get))
             {
-                return View(address);
+                return View((address, asn));
             }
 
-            return Json(address);
+            return Json(new { address, asn });
         }
 
         /// <summary>

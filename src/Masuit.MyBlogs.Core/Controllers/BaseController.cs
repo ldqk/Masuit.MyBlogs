@@ -47,19 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 客户端的真实IP
         /// </summary>
-        public string ClientIP
-        {
-            get
-            {
-                var ip = HttpContext.Connection.RemoteIpAddress.ToString();
-                var trueip = Request.Headers[AppConfig.TrueClientIPHeader].ToString();
-                if (!string.IsNullOrEmpty(trueip) && ip != trueip)
-                {
-                    ip = trueip;
-                }
-                return ip;
-            }
-        }
+        public string ClientIP => HttpContext.GetTrueIP();
 
         /// <summary>
         /// 普通访客是否token合法

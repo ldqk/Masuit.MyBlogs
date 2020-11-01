@@ -162,7 +162,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private void CheckPermission(PagedList<PostDto> posts)
         {
-            var location = ClientIP.GetIPLocation() + "|" + Request.Headers[HeaderNames.UserAgent];
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
             posts.Data.RemoveAll(p => p.LimitMode switch
             {
                 PostLimitMode.AllowRegion => !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot(),
