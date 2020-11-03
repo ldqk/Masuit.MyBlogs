@@ -332,7 +332,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="time">UTC时间</param>
         /// <param name="zone">时区id</param>
         /// <returns></returns>
-        public static DateTime ToTimeZone(this DateTime time, string zone)
+        public static DateTime ToTimeZone(this in DateTime time, string zone)
         {
             return TimeZoneInfo.ConvertTime(time, TZConvert.GetTimeZoneInfo(zone));
         }
@@ -344,7 +344,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="zone">时区id</param>
         /// <param name="format">时间格式字符串</param>
         /// <returns></returns>
-        public static string ToTimeZoneF(this DateTime time, string zone, string format = "yyyy-MM-dd HH:mm:ss")
+        public static string ToTimeZoneF(this in DateTime time, string zone, string format = "yyyy-MM-dd HH:mm:ss")
         {
             return ToTimeZone(time, zone).ToString(format);
         }
