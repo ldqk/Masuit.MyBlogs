@@ -3,6 +3,7 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -65,7 +66,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Author = new Author
                 {
                     Name = p.Author,
-                    Email = p.Email
+                    Email = p.Email.MaskEmail('*')
                 },
                 Body = p.Content.GetSummary(300, 50),
                 Categories = new List<string>
@@ -114,7 +115,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Author = new Author
                 {
                     Name = p.Author,
-                    Email = p.Email
+                    Email = p.Email.MaskEmail('*')
                 },
                 Body = p.Content.GetSummary(300, 50),
                 Categories = new List<string>
@@ -163,7 +164,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Author = new Author
                 {
                     Name = p.Author,
-                    Email = p.Email
+                    Email = p.Email.MaskEmail()
                 },
                 Body = summary,
                 Categories = new List<string>
