@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Hangfire;
-using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Repository;
@@ -11,6 +10,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Linq;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;

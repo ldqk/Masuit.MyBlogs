@@ -1,6 +1,5 @@
 ﻿using CacheManager.Core;
 using Masuit.LuceneEFCore.SearchEngine;
-using Masuit.LuceneEFCore.SearchEngine.Extensions;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
@@ -10,6 +9,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.Html;
 using Microsoft.EntityFrameworkCore.Internal;
 using PanGu;
 using PanGu.HighLight;

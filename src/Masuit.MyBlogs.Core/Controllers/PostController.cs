@@ -1,7 +1,5 @@
 ﻿using Hangfire;
-using Masuit.LuceneEFCore.SearchEngine.Extensions;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
-using Masuit.LuceneEFCore.SearchEngine.Linq;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
@@ -18,6 +16,7 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
+using Masuit.Tools.Linq;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
