@@ -197,6 +197,11 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                     {
                         link.UpdateTime = DateTime.Now;
                     }
+
+                    if (link.Status == Status.Unavailable)
+                    {
+                        link.Weight -= 1;
+                    }
                 }).Wait();
             });
             _linksService.SaveChanges();

@@ -109,6 +109,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                 case PostLimitMode.AllowRegion:
                     if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
                     {
+                        BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
+                        {
+                            IP = ClientIP,
+                            RequestUrl = $"{Request.Host}/{post.Id}",
+                            Time = DateTime.Now,
+                            UserAgent = Request.Headers[HeaderNames.UserAgent],
+                            Remark = "无权限查看该文章"
+                        }));
                         throw new NotFoundException("文章未找到");
                     }
 
@@ -116,6 +124,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                 case PostLimitMode.ForbidRegion:
                     if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
                     {
+                        BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
+                        {
+                            IP = ClientIP,
+                            RequestUrl = $"{Request.Host}/{post.Id}",
+                            Time = DateTime.Now,
+                            UserAgent = Request.Headers[HeaderNames.UserAgent],
+                            Remark = "无权限查看该文章"
+                        }));
                         throw new NotFoundException("文章未找到");
                     }
 

@@ -244,7 +244,8 @@ namespace Masuit.MyBlogs.Core
                 Console.WriteLine("正在导入自定义词库...");
                 double time = HiPerfTimer.Execute(() =>
                 {
-                    var lines = File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomKeywords.txt"));
+                    var set = ServiceProvider.GetRequiredService<DataContext>().Post.Select(p => $"{p.Title},{p.Label},{p.Keyword}").AsEnumerable().SelectMany(s => s.Split(new[] { ',', ' ', '+', '—' }, StringSplitOptions.RemoveEmptyEntries)).ToHashSet();
+                    var lines = File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomKeywords.txt")).Union(set);
                     var segmenter = new JiebaSegmenter();
                     foreach (var word in lines)
                     {
