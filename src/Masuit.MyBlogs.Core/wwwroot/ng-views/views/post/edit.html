@@ -17,7 +17,7 @@
         <div style="height: 200px;" class="ueditor" ng-model="post.ProtectContent" type="text/plain"></div>
     </div>
     <div class="row">
-        <div class="col-md-3 col-sm-6">
+        <div class="col-md-2 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">分类：</span>
                 <div class="ui fluid search selection dropdown category">
@@ -30,7 +30,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 col-sm-6">
+        <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon"><label for="Label">标签：</label></span>
                 <div class="ui fluid multiple search selection dropdown tags">
@@ -43,7 +43,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-5 col-sm-6">
+        <div class="col-md-4 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon"><label for="keyword">文章关键词：</label></span>
                 <div class="ui fluid multiple search selection dropdown keyword">
@@ -54,9 +54,7 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-5 col-sm-6">
+        <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">
                     <label>选择专题：</label>
@@ -71,48 +69,65 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-7 col-sm-6">
-            <div class="pull-right">
-                <label class="checkbox checkbox-inline m-r-20">
-                    <input type="checkbox" id="reserve" ng-model="reserve">
-                    <i class="input-helper"></i>
-                    保留历史版本
-                </label>
-                <label class="checkbox checkbox-inline m-r-20">
-                    <input type="checkbox" id="DisableCopy" ng-model="post.DisableCopy">
-                    <i class="input-helper"></i>
-                    禁止转载
-                </label>
-                <label class="checkbox checkbox-inline m-r-20">
-                    <input type="checkbox" id="DisableComment" ng-model="post.DisableComment">
-                    <i class="input-helper"></i>
-                    禁止评论
-                </label>
-                <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)">确认修改</button>
+    </div>
+    <div class="row">
+        <div class="col-md-3 col-sm-6">
+            <div class="input-group">
+                <div class="input-group-addon">
+                    <label class="checkbox checkbox-inline m-r-20">
+                        <input type="checkbox" id="reserve" ng-model="reserve">
+                        <i class="input-helper"></i>
+                        保留历史版本
+                    </label>
+                    <label class="checkbox checkbox-inline m-r-20">
+                        <input type="checkbox" id="DisableCopy" ng-model="post.DisableCopy">
+                        <i class="input-helper"></i>
+                        禁止转载
+                    </label>
+                    <label class="checkbox checkbox-inline m-r-20">
+                        <input type="checkbox" id="DisableComment" ng-model="post.DisableComment">
+                        <i class="input-helper"></i>
+                        禁止评论
+                    </label>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="input-group">
-        <span class="input-group-addon text-left">
-            <span>按地区投放：</span>
-            <label class="radio radio-inline m-r-20">
-                <input type="radio" ng-model="post.LimitMode" ng-value="1">
-                <i class="input-helper"></i>
-                指定地区可见
-            </label>
-            <label class="radio radio-inline m-r-20">
-                <input type="radio" ng-model="post.LimitMode" ng-value="2">
-                <i class="input-helper"></i>
-                指定地区不可见
-            </label>
-            <label class="radio radio-inline m-r-20">
-                <input type="radio" ng-model="post.LimitMode" ng-value="0">
-                <i class="input-helper"></i>
-                不限
-            </label>
-        </span>
-        <div class="fg-line" ng-if="post.LimitMode==1||post.LimitMode==2">
-            <input type="text" class="form-control" placeholder="江苏,苏州,移动,AS2333,DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.Regions">
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-addon" id="sizing-addon2">按地区投放：</span><select ng-model="post.LimitMode" class="form-control">
+                    <option ng-value="null">--</option>
+                    <option ng-value="0">不限</option>
+                    <option ng-value="1">指定地区可见</option>
+                    <option ng-value="2">指定地区不可见</option>
+                    <option ng-value="3">指定地区可见但排除在内的这些地区</option>
+                    <option ng-value="4">指定地区不可见但排除在内的这些地区</option>
+                </select>
+                <span class="input-group-btn" ng-if="(post.LimitMode||0)==0">
+                    <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)">确认修改</button>
+                </span>
+            </div>
+        </div>
+        <div ng-class="{true:'col-md-3',false:'col-md-6'}[post.LimitMode>2]" ng-if="post.LimitMode>0">
+            <div class="input-group">
+                <span class="input-group-addon">限制地区：</span>
+                <div class="fg-line">
+                    <input type="text" class="form-control" placeholder="江苏,苏州,移动,AS2333,DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.Regions">
+                </div>
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)" ng-if="post.LimitMode<3">确认修改</button>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-3" ng-if="post.LimitMode==3||post.LimitMode==4">
+            <div class="input-group">
+                <span class="input-group-addon">排除地区：</span>
+                <div class="fg-line">
+                    <input type="text" class="form-control" placeholder="江苏,苏州,移动,AS2333,DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.ExceptRegions">
+                </div>
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)">确认修改</button>
+                </span>
+            </div>
         </div>
     </div>
 </form>

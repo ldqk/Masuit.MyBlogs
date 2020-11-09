@@ -108,34 +108,45 @@ namespace Masuit.MyBlogs.Core.Controllers
                 case PostLimitMode.AllowRegion:
                     if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
                     {
-                        BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
-                        {
-                            IP = ClientIP,
-                            RequestUrl = $"{Request.Host}/{post.Id}",
-                            Time = DateTime.Now,
-                            UserAgent = Request.Headers[HeaderNames.UserAgent],
-                            Remark = "无权限查看该文章"
-                        }));
-                        throw new NotFoundException("文章未找到");
+                        Disallow(post);
                     }
 
                     break;
                 case PostLimitMode.ForbidRegion:
                     if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
                     {
-                        BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
-                        {
-                            IP = ClientIP,
-                            RequestUrl = $"{Request.Host}/{post.Id}",
-                            Time = DateTime.Now,
-                            UserAgent = Request.Headers[HeaderNames.UserAgent],
-                            Remark = "无权限查看该文章"
-                        }));
-                        throw new NotFoundException("文章未找到");
+                        Disallow(post);
                     }
 
                     break;
+                case PostLimitMode.AllowRegionExceptForbidRegion:
+                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                    {
+                        Disallow(post);
+                    }
+
+                    goto case PostLimitMode.AllowRegion;
+                case PostLimitMode.ForbidRegionExceptAllowRegion:
+                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                    {
+                        break;
+                    }
+
+                    goto case PostLimitMode.ForbidRegion;
             }
+        }
+
+        private void Disallow(Post post)
+        {
+            BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
+            {
+                IP = ClientIP,
+                RequestUrl = $"//{Request.Host}/{post.Id}",
+                Time = DateTime.Now,
+                UserAgent = Request.Headers[HeaderNames.UserAgent],
+                Remark = "无权限查看该文章"
+            }));
+            throw new NotFoundException("文章未找到");
         }
 
         /// <summary>
@@ -698,33 +709,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Edit(PostCommand post, bool reserve = true)
         {
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
-            if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
+            if (!ValidatePost(post, out var resultData))
             {
-                return ResultData(null, false, "请选择一个分类");
-            }
-
-            if (post.LimitMode > 0 && string.IsNullOrEmpty(post.Regions))
-            {
-                return ResultData(null, false, "请输入投放的地区");
-            }
-
-            if (string.IsNullOrEmpty(post.Label?.Trim()) || post.Label.Equals("null"))
-            {
-                post.Label = null;
-            }
-            else if (post.Label.Trim().Length > 50)
-            {
-                post.Label = post.Label.Replace("，", ",");
-                post.Label = post.Label.Trim().Substring(0, 50);
-            }
-            else
-            {
-                post.Label = post.Label.Replace("，", ",");
-            }
-
-            if (string.IsNullOrEmpty(post.ProtectContent?.RemoveHtmlTag()) || post.ProtectContent.Equals("null"))
-            {
-                post.ProtectContent = null;
+                return resultData;
             }
 
             Post p = await PostService.GetByIdAsync(post.Id);
@@ -780,28 +767,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Write(PostCommand post, DateTime? timespan, bool schedule = false)
         {
             post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
-            if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
+            if (!ValidatePost(post, out var resultData))
             {
-                return ResultData(null, message: "请选择一个分类");
-            }
-
-            if (string.IsNullOrEmpty(post.Label?.Trim()) || post.Label.Equals("null"))
-            {
-                post.Label = null;
-            }
-            else if (post.Label.Trim().Length > 50)
-            {
-                post.Label = post.Label.Replace("，", ",");
-                post.Label = post.Label.Trim().Substring(0, 50);
-            }
-            else
-            {
-                post.Label = post.Label.Replace("，", ",");
-            }
-
-            if (string.IsNullOrEmpty(post.ProtectContent?.RemoveHtmlTag()) || post.ProtectContent.Equals("null"))
-            {
-                post.ProtectContent = null;
+                return resultData;
             }
 
             post.Status = Status.Published;
@@ -848,6 +816,59 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             return ResultData(null, true, "文章发表成功！");
+        }
+
+        private bool ValidatePost(PostCommand post, out ActionResult resultData)
+        {
+            if (!CategoryService.Any(c => c.Id == post.CategoryId && c.Status == Status.Available))
+            {
+                resultData = ResultData(null, false, "请选择一个分类");
+                return false;
+            }
+
+            switch (post.LimitMode)
+            {
+                case PostLimitMode.AllowRegion:
+                case PostLimitMode.ForbidRegion:
+                    if (string.IsNullOrEmpty(post.Regions))
+                    {
+                        resultData = ResultData(null, false, "请输入限制的地区");
+                        return false;
+                    }
+
+                    break;
+                case PostLimitMode.AllowRegionExceptForbidRegion:
+                case PostLimitMode.ForbidRegionExceptAllowRegion:
+                    if (string.IsNullOrEmpty(post.ExceptRegions))
+                    {
+                        resultData = ResultData(null, false, "请输入排除的地区");
+                        return false;
+                    }
+
+                    goto case PostLimitMode.AllowRegion;
+            }
+
+            if (string.IsNullOrEmpty(post.Label?.Trim()) || post.Label.Equals("null"))
+            {
+                post.Label = null;
+            }
+            else if (post.Label.Trim().Length > 50)
+            {
+                post.Label = post.Label.Replace("，", ",");
+                post.Label = post.Label.Trim().Substring(0, 50);
+            }
+            else
+            {
+                post.Label = post.Label.Replace("，", ",");
+            }
+
+            if (string.IsNullOrEmpty(post.ProtectContent?.RemoveHtmlTag()) || post.ProtectContent.Equals("null"))
+            {
+                post.ProtectContent = null;
+            }
+
+            resultData = null;
+            return true;
         }
 
         /// <summary>

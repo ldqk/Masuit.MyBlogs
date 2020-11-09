@@ -163,11 +163,31 @@ namespace Masuit.MyBlogs.Core.Controllers
         private void CheckPermission(PagedList<PostDto> posts)
         {
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
-            posts.Data.RemoveAll(p => p.LimitMode switch
+            posts.Data.RemoveAll(p =>
             {
-                PostLimitMode.AllowRegion => !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot(),
-                PostLimitMode.ForbidRegion => location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot(),
-                _ => false
+                switch (p.LimitMode)
+                {
+                    case PostLimitMode.AllowRegion:
+                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                    case PostLimitMode.ForbidRegion:
+                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                    case PostLimitMode.AllowRegionExceptForbidRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        {
+                            return true;
+                        }
+
+                        goto case PostLimitMode.AllowRegion;
+                    case PostLimitMode.ForbidRegionExceptAllowRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        {
+                            return false;
+                        }
+
+                        goto case PostLimitMode.ForbidRegion;
+                    default:
+                        return false;
+                }
             });
             foreach (var item in posts.Data)
             {

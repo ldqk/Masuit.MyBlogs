@@ -228,8 +228,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 	$scope.post.Email = $scope.user.Email;
 	$scope.getCategory = function () {
         $http.post("/category/getcategories", null).then(function (res) {
-			
-			var data = res.data;
+            var data = res.data;
 			if (data.Success) {
 				$scope.cat = data.Data;
 				$('.ui.dropdown.category').dropdown({
@@ -365,8 +364,8 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 
 	// 定时发布
 	$scope.Scheduled= function() {
-		$timeout(function () {
-			jeDate('#timespan',{
+        if ($scope.post.schedule) {
+            jeDate('#timespan',{
 				isinitVal: true,
 				festival: true,
 				isTime: true,
@@ -378,7 +377,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 					$scope.post.timespan = obj.val;
 				}
 			});
-		}, 0);
+        }
 	}
 
 	//检查草稿

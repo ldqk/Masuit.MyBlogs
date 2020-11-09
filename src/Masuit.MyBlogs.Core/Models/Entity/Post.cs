@@ -146,9 +146,14 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public PostLimitMode? LimitMode { get; set; }
 
         /// <summary>
-        /// 地区，逗号分隔
+        /// 限制地区，逗号分隔
         /// </summary>
         public string Regions { get; set; }
+
+        /// <summary>
+        /// 限制排除地区，逗号分隔
+        /// </summary>
+        public string ExceptRegions { get; set; }
 
         /// <summary>
         /// 分类
@@ -183,9 +188,13 @@ namespace Masuit.MyBlogs.Core.Models.Entity
     {
         [Description("不限")]
         All,
-        [Description("指定地区可见")]
+        [Description("指定地区可见：{0}")]
         AllowRegion,
-        [Description("指定地区不可见")]
-        ForbidRegion
+        [Description("指定地区不可见：{0}")]
+        ForbidRegion,
+        [Description("可见地区：{0}，排除地区：{1}")]
+        AllowRegionExceptForbidRegion,
+        [Description("不可见地区：{0}，排除地区：{1}")]
+        ForbidRegionExceptAllowRegion
     }
 }

@@ -83,8 +83,13 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public PostLimitMode? LimitMode { get; set; }
 
         /// <summary>
-        /// 地区，逗号分隔
+        /// 限制地区，逗号分隔
         /// </summary>
         public string Regions { get; set; }
+
+        /// <summary>
+        /// 限制排除地区，逗号分隔
+        /// </summary>
+        public string ExceptRegions { get; set; }
     }
 }

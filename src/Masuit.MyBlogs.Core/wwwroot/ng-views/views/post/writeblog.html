@@ -74,7 +74,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-5 col-sm-6">
+        <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon"><label for="seminar">专题：</label></span>
                 <div class="ui fluid multiple search selection dropdown seminar">
@@ -87,13 +87,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="input-group" ng-if="post.schedule">
-                <span class="input-group-addon"><label for="Label">选择时间：</label></span>
-                <input type="text" class="workinput wicon" id="timespan" ng-model="post.timespan" readonly="readonly" />
-            </div>
-        </div>
-        <div class="col-md-4 text-right">
+        <div class="col-md-5 text-right">
             <div class="input-group">
                 <span class="input-group-addon">
                     <label class="checkbox checkbox-inline m-r-20">
@@ -109,35 +103,42 @@
                     <label class="checkbox checkbox-inline m-r-20">
                         <input type="checkbox" ng-model="post.schedule" ng-click="Scheduled()">
                         <i class="input-helper"></i>
-                        定时发表&nbsp;&nbsp;&nbsp;
+                        定时发表
                     </label>
                 </span>
-                <button type="button" class="btn btn-info" ng-click="submit(post)">发布</button>
+                <span class="input-group-addon" ng-if="post.schedule"><label for="Label">选择时间：</label></span>
+                <input type="text" class="workinput wicon" id="timespan" ng-model="post.timespan" readonly="readonly" ng-if="post.schedule" />
             </div>
         </div>
-    </div>
-
-    <div class="input-group">
-        <span class="input-group-addon text-left">
-            <span>按地区投放：</span>
-            <label class="radio radio-inline m-r-20">
-                <input type="radio" ng-model="post.LimitMode" ng-value="1">
-                <i class="input-helper"></i>
-                指定地区可见
-            </label>
-            <label class="radio radio-inline m-r-20">
-                <input type="radio" ng-model="post.LimitMode" ng-value="2">
-                <i class="input-helper"></i>
-                指定地区不可见
-            </label>
-            <label class="radio radio-inline m-r-20">
-                <input type="radio" ng-model="post.LimitMode" ng-value="0">
-                <i class="input-helper"></i>
-                不限
-            </label>
-        </span>
-        <div class="fg-line" ng-if="post.LimitMode==1||post.LimitMode==2">
-            <input type="text" class="form-control" placeholder="江苏,苏州,移动,AS2333,DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.Regions">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-addon" id="sizing-addon2">按地区投放：</span><select ng-model="post.LimitMode" ng-init="post.LimitMode = '0'" class="form-control">
+                    <option ng-value="0">不限</option>
+                    <option ng-value="1">指定地区可见</option>
+                    <option ng-value="2">指定地区不可见</option>
+                    <option ng-value="3">指定地区可见但排除在内的这些地区</option>
+                    <option ng-value="4">指定地区不可见但排除在内的这些地区</option>
+                </select>
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-info" ng-click="submit(post)">发布</button>
+                </span>
+            </div>
+        </div>
+        <div ng-class="{true:'col-md-6',false:'col-md-12'}[post.LimitMode>2]" ng-if="post.LimitMode>0">
+            <div class="input-group">
+                <span class="input-group-addon">限制地区：</span>
+                <div class="fg-line">
+                    <input type="text" class="form-control" placeholder="江苏,苏州,移动,AS2333,DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.Regions">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6" ng-if="post.LimitMode==3||post.LimitMode==4">
+            <div class="input-group">
+                <span class="input-group-addon">排除地区：</span>
+                <div class="fg-line">
+                    <input type="text" class="form-control" placeholder="江苏,苏州,移动,AS2333,DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.ExceptRegions">
+                </div>
+            </div>
         </div>
     </div>
 </form>
