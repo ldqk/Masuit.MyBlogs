@@ -173,7 +173,7 @@ namespace Masuit.MyBlogs.Core.Hubs
         {
             double time = DateTime.Now.GetTotalMilliseconds(); // - 28800000;
             float load = SystemInfo.CpuLoad;
-            double mem = (1 - SystemInfo.MemoryAvailable.To<double>() / SystemInfo.PhysicalMemory.To<double>()) * 100;
+            double mem = (1 - SystemInfo.MemoryAvailable.ConvertTo<double>() / SystemInfo.PhysicalMemory.ConvertTo<double>()) * 100;
 
             var read = SystemInfo.GetDiskData(DiskData.Read) / 1024;
             var write = SystemInfo.GetDiskData(DiskData.Write) / 1024;

@@ -112,8 +112,8 @@
         </div>
         <div class="col-md-4">
             <div class="input-group">
-                <span class="input-group-addon" id="sizing-addon2">按地区投放：</span><select ng-model="post.LimitMode" ng-init="post.LimitMode = '0'" class="form-control">
-                    <option ng-value="0">不限</option>
+                <span class="input-group-addon" id="sizing-addon2">按地区投放：</span><select ng-model="post.LimitMode" ng-init="post.LimitMode = 0" class="form-control">
+                    <option ng-value="0" selected="selected">不限</option>
                     <option ng-value="1">指定地区可见</option>
                     <option ng-value="2">指定地区不可见</option>
                     <option ng-value="3">指定地区可见但排除在内的这些地区</option>

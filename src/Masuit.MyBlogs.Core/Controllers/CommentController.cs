@@ -114,7 +114,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     {
                         Title = $"来自【{comment.NickName}】的新文章评论",
                         Content = comment.Content,
-                        Link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment"
+                        Link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }) + "#comment"
                     });
                 }
                 if (comment.ParentId == 0)

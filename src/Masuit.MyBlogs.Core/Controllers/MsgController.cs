@@ -178,7 +178,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     {
                         Title = $"来自【{msg.NickName}】的新留言",
                         Content = msg.Content,
-                        Link = Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)
+                        Link = Url.Action("Index", "Msg", new { cid = msg.Id })
                     });
                 }
                 if (msg.ParentId == 0)
