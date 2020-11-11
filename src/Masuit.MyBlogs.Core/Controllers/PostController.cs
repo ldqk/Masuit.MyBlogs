@@ -24,7 +24,6 @@ using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -585,6 +584,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             post.Status = Status.Deleted;
             bool b = await PostService.SaveChangesAsync(true) > 0;
+            SearchEngine.LuceneIndexer.Delete(post);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 

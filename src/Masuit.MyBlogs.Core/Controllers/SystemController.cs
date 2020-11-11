@@ -13,7 +13,6 @@ using Masuit.Tools.Systems;
 using Masuit.Tools.Win32;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;

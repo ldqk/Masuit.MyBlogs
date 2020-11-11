@@ -8,7 +8,6 @@ using Masuit.Tools.Media;
 using MaxMind.GeoIP2;
 using MaxMind.GeoIP2.Exceptions;
 using MaxMind.GeoIP2.Responses;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using System;
@@ -22,9 +21,6 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using TimeZoneConverter;
-
-#if !DEBUG
-#endif
 
 namespace Masuit.MyBlogs.Core.Common
 {
@@ -145,6 +141,11 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static AsnResponse GetIPAsn(this string ip)
         {
+            if (ip.IsPrivateIP())
+            {
+                return new AsnResponse();
+            }
+
             return Policy<AsnResponse>.Handle<AddressNotFoundException>().Fallback(new AsnResponse()).Execute(() => MaxmindAsnReader.Asn(ip));
         }
 

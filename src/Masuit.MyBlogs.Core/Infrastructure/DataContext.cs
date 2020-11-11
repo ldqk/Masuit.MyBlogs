@@ -1,6 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Infrastructure
@@ -95,22 +94,5 @@ namespace Masuit.MyBlogs.Core.Infrastructure
 
         public virtual DbSet<PostMergeRequest> PostMergeRequests { get; set; }
         public virtual DbSet<Advertisement> Advertisements { get; set; }
-    }
-
-    /// <summary>
-    /// 勿删，数据库迁移时powershell会执行该方法
-    /// </summary>
-    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<DataContext>
-    {
-        public DataContext CreateDbContext(string[] args)
-        {
-            //IConfigurationRoot config = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: true, reloadOnChange: true).Build();
-            var conn = "Server=127.0.0.1;Database=myblogs;Uid=root;Pwd=;Charset=utf8mb4";
-            var builder = new DbContextOptionsBuilder<DataContext>();
-            builder.UseMySql(conn);
-            //builder.UseSqlServer("Data Source=.;Initial Catalog=CoreTest;Integrated Security=True");
-
-            return new DataContext(builder.Options);
-        }
     }
 }
