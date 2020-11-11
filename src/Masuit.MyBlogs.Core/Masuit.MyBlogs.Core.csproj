@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <ServerGarbageCollection>true</ServerGarbageCollection>
         <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
         <Authors>懒得勤快</Authors>
@@ -14,6 +14,7 @@
         <ApplicationIcon />
         <OutputType>Exe</OutputType>
         <StartupObject />
+        <UserSecretsId>1c4bc9d2-dc90-4883-9a1e-966e5c877283</UserSecretsId>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

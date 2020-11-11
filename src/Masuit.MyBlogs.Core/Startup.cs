@@ -189,7 +189,7 @@ namespace Masuit.MyBlogs.Core
             switch (Configuration["UseRewriter"])
             {
                 case "NonWww":
-                    app.UseRewriter(new RewriteOptions().AddRedirectToNonWww()); // URL重写
+                    app.UseRewriter(new RewriteOptions().AddRedirectToNonWww(301)); // URL重写
                     break;
                 case "WWW":
                     app.UseRewriter(new RewriteOptions().AddRedirectToWww(301)); // URL重写
