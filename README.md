@@ -15,16 +15,16 @@ masuit.com个人博客站项目源码，高性能低占用的博客系统，这�
 ### 前端请求支援
 目前网站前端页面的代码比较零乱，到处都是，大家想吐槽的尽管吐槽吧，也想找个人帮忙设计下整体的前端页面，有兴趣愿意贡献代码的的小伙伴，欢迎Pull Request吧！😂😂
 ### 开发环境
-操作系统：Windows 10 2004  
-IDE：Visual Studio 2019 Enterprise 16.5  
+操作系统：Windows 10 2009  
+IDE：Visual Studio 2019 v16.8  
 数据库：SQL Server 2017/MySQL 8.0  
 Redis：redis-server-windows 3.2  
-运行时：必须是.NET Core 3.1 
+运行时：必须是.NET 5 
 ### 当前运行环境
-操作系统：Windows Server 2008 R2/Linux+docker  
-数据库：SQL Server 2012 express/MySQL 8.0  
+操作系统：Windows Server 2008 R2  
+数据库：MySQL 8.0  
 Redis：redis-server-windows 3.2  
-运行时：.NET Framework 4.7.2/.NET Core 3.1  
+运行时：.NET 5  
 服务器配置：2核+4GB+1M
 `请勿使用阿里云、百度云等活动超卖机运行本程序，否则卡出翔！！！`  
 `如何判断服务器商是否有超卖：给你的服务器跑个分，如果跑分接近于网络上该处理器公布的分数，则不是超卖的机器，计算公式：总分/核心数进行比较，由于是虚拟机，如果单独比较单核跑分，没有参考意义`
