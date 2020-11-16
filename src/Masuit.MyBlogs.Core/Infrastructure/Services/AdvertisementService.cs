@@ -50,10 +50,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                     var scid = cid.ToString();
                     if (Any(a => a.CategoryIds.Contains(scid)))
                     {
-                        where = where.And(a => a.CategoryIds.Contains(scid));
+                        where = where.And(a => a.CategoryIds.Contains(scid) || string.IsNullOrEmpty(a.CategoryIds));
                     }
                 }
-                var list = GetQuery(where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, (int)a.Price)).WeightedItems(count);
+                var list = GetQuery(where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, a.CategoryIds is { Length: > 0 } ? (int)a.Price * 2 : (int)a.Price)).WeightedItems(count);
                 var ids = list.Select(a => a.Id).ToArray();
                 GetQuery(a => ids.Contains(a.Id)).UpdateFromQuery(a => new Advertisement()
                 {
