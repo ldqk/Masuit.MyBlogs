@@ -3,6 +3,22 @@
         max-height: 800px;
         overflow-y: auto;
     }
+    .wicon {
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAASAgMAAAA1aVZ3AAAACVBMVEUAAAD///9nyrNdI4MmAAAAAXRSTlMAQObYZgAAAChJREFUCNdjWAUCCxjg9DQgtTKBAUN8aigQJGCho6KiYDSJ8ggaYR8Ao74zAKjm+cYAAAAASUVORK5CYII=");
+        background-repeat: no-repeat;
+        background-position: right center;
+    }
+
+    .workinput {
+        width: 100%;
+        line-height: 21px;
+        border: 1px #ddd solid;
+        border-radius: 4px;
+        padding: 5px;
+        background-color: transparent;
+        float: left;
+        font-size: 14px;
+    }
 </style>
 <div>
     <div class="form-inline pull-right">
@@ -169,6 +185,12 @@
                     </div>
                 </div>
             </div>
+            <div class="input-group">
+                <label for="desc" class="input-group-addon control-label">过期时间：</label>
+                <div class="fg-line">
+                    <input type="text" class="workinput wicon" id="timespan" ng-model="partner.ExpireTime" readonly="readonly" />
+                </div>
+            </div>
             <div class="form-group">
                 <div class="col-xs-12">
                     <div class="fg-line">
@@ -196,8 +218,12 @@
                 </tr>
                 <tr>
                     <td>推广地址</td>
-                    <td colspan="2">
+                    <td>
                         <a ng-href="{{partner.Url}}" target="_blank">{{partner.Url}}</a>
+                    </td>
+                    <td>过期时间</td>
+                    <td>
+                        {{partner.ExpireTime|date:'yyyy-MM-dd HH:mm:ss'}}
                     </td>
                 </tr>
                 <tr>

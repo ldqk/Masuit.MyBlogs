@@ -155,6 +155,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             DateTime time = DateTime.Now.AddMonths(-1);
             _searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
             TrackData.DumpLog();
+            _advertisementService.GetQuery(a => DateTime.Now >= a.ExpireTime).UpdateFromQuery(a => new Advertisement()
+            {
+                Status = Status.Unavailable
+            });
         }
 
         /// <summary>

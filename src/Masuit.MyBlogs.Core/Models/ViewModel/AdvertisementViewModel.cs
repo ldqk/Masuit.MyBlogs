@@ -82,5 +82,10 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
 
         public string CategoryIds { get; set; }
         public string CategoryNames { get; set; }
+
+        /// <summary>
+        /// 到期时间
+        /// </summary>
+        public DateTime? ExpireTime { get; set; }
     }
 }

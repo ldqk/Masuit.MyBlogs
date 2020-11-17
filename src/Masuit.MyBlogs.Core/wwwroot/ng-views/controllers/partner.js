@@ -82,8 +82,10 @@
 		}).catch(swal.noop);
 	}
 	$scope.add = function() {
-		$scope.partner = {};
-		$scope.isAdd = true;
+		$scope.partner = {
+			ExpireTime:"2099-12-31"
+        };
+        $scope.isAdd = true;
 		$scope.allowUpload=false;
 		layer.open({
 			type: 1,
@@ -101,6 +103,7 @@
 	}
 	$scope.edit = function (item) {
 		$scope.partner = angular.copy(item);
+		$scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2099-12-31":$scope.partner.ExpireTime;
 		$scope.isAdd = false;
 		$scope.allowUpload=false;
 		layer.closeAll();
@@ -213,4 +216,16 @@
 			}
 		});
 	}
+	jeDate('#timespan',{
+		isinitVal: true,
+		festival: true,
+		isTime: true,
+		ishmsVal: true,
+		format: 'YYYY-MM-DD hh:mm:ss',
+		minDate: new Date().Format("yyyy-MM-dd 00:00:00"),
+		maxDate: '2099-12-31 23:59:59',
+		donefun: function (obj) {
+			$scope.partner.ExpireTime = obj.val;
+		}
+	});
 }]);

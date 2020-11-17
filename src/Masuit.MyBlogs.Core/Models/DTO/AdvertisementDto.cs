@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
 {
@@ -49,5 +50,10 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public string Types { get; set; }
 
         public string CategoryIds { get; set; }
+
+        /// <summary>
+        /// 到期时间
+        /// </summary>
+        public DateTime? ExpireTime { get; set; }
     }
 }
