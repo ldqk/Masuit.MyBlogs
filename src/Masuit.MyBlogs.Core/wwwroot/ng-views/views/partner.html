@@ -214,7 +214,7 @@
             <table class="table table-bordered table-hover">
                 <tr>
                     <td style="min-width: 110px">描述</td>
-                    <td colspan="2">{{partner.Description}}</td>
+                    <td colspan="3">{{partner.Description}}</td>
                 </tr>
                 <tr>
                     <td>推广地址</td>
@@ -241,11 +241,12 @@
                             </div>
                         </div>
                     </td>
-                    <td>分类：{{partner.CategoryNames}}</td>
+                    <td>分类：</td>
+                    <td>{{partner.CategoryNames}}</td>
                 </tr>
                 <tr>
                     <td>宣传大图片</td>
-                    <td colspan="2">
+                    <td colspan="3">
                         <a ng-href="{{partner.ImageUrl}}" target="_blank">
                             <img class="img-rounded img-responsive" style="max-height: fit-content" src="{{partner.ImageUrl}}" />
                         </a>
@@ -253,7 +254,7 @@
                 </tr>
                 <tr>
                     <td>宣传小图片</td>
-                    <td colspan="2">
+                    <td colspan="3">
                         <a ng-href="{{partner.ThumbImgUrl}}" target="_blank">
                             <img class="img-rounded img-responsive" style="max-height: fit-content" src="{{partner.ThumbImgUrl}}" />
                         </a>
@@ -263,11 +264,13 @@
                     <td>竞价：{{partner.Price}}</td>
                     <td>权重：{{partner.Weight}}</td>
                     <td>点击量：{{partner.ViewCount}}</td>
+                    <td>日均点击量：{{partner.AverageViewCount}}</td>
                 </tr>
                 <tr>
                     <td>上架时间：</td>
                     <td>{{partner.CreateTime|date:'yyyy-MM-dd HH:mm:ss'}}</td>
-                    <td>更新时间：{{partner.UpdateTime|date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                    <td>更新时间：</td>
+                    <td>{{partner.UpdateTime|date:'yyyy-MM-dd HH:mm:ss'}}</td>
                 </tr>
             </table>
             <div class="btn-group">

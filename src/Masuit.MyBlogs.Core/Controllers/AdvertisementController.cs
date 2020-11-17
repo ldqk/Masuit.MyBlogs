@@ -7,6 +7,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -61,7 +62,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var dic = await CategoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionaryAsync(c => c.Id + "", c => c.Name);
             foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
             {
-                ad.CategoryNames = ad.CategoryIds.Split(",").Select(c => dic.GetValueOrDefault(c)).Join(",");
+                ad.CategoryNames = JiebaNet.Segmenter.Common.Extensions.Join(ad.CategoryIds.Split(",").Select(c => dic.GetValueOrDefault(c)), ",");
                 ad.CreateTime = ad.CreateTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 ad.UpdateTime = ad.UpdateTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             }
@@ -78,6 +79,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<IActionResult> Save(AdvertisementDto model)
         {
             model.CategoryIds = model.CategoryIds?.Replace("null", "");
+            if (model.Types.Contains(AdvertiseType.Banner.ToString("D")) && string.IsNullOrEmpty(model.ImageUrl))
+            {
+                return ResultData(null, false, "宣传大图不能为空");
+            }
+
+            if (model.Types.Length > 3 && string.IsNullOrEmpty(model.ThumbImgUrl))
+            {
+                return ResultData(null, false, "宣传小图不能为空");
+            }
+
             var b = await AdsService.AddOrUpdateSavedAsync(a => a.Id, model.Mapper<Advertisement>()) > 0;
             return ResultData(null, b, b ? "保存成功" : "保存失败");
         }

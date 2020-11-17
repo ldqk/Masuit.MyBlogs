@@ -48,7 +48,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IPostHistoryVersionService PostHistoryVersionService { get; set; }
         public IInternalMessageService MessageService { get; set; }
         public IPostMergeRequestService PostMergeRequestService { get; set; }
-
         public IWebHostEnvironment HostEnvironment { get; set; }
         public ISearchEngine<DataContext> SearchEngine { get; set; }
         public ImagebedClient ImagebedClient { get; set; }

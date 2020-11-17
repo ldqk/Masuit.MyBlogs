@@ -100,7 +100,7 @@ namespace Masuit.MyBlogs.Core
             }); //配置Cookie策略
             services.AddDbContext<DataContext>(opt =>
             {
-                opt.UseMySql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(3)).EnableDetailedErrors().EnableSensitiveDataLogging();
+                opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(3)).EnableDetailedErrors();
                 //opt.UseSqlServer(AppConfig.ConnString);
             }); //配置数据库
             services.Configure<FormOptions>(options =>
@@ -167,6 +167,10 @@ namespace Masuit.MyBlogs.Core
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext db, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
             ServiceProvider = app.ApplicationServices;
+            db.Database.EnsureCreated();
+            InitSettings(db);
+            UseLuceneSearch(env, hangfire, luceneIndexerOptions);
+
             app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For
             if (env.IsDevelopment())
             {
@@ -177,10 +181,7 @@ namespace Masuit.MyBlogs.Core
                 app.UseExceptionHandler("/ServiceUnavailable");
             }
 
-            db.Database.EnsureCreated();
-            InitSettings(db);
             app.UseBundles();
-            UseLuceneSearch(env, hangfire, luceneIndexerOptions);
             if (bool.Parse(Configuration["Https:Enabled"]))
             {
                 app.UseHttpsRedirection();
@@ -224,6 +225,7 @@ namespace Masuit.MyBlogs.Core
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}"); // 默认路由
                 endpoints.MapHub<MyHub>("/hubs");
             });
+
             HangfireJobInit.Start(); //初始化定时任务
             Console.WriteLine("网站启动完成");
         }

@@ -162,16 +162,10 @@
                             </h3>
 
                             <div class="row">
-                                @{
-                                    string imgSrc = ad.ThumbImgUrl;
-                                    if (!string.IsNullOrEmpty(imgSrc))
-                                    {
-                                        <div class="col-md-3 paddingright-clear">
-                                            <img class="img-thumbnail img-responsive" src="@imgSrc" alt="@ad.Title" title="@ad.Title ">
-                                        </div>
-                                    }
-                                }
-                                <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
+                                <div class="col-md-2 paddingright-clear">
+                                    <img class="img-thumbnail img-responsive" src="@ad.ThumbImgUrl" alt="@ad.Title" title="@ad.Title ">
+                                </div>
+                                <div class="col-md-10">
                                     <p>
                                         @ad.Description
                                     </p>

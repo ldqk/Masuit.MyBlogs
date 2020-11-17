@@ -141,6 +141,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             }
 
             var searchOptions = fields.Any() ? new SearchOptions(newkeywords.Join(" "), page, size, fields.Join(",")) : new SearchOptions(keyword, page, size, typeof(Post));
+            if (keyword.Contains(new[] { " ", ",", "+", ";" }))
+            {
+                searchOptions.Score = 0.2f;
+            }
+
             return searchOptions;
         }
 

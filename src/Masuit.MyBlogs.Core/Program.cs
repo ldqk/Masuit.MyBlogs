@@ -42,6 +42,6 @@ namespace Masuit.MyBlogs.Core
 
             opt.Limits.MaxRequestBodySize = null;
             Console.WriteLine($"应用程序监听端口：http：{port}，https：{sslport}");
-        }).UseIISIntegration().UseStartup<Startup>());
+        }).UseStartup<Startup>());
     }
 }
