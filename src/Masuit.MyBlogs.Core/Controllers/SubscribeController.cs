@@ -10,7 +10,6 @@ using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using WilderMinds.RssSyndication;
@@ -29,39 +28,19 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IPostService PostService { get; set; }
         public ICategoryService CategoryService { get; set; }
         public ICommentService CommentService { get; set; }
-
-        /// <summary>
-        /// 响应数据
-        /// </summary>
-        /// <param name="data">数据</param>
-        /// <param name="success">响应状态</param>
-        /// <param name="message">响应消息</param>
-        /// <param name="isLogin">登录状态</param>
-        /// <param name="code">http响应码</param>
-        /// <returns></returns>
-        public ActionResult ResultData(object data, bool success = true, string message = "", bool isLogin = true, HttpStatusCode code = HttpStatusCode.OK)
-        {
-            return Ok(new
-            {
-                IsLogin = isLogin,
-                Success = success,
-                Message = message,
-                Data = data,
-                code
-            });
-        }
+        public IAdvertisementService AdvertisementService { get; set; }
 
         /// <summary>
         /// RSS订阅
         /// </summary>
         /// <returns></returns>
         [Route("/rss"), ResponseCache(Duration = 3600)]
-        public async Task<IActionResult> Rss()
+        public IActionResult Rss()
         {
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var posts = await PostService.GetQueryNoTracking(p => p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
+            var posts = PostService.GetQueryNoTracking(p => p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
             {
                 Author = new Author
                 {
@@ -79,10 +58,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
                 FullHtmlContent = p.Content.GetSummary(300, 50)
-            }).FromCacheAsync(new MemoryCacheEntryOptions()
+            }).FromCache(new MemoryCacheEntryOptions()
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
-            });
+            }).ToList();
+            InsertAdvertisement(posts);
             var feed = new Feed()
             {
                 Title = CommonHelper.SystemSettings["Title"],
@@ -99,6 +79,31 @@ namespace Masuit.MyBlogs.Core.Controllers
             return Content(rss, "text/xml");
         }
 
+        private void InsertAdvertisement(List<Item> posts, int? cid = null)
+        {
+            if (posts.Count > 2)
+            {
+                var ad = AdvertisementService.GetByWeightedPrice((AdvertiseType)(DateTime.Now.Second % 4 + 1), cid);
+                if (ad is not null)
+                {
+                    posts.Insert(new Random().Next(1, posts.Count), new Item()
+                    {
+                        Author = new Author()
+                        {
+                            Name = ad.IndexId
+                        },
+                        Body = ad.Description,
+                        Title = ad.Title,
+                        FullHtmlContent = ad.Description,
+                        Guid = ad.IndexId,
+                        PublishDate = DateTime.UtcNow,
+                        Link = new Uri(Url.ActionLink("Redirect", "Advertisement", new { id = ad.Id })),
+                        Permalink = Url.ActionLink("Redirect", "Advertisement", new { id = ad.Id })
+                    });
+                }
+            }
+        }
+
         /// <summary>
         /// RSS分类订阅
         /// </summary>
@@ -110,7 +115,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string scheme = Request.Scheme;
             var host = Request.Host;
             var category = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("分类未找到");
-            var posts = await PostService.GetQueryNoTracking(p => p.CategoryId == id && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
+            var posts = PostService.GetQueryNoTracking(p => p.CategoryId == id && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).Select(p => new Item()
             {
                 Author = new Author
                 {
@@ -128,10 +133,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Permalink = scheme + "://" + host + "/" + p.Id,
                 Guid = p.Id.ToString(),
                 FullHtmlContent = p.Content.GetSummary(300, 50)
-            }).FromCacheAsync(new MemoryCacheEntryOptions()
+            }).FromCache(new MemoryCacheEntryOptions()
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
-            });
+            }).ToList();
+            InsertAdvertisement(posts, id);
             var feed = new Feed()
             {
                 Title = Request.Host + $":分类{category.Name}文章订阅",

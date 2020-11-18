@@ -4,22 +4,15 @@
     <div class="ibox-content" id="@Stopwatch.GetTimestamp()">
         <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
             <h4>
-                <i class="text-red size18">[荐]</i>
-                @Model.Title
+                <i class="text-red size18">[荐]</i>@Model.Title
             </h4>
         </a>
         <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
             <div class="row padding-bot10">
-                @{
-                    string imgSrc = Model.ThumbImgUrl;
-                    if (!string.IsNullOrEmpty(imgSrc))
-                    {
-                        <div class="col-md-2 paddingright-clear">
-                            <img class="img-thumbnail img-responsive thumb" src="@imgSrc" alt="@Model.Title" title="@Model.Title">
-                        </div>
-                    }
-                }
-                <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 10)">
+                <div class="col-md-2 paddingright-clear">
+                    <img class="img-thumbnail img-responsive thumb" src="@Model.ThumbImgUrl" alt="@Model.Title" title="@Model.Title">
+                </div>
+                <div class="col-md-10">
                     <p>
                         @Model.Description
                     </p>
