@@ -1,4 +1,5 @@
-﻿@model IList<Masuit.MyBlogs.Core.Models.DTO.NoticeDto>
+﻿@using Masuit.MyBlogs.Core.Models.Entity
+@model IList<Masuit.MyBlogs.Core.Models.DTO.NoticeDto>
 @{
     ViewBag.Title = "网站公告栏";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -29,5 +30,6 @@
     </div>
     @{
         await Html.RenderPartialAsync("_Pagination", ViewData["page"]);
+        await Html.RenderPartialAsync("_ArticleListAdvertisement", (Advertisement)ViewBag.Ads);
     }
 </div>

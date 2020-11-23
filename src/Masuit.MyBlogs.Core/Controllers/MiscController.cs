@@ -75,8 +75,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 foreach (var item in list.Data.Where(item => !(item.QQorWechat + item.Email).Contains("匿名")))
                 {
-                    item.QQorWechat = item.QQorWechat.Mask();
-                    item.Email = item.Email.MaskEmail();
+                    item.QQorWechat = item.QQorWechat?.Mask();
+                    item.Email = item.Email?.MaskEmail();
                 }
             }
 
