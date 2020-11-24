@@ -58,13 +58,19 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Login()
         {
             var keys = RsaCrypt.GenerateRsaKeys(RsaKeyType.PKCS1);
-            Response.Cookies.Append(nameof(keys.PublicKey), keys.PublicKey);
+            Response.Cookies.Append(nameof(keys.PublicKey), keys.PublicKey, new CookieOptions()
+            {
+                SameSite = SameSiteMode.Lax
+            });
             HttpContext.Session.Set(nameof(keys.PrivateKey), keys.PrivateKey);
             string from = Request.Query["from"];
             if (!string.IsNullOrEmpty(from))
             {
                 from = HttpUtility.UrlDecode(from);
-                Response.Cookies.Append("refer", from);
+                Response.Cookies.Append("refer", from, new CookieOptions()
+                {
+                    SameSite = SameSiteMode.Lax
+                });
             }
 
             if (HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) != null)
@@ -154,8 +160,14 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, ClientIP, LoginType.Default);
             string refer = Request.Cookies["refer"];
-            Response.Cookies.Delete(nameof(RsaKey.PublicKey));
-            Response.Cookies.Delete("refer");
+            Response.Cookies.Delete(nameof(RsaKey.PublicKey), new CookieOptions()
+            {
+                SameSite = SameSiteMode.Lax
+            });
+            Response.Cookies.Delete("refer", new CookieOptions()
+            {
+                SameSite = SameSiteMode.Lax
+            });
             HttpContext.Session.Remove(nameof(RsaKey.PrivateKey));
             return ResultData(null, true, string.IsNullOrEmpty(refer) ? "/" : refer);
         }
@@ -210,8 +222,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Logout()
         {
             HttpContext.Session.Remove(SessionKey.UserInfo);
-            Response.Cookies.Delete("username");
-            Response.Cookies.Delete("password");
+            Response.Cookies.Delete("username", new CookieOptions()
+            {
+                SameSite = SameSiteMode.Lax
+            });
+            Response.Cookies.Delete("password", new CookieOptions()
+            {
+                SameSite = SameSiteMode.Lax
+            });
             HttpContext.Session.Clear();
             return Request.Method.Equals(HttpMethods.Get) ? RedirectToAction("Index", "Home") : ResultData(null, message: "注销成功！");
         }
