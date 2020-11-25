@@ -52,9 +52,9 @@
                     <div class="form-group" id="btnlogin" style="display: none">
                         <button type="button" class="tran pr" onclick="login()">
                             <a class="tran">登录</a>
-                            <img class="loading" id="statues" src="~/Content/images/loading.gif" style="display: none">
+                            <img class="loading" id="status" src="~/Content/images/loading.gif" style="display: none">
                         </button>
-                        <span id="loginStatues" class="error-notic">登录失败，请检查表单完整性！</span>
+                        <span id="loginStatus" class="error-notic">登录失败，请检查表单完整性！</span>
                     </div>
                 </div>
             </form>
@@ -92,8 +92,8 @@
     //登录过程
     function login() {
         $(".tran").attr({ "disabled": "disabled" });
-        $("#statues").fadeIn(100);
-        $("#statues").parents("button").parents(".form-group").find(".error-notic").fadeOut(100);
+        $("#status").fadeIn(100);
+        $("#status").parents("button").parents(".form-group").find(".error-notic").fadeOut(100);
         var encrypt = new JSEncrypt();
         encrypt.setPublicKey($.cookie("PublicKey"));
         let form = $("#login-form").serialize();
@@ -103,12 +103,16 @@
                 location.href = data.Message || "/Home/Index"; //否则直接跳转
                 return;
             } else {
-                $("#statues").parents("button").parents(".form-group").find(".error-notic").html(data.Message);
-                $("#statues").parents("button").parents(".form-group").find(".error-notic").fadeIn(100);
-                $("#statues").fadeOut(200);
+                $("#status").parents("button").parents(".form-group").find(".error-notic").html(data.Message);
+                $("#status").parents("button").parents(".form-group").find(".error-notic").fadeIn(100);
+                $("#status").fadeOut(200);
                 $(".tran").removeAttr("disabled");
                 flushcode();
             }
+        }).fail(function(data) {
+            $("#status").parents("button").parents(".form-group").find(".error-notic").html(data.Message);
+            $("#status").parents("button").parents(".form-group").find(".error-notic").fadeIn(100);
+            $("#status").fadeOut(200);
         });
     }
 

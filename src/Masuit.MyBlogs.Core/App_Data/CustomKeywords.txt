@@ -11821,7 +11821,6 @@ static
 Static
 STATISTICAL ANALYSIS SYSTEM
 statue
-Statues
 Status
 stay
 stdin
