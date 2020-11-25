@@ -46,12 +46,12 @@ namespace Masuit.MyBlogs.Core.Extensions
                 {
                     filterContext.HttpContext.Response.Cookies.Append("username", name, new CookieOptions()
                     {
-                        Expires = DateTime.Now.AddDays(7),
+                        Expires = DateTime.Now.AddYears(1),
                         SameSite = SameSiteMode.Lax
                     });
                     filterContext.HttpContext.Response.Cookies.Append("password", filterContext.HttpContext.Request.Cookies["password"], new CookieOptions()
                     {
-                        Expires = DateTime.Now.AddDays(7),
+                        Expires = DateTime.Now.AddYears(1),
                         SameSite = SameSiteMode.Lax
                     });
                     filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
