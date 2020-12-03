@@ -75,18 +75,28 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
             }
             else
             {
-                var result = await _driveService.GetDriveItemsByPath(path, siteName, CurrentUser.IsAdmin);
-                if (result == null)
+                try
+                {
+                    var result = await _driveService.GetDriveItemsByPath(path, siteName, CurrentUser.IsAdmin);
+                    if (result == null)
+                    {
+                        return NotFound(new ErrorResponse()
+                        {
+                            message = $"路径{path}不存在"
+                        });
+                    }
+                    return Json(result, new JsonSerializerSettings()
+                    {
+                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+                    });
+                }
+                catch (Exception e)
                 {
                     return NotFound(new ErrorResponse()
                     {
                         message = $"路径{path}不存在"
                     });
                 }
-                return Json(result, new JsonSerializerSettings()
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                });
             }
         }
         // catch-all 参数匹配路径
@@ -98,10 +108,9 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         [HttpGet("files/{siteName}/{**path}")]
         public async Task<IActionResult> Download(string siteName, string path)
         {
-            DriveFile result;
             try
             {
-                result = await _driveService.GetDriveItemByPath(path, siteName);
+                var result = await _driveService.GetDriveItemByPath(path, siteName);
                 if (result != null)
                 {
                     return new RedirectResult(result.DownloadUrl);
