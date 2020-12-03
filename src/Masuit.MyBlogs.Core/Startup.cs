@@ -30,7 +30,6 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -107,12 +106,12 @@ namespace Masuit.MyBlogs.Core
             {
                 options.MultipartBodyLengthLimit = 104857600; // 100MB
             }); //配置请求长度
-            services.AddSession().AddAntiforgery(); //注入Session
-            services.AddWebSockets(opt => opt.ReceiveBufferSize = 4096 * 1024).AddSignalR().AddNewtonsoftJsonProtocol();
             services.AddHttpsRedirection(options =>
             {
                 options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
             });
+            services.AddSession().AddAntiforgery(); //注入Session
+            services.AddSignalR().AddNewtonsoftJsonProtocol();
 
             services.AddResponseCache().AddCacheConfig();
             services.AddHangfire((provider, configuration) =>
@@ -217,7 +216,7 @@ namespace Masuit.MyBlogs.Core
                 }
             }); //配置hangfire
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
-            app.UseActivity();// 抽奖活动
+            //app.UseActivity();// 抽奖活动
             app.UseRouting(); // 放在 UseStaticFiles 之后
             app.UseEndpoints(endpoints =>
             {

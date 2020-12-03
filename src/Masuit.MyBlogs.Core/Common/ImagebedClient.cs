@@ -56,7 +56,11 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             file = SnowFlake.NewId + Path.GetExtension(file);
-            var fallbackPolicy = Policy<(string url, bool success)>.Handle<Exception>().FallbackAsync(async _ => UploadOss(stream, file));
+            var fallbackPolicy = Policy<(string url, bool success)>.Handle<Exception>().FallbackAsync(async _ =>
+            {
+                await Task.CompletedTask;
+                return UploadOss(stream, file);
+            });
             var retryPolicy = Policy<(string url, bool success)>.Handle<Exception>().RetryAsync(3);
             return await fallbackPolicy.WrapAsync(retryPolicy).ExecuteAsync(() => UploadGitlab(stream, file));
         }

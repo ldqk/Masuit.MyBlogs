@@ -87,7 +87,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             throw new TempDenyException("访问频次限制");
         }
 
-        private void AccessDeny(string ip, HttpRequest request, string remark)
+        private async void AccessDeny(string ip, HttpRequest request, string remark)
         {
             var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
             BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
@@ -99,14 +99,14 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 Remark = remark
             }));
             var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPInterceptTimes", "30").ToInt32();
-            RedisHelper.LRangeAsync<IpIntercepter>("intercept", 0, -1).ContinueWith(async t =>
+            await RedisHelper.LRangeAsync<IpIntercepter>("intercept", 0, -1).ContinueWith(async t =>
             {
                 if (t.Result.Count(x => x.IP == ip) >= limit)
                 {
                     LogManager.Info($"准备上报IP{ip}到{FirewallRepoter.ReporterName}");
                     await FirewallRepoter.ReportAsync(IPAddress.Parse(ip)).ContinueWith(_ => LogManager.Info($"访问频次限制，已上报IP{ip}至：" + FirewallRepoter.ReporterName));
                 }
-            }).ConfigureAwait(false);
+            });
         }
     }
 }
