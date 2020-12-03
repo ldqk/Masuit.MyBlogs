@@ -11,6 +11,7 @@ using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Hubs;
@@ -141,6 +142,7 @@ namespace Masuit.MyBlogs.Core
                 options.PopupShowTimeWithChildren = true;
                 options.PopupShowTrivial = true;
             }).AddEntityFramework();
+            services.AddOneDrive();
             services.AddMapper().AddAutofac().AddMyMvc().Configure<ForwardedHeadersOptions>(options => // X-Forwarded-For
             {
                 options.ForwardLimit = null;

@@ -26,6 +26,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Include="wwwroot\drive\js\app.8b25141a.js" />
+      <None Include="wwwroot\drive\js\app.8b25141a.js.map" />
+      <None Include="wwwroot\drive\js\chunk-vendors.b37660ae.js" />
+      <None Include="wwwroot\drive\js\chunk-vendors.b37660ae.js.map" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\..\..\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine.csproj" />
         <ProjectReference Include="..\..\..\Masuit.Tools\Masuit.Tools.Core\Masuit.Tools.Core.csproj" />
     </ItemGroup>
@@ -45,9 +52,12 @@
         <PackageReference Include="IP2Region" Version="1.2.0" />
         <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.4.1" />
         <PackageReference Include="MaxMind.GeoIP2" Version="4.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Graph" Version="3.20.0" />
+        <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.6" />
         <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.1" />
         <PackageReference Include="OpenXmlPowerTools-NetStandard" Version="4.4.21" />
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.1" />
@@ -59,7 +69,7 @@
         <PackageReference Include="TimeZoneConverter" Version="3.3.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.0" />
         <PackageReference Include="WinInsider.System.Net.Http.Formatting" Version="1.0.14" />
-        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.4" />
+        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.5" />
     </ItemGroup>
     <ItemGroup>
         <Content Update="appsettings.json">

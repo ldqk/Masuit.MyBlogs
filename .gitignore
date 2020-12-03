@@ -274,3 +274,6 @@ Test
 material_admin_v-1.5-2
 /src/Masuit.MyBlogs.Core/App_Data/subjects.json
 /src/Masuit.MyBlogs.Core/wwwroot/subjects.json
+/src/Masuit.MyBlogs.Core/TokenCache.bin
+/src/Masuit.MyBlogs.Core/OneDrive.db
+/src/Masuit.MyBlogs.Core/App_Data/OneDrive.template.db
