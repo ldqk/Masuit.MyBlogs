@@ -612,6 +612,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         IEnumerable<T> AddEntities(IList<T> list);
 
         void Dispose(bool disposing);
+        T this[object id] => GetById(id);
+
+        List<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToList();
     }
 
     public partial interface ICategoryRepository : IBaseRepository<Category> { }

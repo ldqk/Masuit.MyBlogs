@@ -25,9 +25,10 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
         {
         }
 
-        public override string Process()
+        public override async Task<string> Process()
         {
-            string[] sources = Request.Form["source[]"];
+            var form = await Request.ReadFormAsync();
+            string[] sources = form["source[]"];
             if (sources?.Length > 0 || sources?.Length <= 10)
             {
                 return WriteJson(new

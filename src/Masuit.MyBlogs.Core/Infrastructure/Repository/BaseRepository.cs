@@ -865,6 +865,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
             DataContext?.Dispose();
             DataContext = null;
         }
+
+        public T this[object id] => GetById(id);
     }
 
     public static class QueryableExt

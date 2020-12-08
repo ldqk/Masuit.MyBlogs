@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -26,9 +27,10 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             };
         }
 
-        public override string Process()
+        public override async Task<string> Process()
         {
-            var file = Request.Form.Files[UploadConfig.UploadFieldName];
+            var form = await Request.ReadFormAsync();
+            var file = form.Files[UploadConfig.UploadFieldName];
             var uploadFileName = file.FileName;
 
             if (!CheckFileType(uploadFileName))

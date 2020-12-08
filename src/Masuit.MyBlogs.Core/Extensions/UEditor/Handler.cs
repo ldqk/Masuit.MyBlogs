@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -16,7 +17,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             //this.Server = context.Server;
         }
 
-        public abstract string Process();
+        public abstract Task<string> Process();
 
         protected string WriteJson(object response)
         {

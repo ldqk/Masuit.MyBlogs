@@ -717,5 +717,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <param name="list">实体集合</param>
         /// <returns>添加成功</returns>
         Task<IEnumerable<T>> AddEntitiesAsync(IList<T> list);
+
+        T this[object id] => GetById(id);
+        List<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToList();
+        public static T operator +(IBaseService<T> left, T right) => left.AddEntitySaved(right);
+        public static bool operator -(IBaseService<T> left, T right) => left.DeleteEntitySaved(right);
+        public static bool operator -(IBaseService<T> left, object id) => left.DeleteByIdSaved(id);
     }
 }

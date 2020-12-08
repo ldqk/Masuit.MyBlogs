@@ -64,7 +64,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost]
         public async Task<ActionResult> UploadWord()
         {
-            var files = Request.Form.Files;
+            var form = await Request.ReadFormAsync();
+            var files = form.Files;
             if (files.Count <= 0)
             {
                 return ResultData(null, false, "请先选择您需要上传的文件!");
@@ -203,7 +204,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("fileuploader")]
-        public ActionResult UeditorFileUploader()
+        public async Task<ActionResult> UeditorFileUploader()
         {
             UserInfoDto user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
             var action = Request.Query["action"].ToString() switch //通用
@@ -263,7 +264,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            string result = action.Process();
+            string result = await action.Process();
             return Content(result, ContentType.Json);
         }
 

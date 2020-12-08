@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -80,21 +81,18 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult Upload(string destination)
+        public async Task<ActionResult> Upload(string destination)
         {
-            List<object> list = new List<object>();
-            if (Request.Form.Files.Count > 0)
+            var form = await Request.ReadFormAsync();
+            foreach (var t in form.Files)
             {
-                foreach (var t in Request.Form.Files)
-                {
-                    string path = Path.Combine(HostEnvironment.ContentRootPath, CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/'), destination.TrimStart('\\', '/'), t.FileName);
-                    using var fs = new FileStream(path, FileMode.Create, FileAccess.ReadWrite);
-                    t.CopyTo(fs);
-                }
+                string path = Path.Combine(HostEnvironment.ContentRootPath, CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/'), destination.TrimStart('\\', '/'), t.FileName);
+                await using var fs = new FileStream(path, FileMode.Create, FileAccess.ReadWrite);
+                await t.CopyToAsync(fs);
             }
             return Json(new
             {
-                result = list
+                result = new List<object>()
             });
         }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -19,9 +20,9 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
         /// 
         /// </summary>
         /// <returns></returns>
-        public override string Process()
+        public override Task<string> Process()
         {
-            return WriteJson(UeditorConfig.Items);
+            return Task.FromResult(WriteJson(UeditorConfig.Items));
         }
     }
 }

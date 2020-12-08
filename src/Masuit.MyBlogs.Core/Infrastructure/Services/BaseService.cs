@@ -1011,5 +1011,12 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             await SaveChangesAsync();
             return entities;
         }
+
+        public virtual T this[object id]
+        {
+            get => GetById(id);
+            set => AddEntity(value);
+        }
+        public static T operator +(BaseService<T> left, T right) => left.AddEntity(right);
     }
 }

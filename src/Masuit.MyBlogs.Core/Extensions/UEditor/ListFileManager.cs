@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -34,7 +35,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             _pathToList = pathToList;
         }
 
-        public override string Process()
+        public override Task<string> Process()
         {
             try
             {
@@ -44,7 +45,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             catch (FormatException)
             {
                 _state = ResultState.InvalidParam;
-                return WriteResult();
+                return Task.FromResult(WriteResult());
             }
             var buildingList = new List<string>();
             try
@@ -66,8 +67,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             {
                 _state = ResultState.IOError;
             }
-            var result = WriteResult();
-            return result;
+            return Task.FromResult(WriteResult());
         }
 
         private string WriteResult()

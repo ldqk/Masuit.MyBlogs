@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -11,12 +12,12 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
         {
         }
 
-        public override string Process()
+        public override Task<string> Process()
         {
-            return WriteJson(new
+            return Task.FromResult(WriteJson(new
             {
                 state = "action 参数为空或者 action 不被支持。"
-            });
+            }));
         }
     }
 }

@@ -508,6 +508,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             else
             {
                 merge = Mapper.Map<PostMergeRequest>(dto);
+                merge.SubmitTime = DateTime.Now;
                 post.PostMergeRequests.Add(merge);
             }
 
@@ -626,7 +627,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            bool b = await PostService.DeleteByIdSavedAsync(id) > 0;
+            bool b = PostService - id;
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 
@@ -638,7 +639,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Get(int id)
         {
-            Post post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            Post post = PostService[id] ?? throw new NotFoundException("文章未找到");
             PostDto model = post.Mapper<PostDto>();
             model.Seminars = post.Seminar.Select(s => s.Seminar.Title).Join(",");
             return ResultData(model);
