@@ -169,10 +169,10 @@
                 loadingDone();
                 return;
             }
-            if (ue.getContent().length < 200 || ue.getContent().length > 1000000) {
+            if (ue.getContent().length < 20 || ue.getContent().length > 1000000) {
                 window.notie.alert({
                     type: 3,
-                    text: '文章内容过短或者超长的，字数200-1000000字！',
+                    text: '文章内容过短或者超长的，字数20-1000000字！',
                     time: 4
                 });
                 loadingDone();

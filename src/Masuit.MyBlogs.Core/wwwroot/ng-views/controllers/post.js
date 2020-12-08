@@ -576,10 +576,10 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 			
 			return;
 		}
-		if (post.Content.length < 200 || post.Content.length > 1000000) {
+		if (post.Content.length < 20 || post.Content.length > 1000000) {
 			window.notie.alert({
 				type: 3,
-				text: '文章内容过短或者超长的，我都认为你是在制造垃圾！',
+				text: '文章内容过短或者超长，请修改后再提交！',
 				time: 4
 			});
 			

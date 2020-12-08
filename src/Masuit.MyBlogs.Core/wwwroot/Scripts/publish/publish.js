@@ -57,10 +57,10 @@
             loadingDone();
             return;
         }
-        if (ue.getContent().length < 200 || ue.getContent().length > 1000000) {
+        if (ue.getContent().length < 20 || ue.getContent().length > 1000000) {
 	        window.notie.alert({
 		        type: 3,
-                text: '文章内容过短或者超长的，我都认为你是在制造垃圾！',
+                text: '文章内容过短或者超长的，请修改后再提交！',
 		        time: 4
 	        });
             loadingDone();
