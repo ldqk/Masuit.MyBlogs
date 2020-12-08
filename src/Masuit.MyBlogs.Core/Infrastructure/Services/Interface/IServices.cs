@@ -25,5 +25,5 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
     public partial interface ISeminarPostService : IBaseService<SeminarPost> { }
     public partial interface ISeminarPostHistoryVersionService : IBaseService<SeminarPostHistoryVersion> { }
     public partial interface IPostMergeRequestService : IBaseService<PostMergeRequest> { }
-
+    public partial interface IVariablesService : IBaseService<Variables> { }
 }

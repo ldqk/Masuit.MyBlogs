@@ -94,4 +94,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         {
         }
     }
+    public partial class VariablesService : BaseService<Variables>, IVariablesService
+    {
+        public VariablesService(IBaseRepository<Variables> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
+        {
+        }
+    }
 }

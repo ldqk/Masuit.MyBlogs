@@ -48,6 +48,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IPostHistoryVersionService PostHistoryVersionService { get; set; }
         public IInternalMessageService MessageService { get; set; }
         public IPostMergeRequestService PostMergeRequestService { get; set; }
+
         public IWebHostEnvironment HostEnvironment { get; set; }
         public ISearchEngine<DataContext> SearchEngine { get; set; }
         public ImagebedClient ImagebedClient { get; set; }
@@ -84,6 +85,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Related = related;
             post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            post.Content = ReplaceVariables(post.Content);
+            post.ProtectContent = ReplaceVariables(post.ProtectContent);
             if (CurrentUser.IsAdmin)
             {
                 return View("Details_Admin", post);
@@ -181,6 +184,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var post = await PostHistoryVersionService.GetAsync(v => v.Id == hid && (v.Post.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             CheckPermission(post.Post);
+            post.Content = ReplaceVariables(post.Content);
+            post.ProtectContent = ReplaceVariables(post.ProtectContent);
             var next = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
             var prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
             ViewBag.Next = next;
@@ -207,8 +212,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             main.Id = id;
             var diff = new HtmlDiff.HtmlDiff(right.Content, left.Content);
             var diffOutput = diff.Build();
-            right.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);
-            left.Content = Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty);
+            right.Content = ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty));
+            left.Content = ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty));
             ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, main.CategoryId);
             ViewBag.DisableCopy = post.DisableCopy;
             return View(new[] { main, left, right });

@@ -435,6 +435,20 @@ myApp.config([
                     }
                 ]
             }
+        }).state("values", {
+            url: "/values",
+            templateUrl: vpath + "/values.html",
+            controller: "values as list",
+            resolve: {
+                deps: ["$ocLazyLoad", function($ocLazyLoad) {
+                        return $ocLazyLoad.load([
+                        {
+                            files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.js"],
+                            cache: true
+                        }, cpath + "/values.js"]);
+                    }
+                ]
+            }
         }).state("loginrecord", {
             url: "/loginrecord",
             templateUrl: vpath + "/loginrecord.html",

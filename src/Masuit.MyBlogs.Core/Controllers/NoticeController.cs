@@ -47,6 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 n.ModifyDate = n.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 n.PostDate = n.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                n.Content = ReplaceVariables(n.Content);
             }
 
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
@@ -71,6 +72,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             notice.ModifyDate = notice.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             notice.PostDate = notice.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            notice.Content = ReplaceVariables(notice.Content);
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage);
             return View(notice);
         }
@@ -160,6 +162,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 notice.ModifyDate = notice.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 notice.PostDate = notice.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                notice.Content = ReplaceVariables(notice.Content);
             }
 
             return ResultData(notice);

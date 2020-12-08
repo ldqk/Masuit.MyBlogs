@@ -63,10 +63,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure
                     entry.OriginalValues.SetValues(databaseValues);
                     entry.CurrentValues.SetValues(resolvedValues);
                 }
-                catch
-                {
-                    throw;
-                }
             }
 
             throw ex;
@@ -94,5 +90,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure
 
         public virtual DbSet<PostMergeRequest> PostMergeRequests { get; set; }
         public virtual DbSet<Advertisement> Advertisements { get; set; }
+        public virtual DbSet<Variables> Variables { get; set; }
     }
 }

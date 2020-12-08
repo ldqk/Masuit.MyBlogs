@@ -10,12 +10,14 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
+using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -41,6 +43,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ILinksService LinksService { get; set; }
 
         public IAdvertisementService AdsService { get; set; }
+        public IVariablesService VariablesService { get; set; }
 
         public UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
 
@@ -77,6 +80,29 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Data = data,
                 code
             });
+        }
+
+        protected string ReplaceVariables(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
+            var keys = Regex.Matches(text, @"\{\{\w+\}\}").Select(m => m.Value).Join(",");
+            if (!string.IsNullOrEmpty(keys))
+            {
+                var dic = VariablesService.GetQueryFromCache(v => keys.Contains(v.Key)).ToDictionary(v => v.Key, v => v.Value);
+                var template = Template.Create(text);
+                foreach (var (key, value) in dic)
+                {
+                    template.Set(key, value);
+                }
+
+                return template.Render();
+            }
+
+            return text;
         }
 
         /// <summary>在调用操作方法前调用。</summary>
