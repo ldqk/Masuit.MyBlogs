@@ -1290,6 +1290,14 @@ h6,
 .h6 {
   font-size: 12px;
 }
+p {
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    vertical-align: baseline;
+}
 .lead {
   margin-bottom: 18px;
   font-size: 14px;
