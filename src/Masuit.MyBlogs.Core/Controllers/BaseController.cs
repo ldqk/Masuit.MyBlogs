@@ -89,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return text;
             }
 
-            var keys = Regex.Matches(text, @"\{\{\w+\}\}").Select(m => m.Value).Join(",");
+            var keys = Regex.Matches(text, @"\{\{[\w._-]+\}\}").Select(m => m.Value).Join(",");
             if (!string.IsNullOrEmpty(keys))
             {
                 var dic = VariablesService.GetQueryFromCache(v => keys.Contains(v.Key)).ToDictionary(v => v.Key, v => v.Value);

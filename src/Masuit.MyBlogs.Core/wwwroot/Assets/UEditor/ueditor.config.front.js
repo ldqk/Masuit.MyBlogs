@@ -50,7 +50,7 @@
             'underline', //下划线
             'strikethrough', //删除线
             'subscript', //下标
-            'fontborder', //字符边框
+            //'fontborder', //字符边框
             'superscript', //上标
             'formatmatch', //格式刷
             'blockquote', //引用
@@ -71,7 +71,7 @@
             'paragraph', //段落格式
             'insertcode', //代码语言
             'simpleupload', //单图上传
-            //'insertimage', //多图上传
+            'insertimage', //多图上传
             //'scrawl', //涂鸦
             //'insertvideo', //视频
             //'selectall', //全选
@@ -110,8 +110,8 @@
             //'fullscreen', //全屏
             //'directionalityltr', //从左向右输入
             //'directionalityrtl', //从右向左输入
-            'rowspacingtop', //段前距
-            'rowspacingbottom', //段后距
+            //'rowspacingtop', //段前距
+            //'rowspacingbottom', //段后距
             //'pagebreak', //分页
             //'insertframe', //插入Iframe
             //'attachment', //附件

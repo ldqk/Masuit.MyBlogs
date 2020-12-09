@@ -51,7 +51,7 @@
             'underline', //下划线
             'strikethrough', //删除线
             'subscript', //下标
-            'fontborder', //字符边框
+            //'fontborder', //字符边框
             'superscript', //上标
             'formatmatch', //格式刷
             'blockquote', //引用
@@ -82,7 +82,7 @@
             'imageleft', //左浮动
             'imageright', //右浮动
             'imagecenter', //居中
-            'spechars', //特殊字符
+            //'spechars', //特殊字符
             'searchreplace', //查询替换
             'insertorderedlist', //有序列表
             'insertunorderedlist', //无序列表
@@ -109,21 +109,21 @@
             //'gmap', //Google地图
             //'help', //帮助
             //'fullscreen', //全屏
-            'directionalityltr', //从左向右输入
-            'directionalityrtl', //从右向左输入
-            'rowspacingtop', //段前距
-            'rowspacingbottom', //段后距
+            //'directionalityltr', //从左向右输入
+            //'directionalityrtl', //从右向左输入
+            //'rowspacingtop', //段前距
+            //'rowspacingbottom', //段后距
             //'pagebreak', //分页
-            //'insertframe', //插入Iframe
+            'insertframe', //插入Iframe
             'attachment', //附件
-            'wordimage', //图片转存
+            //'wordimage', //图片转存
             'lineheight', //行间距
             //'edittip ', //编辑提示
             //'webapp', //百度应用
             //'touppercase', //字母大写
             //'tolowercase', //字母小写
             //'background', //背景
-            'template', //模板
+            //'template', //模板
             //'music', //音乐
             //'drafts', // 从草稿箱加载
             //'charts', // 图表

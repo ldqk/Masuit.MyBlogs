@@ -32,14 +32,13 @@
                     变量名：
                 </span>
                 <div class="fg-line">
-                    <input type="text" class="form-control" ng-model="values.Key" />
+                    <input type="text" class="form-control" ng-model="values.Key"  ng-disabled="values.Id>0"/>
                 </div>
             </div>
             <div class="input-group">
                 <span class="input-group-addon">
                     变量值：
                 </span>
-                <!--<div class="ueditor max-height400" ng-model="values.Value" type="text/plain"></div>-->
                 <div style="height: 300px;" class="ueditor" ng-model="values.Value" type="text/plain"></div>
             </div>
             <div class="btn-group">
