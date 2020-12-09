@@ -29,7 +29,7 @@
 	self.edit = function (row) {
 		layer.open({
 			type: 1,
-			zIndex: 20,
+			zIndex: 8,
 			title: '修改变量',
 			area: (window.screen.width > 800 ? 800 : window.screen.width) + 'px',
 			content: $("#modal"),
@@ -44,7 +44,7 @@
 	self.add = function() {
 		layer.open({
 			type: 1,
-			zIndex: 20,
+			zIndex: 8,
 			title: '添加变量',
 			area: (window.screen.width > 800 ? 800 : window.screen.width) + 'px',
 			content: $("#modal"),

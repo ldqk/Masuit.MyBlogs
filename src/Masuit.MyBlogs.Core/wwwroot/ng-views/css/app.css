@@ -1290,9 +1290,6 @@ h6,
 .h6 {
   font-size: 12px;
 }
-p {
-  margin: 0 0 9px;
-}
 .lead {
   margin-bottom: 18px;
   font-size: 14px;
@@ -8225,9 +8222,6 @@ body {
 audio,
 video {
   outline: none;
-}
-p {
-  margin-bottom: 20px;
 }
 small {
   font-size: 11px;
