@@ -119,7 +119,7 @@
                                             <span class="label label-primary">${rows[i].Location}</span>
                                         </div>
                                         <div class="pull-right">
-                                            <span class="label label-success">${rows[i].Email}</span>
+                                            <span class="label label-success" onclick="bounceEmail('${rows[i].Email}')">${rows[i].Email}</span>
                                             <span class="label label-primary">${rows[i].QQorWechat}</span>
                                         </div><br/>
                                         ${loadMsgs(data.rows, Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.PostDate).ToArray(), startfloor--)}
@@ -155,7 +155,7 @@
                                 <span class="label label-primary">${item.Location}</span>
                             </div>
                             <div class="pull-right">
-                                <span class="label label-success">${item.Email}</span>
+                                <span class="label label-success" onclick="bounceEmail('${item.Email}')">${item.Email}</span>
                                 <span class="label label-primary">${item.QQorWechat}</span>
                             </div><br/>
                             ${loadMsgs(data, Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.PostDate), root, depth)}
@@ -172,6 +172,25 @@
 			swal(res.Message, "", res.Success ? "success" : "error");
 			getmsgs();
 		});
+    }
+
+    function bounceEmail(email) {
+        swal({
+            title: "确定将这个邮箱添加到黑名单吗？",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            showLoaderOnConfirm: true,
+            animation: true,
+            allowOutsideClick: false
+        }).then(function () {
+            window.post("/system/BounceEmail", { email: email }, function () {
+                swal("邮箱添加到黑名单成功", "", "success");
+            }, (e) => {
+                swal("操作失败，请稍候再试", "", "error");
+            });
+        }, function () { });
     }
 
     function del(id) {

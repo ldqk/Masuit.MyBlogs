@@ -1,6 +1,7 @@
 ﻿using CacheManager.Core;
 using Hangfire;
 using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Command;
@@ -16,7 +17,6 @@ using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
@@ -38,6 +38,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IInternalMessageService MessageService { get; set; }
         public IWebHostEnvironment HostEnvironment { get; set; }
         public ICacheManager<int> CommentFeq { get; set; }
+        public IMailSender MailSender { get; set; }
 
         /// <summary>
         /// 发表评论
@@ -52,6 +53,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 LogManager.Info($"提交内容：{dto.NickName}/{dto.Content}，敏感词：{match.Value}");
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
+            }
+
+            if (MailSender.GetBounces().Any(s => s == dto.Email))
+            {
+                return ResultData(null, false, "邮箱地址错误，请使用有效的邮箱地址！");
             }
 
             Post post = await PostService.GetByIdAsync(dto.PostId) ?? throw new NotFoundException("评论失败，文章未找到");

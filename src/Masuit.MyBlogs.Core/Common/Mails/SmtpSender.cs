@@ -1,5 +1,10 @@
 ﻿using Masuit.Tools;
 using Masuit.Tools.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace Masuit.MyBlogs.Core.Common.Mails
 {
@@ -20,6 +25,19 @@ namespace Masuit.MyBlogs.Core.Common.Mails
                 Tos = tos
             }.Send();
 #endif
+        }
+
+        public List<string> GetBounces()
+        {
+            return File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "email-bounces.txt"), Encoding.UTF8).Split(',').ToList();
+        }
+
+        public string AddBounces(string email)
+        {
+            var bounces = GetBounces();
+            bounces.Add(email);
+            File.WriteAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "email-bounces.txt"), bounces.Join(","));
+            return "添加成功";
         }
     }
 }

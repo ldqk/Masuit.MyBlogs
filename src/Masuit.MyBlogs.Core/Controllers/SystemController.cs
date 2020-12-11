@@ -1,4 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Hubs;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -37,6 +38,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ISystemSettingService SystemSettingService { get; set; }
 
         public IFirewallRepoter FirewallRepoter { get; set; }
+        public IMailSender MailSender { get; set; }
 
         /// <summary>
         /// 获取硬件基本信息
@@ -258,6 +260,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult<List<JObject>> SendBox()
         {
             return RedisHelper.SUnion(RedisHelper.Keys("Email:*")).Select(JObject.Parse).OrderByDescending(o => o["time"]).ToList();
+        }
+
+        public ActionResult BounceEmail(string email)
+        {
+            var msg = MailSender.AddBounces(email);
+            return Ok(new { msg });
         }
 
         #region 网站防火墙

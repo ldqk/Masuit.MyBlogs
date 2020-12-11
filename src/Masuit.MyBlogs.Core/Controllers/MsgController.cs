@@ -1,6 +1,7 @@
 ﻿using CacheManager.Core;
 using Hangfire;
 using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Command;
@@ -43,6 +44,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IWebHostEnvironment HostEnvironment { get; set; }
 
         public ICacheManager<int> MsgFeq { get; set; }
+        public IMailSender MailSender { get; set; }
 
         /// <summary>
         /// 留言板
@@ -127,6 +129,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 LogManager.Info($"提交内容：{dto.NickName}/{dto.Content}，敏感词：{match.Value}");
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
+            }
+
+            if (MailSender.GetBounces().Any(s => s == dto.Email))
+            {
+                return ResultData(null, false, "邮箱地址错误，请使用有效的邮箱地址！");
             }
 
             dto.Content = dto.Content.Trim().Replace("<p><br></p>", string.Empty);
