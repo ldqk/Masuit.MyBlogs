@@ -7,6 +7,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.Core;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -41,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("s/{wd?}/{page:int?}/{size:int?}")]
         public async Task<ActionResult> Search(string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            wd = wd?.Trim();
+            wd = wd?.Trim().ToSimplified();
             ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
             string key = "Search:" + ClientIP;
