@@ -12,6 +12,7 @@ using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
@@ -168,6 +169,17 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, id);
             viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.PostList, id);
             return View(viewModel);
+        }
+
+        [Route("lang/{lang}")]
+        public ActionResult SetLang(string lang)
+        {
+            Response.Cookies.Append("lang", lang, new CookieOptions()
+            {
+                Expires = DateTime.Now.AddYears(1),
+            });
+            var referer = Request.Headers[HeaderNames.Referer].ToString();
+            return Redirect(string.IsNullOrEmpty(referer) ? "/" : referer);
         }
 
         private void CheckPermission(PagedList<PostDto> posts)

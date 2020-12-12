@@ -36,6 +36,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
         public async Task Invoke(HttpContext context)
         {
             var request = context.Request;
+            //启用读取request
+            request.EnableBuffering();
             if (!AppConfig.EnableIPDirect && request.Host.Host.MatchInetAddress() && !request.Host.Host.IsPrivateIP())
             {
                 context.Response.StatusCode = 404;

@@ -96,7 +96,7 @@ namespace Masuit.MyBlogs.Core
             RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
             services.Configure<CookiePolicyOptions>(options =>
             {
-                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.MinimumSameSitePolicy = SameSiteMode.Lax;
             }); //配置Cookie策略
             services.AddDbContext<DataContext>(opt =>
             {
@@ -218,6 +218,7 @@ namespace Masuit.MyBlogs.Core
                 }
             }); //配置hangfire
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
+            app.UseMiddleware<TranslateMiddleware>();
             //app.UseActivity();// 抽奖活动
             app.UseRouting(); // 放在 UseStaticFiles 之后
             app.UseEndpoints(endpoints =>
