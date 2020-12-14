@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             return _searchCacheManager.GetOrAdd(cacheKey, s =>
             {
                 _searchCacheManager.Expire(cacheKey, TimeSpan.FromHours(1));
-                return SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword)).Results.Select(r => r.Entity).ToList();
+                return SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword)).Results.Select(r => r.Entity).Distinct().ToList();
             });
         }
 

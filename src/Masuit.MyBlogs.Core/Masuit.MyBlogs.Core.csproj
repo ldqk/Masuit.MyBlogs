@@ -58,9 +58,9 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.1" />
         <PackageReference Include="Microsoft.Graph" Version="3.21.0" />
         <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.6" />
-        <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.1" />
+        <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />
         <PackageReference Include="OpenXmlPowerTools-NetStandard" Version="4.4.21" />
-        <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.1" />
+        <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.22" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
         <PackageReference Include="Polly" Version="7.2.1" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0-alpha.2" />
