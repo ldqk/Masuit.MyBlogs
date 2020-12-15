@@ -8,7 +8,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// <summary>
         /// 标题
         /// </summary>
-        [Required(ErrorMessage = "标题不能为空"), MinLength(10, ErrorMessage = "标题建议设置为10-128字"), MaxLength(128, ErrorMessage = "标题建议设置为10-128字")]
+        [Required(ErrorMessage = "标题不能为空"), MinLength(10, ErrorMessage = "标题建议至少设置为10字"), MaxLength(128, ErrorMessage = "标题不能超过128字")]
         public string Title { get; set; }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// <summary>
         /// 描述
         /// </summary>
-        [Required(ErrorMessage = "描述文字不能为空"), MinLength(50, ErrorMessage = "标题建议设置为50-1000字"), MaxLength(1000, ErrorMessage = "标题建议设置为50-1000字")]
+        [Required(ErrorMessage = "描述文字不能为空"), MinLength(40, ErrorMessage = "描述文字建议至少设置为40字"), MaxLength(300, ErrorMessage = "描述文字不能超过300字")]
         public string Description { get; set; }
 
         /// <summary>

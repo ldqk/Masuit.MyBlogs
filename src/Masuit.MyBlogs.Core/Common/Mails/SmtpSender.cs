@@ -12,7 +12,6 @@ namespace Masuit.MyBlogs.Core.Common.Mails
     {
         public void Send(string title, string content, string tos)
         {
-#if !DEBUG
             new Email()
             {
                 EnableSsl = bool.Parse(CommonHelper.SystemSettings.GetOrAdd("EnableSsl", "true")),
@@ -24,7 +23,6 @@ namespace Masuit.MyBlogs.Core.Common.Mails
                 Subject = title,
                 Tos = tos
             }.Send();
-#endif
         }
 
         public List<string> GetBounces()
@@ -32,12 +30,17 @@ namespace Masuit.MyBlogs.Core.Common.Mails
             return File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "email-bounces.txt"), Encoding.UTF8).Split(',').ToList();
         }
 
-        public string AddBounces(string email)
+        public string AddRecipient(string email)
         {
             var bounces = GetBounces();
             bounces.Add(email);
             File.WriteAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "email-bounces.txt"), bounces.Join(","));
             return "添加成功";
+        }
+
+        public bool HasBounced(string address)
+        {
+            return GetBounces().Contains(address);
         }
     }
 }

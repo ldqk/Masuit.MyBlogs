@@ -6,6 +6,7 @@ namespace Masuit.MyBlogs.Core.Common.Mails
     {
         void Send(string title, string content, string tos);
         List<string> GetBounces();
-        string AddBounces(string email);
+        string AddRecipient(string email);
+        public bool HasBounced(string address);
     }
 }

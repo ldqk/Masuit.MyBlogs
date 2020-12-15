@@ -16,11 +16,13 @@ namespace Masuit.MyBlogs.Core.Common.Mails
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly ICacheManager<List<string>> _cacheManager;
+        private readonly ICacheManager<bool> _bouncedCacheManager;
 
-        public MailgunSender(HttpClient httpClient, IConfiguration configuration, ICacheManager<List<string>> cacheManager)
+        public MailgunSender(HttpClient httpClient, IConfiguration configuration, ICacheManager<List<string>> cacheManager, ICacheManager<bool> bouncedCacheManager)
         {
             _configuration = configuration;
             _cacheManager = cacheManager;
+            _bouncedCacheManager = bouncedCacheManager;
             _httpClient = httpClient;
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"api:{_configuration["MailgunConfig:apikey"]}")));
         }
@@ -41,13 +43,19 @@ namespace Masuit.MyBlogs.Core.Common.Mails
         public List<string> GetBounces()
         {
             EmailAddress email = _configuration["MailgunConfig:from"];
-            return _cacheManager.GetOrAdd("emailbounces", _ => _httpClient.GetStringAsync($"https://api.mailgun.net/v3/{email.Domain}/bounces").ContinueWith(t =>
+            return _cacheManager.GetOrAdd("email-bounces", _ => _httpClient.GetStringAsync($"https://api.mailgun.net/v3/{email.Domain}/bounces").ContinueWith(t =>
              {
                  return t.IsCompletedSuccessfully ? ((JArray)JObject.Parse(t.Result)["items"])?.Select(x => (string)x["address"]).ToList() : new List<string>();
              }).Result);
         }
 
-        public string AddBounces(string email)
+        public bool HasBounced(string address)
+        {
+            EmailAddress email = _configuration["MailgunConfig:from"];
+            return _bouncedCacheManager.GetOrAdd("email-bounced", _ => _httpClient.GetStringAsync($"https://api.mailgun.net/v3/{email.Domain}/bounces/{address}").ContinueWith(t => t.IsCompletedSuccessfully && JObject.Parse(t.Result).ContainsKey("error")).Result);
+        }
+
+        public string AddRecipient(string email)
         {
             EmailAddress mail = _configuration["MailgunConfig:from"];
             return _httpClient.PostAsync($"https://api.mailgun.net/v3/{mail.Domain}/bounces", new MultipartFormDataContent

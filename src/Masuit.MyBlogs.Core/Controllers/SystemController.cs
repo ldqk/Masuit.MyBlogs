@@ -264,7 +264,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public ActionResult BounceEmail(string email)
         {
-            var msg = MailSender.AddBounces(email);
+            var msg = MailSender.AddRecipient(email);
             return Ok(new { msg });
         }
 

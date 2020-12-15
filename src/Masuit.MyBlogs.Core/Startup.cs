@@ -24,6 +24,7 @@ using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Config;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Systems;
+using Masuit.Tools.Win32;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -257,6 +258,7 @@ namespace Masuit.MyBlogs.Core
                     }
                 });
                 Console.WriteLine($"导入自定义词库完成，耗时{time}s");
+                Windows.ClearMemorySilent();
             });
 
             string lucenePath = Path.Combine(env.ContentRootPath, luceneIndexerOptions.Path);
