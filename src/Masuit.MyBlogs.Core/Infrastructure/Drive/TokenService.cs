@@ -26,45 +26,45 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 
         public TokenService()
         {
-            if (Configuration.Type == Configuration.OfficeType.China)
+            if (OneDriveConfiguration.Type == OneDriveConfiguration.OfficeType.China)
             {
-                app = ConfidentialClientApplicationBuilder.Create(Configuration.ClientId).WithClientSecret(Configuration.ClientSecret).WithRedirectUri(Configuration.BaseUri + "/api/admin/bind/new").WithAuthority(AzureCloudInstance.AzureChina, "common").Build();
+                app = ConfidentialClientApplicationBuilder.Create(OneDriveConfiguration.ClientId).WithClientSecret(OneDriveConfiguration.ClientSecret).WithRedirectUri(OneDriveConfiguration.BaseUri + "/api/admin/bind/new").WithAuthority(AzureCloudInstance.AzureChina, "common").Build();
             }
             else
             {
-                app = ConfidentialClientApplicationBuilder.Create(Configuration.ClientId).WithClientSecret(Configuration.ClientSecret).WithRedirectUri(Configuration.BaseUri + "/api/admin/bind/new").WithAuthority(AzureCloudInstance.AzurePublic, "common").Build();
+                app = ConfidentialClientApplicationBuilder.Create(OneDriveConfiguration.ClientId).WithClientSecret(OneDriveConfiguration.ClientSecret).WithRedirectUri(OneDriveConfiguration.BaseUri + "/api/admin/bind/new").WithAuthority(AzureCloudInstance.AzurePublic, "common").Build();
             }
 
             //缓存Token
             TokenCacheHelper.EnableSerialization(app.UserTokenCache);
             //这里要传入一个 Scope 否则默认使用 https://graph.microsoft.com/.default
             //而导致无法使用世纪互联版本
-            authProvider = new AuthorizationCodeProvider(app, Configuration.Scopes);
+            authProvider = new AuthorizationCodeProvider(app, OneDriveConfiguration.Scopes);
             //获取Token
             if (File.Exists(TokenCacheHelper.CacheFilePath))
             {
-                authorizeResult = authProvider.ClientApplication.AcquireTokenSilent(Configuration.Scopes, Configuration.AccountName).ExecuteAsync().Result;
+                authorizeResult = authProvider.ClientApplication.AcquireTokenSilent(OneDriveConfiguration.Scopes, OneDriveConfiguration.AccountName).ExecuteAsync().Result;
                 //Debug.WriteLine(authorizeResult.AccessToken);
             }
 
             //启用代理
-            if (!string.IsNullOrEmpty(Configuration.Proxy))
+            if (!string.IsNullOrEmpty(OneDriveConfiguration.Proxy))
             {
                 // Configure your proxy
                 var httpClientHandler = new HttpClientHandler
                 {
-                    Proxy = new WebProxy(Configuration.Proxy),
+                    Proxy = new WebProxy(OneDriveConfiguration.Proxy),
                     UseDefaultCredentials = true
                 };
                 var httpProvider = new Microsoft.Graph.HttpProvider(httpClientHandler, false)
                 {
                     OverallTimeout = TimeSpan.FromSeconds(10)
                 };
-                Graph = new Microsoft.Graph.GraphServiceClient($"{Configuration.GraphApi}/v1.0", authProvider, httpProvider);
+                Graph = new Microsoft.Graph.GraphServiceClient($"{OneDriveConfiguration.GraphApi}/v1.0", authProvider, httpProvider);
             }
             else
             {
-                Graph = new Microsoft.Graph.GraphServiceClient($"{Configuration.GraphApi}/v1.0", authProvider);
+                Graph = new Microsoft.Graph.GraphServiceClient($"{OneDriveConfiguration.GraphApi}/v1.0", authProvider);
             }
 
             //定时更新Token
@@ -73,7 +73,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
                   if (File.Exists(TokenCacheHelper.CacheFilePath))
                   {
                       //TODO:自动刷新 Token 失效
-                      authorizeResult = authProvider.ClientApplication.AcquireTokenSilent(Configuration.Scopes, Configuration.AccountName).ExecuteAsync().Result;
+                      authorizeResult = authProvider.ClientApplication.AcquireTokenSilent(OneDriveConfiguration.Scopes, OneDriveConfiguration.AccountName).ExecuteAsync().Result;
                   }
               }, null, TimeSpan.FromSeconds(0), TimeSpan.FromHours(1));
         }
@@ -86,7 +86,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         public async Task<AuthenticationResult> Authorize(string code)
         {
             AuthorizationCodeProvider authorizationCodeProvider = new AuthorizationCodeProvider(app);
-            authorizeResult = await authorizationCodeProvider.ClientApplication.AcquireTokenByAuthorizationCode(Configuration.Scopes, code).ExecuteAsync();
+            authorizeResult = await authorizationCodeProvider.ClientApplication.AcquireTokenByAuthorizationCode(OneDriveConfiguration.Scopes, code).ExecuteAsync();
             return authorizeResult;
         }
     }

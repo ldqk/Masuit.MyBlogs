@@ -4,7 +4,6 @@ using CSRedis;
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.MemoryStorage;
-using JiebaNet.Segmenter;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Extensions;
 using Masuit.MyBlogs.Core.Common;
@@ -23,8 +22,6 @@ using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Config;
 using Masuit.Tools.Core.Net;
-using Masuit.Tools.Systems;
-using Masuit.Tools.Win32;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -40,9 +37,6 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using StackExchange.Profiling;
 using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core
@@ -95,15 +89,15 @@ namespace Masuit.MyBlogs.Core
         public void ConfigureServices(IServiceCollection services)
         {
             RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.MinimumSameSitePolicy = SameSiteMode.Lax;
-            }); //配置Cookie策略
             services.AddDbContext<DataContext>(opt =>
             {
                 opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(3)).EnableDetailedErrors();
                 //opt.UseSqlServer(AppConfig.ConnString);
             }); //配置数据库
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.Lax;
+            }); //配置Cookie策略
             services.Configure<FormOptions>(options =>
             {
                 options.MultipartBodyLengthLimit = 104857600; // 100MB
@@ -116,7 +110,7 @@ namespace Masuit.MyBlogs.Core
             services.AddSignalR().AddNewtonsoftJsonProtocol();
 
             services.AddResponseCache().AddCacheConfig();
-            services.AddHangfire((provider, configuration) =>
+            services.AddHangfire((_, configuration) =>
             {
                 configuration.UseFilter(new AutomaticRetryAttribute());
                 configuration.UseMemoryStorage();
@@ -129,14 +123,13 @@ namespace Masuit.MyBlogs.Core
 
             services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)); //注入HttpClient
             services.AddHttpClient<ImagebedClient>();
-            services.AddHttpContextAccessor(); //注入静态HttpContext
             services.AddMailSender(Configuration).AddFirewallReporter(Configuration);
             services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
             services.AddMiniProfiler(options =>
             {
                 options.RouteBasePath = "/profiler";
                 options.EnableServerTimingHeader = true;
-                options.ResultsAuthorize = req => req.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin ?? false;
+                options.ResultsAuthorize = req => req.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true;
                 options.ResultsListAuthorize = options.ResultsAuthorize;
                 options.IgnoredPaths.AddRange("/Assets/", "/Content/", "/fonts/", "/images/", "/ng-views/", "/Scripts/", "/static/", "/template/", "/cloud10.png", "/favicon.ico");
                 options.PopupRenderPosition = RenderPosition.BottomLeft;
@@ -170,8 +163,8 @@ namespace Masuit.MyBlogs.Core
         {
             ServiceProvider = app.ApplicationServices;
             db.Database.EnsureCreated();
-            InitSettings(db);
-            UseLuceneSearch(env, hangfire, luceneIndexerOptions);
+            app.InitSettings();
+            app.UseLuceneSearch(env, hangfire, luceneIndexerOptions);
 
             app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For
             if (env.IsDevelopment())
@@ -231,43 +224,6 @@ namespace Masuit.MyBlogs.Core
 
             HangfireJobInit.Start(); //初始化定时任务
             Console.WriteLine("网站启动完成");
-        }
-
-        private static void InitSettings(DataContext db)
-        {
-            var dic = db.SystemSetting.ToDictionary(s => s.Name, s => s.Value); //初始化系统设置参数
-            foreach (var (key, value) in dic)
-            {
-                CommonHelper.SystemSettings.TryAdd(key, value);
-            }
-        }
-
-        private static void UseLuceneSearch(IHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
-        {
-            Task.Run(() =>
-            {
-                Console.WriteLine("正在导入自定义词库...");
-                double time = HiPerfTimer.Execute(() =>
-                {
-                    var set = ServiceProvider.GetRequiredService<DataContext>().Post.Select(p => $"{p.Title},{p.Label},{p.Keyword}").AsEnumerable().SelectMany(s => s.Split(new[] { ',', ' ', '+', '—' }, StringSplitOptions.RemoveEmptyEntries)).ToHashSet();
-                    var lines = File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomKeywords.txt")).Union(set);
-                    var segmenter = new JiebaSegmenter();
-                    foreach (var word in lines)
-                    {
-                        segmenter.AddWord(word);
-                    }
-                });
-                Console.WriteLine($"导入自定义词库完成，耗时{time}s");
-                Windows.ClearMemorySilent();
-            });
-
-            string lucenePath = Path.Combine(env.ContentRootPath, luceneIndexerOptions.Path);
-            if (!Directory.Exists(lucenePath) || Directory.GetFiles(lucenePath).Length < 1)
-            {
-                Console.WriteLine("索引库不存在，开始自动创建Lucene索引库...");
-                hangfire.CreateLuceneIndex();
-                Console.WriteLine("索引库创建完成！");
-            }
         }
     }
 

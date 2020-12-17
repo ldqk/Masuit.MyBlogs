@@ -1,5 +1,6 @@
 ﻿using Autofac.Extensions.DependencyInjection;
 using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Hubs;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Drive;
@@ -12,7 +13,6 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
 using Z.EntityFramework.Plus;
-using Configuration = Masuit.MyBlogs.Core.Extensions.DriveHelpers.Configuration;
 
 namespace Masuit.MyBlogs.Core
 {
@@ -29,7 +29,7 @@ namespace Masuit.MyBlogs.Core
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             };
-            Init();
+            InitOneDrive();
             MyHub.Init();
             CreateWebHostBuilder(args).Build().Run();
         }
@@ -49,7 +49,7 @@ namespace Masuit.MyBlogs.Core
             Console.WriteLine($"应用程序监听端口：http：{port}，https：{sslport}");
         }).UseStartup<Startup>());
 
-        public static void Init()
+        public static void InitOneDrive()
         {
             //初始化
             if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "OneDrive.db")))
@@ -63,7 +63,7 @@ namespace Masuit.MyBlogs.Core
             {
                 settingService.Set("IsInit", "true").Wait();
                 Console.WriteLine("数据初始化成功");
-                Console.WriteLine($"请登录 {Configuration.BaseUri}/#/admin 进行身份及其他配置");
+                Console.WriteLine($"请登录 {OneDriveConfiguration.BaseUri}/#/admin 进行身份及其他配置");
             }
         }
     }

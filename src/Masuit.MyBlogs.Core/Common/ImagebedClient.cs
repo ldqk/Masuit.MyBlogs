@@ -40,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <summary>
         /// OSS客户端
         /// </summary>
-        public static OssClient OssClient { get; set; } = new OssClient(AppConfig.AliOssConfig.EndPoint, AppConfig.AliOssConfig.AccessKeyId, AppConfig.AliOssConfig.AccessKeySecret);
+        public static OssClient OssClient { get; set; } = new(AppConfig.AliOssConfig.EndPoint, AppConfig.AliOssConfig.AccessKeyId, AppConfig.AliOssConfig.AccessKeySecret);
 
         /// <summary>
         /// 上传图片
@@ -65,7 +65,7 @@ namespace Masuit.MyBlogs.Core.Common
             return await fallbackPolicy.WrapAsync(retryPolicy).ExecuteAsync(() => UploadGitlab(stream, file));
         }
 
-        private readonly List<string> _failedList = new List<string>();
+        private readonly List<string> _failedList = new();
 
         /// <summary>
         /// gitlab图床

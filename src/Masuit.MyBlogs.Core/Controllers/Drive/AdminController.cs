@@ -105,8 +105,8 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
                 }
                 return Json(new
                 {
-                    officeName = Configuration.AccountName,
-                    officeType = Enum.GetName(typeof(Configuration.OfficeType), Configuration.Type),
+                    officeName = OneDriveConfiguration.AccountName,
+                    officeType = Enum.GetName(typeof(OneDriveConfiguration.OfficeType), OneDriveConfiguration.Type),
                     driveInfo,
                     appName = _setting.Get("AppName"),
                     webName = _setting.Get("WebName"),

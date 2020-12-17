@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire
@@ -186,7 +187,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             Parallel.ForEach(links, link =>
             {
                 var prev = link.Status;
-                client.GetStringAsync(link.Url).ContinueWith(t =>
+                client.GetStringAsync(link.Url, new CancellationTokenSource(client.Timeout).Token).ContinueWith(t =>
                 {
                     if (t.IsCanceled || t.IsFaulted)
                     {

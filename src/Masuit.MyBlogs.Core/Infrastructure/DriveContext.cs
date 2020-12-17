@@ -13,7 +13,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
-            builder.UseSqlite(Configuration.ConnectionString);
+            builder.UseSqlite(OneDriveConfiguration.ConnectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

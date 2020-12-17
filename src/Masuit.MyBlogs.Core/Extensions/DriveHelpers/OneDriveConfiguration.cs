@@ -3,10 +3,10 @@ using System.IO;
 
 namespace Masuit.MyBlogs.Core.Extensions.DriveHelpers
 {
-    public class Configuration
+    public class OneDriveConfiguration
     {
         private static readonly IConfigurationRoot ConfigurationRoot;
-        static Configuration()
+        static OneDriveConfiguration()
         {
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", true, true);
             ConfigurationRoot = builder.Build();
@@ -36,7 +36,7 @@ namespace Masuit.MyBlogs.Core.Extensions.DriveHelpers
         /// 返回 Scopes
         /// </summary>
         /// <value></value>
-        public static string[] Scopes => new string[] { "Sites.ReadWrite.All", "Files.ReadWrite.All" };
+        public static string[] Scopes => new[] { "Sites.ReadWrite.All", "Files.ReadWrite.All" };
 
         /// <summary>
         /// 代理路径

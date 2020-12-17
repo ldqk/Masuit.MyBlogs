@@ -199,7 +199,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
                 return Json(new
                 {
                     requestUrl = result,
-                    fileUrl = $"{Configuration.BaseUri}/api/files/{siteName}/{path}"
+                    fileUrl = $"{OneDriveConfiguration.BaseUri}/api/files/{siteName}/{path}"
                 }, new JsonSerializerSettings()
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver()

@@ -31,7 +31,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// <returns></returns>
         public async Task<string> GetAuthorizationRequestUrl()
         {
-            var redirectUrl = await app.GetAuthorizationRequestUrl(Configuration.Scopes).ExecuteAsync();
+            var redirectUrl = await app.GetAuthorizationRequestUrl(OneDriveConfiguration.Scopes).ExecuteAsync();
             return redirectUrl.AbsoluteUri;
         }
         /// <summary>
@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
                     Timeout = TimeSpan.FromSeconds(20)
                 };
                 var apiCaller = new ProtectedApiCallHelper(httpClient);
-                await apiCaller.CallWebApiAndProcessResultASync($"{Configuration.GraphApi}/v1.0/sites/{Configuration.DominName}:/sites/{siteName}", GetToken(), result =>
+                await apiCaller.CallWebApiAndProcessResultASync($"{OneDriveConfiguration.GraphApi}/v1.0/sites/{OneDriveConfiguration.DominName}:/sites/{siteName}", GetToken(), result =>
                 {
                     site.SiteId = result.Properties().Single((prop) => prop.Name == "id").Value.ToString();
                     site.Name = result.Properties().Single((prop) => prop.Name == "name").Value.ToString();
@@ -130,7 +130,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// <returns></returns>
         public string GetToken()
         {
-            return app.AcquireTokenSilent(Configuration.Scopes, Configuration.AccountName).ExecuteAsync().Result.AccessToken;
+            return app.AcquireTokenSilent(OneDriveConfiguration.Scopes, OneDriveConfiguration.AccountName).ExecuteAsync().Result.AccessToken;
         }
         public class DriveInfo
         {
