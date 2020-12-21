@@ -470,8 +470,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var post = await PostService.GetByIdAsync(dto.PostId) ?? throw new NotFoundException("文章未找到");
-            var diff = new HtmlDiff.HtmlDiff(post.Content.RemoveHtmlTag(), dto.Content.RemoveHtmlTag());
-            if (post.Title.Equals(dto.Title) && !diff.Build().Contains(new[] { "diffmod", "diffdel", "diffins" }))
+            var htmlDiff = new HtmlDiff.HtmlDiff(post.Content.RemoveHtmlTag(), dto.Content.RemoveHtmlTag());
+            var diff = htmlDiff.Build();
+            if (post.Title.Equals(dto.Title) && !diff.Contains(new[] { "diffmod", "diffdel", "diffins" }))
             {
                 return ResultData(null, false, "内容未被修改！");
             }
@@ -526,11 +527,17 @@ namespace Masuit.MyBlogs.Core.Controllers
             await RedisHelper.ExpireAsync("code:" + dto.ModifierEmail, 1);
             await MessageService.AddEntitySavedAsync(new InternalMessage()
             {
-                Title = $"来自【{dto.Modifier}】的文章修改合并请求",
+                Title = $"来自【{dto.Modifier}】对文章《{post.Title}》的修改请求",
                 Content = dto.Title,
                 Link = "#/merge/compare?id=" + merge.Id
             });
-            var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/merge-request.html")).Set("title", post.Title).Set("link", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id).Render();
+            var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/merge-request.html"))
+                .Set("title", post.Title)
+                .Set("link", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id)
+                .Set("diff", diff)
+                .Set("host", "//" + Request.Host)
+                .Set("id", merge.Id.ToString())
+                .Render();
             BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"], ClientIP));
             return ResultData(null, true, "您的修改请求已提交，已进入审核状态，感谢您的参与！");
         }

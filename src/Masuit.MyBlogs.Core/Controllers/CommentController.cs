@@ -118,7 +118,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     await MessageService.AddEntitySavedAsync(new InternalMessage()
                     {
-                        Title = $"来自【{comment.NickName}】的新文章评论",
+                        Title = $"来自【{comment.NickName}】在文章《{post.Title}》的新评论",
                         Content = comment.Content,
                         Link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }) + "#comment"
                     });

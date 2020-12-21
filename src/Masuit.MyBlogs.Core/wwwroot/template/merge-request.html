@@ -1,8 +1,23 @@
-﻿<h2>文章合并修改请求！</h2>
+﻿<style>
+    ins {
+        background-color: #cfc;
+        text-decoration: none;
+    }
+
+    del {
+        color: #999;
+        background-color: #FEC8C8;
+    }
+</style>
+<h2>文章合并修改请求！</h2>
 <div>
     <p>《{{title}}》</p>
-    <a href="{{link}}">查看详情</a>
+    <div>{{diff}}</div>
 </div>
+<a href="{{link}}">查看详情</a> | 
+<a href="{{host}}/dashboard#/merge/edit?id={{id}}" target="_blank">
+    编辑并合并
+</a>
 <p style="color: red">
     本邮件由系统自动发出，请勿回复本邮件！
 </p>
