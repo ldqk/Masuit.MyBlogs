@@ -105,6 +105,8 @@ namespace Masuit.MyBlogs.Core
             services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
             services.SetupMiniProfile();
             services.AddOneDrive();
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
             services.AddMapper().AddAutofac().AddMyMvc();
         }
 
@@ -139,18 +141,20 @@ namespace Masuit.MyBlogs.Core
 
             app.UseBundles();
             app.SetupHttpsRedirection(Configuration);
-            app.SetupStaticFiles();
+            app.UseDefaultFiles().UseStaticFiles();
             app.UseSession().UseCookiePolicy().UseMiniProfiler(); //注入Session
             app.UseRequestIntercept(); //启用网站请求拦截
             app.SetupHangfire();
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
             app.UseMiddleware<TranslateMiddleware>();
-            //app.UseActivity();// 抽奖活动
+            //app.UseActivity();// 抽奖活动 
             app.UseRouting().UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers(); // 属性路由
+                endpoints.MapBlazorHub();
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}"); // 默认路由
                 endpoints.MapHub<MyHub>("/hubs");
+                endpoints.MapFallbackToController("Index", "Error");
             });
 
             Console.WriteLine("网站启动完成");

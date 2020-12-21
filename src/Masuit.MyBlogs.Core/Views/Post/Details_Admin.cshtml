@@ -5,6 +5,7 @@
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
+@using Masuit.MyBlogs.Core.Views.Post
 @using Masuit.Tools.Core.Net
 @using Masuit.Tools.Systems
 @model Masuit.MyBlogs.Core.Models.Entity.Post
@@ -88,7 +89,7 @@
                                 <div class="col-md-12 line-height24">
                                     分类：<i class="icon-map-pin"></i>
                                     <a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId" class="label label-info">@Model.Category.Name</a>
-                                    | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃ | 状态：@Model.Status.GetDisplay()
+                                    | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃ | @(await Html.RenderComponentAsync<PostOnline>(RenderMode.ServerPrerendered, new { Model.Id })) | 状态：@Model.Status.GetDisplay()
                                     @if (Model.Seminar.Any())
                                     {
                                         <span> | 所属专题：</span>
@@ -536,3 +537,4 @@
         }, function () { });
 	}
 </script>
+<script src="_framework/blazor.server.js"></script>

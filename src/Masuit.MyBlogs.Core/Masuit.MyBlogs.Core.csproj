@@ -65,6 +65,7 @@
         <PackageReference Include="Polly" Version="7.2.1" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0-alpha.2" />
         <PackageReference Include="Svg" Version="3.1.1" />
+        <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.0" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.6" />
         <PackageReference Include="TimeZoneConverter" Version="3.3.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.0" />

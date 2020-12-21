@@ -101,18 +101,6 @@ namespace Masuit.MyBlogs.Core
                     break;
             }
         }
-        public static void SetupStaticFiles(this IApplicationBuilder app)
-        {
-            app.UseDefaultFiles().UseStaticFiles(new StaticFileOptions //静态资源缓存策略
-            {
-                OnPrepareResponse = context =>
-                {
-                    context.Context.Response.Headers[HeaderNames.CacheControl] = "public,no-cache";
-                    context.Context.Response.Headers[HeaderNames.Expires] = DateTime.Now.AddDays(7).ToString("R");
-                },
-                ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes),
-            });
-        }
 
         public static void SetupMiniProfile(this IServiceCollection services)
         {
@@ -146,6 +134,16 @@ namespace Masuit.MyBlogs.Core
                 options.KnownNetworks.Clear();
                 options.KnownProxies.Clear();
             });
+            services.Configure<StaticFileOptions>(options =>
+            {
+                options.OnPrepareResponse = context =>
+                {
+                    context.Context.Response.Headers[HeaderNames.CacheControl] = "public,no-cache";
+                    context.Context.Response.Headers[HeaderNames.Expires] = DateTime.Now.AddDays(7).ToString("R");
+                };
+                options.ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes);
+                options.HttpsCompression = HttpsCompressionMode.Compress;
+            }); // 配置静态资源文件类型和缓存
         }
     }
 
