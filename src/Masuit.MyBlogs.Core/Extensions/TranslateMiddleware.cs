@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Masuit.MyBlogs.Core.Extensions
 {
     /// <summary>
-    /// 请求拦截器
+    /// 简繁转换拦截器
     /// </summary>
     public class TranslateMiddleware
     {
@@ -63,10 +63,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             memStream.Position = 0;
             var responseReader = new StreamReader(memStream, Encoding.UTF8);
             var responseBody = await responseReader.ReadToEndAsync();
-            memStream = new MemoryStream(Encoding.UTF8.GetBytes(responseBody.ToTraditional()))
-            {
-                Position = 0
-            };
+            memStream = new MemoryStream(Encoding.UTF8.GetBytes(responseBody.ToTraditional()));
             await memStream.CopyToAsync(responseOriginalBody);
             context.Response.Body = responseOriginalBody;
         }
