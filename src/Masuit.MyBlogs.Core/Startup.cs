@@ -146,21 +146,21 @@ namespace Masuit.MyBlogs.Core
             app.UseRequestIntercept(); //启用网站请求拦截
             app.SetupHangfire();
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
-            app.UseMiddleware<TranslateMiddleware>();
+            app.UseWhen(c => !c.Request.Path.StartsWithSegments("/_") && c.Request.Scheme.StartsWith("http"), builder => builder.UseMiddleware<TranslateMiddleware>());
             //app.UseActivity();// 抽奖活动 
             app.UseRouting().UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub(options =>
                 {
-                    options.ApplicationMaxBufferSize = 0;
+                    options.ApplicationMaxBufferSize = 4194304;
                     options.LongPolling.PollTimeout = TimeSpan.FromSeconds(10);
-                    options.TransportMaxBufferSize = 0;
+                    options.TransportMaxBufferSize = 8388608;
                 });
                 endpoints.MapHub<MyHub>("/hubs", options =>
                 {
-                    options.ApplicationMaxBufferSize = 0;
+                    options.ApplicationMaxBufferSize = 4194304;
                     options.LongPolling.PollTimeout = TimeSpan.FromSeconds(10);
-                    options.TransportMaxBufferSize = 0;
+                    options.TransportMaxBufferSize = 8388608;
                 });
                 endpoints.MapControllers(); // 属性路由
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}"); // 默认路由

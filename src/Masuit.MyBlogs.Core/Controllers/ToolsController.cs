@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Polly;
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using TimeZoneConverter;
 
@@ -100,9 +101,17 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return View(address);
             }
 
-            var s = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={AppConfig.BaiduAK}");
-            var physicsAddress = JsonConvert.DeserializeObject<PhysicsAddress>(s);
-            return View(physicsAddress);
+            var s = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={AppConfig.BaiduAK}", new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token).ContinueWith(t =>
+             {
+                 if (t.IsCompletedSuccessfully)
+                 {
+                     return JsonConvert.DeserializeObject<PhysicsAddress>(t.Result);
+                 }
+
+                 return new PhysicsAddress();
+             });
+
+            return View(s);
         }
 
         /// <summary>
@@ -134,8 +143,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             ViewBag.Address = addr;
-            var s = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?output=json&address={addr}&ak={AppConfig.BaiduAK}");
-            var physicsAddress = JsonConvert.DeserializeObject<PhysicsAddress>(s);
+            var physicsAddress = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?output=json&address={addr}&ak={AppConfig.BaiduAK}", new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token).ContinueWith(t =>
+             {
+                 if (t.IsCompletedSuccessfully)
+                 {
+                     return JsonConvert.DeserializeObject<PhysicsAddress>(t.Result);
+                 }
+
+                 return new PhysicsAddress();
+             });
             if (Request.Method.Equals(HttpMethods.Get))
             {
                 return View(physicsAddress?.AddressResult?.Location);
