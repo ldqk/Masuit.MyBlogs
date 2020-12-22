@@ -150,10 +150,20 @@ namespace Masuit.MyBlogs.Core
             //app.UseActivity();// 抽奖活动 
             app.UseRouting().UseEndpoints(endpoints =>
             {
+                endpoints.MapBlazorHub(options =>
+                {
+                    options.ApplicationMaxBufferSize = 0;
+                    options.LongPolling.PollTimeout = TimeSpan.FromSeconds(10);
+                    options.TransportMaxBufferSize = 0;
+                });
+                endpoints.MapHub<MyHub>("/hubs", options =>
+                {
+                    options.ApplicationMaxBufferSize = 0;
+                    options.LongPolling.PollTimeout = TimeSpan.FromSeconds(10);
+                    options.TransportMaxBufferSize = 0;
+                });
                 endpoints.MapControllers(); // 属性路由
-                endpoints.MapBlazorHub();
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}"); // 默认路由
-                endpoints.MapHub<MyHub>("/hubs");
                 endpoints.MapFallbackToController("Index", "Error");
             });
 

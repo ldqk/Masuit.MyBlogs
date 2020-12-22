@@ -10,7 +10,7 @@
     <title>@ViewBag.Title</title>
     <link href="~/Content/login/style.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/Content/iconfont.css">
-    <script src="~/Scripts/jquery-2.2.4.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js"></script>
     <link href="~/Content/jquery-labelauty.css" rel="stylesheet" />
     <script src="~/Scripts/jquery.complexify.js"></script>
     <script src="~/Scripts/jquery.placeholder.min.js"></script>
@@ -109,7 +109,7 @@
                 $(".tran").removeAttr("disabled");
                 flushcode();
             }
-        }).fail(function(data) {
+        }).fail(function (data) {
             $("#status").parents("button").parents(".form-group").find(".error-notic").html(data.Message);
             $("#status").parents("button").parents(".form-group").find(".error-notic").fadeIn(100);
             $("#status").fadeOut(200);

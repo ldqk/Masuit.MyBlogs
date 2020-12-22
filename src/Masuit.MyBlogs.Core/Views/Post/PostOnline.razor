@@ -1,6 +1,6 @@
 ﻿@using CacheManager.Core
 @implements IDisposable
-@inject ICacheManager<int> CacheManager
+@inject ICacheManager<uint> CacheManager
 
 <span class="text-red">@online</span>人正在浏览本文
 
@@ -8,11 +8,11 @@
     [Parameter]
     public int Id { get; set; }
     bool flag;
-    int online;
+    uint online;
 
     protected override void OnInitialized()
     {
-        online = CacheManager.AddOrUpdate("postOnline:" + Id, 1, i => i + 1);
+        online = CacheManager.AddOrUpdate("postOnline:" + Id, 1u, i => i + 1);
         flag = true;
         Task.Run(async () =>
         {
@@ -29,6 +29,19 @@
     public void Dispose()
     {
         flag = false;
-        online = CacheManager.AddOrUpdate("postOnline:" + Id, 1, i => i - 1);
+        online = CacheManager.AddOrUpdate("postOnline:" + Id, 1u, i =>
+        {
+            try
+            {
+                checked
+                {
+                    return i - 1;
+                }
+            }
+            catch
+            {
+                return 0;
+            }
+        });
     }
 }
