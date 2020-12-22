@@ -1,35 +1,5 @@
 [
   {
-    "outputFileName": "wwwroot/ng-views/app/app.config.min.js",
-    "inputFiles": [
-      "wwwroot/ng-views/app/app.config.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/Scripts/global/article.min.js",
-    "inputFiles": [
-      "wwwroot/Scripts/global/article.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/ng-views/controllers/menu.min.js",
-    "inputFiles": [
-      "wwwroot/ng-views/controllers/menu.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/ng-views/controllers/merge.min.js",
-    "inputFiles": [
-      "wwwroot/ng-views/controllers/merge.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/ng-views/controllers/post.min.js",
-    "inputFiles": [
-      "wwwroot/ng-views/controllers/post.js"
-    ]
-  },
-  {
     "outputFileName": "wwwroot/Scripts/publish/publish.min.js",
     "inputFiles": [
       "wwwroot/Scripts/publish/publish.js"
@@ -69,48 +39,6 @@
     "outputFileName": "wwwroot/Assets/UEditor/ueditor.config.admin.min.js",
     "inputFiles": [
       "wwwroot/Assets/UEditor/ueditor.config.admin.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/ng-views/controllers/partner.min.js",
-    "inputFiles": [
-      "wwwroot/ng-views/controllers/partner.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/ng-views/controllers/dashboard.min.js",
-    "inputFiles": [
-      "wwwroot/ng-views/controllers/dashboard.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/ng-views/css/app.min.css",
-    "inputFiles": [
-      "wwwroot/ng-views/css/app.css"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/ng-views/controllers/system.min.js",
-    "inputFiles": [
-      "wwwroot/ng-views/controllers/system.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/ng-views/controllers/links.min.js",
-    "inputFiles": [
-      "wwwroot/ng-views/controllers/links.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/ng-views/app/route.config.min.js",
-    "inputFiles": [
-      "wwwroot/ng-views/app/route.config.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/ng-views/controllers/analysis.min.js",
-    "inputFiles": [
-      "wwwroot/ng-views/controllers/analysis.js"
     ]
   },
   {
