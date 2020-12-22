@@ -38,7 +38,7 @@
   {
     "outputFileName": "wwwroot/Assets/UEditor/ueditor.all.min.js",
     "inputFiles": [
-      "wwwroot/Assets/UEditor/ueditor.all.js"
+      "wwwroot/Assets/UEditor/ueditor.all.min.js"
     ]
   },
   {
@@ -87,12 +87,6 @@
     "outputFileName": "wwwroot/ng-views/css/app.min.css",
     "inputFiles": [
       "wwwroot/ng-views/css/app.css"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/Scripts/jquery_3.4.1.min.js",
-    "inputFiles": [
-      "wwwroot/Scripts/jquery_3.4.1.js"
     ]
   },
   {
