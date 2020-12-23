@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.Tools;
 using Masuit.Tools.Logging;
@@ -15,9 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
-using System.Net;
 using System.Web;
-using Masuit.MyBlogs.Core.Extensions.Firewall;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -58,13 +57,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 string err;
                 var req = HttpContext.Request;
-                var ip = HttpContext.Connection.RemoteIpAddress.ToString();
-                var trueip = Request.Headers[AppConfig.TrueClientIPHeader].ToString();
-                if (!string.IsNullOrEmpty(trueip) && ip != trueip)
-                {
-                    ip = trueip;
-                }
-
+                var ip = HttpContext.Connection.RemoteIpAddress;
                 switch (feature.Error)
                 {
                     case DbUpdateConcurrencyException ex:
@@ -92,9 +85,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                             ex.Message
                         });
                     case AccessDenyException _:
-                        var (location, network) = IPAddress.Parse(ip).GetIPLocation();
+                        var (location, network) = ip.GetIPLocation();
                         var tips = Template.Create(CommonHelper.SystemSettings.GetOrAdd("AccessDenyTips", @"<h4>遇到了什么问题？</h4>
-                <h4>基于主观因素考虑，您所在的地区暂时不允许访问本站，如有疑问，请联系站长！或者请联系站长开通本站的访问权限！</h4>")).Set("clientip", ip).Set(nameof(location), location).Set(nameof(network), network).Render();
+                <h4>基于主观因素考虑，您所在的地区暂时不允许访问本站，如有疑问，请联系站长！或者请联系站长开通本站的访问权限！</h4>")).Set("clientip", ip.ToString()).Set(nameof(location), location).Set(nameof(network), network).Render();
                         Response.StatusCode = 403;
                         return View("AccessDeny", tips);
                     case TempDenyException _:

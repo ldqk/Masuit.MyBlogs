@@ -14,7 +14,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <summary>
         /// 请求日志
         /// </summary>
-        public static ConcurrentDictionary<string, RequestLog> RequestLogs { get; } = new ConcurrentDictionary<string, RequestLog>();
+        public static ConcurrentDictionary<string, RequestLog> RequestLogs { get; } = new();
 
         /// <summary>
         /// 刷写日志
@@ -50,8 +50,8 @@ namespace Masuit.MyBlogs.Core.Common
 
     public class RequestLog
     {
-        public HashSet<string> UserAgents { get; } = new HashSet<string>();
-        public HashSet<string> RequestUrls { get; } = new HashSet<string>();
+        public HashSet<string> UserAgents { get; } = new();
+        public HashSet<string> RequestUrls { get; } = new();
         public int Count { get; set; }
     }
 }

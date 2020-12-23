@@ -131,6 +131,7 @@ namespace Masuit.MyBlogs.Core
             {
                 options.ForwardLimit = null;
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.ForwardedForHeaderName = AppConfig.TrueClientIPHeader;
                 options.KnownNetworks.Clear();
                 options.KnownProxies.Clear();
             });

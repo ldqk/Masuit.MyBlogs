@@ -143,7 +143,7 @@ namespace Masuit.MyBlogs.Core
             app.SetupHttpsRedirection(Configuration);
             app.UseDefaultFiles().UseStaticFiles();
             app.UseSession().UseCookiePolicy().UseMiniProfiler(); //注入Session
-            app.UseRequestIntercept(); //启用网站请求拦截
+            app.UseMiddleware<RequestInterceptMiddleware>(); //启用网站请求拦截
             app.SetupHangfire();
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
             app.UseWhen(c => !c.Request.Path.StartsWithSegments("/_") && c.Request.Scheme.StartsWith("http"), builder => builder.UseMiddleware<TranslateMiddleware>());

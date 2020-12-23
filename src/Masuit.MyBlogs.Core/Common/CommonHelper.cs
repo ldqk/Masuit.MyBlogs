@@ -31,7 +31,7 @@ namespace Masuit.MyBlogs.Core.Common
     {
         static CommonHelper()
         {
-            ThreadPool.QueueUserWorkItem(s =>
+            ThreadPool.QueueUserWorkItem(_ =>
             {
                 while (true)
                 {
@@ -82,12 +82,12 @@ namespace Masuit.MyBlogs.Core.Common
         /// <summary>
         /// 每IP错误的次数统计
         /// </summary>
-        public static ConcurrentDictionary<string, int> IPErrorTimes { get; set; } = new ConcurrentDictionary<string, int>();
+        public static ConcurrentDictionary<string, int> IPErrorTimes { get; set; } = new();
 
         /// <summary>
         /// 系统设定
         /// </summary>
-        public static ConcurrentDictionary<string, string> SystemSettings { get; set; } = new ConcurrentDictionary<string, string>();
+        public static ConcurrentDictionary<string, string> SystemSettings { get; set; } = new();
 
         /// <summary>
         /// 网站启动时间
@@ -135,9 +135,9 @@ namespace Masuit.MyBlogs.Core.Common
             return false;
         }
 
-        private static readonly DbSearcher IPSearcher = new DbSearcher(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
-        public static readonly DatabaseReader MaxmindReader = new DatabaseReader(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-City.mmdb"));
-        private static readonly DatabaseReader MaxmindAsnReader = new DatabaseReader(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-ASN.mmdb"));
+        private static readonly DbSearcher IPSearcher = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
+        public static readonly DatabaseReader MaxmindReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-City.mmdb"));
+        private static readonly DatabaseReader MaxmindAsnReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-ASN.mmdb"));
 
         public static AsnResponse GetIPAsn(this string ip)
         {
@@ -156,11 +156,8 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static string GetIPLocation(this string ips)
         {
-            return ips.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s =>
-            {
-                var (location, network) = GetIPLocation(IPAddress.Parse(s.Trim()));
-                return location + "|" + network;
-            }).Join(" , ");
+            var (location, network) = GetIPLocation(IPAddress.Parse(ips));
+            return location + "|" + network;
         }
 
         public static (string location, string network) GetIPLocation(this IPAddress ip)

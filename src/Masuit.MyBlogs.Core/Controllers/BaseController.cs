@@ -50,7 +50,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 客户端的真实IP
         /// </summary>
-        public string ClientIP => HttpContext.GetTrueIP();
+        public string ClientIP => HttpContext.Connection.RemoteIpAddress.ToString();
 
         /// <summary>
         /// 普通访客是否token合法

@@ -43,9 +43,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 context.Response.StatusCode = 404;
                 return;
             }
-            var ip = context.GetTrueIP();
-            context.Items.AddOrUpdate("ip.asn", ip.GetIPAsn());
-            context.Items.AddOrUpdate("ip.location", ip.GetIPLocation());
+            var ip = context.Connection.RemoteIpAddress.ToString();
             var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
             var requestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path);
             var match = Regex.Match(path ?? "", CommonHelper.BanRegex);
@@ -99,7 +97,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     Count = 1,
                     RequestUrls = { requestUrl },
                     UserAgents = { request.Headers[HeaderNames.UserAgent] }
-                }, (s, i) =>
+                }, (_, i) =>
                 {
                     i.UserAgents.Add(request.Headers[HeaderNames.UserAgent]);
                     i.RequestUrls.Add(requestUrl);
