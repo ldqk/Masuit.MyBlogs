@@ -63,8 +63,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
             {
                 ad.CategoryNames = JiebaNet.Segmenter.Common.Extensions.Join(ad.CategoryIds.Split(",").Select(c => dic.GetValueOrDefault(c)), ",");
-                ad.CreateTime = ad.CreateTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-                ad.UpdateTime = ad.UpdateTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             }
 
             return Ok(list);

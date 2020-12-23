@@ -1,7 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+﻿using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -30,11 +28,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var time = DateTime.Now.AddMonths(-1);
             var list = await LoginRecordService.GetQueryFromCacheAsync<DateTime, LoginRecordViewModel>(r => r.UserInfoId == id && r.LoginTime >= time, r => r.LoginTime, false);
-            foreach (var item in list)
-            {
-                item.LoginTime = item.LoginTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-            }
-
             return ResultData(list);
         }
     }

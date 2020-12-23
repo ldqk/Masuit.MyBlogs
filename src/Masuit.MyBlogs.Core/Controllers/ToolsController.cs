@@ -97,7 +97,21 @@ namespace Masuit.MyBlogs.Core.Controllers
                 var r = new Random();
                 ip = $"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}";
 #endif
-                var address = await ip.GetPhysicsAddressInfo();
+                var location = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
+                var address = await ip.GetPhysicsAddressInfo() ?? new PhysicsAddress()
+                {
+                    Status = 0,
+                    AddressResult = new AddressResult()
+                    {
+                        AddressComponent = new AddressComponent(),
+                        FormattedAddress = ip.GetIPLocation(),
+                        Location = new Location()
+                        {
+                            Lng = location.Location.Longitude ?? 0,
+                            Lat = location.Location.Latitude ?? 0
+                        }
+                    }
+                };
                 return View(address);
             }
 
@@ -129,17 +143,28 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Random r = new Random();
                 ip = $"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}";
 #endif
-                var address = await ip.GetPhysicsAddressInfo();
-                if (address?.Status == 0)
+                var location = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
+                var address = await ip.GetPhysicsAddressInfo() ?? new PhysicsAddress()
                 {
-                    ViewBag.Address = address.AddressResult.FormattedAddress;
-                    if (Request.Method.Equals(HttpMethods.Get))
+                    Status = 0,
+                    AddressResult = new AddressResult()
                     {
-                        return View(address.AddressResult.Location);
+                        AddressComponent = new AddressComponent(),
+                        FormattedAddress = ip.GetIPLocation(),
+                        Location = new Location()
+                        {
+                            Lng = location.Location.Longitude ?? 0,
+                            Lat = location.Location.Latitude ?? 0
+                        }
                     }
-
-                    return Json(address.AddressResult.Location);
+                };
+                ViewBag.Address = address.AddressResult.FormattedAddress;
+                if (Request.Method.Equals(HttpMethods.Get))
+                {
+                    return View(address.AddressResult.Location);
                 }
+
+                return Json(address.AddressResult.Location);
             }
 
             ViewBag.Address = addr;
