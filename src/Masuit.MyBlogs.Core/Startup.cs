@@ -146,7 +146,7 @@ namespace Masuit.MyBlogs.Core
             app.UseMiddleware<RequestInterceptMiddleware>(); //启用网站请求拦截
             app.SetupHangfire();
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
-            app.UseWhen(c => !c.Request.Path.StartsWithSegments("/_") && c.Request.Scheme.StartsWith("http"), builder => builder.UseMiddleware<TranslateMiddleware>());
+            app.UseWhen(c => !c.Request.Path.StartsWithSegments("/_blazor"), builder => builder.UseMiddleware<TranslateMiddleware>());
             //app.UseActivity();// 抽奖活动 
             app.UseRouting().UseEndpoints(endpoints =>
             {
