@@ -100,6 +100,10 @@
 				return true;
 			}
 		});
+        $timeout(function () {
+		    $('.ui.dropdown.category').dropdown('clear');
+		    $('.ui.dropdown.types').dropdown('clear');
+		}, 10);
 	}
 	$scope.edit = function (item) {
 		$scope.partner = angular.copy(item);

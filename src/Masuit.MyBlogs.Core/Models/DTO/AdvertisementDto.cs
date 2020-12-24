@@ -44,9 +44,9 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public decimal Price { get; set; }
 
         /// <summary>
-        /// 广告类型
+        /// 推广区域
         /// </summary>
-        [Required(ErrorMessage = "类型不能为空，至少需要选择一个类型")]
+        [Required(ErrorMessage = "推广区域不能为空，至少需要选择一个推广区域")]
         public string Types { get; set; }
 
         public string CategoryIds { get; set; }
