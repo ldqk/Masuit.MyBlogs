@@ -14,6 +14,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
     string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
+    string hidden = string.IsNullOrEmpty(Context.Request.Cookies["Email"]) ? "" : "hidden";
     Advertisement ad = ViewBag.Ads;
 }
 <environment names="Development">
@@ -106,6 +107,7 @@
                                 {
                                     <p class="text-focus text-center">该文章已经超过1年未更新，可能无法为您提供及时准确的资讯，请根据当下实际情况，酌情参考本文内容。</p>
                                 }
+                            </div>
                         </header>
                         <article class="article" id="article">
                             @Html.Raw(Model.Content.ReplaceImgAttribute(Model.Title))
@@ -275,13 +277,13 @@
                                 <input type="hidden" name="PostId" value="@Model.Id" />
                                 <input type="hidden" id="OperatingSystem" name="OperatingSystem" />
                                 <input type="hidden" name="Browser" id="Browser" />
-                                <div class="row">
+                                <div class="row @hidden">
                                     <div class="col-md-4">
                                         <div class="input-group">
                                             <span class="input-group-addon">
                                                 <label for="name">昵称：</label>
                                             </span>
-                                            <input type="text" class="form-control" name="NickName" id="name" required placeholder="昵称">
+                                            <input type="text" class="form-control" name="NickName" id="name" required placeholder="昵称" value="@Context.Request.Cookies["NickName"]">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
@@ -289,7 +291,7 @@
                                             <span class="input-group-addon">
                                                 <label for="email">邮箱：</label>
                                             </span>
-                                            <input type="email" class="form-control" name="Email" id="email" required placeholder="留下您的真实邮箱，以方便接收回复">
+                                            <input type="email" class="form-control" name="Email" id="email" required placeholder="留下您的真实邮箱，以方便接收回复" value="@Context.Request.Cookies["Email"]">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
@@ -297,14 +299,14 @@
                                             <span class="input-group-addon">
                                                 <label for="chat">QQ/微信：</label>
                                             </span>
-                                            <input type="text" class="form-control" name="QQorWechat" id="chat" placeholder="QQ或微信(可选)">
+                                            <input type="text" class="form-control" name="QQorWechat" id="chat" placeholder="QQ或微信(可选)" value="@Context.Request.Cookies["QQorWechat"]">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group overlay animated fadeInDown" style="margin-bottom: 0px !important;">
                                     <textarea class="layui-textarea" id="layedit" name="Content" style="height: 100px"></textarea>
                                 </div>
-                                <input type="checkbox" name="Agree" id="aggrement" value="true" /><label for="aggrement">我已接受<a asp-controller="Misc" asp-action="agreement" target="_blank">《评论须知》</a></label>
+                                <label><input type="checkbox" name="Agree" value="true" />我已阅读<a asp-controller="Misc" asp-action="agreement" target="_blank">《评论须知》</a></label>
                                 <div class="form-group">
                                     <div class="col-xs-6">
                                         <button type="submit" class="btn btn-info btn-lg">提交</button>
@@ -344,37 +346,39 @@
             <input type="hidden" name="PostId" id="postId" value="@Model.Id" />
             <input type="hidden" name="OperatingSystem" id="OperatingSystem2" />
             <input type="hidden" name="Browser" id="Browser2" />
-            <div class="input-group">
-                <span class="input-group-addon">
-                    <label for="name">昵称：</label>
-                </span>
-                <input type="text" class="form-control" name="NickName" id="name2" required placeholder="昵称">
-            </div>
-            <div class="input-group">
-                <span class="input-group-addon">
-                    <label for="email">邮箱：</label>
-                </span>
-                <input type="email" class="form-control" name="Email" id="email2" required placeholder="留下您的真实邮箱，以方便接收回复">
-            </div>
-            <div class="input-group">
-                <span class="input-group-addon">
-                    <label for="chat">QQ/微信：</label>
-                </span>
-                <input type="text" class="form-control" name="QQorWechat" id="chat2" placeholder="QQ或微信(可选)">
+            <div class="@hidden">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <label for="name">昵称：</label>
+                    </span>
+                    <input type="text" class="form-control" name="NickName" id="name2" required placeholder="昵称" value="@Context.Request.Cookies["NickName"]">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <label for="email">邮箱：</label>
+                    </span>
+                    <input type="email" class="form-control" name="Email" id="email2" required placeholder="留下您的真实邮箱，以方便接收回复" value="@Context.Request.Cookies["Email"]">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <label for="chat">QQ/微信：</label>
+                    </span>
+                    <input type="text" class="form-control" name="QQorWechat" id="chat2" placeholder="QQ或微信(可选)" value="@Context.Request.Cookies["QQorWechat"]">
+                </div>
             </div>
             <input type="hidden" value="" id="uid" name="ParentId" />
             <div class="form-group overlay animated fadeInDown">
                 <textarea class="layui-textarea" id="layedit2" name="Content" style="height: 80px"></textarea>
             </div>
-            <input type="checkbox" name="Agree" id="aggrement2" value="true" /><label for="aggrement2">我已接受<a asp-controller="Misc" asp-action="agreement" target="_blank">《评论须知》</a></label>
+            <label><input type="checkbox" name="Agree" value="true" />我已阅读<a asp-controller="Misc" asp-action="agreement" target="_blank">《评论须知》</a></label>
             <div class="form-group">
                 <div class="col-xs-12">
                     <div class="btn-group">
-                        <button type="submit" class="btn btn-info btn-lg">
-                            提交回复
+                        <button type="submit" class="btn btn-info">
+                            提交
                         </button>
-                        <button type="button" class="btn-cancel btn btn-danger btn-lg">
-                            取消回复
+                        <button type="button" class="btn-cancel btn btn-danger">
+                            取消
                         </button>
                     </div>
                 </div>

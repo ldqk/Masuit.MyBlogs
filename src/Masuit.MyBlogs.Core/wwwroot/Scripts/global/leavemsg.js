@@ -8,12 +8,7 @@
 	$("#OperatingSystem").val(DeviceInfo.OS.toString());
     $("#Browser").val(DeviceInfo.browserInfo.Name+" "+DeviceInfo.browserInfo.Version);
 	window.getmsgs();
-	var user = JSON.parse(localStorage.getItem("user"));
-	if (user) {
-		$("[name='NickName']").val(user.NickName);
-		$("[name='Email']").val(user.Email);
-		$("[name='QQorWechat']").val(user.QQorWechat);
-	}
+	
     //异步提交留言表单开始
     $("#msg-form").on("submit", function(e) {
         e.preventDefault();
@@ -102,7 +97,6 @@
             loadingDone();
             return;
         }
-		localStorage.setItem("user", JSON.stringify($(this).serializeObject()));
 		window.post("/Msg/submit", $(this).serializeObject(), (data) => {
             loadingDone();
             if (data && data.Success) {
@@ -133,7 +127,6 @@
  */
 function submitComment(_this) {
     loading();
-	localStorage.setItem("user", JSON.stringify($(_this).serializeObject()));
     window.post("/Msg/submit", $(_this).serializeObject(), (data) => {
         loadingDone();
         if (data && data.Success) {
@@ -161,12 +154,6 @@ function bindReplyBtn() {
 	$(".msg-list article .panel-body a").on("click", function (e) {
 		e.preventDefault();
 		loadingDone();
-		var user = JSON.parse(localStorage.getItem("user"));
-		if (user) {
-			$("[name='NickName']").val(user.NickName);
-			$("[name='Email']").val(user.Email);
-			$("[name='QQorWechat']").val(user.QQorWechat);
-		}
 		var href = $(this).attr("href");
 		var uid = href.substring(href.indexOf("uid") + 4);
 		$("#uid").val(uid);

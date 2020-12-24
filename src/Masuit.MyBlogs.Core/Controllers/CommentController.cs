@@ -25,6 +25,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -57,7 +58,10 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (MailSender.HasBounced(dto.Email) || (!CurrentUser.IsAdmin && dto.Email.EndsWith(CommonHelper.SystemSettings["Domain"])))
             {
-                return ResultData(null, false, "邮箱地址错误，请使用有效的邮箱地址！");
+                Response.Cookies.Delete("Email");
+                Response.Cookies.Delete("QQorWechat");
+                Response.Cookies.Delete("NickName");
+                return ResultData(null, false, "邮箱地址错误，请刷新页面后重新使用有效的邮箱地址！");
             }
 
             Post post = await PostService.GetByIdAsync(dto.PostId) ?? throw new NotFoundException("评论失败，文章未找到");
@@ -102,6 +106,21 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "评论失败");
             }
 
+            Response.Cookies.Append("Email", comment.Email, new CookieOptions()
+            {
+                Expires = DateTimeOffset.Now.AddYears(1),
+                SameSite = SameSiteMode.Lax
+            });
+            Response.Cookies.Append("QQorWechat", comment.QQorWechat + "", new CookieOptions()
+            {
+                Expires = DateTimeOffset.Now.AddYears(1),
+                SameSite = SameSiteMode.Lax
+            });
+            Response.Cookies.Append("NickName", comment.NickName, new CookieOptions()
+            {
+                Expires = DateTimeOffset.Now.AddYears(1),
+                SameSite = SameSiteMode.Lax
+            });
             CommentFeq.AddOrUpdate("Comments:" + ClientIP, 1, i => i + 1, 5);
             CommentFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
             var emails = new HashSet<string>();

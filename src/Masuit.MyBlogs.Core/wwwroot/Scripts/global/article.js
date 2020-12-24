@@ -73,12 +73,6 @@
 			});
         });
 	});
-	var user = JSON.parse(localStorage.getItem("user"));
-	if (user) {
-		$("[name='NickName']").val(user.NickName||$("[name='NickName']").val());
-		$("[name='Email']").val(user.Email||$("[name='Email']").val());
-		$("[name='QQorWechat']").val(user.QQorWechat);
-	}
 
 	bindReplyBtn();//绑定回复按钮事件
 	bindVote();//绑定文章投票按钮
@@ -167,8 +161,7 @@
 			loadingDone();
 			return;
 		}
-
-		localStorage.setItem("user",  JSON.stringify(formData));
+		
 		window.post("/comment/submit", formData, function(data) {
 			loadingDone();
 			if (data.Success) {
@@ -206,7 +199,6 @@
  */
 function submitComment(_this) {
 	loading();
-	localStorage.setItem("user", JSON.stringify($(_this).serializeObject()));
 	window.post("/comment/submit", $(_this).serializeObject(), function(data) {
 		loadingDone();
 		if (data.Success) {
@@ -240,12 +232,6 @@ function bindReplyBtn() {
 	$(".msg-list article .panel-body a").on("click", function(e) {
 		e.preventDefault();
 		loadingDone();
-		var user = JSON.parse(localStorage.getItem("user"));
-		if (user) {
-		    $("[name='NickName']").val(user.NickName||$("[name='NickName']").val());
-		    $("[name='Email']").val(user.Email||$("[name='Email']").val());
-		    $("[name='QQorWechat']").val(user.QQorWechat);
-		}
 		var href = $(this).attr("href");
 		var uid = href.substring(href.indexOf("uid") + 4);
 		$("#uid").val(uid);
