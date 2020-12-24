@@ -18,7 +18,7 @@ namespace Masuit.MyBlogs.Core.Configs
         public MappingProfile()
         {
             CreateMap<Category, CategoryCommand>().ReverseMap();
-            CreateMap<Category, CategoryDto>().ForMember(c => c.TotalPostCount, e => e.MapFrom(c => c.Post.Count)).ForMember(c => c.PendedPostCount, e => e.MapFrom(c => c.Post.Count)).ReverseMap();
+            CreateMap<Category, CategoryDto>().ForMember(c => c.TotalPostCount, e => e.MapFrom(c => c.Post.Count)).ForMember(c => c.PendedPostCount, e => e.MapFrom(c => c.Post.Count(p => p.Status == Status.Published))).ReverseMap();
             CreateMap<CategoryCommand, CategoryDto>().ReverseMap();
 
             CreateMap<CommentCommand, Comment>().ForMember(c => c.Status, e => e.MapFrom(c => Status.Pending)).ReverseMap();

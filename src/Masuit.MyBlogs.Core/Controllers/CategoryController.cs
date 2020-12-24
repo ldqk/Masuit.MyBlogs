@@ -49,6 +49,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
+        [MyAuthorize]
         public async Task<ActionResult> Add(Category model)
         {
             bool exist = CategoryService.Any(c => c.Name.Equals(model.Name));
@@ -70,6 +71,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
+        [MyAuthorize]
         public async Task<ActionResult> Edit(CategoryCommand dto)
         {
             var cat = await CategoryService.GetByIdAsync(dto.Id) ?? throw new NotFoundException("分类不存在！");
@@ -85,6 +87,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="cid"></param>
         /// <returns></returns>
+        [MyAuthorize]
         public async Task<ActionResult> Delete(int id, int cid = 1)
         {
             bool b = await CategoryService.Delete(id, cid);
