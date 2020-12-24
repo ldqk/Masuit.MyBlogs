@@ -131,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
 
-            if (MailSender.HasBounced(dto.Email))
+            if (MailSender.HasBounced(dto.Email) || (!CurrentUser.IsAdmin && dto.Email.EndsWith(CommonHelper.SystemSettings["Domain"])))
             {
                 return ResultData(null, false, "邮箱地址错误，请使用有效的邮箱地址！");
             }

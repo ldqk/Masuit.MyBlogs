@@ -94,6 +94,9 @@
         <None Update="App_Data\DenyIPRange.txt">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <None Update="App_Data\email-bounces.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
         <None Update="App_Data\GeoLite2-ASN.mmdb">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
