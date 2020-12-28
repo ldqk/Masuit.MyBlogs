@@ -262,6 +262,6 @@
                         option.series[0].data[1].value = item.memoryUsage.toFixed(2);
                         rateChart.setOption(option, true);
                     });
-                }, 1000);
+                }, 5000);
             });
         }

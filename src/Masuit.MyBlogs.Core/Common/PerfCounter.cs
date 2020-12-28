@@ -35,7 +35,7 @@ namespace Masuit.MyBlogs.Core.Common
                         Console.ForegroundColor = ConsoleColor.White;
                         errorCount++;
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(5000);
                 }
             });
         }
