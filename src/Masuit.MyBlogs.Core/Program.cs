@@ -1,7 +1,6 @@
 ﻿using Autofac.Extensions.DependencyInjection;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
-using Masuit.MyBlogs.Core.Hubs;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Drive;
 using Masuit.Tools;
@@ -30,7 +29,7 @@ namespace Masuit.MyBlogs.Core
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             };
             InitOneDrive();
-            MyHub.Init();
+            PerfCounter.Init();
             CreateWebHostBuilder(args).Build().Run();
         }
 

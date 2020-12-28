@@ -26,7 +26,7 @@
                 string imgSrc = Model.Content.MatchFirstImgSrc();
                 if (!string.IsNullOrEmpty(imgSrc))
                 {
-                    <div class="col-sm-2 paddingright-clear">
+                    <div class="col-sm-2 paddingright-clear hidden-xs">
                         <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@Model.Title">
                     </div>
                 }

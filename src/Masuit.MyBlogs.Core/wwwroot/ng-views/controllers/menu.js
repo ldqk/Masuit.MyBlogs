@@ -1,5 +1,4 @@
 ﻿myApp.controller("menu", ["$scope", "$http", "$timeout", function($scope, $http, $timeout) {
-	window.hub.stop();
 	$scope.menu = {};
 	$scope.init = function() {
 		$scope.request("/menu/getmenus", null, function(data) {

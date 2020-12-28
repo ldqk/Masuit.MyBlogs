@@ -36,6 +36,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             return View();
         }
 
+        [Route("counter")]
+        public ActionResult Counter()
+        {
+            return View();
+        }
+
         /// <summary>
         /// 获取站内消息
         /// </summary>

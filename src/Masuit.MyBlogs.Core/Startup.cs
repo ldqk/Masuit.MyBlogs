@@ -12,7 +12,6 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using Masuit.MyBlogs.Core.Hubs;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Config;
@@ -86,7 +85,6 @@ namespace Masuit.MyBlogs.Core
                 options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
             });
             services.AddSession().AddAntiforgery(); //注入Session
-            services.AddSignalR().AddNewtonsoftJsonProtocol();
             services.AddResponseCache().AddCacheConfig();
             services.AddHangfire((_, configuration) =>
             {
@@ -151,12 +149,6 @@ namespace Masuit.MyBlogs.Core
             app.UseRouting().UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub(options =>
-                {
-                    options.ApplicationMaxBufferSize = 4194304;
-                    options.LongPolling.PollTimeout = TimeSpan.FromSeconds(10);
-                    options.TransportMaxBufferSize = 8388608;
-                });
-                endpoints.MapHub<MyHub>("/hubs", options =>
                 {
                     options.ApplicationMaxBufferSize = 4194304;
                     options.LongPolling.PollTimeout = TimeSpan.FromSeconds(10);

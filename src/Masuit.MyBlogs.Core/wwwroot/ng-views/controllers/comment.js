@@ -1,5 +1,4 @@
 ﻿myApp.controller("comment", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
-	window.hub.stop();
 	var self = this;
 	$scope.paginationConf = {
 		currentPage: $scope.currentPage ? $scope.currentPage : 1,

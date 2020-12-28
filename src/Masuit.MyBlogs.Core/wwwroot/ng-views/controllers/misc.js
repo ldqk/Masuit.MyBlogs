@@ -1,5 +1,4 @@
-﻿myApp.controller("miscAdd", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
-	window.hub.stop();
+﻿myApp.controller("miscAdd", ["$scope", "$http", "$location", function ($scope, $http, $location) {
 	$scope.misc = {};
 	$scope.misc.Id = $location.search()['id'];
 	if ($scope.misc.Id) {
@@ -40,7 +39,6 @@
 	//异步提交表单结束
 }]);
 myApp.controller("miscList", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
-	window.hub.stop();
 	var self = this;
 	$scope.paginationConf = {
 		currentPage: $scope.currentPage ? $scope.currentPage : 1,

@@ -1,6 +1,5 @@
 ﻿myApp.controller("searchAnalysis", ["$scope", "$http", "NgTableParams", "$timeout",
 	function($scope, $http, NgTableParams, $timeout) {
-		window.hub.stop();
 		var self = this;
 		$scope.query = "";
 		$scope.currentPage = 1;

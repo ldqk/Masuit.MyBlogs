@@ -1,6 +1,5 @@
 ﻿myApp.controller("values", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
 	UEDITOR_CONFIG.autoHeightEnabled=false;
-	window.hub.stop();
 	var self = this;
 	self.data = {};
 	this.load = function() {
@@ -19,12 +18,12 @@
 		}, 500);
 	}
 	$scope.submit = function (values) {
-			$scope.request("/values", values, function (data) {
-				swal(data.Message, null, 'info');
-				$scope.values = {};
-				$scope.closeAll();
-				self.load();
-			});
+		$scope.request("/values", values, function (data) {
+			swal(data.Message, null, 'info');
+			$scope.values = {};
+			$scope.closeAll();
+			self.load();
+		});
 	}
 	self.edit = function (row) {
 		layer.open({

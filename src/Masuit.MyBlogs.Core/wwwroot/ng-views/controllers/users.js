@@ -1,6 +1,5 @@
-﻿myApp.controller("users", ["$scope", "$http", "$location", "$timeout","NgTableParams", function ($scope, $http, $location, $timeout,NgTableParams) {
-	window.hub.stop();
-	var self = this;
+﻿myApp.controller("users", ["$scope", "$http", "$timeout","NgTableParams", function ($scope, $http, $timeout,NgTableParams) {
+    var self = this;
 	$scope.isAdd = true;
 	$scope.allowUpload=false;
     $scope.userinfo = {};

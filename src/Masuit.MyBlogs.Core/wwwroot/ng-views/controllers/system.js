@@ -1,5 +1,10 @@
-﻿myApp.controller("system", ["$scope", "$http", function($scope, $http) {
-	window.hub.stop();
+﻿myApp.controller("file", ["$scope", "$http", function ($scope, $http) {
+}]);
+myApp.controller("task", ["$scope", "$http", function ($scope, $http) {
+}]);
+myApp.controller("dashboard", ["$scope", function ($scope) {
+}]);
+myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 	$scope.request("/system/getsettings", null, function(data) {
 		var settings = {};
 		Enumerable.From(data.Data).Select(e => {
@@ -180,8 +185,7 @@
 		}
 	}
 }]);
-myApp.controller("log", ["$scope", "$http", function ($scope, $http) {
-	window.hub.stop();
+myApp.controller("log", ["$scope", function ($scope) {
 	$scope.getfiles= function() {
 		$scope.request("/dashboard/GetLogfiles", null, function(data) {
 			$scope.files = data.Data;
@@ -228,8 +232,7 @@ myApp.controller("log", ["$scope", "$http", function ($scope, $http) {
 		}).catch(swal.noop);
 	}
 }]);
-myApp.controller("email", ["$scope", "$http", function ($scope, $http) {
-	window.hub.stop();
+myApp.controller("email", ["$scope", "$http", function ($scope) {
 	$scope.getfiles = function () {
 		$scope.request("/file/Getfiles", {path:"/template"}, function (data) {
 			$scope.files = data.Data;
@@ -274,15 +277,8 @@ myApp.controller("email", ["$scope", "$http", function ($scope, $http) {
 		});
 	}
 }]);
-myApp.controller("file", ["$scope", "$http", function ($scope, $http) {
-	window.hub.stop();
-}]);
-myApp.controller("task", ["$scope", "$http", function ($scope, $http) {
-	window.hub.stop();
-}]);
 myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", function ($scope, $http,NgTableParams,$timeout) {
-	window.hub.stop();
-	var self = this;
+    var self = this;
 	var data = [];
 	self.data = {};
 	$scope.request("/system/getsettings", null, function(data) {
@@ -540,7 +536,6 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 }]);
 
 myApp.controller("sendbox", ["$scope", "$http", function ($scope, $http) {
-	window.hub.stop();
 	$http.post("/system/sendbox").then(function (res) {
 		$scope.Mails = res.data;
 	});

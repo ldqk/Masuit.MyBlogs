@@ -1,6 +1,5 @@
 ﻿myApp.controller("msg", ["$scope", "$http", "NgTableParams", "$timeout", function ($scope, $http, NgTableParams, $timeout) {
-	window.hub.stop();
-	var self = this;
+    var self = this;
 	$scope.currentPage = 1;
 	$scope.paginationConf = {
 		currentPage: $scope.currentPage ||1,
@@ -72,8 +71,7 @@
 		});
 	}
 }]);
-myApp.controller("msgs", ["$scope", "$http", "$timeout", function ($scope, $http, $timeout) {
-	window.hub.stop();
+myApp.controller("msgs", ["$scope", "$http", function ($scope, $http) {
 	var self = this;
 	$scope.currentPage = 1;
 	$scope.paginationConf = {

@@ -12,12 +12,7 @@ myApp.config([
             controller: "dashboard",
             resolve: {
                 deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: ["/Scripts/boost.js"],
-                                cache: true
-                            }, cpath + "/dashboard.js"
-                        ]);
+                        return $ocLazyLoad.load([cpath + "/system.js"]);
                     }
                 ]
             }
@@ -341,7 +336,7 @@ myApp.config([
                             {
                                 files: [
                                     "/assets/jedate/jedate.min.css", "/Assets/semantic/semantic.css",
-                                    "/assets/jedate/jedate.js", "/Scripts/boost.js",
+                                    "/assets/jedate/jedate.js", 
                                     "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"
                                 ],
                                 cache: true

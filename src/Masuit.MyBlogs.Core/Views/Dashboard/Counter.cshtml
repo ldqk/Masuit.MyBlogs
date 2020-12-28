@@ -1,0 +1,21 @@
+﻿@using Masuit.MyBlogs.Core.Views.Dashboard
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>服务器性能监控</title>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <component type="typeof(Counter)" render-mode="ServerPrerendered" />
+    </div>
+    <script src="/_framework/blazor.server.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <script src="~/Scripts/global/counter.js"></script>
+</body>
+</html>

@@ -1,5 +1,4 @@
 ﻿myApp.controller("links", ["$scope", "$http", "NgTableParams", function($scope, $http, NgTableParams) {
-	window.hub.stop();
 	var self = this;
 	var source = [];
 	this.load = function() {

@@ -1,6 +1,5 @@
-﻿myApp.controller("noticeAdd", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
-	window.hub.stop();
-	$scope.notice = {};
+﻿myApp.controller("noticeAdd", ["$scope", "$http", "$location", function ($scope, $http, $location) {
+    $scope.notice = {};
 	$scope.notice.Id = $location.search()['id']||0;
 	if ($scope.notice.Id) {
 		$scope.request("/notice/get", { id: $scope.notice.Id }, function (res) {
@@ -35,7 +34,6 @@
 	//异步提交表单结束
 }]);
 myApp.controller("noticeList", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
-	window.hub.stop();
 	var self = this;
 	$scope.paginationConf = {
 		currentPage: 1,

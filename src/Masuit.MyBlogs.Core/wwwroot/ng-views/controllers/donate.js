@@ -1,7 +1,5 @@
 ﻿myApp.controller("donate", ["$scope", "$http", "NgTableParams", function($scope, $http, NgTableParams) {
-	window.hub.stop();
 	var self = this;
-	var source = [];
 	$scope.paginationConf = {
 		currentPage: 1,
 		itemsPerPage: 10,
@@ -25,7 +23,6 @@
 				filterDelay: 0,
 				dataset: res.data.Data
 			});
-			source = angular.copy(res.data.Data);
 		});
 	};
 	self.del = function(row) {

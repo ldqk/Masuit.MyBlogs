@@ -1,6 +1,5 @@
 ﻿myApp.controller("mergelist", ["$scope", "$http", "NgTableParams", "$timeout", function ($scope, $http, NgTableParams, $timeout) {
-	window.hub.stop();
-	var self = this;
+    var self = this;
 	$scope.kw = "";
 	$scope.orderby = 1;
 	$scope.paginationConf = {
@@ -122,8 +121,7 @@
 		}, 500);
 	}
 }]);
-myApp.controller("mergecompare", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
-	window.hub.stop();
+myApp.controller("mergecompare", ["$scope","$location", function ($scope, $location) {
 	clearInterval(window.interval);
 	$scope.id = $location.search()['id'];
 	$scope.get("/merge/compare/"+$scope.id, function(res) {
@@ -213,8 +211,7 @@ myApp.controller("mergecompare", ["$scope", "$http", "$timeout","$location", fun
     }
 
 }]);
-myApp.controller("mergeedit", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
-	window.hub.stop();
+myApp.controller("mergeedit", ["$scope", "$location", function ($scope, $location) {
 	clearInterval(window.interval);
 	$scope.id = $location.search()['id'];
 	$scope.get("/merge/"+$scope.id, function(res) {

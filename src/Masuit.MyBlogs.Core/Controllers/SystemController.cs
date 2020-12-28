@@ -1,7 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
-using Masuit.MyBlogs.Core.Hubs;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -74,47 +73,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                     mac,
                     ips
                 }
-            });
-        }
-
-        /// <summary>
-        /// 获取历史性能计数器
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult GetHistoryList()
-        {
-            return Json(new
-            {
-                cpu = MyHub.PerformanceCounter.Select(c => new[]
-                {
-                    c.Time,
-                    c.CpuLoad
-                }),
-                mem = MyHub.PerformanceCounter.Select(c => new[]
-                {
-                    c.Time,
-                    c.MemoryUsage
-                }),
-                read = MyHub.PerformanceCounter.Select(c => new[]
-                {
-                    c.Time,
-                    c.DiskRead
-                }),
-                write = MyHub.PerformanceCounter.Select(c => new[]
-                {
-                    c.Time,
-                    c.DiskWrite
-                }),
-                down = MyHub.PerformanceCounter.Select(c => new[]
-                {
-                    c.Time,
-                    c.Download
-                }),
-                up = MyHub.PerformanceCounter.Select(c => new[]
-                {
-                    c.Time,
-                    c.Upload
-                }),
             });
         }
 
@@ -241,16 +199,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 LogManager.Error(GetType(), e);
                 return ResultData(null, false, "路径格式不正确！错误信息：\r\n" + e.Message + "\r\n\r\n详细堆栈跟踪：\r\n" + e.StackTrace);
             }
-        }
-
-        /// <summary>
-        /// 清空性能计数器缓存
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult ClearPerfCounter()
-        {
-            MyHub.PerformanceCounter.Clear();
-            return Ok();
         }
 
         /// <summary>
