@@ -6,12 +6,9 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.DateTimeExt;
-using Masuit.Tools.Hardware;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
-using Masuit.Tools.Win32;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -20,7 +17,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,39 +36,43 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IMailSender MailSender { get; set; }
 
         /// <summary>
-        /// 获取硬件基本信息
+        /// 获取历史性能计数器
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetBaseInfo()
+        public IActionResult GetCounterHistory()
         {
-            var cpuInfo = SystemInfo.GetCpuInfo();
-            var ramInfo = SystemInfo.GetRamInfo();
-            var osVersion = Windows.GetOsVersion();
-            var mac = SystemInfo.GetMacAddress();
-            var ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToList();
-            var diskTotal = SystemInfo.DiskTotalSpace().Select(kv => kv.Key + kv.Value).Join(" | ");
-            var diskFree = SystemInfo.DiskFree().Select(kv => kv.Key + kv.Value).Join(" | ");
-            var diskUsage = SystemInfo.DiskUsage().Select(kv => kv.Key + kv.Value.ToString("P")).Join(" | ");
-            var span = DateTime.Now - CommonHelper.StartupTime;
-            var boot = DateTime.Now - SystemInfo.BootTime();
-            return Json(new
+            return Ok(new
             {
-                runningTime = $"{span.Days}天{span.Hours}小时{span.Minutes}分钟",
-                bootTime = $"{boot.Days}天{boot.Hours}小时{boot.Minutes}分钟",
-                cpuInfo,
-                ramInfo,
-                osVersion,
-                diskInfo = new
+                cpu = PerfCounter.List.Select(c => new[]
                 {
-                    total = diskTotal,
-                    free = diskFree,
-                    usage = diskUsage
-                },
-                netInfo = new
+                    c.Time,
+                    c.CpuLoad
+                }),
+                mem = PerfCounter.List.Select(c => new[]
                 {
-                    mac,
-                    ips
-                }
+                    c.Time,
+                    c.MemoryUsage
+                }),
+                read = PerfCounter.List.Select(c => new[]
+                {
+                    c.Time,
+                    c.DiskRead
+                }),
+                write = PerfCounter.List.Select(c => new[]
+                {
+                    c.Time,
+                    c.DiskWrite
+                }),
+                down = PerfCounter.List.Select(c => new[]
+                {
+                    c.Time,
+                    c.Download
+                }),
+                up = PerfCounter.List.Select(c => new[]
+                {
+                    c.Time,
+                    c.Upload
+                })
             });
         }
 
@@ -90,17 +90,17 @@ namespace Masuit.MyBlogs.Core.Controllers
             return ResultData(list);
         }
 
-        /// <summary>
-        /// 获取设置项
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        [AllowAnonymous]
-        public ActionResult GetSetting(string name)
-        {
-            var entity = SystemSettingService.Get(s => s.Name.Equals(name));
-            return ResultData(entity);
-        }
+        ///// <summary>
+        ///// 获取设置项
+        ///// </summary>
+        ///// <param name="name"></param>
+        ///// <returns></returns>
+        //[AllowAnonymous]
+        //public ActionResult GetSetting(string name)
+        //{
+        //    var entity = SystemSettingService.Get(s => s.Name.Equals(name));
+        //    return ResultData(entity);
+        //}
 
         /// <summary>
         /// 保存设置
@@ -213,7 +213,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult BounceEmail(string email)
         {
             var msg = MailSender.AddRecipient(email);
-            return Ok(new { msg });
+            return Ok(new
+            {
+                msg
+            });
         }
 
         #region 网站防火墙

@@ -105,41 +105,4 @@
     {
         return PerfCounter.GetCurrentPerformanceCounter();
     }
-
-    /// <summary>
-    /// 获取历史性能计数器
-    /// </summary>
-    /// <returns></returns>
-    [JSInvokable]
-    public static object GetHistoryList()
-    {
-        return new
-        {
-            cpu = PerfCounter.List.Select(c => new[] {
-                c.Time,
-                c.CpuLoad
-            }),
-            mem = PerfCounter.List.Select(c => new[] {
-                c.Time,
-                c.MemoryUsage
-            }),
-            read = PerfCounter.List.Select(c => new[] {
-                c.Time,
-                c.DiskRead
-            }),
-            write = PerfCounter.List.Select(c => new[] {
-                c.Time,
-                c.DiskWrite
-            }),
-            down = PerfCounter.List.Select(c => new[] {
-                c.Time,
-                c.Download
-            }),
-            up = PerfCounter.List.Select(c => new[] {
-                c.Time,
-                c.Upload
-            }),
-        };
-    }
-
 }

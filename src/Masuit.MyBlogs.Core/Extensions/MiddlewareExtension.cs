@@ -76,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             services.AddResponseCaching(); //注入响应缓存
             services.Configure<BrotliCompressionProviderOptions>(options =>
             {
-                options.Level = CompressionLevel.Optimal;
+                options.Level = CompressionLevel.Fastest;
             }).Configure<GzipCompressionProviderOptions>(options =>
             {
                 options.Level = CompressionLevel.Optimal;
