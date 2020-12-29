@@ -75,27 +75,40 @@ function showIO(data) {
         },
         dataZoom: [{
                 type: 'inside',
-                start: 90,
+                start: 70,
                 end: 100,
-                minValueSpan: 50
+                minValueSpan: 100
             }, {
-                start: 90,
+                start: 70,
                 end: 100,
-                minValueSpan: 50
+                minValueSpan: 100
             }],
         xAxis: {
             type: 'time',
+            interval: 20000,
+            axisLabel: {
+                formatter:function (value){
+                    var dt=new Date(value);
+                    return dt.getHours()+":"+dt.getMinutes()+":"+dt.getSeconds()
+                }
+            },
             splitLine: {
                 show: false
             }
         },
         yAxis: [{
                 name: '磁盘',
-                type: 'value'
+                type: 'value',
+                splitLine: {
+                    show: false
+                }
             },
             {
                 name: '网络',
-                type: 'value'
+                type: 'value',
+                splitLine: {
+                    show: false
+                }
             }
         ],
         legend: {
@@ -106,47 +119,27 @@ function showIO(data) {
                 type: 'line',
                 showSymbol: false,
                 hoverAnimation: false,
-                data: data.read,
-                markLine: {
-                    data: [
-                        { type: 'average', name: '磁盘读平均值' }
-                    ]
-                }
+                data: data.read
             }, {
                 name: '磁盘写(KBps)',
                 type: 'line',
                 showSymbol: false,
                 hoverAnimation: false,
-                data: data.write,
-                markLine: {
-                    data: [
-                        { type: 'average', name: '磁盘写平均值' }
-                    ]
-                }
+                data: data.write
             }, {
                 name: '网络上行(KBps)',
                 yAxisIndex: 1,
                 type: 'line',
                 showSymbol: false,
                 hoverAnimation: false,
-                data: data.up,
-                markLine: {
-                    data: [
-                        { type: 'average', name: '上行平均值' }
-                    ]
-                }
+                data: data.up
             }, {
                 name: '网络下行(KBps)',
                 yAxisIndex: 1,
                 type: 'line',
                 showSymbol: false,
                 hoverAnimation: false,
-                data: data.down,
-                markLine: {
-                    data: [
-                        { type: 'average', name: '下行平均值' }
-                    ]
-                }
+                data: data.down
             }]
     });
     return myChart;
@@ -176,16 +169,23 @@ function showLine() {
             },
             dataZoom: [{
                     type: 'inside',
-                    start: 90,
+                    start: 70,
                     end: 100,
-                    minValueSpan: 50
+                    minValueSpan: 100
                 }, {
-                    start: 90,
+                    start: 70,
                     end: 100,
-                    minValueSpan: 50
+                    minValueSpan: 100
                 }],
             xAxis: {
                 type: 'time',
+                interval: 20000,
+                axisLabel: {
+                    formatter:function (value){
+                        var dt=new Date(value);
+                        return dt.getHours()+":"+dt.getMinutes()+":"+dt.getSeconds()
+                    }
+                  },
                 splitLine: {
                     show: false
                 }
@@ -274,4 +274,8 @@ function showLine() {
     }).catch(function(e) {
         console.error(e);
     });
+}
+
+function showSuccess() {
+    swal({ type: 'success', html: "操作成功" });
 }

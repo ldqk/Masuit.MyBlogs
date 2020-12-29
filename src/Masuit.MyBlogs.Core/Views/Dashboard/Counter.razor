@@ -68,6 +68,7 @@
         </tr>
     </tbody>
 </table>
+    <button class="btn btn-success" @onclick="ClearMemory">整理内存</button>
 <div>
     <div class="page-header">
         <h3 class="text-center">性能实时监控</h3>
@@ -104,5 +105,11 @@
     public static PerfCounter.PerformanceCounter GetCurrentPerformanceCounter()
     {
         return PerfCounter.GetCurrentPerformanceCounter();
+    }
+
+    public void ClearMemory()
+    {
+        Windows.ClearMemorySilent();
+        JS.InvokeVoidAsync("showSuccess");
     }
 }

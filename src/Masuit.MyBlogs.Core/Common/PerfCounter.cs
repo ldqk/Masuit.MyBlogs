@@ -42,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static PerformanceCounter GetCurrentPerformanceCounter()
         {
-            var time = DateTime.Now.GetTotalMilliseconds(); // - 28800000;
+            var time = (long)DateTime.Now.GetTotalMilliseconds();
             float load = SystemInfo.CpuLoad;
             var mem = (1 - SystemInfo.MemoryAvailable.ConvertTo<float>() / SystemInfo.PhysicalMemory.ConvertTo<float>()) * 100;
 
@@ -72,7 +72,7 @@ namespace Masuit.MyBlogs.Core.Common
             /// <summary>
             /// 当前时间戳
             /// </summary>
-            public double Time { get; set; }
+            public long Time { get; set; }
 
             /// <summary>
             /// CPU当前负载

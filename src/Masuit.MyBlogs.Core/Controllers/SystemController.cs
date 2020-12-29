@@ -31,7 +31,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 系统设置
         /// </summary>
         public ISystemSettingService SystemSettingService { get; set; }
-
         public IFirewallRepoter FirewallRepoter { get; set; }
         public IMailSender MailSender { get; set; }
 
@@ -46,32 +45,32 @@ namespace Masuit.MyBlogs.Core.Controllers
                 cpu = PerfCounter.List.Select(c => new[]
                 {
                     c.Time,
-                    c.CpuLoad
+                    c.CpuLoad.ConvertTo<long>()
                 }),
                 mem = PerfCounter.List.Select(c => new[]
                 {
                     c.Time,
-                    c.MemoryUsage
+                    c.MemoryUsage.ConvertTo<long>()
                 }),
                 read = PerfCounter.List.Select(c => new[]
                 {
                     c.Time,
-                    c.DiskRead
+                    c.DiskRead.ConvertTo<long>()
                 }),
                 write = PerfCounter.List.Select(c => new[]
                 {
                     c.Time,
-                    c.DiskWrite
+                    c.DiskWrite.ConvertTo<long>()
                 }),
                 down = PerfCounter.List.Select(c => new[]
                 {
                     c.Time,
-                    c.Download
+                    c.Download.ConvertTo<long>()
                 }),
                 up = PerfCounter.List.Select(c => new[]
                 {
                     c.Time,
-                    c.Upload
+                    c.Upload.ConvertTo<long>()
                 })
             });
         }
@@ -89,18 +88,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             }).ToList();
             return ResultData(list);
         }
-
-        ///// <summary>
-        ///// 获取设置项
-        ///// </summary>
-        ///// <param name="name"></param>
-        ///// <returns></returns>
-        //[AllowAnonymous]
-        //public ActionResult GetSetting(string name)
-        //{
-        //    var entity = SystemSettingService.Get(s => s.Name.Equals(name));
-        //    return ResultData(entity);
-        //}
 
         /// <summary>
         /// 保存设置
@@ -346,7 +333,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false);
             }
 
-            var basedir = AppDomain.CurrentDomain.BaseDirectory ?? Environment.CurrentDirectory;
+            var basedir = AppDomain.CurrentDomain.BaseDirectory;
             string ips = await System.IO.File.ReadAllTextAsync(Path.Combine(basedir, "App_Data", "whitelist.txt"));
             List<string> list = ips.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
             list.Add(ip);
@@ -368,7 +355,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             CommonHelper.DenyIP += "," + ip;
-            var basedir = AppDomain.CurrentDomain.BaseDirectory ?? Environment.CurrentDirectory;
+            var basedir = AppDomain.CurrentDomain.BaseDirectory;
             await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
             CommonHelper.IPWhiteList.Remove(ip);
             await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "whitelist.txt"), string.Join(",", CommonHelper.IPWhiteList.Distinct()), Encoding.UTF8);
