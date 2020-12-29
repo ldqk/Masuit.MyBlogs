@@ -58,6 +58,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     Remark = $"检测到敏感词拦截：{match.Value}"
                 }));
                 context.Response.StatusCode = 400;
+                context.Response.ContentType = "text/html; charset=utf-8";
                 await context.Response.WriteAsync("参数不合法！", Encoding.UTF8);
                 return;
             }
@@ -79,6 +80,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     catch
                     {
                         context.Response.StatusCode = 504;
+                        context.Response.ContentType = "text/html; charset=utf-8";
                         await context.Response.WriteAsync("您的浏览器不支持访问本站！", Encoding.UTF8);
                         return;
                     }
