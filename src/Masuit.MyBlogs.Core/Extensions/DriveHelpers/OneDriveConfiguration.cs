@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Extensions.DriveHelpers
 {
@@ -66,6 +67,11 @@ namespace Masuit.MyBlogs.Core.Extensions.DriveHelpers
         /// <param name="="></param>
         /// <returns></returns>
         public static string GraphApi => (ConfigurationRoot["OneDrive:Type"] == "China") ? "https://microsoftgraph.chinacloudapi.cn" : "https://graph.microsoft.com";
+
+        /// <summary>
+        /// CDN URL
+        /// </summary>
+        public static string[] CDNUrls => ConfigurationRoot.GetSection("OneDrive:CDNUrls").GetChildren().Select(x => x.Value).ToArray();
 
         public enum OfficeType
         {

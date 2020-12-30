@@ -1,25 +1,25 @@
+using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
+using Masuit.MyBlogs.Core.Models.Drive;
+using Microsoft.Graph;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
-using Masuit.MyBlogs.Core.Models.Drive;
-using Microsoft.Graph;
-using Site = Masuit.MyBlogs.Core.Models.Drive.Site;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 {
     public class DriveService : IDriveService
     {
-        IDriveAccountService accountService;
-        GraphServiceClient graph;
-        DriveContext driveContext;
+        readonly IDriveAccountService _accountService;
+        readonly GraphServiceClient _graph;
+        readonly DriveContext _driveContext;
+
         public DriveService(IDriveAccountService accountService, DriveContext driveContext)
         {
-            this.accountService = accountService;
-            graph = accountService.Graph;
-            this.driveContext = driveContext;
+            _accountService = accountService;
+            _graph = accountService.Graph;
+            _driveContext = driveContext;
         }
         /// <summary>
         /// 获取根目录的所有项目
@@ -28,7 +28,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         public async Task<List<DriveFile>> GetRootItems(string siteName = "onedrive", bool showHiddenFolders = false)
         {
             string siteId = GetSiteId(siteName);
-            var drive = (siteName != "onedrive") ? graph.Sites[siteId].Drive : graph.Me.Drive;
+            var drive = siteName != "onedrive" ? _graph.Sites[siteId].Drive : _graph.Me.Drive;
             var result = await drive.Root.Children.Request().GetAsync();
             List<DriveFile> files = GetItems(result, siteName, showHiddenFolders);
             return files;
@@ -42,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         public async Task<List<DriveFile>> GetDriveItemsByPath(string path, string siteName = "onedrive", bool showHiddenFolders = false)
         {
             string siteId = GetSiteId(siteName);
-            var drive = (siteName != "onedrive") ? graph.Sites[siteId].Drive : graph.Me.Drive;
+            var drive = siteName != "onedrive" ? _graph.Sites[siteId].Drive : _graph.Me.Drive;
             var result = await drive.Root.ItemWithPath(path).Children.Request().GetAsync();
             List<DriveFile> files = GetItems(result, siteName, showHiddenFolders);
             return files;
@@ -57,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             string[] imgArray = { ".png", ".jpg", ".jpeg", ".bmp", ".webp" };
             string extension = Path.GetExtension(path);
             string siteId = GetSiteId(siteName);
-            var drive = (siteName != "onedrive") ? graph.Sites[siteId].Drive : graph.Me.Drive;
+            var drive = (siteName != "onedrive") ? _graph.Sites[siteId].Drive : _graph.Me.Drive;
             //这么写是因为：分块上传图片后直接获取会报错。
             if (imgArray.Contains(extension))
             {
@@ -77,11 +77,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         public async Task<string> GetUploadUrl(string path, string siteName = "onedrive")
         {
             string siteId = GetSiteId(siteName);
-            var drive = siteName != "onedrive" ? graph.Sites[siteId].Drive : graph.Me.Drive;
+            var drive = (siteName != "onedrive") ? _graph.Sites[siteId].Drive : _graph.Me.Drive;
             string requestUrl = drive.Root.ItemWithPath(path).CreateUploadSession().Request().RequestUrl;
             ProtectedApiCallHelper apiCallHelper = new ProtectedApiCallHelper(new HttpClient());
             string uploadUrl = "";
-            await apiCallHelper.CallWebApiAndProcessResultASync(requestUrl, accountService.GetToken(), o =>
+            await apiCallHelper.CallWebApiAndProcessResultASync(requestUrl, _accountService.GetToken(), o =>
             {
                 uploadUrl = o["uploadUrl"].ToString();
             }, ProtectedApiCallHelper.Method.Post);
@@ -102,7 +102,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             {
                 //可能是文件夹
                 if (result.AdditionalData.TryGetValue("@microsoft.graph.downloadUrl", out var downloadUrl))
-                    file.DownloadUrl = (string)downloadUrl;
+                {
+                    var dlurl = (string)downloadUrl;
+                    ReplaceCDNUrls(ref dlurl);
+                    file.DownloadUrl = dlurl;
+                }
             }
 
             return file;
@@ -111,7 +115,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         private List<DriveFile> GetItems(IDriveItemChildrenCollectionPage result, string siteName = "onedrive", bool showHiddenFolders = false)
         {
             List<DriveFile> files = new List<DriveFile>();
-            string[] hiddenFolders = driveContext.Sites.Single(site => site.Name == siteName).HiddenFolders;
+            string[] hiddenFolders = _driveContext.Sites.Single(site => site.Name == siteName).HiddenFolders;
             foreach (var item in result)
             {
                 //要隐藏文件
@@ -137,7 +141,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
                 {
                     //可能是文件夹
                     if (item.AdditionalData.TryGetValue("@microsoft.graph.downloadUrl", out var downloadUrl))
-                        file.DownloadUrl = (string)downloadUrl;
+                    {
+                        var dlurl = (string)downloadUrl;
+                        ReplaceCDNUrls(ref dlurl);
+                        file.DownloadUrl = dlurl;
+                    }
                 }
                 files.Add(file);
             }
@@ -151,8 +159,16 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// <returns></returns>
         private string GetSiteId(string siteName)
         {
-            Site site = driveContext.Sites.SingleOrDefault(s => s.Name == siteName);
+            var site = _driveContext.Sites.SingleOrDefault(s => s.Name == siteName);
             return site?.SiteId;
+        }
+
+        private void ReplaceCDNUrls(ref string downloadUrl)
+        {
+            if (OneDriveConfiguration.CDNUrls.Length != 0)
+            {
+                downloadUrl = OneDriveConfiguration.CDNUrls.Select(item => item.Split(";")).Aggregate(downloadUrl, (current, a) => current.Replace(a[0], a[1]));
+            }
         }
         #endregion
     }
