@@ -44,7 +44,7 @@
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
         <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="2.0.0-beta-1629" />
         <PackageReference Include="CacheManager.Serialization.Json" Version="2.0.0-beta-1629" />
-        <PackageReference Include="CSRedisCore" Version="3.6.5" />
+        <PackageReference Include="CSRedisCore" Version="3.6.6" />
         <PackageReference Include="Hangfire" Version="1.7.18" />
         <PackageReference Include="Hangfire.Autofac" Version="2.3.1" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
@@ -70,7 +70,7 @@
         <PackageReference Include="TimeZoneConverter" Version="3.3.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.0" />
         <PackageReference Include="WinInsider.System.Net.Http.Formatting" Version="1.0.14" />
-        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.8" />
+        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.10" />
     </ItemGroup>
     <ItemGroup>
         <Content Update="appsettings.json">

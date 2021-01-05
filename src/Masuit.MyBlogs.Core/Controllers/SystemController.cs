@@ -40,34 +40,44 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public IActionResult GetCounterHistory()
         {
+            var list = PerfCounter.List.Count < 5000 ? PerfCounter.List : PerfCounter.List.GroupBy(c => c.Time / 60000).Select(g => new PerfCounter.PerformanceCounter()
+            {
+                Time = g.Key * 60000,
+                CpuLoad = g.Average(c => c.CpuLoad),
+                DiskRead = g.Average(c => c.DiskRead),
+                DiskWrite = g.Average(c => c.DiskWrite),
+                Download = g.Average(c => c.Download),
+                Upload = g.Average(c => c.Upload),
+                MemoryUsage = g.Average(c => c.MemoryUsage)
+            }).ToList();
             return Ok(new
             {
-                cpu = PerfCounter.List.Select(c => new[]
+                cpu = list.Select(c => new[]
                 {
                     c.Time,
                     c.CpuLoad.ConvertTo<long>()
                 }),
-                mem = PerfCounter.List.Select(c => new[]
+                mem = list.Select(c => new[]
                 {
                     c.Time,
                     c.MemoryUsage.ConvertTo<long>()
                 }),
-                read = PerfCounter.List.Select(c => new[]
+                read = list.Select(c => new[]
                 {
                     c.Time,
                     c.DiskRead.ConvertTo<long>()
                 }),
-                write = PerfCounter.List.Select(c => new[]
+                write = list.Select(c => new[]
                 {
                     c.Time,
                     c.DiskWrite.ConvertTo<long>()
                 }),
-                down = PerfCounter.List.Select(c => new[]
+                down = list.Select(c => new[]
                 {
                     c.Time,
                     c.Download.ConvertTo<long>()
                 }),
-                up = PerfCounter.List.Select(c => new[]
+                up = list.Select(c => new[]
                 {
                     c.Time,
                     c.Upload.ConvertTo<long>()
