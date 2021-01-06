@@ -113,7 +113,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
                 var result = await _driveService.GetDriveItemByPath(path, siteName);
                 if (result != null)
                 {
-                    return new RedirectResult(result.DownloadUrl);
+                    return Redirect(result.DownloadUrl);
                 }
 
                 return NotFound(new ErrorResponse()

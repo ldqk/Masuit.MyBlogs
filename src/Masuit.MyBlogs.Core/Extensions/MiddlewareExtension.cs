@@ -138,7 +138,6 @@ namespace Masuit.MyBlogs.Core.Extensions
                 bundles.AddCss("/article.css")
                     .Include("/Assets/jquery.tocify/jquery.tocify.min.css")
                     .Include("/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css")
-                    .Include("/Assets/share/share.css")
                     .Include("/Assets/highlight/css/highlight.css");
 
                 bundles.AddJs("/main.js").Include("/Scripts/bootstrap.min.js")
@@ -169,8 +168,6 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/ng-views/filemanager/js/controllers/main.js")
                     .Include("/ng-views/filemanager/js/controllers/selector-controller.js");
                 bundles.AddJs("/article.js")
-                    .Include("/Assets/share/jquery.qrcode.min.js")
-                    .Include("/Assets/share/jquery.share.min.js")
                     .Include("/Assets/highlight/js/highlight.js")
                     .Include("/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js")
                     .Include("/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js")

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 using System.IO;
 using System.Linq;
 
@@ -6,11 +7,17 @@ namespace Masuit.MyBlogs.Core.Extensions.DriveHelpers
 {
     public class OneDriveConfiguration
     {
-        private static readonly IConfigurationRoot ConfigurationRoot;
+        private static IConfigurationRoot ConfigurationRoot;
         static OneDriveConfiguration()
         {
-            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", true, true);
-            ConfigurationRoot = builder.Build();
+            void BindConfig()
+            {
+                var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", true, true);
+                ConfigurationRoot = builder.Build();
+            }
+
+            BindConfig();
+            ChangeToken.OnChange(ConfigurationRoot.GetReloadToken, BindConfig);
         }
 
         /// <summary>
