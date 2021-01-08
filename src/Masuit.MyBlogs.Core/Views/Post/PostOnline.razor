@@ -1,5 +1,6 @@
 ﻿@using CacheManager.Core
-@implements IDisposable
+@using System.Threading
+@implements IAsyncDisposable
 @inject ICacheManager<uint> CacheManager
 
 <span class="text-red">@online</span>人正在浏览本文
@@ -7,28 +8,23 @@
 @code {
     [Parameter]
     public int Id { get; set; }
-    bool flag;
     uint online;
+    Timer _timer;
 
     protected override void OnInitialized()
     {
         online = CacheManager.AddOrUpdate("postOnline:" + Id, 1u, i => i + 1);
-        flag = true;
-        Task.Run(async () =>
+        _timer = new Timer(_ =>
         {
-            while (flag)
-            {
-                online = CacheManager.Get("postOnline:" + Id);
-                await InvokeAsync(StateHasChanged);
-                await Task.Delay(2000);
-            }
-        });
+            online = CacheManager.Get("postOnline:" + Id);
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 1000);
     }
 
-    /// <summary>执行与释放或重置非托管资源关联的应用程序定义的任务。</summary>
-    public void Dispose()
+    /// <summary>以异步方式执行与释放或重置非托管资源相关的应用程序定义的任务。</summary>
+    /// <returns>一个表示异步释放操作的任务。</returns>
+    public ValueTask DisposeAsync()
     {
-        flag = false;
         online = CacheManager.AddOrUpdate("postOnline:" + Id, 1u, i =>
         {
             try
@@ -43,5 +39,6 @@
                 return 0;
             }
         });
+        return _timer.DisposeAsync();
     }
 }

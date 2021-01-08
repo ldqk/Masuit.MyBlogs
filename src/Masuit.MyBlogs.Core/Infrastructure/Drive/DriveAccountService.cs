@@ -1,18 +1,19 @@
+using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
+using Masuit.MyBlogs.Core.Models.Drive;
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
-using Masuit.MyBlogs.Core.Models.Drive;
-using Microsoft.Identity.Client;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 {
     public class DriveAccountService : IDriveAccountService
     {
-        private IConfidentialClientApplication app;
+        private readonly IConfidentialClientApplication _app;
         public DriveContext SiteContext { get; set; }
+
         /// <summary>
         /// Graph实例
         /// </summary>
@@ -21,9 +22,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 
         public DriveAccountService(DriveContext siteContext, TokenService tokenService)
         {
-            this.SiteContext = siteContext;
-            this.app = tokenService.app;
-            this.Graph = tokenService.Graph;
+            SiteContext = siteContext;
+            _app = tokenService.app;
+            Graph = tokenService.Graph;
         }
         /// <summary>
         /// 返回 Oauth 验证url
@@ -31,14 +32,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// <returns></returns>
         public async Task<string> GetAuthorizationRequestUrl()
         {
-            var redirectUrl = await app.GetAuthorizationRequestUrl(OneDriveConfiguration.Scopes).ExecuteAsync();
+            var redirectUrl = await _app.GetAuthorizationRequestUrl(OneDriveConfiguration.Scopes).ExecuteAsync();
             return redirectUrl.AbsoluteUri;
         }
         /// <summary>
         /// 添加 SharePoint Site-ID 到数据库
         /// </summary>
         /// <param name="siteName"></param>
-        /// <param name="dominName"></param>
+        /// <param name="nickName"></param>
         /// <returns></returns>
         public async Task AddSiteId(string siteName, string nickName)
         {
@@ -130,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// <returns></returns>
         public string GetToken()
         {
-            return app.AcquireTokenSilent(OneDriveConfiguration.Scopes, OneDriveConfiguration.AccountName).ExecuteAsync().Result.AccessToken;
+            return _app.AcquireTokenSilent(OneDriveConfiguration.Scopes, OneDriveConfiguration.AccountName).ExecuteAsync().Result.AccessToken;
         }
         public class DriveInfo
         {

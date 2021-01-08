@@ -27,8 +27,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// <returns></returns>
         public async Task<List<DriveFile>> GetRootItems(string siteName = "onedrive", bool showHiddenFolders = false)
         {
-            string siteId = GetSiteId(siteName);
-            var drive = siteName != "onedrive" ? _graph.Sites[siteId].Drive : _graph.Me.Drive;
+            var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
             var result = await drive.Root.Children.Request().GetAsync();
             List<DriveFile> files = GetItems(result, siteName, showHiddenFolders);
             return files;
@@ -41,8 +40,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// <returns></returns>
         public async Task<List<DriveFile>> GetDriveItemsByPath(string path, string siteName = "onedrive", bool showHiddenFolders = false)
         {
-            string siteId = GetSiteId(siteName);
-            var drive = siteName != "onedrive" ? _graph.Sites[siteId].Drive : _graph.Me.Drive;
+            var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
             var result = await drive.Root.ItemWithPath(path).Children.Request().GetAsync();
             List<DriveFile> files = GetItems(result, siteName, showHiddenFolders);
             return files;
@@ -56,8 +54,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         {
             string[] imgArray = { ".png", ".jpg", ".jpeg", ".bmp", ".webp" };
             string extension = Path.GetExtension(path);
-            string siteId = GetSiteId(siteName);
-            var drive = (siteName != "onedrive") ? _graph.Sites[siteId].Drive : _graph.Me.Drive;
+            var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
             //这么写是因为：分块上传图片后直接获取会报错。
             if (imgArray.Contains(extension))
             {
@@ -76,8 +73,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// <returns></returns>
         public async Task<string> GetUploadUrl(string path, string siteName = "onedrive")
         {
-            string siteId = GetSiteId(siteName);
-            var drive = (siteName != "onedrive") ? _graph.Sites[siteId].Drive : _graph.Me.Drive;
+            var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
             string requestUrl = drive.Root.ItemWithPath(path).CreateUploadSession().Request().RequestUrl;
             ProtectedApiCallHelper apiCallHelper = new ProtectedApiCallHelper(new HttpClient());
             string uploadUrl = "";
@@ -115,13 +111,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         private List<DriveFile> GetItems(IDriveItemChildrenCollectionPage result, string siteName = "onedrive", bool showHiddenFolders = false)
         {
             List<DriveFile> files = new List<DriveFile>();
-            string[] hiddenFolders = _driveContext.Sites.Single(site => site.Name == siteName).HiddenFolders;
             foreach (var item in result)
             {
                 //要隐藏文件
                 if (!showHiddenFolders)
                 {
                     //跳过隐藏的文件
+                    string[] hiddenFolders = _driveContext.Sites.Single(site => site.Name == siteName).HiddenFolders;
                     if (hiddenFolders != null)
                     {
                         if (hiddenFolders.Any(str => str == item.Name))

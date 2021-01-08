@@ -8,39 +8,32 @@ namespace Masuit.MyBlogs.Core.Extensions.DriveHelpers
     /// </summary>
     static class TokenCacheHelper
     {
-        public static void EnableSerialization(ITokenCache tokenCache)
-        {
-            tokenCache.SetBeforeAccess(BeforeAccessNotification);
-            tokenCache.SetAfterAccess(AfterAccessNotification);
-        }
-
         /// <summary>
         /// Path to the token cache
         /// </summary>
         public static readonly string CacheFilePath = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "TokenCache.bin");
 
-        private static readonly object FileLock = new object();
-
-
-        private static void BeforeAccessNotification(TokenCacheNotificationArgs args)
+        private static readonly object FileLock = new();
+        public static void EnableSerialization(ITokenCache tokenCache)
         {
-            lock (FileLock)
-            {
-                args.TokenCache.DeserializeMsalV3(File.Exists(CacheFilePath) ? File.ReadAllBytes(CacheFilePath) : null);
-            }
-        }
-
-        private static void AfterAccessNotification(TokenCacheNotificationArgs args)
-        {
-            // if the access operation resulted in a cache update
-            if (args.HasStateChanged)
+            tokenCache.SetBeforeAccess(args =>
             {
                 lock (FileLock)
                 {
-                    // reflect changesgs in the persistent store
-                    File.WriteAllBytes(CacheFilePath, args.TokenCache.SerializeMsalV3());
+                    args.TokenCache.DeserializeMsalV3(File.Exists(CacheFilePath) ? File.ReadAllBytes(CacheFilePath) : null);
                 }
-            }
+            });
+            tokenCache.SetAfterAccess(args =>
+            {
+                if (args.HasStateChanged)
+                {
+                    lock (FileLock)
+                    {
+                        File.WriteAllBytes(CacheFilePath, args.TokenCache.SerializeMsalV3());
+                    }
+                }
+            });
         }
+
     }
 }

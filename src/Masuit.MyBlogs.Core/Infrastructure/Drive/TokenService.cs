@@ -1,12 +1,12 @@
+using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
+using Microsoft.Graph.Auth;
+using Microsoft.Identity.Client;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
-using Microsoft.Graph.Auth;
-using Microsoft.Identity.Client;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 {
@@ -68,14 +68,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             }
 
             //定时更新Token
-            _ = new Timer(o =>
+            _ = new Timer(_ =>
               {
                   if (File.Exists(TokenCacheHelper.CacheFilePath))
                   {
-                      //TODO:自动刷新 Token 失效
                       authorizeResult = authProvider.ClientApplication.AcquireTokenSilent(OneDriveConfiguration.Scopes, OneDriveConfiguration.AccountName).ExecuteAsync().Result;
                   }
-              }, null, TimeSpan.FromSeconds(0), TimeSpan.FromHours(1));
+              }, null, TimeSpan.Zero, TimeSpan.FromHours(1));
         }
 
         /// <summary>
