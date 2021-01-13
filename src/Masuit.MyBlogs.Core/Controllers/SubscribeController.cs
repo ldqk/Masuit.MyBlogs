@@ -27,7 +27,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public IPostService PostService { get; set; }
         public ICategoryService CategoryService { get; set; }
-        public ICommentService CommentService { get; set; }
         public IAdvertisementService AdvertisementService { get; set; }
 
         /// <summary>
@@ -192,54 +191,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Copyright = CommonHelper.SystemSettings["Title"],
                 Language = "zh-cn",
                 Items = new List<Item>() { item }
-            };
-            var rss = feed.Serialize(new SerializeOption()
-            {
-                Encoding = Encoding.UTF8
-            });
-            return Content(rss, "text/xml");
-        }
-
-        /// <summary>
-        /// RSS文章评论订阅
-        /// </summary>
-        /// <returns></returns>
-        [Route("/{id}/comments/rss"), ResponseCache(Duration = 600)]
-        public async Task<IActionResult> CommentsRss(int id)
-        {
-            string scheme = Request.Scheme;
-            var host = Request.Host;
-            var post = await PostService.GetAsync(p => p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章不存在");
-            var start = DateTime.Today.AddDays(-7);
-            var comments = await CommentService.GetQuery(c => c.PostId == post.Id && c.CommentDate > start).Select(c => new Item()
-            {
-                Author = new Author
-                {
-                    Name = c.NickName
-                },
-                Body = c.Content,
-                Categories = new List<string>
-                {
-                    c.Post.Title
-                },
-                Link = new Uri($"{scheme}://{host}/{post.Id}?cid={c.Id}#comment"),
-                PublishDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone)),
-                Title = c.NickName,
-                Permalink = $"{scheme}://{host}/{post.Id}?cid={c.Id}#comment",
-                Guid = c.Id.ToString(),
-                FullHtmlContent = c.Content
-            }).FromCacheAsync(new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
-            });
-            var feed = new Feed()
-            {
-                Title = Request.Host + $":文章【{post.Title}】文章评论更新订阅",
-                Description = post.Content.GetSummary(300, 50),
-                Link = new Uri(scheme + "://" + host + "/rss/" + id + "/comments"),
-                Copyright = CommonHelper.SystemSettings["Title"],
-                Language = "zh-cn",
-                Items = comments.ToArray()
             };
             var rss = feed.Serialize(new SerializeOption()
             {

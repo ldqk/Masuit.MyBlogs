@@ -29,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         {
             var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
             var result = await drive.Root.Children.Request().GetAsync();
-            List<DriveFile> files = GetItems(result, siteName, showHiddenFolders);
+            var files = GetItems(result, siteName, showHiddenFolders);
             return files;
         }
 
@@ -42,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         {
             var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
             var result = await drive.Root.ItemWithPath(path).Children.Request().GetAsync();
-            List<DriveFile> files = GetItems(result, siteName, showHiddenFolders);
+            var files = GetItems(result, siteName, showHiddenFolders);
             return files;
         }
         /// <summary>
@@ -53,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         public async Task<DriveFile> GetDriveItemByPath(string path, string siteName = "onedrive")
         {
             string[] imgArray = { ".png", ".jpg", ".jpeg", ".bmp", ".webp" };
-            string extension = Path.GetExtension(path);
+            var extension = Path.GetExtension(path);
             var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
             //这么写是因为：分块上传图片后直接获取会报错。
             if (imgArray.Contains(extension))
@@ -61,8 +61,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
                 await drive.Root.ItemWithPath(path).Thumbnails.Request().GetAsync();
             }
             var result = await drive.Root.ItemWithPath(path).Request().GetAsync();
-            DriveFile file = GetItem(result);
-            return file;
+            return GetItem(result);
         }
 
         /// <summary>
@@ -74,9 +73,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         public async Task<string> GetUploadUrl(string path, string siteName = "onedrive")
         {
             var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
-            string requestUrl = drive.Root.ItemWithPath(path).CreateUploadSession().Request().RequestUrl;
-            ProtectedApiCallHelper apiCallHelper = new ProtectedApiCallHelper(new HttpClient());
-            string uploadUrl = "";
+            var requestUrl = drive.Root.ItemWithPath(path).CreateUploadSession().Request().RequestUrl;
+            var apiCallHelper = new ProtectedApiCallHelper(new HttpClient());
+            var uploadUrl = "";
             await apiCallHelper.CallWebApiAndProcessResultASync(requestUrl, _accountService.GetToken(), o =>
             {
                 uploadUrl = o["uploadUrl"].ToString();
@@ -87,7 +86,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         #region PrivateMethod
         private DriveFile GetItem(DriveItem result)
         {
-            DriveFile file = new DriveFile()
+            var file = new DriveFile()
             {
                 CreatedTime = result.CreatedDateTime,
                 Name = result.Name,
@@ -99,9 +98,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
                 //可能是文件夹
                 if (result.AdditionalData.TryGetValue("@microsoft.graph.downloadUrl", out var downloadUrl))
                 {
-                    var dlurl = (string)downloadUrl;
-                    ReplaceCDNUrls(ref dlurl);
-                    file.DownloadUrl = dlurl;
+                    file.DownloadUrl = ReplaceCDNUrls((string)downloadUrl);
                 }
             }
 
@@ -110,14 +107,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 
         private List<DriveFile> GetItems(IDriveItemChildrenCollectionPage result, string siteName = "onedrive", bool showHiddenFolders = false)
         {
-            List<DriveFile> files = new List<DriveFile>();
+            var files = new List<DriveFile>();
             foreach (var item in result)
             {
                 //要隐藏文件
                 if (!showHiddenFolders)
                 {
                     //跳过隐藏的文件
-                    string[] hiddenFolders = _driveContext.Sites.Single(site => site.Name == siteName).HiddenFolders;
+                    var hiddenFolders = _driveContext.Sites.Single(site => site.Name == siteName).HiddenFolders;
                     if (hiddenFolders != null)
                     {
                         if (hiddenFolders.Any(str => str == item.Name))
@@ -126,7 +123,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
                         }
                     }
                 }
-                DriveFile file = new DriveFile()
+                var file = new DriveFile()
                 {
                     CreatedTime = item.CreatedDateTime,
                     Name = item.Name,
@@ -138,9 +135,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
                     //可能是文件夹
                     if (item.AdditionalData.TryGetValue("@microsoft.graph.downloadUrl", out var downloadUrl))
                     {
-                        var dlurl = (string)downloadUrl;
-                        ReplaceCDNUrls(ref dlurl);
-                        file.DownloadUrl = dlurl;
+                        file.DownloadUrl = ReplaceCDNUrls((string)downloadUrl);
                     }
                 }
                 files.Add(file);
@@ -159,12 +154,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             return site?.SiteId;
         }
 
-        private void ReplaceCDNUrls(ref string downloadUrl)
+        private string ReplaceCDNUrls(string downloadUrl)
         {
             if (OneDriveConfiguration.CDNUrls.Length != 0)
             {
-                downloadUrl = OneDriveConfiguration.CDNUrls.Select(item => item.Split(";")).Aggregate(downloadUrl, (current, a) => current.Replace(a[0], a[1]));
+                return OneDriveConfiguration.CDNUrls.Select(item => item.Split(";")).Aggregate(downloadUrl, (current, a) => current.Replace(a[0], a[1]));
             }
+            return downloadUrl;
         }
         #endregion
     }
