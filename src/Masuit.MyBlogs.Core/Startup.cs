@@ -23,7 +23,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
+using Polly;
 using System;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core
 {
@@ -97,8 +99,8 @@ namespace Masuit.MyBlogs.Core
                 Path = "lucene"
             }); // 配置7z和断点续传和Redis和Lucene搜索引擎
 
-            services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)); //注入HttpClient
-            services.AddHttpClient<ImagebedClient>();
+            services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)).AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(5)); //注入HttpClient
+            services.AddHttpClient<ImagebedClient>().AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(5));
             services.AddMailSender(Configuration).AddFirewallReporter(Configuration);
             services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
             services.SetupMiniProfile();
