@@ -27,9 +27,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 公告
         /// </summary>
         public INoticeService NoticeService { get; set; }
-
-        public IWebHostEnvironment HostEnvironment { get; set; }
-
         public ImagebedClient ImagebedClient { get; set; }
 
         /// <summary>
@@ -93,10 +90,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 删除公告
         /// </summary>
+        /// <param name="hostEnvironment"></param>
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult> Delete([FromServices] IWebHostEnvironment hostEnvironment, int id)
         {
             var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("公告已经被删除！");
             var srcs = notice.Content.MatchImgSrcs().Where(s => s.StartsWith("/"));
@@ -104,7 +102,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 try
                 {
-                    System.IO.File.Delete(HostEnvironment.WebRootPath + path);
+                    System.IO.File.Delete(hostEnvironment.WebRootPath + path);
                 }
                 catch
                 {

@@ -24,23 +24,19 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// </summary>
     public class SearchController : BaseController
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public ISearchDetailsService SearchDetailsService { get; set; }
-        public IPostService PostService { get; set; }
-
         public ICacheManager<string> CacheManager { get; set; }
 
         /// <summary>
         /// 搜索页
         /// </summary>
+        /// <param name="postService"></param>
         /// <param name="wd"></param>
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Route("s/{wd?}/{page:int?}/{size:int?}")]
-        public async Task<ActionResult> Search(string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        [Route("s/{wd?}")]
+        public async Task<ActionResult> Search([FromServices] IPostService postService, string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             wd = wd?.Trim().ToSimplified();
             ViewBag.PageSize = size;
@@ -68,7 +64,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     HttpContext.Session.Set("search:" + wd, wd.ToByteArray());
                 }
 
-                var posts = PostService.SearchPage(page, size, wd);
+                var posts = postService.SearchPage(page, size, wd);
                 if (posts.Total > 1)
                 {
                     CacheManager.AddOrUpdate(key, wd, s => wd);

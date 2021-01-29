@@ -48,19 +48,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         public INoticeService NoticeService { get; set; }
 
         /// <summary>
-        /// 快速分享
-        /// </summary>
-        public IFastShareService FastShareService { get; set; }
-
-        /// <summary>
         /// 首页
         /// </summary>
         /// <returns></returns>
         [HttpGet, ResponseCache(Duration = 600, VaryByHeader = "Cookie", Location = ResponseCacheLocation.Any)]
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index([FromServices] IFastShareService fastShareService)
         {
             var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner).OrderBy(a => Guid.NewGuid()).ToList();
-            var fastShares = await FastShareService.GetAllFromCacheAsync(s => s.Sort);
+            var fastShares = await fastShareService.GetAllFromCacheAsync(s => s.Sort);
             var postsQuery = PostService.GetQuery<PostDto>(p => p.Status == Status.Published); //准备文章的查询
             var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ToCachedPagedListAsync(1, 15);
             posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ToList());

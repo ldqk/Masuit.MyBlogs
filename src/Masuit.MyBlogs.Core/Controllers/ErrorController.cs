@@ -27,8 +27,6 @@ namespace Masuit.MyBlogs.Core.Controllers
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorController : Controller
     {
-        public IUserInfoService UserInfoService { get; set; }
-
         /// <summary>
         /// 404
         /// </summary>
@@ -154,10 +152,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 检查授权邮箱
         /// </summary>
+        /// <param name="userInfoService"></param>
         /// <param name="email"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" })]
-        public ActionResult GetViewToken(string email)
+        public ActionResult GetViewToken([FromServices] IUserInfoService userInfoService, string email)
         {
             if (string.IsNullOrEmpty(email) || !email.MatchEmail().isMatch)
             {
@@ -170,7 +169,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "发送频率限制，请在2分钟后重新尝试发送邮件！请检查你的邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！");
             }
 
-            if (!UserInfoService.Any(b => b.Email == email))
+            if (!userInfoService.Any(b => b.Email == email))
             {
                 return ResultData(null, false, "您目前没有权限访问这个链接，请联系站长开通访问权限！");
             }

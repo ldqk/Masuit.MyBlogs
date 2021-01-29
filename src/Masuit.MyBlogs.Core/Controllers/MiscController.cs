@@ -26,12 +26,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// MiscService
         /// </summary>
         public IMiscService MiscService { get; set; }
-
-        /// <summary>
-        /// 打赏
-        /// </summary>
-        public IDonateService DonateService { get; set; }
-
         public IWebHostEnvironment HostEnvironment { get; set; }
         public ImagebedClient ImagebedClient { get; set; }
 
@@ -65,13 +59,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 打赏列表
         /// </summary>
+        /// <param name="donateService"></param>
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("donatelist")]
-        public async Task<ActionResult> DonateList(int page = 1, int size = 10)
+        public async Task<ActionResult> DonateList([FromServices] IDonateService donateService, int page = 1, int size = 10)
         {
-            var list = await DonateService.GetPagesFromCacheAsync<DateTime, DonateDto>(page, size, d => true, d => d.DonateTime, false);
+            var list = await donateService.GetPagesFromCacheAsync<DateTime, DonateDto>(page, size, d => true, d => d.DonateTime, false);
             if (!CurrentUser.IsAdmin)
             {
                 foreach (var item in list.Data.Where(item => !(item.QQorWechat + item.Email).Contains("匿名")))

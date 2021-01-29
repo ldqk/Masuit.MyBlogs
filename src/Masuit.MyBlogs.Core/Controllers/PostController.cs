@@ -46,9 +46,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ICategoryService CategoryService { get; set; }
         public ISeminarService SeminarService { get; set; }
         public IPostHistoryVersionService PostHistoryVersionService { get; set; }
-        public IInternalMessageService MessageService { get; set; }
-        public IPostMergeRequestService PostMergeRequestService { get; set; }
-
         public IWebHostEnvironment HostEnvironment { get; set; }
         public ISearchEngine<DataContext> SearchEngine { get; set; }
         public ImagebedClient ImagebedClient { get; set; }
@@ -459,10 +456,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 文章合并
         /// </summary>
+        /// <param name="messageService"></param>
+        /// <param name="postMergeRequestService"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost("{id}/pushmerge")]
-        public async Task<ActionResult> PushMerge(PostMergeRequestCommand dto)
+        public async Task<ActionResult> PushMerge([FromServices] IInternalMessageService messageService, [FromServices] IPostMergeRequestService postMergeRequestService, PostMergeRequestCommand dto)
         {
             if (await RedisHelper.GetAsync("code:" + dto.ModifierEmail) != dto.Code)
             {
@@ -479,7 +478,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             #region 合并验证
 
-            if (PostMergeRequestService.Any(p => p.ModifierEmail == dto.ModifierEmail && p.MergeState == MergeStatus.Block))
+            if (postMergeRequestService.Any(p => p.ModifierEmail == dto.ModifierEmail && p.MergeState == MergeStatus.Block))
             {
                 return ResultData(null, false, "由于您曾经多次恶意修改文章，已经被标记为黑名单，无法修改任何文章，如有疑问，请联系网站管理员进行处理。");
             }
@@ -525,7 +524,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             await RedisHelper.ExpireAsync("code:" + dto.ModifierEmail, 1);
-            await MessageService.AddEntitySavedAsync(new InternalMessage()
+            await messageService.AddEntitySavedAsync(new InternalMessage()
             {
                 Title = $"来自【{dto.Modifier}】对文章《{post.Title}》的修改请求",
                 Content = dto.Title,

@@ -14,19 +14,6 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class DashboardController : AdminController
     {
         /// <summary>
-        /// PostService
-        /// </summary>
-        public IPostService PostService { get; set; }
-        /// <summary>
-        /// LeaveMessageService
-        /// </summary>
-        public ILeaveMessageService LeaveMessageService { get; set; }
-        /// <summary>
-        /// CommentService
-        /// </summary>
-        public ICommentService CommentService { get; set; }
-
-        /// <summary>
         /// 控制面板
         /// </summary>
         /// <returns></returns>
@@ -46,22 +33,22 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取站内消息
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetMessages()
+        public ActionResult GetMessages([FromServices] IPostService postService, [FromServices] ILeaveMessageService leaveMessageService, [FromServices] ICommentService commentService)
         {
-            var post = PostService.GetQuery(p => p.Status == Status.Pending).Select(p => new
+            var post = postService.GetQuery(p => p.Status == Status.Pending).Select(p => new
             {
                 p.Id,
                 p.Title,
                 p.PostDate,
                 p.Author
             }).ToList();
-            var msgs = LeaveMessageService.GetQuery(m => m.Status == Status.Pending).Select(p => new
+            var msgs = leaveMessageService.GetQuery(m => m.Status == Status.Pending).Select(p => new
             {
                 p.Id,
                 p.PostDate,
                 p.NickName
             }).ToList();
-            var comments = CommentService.GetQuery(c => c.Status == Status.Pending).Select(p => new
+            var comments = commentService.GetQuery(c => c.Status == Status.Pending).Select(p => new
             {
                 p.Id,
                 p.CommentDate,

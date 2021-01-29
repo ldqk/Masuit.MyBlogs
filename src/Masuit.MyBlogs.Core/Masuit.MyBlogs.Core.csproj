@@ -44,6 +44,7 @@
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
         <PackageReference Include="CacheManager.Microsoft.Extensions.Caching.Memory" Version="2.0.0-beta-1629" />
         <PackageReference Include="CacheManager.Serialization.Json" Version="2.0.0-beta-1629" />
+        <PackageReference Include="CLRStats" Version="1.0.0" />
         <PackageReference Include="CSRedisCore" Version="3.6.6" />
         <PackageReference Include="Hangfire" Version="1.7.19" />
         <PackageReference Include="Hangfire.Autofac" Version="2.3.1" />
@@ -57,7 +58,7 @@
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="5.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.2" />
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="5.0.1" />
-        <PackageReference Include="Microsoft.Graph" Version="3.21.0" />
+        <PackageReference Include="Microsoft.Graph" Version="3.22.0" />
         <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.6" />
         <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />
         <PackageReference Include="OpenXmlPowerTools-NetStandard" Version="4.4.21" />
@@ -71,7 +72,7 @@
         <PackageReference Include="TimeZoneConverter" Version="3.3.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.0" />
         <PackageReference Include="WinInsider.System.Net.Http.Formatting" Version="1.0.14" />
-        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.13" />
+        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.15" />
     </ItemGroup>
     <ItemGroup>
         <Content Update="appsettings.json">

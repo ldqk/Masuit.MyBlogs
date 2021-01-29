@@ -23,8 +23,6 @@ namespace Masuit.MyBlogs.Core.Controllers
     [Route("partner/[action]")]
     public class AdvertisementController : BaseController
     {
-        public ICategoryService CategoryService { get; set; }
-
         /// <summary>
         /// 前往
         /// </summary>
@@ -49,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> GetPageData([Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, string kw = "")
+        public async Task<ActionResult> GetPageData([FromServices] ICategoryService categoryService, [Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, string kw = "")
         {
             Expression<Func<Advertisement, bool>> where = p => true;
             if (!string.IsNullOrEmpty(kw))
@@ -59,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var list = AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ToPagedList<Advertisement, AdvertisementViewModel>(page, size, MapperConfig);
             var cids = list.Data.Where(m => !string.IsNullOrEmpty(m.CategoryIds)).SelectMany(m => m.CategoryIds.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)).Distinct().ToArray();
-            var dic = await CategoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionaryAsync(c => c.Id + "", c => c.Name);
+            var dic = await categoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionaryAsync(c => c.Id + "", c => c.Name);
             foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
             {
                 ad.CategoryNames = JiebaNet.Segmenter.Common.Extensions.Join(ad.CategoryIds.Split(",").Select(c => dic.GetValueOrDefault(c)), ",");

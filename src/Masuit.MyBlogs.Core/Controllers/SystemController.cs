@@ -31,8 +31,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 系统设置
         /// </summary>
         public ISystemSettingService SystemSettingService { get; set; }
-        public IFirewallRepoter FirewallRepoter { get; set; }
-        public IMailSender MailSender { get; set; }
 
         /// <summary>
         /// 获取历史性能计数器
@@ -207,9 +205,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             return RedisHelper.SUnion(RedisHelper.Keys("Email:*")).Select(JObject.Parse).OrderByDescending(o => o["time"]).ToList();
         }
 
-        public ActionResult BounceEmail(string email)
+        public ActionResult BounceEmail([FromServices] IMailSender mailSender, string email)
         {
-            var msg = MailSender.AddRecipient(email);
+            var msg = mailSender.AddRecipient(email);
             return Ok(new
             {
                 msg
@@ -355,9 +353,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 将IP添加到黑名单
         /// </summary>
+        /// <param name="firewallRepoter"></param>
         /// <param name="ip"></param>
         /// <returns></returns>
-        public async Task<ActionResult> AddToBlackList(string ip)
+        public async Task<ActionResult> AddToBlackList([FromServices] IFirewallRepoter firewallRepoter, string ip)
         {
             if (!ip.MatchInetAddress())
             {
@@ -369,7 +368,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
             CommonHelper.IPWhiteList.Remove(ip);
             await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "whitelist.txt"), string.Join(",", CommonHelper.IPWhiteList.Distinct()), Encoding.UTF8);
-            await FirewallRepoter.ReportAsync(IPAddress.Parse(ip));
+            await firewallRepoter.ReportAsync(IPAddress.Parse(ip));
             return ResultData(null);
         }
 

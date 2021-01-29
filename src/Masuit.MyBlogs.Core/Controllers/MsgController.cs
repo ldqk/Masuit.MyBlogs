@@ -46,7 +46,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IWebHostEnvironment HostEnvironment { get; set; }
 
         public ICacheManager<int> MsgFeq { get; set; }
-        public IMailSender MailSender { get; set; }
 
         /// <summary>
         /// 留言板
@@ -121,10 +120,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 发表留言
         /// </summary>
+        /// <param name="mailSender"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Submit(LeaveMessageCommand dto)
+        public async Task<ActionResult> Submit([FromServices] IMailSender mailSender, LeaveMessageCommand dto)
         {
             var match = Regex.Match(dto.NickName + dto.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
             if (match.Success)
@@ -133,7 +133,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
 
-            if (MailSender.HasBounced(dto.Email) || (!CurrentUser.IsAdmin && dto.Email.EndsWith(CommonHelper.SystemSettings["Domain"])))
+            if (mailSender.HasBounced(dto.Email) || (!CurrentUser.IsAdmin && dto.Email.EndsWith(CommonHelper.SystemSettings["Domain"])))
             {
                 Response.Cookies.Delete("Email");
                 Response.Cookies.Delete("QQorWechat");

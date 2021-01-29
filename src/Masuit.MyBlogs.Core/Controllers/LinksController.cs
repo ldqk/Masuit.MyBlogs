@@ -21,7 +21,6 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class LinksController : BaseController
     {
         public IHttpClientFactory HttpClientFactory { get; set; }
-        public IWebHostEnvironment HostEnvironment { get; set; }
         private HttpClient HttpClient => HttpClientFactory.CreateClient();
 
         /// <summary>
@@ -29,10 +28,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("links"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index([FromServices] IWebHostEnvironment hostEnvironment)
         {
             var list = await LinksService.GetQueryFromCacheAsync<bool, LinksDto>(l => l.Status == Status.Available, l => l.Recommend, false);
-            ViewBag.Html = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "links.html"));
+            ViewBag.Html = await System.IO.File.ReadAllTextAsync(Path.Combine(hostEnvironment.WebRootPath, "template", "links.html"));
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage);
             return CurrentUser.IsAdmin ? View("Index_Admin", list) : View(list);
         }

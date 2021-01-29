@@ -34,8 +34,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public IPostService PostService { get; set; }
 
-        public ISeminarPostService SeminarPostService { get; set; }
-
         /// <summary>
         /// 专题页
         /// </summary>
@@ -176,15 +174,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 移除文章
         /// </summary>
+        /// <param name="seminarPostService"></param>
         /// <param name="id"></param>
         /// <param name="pid"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> RemovePost(int id, int pid)
+        public async Task<ActionResult> RemovePost([FromServices] ISeminarPostService seminarPostService, int id, int pid)
         {
             Seminar seminar = await SeminarService.GetByIdAsync(id);
             Post post = await PostService.GetByIdAsync(pid);
-            bool b = await SeminarPostService.DeleteEntitySavedAsync(s => s.SeminarId == id && s.PostId == pid) > 0;
+            bool b = await seminarPostService.DeleteEntitySavedAsync(s => s.SeminarId == id && s.PostId == pid) > 0;
             return ResultData(null, b, b ? $"已成功将【{post.Title}】从专题【{seminar.Title}】移除" : "添加失败！");
         }
 

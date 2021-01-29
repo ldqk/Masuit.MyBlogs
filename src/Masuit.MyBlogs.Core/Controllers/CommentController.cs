@@ -36,18 +36,18 @@ namespace Masuit.MyBlogs.Core.Controllers
     {
         public ICommentService CommentService { get; set; }
         public IPostService PostService { get; set; }
-        public IInternalMessageService MessageService { get; set; }
         public IWebHostEnvironment HostEnvironment { get; set; }
         public ICacheManager<int> CommentFeq { get; set; }
-        public IMailSender MailSender { get; set; }
 
         /// <summary>
         /// 发表评论
         /// </summary>
+        /// <param name="messageService"></param>
+        /// <param name="mailSender"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Submit(CommentCommand dto)
+        public async Task<ActionResult> Submit([FromServices] IInternalMessageService messageService, [FromServices] IMailSender mailSender, CommentCommand dto)
         {
             var match = Regex.Match(dto.NickName + dto.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
             if (match.Success)
@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
 
-            if (MailSender.HasBounced(dto.Email) || (!CurrentUser.IsAdmin && dto.Email.EndsWith(CommonHelper.SystemSettings["Domain"])))
+            if (mailSender.HasBounced(dto.Email) || (!CurrentUser.IsAdmin && dto.Email.EndsWith(CommonHelper.SystemSettings["Domain"])))
             {
                 Response.Cookies.Delete("Email");
                 Response.Cookies.Delete("QQorWechat");
@@ -135,7 +135,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 if (!comment.IsMaster)
                 {
-                    await MessageService.AddEntitySavedAsync(new InternalMessage()
+                    await messageService.AddEntitySavedAsync(new InternalMessage()
                     {
                         Title = $"来自【{comment.NickName}】在文章《{post.Title}》的新评论",
                         Content = comment.Content,

@@ -33,15 +33,6 @@ namespace Masuit.MyBlogs.Core.Controllers
     {
         public IWebHostEnvironment HostEnvironment { get; set; }
 
-        public ImagebedClient ImagebedClient { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="isTrue"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         public ActionResult ResultData(object data, bool isTrue = true, string message = "")
         {
             return Content(JsonConvert.SerializeObject(new
@@ -271,10 +262,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 上传文件
         /// </summary>
+        /// <param name="imagebedClient"></param>
         /// <param name="file"></param>
         /// <returns></returns>
         [HttpPost("upload"), ApiExplorerSettings(IgnoreApi = false)]
-        public async Task<ActionResult> UploadFile(IFormFile file)
+        public async Task<ActionResult> UploadFile([FromServices] ImagebedClient imagebedClient, IFormFile file)
         {
             string path;
             string filename = SnowFlake.GetInstance().GetUniqueId() + Path.GetExtension(file.FileName);
@@ -282,7 +274,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 case var _ when file.ContentType.StartsWith("image"):
                     {
-                        var (url, success) = await ImagebedClient.UploadImage(file.OpenReadStream(), file.FileName);
+                        var (url, success) = await imagebedClient.UploadImage(file.OpenReadStream(), file.FileName);
                         if (success)
                         {
                             return ResultData(url);
