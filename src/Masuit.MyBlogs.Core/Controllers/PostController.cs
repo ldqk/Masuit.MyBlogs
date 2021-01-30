@@ -202,8 +202,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
-            CheckPermission(post);
             var main = post.Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
+            CheckPermission(post);
             var left = v1 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
             var right = v2 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
             main.Id = id;
