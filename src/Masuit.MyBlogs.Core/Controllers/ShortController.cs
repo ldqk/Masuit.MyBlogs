@@ -7,9 +7,9 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class ShortController : Controller
     {
         [HttpGet("short"), MyAuthorize]
-        public IActionResult Short(string url)
+        public IActionResult Short(string key, string url)
         {
-            var id = url.Crc32().FromBinary(16).ToBinary(62);
+            var id = string.IsNullOrEmpty(key) ? url.Crc32().FromBinary(16).ToBinary(62) : key;
             RedisHelper.Set("shorturl:" + id, url);
             return Ok(id);
         }
