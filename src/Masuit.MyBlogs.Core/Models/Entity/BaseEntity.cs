@@ -18,7 +18,12 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <returns>如果指定的对象等于当前对象，则为 <see langword="true" />；否则为 <see langword="false" />。</returns>
         public override bool Equals(object obj)
         {
-            return Id == ((BaseEntity)obj).Id;
+            if (obj.GetType() == GetType())
+            {
+                return Id == ((BaseEntity)obj).Id;
+            }
+
+            return false;
         }
 
         /// <summary>作为默认哈希函数。</summary>

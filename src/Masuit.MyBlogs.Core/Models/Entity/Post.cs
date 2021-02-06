@@ -22,7 +22,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
             ModifyDate = DateTime.Now;
             IsFixedTop = false;
             Status = Status.Pending;
-            Seminar = new HashSet<SeminarPost>();
+            Seminar = new HashSet<Seminar>();
             PostMergeRequests = new HashSet<PostMergeRequest>();
         }
 
@@ -168,7 +168,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 专题
         /// </summary>
-        public virtual ICollection<SeminarPost> Seminar { get; set; }
+        public virtual ICollection<Seminar> Seminar { get; set; }
 
         /// <summary>
         /// 文章历史版本

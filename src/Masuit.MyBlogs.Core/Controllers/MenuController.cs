@@ -1,6 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Command;
+using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Systems;
@@ -28,8 +29,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetMenus()
         {
-            var menus = MenuService.GetAll(m => m.ParentId).ThenBy(m => m.Sort).ToList();
-            return ResultData(menus);
+            var menus = MenuService.GetQuery(m => m.ParentId == null, m => m.ParentId).ThenBy(m => m.Sort).ToList();
+            return ResultData(Mapper.Map<List<MenuDto>>(menus));
         }
 
         /// <summary>

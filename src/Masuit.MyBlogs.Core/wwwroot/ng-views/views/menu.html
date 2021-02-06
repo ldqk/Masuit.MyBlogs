@@ -61,7 +61,7 @@
     <div ui-tree-handle class="tree-node tree-node-content">
         <div class="row">
             <div class="col-sm-2">
-                <a class="btn btn-success btn-xs waves-effect" ng-if="node.nodes && node.nodes.length > 0" data-nodrag ng-click="toggle(this)" style="margin-right:5px;">
+                <a class="btn btn-success btn-xs waves-effect" ng-if="node.Children && node.Children.length > 0" data-nodrag ng-click="toggle(this)" style="margin-right:5px;">
                     <span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}"></span>
                 </a>
                 <a ng-href="{{node.Url}}" style="font-size:16px;" target="_blank">{{node.Id}}：{{node.Name}}</a>
@@ -94,8 +94,8 @@
             </div>
         </div>
     </div>
-    <ol ui-tree-nodes="" ng-model="node.nodes" ng-class="{hidden: collapsed}" class="animated fadeIn">
-        <li ng-repeat="node in node.nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+    <ol ui-tree-nodes="" ng-model="node.Children" ng-class="{hidden: collapsed}" class="animated fadeIn">
+        <li ng-repeat="node in node.Children" ui-tree-node ng-include="'nodes_renderer.html'"></li>
     </ol>
 </script>
 <h1>导航菜单管理</h1>

@@ -2,7 +2,7 @@
 	$scope.menu = {};
 	$scope.init = function() {
 		$scope.request("/menu/getmenus", null, function(data) {
-			$scope.data = transData(data.Data, "Id", "ParentId", "nodes");
+			$scope.data = data.Data;//transData(data.Data, "Id", "ParentId", "nodes");
 			$scope.collapse = true;
 			$timeout(function() {
 				$scope.expandAll();
@@ -172,7 +172,7 @@
 			}
 		});
 		var nodeData = $scope.data[$scope.data.length - 1];
-		$scope.menu.Sort = nodeData.Sort + (nodeData.nodes.length + 1) * 10;
+		$scope.menu.Sort = nodeData.Sort + (nodeData.Children.length + 1) * 10;
 		$scope.menu.ParentId  = 0;
 		$scope.menu.MenuType  = 0;
 	};
@@ -204,7 +204,7 @@
 			swal("异常操作！", "菜单【" + nodeData.Name + "】是一个有链接的菜单，不能作为父级菜单", "error");
 			return false;
 		}
-		$scope.menu.Sort = (nodeData.Sort + nodeData.nodes.length + 1) * 10;
+		$scope.menu.Sort = (nodeData.Sort + nodeData.Children.length + 1) * 10;
 		$scope.menu.MenuType  = nodeData.MenuType;
 		$scope.menu.ParentId = nodeData.Id;
 	};

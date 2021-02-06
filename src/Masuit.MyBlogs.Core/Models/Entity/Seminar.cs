@@ -12,7 +12,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
     {
         public Seminar()
         {
-            this.Post = new HashSet<SeminarPost>();
+            this.Post = new HashSet<Post>();
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         [Required(ErrorMessage = "专题描述不能为空！")]
         public string Description { get; set; }
 
-        public virtual ICollection<SeminarPost> Post { get; set; }
-        public virtual ICollection<SeminarPostHistoryVersion> PostHistoryVersion { get; set; }
+        public virtual ICollection<Post> Post { get; set; }
+        public virtual ICollection<PostHistoryVersion> PostHistoryVersion { get; set; }
     }
 }

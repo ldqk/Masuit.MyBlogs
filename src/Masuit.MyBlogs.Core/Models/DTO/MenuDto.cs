@@ -1,4 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Models.Enum;
+using System.Collections.Generic;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
 {
@@ -11,6 +12,11 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 名字
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// 子级
+        /// </summary>
+        public ICollection<MenuDto> Children { get; set; }
 
         /// <summary>
         /// 图标

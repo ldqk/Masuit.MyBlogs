@@ -92,7 +92,7 @@
                                         var seminars = Model.Seminar;
                                         foreach (var s in seminars)
                                         {
-                                            <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-info">@s.Seminar.Title</a>
+                                            <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.Id" class="label label-info">@s.Title</a>
                                             <text> </text>
                                         }
                                     }

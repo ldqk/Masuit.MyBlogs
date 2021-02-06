@@ -1,12 +1,13 @@
 ﻿@using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools
 @using Masuit.Tools.Core.Net
 @{
     string[] colors = { "success", "info", "warning", "danger", "default" };
-    IList<MenuDto> menus = ViewBag.menus;
+    List<Menu> menus = ViewBag.menus;
     UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
     PageFootViewModel footer = ViewBag.Footer;
 }
@@ -107,8 +108,7 @@
                             <a> | </a>
                         </li>
                     }
-                    var parent = menus.Where(m => m.ParentId == 0);
-                    foreach (var m in parent)
+                    foreach (var m in menus)
                     {
                         if (m.MenuType == MenuType.SubMenu)
                         {
@@ -117,23 +117,23 @@
                                 <ul class="cd-secondary-nav is-hidden">
                                     <li class="go-back"><a href="#">上级菜单</a></li>
                                     <li class="see-all"><a asp-controller="Post" asp-action="All">所有 @m.Name</a></li>
-                                    @foreach (MenuDto m2 in menus.Where(s => s.ParentId == m.Id).OrderBy(c => c.Sort))
+                                    @foreach (var m2 in m.Children.OrderBy(c => c.Sort))
                                     {
-                                        if (menus.Any(mm => mm.ParentId == m2.Id))
+                                        if (m2.Children.Any())
                                         {
                                             <li class="has-children">
                                                 <a href="#">@m2.Name</a>
                                                 <ul class="is-hidden">
                                                     <li class="go-back"><a href="#">上级菜单</a></li>
-                                                    @foreach (MenuDto m3 in menus.Where(s => s.ParentId == m2.Id).OrderBy(c => c.Sort))
+                                                    @foreach (var m3 in m2.Children.OrderBy(c => c.Sort))
                                                     {
-                                                        if (menus.Any(mmm => mmm.ParentId == m3.Id))
+                                                        if (m3.Children.Any())
                                                         {
                                                             <li class="has-children">
                                                                 <a href="#">@m3.Name</a>
                                                                 <ul class="is-hidden">
                                                                     <li class="go-back"><a href="#">上级菜单</a></li>
-                                                                    @foreach (MenuDto m4 in menus.Where(s => s.ParentId == m3.Id).OrderBy(c => c.Sort))
+                                                                    @foreach (var m4 in m.Children.OrderBy(c => c.Sort))
                                                                     {
                                                                         if (m4.NewTab)
                                                                         {
@@ -186,8 +186,7 @@
                                     <li class="go-back"><a href="#">返回主菜单</a></li>
                                     <li class="see-all"><a asp-controller="Post" asp-action="All">所有 @m.Name</a></li>
                                     @{
-                                        var ms = menus.Where(s => s.ParentId == m.Id);
-                                        foreach (var mm in ms)
+                                        foreach (var mm in m.Children)
                                         {
                                             if (mm.NewTab)
                                             {
@@ -219,9 +218,8 @@
                                 <ul class="cd-nav-icons is-hidden">
                                     <li class="go-back"><a href="#">返回主菜单</a></li>
                                     @{
-                                        var ms = menus.Where(s => s.ParentId == m.Id);
                                         var step = 1;
-                                        foreach (var mm in ms)
+                                        foreach (var mm in m.Children)
                                         {
                                             if (mm.NewTab)
                                             {

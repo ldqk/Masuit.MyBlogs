@@ -18,7 +18,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         {
             ModifyDate = DateTime.Now;
             Status = Status.Pending;
-            Seminar = new HashSet<SeminarPostHistoryVersion>();
+            Seminar = new HashSet<Seminar>();
         }
 
         /// <summary>
@@ -96,6 +96,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// ×¨Ìâ
         /// </summary>
-        public virtual ICollection<SeminarPostHistoryVersion> Seminar { get; set; }
+        public virtual ICollection<Seminar> Seminar { get; set; }
     }
 }

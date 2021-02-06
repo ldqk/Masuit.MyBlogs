@@ -75,19 +75,19 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
     }
 
-    public partial class SeminarPostService : BaseService<SeminarPost>, ISeminarPostService
-    {
-        public SeminarPostService(IBaseRepository<SeminarPost> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
-        {
-        }
-    }
+    //public partial class SeminarPostService : BaseService<SeminarPost>, ISeminarPostService
+    //{
+    //    public SeminarPostService(IBaseRepository<SeminarPost> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
+    //    {
+    //    }
+    //}
 
-    public partial class SeminarPostHistoryVersionService : BaseService<SeminarPostHistoryVersion>, ISeminarPostHistoryVersionService
-    {
-        public SeminarPostHistoryVersionService(IBaseRepository<SeminarPostHistoryVersion> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
-        {
-        }
-    }
+    //public partial class SeminarPostHistoryVersionService : BaseService<SeminarPostHistoryVersion>, ISeminarPostHistoryVersionService
+    //{
+    //    public SeminarPostHistoryVersionService(IBaseRepository<SeminarPostHistoryVersion> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
+    //    {
+    //    }
+    //}
     public partial class PostMergeRequestService : BaseService<PostMergeRequest>, IPostMergeRequestService
     {
         public PostMergeRequestService(IBaseRepository<PostMergeRequest> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)

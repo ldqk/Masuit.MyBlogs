@@ -356,7 +356,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 Id = c.Id,
                 Name = c.Title,
-                Count = c.Post.Count(p => p.Post.Status == Status.Published || CurrentUser.IsAdmin)
+                Count = c.Post.Count(p => p.Status == Status.Published || CurrentUser.IsAdmin)
             }).ToList(); //seminars
             return View();
         }
@@ -652,7 +652,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             Post post = PostService[id] ?? throw new NotFoundException("文章未找到");
             PostDto model = post.Mapper<PostDto>();
-            model.Seminars = post.Seminar.Select(s => s.Seminar.Title).Join(",");
+            model.Seminars = post.Seminar.Select(s => s.Title).Join(",");
             return ResultData(model);
         }
 
@@ -747,13 +747,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     var seminar = await SeminarService.GetAsync(e => e.Title.Equals(s));
                     if (seminar != null)
                     {
-                        p.Seminar.Add(new SeminarPost()
-                        {
-                            Post = p,
-                            Seminar = seminar,
-                            PostId = p.Id,
-                            SeminarId = seminar.Id
-                        });
+                        p.Seminar.Add(seminar);
                     }
                 }
             }
@@ -795,13 +789,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     var id = s.ToInt32();
                     Seminar seminar = await SeminarService.GetByIdAsync(id);
-                    p.Seminar.Add(new SeminarPost()
-                    {
-                        Post = p,
-                        PostId = p.Id,
-                        Seminar = seminar,
-                        SeminarId = seminar.Id
-                    });
+                    p.Seminar.Add(seminar);
                 }
             }
 
@@ -893,13 +881,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             Seminar seminar = await SeminarService.GetByIdAsync(sid) ?? throw new NotFoundException("专题未找到");
-            post.Seminar.Add(new SeminarPost()
-            {
-                Post = post,
-                Seminar = seminar,
-                SeminarId = seminar.Id,
-                PostId = post.Id
-            });
+            post.Seminar.Add(seminar);
             bool b = await PostService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? $"已将文章【{post.Title}】添加到专题【{seminar.Title}】" : "添加失败");
         }
@@ -915,13 +897,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             Seminar seminar = await SeminarService.GetByIdAsync(sid) ?? throw new NotFoundException("专题未找到");
-            post.Seminar.Remove(new SeminarPost()
-            {
-                Post = post,
-                Seminar = seminar,
-                SeminarId = seminar.Id,
-                PostId = post.Id
-            });
+            post.Seminar.Remove(seminar);
             bool b = await PostService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? $"已将文章【{post.Title}】从【{seminar.Title}】专题移除" : "添加失败");
         }
@@ -956,13 +932,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             history.Post.Seminar.Clear();
             foreach (var s in history.Seminar)
             {
-                history.Post.Seminar.Add(new SeminarPost()
-                {
-                    Post = history.Post,
-                    PostId = history.PostId,
-                    Seminar = s.Seminar,
-                    SeminarId = s.SeminarId
-                });
+                history.Post.Seminar.Add(s);
             }
             bool b = await SearchEngine.SaveChangesAsync() > 0;
             await PostHistoryVersionService.DeleteByIdSavedAsync(id);

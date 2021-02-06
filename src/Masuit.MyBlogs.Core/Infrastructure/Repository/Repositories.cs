@@ -115,20 +115,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
     }
 
-    public partial class MenuRepository : BaseRepository<Menu>, IMenuRepository
-    {
-        /// <summary>
-        /// 添加实体
-        /// </summary>
-        /// <param name="t">需要添加的实体</param>
-        /// <returns>添加成功</returns>
-        public override Menu AddEntity(Menu t)
-        {
-            DataContext.Add(t);
-            return t;
-        }
-    }
-
     public partial class MiscRepository : BaseRepository<Misc>, IMiscRepository
     {
         /// <summary>
@@ -213,33 +199,33 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
     }
 
-    public partial class SeminarPostRepository : BaseRepository<SeminarPost>, ISeminarPostRepository
-    {
-        /// <summary>
-        /// 添加实体
-        /// </summary>
-        /// <param name="t">需要添加的实体</param>
-        /// <returns>添加成功</returns>
-        public override SeminarPost AddEntity(SeminarPost t)
-        {
-            DataContext.Add(t);
-            return t;
-        }
-    }
+    //public partial class SeminarPostRepository : BaseRepository<SeminarPost>, ISeminarPostRepository
+    //{
+    //    /// <summary>
+    //    /// 添加实体
+    //    /// </summary>
+    //    /// <param name="t">需要添加的实体</param>
+    //    /// <returns>添加成功</returns>
+    //    public override SeminarPost AddEntity(SeminarPost t)
+    //    {
+    //        DataContext.Add(t);
+    //        return t;
+    //    }
+    //}
 
-    public partial class SeminarPostHistoryVersionRepository : BaseRepository<SeminarPostHistoryVersion>, ISeminarPostHistoryVersionRepository
-    {
-        /// <summary>
-        /// 添加实体
-        /// </summary>
-        /// <param name="t">需要添加的实体</param>
-        /// <returns>添加成功</returns>
-        public override SeminarPostHistoryVersion AddEntity(SeminarPostHistoryVersion t)
-        {
-            DataContext.Add(t);
-            return t;
-        }
-    }
+    //public partial class SeminarPostHistoryVersionRepository : BaseRepository<SeminarPostHistoryVersion>, ISeminarPostHistoryVersionRepository
+    //{
+    //    /// <summary>
+    //    /// 添加实体
+    //    /// </summary>
+    //    /// <param name="t">需要添加的实体</param>
+    //    /// <returns>添加成功</returns>
+    //    public override SeminarPostHistoryVersion AddEntity(SeminarPostHistoryVersion t)
+    //    {
+    //        DataContext.Add(t);
+    //        return t;
+    //    }
+    //}
 
     public partial class PostMergeRequestRepository : BaseRepository<PostMergeRequest>, IPostMergeRequestRepository
     {

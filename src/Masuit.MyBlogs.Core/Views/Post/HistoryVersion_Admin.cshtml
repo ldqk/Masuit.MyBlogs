@@ -60,7 +60,7 @@
                                             var seminars = Model.Seminar;
                                             foreach (var s in seminars)
                                             {
-                                                <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.SeminarId" class="label label-@colors[new Random().Next() % colors.Length]">@s.Seminar.Title</a><text> </text>
+                                                <a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.Id" class="label label-@colors[new Random().Next() % colors.Length]">@s.Title</a><text> </text>
                                             }
                                         }
                                         <div class="btn-group">

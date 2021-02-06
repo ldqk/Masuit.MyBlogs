@@ -463,31 +463,31 @@ function getFile(obj, inputName) {
 	$("input[name='" + inputName + "']").val(file_name);
 }
 
-/**
- * 将带pid/ParentId的json数据转换成带children树形json
- * @param {any} a 源数据
- * @param {any} idStr  id字段
- * @param {any} pidStr  pid字段
- * @param {any} chindrenStr  children字段
- */
-function transData(a, idStr, pidStr, chindrenStr) {
-	var r = [], hash = {}, id = idStr, pid = pidStr, children = chindrenStr, i = 0, j = 0, len = a.length;
-	for(; i < len; i++) {
-		hash[a[i][id]] = a[i];
-	}
-	for(; j < len; j++) {
-		var aVal = a[j], hashVP = hash[aVal[pid]];
-		if(hashVP) {
-			!hashVP[children] && (hashVP[children] = []);
-			aVal[children] = [];
-			hashVP[children].push(aVal);
-		} else {
-			aVal[children] = [];
-			r.push(aVal);
-		}
-	}
-	return r;
-}
+///**
+// * 将带pid/ParentId的json数据转换成带children树形json
+// * @param {any} a 源数据
+// * @param {any} idStr  id字段
+// * @param {any} pidStr  pid字段
+// * @param {any} chindrenStr  children字段
+// */
+//function transData(a, idStr, pidStr, chindrenStr) {
+//	var r = [], hash = {}, id = idStr, pid = pidStr, children = chindrenStr, i = 0, j = 0, len = a.length;
+//	for(; i < len; i++) {
+//		hash[a[i][id]] = a[i];
+//	}
+//	for(; j < len; j++) {
+//		var aVal = a[j], hashVP = hash[aVal[pid]];
+//		if(hashVP) {
+//			!hashVP[children] && (hashVP[children] = []);
+//			aVal[children] = [];
+//			hashVP[children].push(aVal);
+//		} else {
+//			aVal[children] = [];
+//			r.push(aVal);
+//		}
+//	}
+//	return r;
+//}
 
 //var jsonDataTree = transData(jsonData, 'id', 'pid', 'chindren');
 Date.prototype.Format = function(fmt) {//author: meizz 
