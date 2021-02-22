@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -118,9 +119,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Write(Misc model)
+        public async Task<ActionResult> Write(Misc model, CancellationToken cancellationToken)
         {
-            model.Content = await ImagebedClient.ReplaceImgSrc(model.Content.Trim().ClearImgAttributes());
+            model.Content = await ImagebedClient.ReplaceImgSrc(model.Content.Trim().ClearImgAttributes(), cancellationToken);
             var e = MiscService.AddEntitySaved(model);
             return e != null ? ResultData(null, message: "发布成功") : ResultData(null, false, "发布失败");
         }
@@ -156,12 +157,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="misc"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Edit(Misc misc)
+        public async Task<ActionResult> Edit(Misc misc, CancellationToken cancellationToken)
         {
             var entity = await MiscService.GetByIdAsync(misc.Id) ?? throw new NotFoundException("杂项页未找到");
             entity.ModifyDate = DateTime.Now;
             entity.Title = misc.Title;
-            entity.Content = await ImagebedClient.ReplaceImgSrc(misc.Content.ClearImgAttributes());
+            entity.Content = await ImagebedClient.ReplaceImgSrc(misc.Content.ClearImgAttributes(), cancellationToken);
             bool b = await MiscService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }

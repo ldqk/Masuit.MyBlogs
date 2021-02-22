@@ -478,7 +478,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual async Task<T> GetAsync<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return isAsc ? await DataContext.Set<T>().OrderBy(orderby).FirstOrDefaultAsync(where).ConfigureAwait(true) : await DataContext.Set<T>().OrderByDescending(orderby).FirstOrDefaultAsync(where).ConfigureAwait(true);
+            return isAsc ? await DataContext.Set<T>().OrderBy(orderby).FirstOrDefaultAsync(where) : await DataContext.Set<T>().OrderByDescending(orderby).FirstOrDefaultAsync(where);
         }
 
         /// <summary>
@@ -568,7 +568,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual async Task<T> GetNoTrackingAsync<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return isAsc ? await DataContext.Set<T>().OrderBy(orderby).AsNoTracking().FirstOrDefaultAsync(where).ConfigureAwait(true) : await DataContext.Set<T>().OrderByDescending(orderby).AsNoTracking().FirstOrDefaultAsync(where).ConfigureAwait(true);
+            return isAsc ? await DataContext.Set<T>().OrderBy(orderby).AsNoTracking().FirstOrDefaultAsync(where) : await DataContext.Set<T>().OrderByDescending(orderby).AsNoTracking().FirstOrDefaultAsync(where);
         }
 
         /// <summary>
@@ -588,7 +588,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual async Task<T> GetByIdAsync(object id)
         {
-            return await DataContext.Set<T>().FindAsync(id).ConfigureAwait(true);
+            return await DataContext.Set<T>().FindAsync(id);
         }
 
         /// <summary>
@@ -754,7 +754,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>删除成功</returns>
         public virtual async Task<int> DeleteEntityAsync(Expression<Func<T, bool>> where)
         {
-            return await DataContext.Set<T>().Where(where).DeleteAsync().ConfigureAwait(false);
+            return await DataContext.Set<T>().Where(where).DeleteAsync();
         }
 
         /// <summary>
@@ -813,7 +813,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>受影响的行数</returns>
         public virtual async Task<int> SaveChangesAsync()
         {
-            return await DataContext.SaveChangesAsync().ConfigureAwait(true);
+            return await DataContext.SaveChangesAsync();
         }
 
         /// <summary>

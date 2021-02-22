@@ -173,7 +173,6 @@
 		});
 		var nodeData = $scope.data[$scope.data.length - 1];
 		$scope.menu.Sort = nodeData.Sort + (nodeData.Children.length + 1) * 10;
-		$scope.menu.ParentId  = 0;
 		$scope.menu.MenuType  = 0;
 	};
 	$scope.submenu = {};

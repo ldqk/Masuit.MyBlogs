@@ -1018,5 +1018,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             set => AddEntity(value);
         }
         public static T operator +(BaseService<T> left, T right) => left.AddEntity(right);
+        public static bool operator -(BaseService<T> left, T right) => left.DeleteEntity(right);
+        public static bool operator -(BaseService<T> left, int id) => left.DeleteById(id);
     }
 }

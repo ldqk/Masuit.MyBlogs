@@ -99,7 +99,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     ServerUrl += MimeMapper.ExtTypes[mediaType];
                 }
 
-                var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath);
+                var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath, default);
                 if (success)
                 {
                     ServerUrl = url;

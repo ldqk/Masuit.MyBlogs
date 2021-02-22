@@ -32,6 +32,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -279,7 +280,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="code"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Publish(PostCommand post, [Required(ErrorMessage = "验证码不能为空")] string code)
+        public async Task<ActionResult> Publish(PostCommand post, [Required(ErrorMessage = "验证码不能为空")] string code, CancellationToken cancellationToken)
         {
             if (await RedisHelper.GetAsync("code:" + post.Email) != code)
             {
@@ -305,7 +306,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
             post.Status = Status.Pending;
-            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes()).ConfigureAwait(false);
+            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes(), cancellationToken).ConfigureAwait(false);
             Post p = post.Mapper<Post>();
             p.IP = ClientIP;
             p.Modifier = p.Author;
@@ -648,7 +649,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Get(int id)
+        public ActionResult Get(int id)
         {
             Post post = PostService[id] ?? throw new NotFoundException("文章未找到");
             PostDto model = post.Mapper<PostDto>();
@@ -717,9 +718,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="reserve">是否保留历史版本</param>
         /// <returns></returns>
         [HttpPost, MyAuthorize]
-        public async Task<ActionResult> Edit(PostCommand post, bool reserve = true)
+        public async Task<ActionResult> Edit(PostCommand post, bool reserve = true, CancellationToken cancellationToken = default)
         {
-            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
+            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes(), cancellationToken);
             if (!ValidatePost(post, out var resultData))
             {
                 return resultData;
@@ -769,9 +770,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="schedule"></param>
         /// <returns></returns>
         [MyAuthorize, HttpPost]
-        public async Task<ActionResult> Write(PostCommand post, DateTime? timespan, bool schedule = false)
+        public async Task<ActionResult> Write(PostCommand post, DateTime? timespan, bool schedule = false, CancellationToken cancellationToken = default)
         {
-            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes());
+            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes(), cancellationToken);
             if (!ValidatePost(post, out var resultData))
             {
                 return resultData;

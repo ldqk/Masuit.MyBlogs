@@ -35,7 +35,7 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<Links, LinksDto>().ReverseMap();
             CreateMap<LinksCommand, LinksDto>().ReverseMap();
 
-            CreateMap<Menu, MenuCommand>().ReverseMap();
+            CreateMap<MenuCommand, Menu>().ForMember(m => m.ParentId, e => e.MapFrom(c => (c.ParentId ?? 0) == 0 ? null : c.ParentId)).ReverseMap();
             CreateMap<Menu, MenuDto>().ReverseMap();
             CreateMap<MenuCommand, MenuDto>().ReverseMap();
 

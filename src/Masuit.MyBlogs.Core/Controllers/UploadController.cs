@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -266,7 +267,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="file"></param>
         /// <returns></returns>
         [HttpPost("upload"), ApiExplorerSettings(IgnoreApi = false)]
-        public async Task<ActionResult> UploadFile([FromServices] ImagebedClient imagebedClient, IFormFile file)
+        public async Task<ActionResult> UploadFile([FromServices] ImagebedClient imagebedClient, IFormFile file, CancellationToken cancellationToken)
         {
             string path;
             string filename = SnowFlake.GetInstance().GetUniqueId() + Path.GetExtension(file.FileName);
@@ -274,7 +275,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 case var _ when file.ContentType.StartsWith("image"):
                     {
-                        var (url, success) = await imagebedClient.UploadImage(file.OpenReadStream(), file.FileName);
+                        var (url, success) = await imagebedClient.UploadImage(file.OpenReadStream(), file.FileName, cancellationToken);
                         if (success)
                         {
                             return ResultData(url);

@@ -1,6 +1,5 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.Command
@@ -41,8 +40,7 @@ namespace Masuit.MyBlogs.Core.Models.Command
         /// <summary>
         /// 父级ID
         /// </summary>
-        [DefaultValue(0)]
-        public int ParentId { get; set; }
+        public int? ParentId { get; set; }
 
         /// <summary>
         /// 菜单类型

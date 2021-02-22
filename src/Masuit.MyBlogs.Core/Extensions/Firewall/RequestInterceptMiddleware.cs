@@ -33,7 +33,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public Task Invoke(HttpContext context)
         {
             var request = context.Request;
             //启用读取request
@@ -41,7 +41,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             if (!AppConfig.EnableIPDirect && request.Host.Host.MatchInetAddress() && !request.Host.Host.IsPrivateIP())
             {
                 context.Response.StatusCode = 404;
-                return;
+                return Task.CompletedTask;
             }
             var ip = context.Connection.RemoteIpAddress.ToString();
             var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
@@ -59,8 +59,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 }));
                 context.Response.StatusCode = 400;
                 context.Response.ContentType = "text/html; charset=utf-8";
-                await context.Response.WriteAsync("参数不合法！", Encoding.UTF8);
-                return;
+                return context.Response.WriteAsync("参数不合法！", Encoding.UTF8);
             }
 
             if (!context.Session.TryGetValue("session", out _) && !context.Request.IsRobot())
@@ -81,8 +80,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     {
                         context.Response.StatusCode = 504;
                         context.Response.ContentType = "text/html; charset=utf-8";
-                        await context.Response.WriteAsync("您的浏览器不支持访问本站！", Encoding.UTF8);
-                        return;
+                        return context.Response.WriteAsync("您的浏览器不支持访问本站！", Encoding.UTF8);
                     }
                 }
             }
@@ -113,7 +111,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 context.Session.Set(SessionKey.TimeZone, context.Connection.RemoteIpAddress.GetClientTimeZone());
             }
 
-            await _next(context);
+            return _next(context);
         }
     }
 }

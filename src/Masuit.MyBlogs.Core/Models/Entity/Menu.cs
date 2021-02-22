@@ -1,7 +1,6 @@
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Models;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -55,7 +54,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 父级ID
         /// </summary>
-        [DefaultValue(0)]
         public int? ParentId { get; set; }
 
         /// <summary>
@@ -67,6 +65,5 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 是否在新标签页打开
         /// </summary>
         public bool NewTab { get; set; }
-
     }
 }

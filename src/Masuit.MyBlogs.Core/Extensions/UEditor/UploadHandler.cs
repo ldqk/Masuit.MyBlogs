@@ -53,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 {
                     var stream = file.OpenReadStream();
                     stream = stream.AddWatermark();
-                    var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath).Result;
+                    var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath, default).Result;
                     if (success)
                     {
                         Result.Url = url;
