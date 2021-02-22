@@ -84,13 +84,16 @@
                     <span class="el-switch-style" ng-click="toggleDisableCopy(row)"></span>
                 </label>
             </td>
-            <td data-title="'操作'" style="width: 126px;">
+            <td data-title="'操作'" style="width: 160px;">
                 <div class="btn-group">
                     <button class="btn btn-default btn-sm waves-effect" ng-click="list.pass(row)" ng-if="row.Status=='审核中'">
                         <i class="icon-checkmark"></i>
                     </button>
                     <a class="btn btn-success btn-sm waves-effect" ng-href="#/post/edit?id={{row.Id}}">
                         <i class="icon-pencil"></i>
+                    </a>
+                    <a class="btn btn-info btn-sm waves-effect" ng-href="#/writeblog?refer={{row.Id}}">
+                        <i class="zmdi zmdi-copy zmdi-hc-fw"></i>
                     </a>
                     <button class="btn btn-danger btn-sm waves-effect" ng-click="list.del(row)" ng-if="row.Status!='已删除'">
                         <i class="icon-bin"></i>

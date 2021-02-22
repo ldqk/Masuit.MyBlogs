@@ -210,7 +210,7 @@
 		});
     }
 }]);
-myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, $http, $timeout) {
+myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
 	clearInterval(window.interval);
 	$scope.post = {
 		Title: "",
@@ -224,6 +224,22 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout", function ($scope, 
 	
 	$scope.post.Author = $scope.user.NickName || $scope.user.Username;
 	$scope.post.Email = $scope.user.Email;
+	var refer = $location.search()['refer'];
+    if (refer) {
+        $scope.request("/post/get", {
+		    id: refer
+	    }, function (data) {
+            $scope.post = data.Data;
+			delete $scope.post.Id;
+            $('.ui.dropdown.keyword').dropdown({
+			    allowAdditions: true,
+			    onChange: function(value) {
+				    $scope.post.Keyword = value;
+			    }
+		    });
+		    $('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
+	    });
+    }
 	$scope.getCategory = function () {
         $http.post("/category/getcategories", null).then(function (res) {
             var data = res.data;
@@ -467,10 +483,8 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 		$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
 	});
 	$scope.getCategory = function () {
-		
-		$http.post("/category/getcategories", null).then(function (res) {
-			
-			var data = res.data;
+        $http.post("/category/getcategories", null).then(function (res) {
+            var data = res.data;
 			if (data.Success) {
 				$scope.cat = data.Data;
 				$('.ui.dropdown.category').dropdown({
