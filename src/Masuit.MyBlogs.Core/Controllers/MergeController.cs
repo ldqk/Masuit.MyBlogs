@@ -15,6 +15,7 @@ using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
@@ -136,7 +137,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="reason"></param>
         /// <returns></returns>
         [HttpPost("reject/{id}")]
-        public async Task<ActionResult> Reject(int id, string reason)
+        public async Task<ActionResult> Reject(int id, [Required(ErrorMessage = "请填写拒绝理由")] string reason)
         {
             var merge = await PostMergeRequestService.GetByIdAsync(id) ?? throw new NotFoundException("待合并文章未找到");
             merge.MergeState = MergeStatus.Reject;

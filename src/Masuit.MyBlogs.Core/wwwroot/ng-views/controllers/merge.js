@@ -71,7 +71,7 @@
             });
           }
 		}).then(function(reason) {
-            $scope.request("/merge/reject/"+row.Id, null, function(data) {
+            $scope.request("/merge/reject/"+row.Id, {reason:reason}, function(data) {
 			    window.notie.alert({
 				    type: 1,
 				    text: data.Message,

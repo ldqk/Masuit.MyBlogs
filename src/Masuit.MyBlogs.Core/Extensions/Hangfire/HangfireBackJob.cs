@@ -17,7 +17,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire
 {
@@ -179,12 +178,11 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// </summary>
         public void CheckLinks()
         {
-            var links = _linksService.GetQuery(l => !l.Except).AsParallel();
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("MasuitBot-link/1.0"));
             client.DefaultRequestHeaders.Referrer = new Uri("https://masuit.com");
             client.Timeout = TimeSpan.FromSeconds(10);
-            Parallel.ForEach(links, link =>
+            _linksService.GetQuery(l => !l.Except).AsParallel().ForAll(link =>
             {
                 var prev = link.Status;
                 client.GetStringAsync(link.Url, new CancellationTokenSource(client.Timeout).Token).ContinueWith(t =>
