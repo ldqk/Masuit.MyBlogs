@@ -15,7 +15,7 @@
     <table ng-table="list.tableParams" id="interview" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
             <td title="'关键词'">
-                <a ng-href="/s/{{row.Keywords}}" target="_blank">{{row.Keywords}}</a>
+                <a ng-href="/search/{{row.Keywords}}" target="_blank">{{row.Keywords}}</a>
             </td>
             <td title="'搜索时间'">
                 {{row.SearchTime|date:'yyyy-MM-dd HH:mm:ss'}}
@@ -49,7 +49,7 @@
             <tbody>
             <tr ng-repeat="item in agg.month">
                 <td>{{$index+1}}</td>
-                <td><a ng-href="/s/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
+                <td><a ng-href="/search/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
                 <td>{{item.Count}}</td>
             </tr>
             </tbody>
@@ -68,7 +68,7 @@
             </thead>
             <tbody>
                 <tr ng-repeat="item in agg.week">
-                    <td><a ng-href="/s/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
+                    <td><a ng-href="/search/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
                     <td>{{item.Count}}</td>
                 </tr>
             </tbody>
@@ -87,7 +87,7 @@
             </thead>
             <tbody>
                 <tr ng-repeat="item in agg.today">
-                    <td><a ng-href="/s/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
+                    <td><a ng-href="/search/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
                     <td>{{item.Count}}</td>
                 </tr>
             </tbody>

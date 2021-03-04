@@ -57,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Route("n/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
+        [Route("notice/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Details(int id)
         {
             var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("页面未找到");

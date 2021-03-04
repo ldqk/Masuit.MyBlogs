@@ -157,7 +157,7 @@ $(function() {
                 btn1: function(layero) {
                     nid.push(data.Id);
                     window.localStorage.setItem("notice", JSON.stringify(nid));
-                    window.location.href = "/n/" + data.Id;
+                    window.location.href = "/notice/" + data.Id;
                     loading();
                 },
                 btn2: function(index) {

@@ -10,7 +10,7 @@
     ViewBag.Title = "首页";
     Layout = "~/Views/Shared/_Layout.cshtml";
     List<FastShare> shares = ViewBag.FastShare;
-    Context.Request.Path = new PathString("/p");
+    Context.Request.Path = new PathString("/posts");
 }
 <link href="~/Assets/banner/bootstrap-touch-slider.min.css" rel="stylesheet" />
 @if (Model.Banner.Any())

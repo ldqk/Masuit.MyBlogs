@@ -7,10 +7,10 @@
     <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed editable-table listTable" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
             <td title="'标题'" filter="{Title: 'text'}" sortable="'Title'">
-                <a ng-href="/n/{{row.Id}}" target="_blank">{{row.Title}}</a>
+                <a ng-href="/notice/{{row.Id}}" target="_blank">{{row.Title}}</a>
             </td>
             <td title="'内容'" filter="{Content: 'text'}" sortable="'Content'">
-                <a ng-href="/n/{{row.Id}}" target="_blank" ng-bind-html="row.Content|htmlString"></a>
+                <a ng-href="/notice/{{row.Id}}" target="_blank" ng-bind-html="row.Content|htmlString"></a>
                 </td>
             <td title="'发表时间'" filter="{PostDate: 'text'}" sortable="'PostDate'">
                 {{row.PostDate|date:'yyyy-MM-dd HH:mm:ss'}}

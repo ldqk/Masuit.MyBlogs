@@ -8,7 +8,7 @@
     <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
             <td title="'标题'" filter="{Title: 'text'}" sortable="'Title'">
-                <a ng-href="/c/{{row.Id}}" target="_blank">{{row.Title}}</a>
+                <a ng-href="/special/{{row.Id}}" target="_blank">{{row.Title}}</a>
             </td>
             <td title="'子标题'" filter="{SubTitle: 'text'}" sortable="'SubTitle'">
                 {{row.SubTitle}}
