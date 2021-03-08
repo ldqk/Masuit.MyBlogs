@@ -36,7 +36,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Route("notice"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
+        [Route("notice"), Route("n", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Index([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var list = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(page, size, n => n.Status == Status.Display, n => n.ModifyDate, false);

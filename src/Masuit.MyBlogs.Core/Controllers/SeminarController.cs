@@ -42,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        [Route("special/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
+        [Route("special/{id:int}"), Route("c/{id:int}", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Index(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var s = await SeminarService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");

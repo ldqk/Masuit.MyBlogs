@@ -14,7 +14,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             return Ok(id);
         }
 
-        [HttpGet("{key}")]
+        [HttpGet("{key}", Order = 100)]
         public ActionResult RedirectTo(string key)
         {
             var url = RedisHelper.Get("shorturl:" + key) ?? throw new NotFoundException("链接未找到");
