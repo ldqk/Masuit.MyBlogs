@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -85,7 +86,12 @@ namespace Masuit.MyBlogs.Core.Common
                     return await UploadGitee(gitlab, stream, file, cancellationToken);
                 }
 
-                var path = $"{DateTime.Now:yyyy/MM/dd}/{file}";
+                if (gitlab.ApiUrl.Contains("api.github.com"))
+                {
+                    return await UploadGithub(gitlab, stream, file, cancellationToken);
+                }
+
+                var path = $"{DateTime.Now:yyyy\\/MM\\/dd}/{file}";
                 _httpClient.DefaultRequestHeaders.Add("PRIVATE-TOKEN", gitlab.AccessToken);
                 return await _httpClient.PostAsJsonAsync(gitlab.ApiUrl.Contains("/v3/") ? gitlab.ApiUrl : gitlab.ApiUrl + HttpUtility.UrlEncode(path), new
                 {
@@ -127,7 +133,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         private Task<(string url, bool success)> UploadGitee(GitlabConfig config, Stream stream, string file, CancellationToken cancellationToken)
         {
-            var path = $"{DateTime.Now:yyyy/MM/dd}/{file}";
+            var path = $"{DateTime.Now:yyyy\\/MM\\/dd}/{file}";
             return _httpClient.PostAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path), new
             {
                 access_token = config.AccessToken,
@@ -151,6 +157,43 @@ namespace Masuit.MyBlogs.Core.Common
         }
 
         /// <summary>
+        /// github图床
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="stream"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        private Task<(string url, bool success)> UploadGithub(GitlabConfig config, Stream stream, string file, CancellationToken cancellationToken)
+        {
+            var path = $"{DateTime.Now:yyyy\\/MM\\/dd}/{file}";
+            _httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Awesome-Octocat-App"));
+            return _httpClient.PutAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path) + $"?access_token={config.AccessToken}", new
+            {
+                message = SnowFlake.NewId,
+                committer = new
+                {
+                    name = SnowFlake.NewId,
+                    email = "1@1.cn"
+                },
+                content = Convert.ToBase64String(stream.ToArray())
+            }, cancellationToken).ContinueWith(t =>
+            {
+                if (t.IsCompletedSuccessfully)
+                {
+                    using var resp = t.Result;
+                    using var content = resp.Content;
+                    if (resp.IsSuccessStatusCode)
+                    {
+                        return (config.RawUrl + path, true);
+                    }
+                }
+
+                LogManager.Info("图片上传到gitee失败。");
+                throw t.Exception ?? new Exception(t.Result.ReasonPhrase);
+            });
+        }
+
+        /// <summary>
         /// 阿里云Oss图床
         /// </summary>
         /// <param name="stream"></param>
@@ -163,7 +206,7 @@ namespace Masuit.MyBlogs.Core.Common
                 return (null, false);
             }
 
-            var objectName = DateTime.Now.ToString("yyyy/MM/dd/") + file;
+            var objectName = DateTime.Now.ToString(@"yyyy\/MM\/dd") + "/" + file;
             var fallbackPolicy = Policy<(string url, bool success)>.Handle<Exception>().Fallback(_ => (null, false));
             var retryPolicy = Policy<(string url, bool success)>.Handle<Exception>().Retry(3);
             return fallbackPolicy.Wrap(retryPolicy).Execute(() =>
