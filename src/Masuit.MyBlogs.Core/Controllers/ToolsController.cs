@@ -39,7 +39,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="ip"></param>
         /// <returns></returns>
-        [Route("ip/{ip?}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "ip" }, VaryByHeader = "Cookie")]
+        [Route("ip"), Route("ip/{ip?}", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "ip" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> GetIpInfo([IsIPAddress] string ip)
         {
             if (string.IsNullOrEmpty(ip))

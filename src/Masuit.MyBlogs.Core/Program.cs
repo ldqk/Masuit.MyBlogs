@@ -19,7 +19,7 @@ namespace Masuit.MyBlogs.Core
     {
         public static void Main(string[] args)
         {
-            if (!"114.114.114.114".GetIPLocation().Contains("南京市"))
+            if (!"114.114.114.114".GetIPLocation().Contains("南京"))
             {
                 throw new Exception("IP地址库初始化失败，请重启应用！");
             }
