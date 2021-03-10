@@ -3,6 +3,7 @@
 @using System.Net.Sockets
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools
+@using Masuit.Tools.Linq
 @inject IJSRuntime JS;
 
 <h3 class="text-center">
@@ -68,7 +69,41 @@
         </tr>
     </tbody>
 </table>
-    <button class="btn btn-success" @onclick="ClearMemory">整理内存</button>
+
+<h3 class="text-center">
+    硬件占用百分位统计
+</h3>
+<table class="table table-inner table-vmiddle table-bordered">
+    <thead>
+        <tr>
+            <th></th>
+            <th>第 50 个百分位</th>
+            <th>第 75 个百分位</th>
+            <th>第 90 个百分位</th>
+            <th>第 99 个百分位</th>
+            <th>第 99.9 个百分位</th>
+            <th>均值</th>
+            <th>标准差</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var (key, value) in GetCounterPercent())
+        {
+            <tr>
+                <th>@key</th>
+                <td>@value.p50</td>
+                <td>@value.p75</td>
+                <td>@value.p90</td>
+                <td>@value.p99</td>
+                <td>@value.p999</td>
+                <td>@value.average</td>
+                <td>@value.stdev</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+<button class="btn btn-success" @onclick="ClearMemory">整理内存</button>
 <div>
     <div class="page-header">
         <h3 class="text-center">性能实时监控</h3>
@@ -111,5 +146,72 @@
     {
         Windows.ClearMemorySilent();
         JS.InvokeVoidAsync("showSuccess");
+    }
+
+    public Dictionary<string, dynamic> GetCounterPercent()
+    {
+        return new()
+        {
+            ["CPU使用率(%)"] = new
+            {
+                p50 = PerfCounter.List.OrderByDescending(c => c.CpuLoad).Take(PerfCounter.List.Count / 2).MinOrDefault(c => c.CpuLoad).ToString("N2"),
+                p75 = PerfCounter.List.OrderByDescending(c => c.CpuLoad).Take(PerfCounter.List.Count / 4).MinOrDefault(c => c.CpuLoad).ToString("N2"),
+                p90 = PerfCounter.List.OrderByDescending(c => c.CpuLoad).Take(PerfCounter.List.Count / 10).MinOrDefault(c => c.CpuLoad).ToString("N2"),
+                p99 = PerfCounter.List.OrderByDescending(c => c.CpuLoad).Take(PerfCounter.List.Count / 100).MinOrDefault(c => c.CpuLoad).ToString("N2"),
+                p999 = PerfCounter.List.OrderByDescending(c => c.CpuLoad).Take(PerfCounter.List.Count / 1000).MinOrDefault(c => c.CpuLoad).ToString("N2"),
+                average = PerfCounter.List.Average(c => c.CpuLoad).ToString("N2"),
+                stdev = PerfCounter.List.StandardDeviation(c => c.CpuLoad).ToString("N2"),
+            },
+            ["内存使用率(%)"] = new
+            {
+                p50 = PerfCounter.List.OrderByDescending(c => c.MemoryUsage).Take(PerfCounter.List.Count / 2).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
+                p75 = PerfCounter.List.OrderByDescending(c => c.MemoryUsage).Take(PerfCounter.List.Count / 4).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
+                p90 = PerfCounter.List.OrderByDescending(c => c.MemoryUsage).Take(PerfCounter.List.Count / 10).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
+                p99 = PerfCounter.List.OrderByDescending(c => c.MemoryUsage).Take(PerfCounter.List.Count / 100).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
+                p999 = PerfCounter.List.OrderByDescending(c => c.MemoryUsage).Take(PerfCounter.List.Count / 1000).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
+                average = PerfCounter.List.Average(c => c.MemoryUsage).ToString("N2"),
+                stdev = PerfCounter.List.StandardDeviation(c => c.MemoryUsage).ToString("N2"),
+            },
+            ["磁盘读(KBps)"] = new
+            {
+                p50 = PerfCounter.List.OrderByDescending(c => c.DiskRead).Take(PerfCounter.List.Count / 2).MinOrDefault(c => c.DiskRead).ToString("N2"),
+                p75 = PerfCounter.List.OrderByDescending(c => c.DiskRead).Take(PerfCounter.List.Count / 4).MinOrDefault(c => c.DiskRead).ToString("N2"),
+                p90 = PerfCounter.List.OrderByDescending(c => c.DiskRead).Take(PerfCounter.List.Count / 10).MinOrDefault(c => c.DiskRead).ToString("N2"),
+                p99 = PerfCounter.List.OrderByDescending(c => c.DiskRead).Take(PerfCounter.List.Count / 100).MinOrDefault(c => c.DiskRead).ToString("N2"),
+                p999 = PerfCounter.List.OrderByDescending(c => c.DiskRead).Take(PerfCounter.List.Count / 1000).MinOrDefault(c => c.DiskRead).ToString("N2"),
+                average = PerfCounter.List.Average(c => c.DiskRead).ToString("N2"),
+                stdev = PerfCounter.List.StandardDeviation(c => c.DiskRead).ToString("N2"),
+            },
+            ["磁盘写(KBps)"] = new
+            {
+                p50 = PerfCounter.List.OrderByDescending(c => c.DiskWrite).Take(PerfCounter.List.Count / 2).MinOrDefault(c => c.DiskWrite).ToString("N2"),
+                p75 = PerfCounter.List.OrderByDescending(c => c.DiskWrite).Take(PerfCounter.List.Count / 4).MinOrDefault(c => c.DiskWrite).ToString("N2"),
+                p90 = PerfCounter.List.OrderByDescending(c => c.DiskWrite).Take(PerfCounter.List.Count / 10).MinOrDefault(c => c.DiskWrite).ToString("N2"),
+                p99 = PerfCounter.List.OrderByDescending(c => c.DiskWrite).Take(PerfCounter.List.Count / 100).MinOrDefault(c => c.DiskWrite).ToString("N2"),
+                p999 = PerfCounter.List.OrderByDescending(c => c.DiskWrite).Take(PerfCounter.List.Count / 1000).MinOrDefault(c => c.DiskWrite).ToString("N2"),
+                average = PerfCounter.List.Average(c => c.DiskWrite).ToString("N2"),
+                stdev = PerfCounter.List.StandardDeviation(c => c.DiskWrite).ToString("N2")
+            },
+            ["网络下载(KBps)"] = new
+            {
+                p50 = PerfCounter.List.OrderByDescending(c => c.Download).Take(PerfCounter.List.Count / 2).MinOrDefault(c => c.Download).ToString("N2"),
+                p75 = PerfCounter.List.OrderByDescending(c => c.Download).Take(PerfCounter.List.Count / 4).MinOrDefault(c => c.Download).ToString("N2"),
+                p90 = PerfCounter.List.OrderByDescending(c => c.Download).Take(PerfCounter.List.Count / 10).MinOrDefault(c => c.Download).ToString("N2"),
+                p99 = PerfCounter.List.OrderByDescending(c => c.Download).Take(PerfCounter.List.Count / 100).MinOrDefault(c => c.Download).ToString("N2"),
+                p999 = PerfCounter.List.OrderByDescending(c => c.Download).Take(PerfCounter.List.Count / 1000).MinOrDefault(c => c.Download).ToString("N2"),
+                average = PerfCounter.List.Average(c => c.Download).ToString("N2"),
+                stdev = PerfCounter.List.StandardDeviation(c => c.Download).ToString("N2")
+            },
+            ["网络上行(KBps)"] = new
+            {
+                p50 = PerfCounter.List.OrderByDescending(c => c.Upload).Take(PerfCounter.List.Count / 2).MinOrDefault(c => c.Upload).ToString("N2"),
+                p75 = PerfCounter.List.OrderByDescending(c => c.Upload).Take(PerfCounter.List.Count / 4).MinOrDefault(c => c.Upload).ToString("N2"),
+                p90 = PerfCounter.List.OrderByDescending(c => c.Upload).Take(PerfCounter.List.Count / 10).MinOrDefault(c => c.Upload).ToString("N2"),
+                p99 = PerfCounter.List.OrderByDescending(c => c.Upload).Take(PerfCounter.List.Count / 100).MinOrDefault(c => c.Upload).ToString("N2"),
+                p999 = PerfCounter.List.OrderByDescending(c => c.Upload).Take(PerfCounter.List.Count / 1000).MinOrDefault(c => c.Upload).ToString("N2"),
+                average = PerfCounter.List.Average(c => c.Upload).ToString("N2"),
+                stdev = PerfCounter.List.StandardDeviation(c => c.Upload).ToString("N2")
+            }
+        };
     }
 }

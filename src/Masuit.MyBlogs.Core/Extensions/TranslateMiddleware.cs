@@ -26,7 +26,8 @@ namespace Masuit.MyBlogs.Core.Extensions
 
         public async Task Invoke(HttpContext context)
         {
-            var lang = context.Request.Cookies["lang"];
+            string lang = context.Request.Query["lang"];
+            lang ??= context.Request.Cookies["lang"];
             if (string.IsNullOrEmpty(lang))
             {
                 if (context.Request.Location().Contains(new[] { "台湾", "香港", "澳门", "Taiwan", "TW", "HongKong", "HK" }))
