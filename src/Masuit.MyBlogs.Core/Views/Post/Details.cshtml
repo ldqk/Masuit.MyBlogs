@@ -14,7 +14,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
     string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
-    string hidden = string.IsNullOrEmpty(Context.Request.Cookies["Email"]) ? "" : "hidden";
+    string hidden = string.IsNullOrEmpty(Context.Request.Cookies["ValidateKey"]) ? "" : "hidden";
     Advertisement ad = ViewBag.Ads;
 }
 <environment names="Development">
