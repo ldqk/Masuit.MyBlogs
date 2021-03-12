@@ -38,17 +38,17 @@
                         <label for="email">邮箱：</label>
                     </span>
                     <input type="email" class="form-control" name="Email" id="email" required placeholder="留下您的真实邮箱，以方便接收回复" value="@Context.Request.Cookies["Email"]">
+                    <span class="input-group-btn">
+                        <button type="button" id="getcode" class="btn btn-danger">
+                            获取验证码
+                        </button>
+                    </span>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="input-group">
                     <span class="input-group-addon">验证码：</span>
                     <input type="text" class="form-control" name="Code" placeholder="验证码">
-                    <span class="input-group-btn">
-                        <button type="button" id="getcode" class="btn btn-danger">
-                            获取验证码
-                        </button>
-                    </span>
                 </div>
             </div>
         </div>
@@ -90,15 +90,15 @@
                         <label for="email">邮箱：</label>
                     </span>
                     <input type="email" class="form-control" name="Email" id="email2" required placeholder="留下您的真实邮箱，以方便接收回复" value="@Context.Request.Cookies["Email"]">
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon">验证码：</span>
-                    <input type="text" class="form-control" name="Code" placeholder="验证码">
                     <span class="input-group-btn">
                         <button type="button" id="getcode-reply" class="btn btn-danger">
                             获取验证码
                         </button>
                     </span>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">验证码：</span>
+                    <input type="text" class="form-control" name="Code" placeholder="验证码">
                 </div>
             </div>
             <input type="hidden" value="" id="uid" name="ParentId" />

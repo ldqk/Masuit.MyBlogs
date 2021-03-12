@@ -60,6 +60,11 @@
                 <div class="input-group">
                     <span class="input-group-addon"><label for="Email">邮箱：</label></span>
                     <input type="email" class="form-control" id="Email" name="Email" required placeholder="您的电子邮箱(非常重要)">
+                    <span class="input-group-btn">
+                        <button type="button" id="getcode" class="btn btn-danger">
+                            获取验证码
+                        </button>
+                    </span>
                 </div>
             </div>
             <div class="col-md-6 col-sm-6">
@@ -67,9 +72,6 @@
                     <span class="input-group-addon"><label for="Code">验证码：</label></span>
                     <input type="text" class="form-control" id="Code" name="Code" required placeholder="验证码">
                     <span class="input-group-btn">
-                        <button type="button" id="getcode" class="btn btn-danger">
-                            获取验证码
-                        </button>
                         <button type="submit" id="submit" class="btn btn-info">
                             <i class="icon-rocket2"></i>
                             马上投递

@@ -24,7 +24,7 @@
             <textarea id="editor" style="height: calc(100vh - 350px);" class="ueditor" name="Content" type="text/plain">@Model.Content</textarea>
         </div>
         <div class="row">
-            <div class="col-md-3 col-sm-4">
+            <div class="col-md-4 col-sm-4">
                 <div class="input-group">
                     <span class="input-group-addon"><label for="Modifier">提交人：</label></span>
                     <input type="text" class="form-control" id="Modifier" name="Modifier" required placeholder="投稿人真名或网名(非常重要)">
@@ -34,16 +34,19 @@
                 <div class="input-group">
                     <span class="input-group-addon"><label for="ModifierEmail">你的邮箱：</label></span>
                     <input type="email" class="form-control" id="ModifierEmail" name="ModifierEmail" required placeholder="您的电子邮箱(非常重要)">
-                </div>
-            </div>
-            <div class="col-md-5 col-sm-4">
-                <div class="input-group">
-                    <span class="input-group-addon"><label for="Code">验证码：</label></span>
-                    <input type="text" class="form-control" id="Code" name="Code" required placeholder="验证码">
                     <span class="input-group-btn">
                         <button type="button" id="getcode" class="btn btn-danger">
                             获取验证码
                         </button>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-4">
+                <div class="input-group">
+                    <span class="input-group-addon"><label for="Code">验证码：</label></span>
+                    <input type="text" class="form-control" id="Code" name="Code" required placeholder="验证码">
+                    <span class="input-group-btn">
+
                         <button type="submit" id="submit" class="btn btn-info">
                             <i class="icon-rocket2"></i>
                             马上投递
