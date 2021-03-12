@@ -36,6 +36,11 @@
 	});
 	$(".getcode").on("click", function(e) {
 		e.preventDefault();
+	    layer.tips('正在发送token，请稍候...', '.getcode', {
+            tips: [1, '#3595CC'],
+            time: 30000
+        });
+        $(".getcode").attr('disabled', true);
 		window.post("/post/getviewtoken", {
 			__RequestVerificationToken:$("[name=__RequestVerificationToken]").val(),
 			email:$("#email3").val()
@@ -47,7 +52,6 @@
 					time: 4
 				});
 				window.localStorage.setItem("email",$("#email3").val());
-				$(".getcode").attr('disabled',true);
 				var count=0;
 				var timer=setInterval(function() {
 					count++;
@@ -64,6 +68,7 @@
 					text: data.Message,
 					time: 4
 				});
+				$(".getcode").attr('disabled', false);
 			}
 		}, function() {
             window.notie.alert({

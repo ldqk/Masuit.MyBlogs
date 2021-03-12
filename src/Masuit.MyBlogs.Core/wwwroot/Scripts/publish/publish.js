@@ -90,6 +90,11 @@
     
     $("#getcode").on("click", function (e) {
         e.preventDefault();
+	    layer.tips('正在发送验证码，请稍候...', '#getcode', {
+            tips: [1, '#3595CC'],
+            time: 30000
+        });
+        $("#getcode").attr('disabled', true);
         window.post("/validate/sendcode", {
             __RequestVerificationToken: $("[name=__RequestVerificationToken]").val(),
             email: $("#Email").val()
@@ -102,7 +107,6 @@
                 user.NickName = $("[name='NickName']").val();
                 user.Email = $("[name='Email']").val();
                 localStorage.setItem("user", JSON.stringify(user));
-                $("#getcode").attr('disabled', true);
                 var count = 0;
                 var timer = setInterval(function () {
                     count++;
@@ -118,6 +122,7 @@
                   tips: [1, '#3595CC'],
                   time: 4000
                 });
+                $("#getcode").attr('disabled', false);
             }
         });
     });
