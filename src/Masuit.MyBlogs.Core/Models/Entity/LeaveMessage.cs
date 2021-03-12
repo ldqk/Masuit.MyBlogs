@@ -45,11 +45,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string Email { get; set; }
 
         /// <summary>
-        /// QQ»òÎ¢ÐÅ
-        /// </summary>
-        public string QQorWechat { get; set; }
-
-        /// <summary>
         /// ¸¸¼¶ID
         /// </summary>
         public int ParentId { get; set; }

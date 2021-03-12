@@ -206,7 +206,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             else if (Request.Cookies["ValidateKey"].DesDecrypt(AppConfig.BaiduAK) != email)
             {
                 Response.Cookies.Delete("Email");
-                Response.Cookies.Delete("QQorWechat");
                 Response.Cookies.Delete("NickName");
                 Response.Cookies.Delete("ValidateKey");
                 return "邮箱验证信息已失效，请刷新页面后重新评论！";
@@ -215,7 +214,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (mailSender.HasBounced(email))
             {
                 Response.Cookies.Delete("Email");
-                Response.Cookies.Delete("QQorWechat");
                 Response.Cookies.Delete("NickName");
                 Response.Cookies.Delete("ValidateKey");
                 return "邮箱地址错误，请刷新页面后重新使用有效的邮箱地址！";

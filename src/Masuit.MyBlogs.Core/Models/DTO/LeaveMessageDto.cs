@@ -28,11 +28,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public string Email { get; set; }
 
         /// <summary>
-        /// QQ或微信
-        /// </summary>
-        public string QQorWechat { get; set; }
-
-        /// <summary>
         /// 父级ID
         /// </summary>
         public int ParentId { get; set; }

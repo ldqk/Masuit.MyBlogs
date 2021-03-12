@@ -18,11 +18,6 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         public string Email { get; set; }
 
         /// <summary>
-        /// QQ或微信
-        /// </summary>
-        public string QQorWechat { get; set; }
-
-        /// <summary>
         /// 评论内容
         /// </summary>
         public string Content { get; set; }

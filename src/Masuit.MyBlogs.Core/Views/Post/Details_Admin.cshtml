@@ -255,7 +255,6 @@
                             <input type="hidden" name="Browser" id="Browser" />
                             <input type="hidden" value="@user.NickName" class="form-control" name="NickName" id="name">
                             <input type="hidden" value="@user.Email" class="form-control" name="Email" id="email">
-                            <input type="hidden" value="@user.QQorWechat" class="form-control" name="QQorWechat" id="chat">
                             <div class="form-group overlay animated fadeInDown" style="margin-bottom: 0px !important;">
                                 <textarea class="layui-textarea" id="layedit" name="Content" style="height: 100px"></textarea>
                             </div>
@@ -295,7 +294,6 @@
             <input type="hidden" name="Browser" id="Browser2" />
             <input type="hidden" value="@user.NickName" class="form-control" name="NickName" id="name2">
             <input type="hidden" value="@user.Email" class="form-control" name="Email" id="email2">
-            <input type="hidden" value="@user.QQorWechat" class="form-control" name="QQorWechat" id="chat2">
             <input type="hidden" value="" id="uid" name="ParentId" />
             <div class="form-group overlay animated fadeInDown">
                 <textarea class="layui-textarea" id="layedit2" name="Content" style="height: 80px"></textarea>
@@ -438,7 +436,6 @@
                                         </div>
                                         <div class="pull-right">
                                             <span class="label label-success" onclick="bounceEmail('${rows[i].Email}')">${rows[i].Email}</span>
-                                            <span class="label label-warning">${rows[i].QQorWechat}</span>
                                         </div><br/>
                                         ${loadComments(data.rows, Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.CommentDate).ToArray(), startfloor--)}
                                     </div>
@@ -475,7 +472,6 @@
                                 </div>
                                 <div class="pull-right">
                                     <span class="label label-success" onclick="bounceEmail('${item.Email}')">${item.Email}</span>
-                                    <span class="label label-primary">${item.QQorWechat}</span>
                                 </div><br/>
                                 ${loadComments(data, Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.CommentDate), root, depth)}
                             </div>

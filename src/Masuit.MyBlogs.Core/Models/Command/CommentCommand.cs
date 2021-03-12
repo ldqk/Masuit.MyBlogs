@@ -29,12 +29,6 @@ namespace Masuit.MyBlogs.Core.Models.Command
         public string Email { get; set; }
 
         /// <summary>
-        /// QQ或微信
-        /// </summary>
-        [StringLength(32, ErrorMessage = "QQ或微信不合法")]
-        public string QQorWechat { get; set; }
-
-        /// <summary>
         /// 评论内容
         /// </summary>
         [Required(ErrorMessage = "评论内容不能为空！"), SubmitCheck(2, 500)]

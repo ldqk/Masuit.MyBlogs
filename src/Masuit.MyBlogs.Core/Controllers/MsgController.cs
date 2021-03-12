@@ -157,7 +157,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (user != null)
             {
                 msg.NickName = user.NickName;
-                msg.QQorWechat = user.QQorWechat;
                 msg.Email = user.Email;
                 if (user.IsAdmin)
                 {

@@ -32,11 +32,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string Email { get; set; }
 
         /// <summary>
-        /// QQ或微信
-        /// </summary>
-        public string QQorWechat { get; set; }
-
-        /// <summary>
         /// 评论内容
         /// </summary>
         [Required(ErrorMessage = "评论内容不能为空！")]

@@ -35,11 +35,6 @@ namespace Masuit.MyBlogs.Core.Models.Command
         public string Email { get; set; }
 
         /// <summary>
-        /// QQ»òÎ¢ÐÅ
-        /// </summary>
-        public string QQorWechat { get; set; }
-
-        /// <summary>
         /// ¸¸¼¶ID
         /// </summary>
         public int ParentId { get; set; }
