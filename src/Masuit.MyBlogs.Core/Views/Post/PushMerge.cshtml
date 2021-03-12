@@ -105,6 +105,11 @@
 
         $("#getcode").on("click", function (e) {
             e.preventDefault();
+            layer.tips('正在发送验证码，请稍候...', '#getcode', {
+                tips: [1, '#3595CC'],
+                time: 30000
+            });
+            $("#getcode").attr('disabled', true);
             $.post("/validate/sendcode", {
                 __RequestVerificationToken: $("[name=__RequestVerificationToken]").val(),
                 email: $("#ModifierEmail").val()
@@ -112,12 +117,11 @@
                 if (data.Success) {
                     layer.tips('验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！', '#getcode', {
                         tips: [1, '#3595CC'],
-                        time: 4000
+                        time: 5000
                     });
                     user.NickName = $("[name='Modifier']").val();
                     user.Email = $("[name='ModifierEmail']").val();
                     localStorage.setItem("user", JSON.stringify(user));
-                    $("#getcode").attr('disabled', true);
                     var count = 0;
                     var timer = setInterval(function () {
                         count++;
@@ -131,8 +135,9 @@
                 } else {
                     layer.tips(data.Message, '#getcode', {
                         tips: [1, '#3595CC'],
-                        time: 4000
+                        time: 5000
                     });
+                    $("#getcode").attr('disabled', false);
                 }
             });
         });

@@ -55,13 +55,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 LogManager.Info($"提交内容：{dto.NickName}/{dto.Content}，敏感词：{match.Value}");
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
-
-            if (mailSender.HasBounced(dto.Email) || (!CurrentUser.IsAdmin && dto.Email.EndsWith(CommonHelper.SystemSettings["Domain"])))
+            var error = await ValidateEmailCode(mailSender, dto.Email, dto.Code);
+            if (!string.IsNullOrEmpty(error))
             {
-                Response.Cookies.Delete("Email");
-                Response.Cookies.Delete("QQorWechat");
-                Response.Cookies.Delete("NickName");
-                return ResultData(null, false, "邮箱地址错误，请刷新页面后重新使用有效的邮箱地址！");
+                return ResultData(null, false, error);
             }
 
             Post post = await PostService.GetByIdAsync(dto.PostId) ?? throw new NotFoundException("评论失败，文章未找到");
@@ -106,21 +103,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "评论失败");
             }
 
-            Response.Cookies.Append("Email", comment.Email, new CookieOptions()
-            {
-                Expires = DateTimeOffset.Now.AddYears(1),
-                SameSite = SameSiteMode.Lax
-            });
-            Response.Cookies.Append("QQorWechat", comment.QQorWechat + "", new CookieOptions()
-            {
-                Expires = DateTimeOffset.Now.AddYears(1),
-                SameSite = SameSiteMode.Lax
-            });
             Response.Cookies.Append("NickName", comment.NickName, new CookieOptions()
             {
                 Expires = DateTimeOffset.Now.AddYears(1),
                 SameSite = SameSiteMode.Lax
             });
+            WriteEmailKeyCookie(dto.Email);
             CommentFeq.AddOrUpdate("Comments:" + ClientIP, 1, i => i + 1, 5);
             CommentFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
             var emails = new HashSet<string>();

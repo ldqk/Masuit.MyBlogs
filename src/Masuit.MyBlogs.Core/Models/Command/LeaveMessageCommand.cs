@@ -61,5 +61,10 @@ namespace Masuit.MyBlogs.Core.Models.Command
         /// </summary>
         [AssignTrue(ErrorMessage = "请先同意接受本站的《留言须知》")]
         public bool Agree { get; set; }
+
+        /// <summary>
+        /// 验证码
+        /// </summary>
+        public string Code { get; set; }
     }
 }

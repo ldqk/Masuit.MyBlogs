@@ -17,7 +17,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" })]
         public async Task<ActionResult> SendCode(string email)
         {
-            if (string.IsNullOrEmpty(email) || !email.MatchEmail().isMatch)
+            if (string.IsNullOrEmpty(email) || !(await email.MatchEmailAsync(true)).isMatch)
             {
                 return ResultData(null, false, "请输入正确的邮箱！");
             }

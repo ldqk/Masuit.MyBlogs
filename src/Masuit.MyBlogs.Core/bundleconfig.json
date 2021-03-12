@@ -48,9 +48,9 @@
     ]
   },
   {
-    "outputFileName": "wwwroot/Assets/jedate/jedate.min.js",
+    "outputFileName": "wwwroot/Scripts/global/article.min.js",
     "inputFiles": [
-      "wwwroot/Assets/jedate/jedate.js"
+      "wwwroot/Scripts/global/article.js"
     ]
   }
 ]

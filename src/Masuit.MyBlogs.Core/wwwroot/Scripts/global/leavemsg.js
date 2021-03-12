@@ -120,6 +120,79 @@
 			}
 		});
 	});
+	
+    $("#getcode").on("click", function (e) {
+        e.preventDefault();
+		layer.tips('正在发送验证码，请稍候...', '#getcode', {
+            tips: [1, '#3595CC'],
+            time: 30000
+        });
+        $("#getcode").attr('disabled', true);
+        $.post("/validate/sendcode", {
+            __RequestVerificationToken: $("[name=__RequestVerificationToken]").val(),
+            email: $("#email").val()
+        }, function (data) {
+            if (data.Success) {
+                layer.tips('验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！', '#getcode', {
+                    tips: [1, '#3595CC'],
+                    time: 5000
+                });
+                var count = 0;
+                var timer = setInterval(function () {
+                    count++;
+                    $("#getcode").text('重新发送(' + (120 - count) + ')');
+                    if (count > 120) {
+                        clearInterval(timer);
+                        $("#getcode").attr('disabled', false);
+                        $("#getcode").text('重新发送');
+                    }
+                }, 1000);
+            } else {
+                layer.tips(data.Message, '#getcode', {
+                    tips: [1, '#3595CC'],
+                    time: 5000
+                });
+                $("#getcode").attr('disabled', false);
+            }
+        });
+    });
+    $("#getcode-reply").on("click", function (e) {
+        e.preventDefault();
+		layer.tips('正在发送验证码，请稍候...', '#getcode-reply', {
+            tips: [1, '#3595CC'],
+            time: 30000
+        });
+        $("#getcode-reply").attr('disabled', true);
+        $.post("/validate/sendcode", {
+            __RequestVerificationToken: $("[name=__RequestVerificationToken]").val(),
+            email: $("#email2").val()
+        }, function (data) {
+            if (data.Success) {
+                layer.tips('验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！', '#getcode-reply', {
+                    tips: [1, '#3595CC'],
+                    time: 5000
+                });
+                $("#getcode-reply").attr('disabled', true);
+                var count = 0;
+                var timer = setInterval(function () {
+                    count++;
+                    $("#getcode-reply").text('重新发送(' + (120 - count) + ')');
+                    if (count > 120) {
+                        clearInterval(timer);
+                        $("#getcode-reply").attr('disabled', false);
+                        $("#getcode-reply").text('重新发送');
+                    }
+                }, 1000);
+            } else {
+                layer.tips(data.Message, '#getcode-reply', {
+                    tips: [1, '#3595CC'],
+                    time: 5000
+                });
+                $("#getcode-reply").attr('disabled', false);
+            }
+        });
+    });
+
 });
 /**
  * 提交留言

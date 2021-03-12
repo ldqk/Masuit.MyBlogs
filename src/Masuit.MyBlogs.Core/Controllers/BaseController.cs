@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
@@ -18,6 +19,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -174,6 +176,66 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ViewBag.Footer = model;
             }
             base.OnActionExecuted(filterContext);
+        }
+
+        /// <summary>
+        /// 验证邮箱验证码
+        /// </summary>
+        /// <param name="mailSender"></param>
+        /// <param name="email">邮箱地址</param>
+        /// <param name="code">验证码</param>
+        /// <returns></returns>
+        internal async Task<string> ValidateEmailCode(IMailSender mailSender, string email, string code)
+        {
+            if (CurrentUser.IsAdmin)
+            {
+                return string.Empty; ;
+            }
+
+            if (string.IsNullOrEmpty(Request.Cookies["ValidateKey"]))
+            {
+                if (string.IsNullOrEmpty(code))
+                {
+                    return "请输入验证码！";
+                }
+                if (await RedisHelper.GetAsync("code:" + email) != code)
+                {
+                    return "验证码错误！";
+                }
+            }
+            else if (Request.Cookies["ValidateKey"].DesDecrypt(AppConfig.BaiduAK) != email)
+            {
+                Response.Cookies.Delete("Email");
+                Response.Cookies.Delete("QQorWechat");
+                Response.Cookies.Delete("NickName");
+                Response.Cookies.Delete("ValidateKey");
+                return "邮箱验证信息已失效，请刷新页面后重新评论！";
+            }
+
+            if (mailSender.HasBounced(email))
+            {
+                Response.Cookies.Delete("Email");
+                Response.Cookies.Delete("QQorWechat");
+                Response.Cookies.Delete("NickName");
+                Response.Cookies.Delete("ValidateKey");
+                return "邮箱地址错误，请刷新页面后重新使用有效的邮箱地址！";
+            }
+
+            return string.Empty;
+        }
+
+        internal void WriteEmailKeyCookie(string email)
+        {
+            Response.Cookies.Append("Email", email, new CookieOptions()
+            {
+                Expires = DateTimeOffset.Now.AddYears(1),
+                SameSite = SameSiteMode.Lax
+            });
+            Response.Cookies.Append("ValidateKey", email.DesEncrypt(AppConfig.BaiduAK), new CookieOptions()
+            {
+                Expires = DateTimeOffset.Now.AddYears(1),
+                SameSite = SameSiteMode.Lax
+            });
         }
     }
 }

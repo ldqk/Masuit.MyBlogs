@@ -63,6 +63,11 @@ namespace Masuit.MyBlogs.Core.Models.Command
         public string OperatingSystem { get; set; }
 
         /// <summary>
+        /// 验证码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
         /// 是否已接受条款
         /// </summary>
         [AssignTrue(ErrorMessage = "请先同意接受本站的《评论须知》")]

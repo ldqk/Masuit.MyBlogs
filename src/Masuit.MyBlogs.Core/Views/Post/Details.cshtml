@@ -290,10 +290,13 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="input-group">
-                                            <span class="input-group-addon">
-                                                <label for="chat">QQ/微信：</label>
+                                            <span class="input-group-addon">验证码：</span>
+                                            <input type="text" class="form-control" name="Code" placeholder="验证码">
+                                            <span class="input-group-btn">
+                                                <button type="button" id="getcode" class="btn btn-danger">
+                                                    获取验证码
+                                                </button>
                                             </span>
-                                            <input type="text" class="form-control" name="QQorWechat" id="chat" placeholder="QQ或微信(可选)" value="@Context.Request.Cookies["QQorWechat"]">
                                         </div>
                                     </div>
                                 </div>
@@ -354,10 +357,13 @@
                     <input type="email" class="form-control" name="Email" id="email2" required placeholder="留下您的真实邮箱，以方便接收回复" value="@Context.Request.Cookies["Email"]">
                 </div>
                 <div class="input-group">
-                    <span class="input-group-addon">
-                        <label for="chat">QQ/微信：</label>
+                    <span class="input-group-addon">验证码：</span>
+                    <input type="text" class="form-control" name="Code" placeholder="验证码">
+                    <span class="input-group-btn">
+                        <button type="button" id="getcode-reply" class="btn btn-danger">
+                            获取验证码
+                        </button>
                     </span>
-                    <input type="text" class="form-control" name="QQorWechat" id="chat2" placeholder="QQ或微信(可选)" value="@Context.Request.Cookies["QQorWechat"]">
                 </div>
             </div>
             <input type="hidden" value="" id="uid" name="ParentId" />
