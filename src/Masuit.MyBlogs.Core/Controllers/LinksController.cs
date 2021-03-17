@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Extensions;
+﻿using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -145,7 +146,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
                 using var httpContent = res.Content;
                 var s = httpContent.ReadAsStringAsync().Result;
-                return s.Contains(Request.Host.Host) ? ResultData(null, true, "友情链接正常！") : ResultData(null, false, link + " 对方似乎没有本站的友情链接！");
+                return s.Contains(CommonHelper.SystemSettings["Domain"].Split("|")) ? ResultData(null, true, "友情链接正常！") : ResultData(null, false, link + " 对方似乎没有本站的友情链接！");
             });
         }
 

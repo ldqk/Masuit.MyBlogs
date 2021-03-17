@@ -15,7 +15,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -48,7 +51,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("ServiceUnavailable")]
-        public ActionResult ServiceUnavailable()
+        public async Task<ActionResult> ServiceUnavailable()
         {
             var feature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
             if (feature != null)
@@ -56,23 +59,31 @@ namespace Masuit.MyBlogs.Core.Controllers
                 string err;
                 var req = HttpContext.Request;
                 var ip = HttpContext.Connection.RemoteIpAddress;
+                req.EnableBuffering();
+                using var sr = new StreamReader(req.Body, Encoding.UTF8);
+                var body = await sr.ReadToEndAsync();
+                req.Body.Position = 0;
                 switch (feature.Error)
                 {
                     case DbUpdateConcurrencyException ex:
-                        err = $"数据库并发更新异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
+                        err = $"数据库并发更新异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{body}\n堆栈信息：";
                         LogManager.Error(err, ex);
                         break;
                     case DbUpdateException ex:
-                        err = $"数据库更新时异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}\t";
+                        err = $"数据库更新时异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{body}\n堆栈信息：";
                         LogManager.Error(err, ex);
                         break;
                     case AggregateException ex:
                         LogManager.Debug("↓↓↓" + ex.Message + "↓↓↓");
                         ex.Flatten().Handle(e =>
                         {
-                            LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t", e);
+                            LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t", e);
                             return true;
                         });
+                        if (!string.IsNullOrEmpty(body))
+                        {
+                            LogManager.Debug("↑↑↑请求参数：\n" + body);
+                        }
                         break;
                     case NotFoundException ex:
                         Response.StatusCode = 404;
@@ -92,7 +103,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         Response.StatusCode = 403;
                         return View("TempDeny");
                     default:
-                        LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，\n请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t", feature.Error);
+                        LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}，请求参数：\n{body}\n堆栈信息：", feature.Error);
                         break;
                 }
             }

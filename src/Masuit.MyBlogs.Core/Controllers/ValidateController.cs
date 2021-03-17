@@ -1,6 +1,6 @@
 ﻿using Hangfire;
 using Masuit.MyBlogs.Core.Common;
-using Masuit.Tools;
+using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -15,13 +15,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="email"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" })]
-        public async Task<ActionResult> SendCode(string email)
+        public async Task<ActionResult> SendCode([IsEmail] string email)
         {
-            if (string.IsNullOrEmpty(email) || !(await email.MatchEmailAsync(true)).isMatch)
-            {
-                return ResultData(null, false, "请输入正确的邮箱！");
-            }
-
             if (await RedisHelper.ExistsAsync("get:" + email))
             {
                 await RedisHelper.ExpireAsync("get:" + email, 120);

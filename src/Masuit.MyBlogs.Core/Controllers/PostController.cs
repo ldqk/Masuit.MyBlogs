@@ -27,7 +27,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
@@ -621,24 +620,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Truncate(int id)
+        public ActionResult Truncate(int id)
         {
-            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
-            var srcs = post.Content.MatchImgSrcs();
-            foreach (var path in srcs)
-            {
-                if (path.StartsWith("/"))
-                {
-                    try
-                    {
-                        System.IO.File.Delete(HostEnvironment.WebRootPath + path);
-                    }
-                    catch (IOException)
-                    {
-                    }
-                }
-            }
-
             bool b = PostService - id;
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }

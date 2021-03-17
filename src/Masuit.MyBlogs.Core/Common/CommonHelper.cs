@@ -19,7 +19,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using TimeZoneConverter;
 
 namespace Masuit.MyBlogs.Core.Common
@@ -29,36 +28,43 @@ namespace Masuit.MyBlogs.Core.Common
     /// </summary>
     public static class CommonHelper
     {
+        private static readonly FileSystemWatcher _fileSystemWatcher = new(AppContext.BaseDirectory + "App_Data", "*.txt")
+        {
+            IncludeSubdirectories = true,
+            EnableRaisingEvents = true,
+            NotifyFilter = NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.Security | NotifyFilters.Size
+        };
+
         static CommonHelper()
         {
-            ThreadPool.QueueUserWorkItem(_ =>
+            Init();
+            _fileSystemWatcher.Changed += (_, _) =>
             {
-                while (true)
-                {
-                    BanRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "ban.txt"), Encoding.UTF8);
-                    ModRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "mod.txt"), Encoding.UTF8);
-                    DenyIP = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "denyip.txt"), Encoding.UTF8);
-                    string[] lines = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory + "App_Data", "DenyIPRange.txt"), Encoding.UTF8);
-                    DenyIPRange = new Dictionary<string, string>();
-                    foreach (string line in lines)
-                    {
-                        try
-                        {
-                            var strs = line.Split(' ');
-                            DenyIPRange[strs[0]] = strs[1];
-                        }
-                        catch (IndexOutOfRangeException)
-                        {
-                        }
-                    }
-
-                    IPWhiteList = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "whitelist.txt")).Split(',', '，').ToList();
-                    Console.WriteLine("刷新公共数据...");
-                    Thread.Sleep(TimeSpan.FromMinutes(10));
-                }
-            });
+                Init();
+            };
         }
 
+        private static void Init()
+        {
+            BanRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "ban.txt"), Encoding.UTF8);
+            ModRegex = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "mod.txt"), Encoding.UTF8);
+            DenyIP = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "denyip.txt"), Encoding.UTF8);
+            var lines = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory + "App_Data", "DenyIPRange.txt"), Encoding.UTF8);
+            DenyIPRange = new Dictionary<string, string>();
+            foreach (string line in lines)
+            {
+                try
+                {
+                    var strs = line.Split(' ');
+                    DenyIPRange[strs[0]] = strs[1];
+                }
+                catch (IndexOutOfRangeException)
+                {
+                }
+            }
+
+            IPWhiteList = File.ReadAllText(Path.Combine(AppContext.BaseDirectory + "App_Data", "whitelist.txt")).Split(',', '，').ToList();
+        }
         /// <summary>
         /// 敏感词
         /// </summary>

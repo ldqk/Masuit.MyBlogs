@@ -7,13 +7,10 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.Net;
-using Masuit.Tools.Html;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -91,29 +88,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 删除公告
         /// </summary>
-        /// <param name="hostEnvironment"></param>
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Delete([FromServices] IWebHostEnvironment hostEnvironment, int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("公告已经被删除！");
-            var srcs = notice.Content.MatchImgSrcs().Where(s => s.StartsWith("/"));
-            foreach (var path in srcs)
-            {
-                try
-                {
-                    System.IO.File.Delete(hostEnvironment.WebRootPath + path);
-                }
-                catch
-                {
-                }
-            }
-
             bool b = await NoticeService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
-
+        
         /// <summary>
         /// 编辑公告
         /// </summary>

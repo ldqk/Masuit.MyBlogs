@@ -7,7 +7,6 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
-using Masuit.Tools.Html;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -134,19 +133,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Delete(int id)
         {
-            var post = await MiscService.GetByIdAsync(id) ?? throw new NotFoundException("杂项页已被删除！");
-            var srcs = post.Content.MatchImgSrcs().Where(s => s.StartsWith("/"));
-            foreach (var path in srcs)
-            {
-                try
-                {
-                    System.IO.File.Delete(Path.Combine(HostEnvironment.WebRootPath + path));
-                }
-                catch (IOException)
-                {
-                }
-            }
-
             bool b = await MiscService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }

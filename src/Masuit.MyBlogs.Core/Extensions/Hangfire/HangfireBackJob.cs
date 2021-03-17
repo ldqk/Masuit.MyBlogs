@@ -193,7 +193,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                     }
                     else
                     {
-                        link.Status = !t.Result.Contains(CommonHelper.SystemSettings["Domain"]) ? Status.Unavailable : Status.Available;
+                        link.Status = !t.Result.Contains(CommonHelper.SystemSettings["Domain"].Split("|")) ? Status.Unavailable : Status.Available;
                     }
 
                     if (link.Status != prev)
