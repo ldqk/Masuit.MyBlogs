@@ -486,6 +486,7 @@
             header: [],
             hr: [],
             i: ['class', 'style'],
+            iframe: ['scrolling','width','height','align','frameborder','src'],
             img: ['src', 'alt', 'title', 'width', 'height', 'id', '_src', 'loadingclass', 'class', 'data-latex'],
             ins: ['datetime'],
             li: ['class', 'style'],
