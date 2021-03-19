@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Masuit.MyBlogs.Core.Models.Entity;
+using System;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
 {
@@ -31,5 +32,20 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 访问次数
         /// </summary>
         public int ViewCount { get; set; }
+
+        /// <summary>
+        /// 生效时间
+        /// </summary>
+        public DateTime? StartTime { get; set; }
+
+        /// <summary>
+        /// 失效时间
+        /// </summary>
+        public DateTime? EndTime { get; set; }
+
+        /// <summary>
+        /// 公告状态
+        /// </summary>
+        public NoticeStatus NoticeStatus { get; set; }
     }
 }

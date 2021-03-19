@@ -4,8 +4,29 @@
 	if ($scope.notice.Id) {
 		$scope.request("/notice/get", { id: $scope.notice.Id }, function (res) {
 			$scope.notice = res.Data;
+            if ($scope.notice.StartTime+$scope.notice.EndTime) {
+                $scope.notice.Range=$scope.notice.StartTime+" 至 "+$scope.notice.EndTime;
+            }
 		});
 	}
+
+    jeDate("#timespan",{
+        multiPane:false,
+        range:" 至 ",
+        minDate:new Date().Format("yyyy-MM-dd 00:00:00"),
+        maxDate:'2099-06-16',
+        format: 'YYYY-MM-DD',
+		donefun: function (obj) {
+			$scope.notice.StartTime = obj.date[0].YYYY+"-"+obj.date[0].MM+"-"+obj.date[0].DD;
+			$scope.notice.EndTime = obj.date[1].YYYY+"-"+obj.date[1].MM+"-"+obj.date[1].DD+" 23:59:59";
+		},
+		clearfun: function(elem, val) {
+            delete $scope.notice.StartTime;
+			delete $scope.notice.EndTime;
+			delete $scope.notice.Range;
+        }
+    });
+	
 	//异步提交表单开始
 	$scope.submit = function (notice) {
 		var url = "/notice/write";
@@ -94,4 +115,16 @@ myApp.controller("noticeList", ["$scope", "$http", "NgTableParams", function ($s
 		}, function () {
 		}).catch(swal.noop);
 	}
+	
+    $scope.changeState= function(row) {
+		$scope.request("/notice/ChangeState/"+row.Id, null, function(data) {
+			window.notie.alert({
+				type: 1,
+				text: data.Message,
+				time: 4
+			});
+			row.NoticeStatus=3-row.NoticeStatus;
+		});
+    }
+
 }]);

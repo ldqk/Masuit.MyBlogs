@@ -34,6 +34,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly ISearchEngine<DataContext> _searchEngine;
         private readonly IAdvertisementService _advertisementService;
+        private readonly INoticeService _noticeService;
 
         /// <summary>
         /// hangfire后台任务
@@ -46,7 +47,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="httpClientFactory"></param>
         /// <param name="HostEnvironment"></param>
         /// <param name="searchEngine"></param>
-        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IWebHostEnvironment HostEnvironment, ISearchEngine<DataContext> searchEngine, IAdvertisementService advertisementService)
+        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IWebHostEnvironment HostEnvironment, ISearchEngine<DataContext> searchEngine, IAdvertisementService advertisementService, INoticeService noticeService)
         {
             _userInfoService = userInfoService;
             _postService = postService;
@@ -57,6 +58,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             _hostEnvironment = HostEnvironment;
             _searchEngine = searchEngine;
             _advertisementService = advertisementService;
+            _noticeService = noticeService;
         }
 
         /// <summary>
@@ -158,6 +160,17 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             _advertisementService.GetQuery(a => DateTime.Now >= a.ExpireTime).UpdateFromQuery(a => new Advertisement()
             {
                 Status = Status.Unavailable
+            });
+            _noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.UnStart && n.StartTime < DateTime.Now).UpdateFromQuery(n => new Notice()
+            {
+                NoticeStatus = NoticeStatus.Normal,
+                PostDate = DateTime.Now,
+                ModifyDate = DateTime.Now
+            });
+            _noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal && n.EndTime < DateTime.Now).UpdateFromQuery(n => new Notice()
+            {
+                NoticeStatus = NoticeStatus.Expired,
+                ModifyDate = DateTime.Now
             });
         }
 

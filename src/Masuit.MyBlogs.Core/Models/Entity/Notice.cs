@@ -45,5 +45,27 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 浏览人数
         /// </summary>
         public int ViewCount { get; set; }
+
+        /// <summary>
+        /// 生效时间
+        /// </summary>
+        public DateTime? StartTime { get; set; }
+
+        /// <summary>
+        /// 失效时间
+        /// </summary>
+        public DateTime? EndTime { get; set; }
+
+        /// <summary>
+        /// 公告状态
+        /// </summary>
+        public NoticeStatus NoticeStatus { get; set; }
+    }
+
+    public enum NoticeStatus
+    {
+        UnStart,
+        Normal,
+        Expired,
     }
 }

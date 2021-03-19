@@ -389,7 +389,10 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 				maxDate: '2099-06-16 23:59:59',
 				donefun: function (obj) {
 					$scope.post.timespan = obj.val;
-				}
+				},
+		        clearfun: function(elem, val) {
+                    delete $scope.post.timespan;
+                }
 			});
         }
 	}

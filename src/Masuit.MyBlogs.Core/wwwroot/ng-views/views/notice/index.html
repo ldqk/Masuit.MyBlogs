@@ -1,17 +1,46 @@
-﻿<form class="form-group" id="article-form" method="post" onsubmit="return false">
+﻿<style>
+    .height800 {
+        max-height: 800px;
+        overflow-y: auto;
+    }
+
+    .wicon {
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAASAgMAAAA1aVZ3AAAACVBMVEUAAAD///9nyrNdI4MmAAAAAXRSTlMAQObYZgAAAChJREFUCNdjWAUCCxjg9DQgtTKBAUN8aigQJGCho6KiYDSJ8ggaYR8Ao74zAKjm+cYAAAAASUVORK5CYII=");
+        background-repeat: no-repeat;
+        background-position: right center;
+    }
+
+    .workinput {
+        width: 100%;
+        line-height: 21px;
+        border: 1px #ddd solid;
+        border-radius: 4px;
+        padding: 5px;
+        background-color: transparent;
+        float: left;
+        font-size: 14px;
+    }
+</style>
+<form class="form-group" id="article-form" method="post" onsubmit="return false">
     <input type="hidden" ng-model="notice.Id">
     <div class="input-group">
-        <span class="input-group-addon size18"><label for="article">标题：</label></span>
-    <div class="fg-line">
-        <input type="text" class="form-control input-lg" ng-model="notice.Title" required placeholder="请输入文章标题">
-    </div>
+        <span class="input-group-addon size18">标题：</span>
+        <div class="fg-line">
+            <input type="text" class="form-control input-lg" ng-model="notice.Title" required placeholder="请输入文章标题">
+        </div>
     </div>
     <!-- 加载编辑器的容器 -->
     <div class="form-group overlay animated bounceInDown">
         <div style="height: 400px;" class="ueditor" ng-model="notice.Content" type="text/plain"></div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-addon">生效时间段：</span>
+                <input type="text" class="form-control workinput wicon" id="timespan" ng-model="notice.Range" readonly="readonly" />
+            </div>
+        </div>
+        <div class="col-md-6">
             <button type="button" class="btn btn-info waves-effect" ng-click="submit(notice)">发布</button>
         </div>
     </div>

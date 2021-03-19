@@ -36,7 +36,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("notice"), Route("n", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Index([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            var list = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(page, size, n => n.Status == Status.Display, n => n.ModifyDate, false);
+            var list = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(page, size, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false);
             ViewData["page"] = new Pagination(page, size, list.TotalCount);
             foreach (var n in list.Data)
             {
@@ -81,6 +81,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Write(Notice notice, CancellationToken cancellationToken)
         {
             notice.Content = await ImagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes(), cancellationToken);
+            if (notice.StartTime.HasValue && notice.EndTime.HasValue && notice.StartTime >= notice.EndTime)
+            {
+                return ResultData(null, false, "开始时间不能小于结束时间");
+            }
+
+            if (DateTime.Now < notice.StartTime)
+            {
+                notice.NoticeStatus = NoticeStatus.UnStart;
+            }
+
             Notice e = NoticeService.AddEntitySaved(notice);
             return e != null ? ResultData(null, message: "发布成功") : ResultData(null, false, "发布失败");
         }
@@ -96,17 +106,43 @@ namespace Masuit.MyBlogs.Core.Controllers
             bool b = await NoticeService.DeleteByIdSavedAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
-        
+
+        /// <summary>
+        /// 公告上下架
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [MyAuthorize]
+        public async Task<ActionResult> ChangeState(int id)
+        {
+            var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("公告未找到");
+            notice.NoticeStatus = notice.NoticeStatus == NoticeStatus.Normal ? NoticeStatus.Expired : NoticeStatus.Normal;
+            var b = await NoticeService.SaveChangesAsync() > 0;
+            return ResultData(null, b, notice.NoticeStatus == NoticeStatus.Normal ? $"【{notice.Title}】已上架！" : $"【{notice.Title}】已下架！");
+        }
+
         /// <summary>
         /// 编辑公告
         /// </summary>
         /// <param name="notice"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Edit(Notice notice, CancellationToken cancellationToken)
+        public async Task<ActionResult> Edit(NoticeDto notice, CancellationToken cancellationToken)
         {
             var entity = await NoticeService.GetByIdAsync(notice.Id) ?? throw new NotFoundException("公告已经被删除！");
+            if (notice.StartTime.HasValue && notice.EndTime.HasValue && notice.StartTime >= notice.EndTime)
+            {
+                return ResultData(null, false, "开始时间不能小于结束时间");
+            }
+
+            if (DateTime.Now < notice.StartTime)
+            {
+                entity.NoticeStatus = NoticeStatus.UnStart;
+            }
+
             entity.ModifyDate = DateTime.Now;
+            entity.StartTime = notice.StartTime;
+            entity.EndTime = notice.EndTime;
             entity.Title = notice.Title;
             entity.Content = await ImagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes(), cancellationToken);
             bool b = await NoticeService.SaveChangesAsync() > 0;
@@ -157,7 +193,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Last()
         {
-            var notice = await NoticeService.GetAsync(n => n.Status == Status.Display, n => n.ModifyDate, false);
+            var notice = await NoticeService.GetAsync(n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false);
             if (notice == null)
             {
                 return ResultData(null, false);

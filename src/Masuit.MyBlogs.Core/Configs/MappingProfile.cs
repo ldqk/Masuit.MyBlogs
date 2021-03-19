@@ -33,21 +33,14 @@ namespace Masuit.MyBlogs.Core.Configs
 
             CreateMap<Links, LinksCommand>().ReverseMap();
             CreateMap<Links, LinksDto>().ReverseMap();
-            CreateMap<LinksCommand, LinksDto>().ReverseMap();
 
             CreateMap<MenuCommand, Menu>().ForMember(m => m.ParentId, e => e.MapFrom(c => (c.ParentId ?? 0) == 0 ? null : c.ParentId)).ReverseMap();
             CreateMap<Menu, MenuDto>().ReverseMap();
-            CreateMap<MenuCommand, MenuDto>().ReverseMap();
 
             CreateMap<Misc, MiscCommand>().ReverseMap();
             CreateMap<Misc, MiscDto>().ReverseMap();
-            CreateMap<MiscCommand, MiscDto>().ReverseMap();
-            CreateMap<Misc, MiscViewModel>().ForMember(c => c.PostDate, e => e.MapFrom(c => c.PostDate.ToString("yyyy-MM-dd HH:mm:ss"))).ForMember(c => c.ModifyDate, e => e.MapFrom(c => c.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
 
-            CreateMap<Notice, NoticeCommand>().ReverseMap();
             CreateMap<Notice, NoticeDto>().ReverseMap();
-            CreateMap<NoticeCommand, NoticeDto>().ReverseMap();
-            CreateMap<Notice, NoticeViewModel>().ForMember(c => c.PostDate, e => e.MapFrom(c => c.PostDate.ToString("yyyy-MM-dd HH:mm:ss"))).ForMember(c => c.ModifyDate, e => e.MapFrom(c => c.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
 
             CreateMap<PostCommand, Post>().ReverseMap();
             CreateMap<Post, PostModelBase>();
