@@ -60,7 +60,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 var req = HttpContext.Request;
                 var ip = HttpContext.Connection.RemoteIpAddress;
                 req.EnableBuffering();
-                using var sr = new StreamReader(req.Body, Encoding.UTF8);
+                req.Body.Seek(0, SeekOrigin.Begin);
+                using var sr = new StreamReader(req.Body, Encoding.UTF8, false);
                 var body = await sr.ReadToEndAsync();
                 req.Body.Position = 0;
                 switch (feature.Error)

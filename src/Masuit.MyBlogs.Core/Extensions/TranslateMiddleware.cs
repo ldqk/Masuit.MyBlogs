@@ -24,30 +24,30 @@ namespace Masuit.MyBlogs.Core.Extensions
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public Task Invoke(HttpContext context)
         {
+            if (context.Request.IsRobot())
+            {
+                return _next(context);
+            }
+
             string lang = context.Request.Query["lang"];
             lang ??= context.Request.Cookies["lang"];
             if (string.IsNullOrEmpty(lang))
             {
                 if (context.Request.Location().Contains(new[] { "台湾", "香港", "澳门", "Taiwan", "TW", "HongKong", "HK" }))
                 {
-                    await Traditional(context);
+                    return Traditional(context);
                 }
-                else
-                {
-                    await _next(context);
-                }
-                return;
+
+                return _next(context);
             }
             if (lang == "zh-cn")
             {
-                await _next(context);
+                return _next(context);
             }
-            else
-            {
-                await Traditional(context);
-            }
+
+            return Traditional(context);
         }
 
         private async Task Traditional(HttpContext context)

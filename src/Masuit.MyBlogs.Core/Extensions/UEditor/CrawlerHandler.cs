@@ -34,11 +34,11 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 return WriteJson(new
                 {
                     state = "SUCCESS",
-                    list = sources.Except(_queue).AsParallel().Select(s =>
+                    list = (await sources.Except(_queue).AsParallel().SelectAsync(s =>
                     {
                         _queue.Add(s);
-                        return new Crawler(s).Fetch().Result;
-                    }).Select(x =>
+                        return new Crawler(s).Fetch();
+                    })).Select(x =>
                     {
                         _queue.Remove(x.SourceUrl);
                         return new
@@ -89,16 +89,9 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     return this;
                 }
 
-                ServerUrl = PathFormatter.Format(Path.GetFileName(SourceUrl), CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\') + UeditorConfig.GetString("catcherPathFormat"));
-                var mediaType = response.Content.Headers.ContentType.MediaType;
+                ServerUrl = PathFormatter.Format(Path.GetFileNameWithoutExtension(SourceUrl), CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\') + UeditorConfig.GetString("catcherPathFormat")) + MimeMapper.ExtTypes[response.Content.Headers.ContentType?.MediaType ?? "image/jpeg"];
                 await using var stream = await response.Content.ReadAsStreamAsync();
                 var savePath = Path.Combine(AppContext.BaseDirectory + "wwwroot", ServerUrl);
-                if (string.IsNullOrEmpty(Path.GetExtension(savePath)))
-                {
-                    savePath += MimeMapper.ExtTypes[mediaType];
-                    ServerUrl += MimeMapper.ExtTypes[mediaType];
-                }
-
                 var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath, default);
                 if (success)
                 {
@@ -107,7 +100,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 else
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-                    await File.WriteAllBytesAsync(savePath, stream.ToArray());
+                    await File.WriteAllBytesAsync(savePath, await stream.ToArrayAsync());
                 }
                 State = "SUCCESS";
             }
