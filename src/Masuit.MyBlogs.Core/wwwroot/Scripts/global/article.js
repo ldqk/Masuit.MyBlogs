@@ -6,6 +6,10 @@
 	$(".tocify>.close").on("click", function(e) {
 		$(this).parent().hide();
 	});		
+	$('article img').click(function(){
+        window.open($(this).attr("src"));
+    });
+
 	SyntaxHighlighter.all();
 	SyntaxHighlighter.defaults['toolbar'] = false;
 	layui.use('layedit', function () {
