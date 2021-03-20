@@ -6,6 +6,9 @@
 			$scope.notice = res.Data;
             if ($scope.notice.StartTime+$scope.notice.EndTime) {
                 $scope.notice.Range=$scope.notice.StartTime+" 至 "+$scope.notice.EndTime;
+            } else {
+                delete $scope.notice.StartTime;
+			    delete $scope.notice.EndTime;
             }
 		});
 	}
