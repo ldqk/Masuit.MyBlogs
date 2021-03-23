@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
@@ -126,6 +127,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
 
         private static SearchOptions BuildSearchOptions(int page, int size, string keyword)
         {
+            keyword = Regex.Replace(keyword, @":\s+", ":");
             var fields = new List<string>();
             var newkeywords = new List<string>();
             if (keyword.Contains("intitle:"))

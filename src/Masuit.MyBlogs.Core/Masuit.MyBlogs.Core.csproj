@@ -46,7 +46,7 @@
         <PackageReference Include="CacheManager.Serialization.Json" Version="2.0.0-beta-1629" />
         <PackageReference Include="CLRStats" Version="1.0.0" />
         <PackageReference Include="CSRedisCore" Version="3.6.6" />
-        <PackageReference Include="Hangfire" Version="1.7.19" />
+        <PackageReference Include="Hangfire" Version="1.7.20" />
         <PackageReference Include="Hangfire.Autofac" Version="2.3.1" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
         <PackageReference Include="htmldiff.net-core" Version="1.3.6" />
@@ -118,4 +118,5 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+    <ProjectExtensions><VisualStudio><UserProperties Reactor_Enabled="0" /></VisualStudio></ProjectExtensions>
 </Project>
