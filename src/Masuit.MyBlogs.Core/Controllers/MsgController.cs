@@ -283,9 +283,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Read(int id)
         {
-            var msg = await MessageService.GetByIdAsync(id);
-            msg.Read = true;
-            await MessageService.SaveChangesAsync();
+            await MessageService.GetQuery(m => m.Id == id).UpdateFromQueryAsync(m => new InternalMessage()
+            {
+                Read = true
+            });
             return Content("ok");
         }
 
@@ -297,9 +298,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Unread(int id)
         {
-            var msg = await MessageService.GetByIdAsync(id);
-            msg.Read = false;
-            await MessageService.SaveChangesAsync();
+            await MessageService.GetQuery(m => m.Id == id).UpdateFromQueryAsync(m => new InternalMessage()
+            {
+                Read = false
+            });
             return Content("ok");
         }
 
@@ -356,15 +358,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult MarkRead(int id)
+        public async Task<ActionResult> MarkRead(int id)
         {
-            var msgs = MessageService.GetQuery(m => m.Id <= id).ToList();
-            foreach (var t in msgs)
+            await MessageService.GetQuery(m => m.Id <= id).UpdateFromQueryAsync(m => new InternalMessage()
             {
-                t.Read = true;
-            }
-
-            MessageService.SaveChanges();
+                Read = true
+            });
             return ResultData(null);
         }
 

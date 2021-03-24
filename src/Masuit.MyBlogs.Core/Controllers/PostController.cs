@@ -24,6 +24,7 @@ using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -228,9 +229,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
 
-            Post post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
-            post.VoteDownCount = post.VoteDownCount + 1;
-            var b = await PostService.SaveChangesAsync() > 0;
+            var b = await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
+            {
+                VoteDownCount = p.VoteDownCount + 1
+            }) > 0;
             if (b)
             {
                 HttpContext.Session.Set("post-vote" + id, id.GetBytes());
@@ -251,9 +253,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
             }
 
-            Post post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
-            post.VoteUpCount += 1;
-            var b = await PostService.SaveChangesAsync() > 0;
+            var b = await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
+            {
+                VoteUpCount = p.VoteUpCount + 1
+            }) > 0;
             if (b)
             {
                 HttpContext.Session.Set("post-vote" + id, id.GetBytes());
@@ -268,7 +271,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public async Task<ActionResult> Publish()
         {
-            var list = await CategoryService.GetQueryFromCacheAsync(c => c.Status == Status.Available).ConfigureAwait(false);
+            var list = await CategoryService.GetQueryFromCacheAsync(c => c.Status == Status.Available);
             return View(list);
         }
 
@@ -305,7 +308,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
             post.Status = Status.Pending;
-            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes(), cancellationToken).ConfigureAwait(false);
+            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes(), cancellationToken);
             Post p = post.Mapper<Post>();
             p.IP = ClientIP;
             p.Modifier = p.Author;
@@ -342,22 +345,22 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("all"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
-        public ActionResult All()
+        public async Task<ActionResult> All()
         {
             var tags = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).ToList().SelectMany(s => s.Split(',', '，')).GroupBy(t => t).Where(g => g.Count() > 1).OrderByDescending(g => g.Count()).ThenBy(g => g.Key).ToList(); //tag
             ViewBag.tags = tags;
-            ViewBag.cats = CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
+            ViewBag.cats = await CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
                 Id = c.Id,
                 Name = c.Name,
                 Count = c.Post.Count(p => p.Status == Status.Published || CurrentUser.IsAdmin)
-            }).ToList(); //category
-            ViewBag.seminars = SeminarService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
+            }).ToListAsync(); //category
+            ViewBag.seminars = await SeminarService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
                 Id = c.Id,
                 Name = c.Title,
                 Count = c.Post.Count(p => p.Status == Status.Published || CurrentUser.IsAdmin)
-            }).ToList(); //seminars
+            }).ToListAsync(); //seminars
             return View();
         }
 
@@ -957,9 +960,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Refresh(int id)
         {
-            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
-            post.ModifyDate = DateTime.Now;
-            await PostService.SaveChangesAsync();
+            await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
+            {
+                ModifyDate = DateTime.Now
+            });
             return RedirectToAction("Details", new { id });
         }
 
@@ -972,9 +976,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost("post/block/{id}")]
         public async Task<ActionResult> Block(int id)
         {
-            var merge = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
-            merge.Status = Status.Forbidden;
-            var b = await PostService.SaveChangesAsync() > 0;
+            var b = await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
+            {
+                Status = Status.Forbidden
+            }) > 0;
             return b ? ResultData(null, true, "操作成功！") : ResultData(null, false, "操作失败！");
         }
         #endregion

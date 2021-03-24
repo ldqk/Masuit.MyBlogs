@@ -131,16 +131,13 @@
 	}
 	$scope.toggleWhite= function(row) {
 		$scope.request("/links/ToggleWhitelist", {
-			id:row.Id,
-			state:row.Except
+			id:row.Id
 		}, function (data) {
-			
-		});
+        });
 	}
 	$scope.toggleState= function(row) {
 		$scope.request("/links/Toggle", {
-			id:row.Id,
-			state:row.Status==1
+			id:row.Id
 		}, function (data) {
 			
 		});
@@ -148,10 +145,8 @@
 
 	$scope.toggleRecommend = function(row) {
 		$scope.request("/links/ToggleRecommend", {
-			id:row.Id,
-			state:row.Recommend
+			id:row.Id
 		}, function (data) {
-			
-		});
+        });
 	}
 }]);

@@ -170,10 +170,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Edit(Links model)
         {
-            Links links = await LinksService.GetByIdAsync(model.Id);
-            links.Name = model.Name;
-            links.Url = model.Url;
-            bool b = await LinksService.SaveChangesAsync() > 0;
+            var b = await LinksService.GetQuery(m => m.Id == model.Id).UpdateFromQueryAsync(m => new Links()
+            {
+                Name = model.Name,
+                Url = model.Url
+            }) > 0;
             return ResultData(null, b, b ? "保存成功" : "保存失败");
         }
 
@@ -192,15 +193,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 切换友情链接的白名单状态
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="state"></param>
         /// <returns></returns>
         [HttpPost]
         [MyAuthorize]
-        public async Task<ActionResult> ToggleWhitelist(int id, bool state)
+        public async Task<ActionResult> ToggleWhitelist(int id)
         {
-            Links link = await LinksService.GetByIdAsync(id);
-            link.Except = !state;
-            bool b = await LinksService.SaveChangesAsync() > 0;
+            var b = await LinksService.GetQuery(m => m.Id == id).UpdateFromQueryAsync(m => new Links()
+            {
+                Except = !m.Except
+            }) > 0;
             return ResultData(null, b, b ? "切换成功！" : "切换失败！");
         }
 
@@ -208,15 +209,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 切换友情链接的推荐状态
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="state"></param>
         /// <returns></returns>
         [HttpPost]
         [MyAuthorize]
-        public async Task<ActionResult> ToggleRecommend(int id, bool state)
+        public async Task<ActionResult> ToggleRecommend(int id)
         {
-            Links link = await LinksService.GetByIdAsync(id);
-            link.Recommend = !state;
-            bool b = await LinksService.SaveChangesAsync() > 0;
+            var b = await LinksService.GetQuery(m => m.Id == id).UpdateFromQueryAsync(m => new Links()
+            {
+                Recommend = !m.Recommend
+            }) > 0;
             return ResultData(null, b, b ? "切换成功！" : "切换失败！");
         }
 
@@ -224,15 +225,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 切换友情链接可用状态
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="state"></param>
         /// <returns></returns>
         [HttpPost]
         [MyAuthorize]
-        public async Task<ActionResult> Toggle(int id, bool state)
+        public async Task<ActionResult> Toggle(int id)
         {
-            Links link = await LinksService.GetByIdAsync(id);
-            link.Status = !state ? Status.Available : Status.Unavailable;
-            bool b = await LinksService.SaveChangesAsync() > 0;
+            var b = await LinksService.GetQuery(m => m.Id == id).UpdateFromQueryAsync(m => new Links()
+            {
+                Status = m.Status == Status.Unavailable ? Status.Available : Status.Unavailable
+            }) > 0;
             return ResultData(null, b, b ? "切换成功！" : "切换失败！");
         }
     }
