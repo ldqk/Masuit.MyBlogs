@@ -29,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetMenus()
         {
-            var menus = MenuService.GetQuery(m => m.ParentId == null, m => m.ParentId).ThenBy(m => m.Sort).ToList();
+            var menus = MenuService.GetQuery(m => m.ParentId == null, m => m.Sort).ThenBy(m => m.Sort).ToList();
             return ResultData(Mapper.Map<List<MenuDto>>(menus));
         }
 
