@@ -424,7 +424,7 @@ function loadParentComments(data) {
     loading();
     var html = '';
 	if (data) {
-		var rows = Enumerable.From(data.rows).Where(function (c) {return c.ParentId === 0}).ToArray();
+		var rows = data.rows;
         var page = data.page;
         var size = data.size;
         var maxPage = Math.ceil(data.total / size);
@@ -442,7 +442,7 @@ function loadParentComments(data) {
                                     ${rows[i].Content} 
                                     <span class="cmvote label label-info" data-id="${rows[i].Id}"><i class="icon-thumbsup"></i>(<span>${rows[i].VoteCount}</span>)</span>
                                     <a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
-                                    ${loadComments(data.rows, Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.CommentDate).ToArray(), startfloor--)}
+                                    ${loadComments(rows[i].Children)}
                                 </div>
                             </article>
                         </div>
@@ -454,13 +454,13 @@ function loadParentComments(data) {
 }
 
 //加载子楼层
-function loadComments(data, comments, root, depth = 0) {
+function loadComments(comments, depth = 0) {
     var colors = ["info", "success", "primary", "warning", "danger"];
     var floor = 1;
     depth++;
     var html = '';
-    Enumerable.From(comments).ForEach(function(item, index) {
-	    var color = colors[depth%5];
+    for (let item of comments) {
+        var color = colors[depth%5];
 		html += `<article id="${item.Id}" class="panel panel-${color}">
                         <div class="panel-heading">
                             ${depth}-${floor++}# ${item.IsMaster ?`<i class="icon icon-user"></i>`:""}${item.NickName}${item.IsMaster ?`(管理员)`:""} | ${item.CommentDate}
@@ -470,9 +470,9 @@ function loadComments(data, comments, root, depth = 0) {
                             ${item.Content} 
                             <span class="cmvote label label-${color}" data-id="${item.Id}"><i class="icon-thumbsup"></i>(<span>${item.VoteCount}</span>)</span>
                             <a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
-                            ${loadComments(data, Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.CommentDate), root, depth)}
+                            ${loadComments(item.Children, depth)}
                         </div>
                     </article>`;
-    });
+    }
     return html;
 }

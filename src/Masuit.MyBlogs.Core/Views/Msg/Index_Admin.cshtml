@@ -95,7 +95,7 @@
         loading();
         var html = '';
 		if (data) {
-            var rows = Enumerable.From(data.rows).Where(c => c.ParentId === 0).ToArray();
+            var rows = data.rows;
             var page = data.page;
             var size = data.size;
             var maxPage = Math.ceil(data.total / size);
@@ -119,7 +119,7 @@
                                         <div class="pull-right">
                                             <span class="label label-success" onclick="bounceEmail('${rows[i].Email}')">${rows[i].Email}</span>
                                         </div><br/>
-                                        ${loadMsgs(data.rows, Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.PostDate).ToArray(), startfloor--)}
+                                        ${loadMsgs(rows[i].Children)}
                                     </div>
                                 </article>
                             </div>
@@ -131,17 +131,17 @@
     }
 
     //加载子楼层
-    function loadMsgs(data, msg, root, depth = 0) {
+    function loadMsgs(msg, depth = 0) {
         var colors = ["info", "success", "primary", "warning", "danger"];
         var floor = 1;
         depth++;
         var html = '';
-        Enumerable.From(msg).ForEach((item, index) => {
+        for (let item of msg) {
             var color = colors[depth % 5];
             html += `<article id="${item.Id}" class="panel panel-${color}">
                         <div class="panel-heading">
                             ${depth}-${floor++}# ${item.IsMaster ? `<i class="icon icon-user"></i>` : ""}${item.NickName}${item.IsMaster ? `(管理员)` : ""} | ${item.PostDate}
-                            <span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${item.Status == 4 ? `<a class="label label-success" onclick="pass(${item.Id})">通过</a> |`:""} <a class="label label-danger" onclick="del(${item.Id})">删除</a> | ${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span>
+                            <span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${item.Status == 4 ? `<a class="label label-success" onclick="pass(${item.Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${item.Id})">删除</a> | ${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span>
                         </div>
                         <div class="panel-body">
                             ${item.Content}
@@ -154,10 +154,10 @@
                             <div class="pull-right">
                                 <span class="label label-success" onclick="bounceEmail('${item.Email}')">${item.Email}</span>
                             </div><br/>
-                            ${loadMsgs(data, Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.PostDate), root, depth)}
+                            ${loadMsgs(item.Children, depth)}
                         </div>
                     </article>`;
-        });
+        }
         return html;
     }
 

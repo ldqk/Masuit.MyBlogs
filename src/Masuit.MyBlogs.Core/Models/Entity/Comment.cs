@@ -1,6 +1,8 @@
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Core.Validator;
+using Masuit.Tools.Models;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,12 +13,13 @@ namespace Masuit.MyBlogs.Core.Models.Entity
     /// 评论表
     /// </summary>
     [Table("Comment")]
-    public class Comment : BaseEntity
+    public class Comment : BaseEntity, ITreeChildren<Comment>, ITreeParent<Comment>
     {
         public Comment()
         {
             Status = Status.Pending;
             IsMaster = false;
+            Children = new List<Comment>();
         }
 
         /// <summary>
@@ -92,5 +95,15 @@ namespace Masuit.MyBlogs.Core.Models.Entity
 
         [ForeignKey("PostId")]
         public virtual Post Post { get; set; }
+
+        /// <summary>
+        /// 子级
+        /// </summary>
+        public virtual ICollection<Comment> Children { get; set; }
+
+        /// <summary>
+        /// 父节点
+        /// </summary>
+        public virtual Comment Parent { get; set; }
     }
 }

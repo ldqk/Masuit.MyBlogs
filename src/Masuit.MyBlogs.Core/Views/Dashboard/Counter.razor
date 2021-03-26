@@ -4,6 +4,7 @@
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools
 @using Masuit.Tools.Linq
+@using System.IO
 @inject IJSRuntime JS;
 
 <h3 class="text-center">
@@ -53,11 +54,11 @@
         </tr>
         <tr>
             <td>磁盘总空间</td>
-            <th>@SystemInfo.DiskTotalSpace().Select(kv => kv.Key + kv.Value).Join(" | ")</th>
+            <th>@DriveInfo.GetDrives().Select(kv => kv.Name + " " + (kv.TotalSize * 1.0 / 1073741824).ToDecimal(2) + "GB").Join(" | ")</th>
             <td>磁盘剩余空间</td>
-            <th>@SystemInfo.DiskFree().Select(kv => kv.Key + kv.Value).Join(" | ")</th>
+            <th>@DriveInfo.GetDrives().Select(kv => kv.Name + " " + (kv.TotalFreeSpace * 1.0 / 1073741824).ToDecimal(2) + "GB").Join(" | ")</th>
             <td>磁盘使用率</td>
-            <th>@SystemInfo.DiskUsage().Select(kv => kv.Key + kv.Value.ToString("P")).Join(" | ")</th>
+            <th>@DriveInfo.GetDrives().Select(kv => kv.Name + " " + (kv.AvailableFreeSpace * 1m / kv.TotalSize).ToString("P")).Join(" | ")</th>
         </tr>
         <tr>
             <td>MAC地址</td>

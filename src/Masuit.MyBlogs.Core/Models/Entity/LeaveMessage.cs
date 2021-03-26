@@ -1,7 +1,9 @@
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
 using Masuit.Tools.Core.Validator;
+using Masuit.Tools.Models;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,13 +14,14 @@ namespace Masuit.MyBlogs.Core.Models.Entity
     /// 留言板
     /// </summary>
     [Table("LeaveMessage")]
-    public class LeaveMessage : BaseEntity
+    public class LeaveMessage : BaseEntity, ITreeParent<LeaveMessage>, ITreeChildren<LeaveMessage>
     {
         public LeaveMessage()
         {
             PostDate = DateTime.Now;
             Status = Status.Pending;
             IsMaster = false;
+            Children = new List<LeaveMessage>();
         }
 
         /// <summary>
@@ -76,5 +79,15 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 地理信息
         /// </summary>
         public string Location { get; set; }
+
+        /// <summary>
+        /// 父节点
+        /// </summary>
+        public virtual LeaveMessage Parent { get; set; }
+
+        /// <summary>
+        /// 子级
+        /// </summary>
+        public virtual ICollection<LeaveMessage> Children { get; set; }
     }
 }

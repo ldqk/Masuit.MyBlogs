@@ -259,7 +259,7 @@ function loadParentMsgs(data) {
 	loading();
 	var html = '';
 	if (data) {
-		var rows = Enumerable.From(data.rows).Where(c => c.ParentId === 0).ToArray();
+		var rows = data.rows;
 		var page = data.page;
 		var size = data.size;
 		var maxPage = Math.ceil(data.total / size);
@@ -276,7 +276,7 @@ function loadParentMsgs(data) {
 									<div class="panel-body">
 										${rows[i].Content}
 										<a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
-										${loadMsgs(data.rows,Enumerable.From(data.rows).Where(c => c.ParentId === rows[i].Id).OrderBy(c => c.PostDate).ToArray(), startfloor--)}
+										${loadMsgs(rows[i].Children)}
 									</div>
 								</article>
 							</div>
@@ -288,13 +288,13 @@ function loadParentMsgs(data) {
 }
 
 //加载子楼层
-function loadMsgs(data, msg, root, depth = 0) {
+function loadMsgs(msg, depth = 0) {
 	var colors = ["info", "success", "primary", "warning", "danger"];
 	var floor = 1;
 	depth++;
 	var html = '';
-	Enumerable.From(msg).ForEach((item, index) => {
-		var color = colors[depth % 5];
+    for (let item of msg) {
+        var color = colors[depth % 5];
 		html += `<article id="${item.Id}" class="panel panel-${color}">
 						<div class="panel-heading">
 							${depth}-${floor++}# ${item.IsMaster ? `<i class="icon icon-user"></i>` : ""}${item.NickName}${item.IsMaster ? `(管理员)` : ""} | ${item.PostDate}<span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}
@@ -303,9 +303,9 @@ function loadMsgs(data, msg, root, depth = 0) {
 						<div class="panel-body">
 							${item.Content}
 							<a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
-							${loadMsgs(data,Enumerable.From(data).Where(c => c.ParentId === item.Id).OrderBy(c => c.PostDate),root, depth)}
+							${loadMsgs(item.Children, depth)}
 						</div>
 					</article>`;
-	});
+    }
 	return html;
 }

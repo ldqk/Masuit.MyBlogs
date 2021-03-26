@@ -13,6 +13,7 @@ using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
+using Masuit.Tools.Models;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -142,8 +143,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 else
                 {
                     //通知博主和上层所有关联的评论访客
-                    var pid = CommentService.GetParentCommentIdByChildId(comment.Id);
-                    emails.AddRange(CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).ToArray());
+                    var parent = await CommentService.GetByIdAsync(comment.ParentId);
+                    emails.AddRange(parent.Root().Flatten().Select(c => c.Email).ToArray());
                     emails.AddRange(post.Email, post.ModifierEmail);
                     emails.Remove(comment.Email);
                     string link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment";
@@ -197,40 +198,35 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetComments(int? id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, int cid = 0)
         {
-            int total; //总条数，用于前台分页
             if (cid != 0)
             {
-                int pid = CommentService.GetParentCommentIdByChildId(cid);
-                var single = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).ToList();
-                if (single.Any())
+                var comment = CommentService.GetById(cid) ?? throw new NotFoundException("评论未找到");
+                var single = new[] { comment.Root() };
+                foreach (var c in single.Flatten())
                 {
-                    total = 1;
-                    foreach (var c in single)
-                    {
-                        c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-                    }
-
-                    return ResultData(new
-                    {
-                        total,
-                        parentTotal = total,
-                        page,
-                        size,
-                        rows = single.Mapper<IList<CommentViewModel>>()
-                    });
+                    c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 }
+
+                return ResultData(new
+                {
+                    total = 1,
+                    parentTotal = 1,
+                    page,
+                    size,
+                    rows = single.Mapper<IList<CommentViewModel>>()
+                });
             }
-            var parent = CommentService.GetPagesNoTracking(page, size, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Published || CurrentUser.IsAdmin), c => c.CommentDate, false);
+
+            var parent = CommentService.GetPages(page, size, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Published || CurrentUser.IsAdmin), c => c.CommentDate, false);
             if (!parent.Data.Any())
             {
                 return ResultData(null, false, "没有评论");
             }
-            total = parent.TotalCount;
-            var result = parent.Data.SelectMany(c => CommentService.GetSelfAndAllChildrenCommentsByParentId(c.Id).Where(x => x.Status == Status.Published || CurrentUser.IsAdmin)).Select(c =>
+            int total = parent.TotalCount; //总条数，用于前台分页
+            parent.Data.Flatten().ForEach(c =>
             {
                 c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-                return c;
-            }).ToList();
+            });
             if (total > 0)
             {
                 return ResultData(new
@@ -239,9 +235,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                     parentTotal = total,
                     page,
                     size,
-                    rows = result.Mapper<IList<CommentViewModel>>()
+                    rows = parent.Data.Mapper<IList<CommentViewModel>>()
                 });
             }
+
             return ResultData(null, false, "没有评论");
         }
 
@@ -259,22 +256,23 @@ namespace Masuit.MyBlogs.Core.Controllers
             bool b = await CommentService.SaveChangesAsync() > 0;
             if (b)
             {
-                var pid = comment.ParentId == 0 ? comment.Id : CommentService.GetParentCommentIdByChildId(id);
                 var content = new Template(await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")))
                     .Set("title", post.Title)
                     .Set("time", DateTime.Now.ToTimeZoneF(HttpContext.Session.Get<string>(SessionKey.TimeZone)))
                     .Set("nickname", comment.NickName)
                     .Set("content", comment.Content);
-                var emails = CommentService.GetSelfAndAllChildrenCommentsByParentId(pid).Select(c => c.Email).Append(post.ModifierEmail).Except(new List<string> { comment.Email, CurrentUser.Email }).ToHashSet();
+                var root = comment.Root();
+                var emails = root.Flatten().Select(c => c.Email).Append(post.ModifierEmail).Except(new List<string> { comment.Email, CurrentUser.Email }).ToHashSet();
                 var link = Url.Action("Details", "Post", new
                 {
                     id = comment.PostId,
-                    cid = pid
+                    cid = root.Id
                 }, Request.Scheme) + "#comment";
                 foreach (var email in emails)
                 {
                     BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), email, ClientIP));
                 }
+
                 return ResultData(null, true, "审核通过！");
             }
 
@@ -289,7 +287,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Delete(int id)
         {
-            var b = CommentService.DeleteEntitiesSaved(CommentService.GetSelfAndAllChildrenCommentsByParentId(id).ToList());
+            var b = CommentService.DeleteByIdSaved(id);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 

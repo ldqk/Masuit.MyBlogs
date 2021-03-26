@@ -78,9 +78,9 @@ namespace Masuit.MyBlogs.Core
         public void ConfigureServices(IServiceCollection services)
         {
             RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
-            services.AddDbContext<DataContext>(opt =>
+            services.AddDbContextPool<DataContext>(opt =>
             {
-                opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(3)).EnableDetailedErrors();
+                opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(3)).EnableDetailedErrors().UseLazyLoadingProxies().UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
             }); //配置数据库
             services.ConfigureOptions();
             services.AddHttpsRedirection(options =>
