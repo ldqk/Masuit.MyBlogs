@@ -106,7 +106,6 @@ namespace Masuit.MyBlogs.Core.Extensions
             app.UseBundling(bundles =>
             {
                 bundles.AddCss("/main.css")
-                    .Include("/Content/bootstrap.min.css")
                     .Include("/fonts/icomoon.min.css")
                     .Include("/Content/jquery.paging.css")
                     .Include("/Content/common/reset.css")
