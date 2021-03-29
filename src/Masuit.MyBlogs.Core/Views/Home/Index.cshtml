@@ -61,7 +61,7 @@
         <a asp-controller="Notice" asp-action="Details" asp-route-id="@(Model.Notices.FirstOrDefault()?.Id)">
             <h3 class="size18 text-red text-center">网站最新公告</h3>
         </a>
-        @Html.Raw(Model.Notices.FirstOrDefault()?.Content.Replace("img src=", $"img title='{CommonHelper.SystemSettings["Title"]}' alt='{CommonHelper.SystemSettings["Title"]}' data-original="))
+        @Html.Raw(Model.Notices[0].Content.Replace("img src=", $"img title='{CommonHelper.SystemSettings["Title"]}' alt='{CommonHelper.SystemSettings["Title"]}' data-original="))
     </div>
 }
 @if (shares.Any())

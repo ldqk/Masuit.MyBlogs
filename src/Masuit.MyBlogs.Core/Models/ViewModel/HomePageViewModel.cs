@@ -19,12 +19,12 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 网站公告列表
         /// </summary>
-        public IList<NoticeDto> Notices { get; set; }
+        public List<NoticeDto> Notices { get; set; }
 
         /// <summary>
         /// 分类列表
         /// </summary>
-        public IList<CategoryDto> Categories { get; set; }
+        public List<CategoryDto> Categories { get; set; }
 
         /// <summary>
         /// 标签列表

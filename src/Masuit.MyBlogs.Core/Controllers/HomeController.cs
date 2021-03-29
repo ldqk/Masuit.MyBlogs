@@ -220,7 +220,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         private async Task<HomePageViewModel> GetIndexPageViewModel()
         {
             var postsQuery = PostService.GetQuery<PostDto>(p => p.Status == Status.Published); //准备文章的查询
-            var notices = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(1, 5, n => n.Status == Status.Display, n => n.ModifyDate, false); //加载前5条公告
+            var notices = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(1, 5, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false); //加载前5条公告
             var cats = await CategoryService.GetQueryFromCacheAsync<string, CategoryDto>(c => c.Status == Status.Available, c => c.Name); //加载分类目录
             var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList(); //热词统计
             var hot6Post = await postsQuery.OrderBy((new Random().Next() % 3) switch
