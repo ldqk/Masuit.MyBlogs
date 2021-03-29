@@ -61,12 +61,12 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     else
                     {
                         Directory.CreateDirectory(Path.GetDirectoryName(localPath));
-                        File.WriteAllBytes(localPath, stream.ToArray());
+                        await File.WriteAllBytesAsync(localPath, await stream.ToArrayAsync());
                         Result.Url = savePath;
                     }
                     Result.State = UploadState.Success;
                     stream.Close();
-                    stream.Dispose();
+                    await stream.DisposeAsync();
                 }
                 else
                 {

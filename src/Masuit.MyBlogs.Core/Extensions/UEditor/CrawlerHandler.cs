@@ -5,9 +5,7 @@ using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -19,8 +17,6 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
     /// </summary>
     public class CrawlerHandler : Handler
     {
-        private static readonly HashSet<string> _queue = new HashSet<string>();
-
         public CrawlerHandler(HttpContext context) : base(context)
         {
         }
@@ -34,20 +30,15 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 return WriteJson(new
                 {
                     state = "SUCCESS",
-                    list = (await sources.Except(_queue).AsParallel().SelectAsync(s =>
+                    list = (await sources.SelectAsync(s =>
                     {
-                        _queue.Add(s);
-                        return new Crawler(s).Fetch();
-                    })).Select(x =>
-                    {
-                        _queue.Remove(x.SourceUrl);
-                        return new
+                        return new Crawler(s).Fetch().ContinueWith(t => new
                         {
-                            state = x.State,
-                            source = x.SourceUrl,
-                            url = x.ServerUrl
-                        };
-                    })
+                            state = t.Result.State,
+                            source = t.Result.SourceUrl,
+                            url = t.Result.ServerUrl
+                        });
+                    }))
                 });
             }
 
@@ -63,7 +54,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
         public string SourceUrl { get; set; }
         public string ServerUrl { get; set; }
         public string State { get; set; }
-        private readonly HttpClient _httpClient = new HttpClient(new HttpClientHandler()
+        private static readonly HttpClient HttpClient = new(new HttpClientHandler()
         {
             ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
         });
@@ -82,16 +73,16 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             }
             try
             {
-                using var response = await _httpClient.GetAsync(SourceUrl);
+                using var response = await HttpClient.GetAsync(SourceUrl);
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    State = "Url returns " + response.StatusCode;
+                    State = "远程地址返回了错误的状态吗：" + response.StatusCode;
                     return this;
                 }
 
-                ServerUrl = PathFormatter.Format(Path.GetFileNameWithoutExtension(SourceUrl), CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\') + UeditorConfig.GetString("catcherPathFormat")) + MimeMapper.ExtTypes[response.Content.Headers.ContentType?.MediaType ?? "image/jpeg"];
+                ServerUrl = PathFormatter.Format(Path.GetFileNameWithoutExtension(SourceUrl), CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload") + UeditorConfig.GetString("catcherPathFormat")) + MimeMapper.ExtTypes[response.Content.Headers.ContentType?.MediaType ?? "image/jpeg"];
                 await using var stream = await response.Content.ReadAsStreamAsync();
-                var savePath = Path.Combine(AppContext.BaseDirectory + "wwwroot", ServerUrl);
+                var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
                 var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath, default);
                 if (success)
                 {
