@@ -86,12 +86,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "开始时间不能小于结束时间");
             }
 
+            notice.NoticeStatus = NoticeStatus.Normal;
             if (DateTime.Now < notice.StartTime)
             {
                 notice.NoticeStatus = NoticeStatus.UnStart;
             }
 
-            Notice e = NoticeService.AddEntitySaved(notice);
+            var e = NoticeService.AddEntitySaved(notice);
             return e != null ? ResultData(null, message: "发布成功") : ResultData(null, false, "发布失败");
         }
 
