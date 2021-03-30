@@ -131,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Check(string link)
         {
             HttpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-            return await HttpClient.GetAsync(link, new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token).ContinueWith(t =>
+            return await HttpClient.GetAsync(link, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token).ContinueWith(t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {
