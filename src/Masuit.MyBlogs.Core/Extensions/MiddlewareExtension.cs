@@ -130,7 +130,6 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/fonts/icomoon.min.css")
                     .Include("/Assets/jedate/jedate.css")
                     .Include("/Assets/fileupload/filestyle.min.css")
-                    .Include("/Assets/select3/bundle.min.css")
                     .Include("/Content/ng-table.min.css")
                     .Include("/Content/common/loading.min.css")
                     .Include("/Content/microtip.min.css")
