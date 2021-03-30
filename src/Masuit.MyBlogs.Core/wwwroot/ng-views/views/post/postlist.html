@@ -51,11 +51,14 @@
             <td data-title="'阅读'">
                 {{row.ViewCount}}
             </td>
+            <td data-title="'在看'">
+                {{row.Online}}
+            </td>
             <td data-title="'发表'">
-                {{row.PostDate|date:'yyyy-MM-dd HH:mm:ss'}}
+                {{row.PostDate|date:'yyyy-MM-dd HH:mm'}}
             </td>
             <td data-title="'修改'">
-                {{row.ModifyDate|date:'yyyy-MM-dd HH:mm:ss'}}
+                {{row.ModifyDate|date:'yyyy-MM-dd HH:mm'}}
             </td>
             <td title="'修改次数'">
                 {{row.ModifyCount}}
@@ -63,7 +66,7 @@
             <td data-title="'分类'">
                 {{row.CategoryName}}
             </td>
-            <td data-title="'标签'">
+            <td data-title="'标签'" style="max-width: 160px;">
                 {{row.Label}}
             </td>
             <td data-title="'支持'">

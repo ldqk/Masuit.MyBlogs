@@ -13,10 +13,12 @@
 
     protected override void OnInitialized()
     {
-        online = CacheManager.AddOrUpdate("postOnline:" + Id, 1u, i => i + 1);
+        var key = nameof(PostOnline) + ":" + Id;
+        online = CacheManager.AddOrUpdate(key, 1u, i => i + 1, 3);
+        CacheManager.Expire(key, ExpirationMode.Sliding, TimeSpan.FromMinutes(5));
         _timer = new Timer(_ =>
         {
-            online = CacheManager.Get("postOnline:" + Id);
+            online = CacheManager.Get(key);
             InvokeAsync(StateHasChanged);
         }, null, 0, 1000);
     }
@@ -25,7 +27,7 @@
     /// <returns>一个表示异步释放操作的任务。</returns>
     public ValueTask DisposeAsync()
     {
-        online = CacheManager.AddOrUpdate("postOnline:" + Id, 1u, i =>
+        online = CacheManager.AddOrUpdate(nameof(PostOnline) + ":" + Id, 1u, i =>
         {
             try
             {

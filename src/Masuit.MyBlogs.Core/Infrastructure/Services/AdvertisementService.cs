@@ -42,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public List<Advertisement> GetsByWeightedPrice(int count, AdvertiseType type, int? cid = null)
         {
-            return CacheManager.GetOrAdd($"{count}{type}{cid}", _ =>
+            return CacheManager.GetOrAdd($"{type}:{count}-{cid}", _ =>
             {
                 Expression<Func<Advertisement, bool>> where = a => a.Types.Contains(type.ToString("D")) && a.Status == Status.Available;
                 if (cid.HasValue)
@@ -53,9 +53,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                         where = where.And(a => a.CategoryIds.Contains(scid) || string.IsNullOrEmpty(a.CategoryIds));
                     }
                 }
+
                 var list = GetQuery(where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, a.CategoryIds is { Length: > 0 } ? (int)a.Price * 2 : (int)a.Price)).WeightedItems(count);
                 var ids = list.Select(a => a.Id).ToArray();
-                GetQuery(a => ids.Contains(a.Id)).UpdateFromQuery(a => new Advertisement()
+                GetQuery(a => ids.Contains(a.Id)).UpdateFromQueryAsync(a => new Advertisement()
                 {
                     DisplayCount = a.DisplayCount + 1
                 });

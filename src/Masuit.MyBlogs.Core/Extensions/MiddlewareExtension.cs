@@ -27,7 +27,9 @@ namespace Masuit.MyBlogs.Core.Extensions
         public static IServiceCollection AddCacheConfig(this IServiceCollection services)
         {
             services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
-            services.AddSingleton(new ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5)).Build());
+            services.AddSingleton(new ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5))
+                .And
+                .WithRedisConfiguration("redis", AppConfig.Redis).WithMaxRetries(50).WithRetryTimeout(100).WithRedisCacheHandle("redis").WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5)).Build());
             return services;
         }
 

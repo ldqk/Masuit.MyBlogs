@@ -71,5 +71,9 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// </summary>
         public bool DisableCopy { get; set; }
 
+        /// <summary>
+        /// 同时浏览人数
+        /// </summary>
+        public uint Online { get; set; }
     }
 }
