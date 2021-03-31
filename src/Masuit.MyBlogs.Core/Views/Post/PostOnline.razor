@@ -1,46 +1,44 @@
 ﻿@using CacheManager.Core
 @using System.Threading
+@using Masuit.MyBlogs.Core.Common
 @implements IAsyncDisposable
-@inject ICacheManager<uint> CacheManager
+@inject ICacheManager<HashSet<string>> CacheManager
 
 <span class="text-red">@online</span>人正在浏览本文
 
 @code {
     [Parameter]
     public int Id { get; set; }
-    uint online;
+
+    [Parameter]
+    public string IP { get; set; }
+
+    int online;
     Timer _timer;
 
     protected override void OnInitialized()
     {
         var key = nameof(PostOnline) + ":" + Id;
-        online = CacheManager.AddOrUpdate(key, 1u, i => i + 1, 3);
+        online = CacheManager.AddOrUpdate(key, new HashSet<string>(), set =>
+        {
+            set.Add(IP);
+            return set;
+        }, 3).Count;
         CacheManager.Expire(key, ExpirationMode.Sliding, TimeSpan.FromMinutes(5));
         _timer = new Timer(_ =>
         {
-            online = CacheManager.Get(key);
+            online = CacheManager.Get(key).Count;
             InvokeAsync(StateHasChanged);
         }, null, 0, 1000);
     }
 
-    /// <summary>以异步方式执行与释放或重置非托管资源相关的应用程序定义的任务。</summary>
-    /// <returns>一个表示异步释放操作的任务。</returns>
     public ValueTask DisposeAsync()
     {
-        online = CacheManager.AddOrUpdate(nameof(PostOnline) + ":" + Id, 1u, i =>
+        online = CacheManager.AddOrUpdate(nameof(PostOnline) + ":" + Id, new HashSet<string>(), set =>
         {
-            try
-            {
-                checked
-                {
-                    return i - 1;
-                }
-            }
-            catch
-            {
-                return 0;
-            }
-        });
+            set.Remove(IP);
+            return set;
+        }).Count;
         return _timer.DisposeAsync();
     }
 }

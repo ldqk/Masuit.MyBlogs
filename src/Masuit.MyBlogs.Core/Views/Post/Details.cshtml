@@ -85,7 +85,7 @@
                                 <div class="col-md-12 line-height24">
                                     分类：<i class="icon-map-pin"></i>
                                     <a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId" class="label label-info">@Model.Category.Name</a>
-                                    | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃ | @(await Html.RenderComponentAsync<PostOnline>(RenderMode.ServerPrerendered, new { Model.Id }))
+                                    | 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃ | @(await Html.RenderComponentAsync<PostOnline>(RenderMode.ServerPrerendered, new{ Model.Id,IP=Context.Connection.RemoteIpAddress.ToString()}))
                                     @if (Model.Seminar.Any())
                                     {
                                         <span> | 所属专题：</span>

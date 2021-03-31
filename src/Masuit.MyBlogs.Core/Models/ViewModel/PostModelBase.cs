@@ -11,5 +11,11 @@
         /// 标题
         /// </summary>
         public string Title { get; set; }
+
+        /// <summary>
+        /// 浏览次数
+        /// </summary>
+        public int ViewCount { get; set; }
+
     }
 }

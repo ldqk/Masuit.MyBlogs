@@ -25,7 +25,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public virtual DataContext DataContext { get; set; }
 
         public MapperConfiguration MapperConfig { get; set; }
-        public static MemoryCacheEntryOptions CacheOtions => new MemoryCacheEntryOptions()
+        public static MemoryCacheEntryOptions CacheOptions => new MemoryCacheEntryOptions()
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
         };
@@ -54,7 +54,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetAllFromCache()
         {
-            return DataContext.Set<T>().FromCache(CacheOtions);
+            return DataContext.Set<T>().FromCache(CacheOptions);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public Task<IEnumerable<T>> GetAllFromCacheAsync()
         {
-            return DataContext.Set<T>().FromCacheAsync(CacheOtions);
+            return DataContext.Set<T>().FromCacheAsync(CacheOptions);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetAllFromCache<TDto>() where TDto : class
         {
-            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCache(CacheOtions);
+            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCache(CacheOptions);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public Task<IEnumerable<TDto>> GetAllFromCacheAsync<TDto>() where TDto : class
         {
-            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCacheAsync(CacheOtions);
+            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCacheAsync(CacheOptions);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return GetAll(orderby, isAsc).FromCache(CacheOtions);
+            return GetAll(orderby, isAsc).FromCache(CacheOptions);
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public Task<IEnumerable<T>> GetAllFromCacheAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return GetAll(orderby, isAsc).FromCacheAsync(CacheOtions);
+            return GetAll(orderby, isAsc).FromCacheAsync(CacheOptions);
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
         {
-            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache(CacheOtions);
+            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache(CacheOptions);
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public Task<IEnumerable<TDto>> GetAllFromCacheAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCacheAsync(CacheOtions);
+            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCacheAsync(CacheOptions);
         }
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetQueryFromCache(Expression<Func<T, bool>> where)
         {
-            return DataContext.Set<T>().Where(where).FromCache(CacheOtions);
+            return DataContext.Set<T>().Where(where).FromCache(CacheOptions);
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public Task<IEnumerable<T>> GetQueryFromCacheAsync(Expression<Func<T, bool>> @where)
         {
-            return DataContext.Set<T>().Where(where).FromCacheAsync(CacheOtions);
+            return DataContext.Set<T>().Where(where).FromCacheAsync(CacheOptions);
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return GetQuery(where, orderby, isAsc).FromCache(CacheOtions);
+            return GetQuery(where, orderby, isAsc).FromCache(CacheOptions);
         }
 
         /// <summary>
@@ -249,7 +249,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public Task<IEnumerable<T>> GetQueryFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return GetQuery(where, orderby, isAsc).FromCacheAsync(CacheOtions);
+            return GetQuery(where, orderby, isAsc).FromCacheAsync(CacheOptions);
         }
 
         /// <summary>
@@ -263,7 +263,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public Task<IEnumerable<TDto>> GetQueryFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return GetQueryNoTracking(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCacheAsync(CacheOtions);
+            return GetQueryNoTracking(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCacheAsync(CacheOptions);
         }
 
         /// <summary>
@@ -320,7 +320,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体集合</returns>
         public virtual IEnumerable<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class
         {
-            return DataContext.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCache(CacheOtions);
+            return DataContext.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCache(CacheOptions);
         }
 
         /// <summary>
@@ -330,7 +330,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public Task<IEnumerable<TDto>> GetQueryFromCacheAsync<TDto>(Expression<Func<T, bool>> @where) where TDto : class
         {
-            return DataContext.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCacheAsync(CacheOtions);
+            return DataContext.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FromCacheAsync(CacheOptions);
         }
 
         /// <summary>
@@ -344,7 +344,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual IEnumerable<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
         {
-            return GetQueryNoTracking(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache(CacheOtions);
+            return GetQueryNoTracking(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache(CacheOptions);
         }
 
         /// <summary>
@@ -925,7 +925,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
                 page = 1;
             }
 
-            var list = query.Skip(size * (page - 1)).Take(size).FromCache(BaseRepository<T>.CacheOtions).ToList();
+            var list = query.Skip(size * (page - 1)).Take(size).FromCache(BaseRepository<T>.CacheOptions).ToList();
             return new PagedList<T>(list, page, size, totalCount);
         }
 
@@ -950,7 +950,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
                 page = 1;
             }
 
-            var list = await query.Skip(size * (page - 1)).Take(size).FromCacheAsync(BaseRepository<T>.CacheOtions);
+            var list = await query.Skip(size * (page - 1)).Take(size).FromCacheAsync(BaseRepository<T>.CacheOptions);
             return new PagedList<T>(list.ToList(), page, size, totalCount);
         }
 
@@ -1031,7 +1031,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
                 page = 1;
             }
 
-            var list = query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).FromCache(BaseRepository<T>.CacheOtions).ToList();
+            var list = query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).FromCache(BaseRepository<T>.CacheOptions).ToList();
             return new PagedList<TDto>(list, page, size, totalCount);
         }
 
@@ -1058,7 +1058,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
                 page = 1;
             }
 
-            var list = await query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).FromCacheAsync(BaseRepository<T>.CacheOtions);
+            var list = await query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).FromCacheAsync(BaseRepository<T>.CacheOptions);
             return new PagedList<TDto>(list.ToList(), page, size, totalCount);
         }
     }

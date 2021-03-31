@@ -3,11 +3,11 @@
 @using Masuit.Tools.Systems
 @using CacheManager.Core
 @using Masuit.MyBlogs.Core.Views.Post
-@inject ICacheManager<uint> CacheManager
+@inject ICacheManager<HashSet<string>> CacheManager
 @model Masuit.MyBlogs.Core.Models.DTO.PostDto
 @{
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
-    var online = CacheManager[nameof(PostOnline) + ":" + Model.Id];
+    var online = CacheManager.GetOrAdd(nameof(PostOnline) + ":" + Model.Id, new HashSet<string>()).Count;
 }
 
 <div class="ibox wow fadeIn">

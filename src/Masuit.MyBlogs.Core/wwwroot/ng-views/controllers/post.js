@@ -24,6 +24,17 @@
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 		}
 	});
+	$http.post("/post/Statistic").then(function(res) {
+		if(res.data.Success) {
+			$scope.agg = res.data.Data;
+		} else {
+			window.notie.alert({
+				type:3,
+				text:res.data.Message,
+				time:4
+			});
+		}
+	});
 
 	$http.post("/category/getcategories", null).then(function (res) {
 		var data = res.data;

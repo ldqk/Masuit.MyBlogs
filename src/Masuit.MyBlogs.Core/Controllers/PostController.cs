@@ -1,4 +1,5 @@
-﻿using CacheManager.Core;
+﻿using AngleSharp.Text;
+using CacheManager.Core;
 using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
@@ -29,6 +30,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -36,6 +38,7 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Z.EntityFramework.Plus;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -651,7 +654,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPageData([FromServices] ICacheManager<uint> cacheManager, [Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
+        public ActionResult GetPageData([FromServices] ICacheManager<HashSet<string>> cacheManager, [Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
         {
             Expression<Func<Post, bool>> where = p => true;
             if (cid.HasValue)
@@ -669,7 +672,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-                item.Online = cacheManager.Get(nameof(PostOnline) + ":" + item.Id);
+                item.Online = cacheManager.GetOrAdd(nameof(PostOnline) + ":" + item.Id, new HashSet<string>()).Count;
             }
 
             return Ok(list);
@@ -986,6 +989,47 @@ namespace Masuit.MyBlogs.Core.Controllers
             }) > 0;
             return b ? ResultData(null, true, "操作成功！") : ResultData(null, false, "操作失败！");
         }
+
+        /// <summary>
+        /// 文章统计
+        /// </summary>
+        /// <returns></returns>
+        [MyAuthorize]
+        public async Task<IActionResult> Statistic()
+        {
+            var keys = await RedisHelper.KeysAsync(nameof(PostOnline) + ":*");
+            var sets = await keys.SelectAsync(async s => (Id: s.Split(':')[1].ToInt32(), Clients: await RedisHelper.HGetAsync<HashSet<string>>(s, "value")));
+            var ids = sets.Where(t => t.Clients.Count > 0).OrderByDescending(t => t.Clients.Count).Take(10).Select(t => t.Id).ToArray();
+            var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).FromCacheAsync().ContinueWith(t =>
+            {
+                foreach (var item in t.Result)
+                {
+                    item.ViewCount = sets.FirstOrDefault(t => t.Id == item.Id).Clients.Count;
+                }
+
+                return t.Result.OrderByDescending(p => p.ViewCount);
+            });
+            var postsQuery = PostService.GetQuery(p => p.Status == Status.Published);
+            var mostView = await postsQuery.OrderByDescending(p => p.TotalViewCount).Take(10).Select(p => new PostModelBase()
+            {
+                Id = p.Id,
+                Title = p.Title,
+                ViewCount = p.TotalViewCount
+            }).FromCacheAsync();
+            var mostAverage = await postsQuery.OrderByDescending(p => p.AverageViewCount).Take(10).Select(p => new PostModelBase()
+            {
+                Id = p.Id,
+                Title = p.Title,
+                ViewCount = (int)p.AverageViewCount
+            }).FromCacheAsync();
+            return ResultData(new
+            {
+                mostHots,
+                mostView,
+                mostAverage
+            });
+        }
+
         #endregion
     }
 }

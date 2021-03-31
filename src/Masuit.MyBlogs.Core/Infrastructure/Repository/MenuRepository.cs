@@ -42,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public override IEnumerable<Menu> GetQueryFromCache(Expression<Func<Menu, bool>> @where)
         {
-            return DataContext.Menu.Include(m => m.Children).ThenInclude(m => m.Children).ThenInclude(m => m.Children).Where(where).FromCache(CacheOtions);
+            return DataContext.Menu.Include(m => m.Children).ThenInclude(m => m.Children).ThenInclude(m => m.Children).Where(where).FromCache(CacheOptions);
         }
     }
 }
