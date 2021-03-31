@@ -270,7 +270,7 @@ function loadParentMsgs(data) {
 			html += `<li class="msg-list media animated fadeInRight" id='${rows[i].Id}'>
 						   <div class="media-body">
 								<article class="panel panel-info">
-									<header class="panel-heading">${startfloor}# ${rows[i].IsMaster? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows  [i].IsMaster ? `(管理员)` : ""} | ${rows[i].PostDate}
+									<header class="panel-heading">${startfloor--}# ${rows[i].IsMaster? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows  [i].IsMaster ? `(管理员)` : ""} | ${rows[i].PostDate}
 										<span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span>
 									</header>
 									<div class="panel-body">

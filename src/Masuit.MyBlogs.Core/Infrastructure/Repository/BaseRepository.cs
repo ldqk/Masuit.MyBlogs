@@ -608,6 +608,22 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
 
         /// <summary>
+        /// 高效分页查询方法
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public virtual Task<PagedList<T>> GetPagesAsync<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
+        {
+            var temp = DataContext.Set<T>().Where(where);
+            return isAsc ? temp.OrderBy(orderby).ToPagedListAsync(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToPagedListAsync(pageIndex, pageSize);
+        }
+
+        /// <summary>
         /// 高效分页查询方法，优先从二级缓存读取
         /// </summary>
         /// <typeparam name="TS"></typeparam>
@@ -633,7 +649,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public Task<PagedList<T>> GetPagesFromCacheAsync<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
+        public virtual Task<PagedList<T>> GetPagesFromCacheAsync<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
         {
             var temp = DataContext.Set<T>().Where(where);
             return isAsc ? temp.OrderBy(orderby).ToCachedPagedListAsync(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToCachedPagedListAsync(pageIndex, pageSize);
@@ -687,6 +703,23 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             var temp = DataContext.Set<T>().Where(where).AsNoTracking();
             return isAsc ? temp.OrderBy(orderby).ToPagedList<T, TDto>(pageIndex, pageSize, MapperConfig) : temp.OrderByDescending(orderby).ToPagedList<T, TDto>(pageIndex, pageSize, MapperConfig);
+        }
+
+        /// <summary>
+        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合
+        /// </summary>
+        /// <typeparam name="TS"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="pageIndex">第几页</param>
+        /// <param name="pageSize">每页大小</param>
+        /// <param name="where">where Lambda条件表达式</param>
+        /// <param name="orderby">orderby Lambda条件表达式</param>
+        /// <param name="isAsc">升序降序</param>
+        /// <returns>还未执行的SQL语句</returns>
+        public Task<PagedList<TDto>> GetPagesAsync<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc) where TDto : class
+        {
+            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
+            return isAsc ? temp.OrderBy(orderby).ToPagedListAsync<T, TDto>(pageIndex, pageSize, MapperConfig) : temp.OrderByDescending(orderby).ToPagedListAsync<T, TDto>(pageIndex, pageSize, MapperConfig);
         }
 
         /// <summary>
@@ -945,6 +978,33 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
             }
 
             var list = query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).ToList();
+            return new PagedList<TDto>(list, page, size, totalCount);
+        }
+
+        /// <summary>
+        /// 生成分页集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="page">当前页</param>
+        /// <param name="size">页大小</param>
+        /// <param name="mapper"></param>
+        /// <returns></returns>
+        public static async Task<PagedList<TDto>> ToPagedListAsync<T, TDto>(this IOrderedQueryable<T> query, int page, int size, MapperConfiguration mapper)
+        {
+            var totalCount = await query.CountAsync();
+            if (page * size > totalCount)
+            {
+                page = (int)Math.Ceiling(totalCount / (size * 1.0));
+            }
+
+            if (page <= 0)
+            {
+                page = 1;
+            }
+
+            var list = await query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).ToListAsync();
             return new PagedList<TDto>(list, page, size, totalCount);
         }
 

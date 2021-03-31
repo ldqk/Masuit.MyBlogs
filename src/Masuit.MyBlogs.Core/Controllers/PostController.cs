@@ -67,8 +67,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Keyword = post.Keyword + "," + post.Label;
             ViewBag.Desc = post.Content.GetSummary(200);
             var modifyDate = post.ModifyDate;
-            ViewBag.Next = PostService.GetFromCache<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate);
-            ViewBag.Prev = PostService.GetFromCache<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate, false);
+            ViewBag.Next = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate);
+            ViewBag.Prev = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate, false);
             if (!string.IsNullOrEmpty(kw))
             {
                 ViewData["keywords"] = post.Content.Contains(kw) ? $"['{kw}']" : SearchEngine.LuceneIndexSearcher.CutKeywords(kw).ToJsonString();
@@ -163,7 +163,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             CheckPermission(post);
             ViewBag.Primary = post;
-            var list = PostHistoryVersionService.GetPages(page, size, v => v.PostId == id, v => v.ModifyDate, false);
+            var list = await PostHistoryVersionService.GetPagesAsync(page, size, v => v.PostId == id, v => v.ModifyDate, false);
             foreach (var item in list.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -282,6 +282,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="post"></param>
         /// <param name="code"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Publish(PostCommand post, [Required(ErrorMessage = "验证码不能为空")] string code, CancellationToken cancellationToken)

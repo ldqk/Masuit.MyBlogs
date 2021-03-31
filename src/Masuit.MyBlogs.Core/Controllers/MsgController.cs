@@ -68,11 +68,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="cid"></param>
         /// <returns></returns>
-        public ActionResult GetMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, int cid = 0)
+        public async Task<ActionResult> GetMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, int cid = 0)
         {
             if (cid != 0)
             {
-                var message = LeaveMessageService.GetById(cid) ?? throw new NotFoundException("留言未找到");
+                var message = await LeaveMessageService.GetByIdAsync(cid) ?? throw new NotFoundException("留言未找到");
                 var single = new[] { message.Root() };
                 foreach (var m in single.Flatten())
                 {
@@ -89,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 });
             }
 
-            var parent = LeaveMessageService.GetPages(page, size, m => m.ParentId == 0 && (m.Status == Status.Published || CurrentUser.IsAdmin), m => m.PostDate, false);
+            var parent = await LeaveMessageService.GetPagesAsync(page, size, m => m.ParentId == 0 && (m.Status == Status.Published || CurrentUser.IsAdmin), m => m.PostDate, false);
             if (!parent.Data.Any())
             {
                 return ResultData(null, false, "没有留言");
@@ -261,9 +261,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPendingMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        public async Task<ActionResult> GetPendingMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            var list = LeaveMessageService.GetPages<DateTime, LeaveMessageDto>(page, size, m => m.Status == Status.Pending, l => l.PostDate, false);
+            var list = await LeaveMessageService.GetPagesAsync<DateTime, LeaveMessageDto>(page, size, m => m.Status == Status.Pending, l => l.PostDate, false);
             foreach (var m in list.Data)
             {
                 m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));

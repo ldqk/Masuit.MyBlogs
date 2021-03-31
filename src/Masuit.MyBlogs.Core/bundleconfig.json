@@ -1,56 +1,26 @@
 [
-  {
-    "outputFileName": "wwwroot/Scripts/publish/publish.min.js",
-    "inputFiles": [
-      "wwwroot/Scripts/publish/publish.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/Assets/UEditor/ueditor.all.min.js",
-    "inputFiles": [
-      "wwwroot/Assets/UEditor/ueditor.all.min.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/Scripts/global/leavemsg.min.js",
-    "inputFiles": [
-      "wwwroot/Scripts/global/leavemsg.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/Assets/jquery.tocify/jquery.tocify.min.css",
-    "inputFiles": [
-      "wwwroot/Assets/jquery.tocify/jquery.tocify.css"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/Assets/banner/bootstrap-touch-slider.min.css",
-    "inputFiles": [
-      "wwwroot/Assets/banner/bootstrap-touch-slider.css"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/Assets/UEditor/ueditor.config.front.min.js",
-    "inputFiles": [
-      "wwwroot/Assets/UEditor/ueditor.config.front.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/Assets/UEditor/ueditor.config.admin.min.js",
-    "inputFiles": [
-      "wwwroot/Assets/UEditor/ueditor.config.admin.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/Assets/jedate/jedate.min.css",
-    "inputFiles": [
-      "wwwroot/Assets/jedate/jedate.css"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/Scripts/global/article.min.js",
-    "inputFiles": [
-      "wwwroot/Scripts/global/article.js"
-    ]
-  }
+    {
+        "outputFileName": "wwwroot/Assets/UEditor/ueditor.all.min.js",
+        "inputFiles": [
+            "wwwroot/Assets/UEditor/ueditor.all.min.js"
+        ]
+    },
+    {
+        "outputFileName": "wwwroot/Assets/UEditor/ueditor.config.front.min.js",
+        "inputFiles": [
+            "wwwroot/Assets/UEditor/ueditor.config.front.js"
+        ]
+    },
+    {
+        "outputFileName": "wwwroot/Assets/UEditor/ueditor.config.admin.min.js",
+        "inputFiles": [
+            "wwwroot/Assets/UEditor/ueditor.config.admin.js"
+        ]
+    },
+    {
+        "outputFileName": "wwwroot/Assets/jedate/jedate.min.css",
+        "inputFiles": [
+            "wwwroot/Assets/jedate/jedate.css"
+        ]
+    }
 ]

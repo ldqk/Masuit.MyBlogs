@@ -196,11 +196,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="cid"></param>
         /// <returns></returns>
-        public ActionResult GetComments(int? id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, int cid = 0)
+        public async Task<ActionResult> GetComments(int? id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, int cid = 0)
         {
             if (cid != 0)
             {
-                var comment = CommentService.GetById(cid) ?? throw new NotFoundException("评论未找到");
+                var comment = await CommentService.GetByIdAsync(cid) ?? throw new NotFoundException("评论未找到");
                 var single = new[] { comment.Root() };
                 foreach (var c in single.Flatten())
                 {
@@ -217,7 +217,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 });
             }
 
-            var parent = CommentService.GetPages(page, size, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Published || CurrentUser.IsAdmin), c => c.CommentDate, false);
+            var parent = await CommentService.GetPagesAsync(page, size, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Published || CurrentUser.IsAdmin), c => c.CommentDate, false);
             if (!parent.Data.Any())
             {
                 return ResultData(null, false, "没有评论");
@@ -296,9 +296,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPendingComments([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        public async Task<ActionResult> GetPendingComments([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            var pages = CommentService.GetPages<DateTime, CommentDto>(page, size, c => c.Status == Status.Pending, c => c.CommentDate, false);
+            var pages = await CommentService.GetPagesAsync<DateTime, CommentDto>(page, size, c => c.Status == Status.Pending, c => c.CommentDate, false);
             foreach (var item in pages.Data)
             {
                 item.CommentDate = item.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));

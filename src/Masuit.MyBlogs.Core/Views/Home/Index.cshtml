@@ -12,7 +12,7 @@
     List<FastShare> shares = ViewBag.FastShare;
     Context.Request.Path = new PathString("/posts");
 }
-<link href="~/Assets/banner/bootstrap-touch-slider.min.css" rel="stylesheet" />
+<link href="~/Assets/banner/bootstrap-touch-slider.css" rel="stylesheet" />
 @if (Model.Banner.Any())
 {
     <div id="bootstrap-touch-slider" class="carousel bs-slider fade  control-round indicators-line" data-ride="carousel" data-pause="hover" data-interval="5000" id="@Stopwatch.GetTimestamp()">

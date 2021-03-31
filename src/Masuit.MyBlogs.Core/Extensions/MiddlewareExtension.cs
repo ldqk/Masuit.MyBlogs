@@ -136,7 +136,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Content/checkbox.min.css")
                     .Include("/ng-views/css/app.css");
                 bundles.AddCss("/article.css")
-                    .Include("/Assets/jquery.tocify/jquery.tocify.min.css")
+                    .Include("/Assets/jquery.tocify/jquery.tocify.css")
                     .Include("/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css")
                     .Include("/Assets/highlight/css/highlight.css");
 

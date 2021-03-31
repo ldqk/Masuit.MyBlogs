@@ -19,7 +19,7 @@
 }
 <script src="https://cdn.staticfile.org/jqueryui/1.12.1/jquery-ui.min.js" async defer></script>
 <environment names="Development">
-    <link href="~/Assets/jquery.tocify/jquery.tocify.min.css" rel="stylesheet" />
+    <link href="~/Assets/jquery.tocify/jquery.tocify.css" rel="stylesheet" />
     <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
     <link href="~/Assets/highlight/css/highlight.css" rel="stylesheet" />
     <script src="/Assets/highlight/js/highlight.js"></script>
@@ -423,7 +423,7 @@
 				html += `<li class="msg-list media animated fadeInRight" id='${rows[i].Id}'>
                             <div class="media-body">
                                 <article class="panel panel-info">
-                                    <header class="panel-heading">${startfloor}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""} | ${rows[i].CommentDate}
+                                    <header class="panel-heading">${startfloor--}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""} | ${rows[i].CommentDate}
                                         <span class="pull-right" style="font-size: 10px;">${rows[i].Status == 4 ? `<a class="label label-success" onclick="pass(${rows[i].Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${rows[i].Id})">删除</a> | ${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span>
                                     </header>
                                     <div class="panel-body">

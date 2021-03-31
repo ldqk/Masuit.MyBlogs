@@ -10,7 +10,6 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Html;
-using Microsoft.EntityFrameworkCore;
 using PanGu;
 using PanGu.HighLight;
 using System;
@@ -150,16 +149,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             }
 
             return searchOptions;
-        }
-
-        /// <summary>
-        /// 获取第一条数据，优先从缓存读取
-        /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns>实体</returns>
-        public override Task<Post> GetAsync(Expression<Func<Post, bool>> @where)
-        {
-            return SearchEngine.Context.Post.Include(p => p.Category).Include(p => p.Seminar).FirstOrDefaultAsync(@where);
         }
 
         /// <summary>

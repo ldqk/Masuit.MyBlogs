@@ -26,13 +26,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Include="wwwroot\drive\js\app.8b25141a.js" />
-      <None Include="wwwroot\drive\js\app.8b25141a.js.map" />
-      <None Include="wwwroot\drive\js\chunk-vendors.b37660ae.js" />
-      <None Include="wwwroot\drive\js\chunk-vendors.b37660ae.js.map" />
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\..\..\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine.csproj" />
         <ProjectReference Include="..\..\..\Masuit.Tools\Masuit.Tools.Core\Masuit.Tools.Core.csproj" />
     </ItemGroup>
