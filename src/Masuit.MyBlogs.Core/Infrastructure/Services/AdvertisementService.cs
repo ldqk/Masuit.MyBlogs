@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
 
                 var list = GetQuery(where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, a.CategoryIds is { Length: > 0 } ? (int)a.Price * 2 : (int)a.Price)).WeightedItems(count);
                 var ids = list.Select(a => a.Id).ToArray();
-                GetQuery(a => ids.Contains(a.Id)).UpdateFromQueryAsync(a => new Advertisement()
+                GetQuery(a => ids.Contains(a.Id)).UpdateFromQuery(a => new Advertisement()
                 {
                     DisplayCount = a.DisplayCount + 1
                 });

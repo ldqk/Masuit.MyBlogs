@@ -14,8 +14,11 @@ using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure;
+using Masuit.MyBlogs.Core.Models.DTO;
+using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Config;
+using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -143,13 +146,12 @@ namespace Masuit.MyBlogs.Core
             app.UseBundles();
             app.SetupHttpsRedirection(Configuration);
             app.UseDefaultFiles().UseStaticFiles();
-            app.UseSession().UseCookiePolicy().UseMiniProfiler(); //注入Session
+            app.UseSession().UseCookiePolicy(); //注入Session
+            app.UseWhen(c => c.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true, builder => builder.UseMiniProfiler().UseCLRStatsDashboard());
             app.UseWhen(c => !c.Request.Path.StartsWithSegments("/_blazor"), builder => builder.UseMiddleware<RequestInterceptMiddleware>()); //启用网站请求拦截
             app.SetupHangfire();
-            app.UseCLRStatsDashboard();
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
             app.UseWhen(c => !c.Request.Path.StartsWithSegments("/_blazor"), builder => builder.UseMiddleware<TranslateMiddleware>());
-            //app.UseActivity();// 抽奖活动 
             app.UseRouting().UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub(options =>
