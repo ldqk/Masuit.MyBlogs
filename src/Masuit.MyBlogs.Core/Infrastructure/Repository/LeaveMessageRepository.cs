@@ -30,7 +30,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public override Task<LeaveMessage> GetByIdAsync(object id)
         {
             var cid = (int)id;
-            return DataContext.LeaveMessage.Include(c => Enumerable.OrderBy<LeaveMessage, DateTime>(c.Children, e => e.PostDate)).ThenInclude(c => c.Children.OrderBy(e => e.PostDate)).ThenInclude(c => c.Children.OrderBy(e => e.PostDate)).FirstOrDefaultAsync(c => c.Id == cid);
+            return DataContext.LeaveMessage.Include(c => c.Children).ThenInclude(c => c.Children).ThenInclude(c => c.Children).FirstOrDefaultAsync(c => c.Id == cid);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public override LeaveMessage GetById(object id)
         {
             var cid = (int)id;
-            return DataContext.LeaveMessage.Include(c => c.Children.OrderBy(e => e.PostDate)).ThenInclude(c => c.Children.OrderBy(e => e.PostDate)).ThenInclude(c => c.Children.OrderBy(e => e.PostDate)).FirstOrDefault(c => c.Id == cid);
+            return DataContext.LeaveMessage.Include(c => c.Children).ThenInclude(c => c.Children).ThenInclude(c => c.Children).FirstOrDefault(c => c.Id == cid);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public override Task<PagedList<LeaveMessage>> GetPagesAsync<TS>(int pageIndex, int pageSize, Expression<Func<LeaveMessage, bool>> @where, Expression<Func<LeaveMessage, TS>> @orderby, bool isAsc)
         {
-            var temp = DataContext.LeaveMessage.Include(c => c.Children.OrderBy(e => e.PostDate)).ThenInclude(c => c.Children.OrderBy(e => e.PostDate)).ThenInclude(c => c.Children.OrderBy(e => e.PostDate)).Where(where);
+            var temp = DataContext.LeaveMessage.Include(c => c.Children).ThenInclude(c => c.Children).ThenInclude(c => c.Children).Where(where);
             return isAsc ? temp.OrderBy(orderby).ToPagedListAsync(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToPagedListAsync(pageIndex, pageSize);
         }
     }

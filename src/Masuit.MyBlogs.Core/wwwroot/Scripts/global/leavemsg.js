@@ -289,6 +289,10 @@ function loadParentMsgs(data) {
 
 //加载子楼层
 function loadMsgs(msg, depth = 0) {
+	msg.sort(function(x, y) {
+        return x.Id - y.Id
+    });
+
 	var colors = ["info", "success", "primary", "warning", "danger"];
 	var floor = 1;
 	depth++;

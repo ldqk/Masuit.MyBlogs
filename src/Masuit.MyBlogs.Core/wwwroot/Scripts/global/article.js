@@ -455,6 +455,10 @@ function loadParentComments(data) {
 
 //加载子楼层
 function loadComments(comments, depth = 0) {
+	comments.sort(function(x, y) {
+        return x.Id - y.Id
+    });
+
     var colors = ["info", "success", "primary", "warning", "danger"];
     var floor = 1;
     depth++;

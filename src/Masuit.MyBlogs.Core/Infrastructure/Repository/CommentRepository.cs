@@ -30,7 +30,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public override Task<Comment> GetByIdAsync(object id)
         {
             var cid = (int)id;
-            return DataContext.Comment.Include(c => c.Children.OrderBy(e => e.CommentDate)).ThenInclude(c => c.Children.OrderBy(e => e.CommentDate)).ThenInclude(c => c.Children.OrderBy(e => e.CommentDate)).FirstOrDefaultAsync(c => c.Id == cid);
+            return DataContext.Comment.Include(c => c.Children).ThenInclude(c => c.Children).ThenInclude(c => c.Children).FirstOrDefaultAsync(c => c.Id == cid);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public override Comment GetById(object id)
         {
             var cid = (int)id;
-            return DataContext.Comment.Include(c => c.Children.OrderBy(e => e.CommentDate)).ThenInclude(c => c.Children.OrderBy(e => e.CommentDate)).ThenInclude(c => c.Children.OrderBy(e => e.CommentDate)).FirstOrDefault(c => c.Id == cid);
+            return DataContext.Comment.Include(c => c.Children).ThenInclude(c => c.Children).ThenInclude(c => c.Children).FirstOrDefault(c => c.Id == cid);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public override Task<PagedList<Comment>> GetPagesAsync<TS>(int pageIndex, int pageSize, Expression<Func<Comment, bool>> @where, Expression<Func<Comment, TS>> @orderby, bool isAsc)
         {
-            var temp = DataContext.Comment.Include(c => c.Children.OrderBy(e => e.CommentDate)).ThenInclude(c => c.Children.OrderBy(e => e.CommentDate)).ThenInclude(c => c.Children.OrderBy(e => e.CommentDate)).Where(where);
+            var temp = DataContext.Comment.Include(c => c.Children).ThenInclude(c => c.Children).ThenInclude(c => c.Children).Where(where);
             return isAsc ? temp.OrderBy(orderby).ToPagedListAsync(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToPagedListAsync(pageIndex, pageSize);
         }
     }
