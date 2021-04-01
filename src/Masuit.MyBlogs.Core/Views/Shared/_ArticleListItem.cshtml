@@ -6,7 +6,7 @@
 @inject ICacheManager<HashSet<string>> CacheManager
 @{
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
-    var online = CacheManager.GetOrAdd(nameof(PostOnline) + ":" + Model.Id, new HashSet<string>()).Count;
+    var online = CacheManager.Get(nameof(PostOnline) + ":" + Model.Id)?.Count ?? 0;
 }
 
 <div class="ibox wow fadeIn">

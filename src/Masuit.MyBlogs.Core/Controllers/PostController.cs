@@ -672,7 +672,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-                item.Online = cacheManager.GetOrAdd(nameof(PostOnline) + ":" + item.Id, new HashSet<string>()).Count;
+                item.Online = cacheManager.Get(nameof(PostOnline) + ":" + item.Id)?.Count ?? 0;
             }
 
             return Ok(list);

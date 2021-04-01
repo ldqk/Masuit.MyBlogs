@@ -1,6 +1,5 @@
 ﻿@using CacheManager.Core
 @using System.Threading
-@using Masuit.MyBlogs.Core.Common
 @implements IAsyncDisposable
 @inject ICacheManager<HashSet<string>> CacheManager
 
@@ -27,7 +26,7 @@
         CacheManager.Expire(key, ExpirationMode.Sliding, TimeSpan.FromMinutes(5));
         _timer = new Timer(_ =>
         {
-            online = CacheManager.Get(key).Count;
+            online = CacheManager.Get(key)?.Count ?? 0;
             InvokeAsync(StateHasChanged);
         }, null, 0, 1000);
     }
