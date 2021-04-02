@@ -167,7 +167,8 @@ namespace Masuit.MyBlogs.Core.Common
         {
             var path = $"{DateTime.Now:yyyy\\/MM\\/dd}/{file}";
             _httpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Awesome-Octocat-App"));
-            return _httpClient.PutAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path) + $"?access_token={config.AccessToken}", new
+            _httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse("token " + config.AccessToken);
+            return _httpClient.PutAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path), new
             {
                 message = SnowFlake.NewId,
                 committer = new
