@@ -58,7 +58,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// 从二级缓存获取所有实体
         /// </summary>
         /// <returns>还未执行的SQL语句</returns>
-        public Task<IEnumerable<T>> GetAllFromCacheAsync()
+        public Task<List<T>> GetAllFromCacheAsync()
         {
             return BaseDal.GetAllFromCacheAsync();
         }
@@ -88,7 +88,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// </summary>
         /// <typeparam name="TDto">映射实体</typeparam>
         /// <returns>还未执行的SQL语句</returns>
-        public Task<IEnumerable<TDto>> GetAllFromCacheAsync<TDto>() where TDto : class
+        public Task<List<TDto>> GetAllFromCacheAsync<TDto>() where TDto : class
         {
             return BaseDal.GetAllFromCacheAsync<TDto>();
         }
@@ -136,9 +136,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public Task<IEnumerable<T>> GetAllFromCacheAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
+        public Task<List<T>> GetAllFromCacheAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return BaseDal.GetAllFromCacheAsync(orderby, isAsc);
+            return BaseDal.GetAllFromCacheAsync(@orderby, isAsc);
         }
 
         /// <summary>
@@ -175,9 +175,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public Task<IEnumerable<TDto>> GetAllFromCacheAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
+        public Task<List<TDto>> GetAllFromCacheAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return BaseDal.GetAllFromCacheAsync<TS, TDto>(orderby, isAsc);
+            return BaseDal.GetAllFromCacheAsync<TS, TDto>(@orderby, isAsc);
         }
 
         /// <summary>
@@ -243,9 +243,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>还未执行的SQL语句</returns>
-        public Task<IEnumerable<T>> GetQueryFromCacheAsync(Expression<Func<T, bool>> @where)
+        public Task<List<T>> GetQueryFromCacheAsync(Expression<Func<T, bool>> @where)
         {
-            return BaseDal.GetQueryFromCacheAsync(where);
+            return BaseDal.GetQueryFromCacheAsync(@where);
         }
 
         /// <summary>
@@ -269,9 +269,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="orderby">排序方式</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public Task<IEnumerable<T>> GetQueryFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
+        public Task<List<T>> GetQueryFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return BaseDal.GetQueryFromCacheAsync(where, orderby, isAsc);
+            return BaseDal.GetQueryFromCacheAsync(@where, @orderby, isAsc);
         }
 
         /// <summary>
@@ -289,9 +289,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>还未执行的SQL语句</returns>
-        public Task<IEnumerable<TDto>> GetQueryFromCacheAsync<TDto>(Expression<Func<T, bool>> @where) where TDto : class
+        public Task<List<TDto>> GetQueryFromCacheAsync<TDto>(Expression<Func<T, bool>> @where) where TDto : class
         {
-            return BaseDal.GetQueryFromCacheAsync<TDto>(where);
+            return BaseDal.GetQueryFromCacheAsync<TDto>(@where);
         }
 
         /// <summary>
@@ -317,9 +317,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="orderby">排序方式</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public Task<IEnumerable<TDto>> GetQueryFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
+        public Task<List<TDto>> GetQueryFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return BaseDal.GetQueryFromCacheAsync<TS, TDto>(where, orderby, isAsc);
+            return BaseDal.GetQueryFromCacheAsync<TS, TDto>(@where, @orderby, isAsc);
         }
 
         /// <summary>

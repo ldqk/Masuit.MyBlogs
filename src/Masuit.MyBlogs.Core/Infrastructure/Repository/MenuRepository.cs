@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository
@@ -40,9 +41,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>还未执行的SQL语句</returns>
-        public override IEnumerable<Menu> GetQueryFromCache(Expression<Func<Menu, bool>> @where)
+        public override List<Menu> GetQueryFromCache(Expression<Func<Menu, bool>> @where)
         {
-            return DataContext.Menu.Include(m => m.Children).ThenInclude(m => m.Children).ThenInclude(m => m.Children).Where(where).FromCache(CacheOptions);
+            return DataContext.Menu.Include(m => m.Children).ThenInclude(m => m.Children).ThenInclude(m => m.Children).Where(where).Cacheable().ToList();
         }
     }
 }

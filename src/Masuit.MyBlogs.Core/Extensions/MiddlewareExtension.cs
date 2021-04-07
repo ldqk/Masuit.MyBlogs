@@ -26,10 +26,16 @@ namespace Masuit.MyBlogs.Core.Extensions
         /// <returns></returns>
         public static IServiceCollection AddCacheConfig(this IServiceCollection services)
         {
+            var jss = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.Auto
+            };
             services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
-            services.AddSingleton(new ConfigurationBuilder().WithJsonSerializer().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5))
+            services.AddSingleton(new ConfigurationBuilder().WithJsonSerializer(jss, jss).WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5))
                 .And
-                .WithRedisConfiguration("redis", AppConfig.Redis).WithMaxRetries(50).WithRetryTimeout(100).WithRedisCacheHandle("redis").WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5)).Build());
+                .WithRedisConfiguration("redis", AppConfig.Redis, 1).WithGzJsonSerializer(jss, jss).WithMaxRetries(50).WithRetryTimeout(100).WithRedisCacheHandle("redis").WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5)).Build());
             return services;
         }
 
