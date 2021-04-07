@@ -82,7 +82,7 @@ namespace Masuit.MyBlogs.Core
         public void ConfigureServices(IServiceCollection services)
         {
             RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
-            services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(5)).UseCacheManagerCoreProvider(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(5)).DisableLogging(true));
+            services.AddEFSecondLevelCache(options => options.UseMemoryCacheProvider(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(5)).DisableLogging(true));
             services.AddDbContextPool<DataContext>((serviceProvider, opt) =>
             {
                 opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(3)).EnableDetailedErrors().UseLazyLoadingProxies().UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>());

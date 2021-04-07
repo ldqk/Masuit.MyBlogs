@@ -5,13 +5,11 @@ using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Drive;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
-using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core
 {
@@ -24,10 +22,6 @@ namespace Masuit.MyBlogs.Core
                 throw new Exception("IP地址库初始化失败，请重启应用！");
             }
 
-            QueryCacheManager.DefaultMemoryCacheEntryOptions = new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-            };
             InitOneDrive();
             PerfCounter.Init();
             CreateWebHostBuilder(args).Build().Run();

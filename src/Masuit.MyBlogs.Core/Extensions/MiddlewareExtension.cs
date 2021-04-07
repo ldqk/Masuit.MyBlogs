@@ -33,9 +33,10 @@ namespace Masuit.MyBlogs.Core.Extensions
                 TypeNameHandling = TypeNameHandling.Auto
             };
             services.AddSingleton(typeof(ICacheManager<>), typeof(BaseCacheManager<>));
-            services.AddSingleton(new ConfigurationBuilder().WithJsonSerializer(jss, jss).WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5))
+            services.AddSingleton(new ConfigurationBuilder().WithMicrosoftMemoryCacheHandle().WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5))
                 .And
-                .WithRedisConfiguration("redis", AppConfig.Redis, 1).WithGzJsonSerializer(jss, jss).WithMaxRetries(50).WithRetryTimeout(100).WithRedisCacheHandle("redis").WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5)).Build());
+                .WithRedisConfiguration("redis", AppConfig.Redis).WithJsonSerializer(jss, jss).WithMaxRetries(50).WithRetryTimeout(100).WithRedisCacheHandle("redis").WithExpiration(ExpirationMode.Absolute, TimeSpan.FromMinutes(5))
+                .Build());
             return services;
         }
 

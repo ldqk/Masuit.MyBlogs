@@ -38,7 +38,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("search"), Route("search/{**wd}", Order = 1), Route("s", Order = 2), Route("s/{**wd}", Order = 3)]
         public async Task<ActionResult> Search([FromServices] IPostService postService, string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            wd = ChineseConverter.Convert(wd?.Trim(), ChineseConversionDirection.TraditionalToSimplified);
+            wd = ChineseConverter.Convert(wd?.Trim() ?? "", ChineseConversionDirection.TraditionalToSimplified);
             ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
             string key = "Search:" + ClientIP;
