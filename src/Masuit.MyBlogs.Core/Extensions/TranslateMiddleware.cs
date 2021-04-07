@@ -1,7 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.Tools;
-using Masuit.Tools.Core;
 using Microsoft.AspNetCore.Http;
+using Microsoft.International.Converters.TraditionalChineseToSimplifiedConverter;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -64,7 +64,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             memStream.Position = 0;
             var responseReader = new StreamReader(memStream, Encoding.UTF8);
             var responseBody = await responseReader.ReadToEndAsync();
-            memStream = new MemoryStream(Encoding.UTF8.GetBytes(responseBody.ToTraditional()));
+            memStream = new MemoryStream(Encoding.UTF8.GetBytes(ChineseConverter.Convert(responseBody, ChineseConversionDirection.SimplifiedToTraditional)));
             await memStream.CopyToAsync(responseOriginalBody);
             context.Response.Body = responseOriginalBody;
         }
