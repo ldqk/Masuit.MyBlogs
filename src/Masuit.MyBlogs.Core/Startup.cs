@@ -151,7 +151,7 @@ namespace Masuit.MyBlogs.Core
             app.UseWhen(c => !c.Request.Path.StartsWithSegments("/_blazor"), builder => builder.UseMiddleware<RequestInterceptMiddleware>()); //启用网站请求拦截
             app.SetupHangfire();
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
-            app.UseWhen(c => !c.Request.Path.StartsWithSegments("/_blazor"), builder => builder.UseMiddleware<TranslateMiddleware>());
+            app.UseMiddleware<TranslateMiddleware>();
             app.UseRouting().UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub(options =>

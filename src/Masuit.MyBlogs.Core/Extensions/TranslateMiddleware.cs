@@ -26,7 +26,8 @@ namespace Masuit.MyBlogs.Core.Extensions
 
         public Task Invoke(HttpContext context)
         {
-            if (context.Request.IsRobot())
+            var path = context.Request.Path.Value ?? "";
+            if (path.StartsWith("/_blazor") || path.StartsWith("/api") || context.Request.IsRobot())
             {
                 return _next(context);
             }
