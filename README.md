@@ -3,7 +3,7 @@
 masuit.com个人博客站项目源码，高性能低占用的博客系统，这也许是我写过的性能最高的web项目了。目前日均处理请求数80-200w次，同时在线活跃用户数30-100人，数据量累计已达到100多万条，数据库+Redis+网站主程序同时运行在一台2核4GB的机器上，浏览器页面请求秒级响应，CPU平均使用率控制在20%左右。  
 ![任务管理器](https://i.loli.net/2020/02/19/cjaxrWlLVvSAF8H.png)
 ### 演示站点
-[https://ldqk.org](https://ldqk.org)
+测试站点1：[https://ldqk.org](https://ldqk.org)，测试站点2：[https://masuit.com](https://masuit.com)
 
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 
