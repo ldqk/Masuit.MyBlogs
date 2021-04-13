@@ -1,4 +1,5 @@
 ﻿using CacheManager.Core;
+using EFCoreSecondLevelCacheInterceptor;
 using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
@@ -336,7 +337,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetUnreadMsgs()
         {
-            var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).ToList();
+            var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).NotCacheable().ToList();
             return ResultData(msgs);
         }
 

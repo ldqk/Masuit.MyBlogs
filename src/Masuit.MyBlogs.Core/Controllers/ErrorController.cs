@@ -134,7 +134,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="email"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email", "token" })]
+        [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall]
         public ActionResult CheckViewToken(string email, string token)
         {
             if (string.IsNullOrEmpty(token))
@@ -167,7 +167,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="userInfoService"></param>
         /// <param name="email"></param>
         /// <returns></returns>
-        [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" })]
+        [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 100, VaryByQueryKeys = new[] { "email" })]
         public ActionResult GetViewToken([FromServices] IUserInfoService userInfoService, string email)
         {
             if (string.IsNullOrEmpty(email) || !email.MatchEmail().isMatch)

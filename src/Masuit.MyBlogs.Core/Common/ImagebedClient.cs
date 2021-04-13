@@ -185,7 +185,7 @@ namespace Masuit.MyBlogs.Core.Common
                     using var content = resp.Content;
                     if (resp.IsSuccessStatusCode)
                     {
-                        return (config.RawUrl + path, true);
+                        return (config.RawUrl.Split(',').OrderBy(_ => Guid.NewGuid()).FirstOrDefault() + path, true);
                     }
                 }
 
@@ -207,7 +207,7 @@ namespace Masuit.MyBlogs.Core.Common
                 return (null, false);
             }
 
-            var objectName = DateTime.Now.ToString(@"yyyy\/MM\/dd") + "/" + file;
+            var objectName = $"{DateTime.Now:yyyy\\/MM\\/dd}/{file}";
             var fallbackPolicy = Policy<(string url, bool success)>.Handle<Exception>().Fallback(_ => (null, false));
             var retryPolicy = Policy<(string url, bool success)>.Handle<Exception>().Retry(3);
             return fallbackPolicy.Wrap(retryPolicy).Execute(() =>

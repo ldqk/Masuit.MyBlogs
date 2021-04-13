@@ -39,10 +39,9 @@
         <PackageReference Include="CacheManager.Serialization.Json" Version="2.0.0-beta-1629" />
         <PackageReference Include="CacheManager.StackExchange.Redis" Version="1.2.0" />
         <PackageReference Include="CHTCHSConv" Version="1.0.0" />
-        <PackageReference Include="CLRStats" Version="1.0.0" />
         <PackageReference Include="CSRedisCore" Version="3.6.6" />
         <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="2.4.1" />
-        <PackageReference Include="Hangfire" Version="1.7.20" />
+        <PackageReference Include="Hangfire" Version="1.7.21" />
         <PackageReference Include="Hangfire.Autofac" Version="2.3.1" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
         <PackageReference Include="htmldiff.net-core" Version="1.3.6" />
@@ -60,14 +59,14 @@
         <PackageReference Include="OpenXmlPowerTools-NetStandard" Version="4.4.21" />
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.22" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
-        <PackageReference Include="Polly" Version="7.2.1" />
+        <PackageReference Include="Polly" Version="7.2.2" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0-alpha.2" />
         <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.1" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.9" />
-        <PackageReference Include="TimeZoneConverter" Version="3.4.0" />
+        <PackageReference Include="TimeZoneConverter" Version="3.5.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.0" />
         <PackageReference Include="WinInsider.System.Net.Http.Formatting" Version="1.0.14" />
-        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.29" />
+        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.30" />
     </ItemGroup>
     <ItemGroup>
         <Content Update="appsettings.json">
