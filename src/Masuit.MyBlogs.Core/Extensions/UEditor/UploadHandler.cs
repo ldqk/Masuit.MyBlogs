@@ -47,38 +47,33 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             Result.OriginFileName = uploadFileName;
             var savePath = PathFormatter.Format(uploadFileName, UploadConfig.PathFormat);
             var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
+            var stream = file.OpenReadStream();
             try
             {
-                if (UploadConfig.AllowExtensions.Contains(Path.GetExtension(uploadFileName).ToLower()))
+                stream = stream.AddWatermark();
+                var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath, default).Result;
+                if (success)
                 {
-                    var stream = file.OpenReadStream();
-                    stream = stream.AddWatermark();
-                    var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath, default).Result;
-                    if (success)
-                    {
-                        Result.Url = url;
-                    }
-                    else
-                    {
-                        Directory.CreateDirectory(Path.GetDirectoryName(localPath));
-                        await File.WriteAllBytesAsync(localPath, await stream.ToArrayAsync());
-                        Result.Url = savePath;
-                    }
-                    Result.State = UploadState.Success;
-                    stream.Close();
-                    await stream.DisposeAsync();
+                    Result.Url = url;
                 }
                 else
                 {
-                    Result.State = UploadState.FileAccessError;
-                    Result.ErrorMessage = "不支持的文件格式";
+                    Directory.CreateDirectory(Path.GetDirectoryName(localPath));
+                    await File.WriteAllBytesAsync(localPath, await stream.ToArrayAsync());
+                    Result.Url = savePath;
                 }
+                Result.State = UploadState.Success;
             }
             catch (Exception e)
             {
                 Result.State = UploadState.FileAccessError;
                 Result.ErrorMessage = e.Message;
                 LogManager.Error(e);
+            }
+            finally
+            {
+                stream.Close();
+                await stream.DisposeAsync();
             }
 
             return WriteResult();

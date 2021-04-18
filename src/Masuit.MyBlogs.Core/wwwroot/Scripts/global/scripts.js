@@ -170,6 +170,13 @@ $(function() {
     }).catch(function(e) {
         console.log("Oops, error");
     });
+
+    setInterval(function() {
+        let timestamp = new Date().getTime();
+        DotNet.invokeMethodAsync('Masuit.MyBlogs.Core', 'Latency').then(data => {
+            $("#ping").text(new Date().getTime()-timestamp);
+        });
+    }, 1000);
 });
 
 //全局加载动画

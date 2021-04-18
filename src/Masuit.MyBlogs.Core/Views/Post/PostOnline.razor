@@ -38,6 +38,6 @@
             set.Remove(IP);
             return set;
         }).Count;
-        return _timer.DisposeAsync();
+        return _timer?.DisposeAsync() ?? ValueTask.CompletedTask;
     }
 }

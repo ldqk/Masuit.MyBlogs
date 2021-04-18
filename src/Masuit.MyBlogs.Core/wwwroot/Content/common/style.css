@@ -36,6 +36,9 @@ body {
 }
 
 /*#endregion */
+#components-reconnect-modal {
+    visibility: hidden !important;
+}
 
 .min-height610 {
     min-height: 610px;

@@ -1,6 +1,8 @@
 ﻿using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure
 {
@@ -42,6 +44,29 @@ namespace Masuit.MyBlogs.Core.Infrastructure
                     ex = e;
                     var entry = e.Entries.Single();
                     var databaseValues = entry.GetDatabaseValues();
+                    var resolvedValues = databaseValues.Clone();
+                    entry.OriginalValues.SetValues(databaseValues);
+                    entry.CurrentValues.SetValues(resolvedValues);
+                }
+            }
+
+            throw ex;
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
+        {
+            DbUpdateConcurrencyException ex = null;
+            for (int i = 0; i < 5; i++)
+            {
+                try
+                {
+                    return await base.SaveChangesAsync(cancellationToken);
+                }
+                catch (DbUpdateConcurrencyException e)
+                {
+                    ex = e;
+                    var entry = e.Entries.Single();
+                    var databaseValues = await entry.GetDatabaseValuesAsync(cancellationToken);
                     var resolvedValues = databaseValues.Clone();
                     entry.OriginalValues.SetValues(databaseValues);
                     entry.CurrentValues.SetValues(resolvedValues);
