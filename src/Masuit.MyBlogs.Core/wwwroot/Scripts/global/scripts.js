@@ -176,7 +176,7 @@ $(function() {
         DotNet.invokeMethodAsync('Masuit.MyBlogs.Core', 'Latency').then(data => {
             $("#ping").text(new Date().getTime()-timestamp);
         });
-    }, 1000);
+    }, 2000);
 });
 
 //全局加载动画

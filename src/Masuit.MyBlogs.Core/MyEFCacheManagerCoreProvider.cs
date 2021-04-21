@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using CacheManager.Core;
+﻿using CacheManager.Core;
 using EFCoreSecondLevelCacheInterceptor;
+using System;
+using System.Collections.Generic;
 
 namespace Masuit.MyBlogs.Core
 {
@@ -22,10 +22,6 @@ namespace Masuit.MyBlogs.Core
             _readerWriterLockProvider = readerWriterLockProvider;
             _dependenciesCacheManager = dependenciesCacheManager ?? throw new ArgumentNullException(nameof(dependenciesCacheManager), "Please register the `ICacheManager`.");
             _valuesCacheManager = valuesCacheManager ?? throw new ArgumentNullException(nameof(valuesCacheManager), "Please register the `ICacheManager`.");
-
-            // Occurs when an item was removed by the cache handle due to expiration or e.g. memory pressure eviction.
-            // Without _dependenciesCacheManager items, we can't invalidate cached items on Insert/Update/Delete.
-            // So to prevent stale reads, we have to clear all cached data in this case.
             _dependenciesCacheManager.OnRemoveByHandle += (sender, args) => ClearAllCachedEntries();
         }
 

@@ -1,4 +1,5 @@
 ﻿using CacheManager.Core;
+using JiebaNet.Segmenter;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -52,6 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
             {
+                new JiebaSegmenter().AddWord(wd);
                 if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !HttpContext.Request.IsRobot())
                 {
                     SearchDetailsService.AddEntity(new SearchDetails

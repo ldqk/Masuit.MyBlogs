@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Text;
 using CacheManager.Core;
 using Hangfire;
+using JiebaNet.Segmenter;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
@@ -574,22 +575,19 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Pass(int id)
         {
-            Post post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             post.Status = Status.Published;
             post.ModifyDate = DateTime.Now;
             post.PostDate = DateTime.Now;
-            bool b = await PostService.SaveChangesAsync() > 0;
+            var b = await PostService.SaveChangesAsync() > 0;
             if (!b)
             {
-                SearchEngine.LuceneIndexer.Add(post);
                 return ResultData(null, false, "审核失败！");
             }
 
-            if ("true" == CommonHelper.SystemSettings["DisabledEmailBroadcast"])
-            {
-                return ResultData(null, true, "审核通过！");
-            }
-
+            var js = new JiebaSegmenter();
+            (post.Keyword + "," + post.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(s => js.AddWord(s));
+            SearchEngine.LuceneIndexer.Add(post);
             return ResultData(null, true, "审核通过！");
         }
 
@@ -746,6 +744,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
+            var js = new JiebaSegmenter();
+            (p.Keyword + "," + p.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(s => js.AddWord(s));
             bool b = await SearchEngine.SaveChangesAsync() > 0;
             if (!b)
             {
@@ -802,6 +802,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             PostService.AddEntity(p);
+            var js = new JiebaSegmenter();
+            (p.Keyword + "," + p.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(s => js.AddWord(s));
             bool b = await SearchEngine.SaveChangesAsync() > 0;
             if (!b)
             {

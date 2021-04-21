@@ -26,6 +26,7 @@ using StackExchange.Profiling;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -50,8 +51,8 @@ namespace Masuit.MyBlogs.Core
                 Console.WriteLine("正在导入自定义词库...");
                 double time = HiPerfTimer.Execute(() =>
                 {
-                    var posts = app.ApplicationServices.GetRequiredService<DataContext>().Post;
-                    var set = posts.Select(p => p.Title).AsEnumerable().SelectMany(s => s.Split(',', '，', ' ', '+', '—', '(', ')', '：', '&', '（', '）', '-', '_', '[', ']')).Where(s => s.Length > 1).Union(posts.Select(p => $"{p.Label},{p.Keyword}").AsEnumerable().SelectMany(s => s.Split(','))).ToHashSet();
+                    var db = app.ApplicationServices.GetRequiredService<DataContext>();
+                    var set = db.Post.Select(p => $"{p.Title},{p.Label},{p.Keyword}").AsParallel().SelectMany(s => Regex.Split(s, @"\p{P}(?<!\.|#)|\p{Z}|\p{S}")).Where(s => s.Length > 1).ToHashSet();
                     var lines = File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomKeywords.txt")).Union(set);
                     var segmenter = new JiebaSegmenter();
                     foreach (var word in lines)

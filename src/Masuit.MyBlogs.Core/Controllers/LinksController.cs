@@ -41,8 +41,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 申请友链
         /// </summary>
         /// <param name="links"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<ActionResult> Apply(Links links)
+        public async Task<ActionResult> Apply(Links links, CancellationToken cancellationToken)
         {
             if (!links.Url.MatchUrl())
             {
@@ -56,8 +57,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             HttpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-            HttpClient.DefaultRequestHeaders.Referrer = new Uri(Request.Scheme + "://" + Request.Host.ToString());
-            return await (await HttpClient.GetAsync(links.Url).ContinueWith(async t =>
+            HttpClient.DefaultRequestHeaders.Referrer = new Uri(Request.Scheme + "://" + Request.Host);
+            return await await HttpClient.GetAsync(links.Url, cancellationToken).ContinueWith(async t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {
@@ -92,8 +93,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
 
                 return ResultData(null, b, b ? "添加成功！这可能有一定的延迟，如果没有看到您的链接，请稍等几分钟后刷新页面即可，如有疑问，请联系站长。" : "添加失败！这可能是由于网站服务器内部发生了错误，如有疑问，请联系站长。");
-
-            })).ConfigureAwait(false);
+            });
         }
 
         /// <summary>
@@ -131,7 +131,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Check(string link)
         {
             HttpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
-            return await HttpClient.GetAsync(link, new CancellationTokenSource(TimeSpan.FromSeconds(5)).Token).ContinueWith(t =>
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            return await HttpClient.GetAsync(link, cts.Token).ContinueWith(t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {
