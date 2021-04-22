@@ -1,5 +1,5 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using HtmlAgilityPack;
+﻿using AngleSharp;
+using DocumentFormat.OpenXml.Packaging;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.UEditor;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -134,11 +134,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         private async Task<string> SaveAsHtml(IFormFile file)
         {
             var html = await ConvertToHtml(file);
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
-            var body = doc.DocumentNode.SelectSingleNode("//body");
-            var style = doc.DocumentNode.SelectSingleNode("//style");
-            var nodes = body.SelectNodes("//img");
+            var context = BrowsingContext.New(Configuration.Default);
+            var doc = context.OpenAsync(req => req.Content(html)).Result;
+            var body = doc.Body;
+            var nodes = body.GetElementsByTagName("img");
             if (nodes != null)
             {
                 foreach (var img in nodes)
@@ -159,7 +158,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            return style.OuterHtml + body.InnerHtml.HtmlSantinizerStandard().HtmlSantinizerCustom(attributes: new[] { "dir", "lang" });
+            return body.InnerHtml.HtmlSantinizerStandard().HtmlSantinizerCustom(attributes: new[] { "dir", "lang" });
         }
 
         private static async Task SaveFile(IFormFile file, string path)

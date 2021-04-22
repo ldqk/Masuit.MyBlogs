@@ -93,7 +93,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     comment.IsMaster = true;
                 }
             }
-            comment.Content = dto.Content.HtmlSantinizerStandard().ClearImgAttributes();
+            comment.Content = await dto.Content.HtmlSantinizerStandard().ClearImgAttributes();
             comment.Browser = dto.Browser ?? Request.Headers[HeaderNames.UserAgent];
             comment.IP = ClientIP;
             comment.Location = Request.Location();

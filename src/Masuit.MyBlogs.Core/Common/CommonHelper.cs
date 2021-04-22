@@ -1,6 +1,6 @@
-﻿using AutoMapper;
+﻿using AngleSharp;
+using AutoMapper;
 using Hangfire;
-using HtmlAgilityPack;
 using IP2Region;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.Tools;
@@ -19,6 +19,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using TimeZoneConverter;
 
 namespace Masuit.MyBlogs.Core.Common
@@ -28,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Common
     /// </summary>
     public static class CommonHelper
     {
-        private static readonly FileSystemWatcher _fileSystemWatcher = new(AppContext.BaseDirectory + "App_Data", "*.txt")
+        private static readonly FileSystemWatcher FileSystemWatcher = new(AppContext.BaseDirectory + "App_Data", "*.txt")
         {
             IncludeSubdirectories = true,
             EnableRaisingEvents = true,
@@ -38,10 +39,7 @@ namespace Masuit.MyBlogs.Core.Common
         static CommonHelper()
         {
             Init();
-            _fileSystemWatcher.Changed += (_, _) =>
-            {
-                Init();
-            };
+            FileSystemWatcher.Changed += (_, _) => Init();
         }
 
         private static void Init()
@@ -94,11 +92,6 @@ namespace Masuit.MyBlogs.Core.Common
         /// 系统设定
         /// </summary>
         public static ConcurrentDictionary<string, string> SystemSettings { get; set; } = new();
-
-        /// <summary>
-        /// 网站启动时间
-        /// </summary>
-        public static DateTime StartupTime { get; set; } = DateTime.Now;
 
         /// <summary>
         /// IP黑名单地址段
@@ -239,17 +232,26 @@ namespace Masuit.MyBlogs.Core.Common
         /// </summary>
         /// <param name="html"></param>
         /// <returns></returns>
-        public static string ClearImgAttributes(this string html)
+        public static async Task<string> ClearImgAttributes(this string html)
         {
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
-            var nodes = doc.DocumentNode.Descendants("img");
+            var context = BrowsingContext.New(Configuration.Default);
+            var doc = await context.OpenAsync(req => req.Content(html));
+            var nodes = doc.DocumentElement.GetElementsByTagName("img");
+            var allows = new[] { "src", "data-original", "width", "style", "class" };
             foreach (var node in nodes)
             {
-                node.Attributes.RemoveWhere(a => !new[] { "src", "data-original", "width", "style", "class" }.Contains(a.Name));
+                for (var i = 0; i < node.Attributes.Length; i++)
+                {
+                    if (allows.Contains(node.Attributes[i].Name))
+                    {
+                        continue;
+                    }
+
+                    node.RemoveAttribute(node.Attributes[i].Name);
+                }
             }
 
-            return doc.DocumentNode.OuterHtml;
+            return doc.Body.InnerHtml;
         }
 
         /// <summary>
@@ -258,24 +260,24 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="html"></param>
         /// <param name="title"></param>
         /// <returns></returns>
-        public static string ReplaceImgAttribute(this string html, string title)
+        public static async Task<string> ReplaceImgAttribute(this string html, string title)
         {
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
-            var nodes = doc.DocumentNode.Descendants("img");
+            var context = BrowsingContext.New(Configuration.Default);
+            var doc = await context.OpenAsync(req => req.Content(html));
+            var nodes = doc.DocumentElement.GetElementsByTagName("img");
             foreach (var node in nodes)
             {
-                if (node.Attributes.Contains("src"))
+                if (node.HasAttribute("src"))
                 {
                     string src = node.Attributes["src"].Value;
-                    node.Attributes.Remove("src");
-                    node.Attributes.Add("data-original", src);
-                    node.Attributes.Add("alt", SystemSettings["Title"]);
-                    node.Attributes.Add("title", title);
+                    node.RemoveAttribute("src");
+                    node.SetAttribute("data-original", src);
+                    node.SetAttribute("alt", SystemSettings["Title"]);
+                    node.SetAttribute("title", title);
                 }
             }
 
-            return doc.DocumentNode.OuterHtml;
+            return doc.Body.InnerHtml;
         }
 
         /// <summary>
@@ -285,11 +287,11 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="length">截取长度</param>
         /// <param name="min">摘要最少字数</param>
         /// <returns></returns>
-        public static string GetSummary(this string html, int length = 150, int min = 10)
+        public static async Task<string> GetSummary(this string html, int length = 150, int min = 10)
         {
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
-            var summary = doc.DocumentNode.Descendants("p").FirstOrDefault(n => n.InnerText.Length > min)?.InnerText ?? "没有摘要";
+            var context = BrowsingContext.New(Configuration.Default);
+            var doc = await context.OpenAsync(req => req.Content(html));
+            var summary = doc.DocumentElement.GetElementsByTagName("p").FirstOrDefault(n => n.TextContent.Length > min)?.TextContent ?? "没有摘要";
             if (summary.Length > length)
             {
                 return summary.Substring(0, length) + "...";

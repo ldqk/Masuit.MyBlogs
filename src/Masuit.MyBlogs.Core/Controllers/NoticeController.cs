@@ -80,7 +80,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Write(Notice notice, CancellationToken cancellationToken)
         {
-            notice.Content = await ImagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes(), cancellationToken);
+            notice.Content = await ImagebedClient.ReplaceImgSrc(await notice.Content.ClearImgAttributes(), cancellationToken);
             if (notice.StartTime.HasValue && notice.EndTime.HasValue && notice.StartTime >= notice.EndTime)
             {
                 return ResultData(null, false, "开始时间不能小于结束时间");
@@ -145,7 +145,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             entity.StartTime = notice.StartTime;
             entity.EndTime = notice.EndTime;
             entity.Title = notice.Title;
-            entity.Content = await ImagebedClient.ReplaceImgSrc(notice.Content.ClearImgAttributes(), cancellationToken);
+            entity.Content = await ImagebedClient.ReplaceImgSrc(await notice.Content.ClearImgAttributes(), cancellationToken);
             bool b = await NoticeService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }

@@ -83,7 +83,7 @@
                                     </div>
                                 </header>
                                 <article class="article" id="article">
-                                    @Html.Raw(Model[1].Content.ReplaceImgAttribute(Model[0].Title))
+                                    @Html.Raw(await Model[1].Content.ReplaceImgAttribute(Model[0].Title))
                                 </article>
                             </section>
                             @if (ads.Any())
@@ -169,7 +169,7 @@
                                     </div>
                                 </header>
                                 <article class="article" id="article">
-                                    @Html.Raw(Model[2].Content.ReplaceImgAttribute(Model[0].Title))
+                                    @Html.Raw(await Model[2].Content.ReplaceImgAttribute(Model[0].Title))
                                 </article>
                             </section>
                             @if (ads.Count > 1)

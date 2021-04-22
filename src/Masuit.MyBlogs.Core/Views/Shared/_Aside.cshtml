@@ -21,7 +21,7 @@
                                 @foreach (NoticeDto notice in Model.Notices)
                                 {
                                     <li class="news-item">
-                                        <a class="tippy-scale" title="查看详情" asp-controller="Notice" asp-action="Details" asp-route-id="@notice.Id">@notice.Content.GetSummary(45, 2)</a>
+                                        <a class="tippy-scale" title="查看详情" asp-controller="Notice" asp-action="Details" asp-route-id="@notice.Id">@await notice.Content.GetSummary(45, 2)</a>
                                     </li>
                                 }
                             </ul>

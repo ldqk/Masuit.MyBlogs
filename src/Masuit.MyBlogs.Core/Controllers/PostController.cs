@@ -1,4 +1,4 @@
-﻿using AngleSharp.Text;
+﻿using AngleSharp;
 using CacheManager.Core;
 using Hangfire;
 using JiebaNet.Segmenter;
@@ -69,7 +69,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             CheckPermission(post);
             ViewBag.Keyword = post.Keyword + "," + post.Label;
-            ViewBag.Desc = post.Content.GetSummary(200);
+            ViewBag.Desc = await post.Content.GetSummary(200);
             var modifyDate = post.ModifyDate;
             ViewBag.Next = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate);
             ViewBag.Prev = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate, false);
@@ -315,7 +315,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
             post.Status = Status.Pending;
-            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.HtmlSantinizerStandard().ClearImgAttributes(), cancellationToken);
+            post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.HtmlSantinizerStandard().ClearImgAttributes(), cancellationToken);
             Post p = post.Mapper<Post>();
             p.IP = ClientIP;
             p.Modifier = p.Author;
@@ -711,7 +711,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, MyAuthorize]
         public async Task<ActionResult> Edit(PostCommand post, bool reserve = true, CancellationToken cancellationToken = default)
         {
-            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes(), cancellationToken);
+            post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.Trim().ClearImgAttributes(), cancellationToken);
             if (!ValidatePost(post, out var resultData))
             {
                 return resultData;
@@ -720,8 +720,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             Post p = await PostService.GetByIdAsync(post.Id);
             if (reserve && p.Status == Status.Published)
             {
-                var history = p.Mapper<PostHistoryVersion>();
-                p.PostHistoryVersion.Add(history);
+                var context = BrowsingContext.New(Configuration.Default);
+                var doc1 = await context.OpenAsync(req => req.Content(p.Content), cancellationToken);
+                var doc2 = await context.OpenAsync(req => req.Content(post.Content), cancellationToken);
+                if (doc1.Body.TextContent != doc2.Body.TextContent)
+                {
+                    var history = p.Mapper<PostHistoryVersion>();
+                    p.PostHistoryVersion.Add(history);
+                }
+
                 p.ModifyDate = DateTime.Now;
                 var user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
                 p.Modifier = user.NickName;
@@ -765,7 +772,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize, HttpPost]
         public async Task<ActionResult> Write(PostCommand post, DateTime? timespan, bool schedule = false, CancellationToken cancellationToken = default)
         {
-            post.Content = await ImagebedClient.ReplaceImgSrc(post.Content.Trim().ClearImgAttributes(), cancellationToken);
+            post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.Trim().ClearImgAttributes(), cancellationToken);
             if (!ValidatePost(post, out var resultData))
             {
                 return resultData;
