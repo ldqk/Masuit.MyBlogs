@@ -350,7 +350,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual T Get(Expression<Func<T, bool>> where)
         {
-            return DataContext.Set<T>().FirstOrDefault(where);
+            return EF.CompileQuery((DataContext ctx) => ctx.Set<T>().FirstOrDefault(where))(DataContext);
         }
 
         /// <summary>
@@ -383,7 +383,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual T Get<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).FirstOrDefault(where) : DataContext.Set<T>().OrderByDescending(orderby).FirstOrDefault(where);
+            return isAsc ? EF.CompileQuery((DataContext ctx) => ctx.Set<T>().OrderBy(orderby).FirstOrDefault(where))(DataContext) : EF.CompileQuery((DataContext ctx) => ctx.Set<T>().OrderByDescending(orderby).FirstOrDefault(where))(DataContext);
         }
 
         /// <summary>
@@ -461,7 +461,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual Task<T> GetAsync(Expression<Func<T, bool>> where)
         {
-            return DataContext.Set<T>().FirstOrDefaultAsync(@where);
+            return EF.CompileAsyncQuery((DataContext ctx) => ctx.Set<T>().FirstOrDefault(where))(DataContext);
         }
 
         /// <summary>
@@ -472,9 +472,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>实体</returns>
-        public virtual async Task<T> GetAsync<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
+        public virtual Task<T> GetAsync<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return isAsc ? await DataContext.Set<T>().OrderBy(orderby).FirstOrDefaultAsync(where) : await DataContext.Set<T>().OrderByDescending(orderby).FirstOrDefaultAsync(where);
+            return isAsc ? EF.CompileAsyncQuery((DataContext ctx) => ctx.Set<T>().OrderBy(orderby).FirstOrDefault(where))(DataContext) : EF.CompileAsyncQuery((DataContext ctx) => ctx.Set<T>().OrderByDescending(orderby).FirstOrDefault(where))(DataContext);
         }
 
         /// <summary>
@@ -484,7 +484,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual T GetNoTracking(Expression<Func<T, bool>> where)
         {
-            return DataContext.Set<T>().AsNoTracking().FirstOrDefault(where);
+            return EF.CompileQuery((DataContext ctx) => ctx.Set<T>().AsNoTracking().FirstOrDefault(where))(DataContext);
         }
 
         /// <summary>

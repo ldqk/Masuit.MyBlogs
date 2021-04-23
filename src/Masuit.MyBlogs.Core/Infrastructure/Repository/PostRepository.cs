@@ -30,7 +30,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public override Task<Post> GetAsync(Expression<Func<Post, bool>> @where)
         {
-            return DataContext.Post.Include(p => p.Category).Include(p => p.Seminar).FirstOrDefaultAsync(@where);
+            return EF.CompileAsyncQuery((DataContext ctx) => ctx.Post.Include(p => p.Category).Include(p => p.Seminar).FirstOrDefault(@where))(DataContext);
         }
 
         /// <summary>

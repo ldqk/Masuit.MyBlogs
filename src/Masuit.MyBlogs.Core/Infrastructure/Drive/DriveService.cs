@@ -28,8 +28,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         public async Task<List<DriveFile>> GetRootItems(string siteName = "onedrive", bool showHiddenFolders = false)
         {
             var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
-            var result = await drive.Root.Children.Request().GetAsync();
-            var files = GetItems(result, siteName, showHiddenFolders);
+            var request = drive.Root.Children.Request();
+            var result = await request.GetAsync();
+            var files = await GetItems(result, siteName, showHiddenFolders);
             return files;
         }
 
@@ -42,7 +43,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         {
             var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
             var result = await drive.Root.ItemWithPath(path).Children.Request().GetAsync();
-            var files = GetItems(result, siteName, showHiddenFolders);
+            var files = await GetItems(result, siteName, showHiddenFolders);
             return files;
         }
         /// <summary>
@@ -105,7 +106,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             return file;
         }
 
-        private List<DriveFile> GetItems(IDriveItemChildrenCollectionPage result, string siteName = "onedrive", bool showHiddenFolders = false)
+        private async Task<List<DriveFile>> GetItems(IDriveItemChildrenCollectionPage result, string siteName = "onedrive", bool showHiddenFolders = false)
         {
             var files = new List<DriveFile>();
             foreach (var item in result)
@@ -139,6 +140,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
                     }
                 }
                 files.Add(file);
+            }
+
+            if (result.Count == 200)
+            {
+                files.AddRange(await GetItems(await result.NextPageRequest.GetAsync(), siteName, showHiddenFolders));
             }
 
             return files;

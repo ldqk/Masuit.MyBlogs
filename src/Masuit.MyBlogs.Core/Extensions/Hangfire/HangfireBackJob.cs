@@ -192,8 +192,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void CheckLinks()
         {
             var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("MasuitBot-link/1.0"));
-            client.DefaultRequestHeaders.Referrer = new Uri("https://masuit.com");
+            client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+            client.DefaultRequestHeaders.Referrer = new Uri("https://google.com");
             client.Timeout = TimeSpan.FromSeconds(5);
             _linksService.GetQuery(l => !l.Except).AsParallel().ForAll(link =>
             {

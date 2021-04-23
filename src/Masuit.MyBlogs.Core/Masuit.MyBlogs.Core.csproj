@@ -73,7 +73,7 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="App_Data\cert\server.pfx">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="App_Data\CustomKeywords.txt">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
