@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
@@ -47,11 +48,12 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             Result.OriginFileName = uploadFileName;
             var savePath = PathFormatter.Format(uploadFileName, UploadConfig.PathFormat);
             var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
+            var cts = new CancellationTokenSource(30000);
             var stream = file.OpenReadStream();
             try
             {
                 stream = stream.AddWatermark();
-                var (url, success) = Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath, default).Result;
+                var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath, cts.Token);
                 if (success)
                 {
                     Result.Url = url;
@@ -72,6 +74,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             }
             finally
             {
+                cts.Dispose();
                 stream.Close();
                 await stream.DisposeAsync();
             }

@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
@@ -27,12 +28,13 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             string[] sources = form["source[]"];
             if (sources?.Length > 0 || sources?.Length <= 10)
             {
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
                 return WriteJson(new
                 {
                     state = "SUCCESS",
                     list = (await sources.SelectAsync(s =>
                     {
-                        return new Crawler(s).Fetch().ContinueWith(t => new
+                        return new Crawler(s).Fetch(cts.Token).ContinueWith(t => new
                         {
                             state = t.Result.State,
                             source = t.Result.SourceUrl,
@@ -64,7 +66,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             SourceUrl = sourceUrl;
         }
 
-        public async Task<Crawler> Fetch()
+        public async Task<Crawler> Fetch(CancellationToken token)
         {
             if (!SourceUrl.IsExternalAddress())
             {
@@ -83,7 +85,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 ServerUrl = PathFormatter.Format(Path.GetFileNameWithoutExtension(SourceUrl), CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload") + UeditorConfig.GetString("catcherPathFormat")) + MimeMapper.ExtTypes[response.Content.Headers.ContentType?.MediaType ?? "image/jpeg"];
                 await using var stream = await response.Content.ReadAsStreamAsync();
                 var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
-                var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath, default);
+                var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath, token);
                 if (success)
                 {
                     ServerUrl = url;
