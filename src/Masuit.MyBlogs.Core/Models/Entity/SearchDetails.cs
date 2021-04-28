@@ -1,3 +1,4 @@
+using Masuit.LuceneEFCore.SearchEngine;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,15 +9,12 @@ namespace Masuit.MyBlogs.Core.Models.Entity
     /// ËÑË÷ÏêÏ¸¼ÇÂ¼
     /// </summary>
     [Table("SearchDetails")]
-    public class SearchDetails
+    public class SearchDetails : LuceneIndexableBaseEntity
     {
         public SearchDetails()
         {
             SearchTime = DateTime.Now;
         }
-
-        [Key]
-        public int Id { get; set; }
 
         /// <summary>
         /// ¹Ø¼ü´Ê

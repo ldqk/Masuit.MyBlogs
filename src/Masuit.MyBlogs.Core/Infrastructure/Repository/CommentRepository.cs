@@ -27,10 +27,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>实体</returns>
-        public override Task<Comment> GetByIdAsync(object id)
+        public override Task<Comment> GetByIdAsync(int id)
         {
-            var cid = (int)id;
-            return DataContext.Comment.Include(c => c.Children).ThenInclude(c => c.Children).ThenInclude(c => c.Children).FirstOrDefaultAsync(c => c.Id == cid);
+            return EF.CompileAsyncQuery((DataContext ctx, int cid) => ctx.Comment.Include(c => c.Children).ThenInclude(c => c.Children).ThenInclude(c => c.Children).FirstOrDefault(c => c.Id == cid))(DataContext, id);
         }
 
         /// <summary>
@@ -38,10 +37,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>实体</returns>
-        public override Comment GetById(object id)
+        public override Comment GetById(int id)
         {
-            var cid = (int)id;
-            return DataContext.Comment.Include(c => c.Children).ThenInclude(c => c.Children).ThenInclude(c => c.Children).FirstOrDefault(c => c.Id == cid);
+            return EF.CompileQuery((DataContext ctx, int cid) => ctx.Comment.Include(c => c.Children).ThenInclude(c => c.Children).ThenInclude(c => c.Children).FirstOrDefault(c => c.Id == cid))(DataContext, id);
         }
 
         /// <summary>

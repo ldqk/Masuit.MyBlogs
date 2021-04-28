@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Models.Entity;
+﻿using Masuit.LuceneEFCore.SearchEngine;
+using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools.Models;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
 {
-    public interface IBaseRepository<T> : IDisposable where T : class, new()
+    public interface IBaseRepository<T> : IDisposable where T : LuceneIndexableBaseEntity
     {
         /// <summary>
         /// 获取所有实体
@@ -416,14 +417,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>实体</returns>
-        T GetById(object id);
+        T GetById(int id);
 
         /// <summary>
         /// 根据ID找实体(异步)
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>实体</returns>
-        Task<T> GetByIdAsync(object id);
+        Task<T> GetByIdAsync(int id);
 
         /// <summary>
         /// 高效分页查询方法
@@ -542,7 +543,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>删除成功</returns>
-        bool DeleteById(object id);
+        bool DeleteById(int id);
 
         /// <summary>
         /// 删除实体
@@ -637,7 +638,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         IEnumerable<T> AddEntities(IList<T> list);
 
         void Dispose(bool disposing);
-        T this[object id] => GetById(id);
+        T this[int id] => GetById(id);
 
         List<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToList();
     }

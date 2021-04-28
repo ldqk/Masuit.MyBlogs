@@ -63,6 +63,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 req.Body.Seek(0, SeekOrigin.Begin);
                 using var sr = new StreamReader(req.Body, Encoding.UTF8, false);
                 var body = await sr.ReadToEndAsync();
+                body = HttpUtility.UrlDecode(body);
                 req.Body.Position = 0;
                 switch (feature.Error)
                 {

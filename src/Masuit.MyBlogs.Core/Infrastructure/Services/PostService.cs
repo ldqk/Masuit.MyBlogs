@@ -179,7 +179,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>删除成功</returns>
-        public override bool DeleteByIdSaved(object id)
+        public override bool DeleteByIdSaved(int id)
         {
             base.DeleteById(id);
             return SearchEngine.SaveChanges() > 0;
@@ -201,7 +201,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>删除成功</returns>
-        public override Task<int> DeleteByIdSavedAsync(object id)
+        public override Task<int> DeleteByIdSavedAsync(int id)
         {
             base.DeleteById(id);
             return SearchEngine.SaveChangesAsync();

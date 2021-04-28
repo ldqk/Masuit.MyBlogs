@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using EFCoreSecondLevelCacheInterceptor;
+using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
-using Masuit.Tools;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
@@ -20,7 +20,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
     /// DAL基类
     /// </summary>
     /// <typeparam name="T">实体类型</typeparam>
-    public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T : class, new()
+    public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T : LuceneIndexableBaseEntity
     {
         public virtual DataContext DataContext { get; set; }
 
@@ -497,7 +497,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual T GetNoTracking<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).AsNoTracking().FirstOrDefault(where) : DataContext.Set<T>().OrderByDescending(orderby).AsNoTracking().FirstOrDefault(where);
+            return isAsc ? EF.CompileQuery((DataContext ctx) => ctx.Set<T>().AsNoTracking().OrderBy(orderby).FirstOrDefault(where))(DataContext) : EF.CompileQuery((DataContext ctx) => ctx.Set<T>().AsNoTracking().OrderByDescending(orderby).FirstOrDefault(where))(DataContext);
         }
 
         /// <summary>
@@ -507,7 +507,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual TDto Get<TDto>(Expression<Func<T, bool>> where) where TDto : class
         {
-            return DataContext.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefault();
+            return EF.CompileQuery((DataContext ctx) => ctx.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefault())(DataContext);
         }
 
         /// <summary>
@@ -551,7 +551,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual Task<T> GetNoTrackingAsync(Expression<Func<T, bool>> where)
         {
-            return DataContext.Set<T>().AsNoTracking().FirstOrDefaultAsync(@where);
+            return EF.CompileAsyncQuery((DataContext ctx) => ctx.Set<T>().AsNoTracking().FirstOrDefault(@where))(DataContext);
         }
 
         /// <summary>
@@ -562,9 +562,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>实体</returns>
-        public virtual async Task<T> GetNoTrackingAsync<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
+        public virtual Task<T> GetNoTrackingAsync<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return isAsc ? await DataContext.Set<T>().OrderBy(orderby).AsNoTracking().FirstOrDefaultAsync(where) : await DataContext.Set<T>().OrderByDescending(orderby).AsNoTracking().FirstOrDefaultAsync(where);
+            return isAsc ? EF.CompileAsyncQuery((DataContext ctx) => ctx.Set<T>().OrderBy(orderby).AsNoTracking().FirstOrDefault(where))(DataContext) : EF.CompileAsyncQuery((DataContext ctx) => ctx.Set<T>().OrderByDescending(orderby).AsNoTracking().FirstOrDefault(where))(DataContext);
         }
 
         /// <summary>
@@ -572,9 +572,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>实体</returns>
-        public virtual T GetById(object id)
+        public virtual T GetById(int id)
         {
-            return DataContext.Set<T>().Find(id);
+            return EF.CompileQuery((DataContext ctx, int xid) => ctx.Set<T>().FirstOrDefault(t => t.Id == xid))(DataContext, id);
         }
 
         /// <summary>
@@ -582,9 +582,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>实体</returns>
-        public virtual async Task<T> GetByIdAsync(object id)
+        public virtual Task<T> GetByIdAsync(int id)
         {
-            return await DataContext.Set<T>().FindAsync(id);
+            return EF.CompileAsyncQuery((DataContext ctx, int xid) => ctx.Set<T>().FirstOrDefault(t => t.Id == xid))(DataContext, id);
         }
 
         /// <summary>
@@ -599,8 +599,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual PagedList<T> GetPages<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc)
         {
-            var temp = DataContext.Set<T>().Where(where);
-            return isAsc ? temp.OrderBy(orderby).ToPagedList(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
+            return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ToPagedList(pageIndex, pageSize) : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
         }
 
         /// <summary>
@@ -613,10 +612,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">orderby Lambda条件表达式</param>
         /// <param name="isAsc">升序降序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual Task<PagedList<T>> GetPagesAsync<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
+        public virtual Task<PagedList<T>> GetPagesAsync<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> orderby, bool isAsc)
         {
-            var temp = DataContext.Set<T>().Where(where);
-            return isAsc ? temp.OrderBy(orderby).ToPagedListAsync(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToPagedListAsync(pageIndex, pageSize);
+            return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ToPagedListAsync(pageIndex, pageSize) : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ToPagedListAsync(pageIndex, pageSize);
         }
 
         /// <summary>
@@ -680,8 +678,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual PagedList<T> GetPagesNoTracking<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            return isAsc ? temp.OrderBy(orderby).ToPagedList(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
+            return isAsc ? DataContext.Set<T>().Where(where).AsNoTracking().OrderBy(orderby).ToPagedList(pageIndex, pageSize) : DataContext.Set<T>().Where(where).AsNoTracking().OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
         }
 
         /// <summary>
@@ -697,8 +694,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual PagedList<TDto> GetPages<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
         {
-            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            return isAsc ? temp.OrderBy(orderby).ToPagedList<T, TDto>(pageIndex, pageSize, MapperConfig) : temp.OrderByDescending(orderby).ToPagedList<T, TDto>(pageIndex, pageSize, MapperConfig);
+            return isAsc ? DataContext.Set<T>().Where(where).AsNoTracking().OrderBy(orderby).ToPagedList<T, TDto>(pageIndex, pageSize, MapperConfig) : DataContext.Set<T>().Where(where).AsNoTracking().OrderByDescending(orderby).ToPagedList<T, TDto>(pageIndex, pageSize, MapperConfig);
         }
 
         /// <summary>
@@ -714,8 +710,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public Task<PagedList<TDto>> GetPagesAsync<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc) where TDto : class
         {
-            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            return isAsc ? temp.OrderBy(orderby).ToPagedListAsync<T, TDto>(pageIndex, pageSize, MapperConfig) : temp.OrderByDescending(orderby).ToPagedListAsync<T, TDto>(pageIndex, pageSize, MapperConfig);
+            return isAsc ? DataContext.Set<T>().Where(where).AsNoTracking().OrderBy(orderby).ToPagedListAsync<T, TDto>(pageIndex, pageSize, MapperConfig) : DataContext.Set<T>().Where(where).AsNoTracking().OrderByDescending(orderby).ToPagedListAsync<T, TDto>(pageIndex, pageSize, MapperConfig);
         }
 
         /// <summary>
@@ -740,17 +735,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>删除成功</returns>
-        public virtual bool DeleteById(object id)
+        public virtual bool DeleteById(int id)
         {
-            T t = GetById(id);
-            if (t != null)
-            {
-                DataContext.Entry(t).State = EntityState.Deleted;
-                DataContext.Remove(t);
-                return true;
-            }
-
-            return false;
+            return DataContext.Set<T>().Where(t => t.Id == id).Delete() > 0;
         }
 
         /// <summary>
@@ -781,9 +768,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>删除成功</returns>
-        public virtual async Task<int> DeleteEntityAsync(Expression<Func<T, bool>> where)
+        public virtual Task<int> DeleteEntityAsync(Expression<Func<T, bool>> where)
         {
-            return await DataContext.Set<T>().Where(where).DeleteAsync();
+            return DataContext.Set<T>().Where(where).DeleteAsync();
         }
 
         /// <summary>
@@ -840,9 +827,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// 统一保存数据（异步）
         /// </summary>
         /// <returns>受影响的行数</returns>
-        public virtual async Task<int> SaveChangesAsync()
+        public virtual Task<int> SaveChangesAsync()
         {
-            return await DataContext.SaveChangesAsync();
+            return DataContext.SaveChangesAsync();
         }
 
         /// <summary>
@@ -852,7 +839,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>是否存在</returns>
         public virtual bool Any(Expression<Func<T, bool>> where)
         {
-            return DataContext.Set<T>().Any(where);
+            return EF.CompileQuery((DataContext ctx) => ctx.Set<T>().Any(where))(DataContext);
         }
 
         /// <summary>
@@ -862,7 +849,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>是否存在</returns>
         public virtual int Count(Expression<Func<T, bool>> where)
         {
-            return DataContext.Set<T>().Count(where);
+            return EF.CompileQuery((DataContext ctx) => ctx.Set<T>().Count(where))(DataContext);
         }
 
         /// <summary>
@@ -872,10 +859,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>删除成功</returns>
         public virtual bool DeleteEntities(IEnumerable<T> list)
         {
-            list.ForEach(t =>
-            {
-                DeleteEntity(t);
-            });
+            DataContext.RemoveRange(list);
             return true;
         }
 
@@ -886,7 +870,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>添加成功</returns>
         public virtual IEnumerable<T> AddEntities(IList<T> list)
         {
-            return list.Select(AddEntity);
+            DataContext.AddRange(list);
+            return list;
         }
 
         public override void Dispose(bool disposing)
@@ -895,7 +880,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
             DataContext = null;
         }
 
-        public T this[object id] => GetById(id);
+        public T this[int id] => GetById(id);
     }
 
     public static class QueryableExt
@@ -908,7 +893,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="page">当前页</param>
         /// <param name="size">页大小</param>
         /// <returns></returns>
-        public static PagedList<T> ToCachedPagedList<T>(this IOrderedQueryable<T> query, int page, int size) where T : class, new()
+        public static PagedList<T> ToCachedPagedList<T>(this IOrderedQueryable<T> query, int page, int size) where T : LuceneIndexableBaseEntity
         {
             var totalCount = query.Count();
             if (page * size > totalCount)
@@ -933,7 +918,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="page">当前页</param>
         /// <param name="size">页大小</param>
         /// <returns></returns>
-        public static async Task<PagedList<T>> ToCachedPagedListAsync<T>(this IOrderedQueryable<T> query, int page, int size) where T : class, new()
+        public static async Task<PagedList<T>> ToCachedPagedListAsync<T>(this IOrderedQueryable<T> query, int page, int size) where T : LuceneIndexableBaseEntity
         {
             var totalCount = query.Count();
             if (page * size > totalCount)
@@ -1014,7 +999,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="size">页大小</param>
         /// <param name="mapper"></param>
         /// <returns></returns>
-        public static PagedList<TDto> ToCachedPagedList<T, TDto>(this IOrderedQueryable<T> query, int page, int size, MapperConfiguration mapper) where TDto : class where T : class, new()
+        public static PagedList<TDto> ToCachedPagedList<T, TDto>(this IOrderedQueryable<T> query, int page, int size, MapperConfiguration mapper) where TDto : class where T : LuceneIndexableBaseEntity
         {
             var totalCount = query.Count();
             if (page * size > totalCount)
@@ -1041,7 +1026,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="size">页大小</param>
         /// <param name="mapper"></param>
         /// <returns></returns>
-        public static async Task<PagedList<TDto>> ToCachedPagedListAsync<T, TDto>(this IOrderedQueryable<T> query, int page, int size, MapperConfiguration mapper) where TDto : class where T : class, new()
+        public static async Task<PagedList<TDto>> ToCachedPagedListAsync<T, TDto>(this IOrderedQueryable<T> query, int page, int size, MapperConfiguration mapper) where TDto : class where T : LuceneIndexableBaseEntity
         {
             var totalCount = query.Count();
             if (page * size > totalCount)

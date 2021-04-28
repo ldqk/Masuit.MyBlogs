@@ -29,8 +29,8 @@ namespace Masuit.MyBlogs.Core.Extensions
                 return;
             }
 #if !DEBUG
-            UserInfoDto user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
-            if (user != null && user.IsAdmin)
+            var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
+            if (user?.IsAdmin == true)
             {
                 return;
             }

@@ -1,4 +1,5 @@
-﻿using Masuit.Tools.Models;
+﻿using Masuit.LuceneEFCore.SearchEngine;
+using Masuit.Tools.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 {
-    public interface IBaseService<T> where T : class
+    public interface IBaseService<T> where T : LuceneIndexableBaseEntity
     {
         /// <summary>
         /// 获取所有实体
@@ -414,14 +415,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>实体</returns>
-        T GetById(object id);
+        T GetById(int id);
 
         /// <summary>
         /// 根据ID找实体(异步)
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>实体</returns>
-        Task<T> GetByIdAsync(object id);
+        Task<T> GetByIdAsync(int id);
 
         /// <summary>
         /// 高效分页查询方法
@@ -540,21 +541,21 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>删除成功</returns>
-        bool DeleteById(object id);
+        bool DeleteById(int id);
 
         /// <summary>
         /// 根据ID删除实体并保存
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>删除成功</returns>
-        bool DeleteByIdSaved(object id);
+        bool DeleteByIdSaved(int id);
 
         /// <summary>
         /// 根据ID删除实体并保存（异步）
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>删除成功</returns>
-        Task<int> DeleteByIdSavedAsync(object id);
+        Task<int> DeleteByIdSavedAsync(int id);
 
         /// <summary>
         /// 删除实体并保存
@@ -743,10 +744,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <returns>添加成功</returns>
         Task<IEnumerable<T>> AddEntitiesAsync(IList<T> list);
 
-        T this[object id] => GetById(id);
+        T this[int id] => GetById(id);
         List<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToList();
         public static T operator +(IBaseService<T> left, T right) => left.AddEntitySaved(right);
         public static bool operator -(IBaseService<T> left, T right) => left.DeleteEntitySaved(right);
-        public static bool operator -(IBaseService<T> left, object id) => left.DeleteByIdSaved(id);
+        public static bool operator -(IBaseService<T> left, int id) => left.DeleteByIdSaved(id);
     }
 }
