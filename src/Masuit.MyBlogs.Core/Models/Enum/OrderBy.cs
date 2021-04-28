@@ -33,7 +33,7 @@ namespace Masuit.MyBlogs.Core.Models.Enum
         /// 按评论数
         /// </summary>
         [Description("评论最多")]
-        [Display(Name = nameof(CommentCount))]
+        [Display(Name = "Comment.Count")]
         CommentCount,
 
         /// <summary>
