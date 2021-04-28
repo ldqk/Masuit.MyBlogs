@@ -195,11 +195,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
             client.DefaultRequestHeaders.Referrer = new Uri("https://google.com");
             client.Timeout = TimeSpan.FromSeconds(10);
-            var cts = new CancellationTokenSource(client.Timeout);
             _linksService.GetQuery(l => !l.Except).AsParallel().ForAll(link =>
             {
                 var prev = link.Status;
-                client.GetStringAsync(link.Url, cts.Token).ContinueWith(t =>
+                client.GetStringAsync(link.Url, new CancellationTokenSource(client.Timeout).Token).ContinueWith(t =>
                 {
                     if (t.IsCanceled || t.IsFaulted)
                     {
