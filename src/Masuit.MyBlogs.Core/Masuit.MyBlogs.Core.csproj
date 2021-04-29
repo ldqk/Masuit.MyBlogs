@@ -54,7 +54,7 @@
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.22" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
         <PackageReference Include="Polly" Version="7.2.2" />
-        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0-alpha.2" />
+        <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0" />
         <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="5.0.1" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.9" />
         <PackageReference Include="TimeZoneConverter" Version="3.5.0" />
