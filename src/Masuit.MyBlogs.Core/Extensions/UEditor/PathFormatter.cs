@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Masuit.Tools.DateTimeExt;
+using System;
 using System.IO;
 using System.Text.RegularExpressions;
 
@@ -13,7 +14,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
         {
             if (String.IsNullOrWhiteSpace(pathFormat))
             {
-                pathFormat = "{filename}{rand:6}";
+                pathFormat = "{filename}_{rand:6}";
             }
 
             var invalidPattern = new Regex(@"[\\\/\:\*\?\042\<\>\|]");
@@ -34,7 +35,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 return rand.Next((int)Math.Pow(10, digit), (int)Math.Pow(10, digit + 1)).ToString();
             });
 
-            pathFormat = pathFormat.Replace("{time}", DateTime.Now.Ticks.ToString());
+            pathFormat = pathFormat.Replace("{time}", DateTime.Now.GetTotalMilliseconds().ToString());
             pathFormat = pathFormat.Replace("{yyyy}", DateTime.Now.Year.ToString());
             pathFormat = pathFormat.Replace("{yy}", (DateTime.Now.Year % 100).ToString("D2"));
             pathFormat = pathFormat.Replace("{mm}", DateTime.Now.Month.ToString("D2"));

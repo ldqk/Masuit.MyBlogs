@@ -57,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Common
                 return (null, false);
             }
 
-            file = SnowFlake.NewId + Path.GetExtension(file);
+            file = Path.GetFileName(file);
             var fallbackPolicy = Policy<(string url, bool success)>.Handle<Exception>().FallbackAsync(async _ =>
             {
                 await Task.CompletedTask;
