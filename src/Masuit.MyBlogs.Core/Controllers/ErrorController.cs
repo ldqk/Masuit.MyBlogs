@@ -89,19 +89,19 @@ namespace Masuit.MyBlogs.Core.Controllers
                         break;
                     case NotFoundException ex:
                         Response.StatusCode = 404;
-                        return Request.Method.Equals(HttpMethods.Get) ? (ActionResult)View("Index") : Json(new
+                        return Request.Method.Equals(HttpMethods.Get) ? View("Index") : Json(new
                         {
                             StatusCode = 404,
                             Success = false,
                             ex.Message
                         });
-                    case AccessDenyException _:
+                    case AccessDenyException:
                         var (location, network) = ip.GetIPLocation();
                         var tips = Template.Create(CommonHelper.SystemSettings.GetOrAdd("AccessDenyTips", @"<h4>遇到了什么问题？</h4>
                 <h4>基于主观因素考虑，您所在的地区暂时不允许访问本站，如有疑问，请联系站长！或者请联系站长开通本站的访问权限！</h4>")).Set("clientip", ip.ToString()).Set(nameof(location), location).Set(nameof(network), network).Render();
                         Response.StatusCode = 403;
                         return View("AccessDeny", tips);
-                    case TempDenyException _:
+                    case TempDenyException:
                         Response.StatusCode = 403;
                         return View("TempDeny");
                     default:
@@ -111,7 +111,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             Response.StatusCode = 503;
-            return Request.Method.Equals(HttpMethods.Get) ? (ActionResult)View() : Json(new
+            return Request.Method.Equals(HttpMethods.Get) ? View() : Json(new
             {
                 StatusCode = 503,
                 Success = false,
