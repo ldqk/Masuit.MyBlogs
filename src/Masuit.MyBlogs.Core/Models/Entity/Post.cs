@@ -58,6 +58,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// ÐÞ¸ÄÊ±¼ä
         /// </summary>
+        [LuceneIndex]
         public DateTime ModifyDate { get; set; }
 
         /// <summary>
