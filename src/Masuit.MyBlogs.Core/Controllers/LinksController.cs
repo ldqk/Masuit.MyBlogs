@@ -159,7 +159,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Delete(int id)
         {
-            bool b = await LinksService.DeleteByIdSavedAsync(id) > 0;
+            bool b = await LinksService.DeleteByIdAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 

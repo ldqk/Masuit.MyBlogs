@@ -740,25 +740,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 根据ID删除实体并保存
-        /// </summary>
-        /// <param name="id">实体id</param>
-        /// <returns>删除成功</returns>
-        public virtual bool DeleteByIdSaved(int id)
-        {
-            BaseDal.DeleteById(id);
-            return SaveChanges() > 0;
-        }
-
-        /// <summary>
         /// 根据ID删除实体并保存（异步）
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>删除成功</returns>
-        public virtual Task<int> DeleteByIdSavedAsync(int id)
+        public virtual Task<int> DeleteByIdAsync(int id)
         {
-            BaseDal.DeleteById(id);
-            return SaveChangesAsync();
+            return BaseDal.DeleteByIdAsync(id);
         }
 
         /// <summary>

@@ -544,18 +544,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         bool DeleteById(int id);
 
         /// <summary>
-        /// 根据ID删除实体并保存
-        /// </summary>
-        /// <param name="id">实体id</param>
-        /// <returns>删除成功</returns>
-        bool DeleteByIdSaved(int id);
-
-        /// <summary>
         /// 根据ID删除实体并保存（异步）
         /// </summary>
         /// <param name="id">实体id</param>
         /// <returns>删除成功</returns>
-        Task<int> DeleteByIdSavedAsync(int id);
+        Task<int> DeleteByIdAsync(int id);
 
         /// <summary>
         /// 删除实体并保存
@@ -748,6 +741,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         List<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToList();
         public static T operator +(IBaseService<T> left, T right) => left.AddEntitySaved(right);
         public static bool operator -(IBaseService<T> left, T right) => left.DeleteEntitySaved(right);
-        public static bool operator -(IBaseService<T> left, int id) => left.DeleteByIdSaved(id);
+        public static bool operator -(IBaseService<T> left, int id) => left.DeleteById(id);
     }
 }

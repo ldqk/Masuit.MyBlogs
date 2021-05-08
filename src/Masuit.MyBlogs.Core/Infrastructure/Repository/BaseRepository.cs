@@ -741,6 +741,16 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
 
         /// <summary>
+        /// 根据ID删除实体
+        /// </summary>
+        /// <param name="id">实体id</param>
+        /// <returns>删除成功</returns>
+        public virtual Task<int> DeleteByIdAsync(int id)
+        {
+            return DataContext.Set<T>().Where(t => t.Id == id).DeleteAsync();
+        }
+
+        /// <summary>
         /// 删除实体
         /// </summary>
         /// <param name="t">需要删除的实体</param>

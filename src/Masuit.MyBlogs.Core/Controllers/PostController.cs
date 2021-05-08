@@ -913,7 +913,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> DeleteHistory(int id)
         {
-            bool b = await PostHistoryVersionService.DeleteByIdSavedAsync(id) > 0;
+            bool b = await PostHistoryVersionService.DeleteByIdAsync(id) > 0;
             return ResultData(null, b, b ? "历史版本文章删除成功！" : "历史版本文章删除失败！");
         }
 
@@ -938,7 +938,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 history.Post.Seminar.Add(s);
             }
             bool b = await SearchEngine.SaveChangesAsync() > 0;
-            await PostHistoryVersionService.DeleteByIdSavedAsync(id);
+            await PostHistoryVersionService.DeleteByIdAsync(id);
             return ResultData(null, b, b ? "回滚成功" : "回滚失败");
         }
 

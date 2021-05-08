@@ -23,7 +23,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")]int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")]int size = 15)
+        public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var list = DonateService.GetPages(page, size, d => true, d => d.DonateTime, false);
             return Ok(list);
@@ -58,7 +58,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult Delete(int id)
         {
-            bool b = DonateService.DeleteByIdSaved(id);
+            bool b = DonateService.DeleteById(id);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
     }

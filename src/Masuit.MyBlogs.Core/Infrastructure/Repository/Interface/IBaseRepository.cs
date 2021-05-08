@@ -546,6 +546,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         bool DeleteById(int id);
 
         /// <summary>
+        /// 根据ID删除实体
+        /// </summary>
+        /// <param name="id">实体id</param>
+        /// <returns>删除成功</returns>
+        Task<int> DeleteByIdAsync(int id);
+
+        /// <summary>
         /// 删除实体
         /// </summary>
         /// <param name="t">需要删除的实体</param>

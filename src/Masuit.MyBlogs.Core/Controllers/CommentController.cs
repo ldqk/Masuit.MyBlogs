@@ -287,7 +287,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Delete(int id)
         {
-            var b = CommentService.DeleteByIdSaved(id);
+            var b = CommentService.DeleteById(id);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 

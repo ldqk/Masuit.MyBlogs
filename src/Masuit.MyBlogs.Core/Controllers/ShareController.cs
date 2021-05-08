@@ -46,7 +46,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost]
         public async Task<ActionResult> Remove(int id)
         {
-            bool b = await FastShareService.DeleteByIdSavedAsync(id) > 0;
+            bool b = await FastShareService.DeleteByIdAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
 

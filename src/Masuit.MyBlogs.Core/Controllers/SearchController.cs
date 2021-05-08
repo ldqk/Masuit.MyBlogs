@@ -125,7 +125,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, MyAuthorize]
         public async Task<ActionResult> Delete(int id)
         {
-            bool b = await SearchDetailsService.DeleteByIdSavedAsync(id) > 0;
+            bool b = await SearchDetailsService.DeleteByIdAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
     }

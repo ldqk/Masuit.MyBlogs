@@ -123,7 +123,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> Delete(int id)
         {
-            await UserInfoService.DeleteByIdSavedAsync(id);
+            await UserInfoService.DeleteByIdAsync(id);
             return ResultData(null);
         }
 

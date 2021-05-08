@@ -253,7 +253,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Delete(int id)
         {
-            var b = LeaveMessageService.DeleteByIdSaved(id);
+            var b = LeaveMessageService.DeleteById(id);
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 
@@ -313,7 +313,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> DeleteMsg(int id)
         {
-            bool b = await MessageService.DeleteByIdSavedAsync(id) > 0;
+            bool b = await MessageService.DeleteByIdAsync(id) > 0;
             return ResultData(null, b, b ? "站内消息删除成功！" : "站内消息删除失败！");
         }
 

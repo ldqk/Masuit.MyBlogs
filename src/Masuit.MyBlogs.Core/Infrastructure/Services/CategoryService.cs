@@ -40,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 moveCat.PostHistoryVersion.Add(p);
             }
 
-            bool b = await DeleteByIdSavedAsync(id) > 0;
+            bool b = await DeleteByIdAsync(id) > 0;
             return b;
         }
     }
