@@ -111,7 +111,7 @@ namespace Masuit.MyBlogs.Core
                 options.EnableServerTimingHeader = true;
                 options.ResultsAuthorize = req => req.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true;
                 options.ResultsListAuthorize = options.ResultsAuthorize;
-                options.IgnoredPaths.AddRange("/Assets/", "/Content/", "/fonts/", "/images/", "/ng-views/", "/Scripts/", "/static/", "/template/", "/cloud10.png", "/favicon.ico");
+                options.IgnoredPaths.AddRange("/Assets/", "/Content/", "/fonts/", "/images/", "/ng-views/", "/Scripts/", "/static/", "/template/", "/cloud10.png", "/favicon.ico", "/_blazor");
                 options.PopupRenderPosition = RenderPosition.BottomLeft;
                 options.PopupShowTimeWithChildren = true;
                 options.PopupShowTrivial = true;
