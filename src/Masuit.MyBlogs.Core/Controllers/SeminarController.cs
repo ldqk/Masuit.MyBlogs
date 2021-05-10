@@ -6,11 +6,9 @@ using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.Tools;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -65,21 +63,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Save(Seminar seminar)
         {
-            bool contain;
-            if (seminar.Id > 0)
-            {
-                //更新
-                contain = SeminarService.GetAll().Select(s => s.Title).Except(new List<string>()
-                {
-                    SeminarService.GetById(seminar.Id).Title
-                }).Contains(seminar.Title);
-            }
-            else
-            {
-                //添加
-                contain = SeminarService.GetAll().Select(s => s.Title).Contains(seminar.Title);
-            }
-            if (contain)
+            if (seminar.Id > 0 ? SeminarService.Any(s => s.Id != seminar.Id && s.Title == seminar.Title) : SeminarService.Any(s => s.Title == seminar.Title))
             {
                 return ResultData(null, false, $"{seminar.Title} 已经存在了");
             }

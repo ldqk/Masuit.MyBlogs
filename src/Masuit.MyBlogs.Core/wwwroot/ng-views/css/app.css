@@ -16249,3 +16249,7 @@ table.table >tbody > tr>td img {
 .layui-layer-shade {
     z-index: 6 !important;
 }
+.mp-results.mp-bottomleft {
+    top: auto !important;
+    bottom: 0;
+}
