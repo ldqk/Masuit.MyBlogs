@@ -1,5 +1,6 @@
 ﻿using AngleSharp;
 using CacheManager.Core;
+using EFCoreSecondLevelCacheInterceptor;
 using Hangfire;
 using JiebaNet.Segmenter;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
@@ -354,7 +355,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("all"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> All()
         {
-            var tags = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).ToList().SelectMany(s => s.Split(',', '，')).GroupBy(t => t).Where(g => g.Count() > 1).OrderByDescending(g => g.Count()).ThenBy(g => g.Key).ToList(); //tag
+            var tags = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().ToList().SelectMany(s => s.Split(',', '，')).GroupBy(t => t).Where(g => g.Count() > 1).OrderByDescending(g => g.Count()).ThenBy(g => g.Key).ToList(); //tag
             ViewBag.tags = tags;
             ViewBag.cats = await CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
@@ -1009,7 +1010,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var keys = await RedisHelper.KeysAsync(nameof(PostOnline) + ":*");
             var sets = await keys.SelectAsync(async s => (Id: s.Split(':')[1].ToInt32(), Clients: await RedisHelper.HGetAsync<HashSet<string>>(s, "value")));
             var ids = sets.Where(t => t.Clients.Count > 0).OrderByDescending(t => t.Clients.Count).Take(10).Select(t => t.Id).ToArray();
-            var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).FromCacheAsync().ContinueWith(t =>
+            var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).Cacheable().ToListAsync().ContinueWith(t =>
             {
                 foreach (var item in t.Result)
                 {
@@ -1024,13 +1025,13 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Id = p.Id,
                 Title = p.Title,
                 ViewCount = p.TotalViewCount
-            }).FromCacheAsync();
+            }).Cacheable().ToListAsync();
             var mostAverage = await postsQuery.OrderByDescending(p => p.AverageViewCount).Take(10).Select(p => new PostModelBase()
             {
                 Id = p.Id,
                 Title = p.Title,
                 ViewCount = (int)p.AverageViewCount
-            }).FromCacheAsync();
+            }).Cacheable().ToListAsync();
             return ResultData(new
             {
                 mostHots,

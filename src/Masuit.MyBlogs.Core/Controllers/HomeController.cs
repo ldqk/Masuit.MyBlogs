@@ -1,4 +1,5 @@
 ﻿using AutoMapper.QueryableExtensions;
+using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Repository;
@@ -24,7 +25,6 @@ using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -64,7 +64,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var viewModel = await GetIndexPageViewModel();
             viewModel.Banner = banners;
             viewModel.Posts = posts;
-            ViewBag.FastShare = fastShares.ToList();
+            ViewBag.FastShare = fastShares;
             viewModel.PageParams = new Pagination(1, 15, posts.TotalCount, OrderBy.ModifyDate);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar);
             viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
@@ -224,14 +224,14 @@ namespace Masuit.MyBlogs.Core.Controllers
             var notices = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(1, 5, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false); //加载前5条公告
             var cats = await CategoryService.GetQueryFromCacheAsync<string, CategoryDto>(c => c.Status == Status.Available, c => c.Name); //加载分类目录
             var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList(); //热词统计
-            var hot6Post = await postsQuery.OrderBy((new Random().Next() % 3) switch
+            var hot6Post = postsQuery.OrderBy((new Random().Next() % 3) switch
             {
                 1 => nameof(OrderBy.VoteUpCount),
                 2 => nameof(OrderBy.AverageViewCount),
                 _ => nameof(OrderBy.TotalViewCount)
-            } + " desc").Skip(0).Take(5).FromCacheAsync(); //热门文章
+            } + " desc").Skip(0).Take(5).Cacheable(); //热门文章
             var newdic = new Dictionary<string, int>(); //标签云最终结果
-            var tagdic = postsQuery.Where(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().FromCache().ToList().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).ToDictionary(g => g.Key, g => g.Count()); //统计标签
+            var tagdic = postsQuery.Where(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().Cacheable().ToList().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).ToDictionary(g => g.Key, g => g.Count()); //统计标签
 
             if (tagdic.Any())
             {
@@ -245,7 +245,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             return new HomePageViewModel()
             {
-                Categories = cats.ToList(),
+                Categories = cats,
                 HotSearch = hotSearches,
                 Notices = notices.Data,
                 Tags = newdic,

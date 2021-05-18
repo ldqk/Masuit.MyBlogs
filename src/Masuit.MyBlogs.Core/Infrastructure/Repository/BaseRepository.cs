@@ -507,7 +507,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual TDto Get<TDto>(Expression<Func<T, bool>> where) where TDto : class
         {
-            return EF.CompileQuery((DataContext ctx) => ctx.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefault())(DataContext);
+            return DataContext.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefault();
         }
 
         /// <summary>

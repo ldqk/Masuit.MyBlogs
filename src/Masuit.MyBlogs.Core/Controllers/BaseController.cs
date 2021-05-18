@@ -111,7 +111,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="filterContext">有关当前请求和操作的信息。</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            base.OnActionExecuting(filterContext);
             ViewBag.Desc = CommonHelper.SystemSettings["Description"];
             var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
@@ -175,7 +174,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                 };
                 ViewBag.Footer = model;
             }
-            base.OnActionExecuted(filterContext);
         }
 
         /// <summary>

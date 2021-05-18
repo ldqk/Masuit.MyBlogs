@@ -1,5 +1,4 @@
 ﻿using CacheManager.Core;
-using Lucene.Net.Search;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
@@ -149,14 +148,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 searchOptions.Score = 0.2f;
             }
 
-            searchOptions.OrderBy = new List<SortField>()
-            {
-                SortField.FIELD_DOC,
-                SortField.FIELD_SCORE
-            };
-            searchOptions.SetBoosts(nameof(Post.Keyword), 2000);
-            searchOptions.SetBoosts(nameof(Post.Content), 2000);
-            searchOptions.SetBoosts(nameof(Post.Title), 1000);
             return searchOptions;
         }
 

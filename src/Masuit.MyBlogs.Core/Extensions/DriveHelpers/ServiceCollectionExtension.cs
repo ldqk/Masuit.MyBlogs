@@ -8,7 +8,7 @@ namespace Masuit.MyBlogs.Core.Extensions.DriveHelpers
     {
         public static IServiceCollection AddOneDrive(this IServiceCollection services)
         {
-            services.AddDbContext<DriveContext>(ServiceLifetime.Transient);
+            services.AddDbContext<DriveContext>(ServiceLifetime.Scoped);
             //不要被 CG Token获取采用单一实例
             services.AddSingleton(new TokenService());
             services.AddTransient<IDriveAccountService, DriveAccountService>();

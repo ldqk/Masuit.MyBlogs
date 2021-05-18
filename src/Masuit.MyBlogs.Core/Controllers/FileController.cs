@@ -218,7 +218,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     break;
                 case "compress":
                     var filename = Path.Combine(Path.Combine(root, req.Destination.TrimStart('\\', '/')), Path.GetFileNameWithoutExtension(req.CompressedFilename) + ".zip");
-                    SevenZipCompressor.Zip(req.Items.Select(s => Path.Combine(root, s.TrimStart('\\', '/'))).ToList(), filename);
+                    SevenZipCompressor.Zip(req.Items.Select(s => Path.Combine(root, s.TrimStart('\\', '/'))), filename);
                     list.Add(new
                     {
                         success = "true"
@@ -262,7 +262,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     }
                     break;
                 case "downloadMultiple":
-                    var buffer = SevenZipCompressor.ZipStream(items.Select(s => Path.Combine(HostEnvironment.ContentRootPath, root, s.TrimStart('\\', '/'))).ToList()).ToArray();
+                    var buffer = SevenZipCompressor.ZipStream(items.Select(s => Path.Combine(HostEnvironment.ContentRootPath, root, s.TrimStart('\\', '/')))).ToArray();
                     return this.ResumeFile(buffer, Path.GetFileName(toFilename));
             }
 
