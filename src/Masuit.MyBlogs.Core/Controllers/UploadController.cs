@@ -178,13 +178,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         [Route("download")]
         [Route("download/{**path}")]
-        public ActionResult Download(string path)
+        public ActionResult Download([FromServices] IMimeMapper mimeMapper, string path)
         {
             if (string.IsNullOrEmpty(path)) return Content("null");
             var file = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), path.Trim('.', '/', '\\'));
             if (System.IO.File.Exists(file))
             {
-                return this.ResumePhysicalFile(file, Path.GetFileName(file));
+                return this.ResumePhysicalFile(file, mimeMapper.GetMimeFromPath(file), Path.GetFileName(file));
             }
 
             return Content("null");

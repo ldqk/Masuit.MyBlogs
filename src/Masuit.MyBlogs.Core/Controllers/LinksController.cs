@@ -45,7 +45,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public async Task<ActionResult> Apply(Links links, CancellationToken cancellationToken)
         {
-            if (!links.Url.MatchUrl())
+            if (!links.Url.MatchUrl()||links.Url.Contains(Request.Host.Host))
             {
                 return ResultData(null, false, "添加失败！链接非法！");
             }

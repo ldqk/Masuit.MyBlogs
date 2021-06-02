@@ -11,7 +11,7 @@ namespace Masuit.MyBlogs.Core.Common
     public static class PerfCounter
     {
         public static ConcurrentLimitedQueue<PerformanceCounter> List { get; set; } = new(50000);
-        public static DateTime StartTime { get; set; } = DateTime.Now;
+        public static readonly DateTime StartTime = DateTime.Now;
 
         public static void Init()
         {
@@ -42,16 +42,16 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static PerformanceCounter GetCurrentPerformanceCounter()
         {
-            var time = (long)DateTime.Now.GetTotalMilliseconds();
-            float load = SystemInfo.CpuLoad;
+            var time = DateTime.Now.GetTotalMilliseconds();
+            var load = SystemInfo.CpuLoad;
             var mem = (1 - SystemInfo.MemoryAvailable.ConvertTo<float>() / SystemInfo.PhysicalMemory.ConvertTo<float>()) * 100;
 
-            float read = SystemInfo.GetDiskData(DiskData.Read) / 1024f;
-            float write = SystemInfo.GetDiskData(DiskData.Write) / 1024;
+            var read = SystemInfo.GetDiskData(DiskData.Read) / 1024f;
+            var write = SystemInfo.GetDiskData(DiskData.Write) / 1024;
 
-            float up = SystemInfo.GetNetData(NetData.Received) / 1024;
-            float down = SystemInfo.GetNetData(NetData.Sent) / 1024;
-            var counter = new PerformanceCounter()
+            var up = SystemInfo.GetNetData(NetData.Received) / 1024;
+            var down = SystemInfo.GetNetData(NetData.Sent) / 1024;
+            return new PerformanceCounter()
             {
                 Time = time,
                 CpuLoad = load,
@@ -61,48 +61,47 @@ namespace Masuit.MyBlogs.Core.Common
                 Download = down,
                 Upload = up
             };
-            return counter;
         }
+    }
+
+    /// <summary>
+    /// 性能计数器
+    /// </summary>
+    public class PerformanceCounter
+    {
+        /// <summary>
+        /// 当前时间戳
+        /// </summary>
+        public long Time { get; set; }
 
         /// <summary>
-        /// 性能计数器
+        /// CPU当前负载
         /// </summary>
-        public class PerformanceCounter
-        {
-            /// <summary>
-            /// 当前时间戳
-            /// </summary>
-            public long Time { get; set; }
+        public float CpuLoad { get; set; }
 
-            /// <summary>
-            /// CPU当前负载
-            /// </summary>
-            public float CpuLoad { get; set; }
+        /// <summary>
+        /// 内存使用率
+        /// </summary>
+        public float MemoryUsage { get; set; }
 
-            /// <summary>
-            /// 内存使用率
-            /// </summary>
-            public float MemoryUsage { get; set; }
+        /// <summary>
+        /// 磁盘读
+        /// </summary>
+        public float DiskRead { get; set; }
 
-            /// <summary>
-            /// 磁盘读
-            /// </summary>
-            public float DiskRead { get; set; }
+        /// <summary>
+        /// 磁盘写
+        /// </summary>
+        public float DiskWrite { get; set; }
 
-            /// <summary>
-            /// 磁盘写
-            /// </summary>
-            public float DiskWrite { get; set; }
+        /// <summary>
+        /// 网络上行
+        /// </summary>
+        public float Upload { get; set; }
 
-            /// <summary>
-            /// 网络上行
-            /// </summary>
-            public float Upload { get; set; }
-
-            /// <summary>
-            /// 网络下行
-            /// </summary>
-            public float Download { get; set; }
-        }
+        /// <summary>
+        /// 网络下行
+        /// </summary>
+        public float Download { get; set; }
     }
 }

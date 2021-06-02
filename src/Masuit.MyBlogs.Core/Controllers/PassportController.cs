@@ -7,6 +7,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
@@ -181,7 +182,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string code = Tools.Strings.ValidateCode.CreateValidateCode(6);
             HttpContext.Session.Set("valid", code); //将验证码生成到Session中
             var buffer = HttpContext.CreateValidateGraphic(code);
-            return this.ResumeFile(buffer, "image/jpeg");
+            return this.ResumeFile(buffer, ContentType.Jpeg, "验证码.jpg");
         }
 
         /// <summary>

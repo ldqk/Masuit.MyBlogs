@@ -27,6 +27,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -46,6 +47,7 @@ namespace Masuit.MyBlogs.Core
 
         internal static void UseLuceneSearch(this IApplicationBuilder app, IHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
+            var are = new AutoResetEvent(false);
             Task.Run(() =>
             {
                 Console.WriteLine("正在导入自定义词库...");
@@ -62,11 +64,13 @@ namespace Masuit.MyBlogs.Core
                 });
                 Console.WriteLine($"导入自定义词库完成，耗时{time}s");
                 Windows.ClearMemorySilent();
+                are.Set();
             });
 
             string lucenePath = Path.Combine(env.ContentRootPath, luceneIndexerOptions.Path);
             if (!Directory.Exists(lucenePath) || Directory.GetFiles(lucenePath).Length < 1)
             {
+                are.WaitOne();
                 Console.WriteLine("索引库不存在，开始自动创建Lucene索引库...");
                 hangfire.CreateLuceneIndex();
                 Console.WriteLine("索引库创建完成！");

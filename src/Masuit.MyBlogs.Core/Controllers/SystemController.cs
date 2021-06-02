@@ -38,7 +38,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public IActionResult GetCounterHistory()
         {
-            var list = PerfCounter.List.Count < 5000 ? PerfCounter.List.OrderBy(c => c.Time) : PerfCounter.List.GroupBy(c => c.Time / 60000).Select(g => new PerfCounter.PerformanceCounter
+            var counters = PerfCounter.List.OrderBy(c => c.Time);
+            var list = counters.Count() < 5000 ? counters : counters.GroupBy(c => c.Time / 60000).Select(g => new PerformanceCounter
             {
                 Time = g.Key * 60000,
                 CpuLoad = g.OrderBy(c => c.CpuLoad).Skip(1).Take(g.Count() - 2).Select(c => c.CpuLoad).DefaultIfEmpty().Average(),
@@ -47,39 +48,39 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Download = g.OrderBy(c => c.Download).Skip(1).Take(g.Count() - 2).Select(c => c.Download).DefaultIfEmpty().Average(),
                 Upload = g.OrderBy(c => c.Upload).Skip(1).Take(g.Count() - 2).Select(c => c.Upload).DefaultIfEmpty().Average(),
                 MemoryUsage = g.OrderBy(c => c.MemoryUsage).Skip(1).Take(g.Count() - 2).Select(c => c.MemoryUsage).DefaultIfEmpty().Average()
-            }).OrderBy(c => c.Time);
+            });
             return Ok(new
             {
                 cpu = list.Select(c => new[]
                 {
-                        c.Time,
-                        c.CpuLoad.ToDecimal(2)
-                    }),
+                    c.Time,
+                    c.CpuLoad.ToDecimal(2)
+                }),
                 mem = list.Select(c => new[]
                 {
-                        c.Time,
-                        c.MemoryUsage.ToDecimal(2)
-                    }),
+                    c.Time,
+                    c.MemoryUsage.ToDecimal(2)
+                }),
                 read = list.Select(c => new[]
                 {
-                        c.Time,
-                        c.DiskRead.ToDecimal(2)
-                    }),
+                    c.Time,
+                    c.DiskRead.ToDecimal(2)
+                }),
                 write = list.Select(c => new[]
                 {
-                        c.Time,
-                        c.DiskWrite.ToDecimal(2)
-                    }),
+                    c.Time,
+                    c.DiskWrite.ToDecimal(2)
+                }),
                 down = list.Select(c => new[]
                 {
-                        c.Time,
-                        c.Download.ToDecimal(2)
-                    }),
+                    c.Time,
+                    c.Download.ToDecimal(2)
+                }),
                 up = list.Select(c => new[]
                 {
-                        c.Time,
-                        c.Upload.ToDecimal(2)
-                    })
+                    c.Time,
+                    c.Upload.ToDecimal(2)
+                })
             });
         }
 

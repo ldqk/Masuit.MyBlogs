@@ -132,7 +132,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             }
 
             post.TotalViewCount += 1;
-            post.AverageViewCount = post.TotalViewCount / (DateTime.Now - post.PostDate).TotalDays;
+            post.AverageViewCount = post.TotalViewCount / Math.Ceiling((DateTime.Now - post.PostDate).TotalDays);
             _postService.SaveChanges();
         }
 

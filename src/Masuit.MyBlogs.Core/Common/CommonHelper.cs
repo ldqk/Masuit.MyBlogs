@@ -294,7 +294,7 @@ namespace Masuit.MyBlogs.Core.Common
             var summary = doc.DocumentElement.GetElementsByTagName("p").FirstOrDefault(n => n.TextContent.Length > min)?.TextContent ?? "没有摘要";
             if (summary.Length > length)
             {
-                return summary.Substring(0, length) + "...";
+                return summary[..length] + "...";
             }
 
             return summary;

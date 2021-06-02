@@ -4,6 +4,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -67,7 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 Encoding = Encoding.UTF8
             });
-            return Content(rss, "text/xml");
+            return Content(rss, ContentType.Xml);
         }
 
         private void InsertAdvertisement(List<Item> posts, int? cid = null)
@@ -140,7 +141,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 Encoding = Encoding.UTF8
             });
-            return Content(rss, "text/xml");
+            return Content(rss, ContentType.Xml);
         }
 
         /// <summary>
@@ -186,7 +187,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 Encoding = Encoding.UTF8
             });
-            return Content(rss, "text/xml");
+            return Content(rss, ContentType.Xml);
         }
     }
 }

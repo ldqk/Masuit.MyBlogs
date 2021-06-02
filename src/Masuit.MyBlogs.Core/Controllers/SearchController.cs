@@ -40,6 +40,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Search([FromServices] IPostService postService, string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             wd = ChineseConverter.Convert(wd?.Trim() ?? "", ChineseConversionDirection.TraditionalToSimplified);
+            if (wd.Length > 128)
+            {
+                wd = wd[..128];
+            }
+
             ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
             string key = "Search:" + ClientIP;

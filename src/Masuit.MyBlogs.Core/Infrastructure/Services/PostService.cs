@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -130,22 +131,22 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             keyword = Regex.Replace(keyword, @":\s+", ":");
             var fields = new List<string>();
             var newkeywords = new List<string>();
-            if (keyword.Contains("intitle:"))
+            foreach (var item in keyword.Split(' ', '　').Where(s => s.Contains(new[] { ":", "：" })))
             {
-                fields.Add("Title");
-                newkeywords.Add(keyword.Split(' ', '　').FirstOrDefault(s => s.Contains("intitle")).Split(':')[1]);
-            }
+                var part = item.Split(':', '：');
+                var field = typeof(Post).GetProperty(part[0], BindingFlags.IgnoreCase)?.Name;
+                if (!string.IsNullOrEmpty(field))
+                {
+                    fields.Add(field);
+                }
 
-            if (keyword.Contains("content:"))
-            {
-                fields.Add("Content");
-                newkeywords.Add(keyword.Split(' ', '　').FirstOrDefault(s => s.Contains("content")).Split(':')[1]);
+                newkeywords.Add(part[1]);
             }
 
             var searchOptions = fields.Any() ? new SearchOptions(newkeywords.Join(" "), page, size, fields.Join(",")) : new SearchOptions(keyword, page, size, typeof(Post));
-            if (keyword.Contains(new[] { " ", ",", "+", ";" }))
+            if (keyword.Contains(new[] { " ", ",", ";" }))
             {
-                searchOptions.Score = 0.2f;
+                searchOptions.Score = 0.3f;
             }
 
             return searchOptions;

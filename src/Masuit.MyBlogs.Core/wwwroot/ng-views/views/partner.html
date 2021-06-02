@@ -37,6 +37,9 @@
     </div>
     <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed listTable" ng-form="list.tableForm" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
+            <td title="'id'">
+                {{row.Id}}
+            </td>
             <td title="'标题'">
                 <a ng-click="detail(row)" target="_blank">{{row.Title}}</a>
             </td>

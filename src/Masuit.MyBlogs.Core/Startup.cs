@@ -16,6 +16,7 @@ using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Config;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Net;
@@ -111,6 +112,7 @@ namespace Masuit.MyBlogs.Core
             services.AddMailSender(Configuration).AddFirewallReporter(Configuration);
             services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
             services.SetupMiniProfile();
+            services.AddSingleton<IMimeMapper, MimeMapper>(p => new MimeMapper());
             services.AddOneDrive();
             services.AddRazorPages();
             services.AddServerSideBlazor();

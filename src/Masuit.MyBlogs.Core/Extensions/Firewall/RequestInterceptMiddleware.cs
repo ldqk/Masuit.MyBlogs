@@ -40,10 +40,11 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             request.EnableBuffering();
             if (!AppConfig.EnableIPDirect && request.Host.Host.MatchInetAddress() && !request.Host.Host.IsPrivateIP())
             {
-                context.Response.StatusCode = 404;
+                context.Response.Redirect("https://www.baidu.com", true);
+                //context.Response.StatusCode = 404;
                 return Task.CompletedTask;
             }
-            var ip = context.Connection.RemoteIpAddress.ToString();
+            var ip = context.Connection.RemoteIpAddress!.ToString();
             var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
             var requestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path);
             var match = Regex.Match(path ?? "", CommonHelper.BanRegex);
