@@ -38,7 +38,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index()
         {
             Response.StatusCode = 404;
-            return Request.Method.Equals(HttpMethods.Get) ? (ActionResult)View() : Json(new
+            return Request.Method.Equals(HttpMethods.Get) ? View() : Json(new
             {
                 StatusCode = 404,
                 Success = false,

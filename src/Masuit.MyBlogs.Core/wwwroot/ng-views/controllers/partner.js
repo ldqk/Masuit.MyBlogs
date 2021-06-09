@@ -104,6 +104,7 @@
 		    $('.ui.dropdown.types').dropdown('clear');
 		}, 10);
 	}
+
 	$scope.edit = function (item) {
 		$scope.partner = angular.copy(item);
 		$scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2099-12-31":$scope.partner.ExpireTime;
@@ -130,12 +131,42 @@
 			}
 		});
 	}
+
+	$scope.copy = function (item) {
+		$scope.partner = angular.copy(item);
+		delete $scope.partner.Id;
+		$scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2099-12-31":$scope.partner.ExpireTime;
+		$scope.isAdd = true;
+		$scope.allowUpload=false;
+		layer.closeAll();
+        $timeout(function () {
+		    $('.ui.dropdown.category').dropdown('clear');
+		    $('.ui.dropdown.types').dropdown('clear');
+			$('.ui.dropdown.category').dropdown('set selected', (item.CategoryIds+"").split(','));
+		    $('.ui.dropdown.types').dropdown('set selected', item.Types.split(','));
+		}, 10);
+		layer.open({
+			type: 1,
+			zIndex: 20,
+			title: '复制广告推广',
+			area: (window.screen.width > 650 ? 650 : window.screen.width) + 'px',// '340px'], //宽高
+			content: $("#edit"),
+			cancel: function(index, layero) {
+				setTimeout(function() {
+					$("#edit").css("display", "none");
+				}, 500);
+				return true;
+			}
+		});
+	}
+
 	$scope.closeAll= function() {
 		layer.closeAll();
 		setTimeout(function() {
 			$("#edit").css("display", "none");
 		}, 500);
 	}
+
 	$scope.submit = function(partner) {
 		if ($scope.isAdd) {
 			partner.Id = 0;

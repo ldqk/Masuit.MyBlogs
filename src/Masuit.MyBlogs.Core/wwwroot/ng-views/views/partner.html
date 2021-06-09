@@ -76,11 +76,14 @@
                     <span class="el-switch-style" ng-click="changeState(row)"></span>
                 </label>
             </td>
-            <td title="'操作'" style="width: 110px;">
+            <td title="'操作'" style="width: 160px;">
                 <div class="btn-group">
                     <button class="btn btn-info btn-sm waves-effect" ng-click="edit(row)">
                         <i class="icon-pencil"></i>
                     </button>
+                    <a class="btn btn-success btn-sm waves-effect" ng-click="copy(row)">
+                        <i class="zmdi zmdi-copy zmdi-hc-fw"></i>
+                    </a>
                     <button class="btn btn-danger btn-sm waves-effect" ng-click="remove(row)">
                         <i class="icon-bin"></i>
                     </button>

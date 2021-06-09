@@ -177,6 +177,19 @@ $(function() {
             $("#ping").text(new Date().getTime()-timestamp);
         });
     }, 2000);
+
+    // 自动重试加载图片
+    $('img').on("error",function() {
+       var that=$(this);
+       var retry=that.attr("retry")||0;
+       if(retry>10){
+          return ;
+       }else{
+          retry++;
+          that.attr("retry", retry);//重试次数+1
+          that.attr('src', that.attr("src"));//继续刷新图片
+       }
+    });
 });
 
 //全局加载动画

@@ -4,9 +4,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.Tools;
 using Masuit.Tools.Linq;
-using Masuit.Tools.RandomSelector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,11 +48,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                     var scid = cid.ToString();
                     if (Any(a => a.CategoryIds.Contains(scid)))
                     {
-                        where = where.And(a => a.CategoryIds.Contains(scid) || string.IsNullOrEmpty(a.CategoryIds));
+                        @where = @where.And(a => a.CategoryIds.Contains(scid) || string.IsNullOrEmpty(a.CategoryIds));
                     }
                 }
-
-                var list = GetQuery(where).AsEnumerable().Select(a => new WeightedItem<Advertisement>(a, a.CategoryIds is { Length: > 0 } ? (int)a.Price * 2 : (int)a.Price)).WeightedItems(count);
+                var list = GetQuery(where).OrderBy(a => -Math.Log(DataContext.Random()) / (double)a.Price * (string.IsNullOrEmpty(a.CategoryIds) ? 2 : 1)).Take(count).ToList();
                 var ids = list.Select(a => a.Id).ToArray();
                 GetQuery(a => ids.Contains(a.Id)).UpdateFromQuery(a => new Advertisement()
                 {
