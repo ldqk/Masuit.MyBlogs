@@ -40,7 +40,6 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Z.EntityFramework.Plus;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -144,14 +143,16 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private void Disallow(Post post)
         {
-            BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
+            RedisHelper.IncrBy("interceptCount");
+            RedisHelper.LPush("intercept", new IpIntercepter()
             {
                 IP = ClientIP,
                 RequestUrl = $"//{Request.Host}/{post.Id}",
                 Time = DateTime.Now,
                 UserAgent = Request.Headers[HeaderNames.UserAgent],
-                Remark = "无权限查看该文章"
-            }));
+                Remark = "无权限查看该文章",
+                Address = Request.Location()
+            });
             throw new NotFoundException("文章未找到");
         }
 

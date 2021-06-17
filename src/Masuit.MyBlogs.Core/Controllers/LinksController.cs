@@ -45,7 +45,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public async Task<ActionResult> Apply(Links links, CancellationToken cancellationToken)
         {
-            if (!links.Url.MatchUrl()||links.Url.Contains(Request.Host.Host))
+            if (!links.Url.MatchUrl() || links.Url.Contains(Request.Host.Host))
             {
                 return ResultData(null, false, "添加失败！链接非法！");
             }
@@ -58,6 +58,9 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             HttpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
             HttpClient.DefaultRequestHeaders.Referrer = new Uri(Request.Scheme + "://" + Request.Host);
+            HttpClient.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
+            HttpClient.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
+            HttpClient.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
             return await await HttpClient.GetAsync(links.Url, cancellationToken).ContinueWith(async t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
@@ -131,6 +134,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Check(string link)
         {
             HttpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+            HttpClient.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
+            HttpClient.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
+            HttpClient.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             return await HttpClient.GetAsync(link, cts.Token).ContinueWith(t =>
             {

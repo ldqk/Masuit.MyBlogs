@@ -21,11 +21,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public DateTime LoginTime { get; set; }
 
         /// <summary>
-        /// 登录地所在省份
-        /// </summary>
-        public string Province { get; set; }
-
-        /// <summary>
         /// 地理位置
         /// </summary>
         public string PhysicAddress { get; set; }

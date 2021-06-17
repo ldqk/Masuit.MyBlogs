@@ -1,7 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
+using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Models;
 using MaxMind.GeoIP2.Exceptions;
@@ -40,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="ip"></param>
         /// <returns></returns>
         [Route("ip"), Route("ip/{ip?}", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "ip" }, VaryByHeader = "Cookie")]
-        public async Task<ActionResult> GetIpInfo([IsIPAddress] string ip)
+        public ActionResult GetIpInfo([IsIPAddress] string ip)
         {
             if (string.IsNullOrEmpty(ip))
             {
@@ -53,32 +53,19 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             ViewBag.IP = ip;
-            var location = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
-            var asn = ip.GetIPAsn();
-            var address = await ip.GetPhysicsAddressInfo() ?? new PhysicsAddress()
+            var cityInfo = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
+            var address = new IpInfo()
             {
-                Status = 0,
-                AddressResult = new AddressResult()
-                {
-                    AddressComponent = new AddressComponent(),
-                    FormattedAddress = ip.GetIPLocation(),
-                    Location = new Location()
-                    {
-                        Lng = location.Location.Longitude ?? 0,
-                        Lat = location.Location.Latitude ?? 0
-                    }
-                }
+                CityInfo = cityInfo,
+                Address = $"{ip.GetIPLocation()}（UTC{TZConvert.GetTimeZoneInfo(cityInfo.Location.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}）",
+                Asn = ip.GetIPAsn()
             };
-            address.AddressResult.Pois.Add(new Pois
-            {
-                AddressDetail = $"{ip.GetIPLocation()}（UTC{TZConvert.GetTimeZoneInfo(location.Location.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}，本地数据库）"
-            });
             if (Request.Method.Equals(HttpMethods.Get))
             {
-                return View((address, asn));
+                return View(address);
             }
 
-            return Json(new { address, asn });
+            return Json(address);
         }
 
         /// <summary>
@@ -98,12 +85,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ip = $"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}";
 #endif
                 var location = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
-                var address = await ip.GetPhysicsAddressInfo() ?? new PhysicsAddress()
+                var address = new PhysicsAddress()
                 {
                     Status = 0,
                     AddressResult = new AddressResult()
                     {
-                        AddressComponent = new AddressComponent(),
                         FormattedAddress = ip.GetIPLocation(),
                         Location = new Location()
                         {
@@ -144,12 +130,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ip = $"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}";
 #endif
                 var location = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
-                var address = await ip.GetPhysicsAddressInfo() ?? new PhysicsAddress()
+                var address = new PhysicsAddress()
                 {
                     Status = 0,
                     AddressResult = new AddressResult()
                     {
-                        AddressComponent = new AddressComponent(),
                         FormattedAddress = ip.GetIPLocation(),
                         Location = new Location()
                         {

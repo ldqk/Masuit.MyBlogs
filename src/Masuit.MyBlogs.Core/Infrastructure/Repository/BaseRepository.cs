@@ -599,7 +599,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual PagedList<T> GetPages<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc)
         {
-            return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ToPagedList(pageIndex, pageSize) : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
+            return isAsc ? DataContext.Set<T>().Where(where).NotCacheable().OrderBy(orderby).ToPagedList(pageIndex, pageSize) : DataContext.Set<T>().Where(where).NotCacheable().OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
         }
 
         /// <summary>
@@ -614,7 +614,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual Task<PagedList<T>> GetPagesAsync<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> orderby, bool isAsc)
         {
-            return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ToPagedListAsync(pageIndex, pageSize) : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ToPagedListAsync(pageIndex, pageSize);
+            return isAsc ? DataContext.Set<T>().Where(where).NotCacheable().OrderBy(orderby).ToPagedListAsync(pageIndex, pageSize) : DataContext.Set<T>().Where(where).NotCacheable().OrderByDescending(orderby).ToPagedListAsync(pageIndex, pageSize);
         }
 
         /// <summary>
@@ -678,7 +678,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual PagedList<T> GetPagesNoTracking<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().Where(where).AsNoTracking().OrderBy(orderby).ToPagedList(pageIndex, pageSize) : DataContext.Set<T>().Where(where).AsNoTracking().OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
+            return isAsc ? DataContext.Set<T>().Where(where).AsNoTracking().NotCacheable().OrderBy(orderby).ToPagedList(pageIndex, pageSize) : DataContext.Set<T>().Where(where).AsNoTracking().NotCacheable().OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
         }
 
         /// <summary>
@@ -968,7 +968,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
                 page = 1;
             }
 
-            var list = query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).ToList();
+            var list = query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).NotCacheable().ToList();
             return new PagedList<TDto>(list, page, size, totalCount);
         }
 
@@ -995,7 +995,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
                 page = 1;
             }
 
-            var list = await query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).ToListAsync();
+            var list = await query.Skip(size * (page - 1)).Take(size).ProjectTo<TDto>(mapper).NotCacheable().ToListAsync();
             return new PagedList<TDto>(list, page, size, totalCount);
         }
 

@@ -306,6 +306,21 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
+        /// 标记为已读
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [MyAuthorize]
+        public async Task<ActionResult> MarkRead(int id)
+        {
+            await MessageService.GetQuery(m => m.Id <= id).UpdateFromQueryAsync(m => new InternalMessage()
+            {
+                Read = true
+            });
+            return ResultData(null);
+        }
+
+        /// <summary>
         /// 删除站内信
         /// </summary>
         /// <param name="id"></param>
@@ -350,21 +365,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             await MessageService.DeleteEntitySavedAsync(m => m.Read);
             return ResultData(null, true, "站内消息清除成功！");
-        }
-
-        /// <summary>
-        /// 标记为已读
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [MyAuthorize]
-        public async Task<ActionResult> MarkRead(int id)
-        {
-            await MessageService.GetQuery(m => m.Id <= id).UpdateFromQueryAsync(m => new InternalMessage()
-            {
-                Read = true
-            });
-            return ResultData(null);
         }
 
         #endregion

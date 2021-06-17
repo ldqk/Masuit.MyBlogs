@@ -1,18 +1,17 @@
-﻿using Hangfire;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
@@ -50,14 +49,16 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             var match = Regex.Match(path ?? "", CommonHelper.BanRegex);
             if (match.Length > 0)
             {
-                BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
+                RedisHelper.IncrBy("interceptCount");
+                RedisHelper.LPush("intercept", new IpIntercepter()
                 {
                     IP = ip,
                     RequestUrl = requestUrl,
                     Time = DateTime.Now,
                     UserAgent = request.Headers[HeaderNames.UserAgent],
-                    Remark = $"检测到敏感词拦截：{match.Value}"
-                }));
+                    Remark = "无权限查看该文章",
+                    Address = request.Location()
+                });
                 context.Response.StatusCode = 400;
                 context.Response.ContentType = "text/html; charset=utf-8";
                 return context.Response.WriteAsync("参数不合法！", Encoding.UTF8);

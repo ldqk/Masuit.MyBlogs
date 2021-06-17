@@ -1,13 +1,11 @@
 ﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Hosting;
 using System;
@@ -69,21 +67,12 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="type"></param>
         public void LoginRecord(UserInfoDto userInfo, string ip, LoginType type)
         {
-            var result = ip.GetPhysicsAddressInfo().Result;
-            if (result?.Status != 0)
-            {
-                return;
-            }
-
-            string addr = result.AddressResult.FormattedAddress;
-            string prov = result.AddressResult.AddressComponent.Province;
             var record = new LoginRecord()
             {
                 IP = ip,
                 LoginTime = DateTime.Now,
                 LoginType = type,
-                PhysicAddress = addr,
-                Province = prov
+                PhysicAddress = ip.GetIPLocation()
             };
             var u = _userInfoService.GetByUsername(userInfo.Username);
             u.LoginRecord.Add(record);
@@ -137,18 +126,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         }
 
         /// <summary>
-        /// 防火墙拦截日志
-        /// </summary>
-        /// <param name="s"></param>
-        public static void InterceptLog(IpIntercepter s)
-        {
-            RedisHelper.IncrBy("interceptCount");
-            var result = s.IP.GetPhysicsAddressInfo().Result;
-            s.Address = result?.Status == 0 ? result.AddressResult.FormattedAddress : s.IP.GetIPLocation();
-            RedisHelper.LPush("intercept", s);
-        }
-
-        /// <summary>
         /// 每天的任务
         /// </summary>
         public void EverydayJob()
@@ -193,6 +170,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         {
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+            client.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
+            client.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
+            client.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
             client.DefaultRequestHeaders.Referrer = new Uri("https://google.com");
             client.Timeout = TimeSpan.FromSeconds(10);
             _linksService.GetQuery(l => !l.Except).AsParallel().ForAll(link =>

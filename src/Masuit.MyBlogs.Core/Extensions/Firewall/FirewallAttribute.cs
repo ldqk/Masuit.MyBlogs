@@ -1,8 +1,6 @@
 ﻿using CacheManager.Core;
-using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
-using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Logging;
@@ -90,14 +88,16 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
         private async void AccessDeny(string ip, HttpRequest request, string remark)
         {
             var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
-            BackgroundJob.Enqueue(() => HangfireBackJob.InterceptLog(new IpIntercepter()
+            await RedisHelper.IncrByAsync("interceptCount");
+            await RedisHelper.LPushAsync("intercept", new IpIntercepter()
             {
                 IP = ip,
                 RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path),
                 Time = DateTime.Now,
                 UserAgent = request.Headers[HeaderNames.UserAgent],
-                Remark = remark
-            }));
+                Remark = "无权限查看该文章",
+                Address = request.Location()
+            });
             var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPInterceptTimes", "30").ToInt32();
             await RedisHelper.LRangeAsync<IpIntercepter>("intercept", 0, -1).ContinueWith(async t =>
             {
