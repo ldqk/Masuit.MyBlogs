@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     RequestUrl = requestUrl,
                     Time = DateTime.Now,
                     UserAgent = request.Headers[HeaderNames.UserAgent],
-                    Remark = "无权限查看该文章",
+                    Remark = $"检测到敏感词拦截：{match.Value}",
                     Address = request.Location()
                 });
                 context.Response.StatusCode = 400;

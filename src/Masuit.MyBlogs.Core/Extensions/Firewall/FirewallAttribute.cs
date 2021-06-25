@@ -95,7 +95,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path),
                 Time = DateTime.Now,
                 UserAgent = request.Headers[HeaderNames.UserAgent],
-                Remark = "无权限查看该文章",
+                Remark = remark,
                 Address = request.Location()
             });
             var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPInterceptTimes", "30").ToInt32();

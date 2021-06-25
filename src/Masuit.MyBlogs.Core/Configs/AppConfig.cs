@@ -23,11 +23,6 @@ namespace Masuit.MyBlogs.Core.Configs
         public static string Redis { get; set; }
 
         /// <summary>
-        /// OSS配置
-        /// </summary>
-        public static AliOssConfig AliOssConfig { get; set; } = new AliOssConfig();
-
-        /// <summary>
         /// gitlab图床配置
         /// </summary>
         public static List<GitlabConfig> GitlabConfigs { get; set; } = new List<GitlabConfig>();

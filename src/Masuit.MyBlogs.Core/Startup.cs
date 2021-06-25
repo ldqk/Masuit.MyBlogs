@@ -69,7 +69,6 @@ namespace Masuit.MyBlogs.Core
                 AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
                 AppConfig.TrueClientIPHeader = configuration[nameof(AppConfig.TrueClientIPHeader)] ?? "CF-Connecting-IP";
                 AppConfig.EnableIPDirect = bool.Parse(configuration[nameof(AppConfig.EnableIPDirect)] ?? "false");
-                configuration.Bind("Imgbed:AliyunOSS", AppConfig.AliOssConfig);
                 configuration.Bind("Imgbed:Gitlabs", AppConfig.GitlabConfigs);
                 configuration.AddToMasuitTools();
             }
