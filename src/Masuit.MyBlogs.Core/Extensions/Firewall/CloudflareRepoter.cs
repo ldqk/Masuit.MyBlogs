@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Polly;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
