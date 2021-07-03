@@ -87,14 +87,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                             LogManager.Debug("↑↑↑请求参数：\n" + body);
                         }
                         break;
-                    case NotFoundException ex:
-                        Response.StatusCode = 404;
-                        return Request.Method.Equals(HttpMethods.Get) ? View("Index") : Json(new
-                        {
-                            StatusCode = 404,
-                            Success = false,
-                            ex.Message
-                        });
+                    case NotFoundException:
+                        return RedirectToAction("Index");
                     case AccessDenyException:
                         var (location, network) = ip.GetIPLocation();
                         var tips = Template.Create(CommonHelper.SystemSettings.GetOrAdd("AccessDenyTips", @"<h4>遇到了什么问题？</h4>

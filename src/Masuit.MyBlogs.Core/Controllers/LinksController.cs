@@ -142,7 +142,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {
-                    return ResultData(null, false, link + " 似乎挂了！");
+                    return ResultData(null, false, link + " 似乎挂了！错误信息：" + t.Exception?.Message);
                 }
 
                 using var res = t.Result;

@@ -5,7 +5,6 @@ using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Systems;
 using Microsoft.Extensions.Configuration;
-using Polly;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,33 +37,22 @@ namespace Masuit.MyBlogs.Core.Common
             _httpClient = httpClient;
         }
 
+        private readonly List<string> _failedList = new();
+
         /// <summary>
         /// 上传图片
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="file"></param>
         /// <returns></returns>
-        public async Task<(string url, bool success)> UploadImage(Stream stream, string file, CancellationToken cancellationToken)
+        public Task<(string url, bool success)> UploadImage(Stream stream, string file, CancellationToken cancellationToken)
         {
             if (stream.Length < 51200)
             {
-                return (null, false);
+                return Task.FromResult<(string, bool)>((null, false));
             }
 
             file = Path.GetFileName(file);
-            return await Policy<(string url, bool success)>.Handle<Exception>().RetryAsync(3).ExecuteAsync(() => UploadGit(stream, file, cancellationToken));
-        }
-
-        private readonly List<string> _failedList = new();
-
-        /// <summary>
-        /// gitlab图床
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        private Task<(string url, bool success)> UploadGit(Stream stream, string file, CancellationToken cancellationToken)
-        {
             var gitlabs = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length && !_failedList.Contains(c.ApiUrl)).OrderBy(c => Guid.NewGuid()).ToList();
             if (gitlabs.Count > 0)
             {
@@ -207,14 +195,14 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             var srcs = content.MatchImgSrcs();
-            foreach (string src in srcs)
+            foreach (var src in srcs)
             {
                 if (src.StartsWith("http"))
                 {
                     continue;
                 }
 
-                var path = Path.Combine(AppContext.BaseDirectory + "wwwroot", src.Replace("/", @"\").Substring(1));
+                var path = Path.Combine(AppContext.BaseDirectory + "wwwroot", src.Replace("/", @"\")[1..]);
                 if (!File.Exists(path))
                 {
                     continue;
