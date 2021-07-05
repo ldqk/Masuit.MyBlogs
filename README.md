@@ -163,5 +163,3 @@ docker：自行爬文。
 基于EntityFrameworkCore和Lucene.NET实现的全文检索搜索引擎：[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine "Masuit.LuceneEFCore.SearchEngine")
 
 .NET万能框架工具库：[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)
-### 友情赞助
-![打赏支持](https://ae01.alicdn.com/kf/H9c0ef439b7ae4a5ba4151456f3c5f0a2N.jpg)
