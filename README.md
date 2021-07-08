@@ -29,13 +29,15 @@ Redis：redis-server-windows 3.2
 服务器配置：2核+4GB+1M
 `请勿使用阿里云、百度云等活动超卖机运行本程序，否则卡出翔！！！`  
 `如何判断服务器商是否有超卖：给你的服务器跑个分，如果跑分接近于网络上该处理器公布的分数，则不是超卖的机器，计算公式：总分/核心数进行比较，由于是虚拟机，如果单独比较单核跑分，没有参考意义`
-### 硬件要求
-||最低配置|推荐配置|豪华配置|
-| --------   | -----:   | :----: | :----: |
-|CPU|1核|2核|4核|
-|内存|1GB|2GB|4GB|
-|带宽|1Mbps|1Mbps|5Mbps|
-|数据库|SQL Server 2008/MySQL 5|SQL Server 2012/MySQL 8|SQL Server 2016/MySQL 8|
+### 基础设施要求
+||最低配置|推荐配置|豪华配置|至尊配置|
+| --------   | -----:   | :----: | :----: | :----: |
+|CPU|1核|2核|4核|4核|
+|内存|1GB|2GB|4GB|8GB|
+|带宽|1Mbps|1Mbps|5Mbps|10Mbps|
+|数据库|MySQL 5/SQL Server 2008|MySQL 8/SQL Server 2012|MySQL 8/SQL Server 2016|MySQL 8/SQL Server 2016|
+|缓存组件|Redis 3.2+|Redis 3.2+|Redis 3.2+|Redis 3.2+|
+|备注|玩玩而已|几个人同时访问|几十个人同时访问，单日请求量200w以下|单日请求量200w以上|
 ### 主要功能
 #### 服务器性能监控
 可直接在线实时监控服务器的运行状态，包括CPU、网络带宽、磁盘使用率、内存占用等情况，可记录最近一天的服务器健康状态，通过websocket进行数据的推送，仅支持Windows，且需要Windows安装最新的更新。
@@ -161,5 +163,3 @@ docker：自行爬文。
 基于EntityFrameworkCore和Lucene.NET实现的全文检索搜索引擎：[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine "Masuit.LuceneEFCore.SearchEngine")
 
 .NET万能框架工具库：[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)
-### 友情赞助
-![打赏支持](https://ae01.alicdn.com/kf/H9c0ef439b7ae4a5ba4151456f3c5f0a2N.jpg)
