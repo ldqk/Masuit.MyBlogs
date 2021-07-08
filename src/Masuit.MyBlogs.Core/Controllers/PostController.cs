@@ -709,6 +709,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="post"></param>
         /// <param name="reserve">是否保留历史版本</param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost, MyAuthorize]
         public async Task<ActionResult> Edit(PostCommand post, bool reserve = true, CancellationToken cancellationToken = default)
@@ -782,6 +783,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             post.Status = Status.Published;
             Post p = post.Mapper<Post>();
+            p.Rss = true;
             p.Modifier = p.Author;
             p.ModifierEmail = p.Email;
             p.IP = ClientIP;
@@ -999,6 +1001,22 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Status = Status.Forbidden
             }) > 0;
             return b ? ResultData(null, true, "操作成功！") : ResultData(null, false, "操作失败！");
+        }
+
+        /// <summary>
+        /// 切换允许rss订阅
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [MyAuthorize]
+        [HttpPost("post/{id}/rss-switch")]
+        public async Task<ActionResult> RssSwitch(int id)
+        {
+            await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
+            {
+                Rss = !p.Rss
+            });
+            return ResultData(null, message: "操作成功");
         }
 
         /// <summary>

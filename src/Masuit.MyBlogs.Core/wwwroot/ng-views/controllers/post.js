@@ -209,10 +209,21 @@
 			});
 		});
     }
+
     $scope.toggleDisableCopy= function(row) {
         $scope.request("/post/DisableCopy", {
 			id: row.Id
 		}, function(data) {
+			window.notie.alert({
+				type: 1,
+				text: data.Message,
+				time: 4
+			});
+		});
+    }
+
+    $scope.rssSwitch= function(id) {
+        $scope.request("/post/"+id+"/rss-switch",null, function(data) {
 			window.notie.alert({
 				type: 1,
 				text: data.Message,

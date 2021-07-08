@@ -11,6 +11,7 @@ using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.International.Converters.TraditionalChineseToSimplifiedConverter;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -72,6 +73,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
 
                 var posts = postService.SearchPage(page, size, wd);
+                CheckPermission(posts);
                 if (posts.Total > 1)
                 {
                     CacheManager.AddOrUpdate(key, wd, s => wd);
@@ -85,6 +87,42 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             ViewBag.hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList();
             return View(new SearchResult<PostDto>());
+        }
+
+        private void CheckPermission(SearchResult<PostDto> posts)
+        {
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
+            posts.Results.RemoveAll(p =>
+            {
+                switch (p.LimitMode)
+                {
+                    case PostLimitMode.AllowRegion:
+                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                    case PostLimitMode.ForbidRegion:
+                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                    case PostLimitMode.AllowRegionExceptForbidRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        {
+                            return true;
+                        }
+
+                        goto case PostLimitMode.AllowRegion;
+                    case PostLimitMode.ForbidRegionExceptAllowRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        {
+                            return false;
+                        }
+
+                        goto case PostLimitMode.ForbidRegion;
+                    default:
+                        return false;
+                }
+            });
+            foreach (var item in posts.Results)
+            {
+                item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
         }
 
         /// <summary>

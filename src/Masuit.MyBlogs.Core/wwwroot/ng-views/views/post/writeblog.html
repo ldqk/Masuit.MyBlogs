@@ -31,7 +31,17 @@
     <!-- 加载编辑器的容器 -->
     <div class="form-group overlay animated bounceInDown">
         <div style="height: 56vh;" class="ueditor" ng-model="post.Content" type="text/plain"></div>
-        <h3 class="size16">文章加密内容：</h3>
+        <h3 class="size16">
+            文章加密内容：
+            <small>
+                授权可见
+                <label class="el-switch">
+                    <input type="checkbox" name="switch">
+                    <span class="el-switch-style" ng-click="post.ProtectContentMode=1"></span>
+                </label>
+                评论可见
+            </small>
+        </h3>
         <div style="height: 200px;" class="ueditor" ng-model="post.ProtectContent" type="text/plain"></div>
     </div>
     <div class="row">

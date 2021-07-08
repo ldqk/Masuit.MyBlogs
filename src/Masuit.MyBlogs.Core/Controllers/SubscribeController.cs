@@ -1,12 +1,14 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,24 +36,30 @@ namespace Masuit.MyBlogs.Core.Controllers
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var data = await PostService.GetQueryFromCache(p => p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).SelectAsync(async p => new Item()
+            var raw = PostService.GetQueryFromCache(p => p.Rss && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).ToList();
+            CheckPermission(raw);
+            var data = await raw.SelectAsync(async p =>
             {
-                Author = new Author
+                var summary = await p.Content.GetSummary(300, 50);
+                return new Item()
                 {
-                    Name = p.Author,
-                    Email = p.Email.MaskEmail()
-                },
-                Body = await p.Content.GetSummary(300, 50),
-                Categories = new List<string>
-                {
-                    p.Category.Name
-                },
-                Link = new Uri(scheme + "://" + host + "/" + p.Id),
-                PublishDate = p.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone)),
-                Title = p.Title,
-                Permalink = scheme + "://" + host + "/" + p.Id,
-                Guid = p.Id.ToString(),
-                FullHtmlContent = await p.Content.GetSummary(300, 50)
+                    Author = new Author
+                    {
+                        Name = p.Author,
+                        Email = p.Email.MaskEmail()
+                    },
+                    Body = summary,
+                    Categories = new List<string>
+                    {
+                        p.Category.Name
+                    },
+                    Link = new Uri(scheme + "://" + host + "/" + p.Id),
+                    PublishDate = p.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone)),
+                    Title = p.Title,
+                    Permalink = scheme + "://" + host + "/" + p.Id,
+                    Guid = p.Id.ToString(),
+                    FullHtmlContent = summary
+                };
             });
             var posts = data.ToList();
             InsertAdvertisement(posts);
@@ -107,24 +115,30 @@ namespace Masuit.MyBlogs.Core.Controllers
             string scheme = Request.Scheme;
             var host = Request.Host;
             var category = await categoryService.GetByIdAsync(id) ?? throw new NotFoundException("分类未找到");
-            var data = await PostService.GetQueryFromCache(p => p.CategoryId == id && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).SelectAsync(async p => new Item()
+            var raw = PostService.GetQueryFromCache(p => p.Rss && p.CategoryId == id && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).ToList();
+            CheckPermission(raw);
+            var data = await raw.SelectAsync(async p =>
             {
-                Author = new Author
+                var summary = await p.Content.GetSummary(300, 50);
+                return new Item()
                 {
-                    Name = p.Author,
-                    Email = p.Email.MaskEmail()
-                },
-                Body = await p.Content.GetSummary(300, 50),
-                Categories = new List<string>
-                {
-                    p.Category.Name
-                },
-                Link = new Uri(scheme + "://" + host + "/" + p.Id),
-                PublishDate = p.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone)),
-                Title = p.Title,
-                Permalink = scheme + "://" + host + "/" + p.Id,
-                Guid = p.Id.ToString(),
-                FullHtmlContent = await p.Content.GetSummary(300, 50)
+                    Author = new Author
+                    {
+                        Name = p.Author,
+                        Email = p.Email.MaskEmail()
+                    },
+                    Body = summary,
+                    Categories = new List<string>
+                    {
+                        p.Category.Name
+                    },
+                    Link = new Uri(scheme + "://" + host + "/" + p.Id),
+                    PublishDate = p.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone)),
+                    Title = p.Title,
+                    Permalink = scheme + "://" + host + "/" + p.Id,
+                    Guid = p.Id.ToString(),
+                    FullHtmlContent = summary
+                };
             });
             var posts = data.ToList();
             InsertAdvertisement(posts, id);
@@ -153,30 +167,30 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var p = await PostService.GetAsync(p => p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章未找到");
-            var summary = await p.Content.GetSummary(300, 50);
+            var post = await PostService.GetAsync(p => p.Rss && p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章未找到");
+            var summary = await post.Content.GetSummary(300, 50);
             var item = new Item()
             {
                 Author = new Author
                 {
-                    Name = p.Author,
-                    Email = p.Email.MaskEmail()
+                    Name = post.Author,
+                    Email = post.Email.MaskEmail()
                 },
                 Body = summary,
                 Categories = new List<string>
                 {
-                    p.Category.Name
+                    post.Category.Name
                 },
-                Link = new Uri(scheme + "://" + host + "/" + p.Id),
-                PublishDate = p.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone)),
-                Title = p.Title,
-                Permalink = scheme + "://" + host + "/" + p.Id,
-                Guid = p.Id.ToString(),
+                Link = new Uri(scheme + "://" + host + "/" + post.Id),
+                PublishDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone)),
+                Title = post.Title,
+                Permalink = scheme + "://" + host + "/" + post.Id,
+                Guid = post.Id.ToString(),
                 FullHtmlContent = summary
             };
             var feed = new Feed()
             {
-                Title = Request.Host + $":文章【{p.Title}】更新订阅",
+                Title = Request.Host + $":文章【{post.Title}】更新订阅",
                 Description = summary,
                 Link = new Uri(scheme + "://" + host + "/rss/" + id),
                 Copyright = CommonHelper.SystemSettings["Title"],
@@ -188,6 +202,42 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Encoding = Encoding.UTF8
             });
             return Content(rss, ContentType.Xml);
+        }
+
+        private void CheckPermission(List<Post> posts)
+        {
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
+            posts.RemoveAll(p =>
+            {
+                switch (p.LimitMode)
+                {
+                    case PostLimitMode.AllowRegion:
+                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !Request.IsRobot();
+                    case PostLimitMode.ForbidRegion:
+                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !Request.IsRobot();
+                    case PostLimitMode.AllowRegionExceptForbidRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                        {
+                            return true;
+                        }
+
+                        goto case PostLimitMode.AllowRegion;
+                    case PostLimitMode.ForbidRegionExceptAllowRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                        {
+                            return false;
+                        }
+
+                        goto case PostLimitMode.ForbidRegion;
+                    default:
+                        return false;
+                }
+            });
+            foreach (var item in posts)
+            {
+                item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
         }
     }
 }

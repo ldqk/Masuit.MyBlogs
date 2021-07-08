@@ -67,6 +67,11 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         public bool DisableCopy { get; set; }
 
         /// <summary>
+        /// 开启rss订阅
+        /// </summary>
+        public bool Rss { get; set; }
+
+        /// <summary>
         /// 同时浏览人数
         /// </summary>
         public int Online { get; set; }

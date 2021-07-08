@@ -7,10 +7,11 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class ShortController : Controller
     {
         [HttpGet("short"), MyAuthorize]
-        public IActionResult Short(string key, string url)
+        public IActionResult Short(string key, string url, int? expire)
         {
+            expire ??= -1;
             var id = string.IsNullOrEmpty(key) ? url.Crc32().FromBinary(16).ToBinary(62) : key;
-            RedisHelper.Set("shorturl:" + id, url);
+            RedisHelper.Set("shorturl:" + id, url, expire.Value);
             return Ok(id);
         }
 

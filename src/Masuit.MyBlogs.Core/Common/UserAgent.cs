@@ -8,10 +8,7 @@ namespace Masuit.MyBlogs.Core.Common
 {
     public class UserAgent
     {
-        private static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions()
-        {
-            SizeLimit = 10000
-        });
+        private static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
 
         internal static readonly Dictionary<string, string> Platforms = new Dictionary<string, string>() {
             {"windows nt 10.0", "Windows 10"},

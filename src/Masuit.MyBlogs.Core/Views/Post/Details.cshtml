@@ -9,6 +9,7 @@
 @using Masuit.Tools.Core.Net
 @using Masuit.Tools.Security
 @model Masuit.MyBlogs.Core.Models.Entity.Post
+
 @{
     ViewBag.Title = Model.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -17,6 +18,7 @@
     string hidden = string.IsNullOrEmpty(Context.Request.Cookies["ValidateKey"]) ? "" : "hidden";
     Advertisement ad = ViewBag.Ads;
 }
+
 <environment names="Development">
     <link href="~/Assets/jquery.tocify/jquery.tocify.css" rel="stylesheet" />
     <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
@@ -108,42 +110,8 @@
                         </header>
                         <article class="article" id="article">
                             @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
-                            @if (!string.IsNullOrEmpty(Model.ProtectContent))
-                            {
-                                <div class="row protected">
-                                    @if (!string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")) || Context.Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Context.Request.Cookies["PostAccessToken"]))
-                                    {
-                                        <p class="text-red text-center size20">↓↓↓以下是文章加密部分↓↓↓</p>
-                                        @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
-
-                                    }
-                                    else
-                                    {
-                                        <p class="text-red text-center size24 margin-bot10">↓↓↓恭喜你发现镇站之宝，请注意，前方高能！非战斗人员请及时撤离，这不是演习！↓↓↓</p>
-                                        <div class="col-md-12">
-                                            <span class="text-red">以下内容已经隐藏，请输入验证码后查看</span>
-                                            <span class="text-green">【完全免费，不收一分钱】</span>
-                                            <form action="/" method="post" class="form-inline" id="code-token">
-                                                @Html.AntiForgeryToken()
-                                                <div class="input-group">
-                                                    <span class="input-group-addon">邮箱：</span>
-                                                    <input type="email" name="Email" id="email3" class="form-control" />
-                                                    <span class="input-group-btn">
-                                                        <button type="button" class="btn btn-info getcode">获取验证码</button>
-                                                    </span>
-                                                </div>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon">验证码：</span>
-                                                    <input type="text" name="token" id="token" class="form-control" />
-                                                    <span class="input-group-btn">
-                                                        <button type="submit" class="btn btn-info">查看文章</button>
-                                                    </span>
-                                                </div>
-                                            </form>
-                                            <p class="text-green">温馨提示：<span class="text-red">获取密码后本站所有加密文章将永久开放！请确保您的邮箱已经通过站长的登记，如果您未使用邮箱登记，请先联系站长获取文章密码并登记邮箱即可！</span></p>
-                                        </div>
-                                    }
-                                </div>
+                            @{
+                                await Html.RenderPartialAsync("ProtectContent",Model);
                             }
                         </article>
                     </section>
@@ -182,11 +150,13 @@
                         </div>
                     </div>
                     <div class="col-xs-6 text-right">
-                        <div class="btn-group">
-                            <a class="btn btn-danger btn-lg" asp-controller="Subscribe" asp-action="PostRss" asp-route-id="@Model.Id" target="_blank">
-                                <i class="icon-rss4"></i><span>订阅本文更新</span>
-                            </a>
-                        </div>
+                        @if (Model.Rss) {
+                            <div class="btn-group">
+                                <a class="btn btn-danger btn-lg" asp-controller="Subscribe" asp-action="PostRss" asp-route-id="@Model.Id" target="_blank">
+                                    <i class="icon-rss4"></i><span>订阅本文更新</span>
+                                </a>
+                            </div>
+                        }
                     </div>
                     <div class="col-xs-6">
                         <p class="text-red">如果你喜欢这篇文章，欢迎点赞或分享本文！</p>

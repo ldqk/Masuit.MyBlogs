@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Drive;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,7 +36,14 @@ namespace Masuit.MyBlogs.Core
             opt.ListenAnyIP(port.ToInt32());
             if (bool.Parse(config["Https:Enabled"]))
             {
-                opt.ListenAnyIP(sslport.ToInt32(), s => s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]));
+                opt.ListenAnyIP(sslport.ToInt32(), s =>
+                {
+                    if (Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.Major >= 10)
+                    {
+                        s.Protocols = HttpProtocols.Http1AndHttp2;
+                    }
+                    s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]);
+                });
             }
 
             opt.Limits.MaxRequestBodySize = null;

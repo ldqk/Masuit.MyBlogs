@@ -51,6 +51,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string ProtectContent { get; set; }
 
         /// <summary>
+        /// 受保护内容模式
+        /// </summary>
+        public ProtectContentMode ProtectContentMode { get; set; }
+
+        /// <summary>
         /// 发表时间
         /// </summary>
         public DateTime PostDate { get; set; }
@@ -157,6 +162,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string ExceptRegions { get; set; }
 
         /// <summary>
+        /// 开启rss订阅
+        /// </summary>
+        public bool Rss { get; set; }
+
+        /// <summary>
         /// 分类
         /// </summary>
         public virtual Category Category { get; set; }
@@ -197,5 +207,21 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         AllowRegionExceptForbidRegion,
         [Description("不可见地区：{0}，排除地区：{1}")]
         ForbidRegionExceptAllowRegion
+    }
+
+    /// <summary>
+    /// 受保护内容模式
+    /// </summary>
+    public enum ProtectContentMode
+    {
+        /// <summary>
+        /// 授权可见
+        /// </summary>
+        AuthorizeVisiable,
+
+        /// <summary>
+        /// 评论可见
+        /// </summary>
+        CommentVisiable
     }
 }

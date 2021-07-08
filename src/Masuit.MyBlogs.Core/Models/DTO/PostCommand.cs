@@ -46,6 +46,11 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public string ProtectContent { get; set; }
 
         /// <summary>
+        /// 受保护内容模式
+        /// </summary>
+        public ProtectContentMode ProtectContentMode { get; set; }
+
+        /// <summary>
         /// 分类id
         /// </summary>
         public int CategoryId { get; set; }

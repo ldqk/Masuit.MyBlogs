@@ -1,4 +1,14 @@
 ﻿<div class="row">
+    <div class="form-inline pull-left">
+        <div class="input-group">
+            <span class="input-group-addon">常规视图</span>
+            <label class="el-switch">
+                <input type="checkbox" name="switch">
+                <span class="el-switch-style" ng-click="aclMode=!aclMode"></span>
+            </label>
+            <span class="input-group-addon">权限控制视图</span>
+        </div>
+    </div>
     <div class="form-inline pull-right">
         <button class="btn btn-info waves-effect" ng-click="list.GetPageData(paginationConf.currentPage, paginationConf.itemsPerPage);">
             <span class="glyphicon glyphicon-refresh"></span>
@@ -48,43 +58,49 @@
             <td data-title="'作者邮箱'">
                 {{row.Email}}
             </td>
-            <td data-title="'阅读'">
+            <td data-title="'阅读'" ng-if="!aclMode">
                 {{row.ViewCount}}
             </td>
-            <td data-title="'在看'">
+            <td data-title="'在看'" ng-if="!aclMode">
                 {{row.Online}}
             </td>
-            <td data-title="'发表'">
+            <td data-title="'发表'" ng-if="!aclMode">
                 {{row.PostDate|date:'yyyy-MM-dd HH:mm'}}
             </td>
             <td data-title="'修改'">
                 {{row.ModifyDate|date:'yyyy-MM-dd HH:mm'}}
             </td>
-            <td title="'修改次数'">
+            <td title="'修改次数'" ng-if="!aclMode">
                 {{row.ModifyCount}}
             </td>
             <td data-title="'分类'">
                 {{row.CategoryName}}
             </td>
-            <td data-title="'标签'" style="max-width: 160px;">
+            <td data-title="'标签'" style="max-width: 160px;" ng-if="!aclMode">
                 {{row.Label}}
             </td>
-            <td data-title="'支持'">
+            <td data-title="'支持'" ng-if="!aclMode">
                 {{row.VoteUpCount}}
             </td>
             <td data-title="'状态'">
                 {{row.Status}}
             </td>
-            <td data-title="'禁止评论'">
+            <td data-title="'禁止评论'" ng-if="aclMode">
                 <label class="el-switch">
                     <input type="checkbox" name="switch" ng-checked="row.DisableComment">
                     <span class="el-switch-style" ng-click="toggleDisableComment(row)"></span>
                 </label>
             </td>
-            <td data-title="'禁止转载'">
+            <td data-title="'禁止转载'" ng-if="aclMode">
                 <label class="el-switch">
                     <input type="checkbox" name="switch" ng-checked="row.DisableCopy">
                     <span class="el-switch-style" ng-click="toggleDisableCopy(row)"></span>
+                </label>
+            </td>
+            <td data-title="'开启Rss'" ng-if="aclMode">
+                <label class="el-switch">
+                    <input type="checkbox" name="switch" ng-checked="row.Rss">
+                    <span class="el-switch-style" ng-click="rssSwitch(row.Id)"></span>
                 </label>
             </td>
             <td data-title="'操作'" style="width: 160px;">
