@@ -156,8 +156,10 @@ IIS：部署时必须将应用程序池的标识设置为LocalSystem，否则无
 docker：自行爬文。  
 
 ### 后台管理：
+https://127.0.0.1:5001/dashboard
 - 初始用户名：masuit  
 - 初始密码：123abc@#$
+`若密码不对，可在后台【用户管理】下重置密码`
 
 ### 推荐项目
 基于EntityFrameworkCore和Lucene.NET实现的全文检索搜索引擎：[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine "Masuit.LuceneEFCore.SearchEngine")
