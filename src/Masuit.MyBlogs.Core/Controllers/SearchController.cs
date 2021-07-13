@@ -78,7 +78,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     CacheManager.AddOrUpdate(key, wd, s => wd);
                     CacheManager.Expire(key, TimeSpan.FromSeconds(10));
-                    ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
+                    ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList, Request.Location());
                 }
 
                 ViewBag.hotSearches = new List<KeywordsRank>();
@@ -96,24 +96,24 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 switch (p.LimitMode)
                 {
-                    case PostLimitMode.AllowRegion:
+                    case RegionLimitMode.AllowRegion:
                         return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
-                    case PostLimitMode.ForbidRegion:
+                    case RegionLimitMode.ForbidRegion:
                         return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
-                    case PostLimitMode.AllowRegionExceptForbidRegion:
+                    case RegionLimitMode.AllowRegionExceptForbidRegion:
                         if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
                         {
                             return true;
                         }
 
-                        goto case PostLimitMode.AllowRegion;
-                    case PostLimitMode.ForbidRegionExceptAllowRegion:
+                        goto case RegionLimitMode.AllowRegion;
+                    case RegionLimitMode.ForbidRegionExceptAllowRegion:
                         if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
                         {
                             return false;
                         }
 
-                        goto case PostLimitMode.ForbidRegion;
+                        goto case RegionLimitMode.ForbidRegion;
                     default:
                         return false;
                 }

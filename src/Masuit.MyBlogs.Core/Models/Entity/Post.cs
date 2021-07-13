@@ -149,7 +149,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 限制模式
         /// </summary>
-        public PostLimitMode? LimitMode { get; set; }
+        public RegionLimitMode? LimitMode { get; set; }
 
         /// <summary>
         /// 限制地区，逗号分隔
@@ -195,7 +195,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
     /// <summary>
     /// 地区限制
     /// </summary>
-    public enum PostLimitMode
+    public enum RegionLimitMode
     {
         [Description("不限")]
         All,

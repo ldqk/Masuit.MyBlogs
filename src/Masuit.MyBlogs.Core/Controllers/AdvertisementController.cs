@@ -15,6 +15,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -74,6 +75,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<IActionResult> Save(AdvertisementDto model)
         {
             model.CategoryIds = model.CategoryIds?.Replace("null", "");
+            model.Regions = Regex.Replace(model.Regions ?? "", @"(\p{P}|\p{Z}|\p{S})+", "|");
+            if (model.RegionMode == RegionLimitMode.All)
+            {
+                model.Regions = null;
+            }
+
             if (model.Types.Contains(AdvertiseType.Banner.ToString("D")) && string.IsNullOrEmpty(model.ImageUrl))
             {
                 return ResultData(null, false, "宣传大图不能为空");

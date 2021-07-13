@@ -51,7 +51,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("donate")]
         public async Task<ActionResult> Donate()
         {
-            ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage);
+            ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location());
             var text = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "donate.html"));
             return CurrentUser.IsAdmin ? View("Donate_Admin", text) : View(model: text);
         }

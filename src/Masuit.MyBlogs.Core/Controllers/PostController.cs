@@ -78,7 +78,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ViewData["keywords"] = post.Content.Contains(kw) ? $"['{kw}']" : SearchEngine.LuceneIndexSearcher.CutKeywords(kw).ToJsonString();
             }
 
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId);
             var related = PostService.ScoreSearch(1, 11, string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label);
             related.RemoveAll(p => p.Id == id);
             if (related.Count <= 1)
@@ -110,34 +110,34 @@ namespace Masuit.MyBlogs.Core.Controllers
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
             switch (post.LimitMode)
             {
-                case PostLimitMode.AllowRegion:
+                case RegionLimitMode.AllowRegion:
                     if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
                     {
                         Disallow(post);
                     }
 
                     break;
-                case PostLimitMode.ForbidRegion:
+                case RegionLimitMode.ForbidRegion:
                     if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
                     {
                         Disallow(post);
                     }
 
                     break;
-                case PostLimitMode.AllowRegionExceptForbidRegion:
+                case RegionLimitMode.AllowRegionExceptForbidRegion:
                     if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
                     {
                         Disallow(post);
                     }
 
-                    goto case PostLimitMode.AllowRegion;
-                case PostLimitMode.ForbidRegionExceptAllowRegion:
+                    goto case RegionLimitMode.AllowRegion;
+                case RegionLimitMode.ForbidRegionExceptAllowRegion:
                     if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
                     {
                         break;
                     }
 
-                    goto case PostLimitMode.ForbidRegion;
+                    goto case RegionLimitMode.ForbidRegion;
             }
         }
 
@@ -175,7 +175,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             }
 
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId);
             return View(list);
         }
 
@@ -196,7 +196,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
             ViewBag.Next = next;
             ViewBag.Prev = prev;
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, post.CategoryId);
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId);
             return CurrentUser.IsAdmin ? View("HistoryVersion_Admin", post) : View(post);
         }
 
@@ -220,7 +220,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var diffOutput = diff.Build();
             right.Content = ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty));
             left.Content = ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty));
-            ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, main.CategoryId);
+            ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location(), main.CategoryId);
             ViewBag.DisableCopy = post.DisableCopy;
             return View(new[] { main, left, right });
         }
@@ -834,8 +834,8 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             switch (post.LimitMode)
             {
-                case PostLimitMode.AllowRegion:
-                case PostLimitMode.ForbidRegion:
+                case RegionLimitMode.AllowRegion:
+                case RegionLimitMode.ForbidRegion:
                     if (string.IsNullOrEmpty(post.Regions))
                     {
                         resultData = ResultData(null, false, "请输入限制的地区");
@@ -843,15 +843,15 @@ namespace Masuit.MyBlogs.Core.Controllers
                     }
 
                     break;
-                case PostLimitMode.AllowRegionExceptForbidRegion:
-                case PostLimitMode.ForbidRegionExceptAllowRegion:
+                case RegionLimitMode.AllowRegionExceptForbidRegion:
+                case RegionLimitMode.ForbidRegionExceptAllowRegion:
                     if (string.IsNullOrEmpty(post.ExceptRegions))
                     {
                         resultData = ResultData(null, false, "请输入排除的地区");
                         return false;
                     }
 
-                    goto case PostLimitMode.AllowRegion;
+                    goto case RegionLimitMode.AllowRegion;
             }
 
             if (string.IsNullOrEmpty(post.Label?.Trim()) || post.Label.Equals("null"))

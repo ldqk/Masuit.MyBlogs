@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -26,9 +27,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="type">广告类型</param>
         /// <param name="cid">分类id</param>
         /// <returns></returns>
-        public Advertisement GetByWeightedPrice(AdvertiseType type, int? cid = null)
+        public Advertisement GetByWeightedPrice(AdvertiseType type, string location, int? cid = null)
         {
-            return GetsByWeightedPrice(1, type, cid).FirstOrDefault();
+            return GetsByWeightedPrice(1, type, location, cid).FirstOrDefault();
         }
 
         /// <summary>
@@ -38,12 +39,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="type">广告类型</param>
         /// <param name="cid">分类id</param>
         /// <returns></returns>
-        public List<Advertisement> GetsByWeightedPrice(int count, AdvertiseType type, int? cid = null)
+        public List<Advertisement> GetsByWeightedPrice(int count, AdvertiseType type, string location, int? cid = null)
         {
             return CacheManager.GetOrAdd($"{type}:{count}-{cid}", _ =>
             {
                 var atype = type.ToString("D");
                 Expression<Func<Advertisement, bool>> where = a => a.Types.Contains(atype) && a.Status == Status.Available;
+                where = where.And(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions) : !Regex.IsMatch(location, a.Regions)));
                 if (cid.HasValue)
                 {
                     var scid = cid.ToString();

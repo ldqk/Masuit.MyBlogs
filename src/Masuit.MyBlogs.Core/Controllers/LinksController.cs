@@ -33,7 +33,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var list = await LinksService.GetQueryFromCacheAsync<bool, LinksDto>(l => l.Status == Status.Available, l => l.Recommend, false);
             ViewBag.Html = await System.IO.File.ReadAllTextAsync(Path.Combine(hostEnvironment.WebRootPath, "template", "links.html"));
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage);
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location());
             return CurrentUser.IsAdmin ? View("Index_Admin", list) : View(list);
         }
 

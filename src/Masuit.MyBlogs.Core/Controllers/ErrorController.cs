@@ -90,9 +90,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                     case NotFoundException:
                         return RedirectToAction("Index");
                     case AccessDenyException:
-                        var (location, network) = ip.GetIPLocation();
+                        var entry = ip.GetIPLocation();
                         var tips = Template.Create(CommonHelper.SystemSettings.GetOrAdd("AccessDenyTips", @"<h4>遇到了什么问题？</h4>
-                <h4>基于主观因素考虑，您所在的地区暂时不允许访问本站，如有疑问，请联系站长！或者请联系站长开通本站的访问权限！</h4>")).Set("clientip", ip.ToString()).Set(nameof(location), location).Set(nameof(network), network).Render();
+                <h4>基于主观因素考虑，您所在的地区暂时不允许访问本站，如有疑问，请联系站长！或者请联系站长开通本站的访问权限！</h4>")).Set("clientip", ip.ToString()).Set("location", entry.Location).Set("network", entry.Network).Render();
                         Response.StatusCode = 403;
                         return View("AccessDeny", tips);
                     case TempDenyException:

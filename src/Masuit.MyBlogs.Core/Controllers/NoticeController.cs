@@ -45,7 +45,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 n.Content = ReplaceVariables(n.Content);
             }
 
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList);
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList, Request.Location());
             return CurrentUser.IsAdmin ? View("Index_Admin", list.Data) : View(list.Data);
         }
 
@@ -68,7 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             notice.ModifyDate = notice.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             notice.PostDate = notice.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             notice.Content = ReplaceVariables(notice.Content);
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage);
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location());
             return View(notice);
         }
 

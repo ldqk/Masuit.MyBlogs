@@ -11,13 +11,9 @@ namespace Masuit.MyBlogs.Core.Common
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public static string Location(this HttpRequest request)
+        public static IPLocation Location(this HttpRequest request)
         {
-            return (string)request.HttpContext.Items.GetOrAdd("ip.location", () =>
-            {
-                var (location, network) = request.HttpContext.Connection.RemoteIpAddress.GetIPLocation();
-                return location + "|" + network;
-            });
+            return (IPLocation)request.HttpContext.Items.GetOrAdd("ip.location", () => request.HttpContext.Connection.RemoteIpAddress.GetIPLocation());
         }
 
         /// <summary>

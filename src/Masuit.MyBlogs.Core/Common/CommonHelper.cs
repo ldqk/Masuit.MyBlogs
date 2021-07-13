@@ -125,7 +125,7 @@ namespace Masuit.MyBlogs.Core.Common
             {
                 foreach (var item in ips.Split(','))
                 {
-                    var pos = GetIPLocation(item);
+                    string pos = GetIPLocation(IPAddress.Parse(item));
                     return pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any();
                 }
             }
@@ -154,17 +154,16 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static string GetIPLocation(this string ips)
         {
-            var (location, network) = GetIPLocation(IPAddress.Parse(ips));
-            return location + "|" + network;
+            return GetIPLocation(IPAddress.Parse(ips));
         }
 
-        public static (string location, string network) GetIPLocation(this IPAddress ip)
+        public static IPLocation GetIPLocation(this IPAddress ip)
         {
             switch (ip.AddressFamily)
             {
                 case AddressFamily.InterNetwork when ip.IsPrivateIP():
                 case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
-                    return ("内网", "内网IP");
+                    return new IPLocation("内网", null, null, "内网IP", null);
                 case AddressFamily.InterNetworkV6 when ip.IsIPv4MappedToIPv6:
                     ip = ip.MapToIPv4();
                     goto case AddressFamily.InterNetwork;
@@ -173,16 +172,15 @@ namespace Masuit.MyBlogs.Core.Common
                     if (parts != null)
                     {
                         var asn = GetIPAsn(ip);
-                        var network = parts[^1] == "0" ? asn.AutonomousSystemOrganization : parts[^1];
-                        var location = parts[..^1].Where(s => s != "0").Distinct().Join("");
-                        return (location, network + $"(AS{asn.AutonomousSystemNumber})");
+                        var network = parts[^1] == "0" ? asn.AutonomousSystemOrganization : parts[^1] + "(" + asn.AutonomousSystemOrganization + ")";
+                        return new IPLocation(parts[0], parts[2], parts[3], network, asn.AutonomousSystemNumber);
                     }
 
                     goto default;
                 default:
                     var cityResp = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(new CityResponse()).Execute(() => MaxmindReader.City(ip));
                     var asnResp = GetIPAsn(ip);
-                    return (cityResp.Country.Names.GetValueOrDefault("zh-CN") + cityResp.City.Names.GetValueOrDefault("zh-CN"), asnResp.AutonomousSystemOrganization + $"(AS{asnResp.AutonomousSystemNumber})");
+                    return new IPLocation(cityResp.Country.Names.GetValueOrDefault("zh-CN"), null, cityResp.City.Names.GetValueOrDefault("zh-CN"), asnResp.AutonomousSystemOrganization, asnResp.AutonomousSystemNumber);
             }
         }
 
@@ -353,5 +351,41 @@ namespace Masuit.MyBlogs.Core.Common
         {
             return ToTimeZone(time, zone).ToString(format);
         }
+    }
+
+    public class IPLocation
+    {
+        public IPLocation(string country, string province, string city, string isp, long? asn)
+        {
+            Country = country?.Trim('0');
+            Province = province?.Trim('0');
+            City = city?.Trim('0');
+            ISP = isp;
+            ASN = asn;
+        }
+
+        public string Country { get; set; }
+        public string Province { get; set; }
+        public string City { get; set; }
+        public string ISP { get; set; }
+        public long? ASN { get; set; }
+        public string Location => Country + Province + City;
+        public string Network => ASN.HasValue ? ISP + "(AS" + ASN + ")" : ISP;
+
+        public string[] ToArray()
+        {
+            return new[] { Country, Province, City, ISP, ASN + "" }.Where(s => !string.IsNullOrEmpty(s) && s != "0").ToArray();
+        }
+
+        public override string ToString()
+        {
+            return Location + "|" + Network;
+        }
+
+        public static implicit operator string(IPLocation entry)
+        {
+            return entry.ToString();
+        }
+
     }
 }

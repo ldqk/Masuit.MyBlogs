@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Masuit.MyBlogs.Core.Models.Entity;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
@@ -55,5 +56,15 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 到期时间
         /// </summary>
         public DateTime? ExpireTime { get; set; }
+
+        /// <summary>
+        /// 地区模式
+        /// </summary>
+        public RegionLimitMode RegionMode { get; set; }
+
+        /// <summary>
+        /// 地区，逗号或竖线分隔
+        /// </summary>
+        public string Regions { get; set; }
     }
 }

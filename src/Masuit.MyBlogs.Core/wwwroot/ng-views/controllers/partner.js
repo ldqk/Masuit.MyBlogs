@@ -31,11 +31,19 @@
 			self.data = res.data.Data;
 		});
 	}
+
     $('.ui.dropdown.types').dropdown({
 		onChange: function (value) {
 			$scope.partner.Types = value;
 		}
 	});
+
+    $('.ui.dropdown.region').dropdown({
+		onChange: function (value) {
+			$scope.partner.RegionMode = value;
+		}
+	});
+
     $scope.getCategory = function () {
 		$http.post("/category/getcategories", null).then(function (res) {
 			var data = res.data;
@@ -102,6 +110,7 @@
         $timeout(function () {
 		    $('.ui.dropdown.category').dropdown('clear');
 		    $('.ui.dropdown.types').dropdown('clear');
+		    $('.ui.dropdown.region').dropdown('clear');
 		}, 10);
 	}
 
@@ -114,8 +123,10 @@
         $timeout(function () {
 		    $('.ui.dropdown.category').dropdown('clear');
 		    $('.ui.dropdown.types').dropdown('clear');
+		    $('.ui.dropdown.region').dropdown('clear');
 			$('.ui.dropdown.category').dropdown('set selected', (item.CategoryIds+"").split(','));
 		    $('.ui.dropdown.types').dropdown('set selected', item.Types.split(','));
+			$('.ui.dropdown.region').dropdown('set selected', item.RegionMode);
 		}, 10);
 		layer.open({
 			type: 1,

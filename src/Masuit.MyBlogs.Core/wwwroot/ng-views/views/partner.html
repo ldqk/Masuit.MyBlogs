@@ -175,19 +175,21 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <div class="input-group">
-                    <label for="desc" class="input-group-addon control-label">权重：</label>
-                    <div class="fg-line">
-                        <input type="number" class="form-control" id="weight" placeholder="权重值" ng-model="partner.Weight">
+            <div class="form-inline">
+                <div class="form-group">
+                    <div class="input-group">
+                        <label for="desc" class="input-group-addon control-label">权重：</label>
+                        <div class="fg-line">
+                            <input type="number" class="form-control" id="weight" placeholder="权重值" ng-model="partner.Weight">
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <div class="input-group">
-                    <label for="desc" class="input-group-addon control-label">当前竞价：</label>
-                    <div class="fg-line">
-                        <input type="number" class="form-control" id="price" placeholder="竞价" ng-model="partner.Price">
+                <div class="form-group">
+                    <div class="input-group">
+                        <label for="desc" class="input-group-addon control-label">当前竞价：</label>
+                        <div class="fg-line">
+                            <input type="number" class="form-control" id="price" placeholder="竞价" ng-model="partner.Price">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -195,6 +197,24 @@
                 <label for="desc" class="input-group-addon control-label">过期时间：</label>
                 <div class="fg-line">
                     <input type="text" class="workinput wicon" id="timespan" ng-model="partner.ExpireTime" readonly="readonly" />
+                </div>
+            </div>
+            <div class="form-group form-inline">
+                <div class="input-group">
+                    <label for="region" class="input-group-addon control-label">投放地区：</label>
+                    <div class="fg-line">
+                        <input type="text" class="form-control" id="region" placeholder="竖线或逗号分隔，支持国家、地区、城市、运营商、ASN" ng-model="partner.Regions" style="width: 460px">
+                        <div class="ui selection dropdown region" style="min-width: 60px">
+                            <input name="category" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">不限</div>
+                            <div class="menu">
+                                <div class="item" data-value="0">不限</div>
+                                <div class="item" data-value="1">以内</div>
+                                <div class="item" data-value="2">以外</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="form-group">
@@ -277,6 +297,14 @@
                     <td>{{partner.CreateTime|date:'yyyy-MM-dd HH:mm:ss'}}</td>
                     <td>更新时间：</td>
                     <td>{{partner.UpdateTime|date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                </tr>
+                <tr>
+                    <td>投放范围</td>
+                    <td colspan="3">
+                        <p ng-if="partner.RegionMode==0">不限</p>
+                        <p ng-if="partner.RegionMode==1">{{partner.Regions}}<span class="text-danger">（以内）</span></p>
+                        <p ng-if="partner.RegionMode==2">{{partner.Regions}}<span class="text-danger">（以外）</span></p>
+                    </td>
                 </tr>
             </table>
             <div class="btn-group">
