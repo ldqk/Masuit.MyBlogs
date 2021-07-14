@@ -4,6 +4,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools;
 using Masuit.Tools.Linq;
 using System;
 using System.Collections.Generic;
@@ -41,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public List<Advertisement> GetsByWeightedPrice(int count, AdvertiseType type, string location, int? cid = null)
         {
-            return CacheManager.GetOrAdd($"{type}:{count}-{cid}", _ =>
+            return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}", _ =>
             {
                 var atype = type.ToString("D");
                 Expression<Func<Advertisement, bool>> where = a => a.Types.Contains(atype) && a.Status == Status.Available;

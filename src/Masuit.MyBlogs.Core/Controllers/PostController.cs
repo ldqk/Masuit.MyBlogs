@@ -86,6 +86,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 related = (await PostService.GetPagesFromCacheAsync(1, 10, p => p.Id != id && p.CategoryId == post.CategoryId, p => p.TotalViewCount, false)).Data;
             }
 
+            CheckPermission(related);
             ViewBag.Related = related;
             post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -105,6 +106,36 @@ namespace Masuit.MyBlogs.Core.Controllers
             return View(post);
         }
 
+        private void CheckPermission(List<Post> posts)
+        {
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
+            posts.RemoveAll(p =>
+            {
+                switch (p.LimitMode)
+                {
+                    case RegionLimitMode.AllowRegion:
+                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                    case RegionLimitMode.ForbidRegion:
+                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                    case RegionLimitMode.AllowRegionExceptForbidRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        {
+                            return true;
+                        }
+
+                        goto case RegionLimitMode.AllowRegion;
+                    case RegionLimitMode.ForbidRegionExceptAllowRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        {
+                            return false;
+                        }
+
+                        goto case RegionLimitMode.ForbidRegion;
+                    default:
+                        return false;
+                }
+            });
+        }
         private void CheckPermission(Post post)
         {
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
