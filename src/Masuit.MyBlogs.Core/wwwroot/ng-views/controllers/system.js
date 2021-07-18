@@ -141,6 +141,14 @@ myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 		}
 	}
 
+	$scope.EnableDonate= function() {
+		if($scope.Settings.EnableDonate=="true") {
+			$scope.Settings.EnableDonate="false";
+		} else {
+			$scope.Settings.EnableDonate="true";
+		}
+	}
+
 	$scope.CloseSite= function() {
 		if($scope.Settings.CloseSite=="true") {
 			$scope.Settings.CloseSite="false";

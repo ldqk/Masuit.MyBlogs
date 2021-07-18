@@ -886,8 +886,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
 
         public override void Dispose(bool disposing)
         {
-            DataContext?.Dispose();
-            DataContext = null;
+            //DataContext?.Dispose();
+            //DataContext = null;
         }
 
         public T this[int id] => GetById(id);

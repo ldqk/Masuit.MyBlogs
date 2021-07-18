@@ -44,7 +44,7 @@
                         if (cat.PendedPostCount > 0)
                         {
                             <li class="list-group-item">
-                                <a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Name (@cat.PendedPostCount)</a>
+                                <a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Name</a>
                                 <a class="pull-right" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
                                     <i class="icon-rss4"></i>
                                 </a>

@@ -20,6 +20,7 @@
             background-size: cover;
             background-position: 50% 0;
             margin: 0;
+            min-height: 100vh;
         }
 
             body:before {
@@ -27,15 +28,20 @@
                 display: inline-block;
                 vertical-align: middle;
             }
+        .hidden {
+            display:none !important;
+        }
     </style>
-    <meta property="qc:admins" content="153016004160513163145" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="https://cdn.staticfile.org/normalize/8.0.1/normalize.min.css" rel="stylesheet">
     <link href="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.staticfile.org/limonte-sweetalert2/6.11.5/sweetalert2.min.css" rel="stylesheet" async defer>
     <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/jquery.ripples/0.5.3/jquery.ripples.min.js"></script>
-    <script src="https://cdn.staticfile.org/limonte-sweetalert2/8.11.8/sweetalert2.min.js"></script>
+    <script src="https://cdn.staticfile.org/phaser/3.24.1/phaser.min.js"></script>
+    <script src="https://cdn.staticfile.org/limonte-sweetalert2/6.6.10/sweetalert2.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -58,7 +64,7 @@
                         <button type="button" class="btn btn-info getcode">获取通行证</button>
                     </span>
                 </div>
-                <div class="input-group">
+                <div class="input-group vcode hidden">
                     <span class="input-group-addon">验证码：</span>
                     <input type="text" name="token" id="token" class="form-control" />
                     <span class="input-group-btn">
@@ -83,15 +89,13 @@
             $('.error').show().text(e);
         }
     });
-</script>
-<script>
     $("#code-token").on("submit", function (e) {
         e.preventDefault();
         $.post("/error/CheckViewToken", $(this).serialize(), function (data) {
             if (data.Success) {
                 window.location.href = "/";
             } else {
-                Swal.fire({
+                swal({
                     type: 'error',
                     title: data.Message,
                     showConfirmButton: false,
@@ -108,7 +112,7 @@
                 email: $("#email3").val()
             }, function (data) {
                 if (data.Success) {
-                    Swal.fire({
+                    swal({
                         type: 'success',
                         title: "验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！",
                         showConfirmButton: false,
@@ -126,8 +130,9 @@
                             $(".getcode").text('重新发送');
                         }
                     }, 1000);
+                    $(".vcode").removeClass("hidden");
                 } else {
-                    Swal.fire({
+                    swal({
                         type: 'error',
                         title: data.Message,
                         showConfirmButton: true,

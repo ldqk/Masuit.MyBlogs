@@ -38,22 +38,31 @@
         <div class="input-group">
             <span class="input-group-addon">上传图片水印：</span>
             <div class="fg-line">
-                <input type="text" class="form-control" ng-model="Settings.Watermark" placeholder="留空则上传图片时不添加水印"/>
+                <input type="text" class="form-control" ng-model="Settings.Watermark" placeholder="留空则上传图片时不添加水印" />
             </div>
         </div>
-        <div class="input-group">
-            <span class="input-group-addon el-switch" style="text-align: left">
-                <span>闭站保护：</span>
-                <input type="checkbox" name="switch" ng-checked="Settings.CloseSite=='true'">
-                <span class="el-switch-style" ng-click="CloseSite()"></span>
-            </span>
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon el-switch" style="text-align: left">
-                <span>数据写保护：</span>
-                <input type="checkbox" name="switch" ng-checked="Settings.DataReadonly=='true'">
-                <span class="el-switch-style" ng-click="DataReadonly()"></span>
-            </span>
+        <div class="form-inline">
+            <div class="input-group">
+                <span class="input-group-addon el-switch" style="text-align: left">
+                    <span>闭站保护：</span>
+                    <input type="checkbox" name="switch" ng-checked="Settings.CloseSite=='true'">
+                    <span class="el-switch-style" ng-click="CloseSite()"></span>
+                </span>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon el-switch" style="text-align: left">
+                    <span>数据写保护：</span>
+                    <input type="checkbox" name="switch" ng-checked="Settings.DataReadonly=='true'">
+                    <span class="el-switch-style" ng-click="DataReadonly()"></span>
+                </span>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon el-switch" style="text-align: left">
+                    <span>启用网站打赏功能：</span>
+                    <input type="checkbox" name="switch" ng-checked="Settings.EnableDonate=='true'">
+                    <span class="el-switch-style" ng-click="EnableDonate()"></span>
+                </span>
+            </div>
         </div>
         <div class="input-group">
             <span class="input-group-addon">资源管理器根目录：</span>
