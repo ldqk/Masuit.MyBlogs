@@ -4,7 +4,7 @@
 ![任务管理器](https://img11.360buyimg.com/ddimg/jfs/t1/170269/23/18655/93697/6076eb8fE82d545e7/78f0815f7311cd49.png)
 ![任务管理器](https://i.loli.net/2020/02/19/cjaxrWlLVvSAF8H.png)
 ### 演示站点
-测试站点1：[https://ldqk.org](https://ldqk.org)，测试站点2：[https://masuit.com](https://masuit.com)
+测试站点1：[https://ldqk.org](https://ldqk.org)，测试站点2：[https://masuit.com](https://masuit.com)，测试站点3：[https://masuit.tk](https://masuit.tk)，测试站点4：[https://ldqk.tk](https://ldqk.tk)
 
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 
