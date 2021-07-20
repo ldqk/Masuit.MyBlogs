@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
@@ -38,12 +39,18 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index()
         {
             Response.StatusCode = 404;
-            return Request.Method.Equals(HttpMethods.Get) ? View() : Json(new
+            string accept = Request.Headers[HeaderNames.Accept];
+            return true switch
             {
-                StatusCode = 404,
-                Success = false,
-                Message = "页面未找到！"
-            });
+                _ when accept.StartsWith("image") => File("/Assets/images/404/4044.jpg", ContentType.Jpeg),
+                _ when accept.StartsWith("application/json") => Json(new
+                {
+                    StatusCode = 404,
+                    Success = false,
+                    Message = "页面未找到！"
+                }),
+                _ => View()
+            };
         }
 
         /// <summary>

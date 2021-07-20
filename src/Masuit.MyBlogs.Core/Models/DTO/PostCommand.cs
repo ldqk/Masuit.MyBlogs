@@ -27,6 +27,8 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// </summary>
         [Required, MaxLength(24, ErrorMessage = "作者名最长支持24个字符！"), MinLength(2, ErrorMessage = "作者名最少2个字符！")]
         public string Author { get; set; }
+        public string Modifier { get; set; }
+        public string ModifierEmail { get; set; }
 
         /// <summary>
         /// 内容

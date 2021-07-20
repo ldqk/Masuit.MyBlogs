@@ -75,5 +75,11 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// 同时浏览人数
         /// </summary>
         public int Online { get; set; }
+
+        /// <summary>
+        /// 限制描述
+        /// </summary>
+        public string LimitDesc { get; set; }
+
     }
 }

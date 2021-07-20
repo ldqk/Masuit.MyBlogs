@@ -244,7 +244,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 		Keyword:""
 	};
 	
-	$scope.post.Author = $scope.user.NickName || $scope.user.Username;
+	$scope.post.Author =$scope.user.NickName || $scope.user.Username;
 	$scope.post.Email = $scope.user.Email;
 	var refer = $location.search()['refer'];
     if (refer) {

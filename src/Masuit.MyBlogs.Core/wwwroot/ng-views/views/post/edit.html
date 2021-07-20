@@ -81,7 +81,23 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-3 col-sm-6">
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-addon">作者：</span>
+                <div class="fg-line">
+                    <input type="text" class="form-control" ng-model="post.Modifier">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-addon">作者邮箱：</span>
+                <div class="fg-line">
+                    <input type="text" class="form-control" ng-model="post.ModifierEmail">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
             <div class="input-group">
                 <div class="input-group-addon">
                     <label class="checkbox checkbox-inline m-r-20">
@@ -117,9 +133,11 @@
                 </span>
             </div>
         </div>
-        <div ng-class="{true:'col-md-3',false:'col-md-6'}[post.LimitMode>2]" ng-if="post.LimitMode>0">
+    </div>
+    <div class="row">
+        <div class="col-md-6" ng-if="post.LimitMode>0">
             <div class="input-group">
-                <span class="input-group-addon">限制地区：</span>
+                <span class="input-group-addon">{{post.LimitMode%2==1?"可见":"不可见"}}地区：</span>
                 <div class="fg-line">
                     <input type="text" class="form-control" placeholder="江苏,苏州,移动,AS2333,DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.Regions">
                 </div>
@@ -128,7 +146,7 @@
                 </span>
             </div>
         </div>
-        <div class="col-md-3" ng-if="post.LimitMode==3||post.LimitMode==4">
+        <div class="col-md-6" ng-if="post.LimitMode==3||post.LimitMode==4">
             <div class="input-group">
                 <span class="input-group-addon">排除地区：</span>
                 <div class="fg-line">

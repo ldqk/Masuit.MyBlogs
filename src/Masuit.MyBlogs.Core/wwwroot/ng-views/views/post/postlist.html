@@ -85,6 +85,9 @@
             <td data-title="'状态'">
                 {{row.Status}}
             </td>
+            <td data-title="'是否限区'" ng-if="aclMode">
+                {{row.LimitDesc}}
+            </td>
             <td data-title="'禁止评论'" ng-if="aclMode">
                 <label class="el-switch">
                     <input type="checkbox" name="switch" ng-checked="row.DisableComment">
