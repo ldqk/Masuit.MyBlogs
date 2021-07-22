@@ -16253,3 +16253,17 @@ table.table >tbody > tr>td img {
     top: auto !important;
     bottom: 0;
 }
+.text-red {
+    font-size: 16px;
+    color: #F44336;
+}
+
+.text-green {
+    color: #009900;
+    font-size: 16px;
+}
+
+.text-blue {
+    font-size: 16px;
+    color: #2196F3;
+}

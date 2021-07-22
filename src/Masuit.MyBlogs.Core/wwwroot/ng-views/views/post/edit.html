@@ -91,7 +91,7 @@
         </div>
         <div class="col-md-3">
             <div class="input-group">
-                <span class="input-group-addon">作者邮箱：</span>
+                <span class="input-group-addon">邮箱：</span>
                 <div class="fg-line">
                     <input type="text" class="form-control" ng-model="post.ModifierEmail">
                 </div>
@@ -120,13 +120,18 @@
         </div>
         <div class="col-md-3">
             <div class="input-group">
-                <span class="input-group-addon" id="sizing-addon2">按地区投放：</span><select ng-model="post.LimitMode" class="form-control">
-                    <option ng-value="null">--</option>
+                <span class="input-group-addon" id="sizing-addon2">按地区投放：</span>
+                <select ng-model="post.LimitMode" class="form-control">
+                    <option ng-value="null" ng-if="post.LimitMode==null">--</option>
                     <option ng-value="0">不限</option>
-                    <option ng-value="1">指定地区可见</option>
-                    <option ng-value="2">指定地区不可见</option>
-                    <option ng-value="3">指定地区可见但排除在内的这些地区</option>
-                    <option ng-value="4">指定地区不可见但排除在内的这些地区</option>
+                    <optgroup label="可见性">
+                        <option ng-value="1">指定地区可见</option>
+                        <option ng-value="3">指定地区可见但排除在内的这些地区</option>
+                    </optgroup>
+                    <optgroup label="不可见性">
+                        <option ng-value="2">指定地区不可见</option>
+                        <option ng-value="4">指定地区不可见但排除在内的这些地区</option>
+                    </optgroup>
                 </select>
                 <span class="input-group-btn" ng-if="(post.LimitMode||0)==0">
                     <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)">确认修改</button>
@@ -137,7 +142,8 @@
     <div class="row">
         <div class="col-md-6" ng-if="post.LimitMode>0">
             <div class="input-group">
-                <span class="input-group-addon">{{post.LimitMode%2==1?"可见":"不可见"}}地区：</span>
+                <span class="input-group-addon" ng-if="post.LimitMode%2==1">可见地区：</span>
+                <span class="input-group-addon" ng-if="post.LimitMode%2==0"><strong class="text-red">不可见地区：</strong></span>
                 <div class="fg-line">
                     <input type="text" class="form-control" placeholder="江苏,苏州,移动,AS2333,DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.Regions">
                 </div>

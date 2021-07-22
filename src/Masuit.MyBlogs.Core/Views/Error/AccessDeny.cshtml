@@ -1,6 +1,4 @@
 ﻿@model string
-@using Masuit.Tools
-@using Microsoft.Net.Http.Headers
 
 @{
     Layout = null;
@@ -142,13 +140,3 @@
             });
     });
 </script>
-@{
-    if (Context.Request.Headers[HeaderNames.UserAgent].ToString().Contains(new[] { "IE", "InternetExplorer" }))
-    {
-        <script type="text/javascript">
-            notie.confirm("亲爱的访客，我们检测到您正在使用IE浏览器，本网站的某些功能或特性可能不会完美地支持IE浏览器，但您可以继续浏览，不过为了更好的体验效果，建议您使用Chrome、Firefox等相同或类似的更高级浏览器访问本网站。珍惜生命，远离IE！", '朕知道了', "挡住我了", function () {
-                notie.alert(1, '为消灭IE做一点贡献，就是为世界上所有广大的互联网开发者们少加一点儿班做善事！<br/>IE：只要不升级，我还会回来的，我就是这么倔强！', 5);
-            });
-        </script>
-    }
-}

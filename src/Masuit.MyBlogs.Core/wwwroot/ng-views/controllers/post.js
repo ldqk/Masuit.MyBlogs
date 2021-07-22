@@ -440,6 +440,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
                     if ($scope.post.Seminars) {
                         $('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
                     }
+				    $scope.Scheduled();
                 }, 10);
                 window.interval = setInterval(function () {
 		            localStorage.setItem("write-post-draft",JSON.stringify($scope.post));

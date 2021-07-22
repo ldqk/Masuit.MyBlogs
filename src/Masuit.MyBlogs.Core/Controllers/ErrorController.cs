@@ -39,7 +39,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Index()
         {
             Response.StatusCode = 404;
-            string accept = Request.Headers[HeaderNames.Accept];
+            string accept = Request.Headers[HeaderNames.Accept] + "";
             return true switch
             {
                 _ when accept.StartsWith("image") => File("/Assets/images/404/4044.jpg", ContentType.Jpeg),

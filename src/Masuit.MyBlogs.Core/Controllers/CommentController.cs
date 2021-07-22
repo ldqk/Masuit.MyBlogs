@@ -76,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var comment = dto.Mapper<Comment>();
-            if (Regex.Match(dto.NickName + dto.Content, CommonHelper.ModRegex).Length <= 0)
+            if (dto.Email == post.Email || dto.Email == post.ModifierEmail || Regex.Match(dto.NickName + dto.Content, CommonHelper.ModRegex).Length <= 0)
             {
                 comment.Status = Status.Published;
             }
