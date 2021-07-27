@@ -159,7 +159,7 @@ docker：自行爬文。
 https://127.0.0.1:5001/dashboard
 - 初始用户名：masuit  
 - 初始密码：123abc@#$
-`若密码不对，可在后台【用户管理】下重置密码`
+`若密码不对，可在debug模式下进入后台【用户管理】下重置密码`
 
 ### 推荐项目
 基于EntityFrameworkCore和Lucene.NET实现的全文检索搜索引擎：[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine "Masuit.LuceneEFCore.SearchEngine")
