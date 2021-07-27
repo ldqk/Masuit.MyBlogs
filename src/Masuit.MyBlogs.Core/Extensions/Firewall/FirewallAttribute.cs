@@ -57,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 };
                 return;
             }
-            if (ip.IsInDenyArea() && !tokenValid)
+            if (ip.IsInDenyArea())
             {
                 AccessDeny(ip, request, "访问地区限制");
                 throw new AccessDenyException("访问地区限制");

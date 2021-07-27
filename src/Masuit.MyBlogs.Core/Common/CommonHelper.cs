@@ -125,8 +125,8 @@ namespace Masuit.MyBlogs.Core.Common
             {
                 foreach (var item in ips.Split(','))
                 {
-                    string pos = GetIPLocation(IPAddress.Parse(item));
-                    return pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any();
+                    var (location, network, pos) = GetIPLocation(IPAddress.Parse(item));
+                    return string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(network) || pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any(); // 未知地区的，未知网络的，禁区的
                 }
             }
 
@@ -149,7 +149,17 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static AsnResponse GetIPAsn(this IPAddress ip)
         {
+            if (ip.IsPrivateIP())
+            {
+                return new AsnResponse();
+            }
+
             return Policy<AsnResponse>.Handle<AddressNotFoundException>().Fallback(new AsnResponse()).Execute(() => MaxmindAsnReader.Asn(ip));
+        }
+
+        private static CityResponse GetCityResp(IPAddress ip)
+        {
+            return Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(new CityResponse()).Execute(() => MaxmindReader.City(ip));
         }
 
         public static string GetIPLocation(this string ips)
@@ -159,11 +169,12 @@ namespace Masuit.MyBlogs.Core.Common
 
         public static IPLocation GetIPLocation(this IPAddress ip)
         {
+            if (ip.IsPrivateIP())
+            {
+                return new IPLocation("内网", null, null, "内网IP", null);
+            }
             switch (ip.AddressFamily)
             {
-                case AddressFamily.InterNetwork when ip.IsPrivateIP():
-                case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
-                    return new IPLocation("内网", null, null, "内网IP", null);
                 case AddressFamily.InterNetworkV6 when ip.IsIPv4MappedToIPv6:
                     ip = ip.MapToIPv4();
                     goto case AddressFamily.InterNetwork;
@@ -173,12 +184,15 @@ namespace Masuit.MyBlogs.Core.Common
                     {
                         var asn = GetIPAsn(ip);
                         var network = parts[^1] == "0" ? asn.AutonomousSystemOrganization : parts[^1] + "(" + asn.AutonomousSystemOrganization + ")";
+                        var city = new Lazy<CityResponse>(() => GetCityResp(ip));
+                        parts[0] = parts[0] != "0" ? parts[0] : city.Value.Country.Names.GetValueOrDefault("zh-CN");
+                        parts[3] = parts[3] != "0" ? parts[3] : city.Value.City.Names.GetValueOrDefault("zh-CN");
                         return new IPLocation(parts[0], parts[2], parts[3], network, asn.AutonomousSystemNumber);
                     }
 
                     goto default;
                 default:
-                    var cityResp = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(new CityResponse()).Execute(() => MaxmindReader.City(ip));
+                    var cityResp = GetCityResp(ip);
                     var asnResp = GetIPAsn(ip);
                     return new IPLocation(cityResp.Country.Names.GetValueOrDefault("zh-CN"), null, cityResp.City.Names.GetValueOrDefault("zh-CN"), asnResp.AutonomousSystemOrganization, asnResp.AutonomousSystemNumber);
             }
@@ -191,15 +205,12 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public static string GetClientTimeZone(this IPAddress ip)
         {
-            switch (ip.AddressFamily)
+            if (ip.IsPrivateIP())
             {
-                case AddressFamily.InterNetwork when ip.IsPrivateIP():
-                case AddressFamily.InterNetworkV6 when ip.IsPrivateIP():
-                    return "Asia/Shanghai";
-                default:
-                    var resp = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(new CityResponse()).Execute(() => MaxmindReader.City(ip));
-                    return resp.Location.TimeZone ?? "Asia/Shanghai";
+                return "Asia/Shanghai";
             }
+
+            return GetCityResp(ip).Location.TimeZone ?? "Asia/Shanghai";
         }
 
         /// <summary>
@@ -379,7 +390,19 @@ namespace Masuit.MyBlogs.Core.Common
 
         public override string ToString()
         {
-            return Location + "|" + Network;
+            string location = Location;
+            string network = Network;
+            if (string.IsNullOrWhiteSpace(location))
+            {
+                location = string.Intern("未知地区");
+            }
+
+            if (string.IsNullOrWhiteSpace(network))
+            {
+                network = string.Intern("未知网络");
+            }
+
+            return location + "|" + network;
         }
 
         public static implicit operator string(IPLocation entry)
@@ -387,5 +410,11 @@ namespace Masuit.MyBlogs.Core.Common
             return entry.ToString();
         }
 
+        public void Deconstruct(out string location, out string network, out string info)
+        {
+            location = Location;
+            network = Network;
+            info = ToString();
+        }
     }
 }

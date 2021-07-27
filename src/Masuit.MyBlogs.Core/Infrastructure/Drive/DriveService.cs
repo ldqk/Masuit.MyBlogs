@@ -1,6 +1,7 @@
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Models.Drive;
 using Microsoft.Graph;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -46,6 +47,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             var files = await GetItems(result, siteName, showHiddenFolders);
             return files;
         }
+
         /// <summary>
         /// 根据路径获取项目
         /// </summary>
@@ -99,7 +101,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
                 //可能是文件夹
                 if (result.AdditionalData.TryGetValue("@microsoft.graph.downloadUrl", out var downloadUrl))
                 {
-                    file.DownloadUrl = ReplaceCDNUrls((string)downloadUrl);
+                    file.DownloadUrl = ReplaceCDNUrls(downloadUrl.ToString());
                 }
             }
 
@@ -136,7 +138,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
                     //可能是文件夹
                     if (item.AdditionalData.TryGetValue("@microsoft.graph.downloadUrl", out var downloadUrl))
                     {
-                        file.DownloadUrl = ReplaceCDNUrls((string)downloadUrl);
+                        file.DownloadUrl = ReplaceCDNUrls(downloadUrl.ToString());
                     }
                 }
                 files.Add(file);
@@ -164,8 +166,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         {
             if (OneDriveConfiguration.CDNUrls.Length != 0)
             {
-                return OneDriveConfiguration.CDNUrls.Select(item => item.Split(";")).Aggregate(downloadUrl, (current, a) => current.Replace(a[0], a[1]));
+                return OneDriveConfiguration.CDNUrls.Select(item => item.Split(";")).Where(strings => strings.Length > 1).Aggregate(downloadUrl, (current, strings) => current.Replace(strings[0], strings[1..].OrderBy(_ => Guid.NewGuid()).First()));
             }
+
             return downloadUrl;
         }
         #endregion
