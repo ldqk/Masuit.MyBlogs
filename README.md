@@ -16,17 +16,18 @@
 ### 前端请求支援
 目前网站前端页面的代码比较零乱，到处都是，大家想吐槽的尽管吐槽吧，也想找个人帮忙设计下整体的前端页面，有兴趣愿意贡献代码的的小伙伴，欢迎Pull Request吧！😂😂
 ### 开发环境
-操作系统：Windows 10 2009  
-IDE：Visual Studio 2019 v16.8  
+操作系统：Windows 10 2104  
+IDE：Visual Studio 2019 v16.10  
 数据库：SQL Server 2017/MySQL 8.0  
 Redis：redis-server-windows 3.2  
 运行时：必须是.NET 5 
 ### 当前运行环境
-操作系统：Windows Server 2008 R2  
+操作系统：Windows Server 2019  
 数据库：MySQL 8.0  
 Redis：redis-server-windows 3.2  
 运行时：.NET 5  
-服务器配置：2核+4GB+1M
+服务器配置：2核+8GB+1000M  
+承载流量：单日请求量平均600w左右，单日带宽1TB左右  
 `请勿使用阿里云、百度云等活动超卖机运行本程序，否则卡出翔！！！`  
 `如何判断服务器商是否有超卖：给你的服务器跑个分，如果跑分接近于网络上该处理器公布的分数，则不是超卖的机器，计算公式：总分/核心数进行比较，由于是虚拟机，如果单独比较单核跑分，没有参考意义`
 ### 基础设施要求
@@ -159,7 +160,7 @@ docker：自行爬文。
 https://127.0.0.1:5001/dashboard
 - 初始用户名：masuit  
 - 初始密码：123abc@#$
-`若密码不对，可在后台【用户管理】下重置密码`
+`若密码不对，可在debug模式下进入后台【用户管理】下重置密码`
 
 ### 推荐项目
 基于EntityFrameworkCore和Lucene.NET实现的全文检索搜索引擎：[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine "Masuit.LuceneEFCore.SearchEngine")
