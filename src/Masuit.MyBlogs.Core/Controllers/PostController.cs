@@ -765,12 +765,12 @@ namespace Masuit.MyBlogs.Core.Controllers
 
                 p.ModifyDate = DateTime.Now;
                 var user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
-                p.Modifier = string.IsNullOrEmpty(post.Modifier) ? user.NickName : post.Modifier;
-                p.ModifierEmail = string.IsNullOrEmpty(post.ModifierEmail) ? user.Email : post.ModifierEmail;
+                post.Modifier = string.IsNullOrEmpty(post.Modifier) ? user.NickName : post.Modifier;
+                post.ModifierEmail = string.IsNullOrEmpty(post.ModifierEmail) ? user.Email : post.ModifierEmail;
             }
 
-            p.IP = ClientIP;
             Mapper.Map(post, p);
+            p.IP = ClientIP;
             if (!string.IsNullOrEmpty(post.Seminars))
             {
                 var tmp = post.Seminars.Split(',').Distinct();
