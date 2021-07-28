@@ -3,6 +3,7 @@ using AutoMapper;
 using Hangfire;
 using IP2Region;
 using Masuit.MyBlogs.Core.Common.Mails;
+using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.Tools;
 using Masuit.Tools.Media;
 using MaxMind.GeoIP2;
@@ -361,6 +362,17 @@ namespace Masuit.MyBlogs.Core.Common
         public static string ToTimeZoneF(this in DateTime time, string zone, string format = "yyyy-MM-dd HH:mm:ss")
         {
             return ToTimeZone(time, zone).ToString(format);
+        }
+
+        /// <summary>
+        /// 随机排序
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static IOrderedQueryable<T> OrderByRandom<T>(this IQueryable<T> source)
+        {
+            return source.OrderBy(_ => DataContext.Random());
         }
     }
 

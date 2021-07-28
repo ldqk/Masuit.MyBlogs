@@ -26,11 +26,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
     {
         private readonly ICacheManager<SearchResult<PostDto>> _cacheManager;
         private readonly ICacheManager<List<Post>> _searchCacheManager;
+        private readonly ICacheManager<Dictionary<string, int>> _tagCacheManager;
 
-        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, ICacheManager<SearchResult<PostDto>> cacheManager, ICacheManager<List<Post>> searchCacheManager) : base(repository, searchEngine, searcher)
+        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, ICacheManager<SearchResult<PostDto>> cacheManager, ICacheManager<List<Post>> searchCacheManager, ICacheManager<Dictionary<string, int>> tagCacheManager) : base(repository, searchEngine, searcher)
         {
             _cacheManager = cacheManager;
             _searchCacheManager = searchCacheManager;
+            _tagCacheManager = tagCacheManager;
         }
 
         public List<Post> ScoreSearch(int page, int size, string keyword)
@@ -150,6 +152,25 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             }
 
             return searchOptions;
+        }
+
+        /// <summary>
+        /// 文章所有tag
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, int> GetTags()
+        {
+            var key = "postTags";
+            var dic = _tagCacheManager.Get(key);
+            if (dic != null)
+            {
+                return dic;
+            }
+
+            dic = GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().ToList().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).OrderByDescending(g => g.Count()).ToDictionary(g => g.Key, g => g.Count());
+            _tagCacheManager.Add(key, dic);
+            _tagCacheManager.Expire(key, DateTimeOffset.Now.AddDays(1));
+            return dic;
         }
 
         /// <summary>

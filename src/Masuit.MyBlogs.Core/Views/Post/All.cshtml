@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "分类云_标签云_专题云";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    List<IGrouping<string, string>> tags = ViewBag.tags;
+    Dictionary<string, int> tags = ViewBag.tags;
     List<TagCloudViewModel> cats = ViewBag.cats;
     List<TagCloudViewModel> seminars = ViewBag.seminars;
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
@@ -115,9 +115,9 @@
             <div id="second">
                 <p>
                     @{
-                        foreach (var g in tags)
+                        foreach (var (key, value) in tags)
                         {
-                            <a asp-controller="Home" asp-action="Tag" asp-route-id="@g.Key" class="label label-@colors[r.Next(colors.Length)]">@g.Key (@g.Count()篇)</a>
+                            <a asp-controller="Home" asp-action="Tag" asp-route-tag="@key" class="label label-@colors[r.Next(colors.Length)]">@key (@value 篇)</a>
                         }
                     }
                 </p>

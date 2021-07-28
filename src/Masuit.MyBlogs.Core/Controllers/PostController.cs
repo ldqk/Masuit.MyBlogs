@@ -33,6 +33,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -376,8 +377,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult GetTag()
         {
-            var list = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().ToList().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).Where(g => g.Count() > 1).OrderBy(s => s.Key).Select(g => g.Key).ToHashSet();
-            return ResultData(list);
+            return ResultData(PostService.GetTags().Keys);
         }
 
         /// <summary>
@@ -387,8 +387,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("all"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> All()
         {
-            var tags = PostService.GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().ToList().SelectMany(s => s.Split(',', '，')).GroupBy(t => t).Where(g => g.Count() > 1).OrderByDescending(g => g.Count()).ThenBy(g => g.Key).ToList(); //tag
-            ViewBag.tags = tags;
+            ViewBag.tags = new Dictionary<string, int>(PostService.GetTags().Where(x => x.Value > 1));
             ViewBag.cats = await CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
             {
                 Id = c.Id,

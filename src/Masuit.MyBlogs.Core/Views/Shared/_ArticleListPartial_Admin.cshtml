@@ -1,5 +1,6 @@
 ﻿@using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.Tools.Systems
+@using Masuit.MyBlogs.Core.Common
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 <div class="col-md-9 padding-clear">
     <div class="animated fadeIn blog">
@@ -19,7 +20,7 @@
         }
         else
         {
-            var list = Model.PostsQueryable.OrderBy(p => Guid.NewGuid()).Skip(0).Take(5).ToList();
+            var list = Model.PostsQueryable.OrderByRandom().Take(5).ToList();
             if (list.Any())
             {
                 <div class="page-header">

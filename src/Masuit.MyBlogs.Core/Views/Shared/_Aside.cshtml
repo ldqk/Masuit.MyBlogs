@@ -76,7 +76,7 @@
             <div class="leaderboard">
                 <h2>推荐文章</h2>
                 <ol>
-                    @foreach (PostDto post in Model.Top6Post)
+                    @foreach (PostDto post in Model.Top5Post)
                     {
                         <li>
                             <a asp-controller="Post" asp-action="Details" asp-route-id="@post.Id">
@@ -118,10 +118,9 @@
                 <div id="tagscloud">
                     @if (Model.Tags.Any())
                     {
-                        var tags = Model.Tags.OrderBy(s => Guid.NewGuid()).Take(20);
-                        foreach (var s in tags)
+                        foreach (var (key, value) in Model.Tags)
                         {
-                            <a asp-controller="Home" asp-action="Tag" asp-route-id="@s.Key" class="tagc-@(new Random().Next(100) % 10)" style="font-size: @(s.Value)px; line-height: @(s.Value * 1.2)px;">@s.Key</a>
+                            <a asp-controller="Home" asp-action="Tag" asp-route-tag="@key" class="tagc-@(new Random().Next(100) % 10)" style="font-size: @(value)px; line-height: @(value * 1.2)px;">@key</a>
                         }
                     }
                     else

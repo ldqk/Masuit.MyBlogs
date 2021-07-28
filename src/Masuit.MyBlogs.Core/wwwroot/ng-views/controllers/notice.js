@@ -5,7 +5,7 @@
 		$scope.request("/notice/get", { id: $scope.notice.Id }, function (res) {
 			$scope.notice = res.Data;
             if ($scope.notice.StartTime+$scope.notice.EndTime) {
-                $scope.notice.Range=$scope.notice.StartTime+" 至 "+$scope.notice.EndTime;
+                $scope.notice.Range=new Date($scope.notice.StartTime).Format("yyyy-MM-dd")+" 至 "+new Date($scope.notice.EndTime).Format("yyyy-MM-dd");
             } else {
                 delete $scope.notice.StartTime;
 			    delete $scope.notice.EndTime;
@@ -16,7 +16,7 @@
     jeDate("#timespan",{
         multiPane:false,
         range:" 至 ",
-        minDate:new Date().Format("yyyy-MM-dd 00:00:00"),
+        minDate:new Date().Format("yyyy-MM-dd"),
         maxDate:'2099-06-16',
         format: 'YYYY-MM-DD',
 		donefun: function (obj) {

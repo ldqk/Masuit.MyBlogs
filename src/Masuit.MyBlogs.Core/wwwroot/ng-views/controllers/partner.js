@@ -116,7 +116,7 @@
 
 	$scope.edit = function (item) {
 		$scope.partner = angular.copy(item);
-		$scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2099-12-31":$scope.partner.ExpireTime;
+		$scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2099-12-31":$scope.partner.ExpireTime.Format("yyyy-MM-dd");
 		$scope.isAdd = false;
 		$scope.allowUpload=false;
 		layer.closeAll();
@@ -146,7 +146,7 @@
 	$scope.copy = function (item) {
 		$scope.partner = angular.copy(item);
 		delete $scope.partner.Id;
-		$scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2099-12-31":$scope.partner.ExpireTime;
+		$scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2099-12-31":$scope.partner.ExpireTime.Format("yyyy-MM-dd");
 		$scope.isAdd = true;
 		$scope.allowUpload=false;
 		layer.closeAll();

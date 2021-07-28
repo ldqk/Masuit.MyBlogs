@@ -71,7 +71,7 @@
                                                 {
                                                     if (!string.IsNullOrEmpty(s))
                                                     {
-                                                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
+                                                        <a asp-controller="Home" asp-action="Tag" asp-route-tag="@s">
                                                             <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
                                                         </a>
                                                     }

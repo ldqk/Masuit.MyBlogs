@@ -23,6 +23,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -99,18 +100,19 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 标签文章页
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="tag"></param>
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        [Route("tag/{id}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
-        public async Task<ActionResult> Tag(string id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        [Route("tag/{tag}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
+        public async Task<ActionResult> Tag(string tag, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            var posts = await PostService.GetQuery(p => p.Label.Contains(id) && p.Status == Status.Published).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+            tag = tag.Replace(",", "|").Replace("，", "|").Split('|').Select(Regex.Escape).Join("|");
+            var posts = await PostService.GetQuery(p => Regex.IsMatch(p.Label, tag) && p.Status == Status.Published).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
             CheckPermission(posts.Data);
             var viewModel = await GetIndexPageViewModel();
-            ViewBag.Tag = id;
+            ViewBag.Tag = tag;
             viewModel.Posts = posts;
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
@@ -223,33 +225,21 @@ namespace Masuit.MyBlogs.Core.Controllers
             var notices = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(1, 5, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false); //加载前5条公告
             var cats = await CategoryService.GetQueryFromCacheAsync<string, CategoryDto>(c => c.Status == Status.Available, c => c.Name); //加载分类目录
             var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList(); //热词统计
-            var hot6Post = postsQuery.OrderBy((new Random().Next() % 3) switch
+            var hot5Post = postsQuery.OrderBy((new Random().Next() % 3) switch
             {
                 1 => nameof(OrderBy.VoteUpCount),
                 2 => nameof(OrderBy.AverageViewCount),
                 _ => nameof(OrderBy.TotalViewCount)
             } + " desc").Skip(0).Take(5).Cacheable().ToList(); //热门文章
-            CheckPermission(hot6Post);
-            var newdic = new Dictionary<string, int>(); //标签云最终结果
-            var tagdic = postsQuery.Where(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().Cacheable().ToList().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).ToDictionary(g => g.Key, g => g.Count()); //统计标签
-
-            if (tagdic.Any())
-            {
-                var min = tagdic.Values.Min();
-                foreach (var (key, value) in tagdic)
-                {
-                    var fontsize = (int)Math.Floor(value * 1.0 / (min * 1.0) + 12.0);
-                    newdic.Add(key, fontsize >= 36 ? 36 : fontsize);
-                }
-            }
-
+            CheckPermission(hot5Post);
+            var tagdic = PostService.GetTags().OrderByRandom().Take(20).ToDictionary(x => x.Key, x => x.Value + 12 >= 32 ? 32 : x.Value + 12); //统计标签
             return new HomePageViewModel()
             {
                 Categories = cats,
                 HotSearch = hotSearches,
                 Notices = notices.Data,
-                Tags = newdic,
-                Top6Post = hot6Post,
+                Tags = tagdic,
+                Top5Post = hot5Post,
                 PostsQueryable = postsQuery
             };
         }

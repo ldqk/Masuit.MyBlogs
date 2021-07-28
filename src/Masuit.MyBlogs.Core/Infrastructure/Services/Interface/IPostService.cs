@@ -23,5 +23,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// </summary>
         /// <returns>受影响的行数</returns>
         Task<int> SaveChangesAsync(bool flushIndex);
+
+        /// <summary>
+        /// 文章所有tag
+        /// </summary>
+        /// <returns></returns>
+        Dictionary<string, int> GetTags();
     }
 }

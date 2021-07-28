@@ -1,13 +1,10 @@
 ﻿@using System.Diagnostics
 @using System.Web
 @using Masuit.MyBlogs.Core.Common
-@using Masuit.MyBlogs.Core.Configs
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.MyBlogs.Core.Views.Post
-@using Masuit.Tools.Core.Net
-@using Masuit.Tools.Security
 @model Masuit.MyBlogs.Core.Models.Entity.Post
 
 @{
@@ -73,7 +70,7 @@
                                                 {
                                                     if (!string.IsNullOrEmpty(s))
                                                     {
-                                                        <a asp-controller="Home" asp-action="Tag" asp-route-id="@s">
+                                                        <a asp-controller="Home" asp-action="Tag" asp-route-tag="@s">
                                                             <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
                                                         </a>
                                                     }
@@ -363,7 +360,10 @@
     window.onload = function() {
         var keywords = @Html.Raw(ViewData["keywords"] ?? "[]");
         for (var i = 0; i < keywords.length; i++) {
-            $("#article").highlight(keywords[i]);
+            $("#article p").highlight(keywords[i]);
+            $("#article div").highlight(keywords[i]);
+            $("#article h3").highlight(keywords[i]);
+            $("#article h4").highlight(keywords[i]);
         }
         loading();
         $('#pageToolbar').Paging({ //异步加载评论

@@ -39,7 +39,7 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 热门文章
         /// </summary>
-        public List<PostDto> Top6Post { get; set; }
+        public List<PostDto> Top5Post { get; set; }
 
         /// <summary>
         /// 文章列表查询
