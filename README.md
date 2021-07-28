@@ -41,42 +41,74 @@ Redis：redis-server-windows 3.2
 |备注|玩玩而已|几个人同时访问|几十个人同时访问，单日请求量200w以下|单日请求量200w以上|
 ### 主要功能
 #### 服务器性能监控
-可直接在线实时监控服务器的运行状态，包括CPU、网络带宽、磁盘使用率、内存占用等情况，可记录最近一天的服务器健康状态，通过websocket进行数据的推送，仅支持Windows，且需要Windows安装最新的更新。
+可直接在线实时监控服务器的运行状态，包括CPU、网络带宽、磁盘使用率、内存占用等情况，百分位统计和图表统计，可记录最近一天的服务器健康状态，通过websocket进行数据的推送，仅支持Windows，且需要Windows安装最新的更新。
+![image](https://user-images.githubusercontent.com/20254980/127088294-89c63e04-399c-45a1-ae47-5b55ea86a05d.png)
+
 #### 文章管理
 - 包含文章审核、文章合并、文章列表的增删查改、分类管理、专题管理；
 - 文章审核：当用户在前台页进行投稿后，会进入审核状态，审核通过后，才会在前台页的文章列表中展示出来。
 - 文章合并：当用户在前台页进行了文章的编辑后，会创建出文章的合并请求，当后台管理进行相应的合并操作后，前台用户的修改才会正式生效，可以直接合并、编辑并合并和拒绝合并，拒绝时，修改人会收到相应的邮件通知。
-- 文章操作：可对文章进行修改、新增、置顶、临时删除(下架)、还原、永久删除、禁止评论等操作，编辑后的文章会生成历史版本。
+- 文章操作：可对文章进行修改、新增、置顶、临时删除(下架)、还原、永久删除、禁止评论等操作，编辑后的文章会生成历史版本。文章支持模板变量。
 - 分类管理：对文章的分类进行增删查改和文章的移动等操作，与文章的关系：一对多。
 - 专题管理：对文章的专题进行管理，与文章的关系：多对多。
 - 快速分享：首页快速分享栏目的管理。
+![image](https://user-images.githubusercontent.com/20254980/127089680-c8f57334-2b7e-4ca2-a2a2-01a50d58e61b.png)
+![image](https://user-images.githubusercontent.com/20254980/127088470-15fabe44-c45f-4801-b2fb-8fc034a593dd.png)
+![image](https://user-images.githubusercontent.com/20254980/127089714-d85a3f8b-bb8e-4a0a-b6c1-0e4aead194e2.png)
+![image](https://user-images.githubusercontent.com/20254980/127089725-25a5fa87-2c70-49bd-ada9-e65a8c71797d.png)
+![image](https://user-images.githubusercontent.com/20254980/127089745-70ec7ac2-b80f-4059-abae-7ba362f02b60.png)
+![image](https://user-images.githubusercontent.com/20254980/127089763-57457c59-cfdf-4b7d-a31b-8123dc944c88.png)
+
 #### 评论和留言管理
 对前台用户提交的留言和评论进行审核，当前台用户提交的内容可能包含有敏感词时，会进入人工审核，审核成功才会在前台页中展示。
 #### 消息通知
 站内消息包含评论、留言、投稿、文章合并等通知。
 #### 公告管理
-对网站的公告进行增删查改管理。
+对网站的公告进行增删查改管理。支持定时上下架发布。
+![image](https://user-images.githubusercontent.com/20254980/127088599-9d9d6b8b-9253-4f3d-8b9a-80965c002422.png)
+
 #### 杂项页管理
 一些通用的页面管理，可自由灵活的创建静态页面。
+![image](https://user-images.githubusercontent.com/20254980/127088620-3ea1e808-7ce2-4ede-9a62-765609cfda94.png)
+
 #### 系统设置
 - 包含系统的全局设置、防火墙管理、网站运行日志记录、友链管理、邮件模板的管理。
 - 全局设置：网站的一些基本配置和SEO相关操作等；
 - 防火墙：对网站的所有请求进行全局流量的拦截，让规则内的请求阻止掉，支持黑名单、白名单、IP地址段、国家或地区、关键词审查等规则；
+- 模板变量：针对文章内容的通用内容生成，变量只能添加不能删除。
+![image](https://user-images.githubusercontent.com/20254980/127088748-13d56e4a-f5e0-4c59-9135-0af935d70976.png)
+![image](https://user-images.githubusercontent.com/20254980/127088776-b95f8e8d-5f07-4937-8a9f-6a975ed29e31.png)
+![image](https://user-images.githubusercontent.com/20254980/127089076-2599c484-9323-4d1a-82e5-61ef833ed4e3.png)
+![image](https://user-images.githubusercontent.com/20254980/127089090-5b0dedcb-6be7-46ce-82e7-b4fcb50ea032.png)
+![image](https://user-images.githubusercontent.com/20254980/127089200-cca28f8a-87bb-4a8b-b581-91c0572714c9.png)
+
 #### 广告管理
-主动式的广告投放管理，支持竞价排名，支持在banner、边栏、页内、列表内的广告展示，竞价或权重的高低决定广告出现的概率。
+主动式的广告投放管理，支持竞价排名，支持在banner、边栏、页内、列表内的广告展示，竞价或权重的高低决定广告出现的概率。支持按地区进行投放。
+![image](https://user-images.githubusercontent.com/20254980/127089325-27b5bf4d-49ea-41ea-aae6-8829924bcc92.png)
+![image](https://user-images.githubusercontent.com/20254980/127089358-7bab075c-5bb7-41ea-8900-29a2eecb71de.png)
+
 #### 赞助管理
 对网站打赏进行增删查改操作，自动掩码。
+![image](https://user-images.githubusercontent.com/20254980/127089429-beb5baf0-c1d3-4880-85c0-9f897fb0de75.png)
+
 #### 搜索统计
 当前台用户每Session周期内的关键词搜索，不重复的关键词将会被记录，用于热词统计，仅记录最近一个月内的所有搜索关键词，用于统计当月、7天以及当天的搜索热词。
+![image](https://user-images.githubusercontent.com/20254980/127089504-2c32288d-aa0d-4331-a3a2-90e97ba9f7a2.png)
+
 #### 任务管理
 hangfire的可视化管理页面
 #### 文件管理
 服务器文件的在线管理，支持浏览、预览、压缩、解压缩、创建文件夹、上传、下载、打包下载等文件的基本操作。
+![image](https://user-images.githubusercontent.com/20254980/127089568-5d3bcef6-5ad7-4f44-b30d-b7253be2d3fb.png)
+#### onedrive网盘程序
+基于[YukiDrive](https://github.com/YukiCoco/YukiDrive)二次开发的内嵌网盘应用。
+![image](https://user-images.githubusercontent.com/20254980/127090161-09fa9337-4601-4eaa-b47c-cefd8242910d.png)
+![image](https://user-images.githubusercontent.com/20254980/127090259-868e38f8-abbe-474e-bdd3-4c241b49d1b5.png)
 
 ### 项目架构
 - 项目采用单体架构，方便部署和配置，传统的MVC模式，ASP.NET Core MVC+EF Core的简单架构。  
 - Controller→Service→Repository→DbContext  
-![](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbcc714c3db.jpg)  
+![image](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbcc714c3db.jpg)  
 ### 项目文件夹定义：
 App_Data：存放网站的一些常规数据，以文本的形式存在，这类数据不需要频繁更新的。  
 ┠─cert文件夹：存放https证书  
@@ -92,19 +124,18 @@ Common：之前老项目的Common项目；
 Configs：项目的一些配置对象  
 Controllers：控制器  
 Extensions：一些扩展类或一些项目的扩展功能，比如hangfire、ueditor、中间件、拦截器等；  
-Hubs：SignalR推送服务类；  
 Infrastructure：数据访问基础设施，包含Repository和Services，相当于老项目的DAL和BLL；  
 Migrations：数据库CodeFirst模式的迁移文件；  
-Models：老项目的Models项目，存放一些实体类或DTO；  
+Models：存放一些实体类或DTO；  
 Views：razor视图  
 wwwroot：项目的所有静态资源；  
 ### 核心功能点技术实现
 #### 后端技术栈：
 依赖注入容器：.NET Core自带的+Autofac，autofac主要负责批量注入和属性注入；  
 实体映射框架：automapper 9.0；  
-缓存框架：CacheManager统一管理网站的热数据，如Session、内存缓存，EFSecondLevelCache.Core负责管理EF Core的二级缓存；  
+缓存框架：CacheManager统一管理网站的热数据，如Session、内存缓存，EFCoreSecondLevelCacheInterceptor负责管理EF Core的二级缓存；  
 定时任务：hangfire统一管理定时任务，包含友链回链检查、文章定时发布、访客统计、搜索热词统计、Lucene库刷新等任务；  
-Websocket：SignalR进行流推送实现服务器硬件健康状态的实时监控；  
+Websocket：Blazor进行流推送实现服务器硬件健康状态的实时监控；  
 硬件检测：Masuit.Tools封装的硬件检测功能；  
 全文检索：Masuit.LuceneEFCore.SearchEngine基于Lucene.Net 4.8实现的全文检索中间件；  
 中文分词：结巴分词结合本地词库实现中文分词；  
@@ -112,13 +143,14 @@ Websocket：SignalR进行流推送实现服务器硬件健康状态的实时监�
 Redis：CSRedis负责Redis的读写操作；  
 文件压缩：Masuit.Tools封装的zip文件压缩功能；  
 Html字符串操作：htmldiff.net-core实现文章版本的内容对比，HtmlAgilityPack实现html字符串的“DOM”操作，主要是用于提取img标签，HtmlSanitizer实现表单的html代码的仿XSS处理；  
-图床：支持多个图床的上传：gitee、gitlab、阿里云OSS、sm.ms图床、人民网图床；  
+图床：支持多个图床的上传：gitee、github、gitlab；  
 拦截器：授权拦截器、请求拦截器负责网站全局流量的拦截和清洗、防火墙拦截器负责拦截网站自带防火墙规则的请求流量、异常拦截器、url重定向重写拦截器，主要用于将http的请求重定向到https；  
-请求IP来源检查：IP2Region+本地数据库实现请求IP的来源检查；  
+请求IP来源检查：maxmind+IP2Region+本地数据库实现请求IP的来源检查；  
 RSS：WilderMinds.RssSyndication实现网站的RSS源；  
 EF扩展功能：zzzproject相关nuget包  
 Word文档转换：OpenXml实现浏览器端上传Word文档转换为html字符串。  
 在线文件管理：angular-filemanager+文件管理代码实现服务器文件的在线管理  
+
 #### 前端技术栈
 ##### 前台页面：
 基于bootstrap3布局  
@@ -129,7 +161,7 @@ angularjs
 ##### 后台管理页：
 - angularjs单一页面应用程序  
 - material布局风格  
-- highchart+echart图表组件  
+- echart图表组件  
 - ng-table表格插件  
 - material风格angular-filemanager文件管理器  
 #### 性能和安全相关
