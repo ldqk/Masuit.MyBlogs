@@ -35,7 +35,7 @@ Redis：redis-server-windows 3.2
 | --------   | -----:   | :----: | :----: | :----: |
 |CPU|1核|2核|4核|4核|
 |内存|1GB|2GB|4GB|8GB|
-|带宽|1Mbps|1Mbps|5Mbps|10Mbps|
+|带宽|1Mbps|1Mbps|5Mbps|1000Mbps|
 |数据库|MySQL 5/SQL Server 2008|MySQL 8/SQL Server 2012|MySQL 8/SQL Server 2016|MySQL 8/SQL Server 2016|
 |缓存组件|Redis 3.2+|Redis 3.2+|Redis 3.2+|Redis 3.2+|
 |备注|玩玩而已|几个人同时访问|几十个人同时访问，单日请求量200w以下|单日请求量200w以上|
