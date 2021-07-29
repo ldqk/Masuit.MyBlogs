@@ -18,10 +18,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var converter = new ValueConverter<string[], string>(
-                model => string.Join(',', model),
-                data => data.Split(',', StringSplitOptions.None)
-            );
+            var converter = new ValueConverter<string[], string>(model => string.Join(',', model), data => data.Split(',', StringSplitOptions.None));
             modelBuilder.Entity<Site>().Property("HiddenFolders").HasConversion(converter);
         }
     }

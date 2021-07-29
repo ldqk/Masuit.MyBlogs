@@ -112,14 +112,7 @@ $(function() {
             return data;
         }
     });
-
-    var tippy = new Tippy('.tippy-scale', {
-            position: 'bottom',
-            animation: 'scale',
-            arrow: 'true',
-            'theme': 'light'
-        }); //注册tooltips
-
+    
     $(".btn").on("mousedown", function(e) { 
         window.ripplet(e, {
                 color: null,

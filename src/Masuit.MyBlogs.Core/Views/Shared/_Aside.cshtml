@@ -21,7 +21,7 @@
                                 @foreach (NoticeDto notice in Model.Notices)
                                 {
                                     <li class="news-item">
-                                        <a class="tippy-scale" title="查看详情" asp-controller="Notice" asp-action="Details" asp-route-id="@notice.Id">@await notice.Content.GetSummary(45, 2)</a>
+                                        <a asp-controller="Notice" asp-action="Details" asp-route-id="@notice.Id">@await notice.Content.GetSummary(45, 2)</a>
                                     </li>
                                 }
                             </ul>
@@ -39,17 +39,14 @@
             </div>
             <div class="panel-body">
                 <ul class="list-group">
-                    @foreach (var cat in Model.Categories)
+                    @foreach (var cat in Model.Categories.Where(c => c.PendedPostCount > 0))
                     {
-                        if (cat.PendedPostCount > 0)
-                        {
-                            <li class="list-group-item">
-                                <a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Name</a>
-                                <a class="pull-right" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
-                                    <i class="icon-rss4"></i>
-                                </a>
-                            </li>
-                        }
+                    <li class="list-group-item">
+                        <a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Name</a>
+                        <a class="pull-right" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
+                            <i class="icon-rss4"></i>
+                        </a>
+                    </li>
                     }
                 </ul>
             </div>

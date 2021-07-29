@@ -412,14 +412,6 @@ Custom bottom spacer
     margin-bottom: 0;
 }
 
-.tippy-scale {
-    color: black;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
-}
 .close-bg {
     position: fixed;
     bottom: 0;

@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+﻿using EFCoreSecondLevelCacheInterceptor;
+using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet("list")]
         public async Task<ActionResult> GetAll()
         {
-            return ResultData(await VariablesService.GetAll().ToListAsync());
+            return ResultData(await VariablesService.GetAll().NotCacheable().ToListAsync());
         }
 
         [HttpPost]

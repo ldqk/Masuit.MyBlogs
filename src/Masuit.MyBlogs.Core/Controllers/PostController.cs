@@ -388,18 +388,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> All()
         {
             ViewBag.tags = new Dictionary<string, int>(PostService.GetTags().Where(x => x.Value > 1));
-            ViewBag.cats = await CategoryService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Count = c.Post.Count(p => p.Status == Status.Published || CurrentUser.IsAdmin)
-            }).ToListAsync(); //category
-            ViewBag.seminars = await SeminarService.GetAll(c => c.Post.Count, false).Select(c => new TagCloudViewModel
-            {
-                Id = c.Id,
-                Name = c.Title,
-                Count = c.Post.Count(p => p.Status == Status.Published || CurrentUser.IsAdmin)
-            }).ToListAsync(); //seminars
+            ViewBag.cats = await CategoryService.GetAll(c => c.Post.Count, false).ToDictionaryAsync(c => c.Id, c => c.Name); //category
+            ViewBag.seminars = await SeminarService.GetAll(c => c.Post.Count, false).ToDictionaryAsync(c => c.Id, c => c.Title); //seminars
             return View();
         }
 
@@ -694,7 +684,8 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (!string.IsNullOrEmpty(kw))
             {
-                where = where.And(p => p.Title.Contains(kw) || p.Author.Contains(kw) || p.Email.Contains(kw) || p.Label.Contains(kw) || p.Content.Contains(kw));
+                kw = Regex.Escape(kw);
+                where = where.And(p => Regex.IsMatch(p.Title + p.Author + p.Email + p.Label + p.Content, kw));
             }
 
             var list = PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToPagedList<Post, PostDataModel>(page, size, MapperConfig);

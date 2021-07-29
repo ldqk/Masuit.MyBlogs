@@ -1,10 +1,9 @@
-﻿@using Masuit.MyBlogs.Core.Models.ViewModel
-@{
+﻿@{
     ViewBag.Title = "分类云_标签云_专题云";
     Layout = "~/Views/Shared/_Layout.cshtml";
     Dictionary<string, int> tags = ViewBag.tags;
-    List<TagCloudViewModel> cats = ViewBag.cats;
-    List<TagCloudViewModel> seminars = ViewBag.seminars;
+    Dictionary<int,string> cats = ViewBag.cats;
+    Dictionary<int,string> seminars = ViewBag.seminars;
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
     Random r = new Random();
 }
@@ -104,31 +103,25 @@
         <div id="right-side">
             <div id="first" class="active">
                 <p>
-                    @{
-                        foreach (var g in cats)
-                        {
-                            <a asp-controller="Home" asp-action="Category" asp-route-id="@g.Id" class="label label-@colors[r.Next(colors.Length)]">@g.Name (@(g.Count)篇)</a>
-                        }
+                    @foreach (var (key, value) in cats)
+                    {
+                        <a asp-controller="Home" asp-action="Category" asp-route-id="@key" class="label label-@colors[r.Next(colors.Length)]">@value</a>
                     }
                 </p>
             </div>
             <div id="second">
                 <p>
-                    @{
-                        foreach (var (key, value) in tags)
-                        {
-                            <a asp-controller="Home" asp-action="Tag" asp-route-tag="@key" class="label label-@colors[r.Next(colors.Length)]">@key (@value 篇)</a>
-                        }
+                    @foreach (var (key, _) in tags)
+                    {
+                        <a asp-controller="Home" asp-action="Tag" asp-route-tag="@key" class="label label-@colors[r.Next(colors.Length)]">@key</a>
                     }
                 </p>
             </div>
             <div id="third">
                 <p>
-                    @{
-                        foreach (var g in seminars)
-                        {
-                            <a asp-controller="Seminar" asp-action="Index" asp-route-id="@g.Id" class="label label-@colors[r.Next(colors.Length)]">@g.Name (@(g.Count)篇)</a>
-                        }
+                    @foreach (var (key, value) in seminars)
+                    {
+                        <a asp-controller="Seminar" asp-action="Index" asp-route-id="@key" class="label label-@colors[r.Next(colors.Length)]">@value</a>
                     }
                 </p>
             </div>

@@ -122,8 +122,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Content/common/leaderboard.css")
                     .Include("/Content/microtip.min.css")
                     .Include("/Assets/breadcrumb/style.css")
-                    .Include("/Assets/nav/css/style.css")
-                    .Include("/Assets/tippy/tippy.css");
+                    .Include("/Assets/nav/css/style.css");
                 bundles.AddCss("/filemanager.css")
                     .Include("/Content/bootswatch.min.css")
                     .Include("/fonts/icomoon.min.css")
@@ -145,21 +144,19 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css")
                     .Include("/Assets/highlight/css/highlight.css");
 
-                bundles.AddJs("/main.js").Include("/Scripts/bootstrap.min.js")
+                bundles.AddJs("/main.js")
                     .Include("/Scripts/bootstrap-suggest.min.js")
                     .Include("/Scripts/jquery.query.js")
                     .Include("/Scripts/jquery.paging.js")
                     .Include("/Scripts/ripplet.js")
                     .Include("/Scripts/global/scripts.js")
                     .Include("/Scripts/platform.js")
-                    .Include("/Assets/tippy/tippy.js")
                     .Include("/Assets/newsbox/jquery.bootstrap.newsbox.js")
                     .Include("/Assets/tagcloud/js/tagcloud.js")
                     .Include("/Assets/scrolltop/js/scrolltop.js")
                     .Include("/Assets/nav/js/main.js");
                 bundles.AddJs("/filemanager.js")
                     .Include("/Scripts/ng-file-upload.min.js")
-                    .Include("/Scripts/bootstrap.min.js")
                     .Include("/ng-views/filemanager/js/app.js")
                     .Include("/ng-views/filemanager/js/directives/directives.js")
                     .Include("/ng-views/filemanager/js/filters/filters.js")
