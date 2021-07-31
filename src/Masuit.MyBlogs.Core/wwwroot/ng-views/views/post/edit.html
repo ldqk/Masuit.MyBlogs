@@ -3,7 +3,7 @@
     <input type="hidden" ng-model="post.Email">
     <div class="input-group">
         <span class="input-group-addon size18">
-            <label for="article">文章标题：</label>
+            文章标题：
         </span>
         <input type="text" class="form-control input-lg" ng-model="post.Title" required placeholder="请输入文章标题">
         <span class="input-group-btn">
@@ -42,7 +42,7 @@
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="input-group">
-                <span class="input-group-addon"><label for="Label">标签：</label></span>
+                <span class="input-group-addon">标签：</span>
                 <div class="ui fluid multiple search selection dropdown tags">
                     <input name="Label" type="hidden" id="Label">
                     <i class="dropdown icon"></i>
@@ -55,10 +55,9 @@
         </div>
         <div class="col-md-4 col-sm-6">
             <div class="input-group">
-                <span class="input-group-addon"><label for="keyword">文章关键词：</label></span>
+                <span class="input-group-addon">文章关键词：</span>
                 <div class="ui fluid multiple search selection dropdown keyword">
                     <input name="keyword" type="hidden" id="keyword">
-                    <i class="dropdown icon"></i>
                     <div class="default text">文章关键词</div>
                     <div class="menu"></div>
                 </div>
@@ -67,7 +66,7 @@
         <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">
-                    <label>选择专题：</label>
+                    选择专题：
                 </span>
                 <div class="ui fluid multiple search selection dropdown seminar">
                     <input name="seminar" type="hidden" id="seminar">
@@ -122,7 +121,6 @@
             <div class="input-group">
                 <span class="input-group-addon" id="sizing-addon2">按地区投放：</span>
                 <select ng-model="post.LimitMode" class="form-control">
-                    <option ng-value="null" ng-if="post.LimitMode==null">--</option>
                     <option ng-value="0">不限</option>
                     <optgroup label="可见性">
                         <option ng-value="1">指定地区可见</option>

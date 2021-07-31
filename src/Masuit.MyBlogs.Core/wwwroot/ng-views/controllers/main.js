@@ -229,10 +229,14 @@
 			window.location.href = "/passport/login";
 		}
 	}
+
 	this.CheckLogin = $scope.CheckLogin;
-	this.getmsg = function() {
-		$scope.request("/dashboard/getmessages", null, function(res) {
-			$scope.Msgs = res.Data;
+
+	setInterval(function() {
+		fetch("/dashboard/getmessages").then(function(response) {
+            return response.json();
+        }).then(function(res) {
+            $scope.Msgs = res.Data;
 			if(res.Data.post.length > 0) {
 				iziToast.info({
 					title:'待审核文章',
@@ -257,10 +261,13 @@
 					transitionIn:'bounceInRight',
 				});
 			}
-		});
-
-		$http.post("/msg/GetUnreadMsgs").then(function(res) {
-			$scope.InternalMsgs = res.data.Data;
+        }).catch(function(e) {
+            console.log("Oops, error");
+        });
+		fetch("/msg/GetUnreadMsgs").then(function(response) {
+            return response.json();
+        }).then(function(res) {
+            $scope.InternalMsgs = res.data.Data;
 			if($scope.InternalMsgs.length > 0) {
 				iziToast.info({
 					title:'未读消息',
@@ -269,9 +276,10 @@
 					transitionIn:'bounceInRight',
 				});
 			}
-		});
-	}
-	this.getmsg();
+        }).catch(function(e) {
+            console.log("Oops, error");
+        });
+    },5000);
 	$scope.read = function(id) {
 		$http.post("/msg/read", {
 			id

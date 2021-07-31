@@ -377,7 +377,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult GetTag()
         {
-            return ResultData(PostService.GetTags().Keys);
+            return ResultData(PostService.GetTags().Where(p => p.Value > 1).Select(x => x.Key).OrderBy(s => s));
         }
 
         /// <summary>
@@ -387,7 +387,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("all"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> All()
         {
-            ViewBag.tags = new Dictionary<string, int>(PostService.GetTags().Where(x => x.Value > 1));
+            ViewBag.tags = new Dictionary<string, int>(PostService.GetTags().Where(x => x.Value > 1).OrderBy(x => x.Key));
             ViewBag.cats = await CategoryService.GetAll(c => c.Post.Count, false).ToDictionaryAsync(c => c.Id, c => c.Name); //category
             ViewBag.seminars = await SeminarService.GetAll(c => c.Post.Count, false).ToDictionaryAsync(c => c.Id, c => c.Title); //seminars
             return View();

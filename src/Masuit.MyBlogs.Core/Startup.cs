@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using CLRStats;
 using CSRedis;
 using EFCoreSecondLevelCacheInterceptor;
 using Hangfire;
@@ -164,7 +165,11 @@ namespace Masuit.MyBlogs.Core
             app.SetupHttpsRedirection(Configuration);
             app.UseDefaultFiles().UseStaticFiles();
             app.UseSession().UseCookiePolicy(); //注入Session
-            app.UseWhen(c => c.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true, builder => builder.UseMiniProfiler());
+            app.UseWhen(c => c.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true, builder =>
+            {
+                builder.UseMiniProfiler();
+                builder.UseCLRStatsDashboard();
+            });
             app.UseWhen(c => !c.Request.Path.StartsWithSegments("/_blazor"), builder => builder.UseMiddleware<RequestInterceptMiddleware>()); //启用网站请求拦截
             app.SetupHangfire();
             app.UseResponseCaching().UseResponseCompression(); //启动Response缓存

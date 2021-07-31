@@ -162,7 +162,6 @@ function showLine() {
                 }],
             tooltip: {
                 trigger: 'axis',
-
                 axisPointer: {
                     animation: false
                 }
@@ -185,7 +184,7 @@ function showLine() {
                         var dt=new Date(value);
                         return dt.getHours()+":"+dt.getMinutes()+":"+dt.getSeconds()
                     }
-                  },
+                },
                 splitLine: {
                     show: false
                 }

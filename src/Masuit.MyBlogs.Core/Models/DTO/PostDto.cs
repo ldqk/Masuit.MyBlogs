@@ -131,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// <summary>
         /// 限制模式
         /// </summary>
-        public RegionLimitMode? LimitMode { get; set; }
+        public RegionLimitMode LimitMode { get; set; }
 
         /// <summary>
         /// 限制地区，逗号分隔
