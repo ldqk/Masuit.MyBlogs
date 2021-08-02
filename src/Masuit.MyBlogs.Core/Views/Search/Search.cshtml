@@ -1,5 +1,4 @@
-﻿@using System.Web
-@using Masuit.MyBlogs.Core.Common
+﻿@using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools
@@ -10,6 +9,7 @@
     ViewBag.Title = "站内搜索：" + ViewBag.Keyword;
     Layout = "~/Views/Shared/_Layout.cshtml";
     List<KeywordsRank> hotSearches = ViewBag.hotSearches;
+    List<string> relateKeywords = ViewBag.RelateKeywords;
     Advertisement ad = ViewBag.Ads;
 }
 <div class="container min-height610">
@@ -82,6 +82,15 @@
                         </div>
                     }
                 }
+                @if(relateKeywords?.Count>0) {
+                    <div class="margin-bot10">
+                        <h3>相关搜索：</h3>
+                        @foreach (var kw in relateKeywords)
+                        {
+                            <a asp-action="Search" asp-route-wd="@kw">@kw</a><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        }
+                    </div>
+                }
                 @if (!string.IsNullOrEmpty((string)ViewBag.ErrorMsg))
                 {
                     <h3>@ViewBag.ErrorMsg</h3>
@@ -116,8 +125,8 @@
                         }
                         else
                         {
-                            <li><a href="@Context.Request.Path?wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Previous">首页</a></li>
-                            <li><a href="@Context.Request.Path?page=@(Context.Request.Query["page"].ToString().ToInt32() - 1 <= 0 ? 1 : Context.Request.Query["page"].ToString().ToInt32() - 1)&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                            <li><a asp-action="Search" asp-route-wd="@ViewBag.Keyword" aria-label="Previous">首页</a></li>
+                            <li><a asp-action="Search" asp-route-wd="@ViewBag.Keyword" asp-route-page="@(Context.Request.Query["page"].ToString().ToInt32() - 1 <= 0 ? 1 : Context.Request.Query["page"].ToString().ToInt32() - 1)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
                         }
                         @if (pageStart > 1)
                         {
@@ -131,7 +140,7 @@
                             }
                             else
                             {
-                                <li><a href="@Context.Request.Path?page=@i&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])">@i</a></li>
+                                <li><a asp-action="Search" asp-route-page="@i" asp-route-wd="@ViewBag.Keyword">@i</a></li>
                             }
                         }
                         @if (pageEnd < pages)
@@ -141,12 +150,12 @@
                         @if (current == pages)
                         {
                             <li class="disabled"><a><span aria-hidden="true">&raquo;</span></a></li>
-                            <li class="disabled"><a>末页</a></li>
+                            <li class="disabled"><a>最后一页</a></li>
                         }
                         else
                         {
-                            <li><a href="@Context.Request.Path?page=@(current + 1)&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
-                            <li><a href="@Context.Request.Path?page=@pages&wd=@HttpUtility.UrlEncode(Context.Request.Query["wd"])" aria-label="Next">末页</a></li>
+                            <li><a asp-action="Search" asp-route-page="@(current + 1)" asp-route-wd="@ViewBag.Keyword" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+                            <li><a asp-action="Search" asp-route-page="@pages" asp-route-wd="@ViewBag.Keyword" aria-label="Next">最后一页</a></li>
                         }
                     </ul>
                 }
@@ -156,6 +165,6 @@
 </div>
 <script>
     $(".baidu").on("click", function(e) {
-		window.location.href = `https://www.baidu.com/s?wd=${$("#search").val().trim()}&si=@Context.Request.Host&ct=2097152`;
+		window.location.href = `https://www.baidu.com/s?wd=@ViewBag.Keyword&si=@Context.Request.Host&ct=2097152`;
 	});
 </script>

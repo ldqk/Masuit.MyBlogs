@@ -1,5 +1,5 @@
 ﻿using CacheManager.Core;
-using JiebaNet.Segmenter;
+using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Route("search"), Route("search/{**wd}", Order = 1), Route("s", Order = 2), Route("s/{**wd}", Order = 3)]
+        [Route("search/{**wd}"), Route("search", Order = 1), Route("s/{**wd}", Order = 2), Route("s", Order = 3)]
         public async Task<ActionResult> Search([FromServices] IPostService postService, string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             wd = ChineseConverter.Convert(wd?.Trim() ?? "", ChineseConversionDirection.TraditionalToSimplified);
@@ -59,7 +59,6 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
             {
-                new JiebaSegmenter().AddWord(wd);
                 if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !HttpContext.Request.IsRobot())
                 {
                     SearchDetailsService.AddEntity(new SearchDetails
@@ -69,7 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         IP = ClientIP
                     });
                     await SearchDetailsService.SaveChangesAsync();
-                    HttpContext.Session.Set("search:" + wd, wd.ToByteArray());
+                    HttpContext.Session.Set("search:" + wd, wd);
                 }
 
                 var posts = postService.SearchPage(page, size, wd);
@@ -82,6 +81,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
 
                 ViewBag.hotSearches = new List<KeywordsRank>();
+                ViewBag.RelateKeywords = SearchDetailsService.GetQuery(s => s.Keywords.Contains(wd) && s.Keywords != wd).Select(s => s.Keywords).GroupBy(s => s).OrderByDescending(g => g.Count()).Select(g => g.Key).Take(10).Cacheable().ToList();
                 return View(posts);
             }
 

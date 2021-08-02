@@ -297,17 +297,14 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="length">截取长度</param>
         /// <param name="min">摘要最少字数</param>
         /// <returns></returns>
-        public static async Task<string> GetSummary(this string html, int length = 150, int min = 10)
+        public static Task<string> GetSummary(this string html, int length = 150, int min = 10)
         {
             var context = BrowsingContext.New(Configuration.Default);
-            var doc = await context.OpenAsync(req => req.Content(html));
-            var summary = doc.DocumentElement.GetElementsByTagName("p").FirstOrDefault(n => n.TextContent.Length > min)?.TextContent ?? "没有摘要";
-            if (summary.Length > length)
+            return context.OpenAsync(req => req.Content(html)).ContinueWith(t =>
             {
-                return summary[..length] + "...";
-            }
-
-            return summary;
+                var summary = t.Result.DocumentElement.GetElementsByTagName("p").FirstOrDefault(n => n.TextContent.Length > min)?.TextContent ?? "没有摘要";
+                return summary.Length > length ? summary[..length] + "..." : summary;
+            });
         }
 
         public static string TrimQuery(this string path)

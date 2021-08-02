@@ -232,12 +232,17 @@
 
 	this.CheckLogin = $scope.CheckLogin;
 
-	setInterval(function() {
-		fetch("/dashboard/getmessages").then(function(response) {
+	function getmsgs(show) {
+		fetch("/dashboard/getmessages",{
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).then(function(response) {
             return response.json();
         }).then(function(res) {
             $scope.Msgs = res.Data;
-			if(res.Data.post.length > 0) {
+			if(res.Data.post.length > 0&&show) {
 				iziToast.info({
 					title:'待审核文章',
 					message:'有' + res.Data.post.length + '篇新文章待审核哦!',
@@ -245,7 +250,7 @@
 					transitionIn:'bounceInRight',
 				});
 			}
-			if(res.Data.msgs.length > 0) {
+			if(res.Data.msgs.length > 0&&show) {
 				iziToast.info({
 					title:'待审核留言',
 					message:'有' + res.Data.msgs.length + '条新留言待审核哦!',
@@ -253,7 +258,7 @@
 					transitionIn:'bounceInRight',
 				});
 			}
-			if(res.Data.comments.length > 0) {
+			if(res.Data.comments.length > 0&&show) {
 				iziToast.info({
 					title:'待审核文章评论',
 					message:'有' + res.Data.comments.length + '条新文章评论待审核哦!',
@@ -261,25 +266,36 @@
 					transitionIn:'bounceInRight',
 				});
 			}
+			$scope.$apply();
         }).catch(function(e) {
             console.log("Oops, error");
         });
-		fetch("/msg/GetUnreadMsgs").then(function(response) {
-            return response.json();
-        }).then(function(res) {
-            $scope.InternalMsgs = res.data.Data;
-			if($scope.InternalMsgs.length > 0) {
-				iziToast.info({
-					title:'未读消息',
-					message:'有' + $scope.InternalMsgs.length + '条未读消息!',
-					position:'topRight',
-					transitionIn:'bounceInRight',
-				});
-			}
-        }).catch(function(e) {
-            console.log("Oops, error");
-        });
-    },5000);
+        if (($scope.InternalMsgs||[]).length==0) {
+			fetch("/msg/GetUnreadMsgs",{
+                headers:{
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }).then(function(response) {
+                return response.json();
+            }).then(function(res) {
+                $scope.InternalMsgs = res.Data;
+			    if($scope.InternalMsgs.length > 0&&show) {
+				    iziToast.info({
+					    title:'未读消息',
+					    message:'有' + $scope.InternalMsgs.length + '条未读消息!',
+					    position:'topRight',
+					    transitionIn:'bounceInRight',
+				    });
+			    }
+			    $scope.$apply();
+            }).catch(function(e) {
+                console.log("Oops, error");
+            });
+        }
+    }
+	getmsgs(true);
+	setInterval(getmsgs,5000);
 	$scope.read = function(id) {
 		$http.post("/msg/read", {
 			id

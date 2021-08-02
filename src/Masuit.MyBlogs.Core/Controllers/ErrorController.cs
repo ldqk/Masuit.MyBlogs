@@ -49,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Success = false,
                     Message = "页面未找到！"
                 }),
-                _ => View()
+                _ => View("Index")
             };
         }
 
@@ -95,7 +95,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         }
                         break;
                     case NotFoundException:
-                        return RedirectToAction("Index");
+                        return Index();
                     case AccessDenyException:
                         var entry = ip.GetIPLocation();
                         var tips = Template.Create(CommonHelper.SystemSettings.GetOrAdd("AccessDenyTips", @"<h4>遇到了什么问题？</h4>

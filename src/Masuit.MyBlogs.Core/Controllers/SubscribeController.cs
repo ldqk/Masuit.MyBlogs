@@ -45,8 +45,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     Author = new Author
                     {
-                        Name = p.Author,
-                        Email = p.Email.MaskEmail()
+                        Name = p.Modifier
                     },
                     Body = summary,
                     Categories = new List<string>
@@ -90,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     {
                         Author = new Author()
                         {
-                            Name = ad.IndexId
+                            Name = ad.Title
                         },
                         Body = ad.Description,
                         Title = ad.Title,
@@ -124,8 +123,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     Author = new Author
                     {
-                        Name = p.Author,
-                        Email = p.Email.MaskEmail()
+                        Name = p.Modifier
                     },
                     Body = summary,
                     Categories = new List<string>
@@ -173,8 +171,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 Author = new Author
                 {
-                    Name = post.Author,
-                    Email = post.Email.MaskEmail()
+                    Name = post.Modifier
                 },
                 Body = summary,
                 Categories = new List<string>

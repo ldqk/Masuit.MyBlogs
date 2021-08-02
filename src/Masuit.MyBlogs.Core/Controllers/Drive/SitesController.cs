@@ -15,7 +15,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
 {
     [ApiController]
     [Route("api/")]
-    public class DefaultController : Controller
+    public class SitesController : Controller
     {
         readonly IDriveAccountService _siteService;
         readonly IDriveService _driveService;
@@ -23,7 +23,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
 
         public UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
 
-        public DefaultController(IDriveAccountService siteService, IDriveService driveService, SettingService setting)
+        public SitesController(IDriveAccountService siteService, IDriveService driveService, SettingService setting)
         {
             this._siteService = siteService;
             this._driveService = driveService;
@@ -36,7 +36,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// 返回所有sites
         /// </summary>
         /// <returns></returns>
-        [HttpGet("sites")]
+        [HttpGet("sites"), ResponseCache(Duration = 600)]
         public IActionResult GetSites()
         {
             return Json(_siteService.GetSites(), new JsonSerializerSettings()
@@ -48,7 +48,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// 根据路径获取文件夹内容
         /// </summary>
         /// <returns></returns>
-        [HttpGet("sites/{siteName}/{**path}")]
+        [HttpGet("sites/{siteName}/{**path}"), ResponseCache(Duration = 600)]
         public async Task<IActionResult> GetDrectory(string siteName, string path)
         {
             if (string.IsNullOrEmpty(siteName))
@@ -105,7 +105,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        [HttpGet("files/{siteName}/{**path}")]
+        [HttpGet("files/{siteName}/{**path}"), ResponseCache(Duration = 600)]
         public async Task<IActionResult> Download(string siteName, string path)
         {
             try
@@ -131,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// 获取基本信息
         /// </summary>
         /// <returns></returns>
-        [HttpGet("info")]
+        [HttpGet("info"), ResponseCache(Duration = 600)]
         public IActionResult GetInfo()
         {
             bool isAollowAnonymous = !string.IsNullOrEmpty(_setting.Get("AllowAnonymouslyUpload")) && Convert.ToBoolean(_setting.Get("AllowAnonymouslyUpload"));
@@ -152,7 +152,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// 获得readme
         /// </summary>
         /// <returns></returns>
-        [HttpGet("readme")]
+        [HttpGet("readme"), ResponseCache(Duration = 600)]
         public IActionResult GetReadme()
         {
             return Json(new
@@ -168,7 +168,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// 获取文件分片上传路径
         /// </summary>
         /// <returns></returns>
-        [HttpGet("upload/{siteName}/{**fileName}")]
+        [HttpGet("upload/{siteName}/{**fileName}"), ResponseCache(Duration = 600)]
         public async Task<IActionResult> GetUploadUrl(string siteName, string fileName)
         {
             bool isAollowAnonymous = !string.IsNullOrEmpty(_setting.Get("AllowAnonymouslyUpload")) && Convert.ToBoolean(_setting.Get("AllowAnonymouslyUpload"));
