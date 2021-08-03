@@ -131,12 +131,7 @@
                         </header>
                         <article class="article" id="article">
                             @Html.Raw(Model.Content)
-                            @if (!string.IsNullOrEmpty(Model.ProtectContent))
-                            {
-                                <div class="row protected">
-                                    @Html.Raw(Model.ProtectContent)
-                                </div>
-                            }
+                            @Html.Raw(Model.ProtectContent)
                         </article>
                     </section>
                 </main>

@@ -18,6 +18,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -137,6 +138,23 @@ namespace Masuit.MyBlogs.Core.Common
         private static readonly DbSearcher IPSearcher = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
         public static readonly DatabaseReader MaxmindReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-City.mmdb"));
         private static readonly DatabaseReader MaxmindAsnReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-ASN.mmdb"));
+
+        /// <summary>
+        /// 是否是代理ip
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <returns></returns>
+        public static async Task<bool> IsProxy(this string ip)
+        {
+            var httpClient = Startup.ServiceProvider.GetRequiredService<IHttpClientFactory>().CreateClient();
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36 Edg/92.0.902.62");
+            var html = await httpClient.GetStringAsync("https://ipinfo.io/" + ip);
+            var ctx = BrowsingContext.New(Configuration.Default);
+            var doc = await ctx.OpenAsync(res => res.Content(html));
+            var isAnycast = doc.DocumentElement.QuerySelectorAll(".title").Where(e => e.TextContent.Contains("Anycast")).Select(e => e.Parent).Any(n => n.TextContent.Contains("True"));
+            var isproxy = doc.DocumentElement.QuerySelectorAll("#block-privacy img").Any(e => e.OuterHtml.Contains("right"));
+            return isAnycast || isproxy;
+        }
 
         public static AsnResponse GetIPAsn(this string ip)
         {
@@ -389,13 +407,8 @@ namespace Masuit.MyBlogs.Core.Common
         public string City { get; set; }
         public string ISP { get; set; }
         public long? ASN { get; set; }
-        public string Location => Country + Province + City;
+        public string Location => new[] { Country, Province, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
         public string Network => ASN.HasValue ? ISP + "(AS" + ASN + ")" : ISP;
-
-        public string[] ToArray()
-        {
-            return new[] { Country, Province, City, ISP, ASN + "" }.Where(s => !string.IsNullOrEmpty(s) && s != "0").ToArray();
-        }
 
         public override string ToString()
         {

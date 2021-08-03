@@ -271,7 +271,12 @@
             console.log("Oops, error");
         });
         if (($scope.InternalMsgs||[]).length==0) {
-			fetch("/msg/GetUnreadMsgs",{
+			getUnreadMsgs(true);
+        }
+    }
+
+    function getUnreadMsgs(show) {
+        fetch("/msg/GetUnreadMsgs",{
                 headers:{
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
@@ -292,15 +297,15 @@
             }).catch(function(e) {
                 console.log("Oops, error");
             });
-        }
     }
 	getmsgs(true);
 	setInterval(getmsgs,5000);
 	$scope.read = function(id) {
 		$http.post("/msg/read", {
 			id
-		});
+		}).then(getUnreadMsgs);
 	}
+
 	$scope.changeUsername = function() {
 		swal({
 			title:'请输入新的用户名',

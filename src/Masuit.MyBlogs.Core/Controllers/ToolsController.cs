@@ -40,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="ip"></param>
         /// <returns></returns>
         [Route("ip"), Route("ip/{ip?}", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "ip" }, VaryByHeader = "Cookie")]
-        public ActionResult GetIpInfo([IsIPAddress] string ip)
+        public async Task<ActionResult> GetIpInfo([IsIPAddress] string ip)
         {
             if (string.IsNullOrEmpty(ip))
             {
@@ -54,11 +54,13 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             ViewBag.IP = ip;
             var cityInfo = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
+            var location = ip.GetIPLocation();
             var address = new IpInfo()
             {
                 CityInfo = cityInfo,
-                Address = $"{ip.GetIPLocation()}（UTC{TZConvert.GetTimeZoneInfo(cityInfo.Location.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}）",
-                Asn = ip.GetIPAsn()
+                Address = $"{location}（UTC{TZConvert.GetTimeZoneInfo(cityInfo.Location.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}）",
+                Asn = ip.GetIPAsn(),
+                IsProxy = location.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Data Services" }) || await ip.IsProxy()
             };
             if (Request.Method.Equals(HttpMethods.Get))
             {

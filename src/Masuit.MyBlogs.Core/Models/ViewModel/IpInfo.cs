@@ -7,5 +7,6 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         public string Address { get; set; }
         public CityResponse CityInfo { get; set; }
         public AsnResponse Asn { get; set; }
+        public bool IsProxy { get; set; }
     }
 }
