@@ -60,7 +60,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 CityInfo = cityInfo,
                 Address = $"{location}（UTC{TZConvert.GetTimeZoneInfo(cityInfo.Location.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}）",
                 Asn = ip.GetIPAsn(),
-                IsProxy = location.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Data Services" }) || await ip.IsProxy()
+                IsProxy = location.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business" }) || await ip.IsProxy()
             };
             if (Request.Method.Equals(HttpMethods.Get))
             {

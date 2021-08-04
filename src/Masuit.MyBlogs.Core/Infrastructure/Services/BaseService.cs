@@ -1037,6 +1037,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             get => GetById(id);
             set => AddEntity(value);
         }
+
+        public virtual string this[int id, Expression<Func<T, string>> selector] => GetQuery(t => t.Id == id).Select(selector).FirstOrDefault();
+        public virtual int this[int id, Expression<Func<T, int>> selector] => GetQuery(t => t.Id == id).Select(selector).FirstOrDefault();
+        public virtual DateTime this[int id, Expression<Func<T, DateTime>> selector] => GetQuery(t => t.Id == id).Select(selector).FirstOrDefault();
+        public virtual long this[int id, Expression<Func<T, long>> selector] => GetQuery(t => t.Id == id).Select(selector).FirstOrDefault();
+        public virtual decimal this[int id, Expression<Func<T, decimal>> selector] => GetQuery(t => t.Id == id).Select(selector).FirstOrDefault();
+
         public static T operator +(BaseService<T> left, T right) => left.AddEntity(right);
         public static bool operator -(BaseService<T> left, T right) => left.DeleteEntity(right);
         public static bool operator -(BaseService<T> left, int id) => left.DeleteById(id);

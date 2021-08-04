@@ -45,38 +45,43 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="messageService"></param>
         /// <param name="mailSender"></param>
-        /// <param name="dto"></param>
+        /// <param name="cmd"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Submit([FromServices] IInternalMessageService messageService, [FromServices] IMailSender mailSender, CommentCommand dto)
+        public async Task<ActionResult> Submit([FromServices] IInternalMessageService messageService, [FromServices] IMailSender mailSender, CommentCommand cmd)
         {
-            var match = Regex.Match(dto.NickName + dto.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
+            var match = Regex.Match(cmd.NickName + cmd.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
             if (match.Success)
             {
-                LogManager.Info($"提交内容：{dto.NickName}/{dto.Content}，敏感词：{match.Value}");
+                LogManager.Info($"提交内容：{cmd.NickName}/{cmd.Content}，敏感词：{match.Value}");
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
-            var error = await ValidateEmailCode(mailSender, dto.Email, dto.Code);
+            var error = await ValidateEmailCode(mailSender, cmd.Email, cmd.Code);
             if (!string.IsNullOrEmpty(error))
             {
                 return ResultData(null, false, error);
             }
 
-            Post post = await PostService.GetByIdAsync(dto.PostId) ?? throw new NotFoundException("评论失败，文章未找到");
+            if (cmd.ParentId > 0 && DateTime.Now - CommentService[cmd.ParentId, c => c.CommentDate] > TimeSpan.FromDays(180))
+            {
+                return ResultData(null, false, "当前评论过于久远，不再允许回复！");
+            }
+
+            Post post = await PostService.GetByIdAsync(cmd.PostId) ?? throw new NotFoundException("评论失败，文章未找到");
             if (post.DisableComment)
             {
                 return ResultData(null, false, "本文已禁用评论功能，不允许任何人回复！");
             }
 
-            dto.Content = dto.Content.Trim().Replace("<p><br></p>", string.Empty);
+            cmd.Content = cmd.Content.Trim().Replace("<p><br></p>", string.Empty);
             if (CommentFeq.GetOrAdd("Comments:" + ClientIP, 1) > 2)
             {
                 CommentFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
                 return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
             }
 
-            var comment = dto.Mapper<Comment>();
-            if (dto.Email == post.Email || dto.Email == post.ModifierEmail || Regex.Match(dto.NickName + dto.Content, CommonHelper.ModRegex).Length <= 0)
+            var comment = cmd.Mapper<Comment>();
+            if (cmd.Email == post.Email || cmd.Email == post.ModifierEmail || Regex.Match(cmd.NickName + cmd.Content, CommonHelper.ModRegex).Length <= 0)
             {
                 comment.Status = Status.Published;
             }
@@ -93,8 +98,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                     comment.IsMaster = true;
                 }
             }
-            comment.Content = await dto.Content.HtmlSantinizerStandard().ClearImgAttributes();
-            comment.Browser = dto.Browser ?? Request.Headers[HeaderNames.UserAgent];
+            comment.Content = await cmd.Content.HtmlSantinizerStandard().ClearImgAttributes();
+            comment.Browser = cmd.Browser ?? Request.Headers[HeaderNames.UserAgent];
             comment.IP = ClientIP;
             comment.Location = Request.Location();
             comment = CommentService.AddEntitySaved(comment);
@@ -108,7 +113,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Expires = DateTimeOffset.Now.AddYears(1),
                 SameSite = SameSiteMode.Lax
             });
-            WriteEmailKeyCookie(dto.Email);
+            WriteEmailKeyCookie(cmd.Email);
             CommentFeq.AddOrUpdate("Comments:" + ClientIP, 1, i => i + 1, 5);
             CommentFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
             var emails = new HashSet<string>();

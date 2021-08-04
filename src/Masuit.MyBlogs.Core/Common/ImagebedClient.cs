@@ -5,6 +5,7 @@ using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Systems;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -70,7 +71,7 @@ namespace Masuit.MyBlogs.Core.Common
                 return UploadGitlab(gitlab, stream, file, cancellationToken);
             }
 
-            return Task.FromResult<(string url, bool success)>((null, false));
+            return UploadKieng(stream, cancellationToken);
         }
 
         /// <summary>
@@ -101,7 +102,7 @@ namespace Masuit.MyBlogs.Core.Common
                 }
 
                 LogManager.Info("图片上传到gitee失败。");
-                throw t.Exception ?? new Exception(t.Result.ReasonPhrase);
+                return UploadKieng(stream, cancellationToken).Result;
             });
         }
 
@@ -139,7 +140,7 @@ namespace Masuit.MyBlogs.Core.Common
                 }
 
                 LogManager.Info("图片上传到gitee失败。");
-                throw t.Exception ?? new Exception(t.Result.ReasonPhrase);
+                return UploadKieng(stream, cancellationToken).Result;
             });
         }
 
@@ -178,8 +179,26 @@ namespace Masuit.MyBlogs.Core.Common
 
                 LogManager.Info($"图片上传到gitlab({config.ApiUrl})失败。");
                 _failedList.Add(config.ApiUrl);
-                throw t.Exception ?? new Exception(t.Result.ReasonPhrase);
+                return UploadKieng(stream, cancellationToken).Result;
             });
+        }
+
+        /// <summary>
+        /// 上传到聚合图床
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<(string url, bool success)> UploadKieng(Stream stream, CancellationToken cancellationToken)
+        {
+            using var formData = new MultipartFormDataContent
+            {
+                { new StreamContent(stream), "image","1.jpg" }
+            };
+            var resp = await _httpClient.PostAsync("https://image.kieng.cn/upload.html?type=" + new[] { "tt", "jd", "c58", "sg", "sh", "wy" }.OrderByRandom().First(), formData, cancellationToken);
+            var json = await resp.Content.ReadAsStringAsync();
+            var result = JObject.Parse(json);
+            return ((string)result["data"]["url"], (int)result["code"] == 200);
         }
 
         /// <summary>

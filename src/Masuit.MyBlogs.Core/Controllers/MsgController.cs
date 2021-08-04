@@ -119,33 +119,38 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 发表留言
         /// </summary>
         /// <param name="mailSender"></param>
-        /// <param name="dto"></param>
+        /// <param name="cmd"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<ActionResult> Submit([FromServices] IMailSender mailSender, LeaveMessageCommand dto)
+        public async Task<ActionResult> Submit([FromServices] IMailSender mailSender, LeaveMessageCommand cmd)
         {
-            var match = Regex.Match(dto.NickName + dto.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
+            var match = Regex.Match(cmd.NickName + cmd.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
             if (match.Success)
             {
-                LogManager.Info($"提交内容：{dto.NickName}/{dto.Content}，敏感词：{match.Value}");
+                LogManager.Info($"提交内容：{cmd.NickName}/{cmd.Content}，敏感词：{match.Value}");
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
 
-            var error = await ValidateEmailCode(mailSender, dto.Email, dto.Code);
+            var error = await ValidateEmailCode(mailSender, cmd.Email, cmd.Code);
             if (!string.IsNullOrEmpty(error))
             {
                 return ResultData(null, false, error);
             }
 
-            dto.Content = dto.Content.Trim().Replace("<p><br></p>", string.Empty);
+            if (cmd.ParentId > 0 && DateTime.Now - LeaveMessageService[cmd.ParentId, m => m.PostDate] > TimeSpan.FromDays(180))
+            {
+                return ResultData(null, false, "当前留言过于久远，不再允许回复！");
+            }
+
+            cmd.Content = cmd.Content.Trim().Replace("<p><br></p>", string.Empty);
             if (MsgFeq.GetOrAdd("Comments:" + ClientIP, 1) > 2)
             {
                 MsgFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
                 return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
             }
 
-            var msg = dto.Mapper<LeaveMessage>();
-            if (Regex.Match(dto.NickName + dto.Content, CommonHelper.ModRegex).Length <= 0)
+            var msg = cmd.Mapper<LeaveMessage>();
+            if (Regex.Match(cmd.NickName + cmd.Content, CommonHelper.ModRegex).Length <= 0)
             {
                 msg.Status = Status.Published;
             }
@@ -163,8 +168,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            msg.Content = await dto.Content.HtmlSantinizerStandard().ClearImgAttributes();
-            msg.Browser = dto.Browser ?? Request.Headers[HeaderNames.UserAgent];
+            msg.Content = await cmd.Content.HtmlSantinizerStandard().ClearImgAttributes();
+            msg.Browser = cmd.Browser ?? Request.Headers[HeaderNames.UserAgent];
             msg.IP = ClientIP;
             msg.Location = Request.Location();
             msg = LeaveMessageService.AddEntitySaved(msg);
@@ -178,7 +183,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Expires = DateTimeOffset.Now.AddYears(1),
                 SameSite = SameSiteMode.Lax
             });
-            WriteEmailKeyCookie(dto.Email);
+            WriteEmailKeyCookie(cmd.Email);
             MsgFeq.AddOrUpdate("Comments:" + ClientIP, 1, i => i + 1, 5);
             MsgFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
             var email = CommonHelper.SystemSettings["ReceiveEmail"];

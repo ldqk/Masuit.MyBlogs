@@ -61,6 +61,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> ServiceUnavailable()
         {
             var feature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            string accept = Request.Headers[HeaderNames.Accept] + "";
             if (feature != null)
             {
                 string err;
@@ -104,7 +105,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                         return View("AccessDeny", tips);
                     case TempDenyException:
                         Response.StatusCode = 403;
-                        return View("TempDeny");
+                        return accept.StartsWith("application/json") ? Json(new
+                        {
+                            StatusCode = 404,
+                            Success = false,
+                            Message = $"检测到您的IP（{ip}）访问过于频繁，已被本站暂时禁止访问，请稍后再试！"
+                        }) : View("TempDeny");
                     default:
                         LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}，请求参数：\n{body}\n堆栈信息：", feature.Error);
                         break;
@@ -112,12 +118,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             Response.StatusCode = 503;
-            return Request.Method.Equals(HttpMethods.Get) ? View() : Json(new
+            return accept.StartsWith("application/json") ? Json(new
             {
                 StatusCode = 503,
                 Success = false,
                 Message = "服务器发生错误！"
-            });
+            }) : View();
         }
 
         /// <summary>

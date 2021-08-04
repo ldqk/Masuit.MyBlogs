@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 return;
             }
 
-            if (CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true") == "false" || context.Filters.Any(m => m.ToString().Contains(nameof(AllowAccessFirewallAttribute))) || tokenValid)
+            if (CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true") == "false" || context.Filters.Any(m => m.ToString().Contains(new[] { nameof(AllowAccessFirewallAttribute), nameof(MyAuthorizeAttribute) })) || tokenValid)
             {
                 return;
             }
@@ -69,7 +69,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             }
 
             var times = CacheManager.AddOrUpdate("Frequency:" + ip, 1, i => i + 1, 5);
-            CacheManager.Expire("Frequency:" + ip, ExpirationMode.Sliding, TimeSpan.FromSeconds(CommonHelper.SystemSettings.GetOrAdd("LimitIPFrequency", "60").ToInt32()));
+            CacheManager.Expire("Frequency:" + ip, ExpirationMode.Absolute, TimeSpan.FromSeconds(CommonHelper.SystemSettings.GetOrAdd("LimitIPFrequency", "60").ToInt32()));
             var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPRequestTimes", "90").ToInt32();
             if (times <= limit)
             {
@@ -78,7 +78,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
 
             if (times > limit * 1.2)
             {
-                CacheManager.Expire("Frequency:" + ip, ExpirationMode.Sliding, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
+                CacheManager.Expire("Frequency:" + ip, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
                 AccessDeny(ip, request, "访问频次限制");
             }
 
