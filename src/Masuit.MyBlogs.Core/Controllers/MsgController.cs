@@ -54,7 +54,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 留言板
         /// </summary>
         /// <returns></returns>
-        [ResponseCache(Duration = 600, VaryByHeader = "Cookie"), Route("msg")]
+        [Route("msg"), Route("msg/{cid:int}"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Index()
         {
             ViewBag.TotalCount = LeaveMessageService.Count(m => m.ParentId == 0 && m.Status == Status.Published);

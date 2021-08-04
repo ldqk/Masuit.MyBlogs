@@ -14,7 +14,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
     UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo);
-    string cid = string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"].ToString();
+    var cid = Context.Request.RouteValues["cid"]??(string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"]);
     Advertisement ad = ViewBag.Ads;
 }
 <script src="https://cdn.staticfile.org/jqueryui/1.12.1/jquery-ui.min.js" async defer></script>
