@@ -9,10 +9,10 @@
         </a>
         <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
             <div class="row padding-bot10">
-                <div class="col-md-2 col-xs-12 paddingright-clear">
+                <div class="col-sm-2 hidden-xs paddingright-clear">
                     <img class="img-thumbnail img-responsive" src="@Model.ThumbImgUrl" alt="@Model.Title" title="@Model.Title">
                 </div>
-                <div class="col-md-10 col-xs-12">
+                <div class="col-sm-10 col-xs-12">
                     <p>
                         @Model.Description
                     </p>

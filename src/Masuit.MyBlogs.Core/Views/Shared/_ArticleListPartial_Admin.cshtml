@@ -33,38 +33,39 @@
                 }
             }
         }
-        <div class="pull-left">
-            @{ await Html.RenderPartialAsync("_Pagination", Model.PageParams); }
-        </div>
-        <div class="pull-right">
-            <div class="btn-group dropup">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    @(Model.PageParams.OrderBy?.GetDescription()??"排序方式")
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a href="">最后修改日期</a>
-                    </li>
-                    <li>
-                        <a asp-route-orderby="@OrderBy.PostDate">最后发表日期</a>
-                    </li>
-                    <li role="separator" class="divider"></li>
-                    <li>
-                        <a asp-route-orderby="@OrderBy.CommentCount">评论最多</a>
-                    </li>
-                    <li>
-                        <a asp-route-orderby="@OrderBy.TotalViewCount">访问量最多</a>
-                    </li>
-                    <li>
-                        <a asp-route-orderby="@OrderBy.VoteUpCount">支持最多</a>
-                    </li>
-                    <li>
-                        <a asp-route-orderby="@OrderBy.AverageViewCount">最热门</a>
-                    </li>
-                </ul>
+        <div class="row">
+            <div class="col-xs-9">
+                @{ await Html.RenderPartialAsync("_Pagination", Model.PageParams); }
+            </div>
+            <div class="col-sm-3 text-right">
+                <div class="btn-group dropup">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @(Model.PageParams.OrderBy?.GetDescription()??"排序方式")
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="">最后修改日期</a>
+                        </li>
+                        <li>
+                            <a asp-route-orderby="@OrderBy.PostDate">最后发表日期</a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                        <li>
+                            <a asp-route-orderby="@OrderBy.CommentCount">评论最多</a>
+                        </li>
+                        <li>
+                            <a asp-route-orderby="@OrderBy.TotalViewCount">访问量最多</a>
+                        </li>
+                        <li>
+                            <a asp-route-orderby="@OrderBy.VoteUpCount">支持最多</a>
+                        </li>
+                        <li>
+                            <a asp-route-orderby="@OrderBy.AverageViewCount">最热门</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-        <div class="height50"></div>
     </div>
 </div>

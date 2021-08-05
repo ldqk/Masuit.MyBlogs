@@ -94,22 +94,15 @@
                                             @ads[0].Title
                                             <span class="text-red">[推广]</span>
                                         </h3>
-
                                         <div class="row padding-bot10">
-                                            @{
-                                                string imgSrc = ads[0].ThumbImgUrl;
-                                                if (!string.IsNullOrEmpty(imgSrc))
-                                                {
-                                                    <div class="col-md-3">
-                                                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@ads[0].Title" title="@ads[0].Title ">
-                                                    </div>
-                                                }
-                                            }
-                                            <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
-                                                <p>
-                                                    @ads[0].Description
-                                                </p>
-                                            </div>
+                                            <div class="col-md-2 col-sm-3 col-xs-4 paddingright-clear">
+                                            <img class="img-thumbnail img-responsive" src="@ads[0].ThumbImgUrl" alt="@ads[0].Title" title="@ads[0].Title ">
+                                        </div>
+                                        <div class="col-md-10 col-sm-9">
+                                            <p>
+                                                @ads[0].Description
+                                            </p>
+                                        </div>
                                         </div>
                                     </a>
                                 </section>
@@ -180,18 +173,11 @@
                                             @ads[1].Title
                                             <span class="text-red">[推广]</span>
                                         </h3>
-
                                         <div class="row padding-bot10">
-                                            @{
-                                                string imgSrc = ads[1].ThumbImgUrl;
-                                                if (!string.IsNullOrEmpty(imgSrc))
-                                                {
-                                                    <div class="col-md-3">
-                                                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@ads[1].Title" title="@ads[1].Title ">
-                                                    </div>
-                                                }
-                                            }
-                                            <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
+                                            <div class="col-md-2 col-sm-3 col-xs-4 paddingright-clear">
+                                                <img class="img-thumbnail img-responsive" src="@ads[1].ThumbImgUrl" alt="@ads[1].Title" title="@ads[1].Title ">
+                                            </div>
+                                            <div class="col-md-10 col-sm-9">
                                                 <p>
                                                     @ads[1].Description
                                                 </p>

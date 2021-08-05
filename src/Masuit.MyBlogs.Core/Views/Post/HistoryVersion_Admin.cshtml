@@ -89,12 +89,7 @@
                         </header>
                         <article class="article" id="article">
                             @Html.Raw(Model.Content)
-                            @if (!string.IsNullOrEmpty(Model.ProtectContent))
-                            {
-                                <div class="row protected">
-                                    @Html.Raw(Model.ProtectContent)
-                                </div>
-                            }
+                            @Html.Raw(Model.ProtectContent)
                         </article>
                         <div id="cyReward" role="cylabs" data-use="reward"></div>
                     </section>
@@ -140,16 +135,10 @@
                             </h3>
 
                             <div class="row padding-bot10">
-                                @{
-                                    string imgSrc = ad.ThumbImgUrl;
-                                    if (!string.IsNullOrEmpty(imgSrc))
-                                    {
-                                        <div class="col-md-3">
-                                            <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@ad.Title" title="@ad.Title ">
-                                        </div>
-                                    }
-                                }
-                                <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 9)">
+                                <div class="col-md-2 col-sm-3 col-xs-4 paddingright-clear">
+                                    <img class="img-thumbnail img-responsive" src="@ad.ThumbImgUrl" alt="@ad.Title" title="@ad.Title ">
+                                </div>
+                                <div class="col-md-10 col-sm-9">
                                     <p>
                                         @ad.Description
                                     </p>
