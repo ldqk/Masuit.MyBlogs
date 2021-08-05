@@ -1,22 +1,22 @@
 ﻿@model Masuit.MyBlogs.Core.Models.Pagination
-@using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools
+@using Masuit.MyBlogs.Core.Common
 @{
     int pages = Math.Ceiling(Model.TotalCount / (Model.Size > 0 ? Model.Size : 15.0)).ToInt32();
     int current = Model.Page > 0 ? Model.Page : 1;
-    int pageStart = current - 4 > 0 ? current - 4 : 1;
-    int pageEnd = current + 4 >= pages ? pages : current + 4;
+    int pageStart = current - 3 > 0 ? current - 3 : 1;
+    int pageEnd = current + 3 >= pages ? pages : current + 3;
     current = current > pages ? pages : current;
     current = current < 1 ? 1 : current;
-    if (pageEnd - pageStart < 9)
+    if (pageEnd - pageStart < 7)
     {
         if (pageStart == 1)
         {
-            pageEnd = pageStart + 8 >= pages ? pages : pageStart + 8;
+            pageEnd = pageStart + 6 >= pages ? pages : pageStart + 6;
         }
         else
         {
-            pageStart = pageEnd - 8 > 0 ? pageEnd - 8 : 1;
+            pageStart = pageEnd - 6 > 0 ? pageEnd - 6 : 1;
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             Result.OriginFileName = uploadFileName;
             var savePath = PathFormatter.Format(uploadFileName, UploadConfig.PathFormat);
             var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
-            var cts = new CancellationTokenSource(30000);
+            var cts = new CancellationTokenSource(20000);
             var stream = file.OpenReadStream();
             try
             {
@@ -64,6 +64,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     await File.WriteAllBytesAsync(localPath, await stream.ToArrayAsync());
                     Result.Url = savePath;
                 }
+
                 Result.State = UploadState.Success;
             }
             catch (Exception e)

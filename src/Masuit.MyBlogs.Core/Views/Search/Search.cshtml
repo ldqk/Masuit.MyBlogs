@@ -95,23 +95,24 @@
                 {
                     <h3>@ViewBag.ErrorMsg</h3>
                 }
-                @*下面是分页组件*@
+
+                @*分页组件*@
                 @{
                     int size = ViewBag.PageSize;
                     int pages = Math.Ceiling(Model.Total / (size > 0 ? size : 10.0)).ToInt32();
                     var page = Context.Request.Query["page"].ToString().ToInt32();
                     int current = page > 0 ? page : 1;
-                    int pageStart = current - 4 > 0 ? current - 4 : 1;
-                    int pageEnd = current + 4 >= pages ? pages : current + 4;
-                    if (pageEnd - pageStart < 9)
+                    int pageStart = current - 3 > 0 ? current - 3 : 1;
+                    int pageEnd = current + 3 >= pages ? pages : current + 3;
+                    if (pageEnd - pageStart < 7)
                     {
                         if (pageStart == 1)
                         {
-                            pageEnd = pageStart + 8 >= pages ? pages : pageStart + 8;
+                            pageEnd = pageStart + 4 >= pages ? pages : pageStart + 4;
                         }
                         else
                         {
-                            pageStart = pageEnd - 8 > 0 ? pageEnd - 8 : 1;
+                            pageStart = pageEnd - 4 > 0 ? pageEnd - 4 : 1;
                         }
                     }
                 }
@@ -126,7 +127,7 @@
                         else
                         {
                             <li><a asp-action="Search" asp-route-wd="@ViewBag.Keyword" aria-label="Previous">首页</a></li>
-                            <li><a asp-action="Search" asp-route-wd="@ViewBag.Keyword" asp-route-page="@(Context.Request.Query["page"].ToString().ToInt32() - 1 <= 0 ? 1 : Context.Request.Query["page"].ToString().ToInt32() - 1)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                            <li><a asp-action="Search" asp-route-wd="@ViewBag.Keyword" asp-route-page="@(page - 1 <= 0 ? 1 : page - 1)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
                         }
                         @if (pageStart > 1)
                         {
