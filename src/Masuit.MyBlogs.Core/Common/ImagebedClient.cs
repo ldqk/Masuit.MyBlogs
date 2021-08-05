@@ -54,7 +54,7 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             file = Path.GetFileName(file);
-            var gitlabs = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length && !_failedList.Contains(c.ApiUrl)).OrderBy(c => Guid.NewGuid()).ToList();
+            var gitlabs = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length && !_failedList.Contains(c.ApiUrl)).OrderByRandom().ToList();
             if (gitlabs.Count > 0)
             {
                 var gitlab = gitlabs[0];
@@ -135,7 +135,7 @@ namespace Masuit.MyBlogs.Core.Common
                     using var content = resp.Content;
                     if (resp.IsSuccessStatusCode)
                     {
-                        return (config.RawUrl.Split(',').OrderBy(_ => Guid.NewGuid()).FirstOrDefault() + path, true);
+                        return (config.RawUrl.Split(',').OrderByRandom().FirstOrDefault() + path, true);
                     }
                 }
 

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OpenXmlPowerTools;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -138,24 +139,21 @@ namespace Masuit.MyBlogs.Core.Controllers
             var doc = context.OpenAsync(req => req.Content(html)).Result;
             var body = doc.Body;
             var nodes = body.GetElementsByTagName("img");
-            if (nodes != null)
+            foreach (var img in nodes)
             {
-                foreach (var img in nodes)
-                {
-                    var attr = img.Attributes["src"].Value;
-                    var strs = attr.Split(",");
-                    var base64 = strs[1];
-                    var bytes = Convert.FromBase64String(base64);
-                    var ext = strs[0].Split(";")[0].Split("/")[1];
-                    await using var image = new MemoryStream(bytes);
-                    var imgFile = $"{SnowFlake.NewId}.{ext}";
-                    var path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "images", imgFile);
-                    var dir = Path.GetDirectoryName(path);
-                    Directory.CreateDirectory(dir);
-                    await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                    await image.CopyToAsync(fs);
-                    img.Attributes["src"].Value = path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/");
-                }
+                var attr = img.Attributes["src"].Value;
+                var strs = attr.Split(",");
+                var base64 = strs[1];
+                var bytes = Convert.FromBase64String(base64);
+                var ext = strs[0].Split(";")[0].Split("/")[1];
+                await using var image = new MemoryStream(bytes);
+                var imgFile = $"{SnowFlake.NewId}.{ext}";
+                var path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "images", imgFile);
+                var dir = Path.GetDirectoryName(path);
+                Directory.CreateDirectory(dir);
+                await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                await image.CopyToAsync(fs);
+                img.Attributes["src"].Value = path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/");
             }
 
             return body.InnerHtml.HtmlSantinizerStandard().HtmlSantinizerCustom(attributes: new[] { "dir", "lang" });
@@ -176,9 +174,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        [Route("download")]
-        [Route("download/{**path}")]
-        public ActionResult Download([FromServices] IMimeMapper mimeMapper, string path)
+        [HttpGet("download/{**path}")]
+        public ActionResult Download([FromServices] IMimeMapper mimeMapper, [Required] string path)
         {
             if (string.IsNullOrEmpty(path)) return Content("null");
             var file = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), path.Trim('.', '/', '\\'));

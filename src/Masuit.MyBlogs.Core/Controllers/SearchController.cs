@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Route("search/{**wd}"), Route("search", Order = 1), Route("s/{**wd}", Order = 2), Route("s", Order = 3)]
+        [HttpGet("search/{**wd}", Order = 2), HttpGet("search", Order = 2), HttpGet("s/{**wd}", Order = 3), HttpGet("s", Order = 4)]
         public async Task<ActionResult> Search([FromServices] IPostService postService, string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             wd = ChineseConverter.Convert(wd?.Trim() ?? "", ChineseConversionDirection.TraditionalToSimplified);
@@ -149,7 +149,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 热词
         /// </summary>
         /// <returns></returns>
-        [MyAuthorize, HttpPost, ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
+        [MyAuthorize, ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult HotKey()
         {
             return ResultData(new

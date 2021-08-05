@@ -4,7 +4,7 @@
 		$scope.query = "";
 		$scope.currentPage = 1;
 		var _timeout;
-		$http.post("/search/HotKey").then(function(res) {
+		$http.get("/search/HotKey").then(function(res) {
 			if(res.data.Success) {
 				$scope.agg = res.data.Data;
 			} else {

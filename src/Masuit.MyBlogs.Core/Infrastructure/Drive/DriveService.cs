@@ -1,5 +1,6 @@
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Models.Drive;
+using Masuit.Tools;
 using Microsoft.Graph;
 using System;
 using System.Collections.Generic;
@@ -166,7 +167,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         {
             if (OneDriveConfiguration.CDNUrls.Length != 0)
             {
-                return OneDriveConfiguration.CDNUrls.Select(item => item.Split(";")).Where(strings => strings.Length > 1).Aggregate(downloadUrl, (current, strings) => current.Replace(strings[0], strings[1..].OrderBy(_ => Guid.NewGuid()).First()));
+                return OneDriveConfiguration.CDNUrls.Select(item => item.Split(";")).Where(strings => strings.Length > 1).Aggregate(downloadUrl, (current, strings) => current.Replace(strings[0], strings[1..].OrderByRandom().First()));
             }
 
             return downloadUrl;

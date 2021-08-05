@@ -55,7 +55,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet, ResponseCache(Duration = 600, VaryByHeader = "Cookie", Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult> Index([FromServices] IFastShareService fastShareService)
         {
-            var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner, Request.Location()).OrderBy(a => Guid.NewGuid()).ToList();
+            var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner, Request.Location()).OrderByRandom().ToList();
             var fastShares = await fastShareService.GetAllFromCacheAsync(s => s.Sort);
             var postsQuery = PostService.GetQuery(p => p.Status == Status.Published); //准备文章的查询
             var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ToCachedPagedListAsync<Post, PostDto>(1, 15, MapperConfig);
