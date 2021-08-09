@@ -1,5 +1,4 @@
-﻿using CacheManager.Core;
-using EFCoreSecondLevelCacheInterceptor;
+﻿using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -27,7 +26,6 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class SearchController : BaseController
     {
         public ISearchDetailsService SearchDetailsService { get; set; }
-        public ICacheManager<string> CacheManager { get; set; }
 
         /// <summary>
         /// 搜索页
@@ -48,16 +46,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
-            string key = "Search:" + ClientIP;
-            if (CacheManager.Exists(key) && CacheManager.Get(key) != wd)
-            {
-                var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList();
-                ViewBag.hotSearches = hotSearches;
-                ViewBag.ErrorMsg = "10秒内只能搜索1次！";
-                return View(new SearchResult<PostDto>());
-            }
-
-            if (!string.IsNullOrWhiteSpace(wd) && !wd.Contains("锟斤拷"))
+            if (!string.IsNullOrWhiteSpace(wd))
             {
                 if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !HttpContext.Request.IsRobot())
                 {
@@ -73,10 +62,8 @@ namespace Masuit.MyBlogs.Core.Controllers
 
                 var posts = postService.SearchPage(page, size, wd);
                 CheckPermission(posts);
-                if (posts.Total > 1)
+                if (posts.Results.Count > 1)
                 {
-                    CacheManager.AddOrUpdate(key, wd, s => wd);
-                    CacheManager.Expire(key, TimeSpan.FromSeconds(10));
                     ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList, Request.Location());
                 }
 

@@ -22,7 +22,6 @@
             <div class="col-sm-12">
                 @if (!string.IsNullOrEmpty(ViewBag.Keyword))
                 {
-                    <h3>为您找到约 @Model.Total 条<span class="text-navy">“@ViewBag.Keyword”</span>匹配或相关的搜索结果。</h3>
                     <small>搜索用时(@Model.Elapsed 毫秒)</small>
                 }
                 <div class="search-form">
@@ -33,7 +32,6 @@
                                 <button type="button" class="sr-only btn btn-default dropdown-toggle" data-toggle="dropdown" style="display: none"><span class="caret"></span></button>
                                 <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
                                 <button class="btn btn-lg btn-primary" type="submit">搜索</button>
-                                <a class="baidu btn btn-lg btn-info">百度一下</a>
                             </div>
                         </div>
                     </form>
@@ -164,8 +162,3 @@
         </div>
     </div>
 </div>
-<script>
-    $(".baidu").on("click", function(e) {
-		window.location.href = `https://www.baidu.com/s?wd=@ViewBag.Keyword&si=@Context.Request.Host&ct=2097152`;
-	});
-</script>

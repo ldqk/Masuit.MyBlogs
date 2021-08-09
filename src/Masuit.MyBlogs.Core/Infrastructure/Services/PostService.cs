@@ -1,7 +1,6 @@
 ﻿using CacheManager.Core;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
-using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -57,32 +56,17 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).DistinctBy(s => s.Entity.Id).ToList();
             var ids = entities.Select(s => s.Entity.Id).ToArray();
             var dic = GetQuery<PostDto>(p => ids.Contains(p.Id)).ToDictionary(p => p.Id);
-            var posts = entities.Select(s =>
-            {
-                var item = s.Entity.Mapper<PostDto>();
-                if (dic.ContainsKey(item.Id))
-                {
-                    item.CategoryName = dic[item.Id].CategoryName;
-                    item.ModifyDate = dic[item.Id].ModifyDate;
-                    item.CommentCount = dic[item.Id].CommentCount;
-                    item.TotalViewCount = dic[item.Id].TotalViewCount;
-                    item.CategoryId = dic[item.Id].CategoryId;
-                }
-
-                return item;
-            }).ToList();
+            var posts = entities.Where(s => dic.ContainsKey(s.Entity.Id)).Select(s => dic[s.Entity.Id]).ToList();
             var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
             var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
             var keywords = Searcher.CutKeywords(keyword);
             HighlightSegment(posts, keywords, highlighter);
-
             var result = new SearchResult<PostDto>()
             {
                 Results = posts,
                 Elapsed = searchResult.Elapsed,
                 Total = searchResult.TotalHits
             };
-
             _cacheManager.Add(cacheKey, result);
             _cacheManager.Expire(cacheKey, TimeSpan.FromHours(1));
             return result;
