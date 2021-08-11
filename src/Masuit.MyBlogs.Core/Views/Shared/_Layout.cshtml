@@ -53,12 +53,11 @@
     <script src="https://cdn.staticfile.org/notie/4.3.1/notie.min.js" async defer></script>
     <script src="https://cdn.staticfile.org/jquery.form/4.2.2/jquery.form.min.js" async defer></script>
     <script src="https://cdn.staticfile.org/jquery-mobile/1.4.5/jquery.mobile.min.js"></script>
-    <script src="https://cdn.staticfile.org/jquery_lazyload/1.9.7/jquery.lazyload.min.js"></script>
+    <script src="https://cdn.statically.io/gh/jieyou/lazyload/master/lazyload.js"></script>
     <script src="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="~/Scripts/layer/layer.js"></script>
     <script src="~/Assets/layui/layui.min.js"></script>
     <environment names="Development">
-        <script src="~/Scripts/bootstrap-suggest.min.js"></script>
         <script src="~/Scripts/jquery.query.js"></script>
         <script src="~/Scripts/jquery.paging.js"></script>
         <script src="~/Scripts/ripplet.js"></script>
@@ -326,7 +325,7 @@
     </div>
     <button type="button" class="btn btn-info btn-sm canvas-close" style="position: fixed;right: 0;bottom: 0;z-index: 200;display: none">不再显示canvas背景</button>
     <script type="text/javascript" color="0,104,183" opacity='1' zIndex="-1" count="100" src="~/Scripts/line.js"></script>
-    <script src="_framework/blazor.server.js"></script>
+    <script src="/_framework/blazor.server.js"></script>
 </body>
 </html>
 @if (Context.Request.Headers["User-Agent"].ToString().Contains(new[] { "IE", "InternetExplorer" }))

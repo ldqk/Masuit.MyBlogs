@@ -94,6 +94,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 IP = ip,
                 RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path),
                 Time = DateTime.Now,
+                Referer = request.Headers[HeaderNames.Referer],
                 UserAgent = request.Headers[HeaderNames.UserAgent],
                 Remark = remark,
                 Address = request.Location()

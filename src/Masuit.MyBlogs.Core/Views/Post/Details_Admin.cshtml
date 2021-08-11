@@ -210,7 +210,7 @@
                 }
                 @{
                     var posts = (List<Post>)ViewBag.Related;
-                    if (posts.Any())
+                    if (posts.Count>1)
                     {
                         <section class="wow margintop20 animated fadeIn">
                             <h3>相关推荐：</h3>

@@ -55,6 +55,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     IP = ip,
                     RequestUrl = requestUrl,
                     Time = DateTime.Now,
+                    Referer = request.Headers[HeaderNames.Referer],
                     UserAgent = request.Headers[HeaderNames.UserAgent],
                     Remark = $"检测到敏感词拦截：{match.Value}",
                     Address = request.Location()

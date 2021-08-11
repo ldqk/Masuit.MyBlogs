@@ -180,6 +180,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 IP = ClientIP,
                 RequestUrl = $"//{Request.Host}/{post.Id}",
+                Referer = Request.Headers[HeaderNames.Referer],
                 Time = DateTime.Now,
                 UserAgent = Request.Headers[HeaderNames.UserAgent],
                 Remark = "无权限查看该文章",

@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
-    public partial class PostService : BaseService<Post>, IPostService
+    public class PostService : BaseService<Post>, IPostService
     {
         private readonly ICacheManager<SearchResult<PostDto>> _cacheManager;
         private readonly ICacheManager<List<Post>> _searchCacheManager;
@@ -37,37 +37,32 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public List<Post> ScoreSearch(int page, int size, string keyword)
         {
             var cacheKey = $"scoreSearch:{keyword}:{page}:{size}";
-            return _searchCacheManager.GetOrAdd(cacheKey, s =>
-            {
-                _searchCacheManager.Expire(cacheKey, TimeSpan.FromHours(1));
-                return SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword)).Results.Select(r => r.Entity).Distinct().ToList();
-            });
+            var result = _searchCacheManager.GetOrAdd(cacheKey, _ => SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword)).Results.Select(r => r.Entity).Distinct().ToList());
+            _searchCacheManager.Expire(cacheKey, TimeSpan.FromHours(1));
+            return result;
         }
 
         public SearchResult<PostDto> SearchPage(int page, int size, string keyword)
         {
             var cacheKey = $"search:{keyword}:{page}:{size}";
-            if (_cacheManager.Exists(cacheKey))
+            var result = _cacheManager.GetOrAdd(cacheKey, _ =>
             {
-                return _cacheManager.Get(cacheKey);
-            }
-
-            var searchResult = SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
-            var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).DistinctBy(s => s.Entity.Id).ToList();
-            var ids = entities.Select(s => s.Entity.Id).ToArray();
-            var dic = GetQuery<PostDto>(p => ids.Contains(p.Id)).ToDictionary(p => p.Id);
-            var posts = entities.Where(s => dic.ContainsKey(s.Entity.Id)).Select(s => dic[s.Entity.Id]).ToList();
-            var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
-            var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
-            var keywords = Searcher.CutKeywords(keyword);
-            HighlightSegment(posts, keywords, highlighter);
-            var result = new SearchResult<PostDto>()
-            {
-                Results = posts,
-                Elapsed = searchResult.Elapsed,
-                Total = searchResult.TotalHits
-            };
-            _cacheManager.Add(cacheKey, result);
+                var searchResult = SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
+                var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).DistinctBy(s => s.Entity.Id).ToList();
+                var ids = entities.Select(s => s.Entity.Id).ToArray();
+                var dic = GetQuery<PostDto>(p => ids.Contains(p.Id)).ToDictionary(p => p.Id);
+                var posts = entities.Where(s => dic.ContainsKey(s.Entity.Id)).Select(s => dic[s.Entity.Id]).ToList();
+                var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
+                var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
+                var keywords = Searcher.CutKeywords(keyword);
+                HighlightSegment(posts, keywords, highlighter);
+                return new SearchResult<PostDto>()
+                {
+                    Results = posts,
+                    Elapsed = searchResult.Elapsed,
+                    Total = searchResult.TotalHits
+                };
+            });
             _cacheManager.Expire(cacheKey, TimeSpan.FromHours(1));
             return result;
         }
@@ -144,15 +139,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public Dictionary<string, int> GetTags()
         {
-            var key = "postTags";
-            var dic = _tagCacheManager.Get(key);
-            if (dic != null)
-            {
-                return dic;
-            }
-
-            dic = GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().ToList().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).OrderByDescending(g => g.Count()).ToDictionary(g => g.Key, g => g.Count());
-            _tagCacheManager.Add(key, dic);
+            const string key = "postTags";
+            var dic = _tagCacheManager.GetOrAdd(key, GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().ToList().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).OrderByDescending(g => g.Count()).ToDictionary(g => g.Key, g => g.Count()));
             _tagCacheManager.Expire(key, DateTimeOffset.Now.AddDays(1));
             return dic;
         }
@@ -229,9 +217,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>删除成功</returns>
-        public override int DeleteEntitySaved(Expression<Func<Post, bool>> @where)
+        public override int DeleteEntitySaved(Expression<Func<Post, bool>> where)
         {
-            base.DeleteEntity(@where);
+            base.DeleteEntity(where);
             return SearchEngine.SaveChanges();
         }
 
@@ -251,9 +239,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>删除成功</returns>
-        public override Task<int> DeleteEntitySavedAsync(Expression<Func<Post, bool>> @where)
+        public override Task<int> DeleteEntitySavedAsync(Expression<Func<Post, bool>> where)
         {
-            base.DeleteEntity(@where);
+            base.DeleteEntity(where);
             return SearchEngine.SaveChangesAsync();
         }
 

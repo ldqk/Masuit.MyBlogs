@@ -24,18 +24,31 @@
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 		}
 	});
-	$http.post("/post/Statistic").then(function(res) {
-		if(res.data.Success) {
-			$scope.agg = res.data.Data;
-		} else {
-			window.notie.alert({
-				type:3,
-				text:res.data.Message,
-				time:4
-			});
-		}
-	});
 
+    function stat() {
+		fetch("/post/Statistic",{
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).then(function(response) {
+            return response.json();
+        }).then(function(res) {
+		    if(res.Success) {
+			    $scope.agg = res.Data;
+			    $scope.$apply();
+		    } else {
+			    window.notie.alert({
+				    type:3,
+				    text:res.data.Message,
+				    time:4
+			    });
+		    }
+	    });
+    }
+
+	stat();
+	setInterval(stat,5000);
 	$http.post("/category/getcategories", null).then(function (res) {
 		var data = res.data;
 		if (data.Success) {

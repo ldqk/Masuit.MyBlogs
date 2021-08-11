@@ -145,7 +145,6 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Assets/highlight/css/highlight.css");
 
                 bundles.AddJs("/main.js")
-                    .Include("/Scripts/bootstrap-suggest.min.js")
                     .Include("/Scripts/jquery.query.js")
                     .Include("/Scripts/jquery.paging.js")
                     .Include("/Scripts/ripplet.js")
