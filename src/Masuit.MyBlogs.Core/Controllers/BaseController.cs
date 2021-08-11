@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
+using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
@@ -15,11 +16,14 @@ using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Net.Http.Headers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -231,6 +235,68 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 Expires = DateTimeOffset.Now.AddYears(1),
                 SameSite = SameSiteMode.Lax
+            });
+        }
+
+        protected void CheckPermission(List<PostDto> posts)
+        {
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
+            posts.RemoveAll(p =>
+            {
+                switch (p.LimitMode)
+                {
+                    case RegionLimitMode.AllowRegion:
+                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                    case RegionLimitMode.ForbidRegion:
+                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                    case RegionLimitMode.AllowRegionExceptForbidRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        {
+                            return true;
+                        }
+
+                        goto case RegionLimitMode.AllowRegion;
+                    case RegionLimitMode.ForbidRegionExceptAllowRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        {
+                            return false;
+                        }
+
+                        goto case RegionLimitMode.ForbidRegion;
+                    default:
+                        return false;
+                }
+            });
+        }
+
+        protected void CheckPermission(List<Post> posts)
+        {
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
+            posts.RemoveAll(p =>
+            {
+                switch (p.LimitMode)
+                {
+                    case RegionLimitMode.AllowRegion:
+                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                    case RegionLimitMode.ForbidRegion:
+                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                    case RegionLimitMode.AllowRegionExceptForbidRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        {
+                            return true;
+                        }
+
+                        goto case RegionLimitMode.AllowRegion;
+                    case RegionLimitMode.ForbidRegionExceptAllowRegion:
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        {
+                            return false;
+                        }
+
+                        goto case RegionLimitMode.ForbidRegion;
+                    default:
+                        return false;
+                }
             });
         }
     }

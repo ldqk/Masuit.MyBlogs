@@ -10,7 +10,6 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Http;
@@ -59,7 +58,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var fastShares = await fastShareService.GetAllFromCacheAsync(s => s.Sort);
             var postsQuery = PostService.GetQuery(p => p.Status == Status.Published); //准备文章的查询
             var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ToCachedPagedListAsync<Post, PostDto>(1, 15, MapperConfig);
-            posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ProjectTo<PostDto>(MapperConfig).ToList());
+            posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ProjectTo<PostDto>(MapperConfig).Cacheable().ToList());
             CheckPermission(posts.Data);
             var viewModel = await GetIndexPageViewModel();
             viewModel.Banner = banners;
@@ -177,42 +176,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             });
             var referer = Request.Headers[HeaderNames.Referer].ToString();
             return Redirect(string.IsNullOrEmpty(referer) ? "/" : referer);
-        }
-
-        private void CheckPermission(List<PostDto> posts)
-        {
-            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
-            posts.RemoveAll(p =>
-            {
-                switch (p.LimitMode)
-                {
-                    case RegionLimitMode.AllowRegion:
-                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
-                    case RegionLimitMode.ForbidRegion:
-                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
-                    case RegionLimitMode.AllowRegionExceptForbidRegion:
-                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
-                        {
-                            return true;
-                        }
-
-                        goto case RegionLimitMode.AllowRegion;
-                    case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
-                        {
-                            return false;
-                        }
-
-                        goto case RegionLimitMode.ForbidRegion;
-                    default:
-                        return false;
-                }
-            });
-            foreach (var item in posts)
-            {
-                item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-                item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-            }
         }
 
         /// <summary>

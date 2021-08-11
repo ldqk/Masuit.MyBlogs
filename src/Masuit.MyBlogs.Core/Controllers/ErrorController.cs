@@ -43,7 +43,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             return true switch
             {
                 _ when accept.StartsWith("image") => File("/Assets/images/404/4044.jpg", ContentType.Jpeg),
-                _ when accept.StartsWith("application/json") => Json(new
+                _ when accept.StartsWith("application/json") || Request.Method == HttpMethods.Post => Json(new
                 {
                     StatusCode = 404,
                     Success = false,
@@ -105,7 +105,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         return View("AccessDeny", tips);
                     case TempDenyException:
                         Response.StatusCode = 403;
-                        return accept.StartsWith("application/json") ? Json(new
+                        return accept.StartsWith("application/json") || Request.Method == HttpMethods.Post ? Json(new
                         {
                             StatusCode = 404,
                             Success = false,
@@ -118,7 +118,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             Response.StatusCode = 503;
-            return accept.StartsWith("application/json") ? Json(new
+            return accept.StartsWith("application/json") || Request.Method == HttpMethods.Post ? Json(new
             {
                 StatusCode = 503,
                 Success = false,

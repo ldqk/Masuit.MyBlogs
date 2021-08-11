@@ -96,15 +96,18 @@ namespace Masuit.MyBlogs.Core
                 app.UseHttpsRedirection();
             }
 
+            var options = new RewriteOptions().AddRewrite(@"\w+/_blazor(.*)", "_blazor$1", true);
             switch (config["UseRewriter"])
             {
                 case "NonWww":
-                    app.UseRewriter(new RewriteOptions().AddRedirectToNonWww(301)); // URL重写
+                    options.AddRedirectToNonWww(301); // URL重写
                     break;
                 case "WWW":
-                    app.UseRewriter(new RewriteOptions().AddRedirectToWww(301)); // URL重写
+                    options.AddRedirectToWww(301); // URL重写
                     break;
             }
+
+            app.UseRewriter(options);
         }
 
         public static void SetupMiniProfile(this IServiceCollection services)

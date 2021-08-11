@@ -87,9 +87,9 @@ namespace Masuit.MyBlogs.Core
         {
             RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
             services.AddEFSecondLevelCache(options => options.UseCustomCacheProvider<MyEFCacheManagerCoreProvider>(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true));
-            services.AddDbContextPool<DataContext>((serviceProvider, opt) =>
+            services.AddDbContext<DataContext>((serviceProvider, opt) =>
             {
-                opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(3)).EnableDetailedErrors().UseLazyLoadingProxies().UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>());
+                opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(3)).AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>());
             }); //配置数据库
             services.ConfigureOptions();
             services.AddHttpsRedirection(options =>
