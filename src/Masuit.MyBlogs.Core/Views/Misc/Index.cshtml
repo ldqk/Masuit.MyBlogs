@@ -1,12 +1,11 @@
-﻿@using System.Text.RegularExpressions
-@using Masuit.MyBlogs.Core.Common
+﻿@using Masuit.MyBlogs.Core.Common
 @model Masuit.MyBlogs.Core.Models.Entity.Misc
 @{
     ViewBag.Title = Model.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
     Random r = new Random();
 }
-<link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css" rel="stylesheet" />
+<link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.css" rel="stylesheet" />
 <style>
     .bg-title {
         height: 50vh;
@@ -56,7 +55,7 @@
         @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
     </article>
 </div>
-<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js"></script>
+<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.js"></script>
 <script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
 <script>
     SyntaxHighlighter.all();

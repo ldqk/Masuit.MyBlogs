@@ -195,7 +195,7 @@ myApp.config([
                             {
                                 files: [
                                     "https://cdn.staticfile.org/angular-ui-tree/2.22.6/angular-ui-tree.min.css",
-                                    "/Assets/checkbox/checkbox.min.css"
+                                    "/Content/checkbox.min.css"
                                 ],
                                 cache: true
                             }, cpath + "/menu.js"
@@ -335,7 +335,7 @@ myApp.config([
                         return $ocLazyLoad.load([
                             {
                                 files: [
-                                    "/assets/jedate/jedate.min.css", "/Assets/semantic/semantic.css",
+                                    "/assets/jedate/jedate.css", "/Assets/semantic/semantic.css",
                                     "/assets/jedate/jedate.js", 
                                     "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"
                                 ],
@@ -423,7 +423,7 @@ myApp.config([
                 deps: ["$ocLazyLoad", function($ocLazyLoad) {
                         return $ocLazyLoad.load([
                             {
-                                files: ["/assets/jedate/jedate.min.css", "/assets/jedate/jedate.js"],
+                                files: ["/assets/jedate/jedate.css", "/assets/jedate/jedate.js"],
                                 cache: true
                             }, cpath + "/donate.js"
                         ]);

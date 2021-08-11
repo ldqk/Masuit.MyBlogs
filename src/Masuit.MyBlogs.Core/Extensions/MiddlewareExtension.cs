@@ -133,15 +133,14 @@ namespace Masuit.MyBlogs.Core.Extensions
                 bundles.AddCss("/dashboard.css")
                     .Include("/fonts/icomoon.min.css")
                     .Include("/Assets/jedate/jedate.css")
-                    .Include("/Assets/fileupload/filestyle.min.css")
-                    .Include("/Content/ng-table.min.css")
+                    .Include("/Assets/fileupload/filestyle.css")
                     .Include("/Content/common/loading.min.css")
                     .Include("/Content/microtip.min.css")
                     .Include("/Content/checkbox.min.css")
                     .Include("/ng-views/css/app.css");
                 bundles.AddCss("/article.css")
                     .Include("/Assets/jquery.tocify/jquery.tocify.css")
-                    .Include("/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.min.css")
+                    .Include("/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.css")
                     .Include("/Assets/highlight/css/highlight.css");
 
                 bundles.AddJs("/main.js")
@@ -170,7 +169,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/ng-views/filemanager/js/controllers/selector-controller.js");
                 bundles.AddJs("/article.js")
                     .Include("/Assets/highlight/js/highlight.js")
-                    .Include("/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.min.js")
+                    .Include("/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.js")
                     .Include("/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js")
                     .Include("/Assets/jquery.tocify/jquery.tocify.js")
                     .Include("/Scripts/global/article.js")
