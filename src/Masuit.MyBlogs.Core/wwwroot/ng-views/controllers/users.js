@@ -29,7 +29,6 @@
 		swal({
 			title: '确定彻底删除这个用户吗？',
 			text: userinfo.Username,
-			type: 'warning',
 			showCancelButton: true,
 			confirmButtonColor: '#3085d6',
 			cancelButtonColor: '#d33',

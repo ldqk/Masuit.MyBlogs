@@ -123,7 +123,6 @@ myApp.controller("msgs", ["$scope", "$http", function ($scope, $http) {
 		swal({
 			title: '确定清除已读消息?',
 			text: "即将彻底清除已读消息，不可恢复!",
-			type: 'warning',
 			showCancelButton: true,
 			confirmButtonColor: '#3085d6',
 			cancelButtonColor: '#d33',

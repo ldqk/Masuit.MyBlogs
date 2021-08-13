@@ -48,7 +48,6 @@ myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 	$scope.save = function() {
 		swal({
 			title: '确认保存吗？',
-			type: 'warning',
 			showCloseButton: true,
 			confirmButtonColor: "#DD6B55",
 			confirmButtonText: "确定",
@@ -156,7 +155,6 @@ myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 			swal({
 				title: '确定要关闭站点么?',
 				text: "一旦关闭，所有前台功能将不再可用！所有前台访问将会被重定向到：/ComingSoon",
-				type: 'warning',
 				showCancelButton: true,
 				confirmButtonColor: '#3085d6',
 				cancelButtonColor: '#d33',
@@ -178,7 +176,6 @@ myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 			swal({
 				title: '确定要开启站点写保护么?',
 				text: "一旦开启，前台所有表单数据将无法被提交！",
-				type: 'warning',
 				showCancelButton: true,
 				confirmButtonColor: '#3085d6',
 				cancelButtonColor: '#d33',
@@ -216,7 +213,6 @@ myApp.controller("log", ["$scope", function ($scope) {
 	$scope.delete= function(file) {
 		swal({
 			title: '确定删除吗？',
-			type: 'warning',
 			showCancelButton: true,
 			showCloseButton: true,
 			confirmButtonColor: '#3085d6',
@@ -317,7 +313,6 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 	this.clear= function() {
 		swal({
 			title: '确定清空拦截日志吗？',
-			type: 'warning',
 			showCancelButton: true,
 			showCloseButton: true,
 			confirmButtonColor: '#3085d6',
@@ -342,7 +337,6 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
             swal({
 				title: '确定要关闭网站防火墙么?',
 				text: "一旦关闭，网站将面临可能会被流量攻击的风险！",
-				type: 'warning',
 				showCancelButton: true,
 				confirmButtonColor: '#3085d6',
 				cancelButtonColor: '#d33',
@@ -443,7 +437,6 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 	$scope.save = function() {
 		swal({
 			title: '确认保存吗？',
-			type: 'warning',
 			showCloseButton: true,
 			confirmButtonColor: "#DD6B55",
 			confirmButtonText: "确定",

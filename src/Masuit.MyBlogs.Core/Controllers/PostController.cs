@@ -64,7 +64,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="kw"></param>
         /// <returns></returns>
-        [Route("{id:int}"), Route("{id:int}/comments/{cid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
+        [Route("{id:int}"), Route("{id:int}/comments/{cid:int}"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Details(int id, string kw)
         {
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
@@ -80,14 +80,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId);
-            var related = PostService.ScoreSearch(1, 11, string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label);
-            related.RemoveAll(p => p.Id == id);
-            if (related.Count <= 1)
-            {
-                related = (await PostService.GetPagesFromCacheAsync(1, 10, p => p.Id != id && p.CategoryId == post.CategoryId && (p.LimitMode ?? 0) == RegionLimitMode.All, p => p.TotalViewCount, false)).Data;
-            }
-
-            CheckPermission(related);
+            var regex = SearchEngine.LuceneIndexSearcher.CutKeywords(string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label).Join("|");
+            var related = await PostService.GetQuery(p => p.Id != id && (p.LimitMode ?? 0) == RegionLimitMode.All && Regex.IsMatch(p.Title + (p.Keyword ?? "") + (p.Label ?? ""), regex), p => p.AverageViewCount, false).Take(10).Select(p => new { p.Id, p.Title }).Cacheable().ToDictionaryAsync(p => p.Id, p => p.Title);
             ViewBag.Related = related;
             post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -658,7 +652,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (!string.IsNullOrEmpty(kw))
             {
                 kw = Regex.Escape(kw);
-                where = where.And(p => Regex.IsMatch(p.Title + p.Author + p.Email + p.Label + p.Content, kw));
+                where = where.And(p => Regex.IsMatch(p.Title + p.Author + p.Email + p.Content, kw));
             }
 
             var list = PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToPagedList<Post, PostDataModel>(page, size, MapperConfig);
@@ -1022,12 +1016,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var keys = await RedisHelper.KeysAsync(nameof(PostOnline) + ":*");
             var sets = await keys.SelectAsync(async s => (Id: s.Split(':')[1].ToInt32(), Clients: await RedisHelper.HGetAsync<HashSet<string>>(s, "value")));
-            var ids = sets.Where(t => t.Clients.Count > 0).OrderByDescending(t => t.Clients.Count).Take(10).Select(t => t.Id).ToArray();
-            var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).Cacheable().ToListAsync().ContinueWith(t =>
+            var ids = sets.Where(t => t.Clients?.Count > 0).OrderByDescending(t => t.Clients.Count).Take(10).Select(t => t.Id).ToArray();
+            var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).ToListAsync().ContinueWith(t =>
             {
                 foreach (var item in t.Result)
                 {
-                    item.ViewCount = sets.FirstOrDefault(t => t.Id == item.Id).Clients.Count;
+                    item.ViewCount = sets.FirstOrDefault(x => x.Id == item.Id).Clients.Count;
                 }
 
                 return t.Result.OrderByDescending(p => p.ViewCount);

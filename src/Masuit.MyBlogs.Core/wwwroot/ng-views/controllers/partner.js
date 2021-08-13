@@ -73,7 +73,6 @@
 		swal({
 			title: '确定移除这条广告吗？',
 			text: partner.Title,
-			type: 'warning',
 			showCancelButton: true,
 			confirmButtonColor: '#3085d6',
 			cancelButtonColor: '#d33',

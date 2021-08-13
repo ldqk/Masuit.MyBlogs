@@ -1,5 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -166,6 +167,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string scheme = Request.Scheme;
             var host = Request.Host;
             var post = await PostService.GetAsync(p => p.Rss && p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章未找到");
+            CheckPermission(post);
             var summary = await post.Content.GetSummary(300, 50);
             var item = new Item()
             {
@@ -236,5 +238,58 @@ namespace Masuit.MyBlogs.Core.Controllers
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             }
         }
+
+        private void CheckPermission(Post post)
+        {
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
+            switch (post.LimitMode)
+            {
+                case RegionLimitMode.AllowRegion:
+                    if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !Request.IsRobot())
+                    {
+                        Disallow(post);
+                    }
+
+                    break;
+                case RegionLimitMode.ForbidRegion:
+                    if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !Request.IsRobot())
+                    {
+                        Disallow(post);
+                    }
+
+                    break;
+                case RegionLimitMode.AllowRegionExceptForbidRegion:
+                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                    {
+                        Disallow(post);
+                    }
+
+                    goto case RegionLimitMode.AllowRegion;
+                case RegionLimitMode.ForbidRegionExceptAllowRegion:
+                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                    {
+                        break;
+                    }
+
+                    goto case RegionLimitMode.ForbidRegion;
+            }
+        }
+
+        private void Disallow(Post post)
+        {
+            RedisHelper.IncrBy("interceptCount");
+            RedisHelper.LPush("intercept", new IpIntercepter()
+            {
+                IP = HttpContext.Connection.RemoteIpAddress.ToString(),
+                RequestUrl = $"//{Request.Host}/{post.Id}",
+                Referer = Request.Headers[HeaderNames.Referer],
+                Time = DateTime.Now,
+                UserAgent = Request.Headers[HeaderNames.UserAgent],
+                Remark = "无权限查看该文章",
+                Address = Request.Location()
+            });
+            throw new NotFoundException("文章未找到");
+        }
+
     }
 }

@@ -10,8 +10,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
     {
         SearchResult<PostDto> SearchPage(int page, int size, string keyword);
 
-        List<Post> ScoreSearch(int page, int size, string keyword);
-
         /// <summary>
         /// 统一保存的方法
         /// </summary>

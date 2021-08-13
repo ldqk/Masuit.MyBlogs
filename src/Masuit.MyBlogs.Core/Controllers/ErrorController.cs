@@ -1,7 +1,6 @@
 ﻿using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
-using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.Tools;
@@ -67,20 +66,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                 string err;
                 var req = HttpContext.Request;
                 var ip = HttpContext.Connection.RemoteIpAddress;
-                req.EnableBuffering();
-                req.Body.Seek(0, SeekOrigin.Begin);
-                using var sr = new StreamReader(req.Body, Encoding.UTF8, false);
-                var body = await sr.ReadToEndAsync();
-                body = HttpUtility.UrlDecode(body);
-                req.Body.Position = 0;
                 switch (feature.Error)
                 {
                     case DbUpdateConcurrencyException ex:
-                        err = $"数据库并发更新异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{body}\n堆栈信息：";
+                        err = $"数据库并发更新异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{await GetRequestBody(req)}\n堆栈信息：";
                         LogManager.Error(err, ex);
                         break;
                     case DbUpdateException ex:
-                        err = $"数据库更新时异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{body}\n堆栈信息：";
+                        err = $"数据库更新时异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{await GetRequestBody(req)}\n堆栈信息：";
                         LogManager.Error(err, ex);
                         break;
                     case AggregateException ex:
@@ -90,13 +83,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                             LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t", e);
                             return true;
                         });
+                        var body = await GetRequestBody(req);
                         if (!string.IsNullOrEmpty(body))
                         {
                             LogManager.Debug("↑↑↑请求参数：\n" + body);
                         }
                         break;
-                    case NotFoundException:
-                        return Index();
                     case AccessDenyException:
                         var entry = ip.GetIPLocation();
                         var tips = Template.Create(CommonHelper.SystemSettings.GetOrAdd("AccessDenyTips", @"<h4>遇到了什么问题？</h4>
@@ -112,7 +104,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                             Message = $"检测到您的IP（{ip}）访问过于频繁，已被本站暂时禁止访问，请稍后再试！"
                         }) : View("TempDeny");
                     default:
-                        LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}，请求参数：\n{body}\n堆栈信息：", feature.Error);
+                        LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}，请求参数：\n{await GetRequestBody(req)}\n堆栈信息：", feature.Error);
                         break;
                 }
             }
@@ -124,6 +116,16 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Success = false,
                 Message = "服务器发生错误！"
             }) : View();
+        }
+
+        private static async Task<string> GetRequestBody(HttpRequest req)
+        {
+            req.Body.Seek(0, SeekOrigin.Begin);
+            using var sr = new StreamReader(req.Body, Encoding.UTF8, false);
+            var body = await sr.ReadToEndAsync();
+            body = HttpUtility.UrlDecode(body);
+            req.Body.Position = 0;
+            return body;
         }
 
         /// <summary>

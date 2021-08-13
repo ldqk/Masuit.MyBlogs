@@ -2,10 +2,15 @@
 using AutoMapper.Extensions.ExpressionMapping;
 using CacheManager.Core;
 using Masuit.MyBlogs.Core.Configs;
+using Masuit.Tools.AspNetCore.Mime;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.WebEncoders;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -61,10 +66,11 @@ namespace Masuit.MyBlogs.Core.Extensions
             services.AddMvc(options =>
             {
                 options.ReturnHttpNotAcceptable = true;
+                options.Filters.Add<ExceptionFilter>();
             }).AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local; // 设置时区为 UTC
+                options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
             }).AddXmlDataContractSerializerFormatters().AddControllersAsServices().AddViewComponentsAsServices().AddTagHelpersAsServices(); // MVC
             services.Configure<WebEncoderOptions>(options =>
             {
@@ -176,6 +182,33 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Assets/highlight/js/highlight.js");
             });
             return app;
+        }
+    }
+
+    public class ExceptionFilter : IExceptionFilter, IFilterMetadata
+    {
+        public void OnException(ExceptionContext context)
+        {
+            if (context.Exception is NotFoundException)
+            {
+                context.HttpContext.Response.StatusCode = 404;
+                string accept = context.HttpContext.Request.Headers[HeaderNames.Accept] + "";
+                context.Result = true switch
+                {
+                    _ when accept.StartsWith("image") => new VirtualFileResult("/Assets/images/404/4044.jpg", ContentType.Jpeg),
+                    _ when accept.StartsWith("application/json") || context.HttpContext.Request.Method == HttpMethods.Post => new JsonResult(new
+                    {
+                        StatusCode = 404,
+                        Success = false,
+                        Message = "页面未找到！"
+                    }),
+                    _ => new ViewResult()
+                    {
+                        ViewName = "/Views/Error/Index.cshtml"
+                    }
+                };
+                context.ExceptionHandled = true;
+            }
         }
     }
 }

@@ -31,53 +31,55 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
         public override async Task<string> Process()
         {
             var form = await Request.ReadFormAsync();
-            var file = form.Files[UploadConfig.UploadFieldName];
-            var uploadFileName = file.FileName;
-
-            if (!CheckFileType(uploadFileName))
+            var files = form.Files;
+            foreach (var file in files)
             {
-                Result.State = UploadState.TypeNotAllow;
-                return WriteResult();
-            }
-            if (!CheckFileSize(file.Length))
-            {
-                Result.State = UploadState.SizeLimitExceed;
-                return WriteResult();
-            }
-
-            Result.OriginFileName = uploadFileName;
-            var savePath = PathFormatter.Format(uploadFileName, UploadConfig.PathFormat);
-            var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
-            var cts = new CancellationTokenSource(20000);
-            var stream = file.OpenReadStream();
-            try
-            {
-                stream = stream.AddWatermark();
-                var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath, cts.Token);
-                if (success)
+                var uploadFileName = file.FileName;
+                if (!CheckFileType(uploadFileName))
                 {
-                    Result.Url = url;
+                    Result.State = UploadState.TypeNotAllow;
+                    return WriteResult();
                 }
-                else
+                if (!CheckFileSize(file.Length))
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(localPath));
-                    await File.WriteAllBytesAsync(localPath, await stream.ToArrayAsync());
-                    Result.Url = savePath;
+                    Result.State = UploadState.SizeLimitExceed;
+                    return WriteResult();
                 }
 
-                Result.State = UploadState.Success;
-            }
-            catch (Exception e)
-            {
-                Result.State = UploadState.FileAccessError;
-                Result.ErrorMessage = e.Message;
-                LogManager.Error(e);
-            }
-            finally
-            {
-                cts.Dispose();
-                stream.Close();
-                await stream.DisposeAsync();
+                Result.OriginFileName = uploadFileName;
+                var savePath = PathFormatter.Format(uploadFileName, UploadConfig.PathFormat);
+                var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
+                var cts = new CancellationTokenSource(20000);
+                var stream = file.OpenReadStream();
+                try
+                {
+                    stream = stream.AddWatermark();
+                    var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath, cts.Token);
+                    if (success)
+                    {
+                        Result.Url = url;
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(localPath));
+                        await File.WriteAllBytesAsync(localPath, await stream.ToArrayAsync());
+                        Result.Url = savePath;
+                    }
+
+                    Result.State = UploadState.Success;
+                }
+                catch (Exception e)
+                {
+                    Result.State = UploadState.FileAccessError;
+                    Result.ErrorMessage = e.Message;
+                    LogManager.Error(e);
+                }
+                finally
+                {
+                    cts.Dispose();
+                    stream.Close();
+                    await stream.DisposeAsync();
+                }
             }
 
             return WriteResult();

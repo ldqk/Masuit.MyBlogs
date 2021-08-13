@@ -268,36 +268,5 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             });
         }
-
-        protected void CheckPermission(List<Post> posts)
-        {
-            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
-            posts.RemoveAll(p =>
-            {
-                switch (p.LimitMode)
-                {
-                    case RegionLimitMode.AllowRegion:
-                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
-                    case RegionLimitMode.ForbidRegion:
-                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
-                    case RegionLimitMode.AllowRegionExceptForbidRegion:
-                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
-                        {
-                            return true;
-                        }
-
-                        goto case RegionLimitMode.AllowRegion;
-                    case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
-                        {
-                            return false;
-                        }
-
-                        goto case RegionLimitMode.ForbidRegion;
-                    default:
-                        return false;
-                }
-            });
-        }
     }
 }

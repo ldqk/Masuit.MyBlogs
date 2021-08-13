@@ -200,7 +200,7 @@
                     </section>
                 }
                 @{
-                    var posts = (List<Post>)ViewBag.Related;
+                    var posts = (Dictionary<int,string>)ViewBag.Related;
                     if (posts.Count>1)
                     {
                         <section class="wow margintop20 animated fadeIn">
@@ -209,8 +209,8 @@
                                 @for (int i = 1; i < posts.Count; i += 2)
                                 {
                                     <tr>
-                                        <td style="width: 50%"><a asp-controller="Post" asp-action="Details" asp-route-id="@posts[i - 1].Id">@posts[i - 1].Title</a></td>
-                                        <td><a asp-controller="Post" asp-action="Details" asp-route-id="@posts[i].Id">@posts[i].Title</a></td>
+                                        <td style="width: 50%"><a asp-controller="Post" asp-action="Details" asp-route-id="@posts.ElementAt(i - 1).Key">@posts.ElementAt(i - 1).Value</a></td>
+                                        <td><a asp-controller="Post" asp-action="Details" asp-route-id="@posts.ElementAt(i).Key">@posts.ElementAt(i).Value</a></td>
                                     </tr>
                                 }
                             </table>

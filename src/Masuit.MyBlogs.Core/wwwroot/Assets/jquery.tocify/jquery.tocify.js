@@ -654,9 +654,7 @@
                                 closestAnchorIdx = null,
 
                                 // Keeps a reference to all anchors
-                                anchors = $(self.options.context).find("div[data-unique]"),
-
-                                anchorText;
+                                anchors = $(self.options.context).find("div[data-unique]");
 
                             // Determines the index of the closest anchor
                             anchors.each(function(idx) {
@@ -669,10 +667,10 @@
                                 }
                             });
 
-                            anchorText = $(anchors[closestAnchorIdx]).attr("data-unique");
-
+                            var anchorText = $(anchors[closestAnchorIdx]).attr("data-unique");
+                            
                             // Stores the list item HTML element that corresponds to the currently traversed anchor tag
-                            elem = $('li[data-unique="' + anchorText + '"]');
+                            elem = $('li[data-unique=\'' + anchorText + '\']');
 
                             // If the `highlightOnScroll` option is true and a next element is found
                             if(self.options.highlightOnScroll && elem.length) {
