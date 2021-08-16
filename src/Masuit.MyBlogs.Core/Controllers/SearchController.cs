@@ -82,7 +82,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="search"></param>
         /// <returns></returns>
-        [MyAuthorize, HttpPost("search/SearchList"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "search" }, VaryByHeader = "Cookie")]
+        [MyAuthorize, HttpPost("search/SearchList"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "search" })]
         public ActionResult SearchList([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string search = "")
         {
             var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.Keywords.Contains(search);
@@ -99,7 +99,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 热词
         /// </summary>
         /// <returns></returns>
-        [MyAuthorize, Route("search/HotKey"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
+        [MyAuthorize, Route("search/HotKey"), ResponseCache(Duration = 600)]
         public ActionResult HotKey()
         {
             return ResultData(new

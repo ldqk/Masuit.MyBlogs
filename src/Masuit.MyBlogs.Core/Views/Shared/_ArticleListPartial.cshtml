@@ -34,10 +34,10 @@
             }
         }
         <div class="row">
-            <div class="col-xs-9">
+            <div class="col-sm-9 col-xs-12">
                 @{ await Html.RenderPartialAsync("_Pagination", Model.PageParams); }
             </div>
-            <div class="col-sm-3 text-right">
+            <div class="col-sm-3 col-xs-12 text-right">
                 <div class="btn-group dropup">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @(Model.PageParams.OrderBy?.GetDescription()??"排序方式")

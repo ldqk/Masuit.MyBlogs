@@ -33,7 +33,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -148,7 +147,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Time = DateTime.Now,
                 UserAgent = Request.Headers[HeaderNames.UserAgent],
                 Remark = "无权限查看该文章",
-                Address = Request.Location()
+                Address = Request.Location(),
+                HttpVersion = Request.Protocol,
+                Headers = Request.Headers.ToJsonString()
             });
             throw new NotFoundException("文章未找到");
         }

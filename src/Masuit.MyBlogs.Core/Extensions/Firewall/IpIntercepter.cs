@@ -11,5 +11,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
         public string UserAgent { get; set; }
         public DateTime Time { get; set; }
         public string Remark { get; set; }
+        public string HttpVersion { get; set; }
+        public string Headers { get; set; }
     }
 }

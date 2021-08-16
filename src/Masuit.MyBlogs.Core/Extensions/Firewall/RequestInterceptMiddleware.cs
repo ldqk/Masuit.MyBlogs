@@ -58,7 +58,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     Referer = request.Headers[HeaderNames.Referer],
                     UserAgent = request.Headers[HeaderNames.UserAgent],
                     Remark = $"检测到敏感词拦截：{match.Value}",
-                    Address = request.Location()
+                    Address = request.Location(),
+                    HttpVersion = request.Protocol,
+                    Headers = request.Headers.ToJsonString()
                 });
                 context.Response.StatusCode = 400;
                 context.Response.ContentType = "text/html; charset=utf-8";

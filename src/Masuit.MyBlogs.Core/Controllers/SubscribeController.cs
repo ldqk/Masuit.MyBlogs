@@ -286,7 +286,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Time = DateTime.Now,
                 UserAgent = Request.Headers[HeaderNames.UserAgent],
                 Remark = "无权限查看该文章",
-                Address = Request.Location()
+                Address = Request.Location(),
+                HttpVersion = Request.Protocol,
+                Headers = Request.Headers.ToJsonString()
             });
             throw new NotFoundException("文章未找到");
         }

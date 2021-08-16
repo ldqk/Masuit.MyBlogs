@@ -109,6 +109,9 @@
             <td filter="{RequestUrl: 'text'}" title="'请求URL'">
                 <a ng-href="{{row.RequestUrl}}" target="_blank">{{row.RequestUrl}}</a>
             </td>
+            <td filter="{HttpVersion: 'text'}" title="'协议'">
+                {{row.HttpVersion}}
+            </td>
             <td filter="{Referer: 'text'}" title="'来源URL'">
                 <a ng-href="{{row.Referer}}" target="_blank">{{row.Referer}}</a>
             </td>
@@ -116,10 +119,13 @@
                 {{row.UserAgent}}
             </td>
             <td title="'拦截时间'">
-                {{row.Time|date:'yyyy-MM-dd HH:mm:ss'}}
+                {{row.Time|date:'yyyy-MM-dd HH:mm'}}
             </td>
             <td filter="{Remark: 'text'}" title="'备注'">
                 {{row.Remark}}
+            </td>
+            <td filter="{Headers: 'text'}" title="'请求头'">
+                {{row.Headers}}
             </td>
         </tr>
     </table>

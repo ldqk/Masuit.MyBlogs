@@ -51,7 +51,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 首页
         /// </summary>
         /// <returns></returns>
-        [HttpGet, ResponseCache(Duration = 600, VaryByHeader = "Cookie", Location = ResponseCacheLocation.Any)]
+        [HttpGet, ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Index([FromServices] IFastShareService fastShareService)
         {
             var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner, Request.Location()).OrderByRandom().ToList();

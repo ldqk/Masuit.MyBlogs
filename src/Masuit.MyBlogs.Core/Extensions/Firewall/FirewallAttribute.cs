@@ -97,7 +97,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 Referer = request.Headers[HeaderNames.Referer],
                 UserAgent = request.Headers[HeaderNames.UserAgent],
                 Remark = remark,
-                Address = request.Location()
+                Address = request.Location(),
+                HttpVersion = request.Protocol,
+                Headers = request.Headers.ToJsonString()
             });
             var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPInterceptTimes", "30").ToInt32();
             await RedisHelper.LRangeAsync<IpIntercepter>("intercept", 0, -1).ContinueWith(async t =>
