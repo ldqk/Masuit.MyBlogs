@@ -1,6 +1,6 @@
 ### Masuit.MyBlogs
 <a href="https://gitee.com/masuit/Masuit.MyBlogs"><img src="https://gitee.com/static/images/logo-black.svg" height="32"></a> <a href="https://github.com/ldqk/Masuit.MyBlogs"><img src="https://p.pstatp.com/origin/13841000102b8e2ba20b2" height="32"></a>  
-个人博客站项目源码，高性能低占用的博客系统，这也许是我写过的性能最高的web项目了。**仅1MB的代码量！** 目前日均处理请求数80-300w次，同时在线活跃用户数30-100人，数据量累计已达到100多万条，数据库+Redis+网站主程序同时运行在一台2核4GB的机器上，浏览器页面请求秒级响应，CPU平均使用率控制在20%左右。  
+个人博客站项目源码，高性能低占用的博客系统，这也许是我写过的性能最高的web项目了。**仅1MB的代码量！** 目前日均处理请求数80-300w次，同时在线活跃用户数30-200人，数据量累计已达到100多万条，数据库+Redis+网站主程序同时运行在一台2核4GB的机器上，浏览器页面请求秒级响应，CPU平均使用率控制在10%左右，内存控制在1GB左右占用。  
 ![任务管理器](https://img11.360buyimg.com/ddimg/jfs/t1/170269/23/18655/93697/6076eb8fE82d545e7/78f0815f7311cd49.png)
 ![任务管理器](https://user-images.githubusercontent.com/20254980/129124177-37e0f98b-57ba-454f-955d-141201f50cc6.png)
 ![image](https://user-images.githubusercontent.com/20254980/129124476-88a324ac-cfd2-4e9b-8fb9-e84e12d04051.png)
