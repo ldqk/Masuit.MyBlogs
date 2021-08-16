@@ -40,7 +40,7 @@ Redis：redis-server-windows 3.2
 |带宽|1Mbps|1Mbps|5Mbps|1000Mbps|
 |数据库|MySQL 5/SQL Server 2008|MySQL 8/SQL Server 2012|MySQL 8/SQL Server 2016|MySQL 8/SQL Server 2016|
 |缓存组件|Redis 3.2+|Redis 3.2+|Redis 3.2+|Redis 3.2+|
-|备注|玩玩而已|几个人同时访问|几十个人同时访问，单日请求量200w以下|单日请求量200w以上|
+|备注|玩玩而已|几个人同时访问|几百个人同时访问，单日请求量600w以下|单日请求量600w以上|
 ### 主要功能
 #### 服务器性能监控
 可直接在线实时监控服务器的运行状态，包括CPU、网络带宽、磁盘使用率、内存占用等情况，百分位统计和图表统计，可记录最近一天的服务器健康状态，通过websocket进行数据的推送，仅支持Windows，且需要Windows安装最新的更新。
