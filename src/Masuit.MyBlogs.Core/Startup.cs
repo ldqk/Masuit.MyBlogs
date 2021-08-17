@@ -109,7 +109,12 @@ namespace Masuit.MyBlogs.Core
                 Path = "lucene"
             }); // 配置7z和断点续传和Redis和Lucene搜索引擎
 
-            services.AddHttpClient("", c => c.Timeout = TimeSpan.FromSeconds(30)).AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(5)).ConfigurePrimaryHttpMessageHandler(() =>
+            services.AddHttpClient("", c =>
+            {
+                c.DefaultRequestVersion = new Version(2, 0);
+                c.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
+                c.Timeout = TimeSpan.FromSeconds(30);
+            }).AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(5)).ConfigurePrimaryHttpMessageHandler(() =>
             {
                 if (bool.TryParse(Configuration["HttpClientProxy:Enabled"], out var b) && b)
                 {
@@ -121,7 +126,11 @@ namespace Masuit.MyBlogs.Core
 
                 return new HttpClientHandler();
             }); //注入HttpClient
-            services.AddHttpClient<ImagebedClient>().AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(3)); //注入HttpClient
+            services.AddHttpClient<ImagebedClient>(c =>
+            {
+                c.DefaultRequestVersion = new Version(2, 0);
+                c.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
+            }).AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(3)); //注入HttpClient
             services.AddMailSender(Configuration).AddFirewallReporter(Configuration);
             services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
             services.SetupMiniProfile();

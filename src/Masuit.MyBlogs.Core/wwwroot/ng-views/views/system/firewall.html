@@ -119,13 +119,13 @@
                 {{row.UserAgent}}
             </td>
             <td title="'拦截时间'">
-                {{row.Time|date:'yyyy-MM-dd HH:mm'}}
+                {{row.Time|date:'MM-dd HH:mm'}}
             </td>
             <td filter="{Remark: 'text'}" title="'备注'">
                 {{row.Remark}}
             </td>
-            <td filter="{Headers: 'text'}" title="'请求头'">
-                {{row.Headers}}
+            <td title="'请求头'">
+                <a ng-click="detail(row.Headers)">详情</a>
             </td>
         </tr>
     </table>

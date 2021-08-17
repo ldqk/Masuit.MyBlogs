@@ -1,6 +1,9 @@
-﻿using Masuit.Tools;
+﻿using DnsClient;
+using Masuit.Tools;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
+using System.Linq;
+using System.Threading;
 
 namespace Masuit.MyBlogs.Core.Common
 {
@@ -21,6 +24,27 @@ namespace Masuit.MyBlogs.Core.Common
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        public static bool IsRobot(this HttpRequest req) => UserAgent.Parse(req.Headers[HeaderNames.UserAgent].ToString()).IsRobot;
+        public static bool IsRobot(this HttpRequest req)
+        {
+            var robotUA = UserAgent.Parse(req.Headers[HeaderNames.UserAgent].ToString()).IsRobot;
+            if (robotUA)
+            {
+                var nslookup = new LookupClient();
+                using var cts = new CancellationTokenSource(100);
+                return nslookup.QueryReverseAsync(req.HttpContext.Connection.RemoteIpAddress, cts.Token).ContinueWith(t => t.IsCompletedSuccessfully && t.Result.Answers.Any(r => r.ToString().Contains(new[]
+                {
+                    "baidu",
+                    "google",
+                    "bing",
+                    "360",
+                    "sogou",
+                    "soso",
+                    "yahoo",
+                    "yandex",
+                }))).Result;
+            }
+
+            return robotUA;
+        }
     }
 }

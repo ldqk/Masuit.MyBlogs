@@ -205,15 +205,15 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private void CheckPermission(List<Post> posts)
         {
-            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
+            var location = Request.Location() + "|" + string.Join("", Request.Headers.Values);
             posts.RemoveAll(p =>
             {
                 switch (p.LimitMode)
                 {
                     case RegionLimitMode.AllowRegion:
-                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !Request.IsRobot();
+                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries));
                     case RegionLimitMode.ForbidRegion:
-                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !Request.IsRobot();
+                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries));
                     case RegionLimitMode.AllowRegionExceptForbidRegion:
                         if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
                         {
@@ -241,7 +241,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private void CheckPermission(Post post)
         {
-            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
+            var location = Request.Location() + "|" + string.Join("", Request.Headers.Values);
             switch (post.LimitMode)
             {
                 case RegionLimitMode.AllowRegion:

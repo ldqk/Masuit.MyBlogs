@@ -42,6 +42,7 @@
     }
     .syntaxhighlighter .code .container:before {
         content: "" !important;
+        display: none;
     }
     .syntaxhighlighter .code .container:after {
         content: "" !important;

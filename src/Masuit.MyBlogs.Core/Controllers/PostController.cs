@@ -102,32 +102,37 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private void CheckPermission(Post post)
         {
-            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
+            if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot())
+            {
+                return;
+            }
+
+            var location = Request.Location() + "|" + string.Join("", Request.Headers.Values);
             switch (post.LimitMode)
             {
                 case RegionLimitMode.AllowRegion:
-                    if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
+                    if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
                     {
                         Disallow(post);
                     }
 
                     break;
                 case RegionLimitMode.ForbidRegion:
-                    if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot())
+                    if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
                     {
                         Disallow(post);
                     }
 
                     break;
                 case RegionLimitMode.AllowRegionExceptForbidRegion:
-                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
                     {
                         Disallow(post);
                     }
 
                     goto case RegionLimitMode.AllowRegion;
                 case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
                     {
                         break;
                     }

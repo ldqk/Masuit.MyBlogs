@@ -16,7 +16,6 @@ using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -240,24 +239,29 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         protected void CheckPermission(List<PostDto> posts)
         {
-            var location = Request.Location() + "|" + Request.Headers[HeaderNames.UserAgent];
+            if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot())
+            {
+                return;
+            }
+
+            var location = Request.Location() + "|" + string.Join("", Request.Headers.Values);
             posts.RemoveAll(p =>
             {
                 switch (p.LimitMode)
                 {
                     case RegionLimitMode.AllowRegion:
-                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries));
                     case RegionLimitMode.ForbidRegion:
-                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid && !Request.IsRobot();
+                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries));
                     case RegionLimitMode.AllowRegionExceptForbidRegion:
-                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
                         {
                             return true;
                         }
 
                         goto case RegionLimitMode.AllowRegion;
                     case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !CurrentUser.IsAdmin && !VisitorTokenValid)
+                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
                         {
                             return false;
                         }
