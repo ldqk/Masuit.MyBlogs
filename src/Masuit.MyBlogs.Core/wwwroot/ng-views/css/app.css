@@ -1,4 +1,4 @@
-/*#region ¹ö¶¯ÌõÃÀ»¯ */
+/*#region æ»šåŠ¨æ¡ç¾ŽåŒ– */
 
 ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -16241,7 +16241,8 @@ select.chosen {
 }
 .ng-table > tbody > tr > td {
     max-width: 300px;
-    word-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 table.table >tbody > tr>td img {
     max-height: 80px;

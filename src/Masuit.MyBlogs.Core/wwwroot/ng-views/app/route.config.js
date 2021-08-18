@@ -248,7 +248,9 @@ myApp.config([
                             {
                                 files: [
                                     "/Assets/semantic/semantic.css",
-                                    "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"
+                                    "https://cdn.jsdelivr.net/gh/abodelot/jquery.json-viewer@master/json-viewer/jquery.json-viewer.css",
+                                    "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js",
+                                    "https://cdn.jsdelivr.net/gh/abodelot/jquery.json-viewer@master/json-viewer/jquery.json-viewer.js"
                                 ],
                                 cache: true
                             }, cpath + "/system.js"
