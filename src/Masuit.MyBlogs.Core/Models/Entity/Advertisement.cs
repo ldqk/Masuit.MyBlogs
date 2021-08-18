@@ -56,11 +56,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public DateTime UpdateTime { get; set; }
 
         /// <summary>
-        /// 权重
-        /// </summary>
-        public int Weight { get; set; }
-
-        /// <summary>
         /// 价格
         /// </summary>
         public decimal Price { get; set; }

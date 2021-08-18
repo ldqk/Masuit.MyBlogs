@@ -35,11 +35,6 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public string Url { get; set; }
 
         /// <summary>
-        /// 权重
-        /// </summary>
-        public int Weight { get; set; }
-
-        /// <summary>
         /// 价格
         /// </summary>
         public decimal Price { get; set; }

@@ -49,9 +49,6 @@
             <td title="'当前竞价'">
                 {{row.Price}}
             </td>
-            <td title="'权重'">
-                {{row.Weight}}
-            </td>
             <td title="'当月曝光量'">
                 {{row.DisplayCount}}
             </td>
@@ -178,61 +175,53 @@
             <div class="form-inline">
                 <div class="form-group">
                     <div class="input-group">
-                        <label for="desc" class="input-group-addon control-label">权重：</label>
-                        <div class="fg-line">
-                            <input type="number" class="form-control" id="weight" placeholder="权重值" ng-model="partner.Weight">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="input-group">
                         <label for="desc" class="input-group-addon control-label">当前竞价：</label>
                         <div class="fg-line">
                             <input type="number" class="form-control" id="price" placeholder="竞价" ng-model="partner.Price">
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="input-group">
-                <label for="desc" class="input-group-addon control-label">过期时间：</label>
-                <div class="fg-line">
-                    <input type="text" class="workinput wicon" id="timespan" ng-model="partner.ExpireTime" readonly="readonly" />
+                <div class="input-group">
+                    <label for="desc" class="input-group-addon control-label">过期时间：</label>
+                    <div class="fg-line">
+                        <input type="text" class="workinput wicon" id="timespan" ng-model="partner.ExpireTime" readonly="readonly" />
+                    </div>
                 </div>
             </div>
-            <div class="form-group form-inline">
-                <div class="input-group">
-                    <label for="region" class="input-group-addon control-label">投放地区：</label>
-                    <div class="fg-line">
-                        <input type="text" class="form-control" id="region" placeholder="竖线或逗号分隔，支持国家、地区、城市、运营商、ASN" ng-model="partner.Regions" style="width: 460px">
-                        <div class="ui selection dropdown region" style="min-width: 60px">
-                            <input name="category" type="hidden">
-                            <i class="dropdown icon"></i>
-                            <div class="default text">不限</div>
-                            <div class="menu">
-                                <div class="item" data-value="0">不限</div>
-                                <div class="item" data-value="1">以内</div>
-                                <div class="item" data-value="2">以外</div>
+                <div class="form-group form-inline">
+                    <div class="input-group">
+                        <label for="region" class="input-group-addon control-label">投放地区：</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" id="region" placeholder="竖线或逗号分隔，支持国家、地区、城市、运营商、ASN" ng-model="partner.Regions" style="width: 460px">
+                            <div class="ui selection dropdown region" style="min-width: 60px">
+                                <input name="category" type="hidden">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">不限</div>
+                                <div class="menu">
+                                    <div class="item" data-value="0">不限</div>
+                                    <div class="item" data-value="1">以内</div>
+                                    <div class="item" data-value="2">以外</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-12">
+                        <div class="fg-line">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info" ng-click="submit(partner)">
+                                    保存
+                                </button>
+                                <button type="button" class="btn btn-danger" ng-click="closeAll()">
+                                    取消
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <div class="col-xs-12">
-                    <div class="fg-line">
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-info" ng-click="submit(partner)">
-                                保存
-                            </button>
-                            <button type="button" class="btn btn-danger" ng-click="closeAll()">
-                                取消
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
-    </div>
 </div>
 <div id="detail" class="modal">
     <div class="container-fluid" style="margin: 15px 0;">
@@ -288,9 +277,9 @@
                 </tr>
                 <tr>
                     <td>竞价：{{partner.Price}}</td>
-                    <td>权重：{{partner.Weight}}</td>
                     <td>点击量：{{partner.ViewCount}}</td>
-                    <td>日均点击量：{{partner.AverageViewCount}}</td>
+                    <td>日均点击量：</td>
+                    <td>{{partner.AverageViewCount}}</td>
                 </tr>
                 <tr>
                     <td>上架时间：</td>
