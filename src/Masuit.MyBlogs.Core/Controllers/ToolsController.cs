@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Polly;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,15 +53,16 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return Ok("内网IP");
             }
 
+            var ipAddress = IPAddress.Parse(ip);
             ViewBag.IP = ip;
-            var cityInfo = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
-            var location = ip.GetIPLocation();
+            var cityInfo = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ipAddress));
+            var location = ipAddress.GetIPLocation();
             var address = new IpInfo()
             {
                 CityInfo = cityInfo,
                 Address = $"{location}（UTC{TZConvert.GetTimeZoneInfo(cityInfo.Location.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}）",
-                Asn = ip.GetIPAsn(),
-                IsProxy = location.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business" }) || await ip.IsProxy()
+                Asn = ipAddress.GetIPAsn(),
+                IsProxy = location.ToString().Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business" }) || await ipAddress.IsProxy()
             };
             if (Request.Method.Equals(HttpMethods.Get))
             {

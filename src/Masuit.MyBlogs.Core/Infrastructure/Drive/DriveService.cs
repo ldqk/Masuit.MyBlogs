@@ -33,6 +33,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             var request = drive.Root.Children.Request();
             var result = await request.GetAsync();
             var files = await GetItems(result, siteName, showHiddenFolders);
+            files = files.OrderByDescending(f => f.CreatedTime).ToList();
             return files;
         }
 
@@ -46,6 +47,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
             var result = await drive.Root.ItemWithPath(path).Children.Request().GetAsync();
             var files = await GetItems(result, siteName, showHiddenFolders);
+            files = files.OrderByDescending(f => f.CreatedTime).ToList();
             return files;
         }
 

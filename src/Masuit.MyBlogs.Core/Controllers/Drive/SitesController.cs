@@ -49,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// </summary>
         /// <returns></returns>
         [HttpGet("sites/{siteName}/{**path}"), ResponseCache(Duration = 600)]
-        public async Task<IActionResult> GetDrectory(string siteName, string path)
+        public async Task<IActionResult> GetDirectory(string siteName, string path)
         {
             if (string.IsNullOrEmpty(siteName))
             {

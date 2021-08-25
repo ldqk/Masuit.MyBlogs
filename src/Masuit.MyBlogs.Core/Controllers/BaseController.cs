@@ -117,8 +117,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Desc = CommonHelper.SystemSettings["Description"];
             var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoDto>();
-            filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
+            //user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoDto>();
+            //filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
 #endif
             if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true" && user?.IsAdmin != true)
             {

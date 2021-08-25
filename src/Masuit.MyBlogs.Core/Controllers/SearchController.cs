@@ -67,7 +67,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
 
                 ViewBag.hotSearches = new List<KeywordsRank>();
-                ViewBag.RelateKeywords = SearchDetailsService.GetQuery(s => s.Keywords.Contains(wd) && s.Keywords != wd).Select(s => s.Keywords).GroupBy(s => s).OrderByDescending(g => g.Count()).Select(g => g.Key).Take(10).Cacheable().ToList();
+                if (posts.Total > size)
+                {
+                    ViewBag.RelateKeywords = SearchDetailsService.GetQuery(s => s.Keywords.Contains(wd) && s.Keywords != wd).Select(s => s.Keywords).GroupBy(s => s).OrderByDescending(g => g.Count()).Select(g => g.Key).Take(10).Cacheable().ToList();
+                }
                 return View(posts);
             }
 

@@ -36,7 +36,6 @@ namespace Masuit.MyBlogs.Core
             opt.ListenAnyIP(port.ToInt32());
             if (bool.Parse(config["Https:Enabled"]))
             {
-                opt.EnableAltSvc = true;
                 opt.ListenAnyIP(sslport.ToInt32(), s =>
                 {
                     if (Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.Major >= 10)

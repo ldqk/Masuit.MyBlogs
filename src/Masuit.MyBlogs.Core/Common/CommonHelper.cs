@@ -144,7 +144,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// </summary>
         /// <param name="ip"></param>
         /// <returns></returns>
-        public static async Task<bool> IsProxy(this string ip)
+        public static async Task<bool> IsProxy(this IPAddress ip)
         {
             var httpClient = Startup.ServiceProvider.GetRequiredService<IHttpClientFactory>().CreateClient();
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36 Edg/92.0.902.62");
