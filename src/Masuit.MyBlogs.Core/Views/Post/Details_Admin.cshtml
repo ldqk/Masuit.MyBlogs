@@ -530,7 +530,15 @@
         }, function () { });
 	}
     
-function showViewer(data) { 
-    layer.alert(data);
+function showViewer(data) {
+    var html="";
+    for (let item of data) {
+        html+=`<p><a href="/tools/ip/${item.key}" target="_blank">${item.key}</a>：${item.value}</p>`;
+    }
+    layer.open({
+      type: 1,
+      area: ['800px',"60%"], //宽高
+      content: html
+    });
 }
 </script>

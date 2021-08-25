@@ -37,7 +37,7 @@
     public void ShowViewer()
     {
         if (online>0) {
-            JS.InvokeVoidAsync("showViewer",CacheManager.Get(nameof(PostOnline) + ":" + Id).Select(s => s+"："+s.GetIPLocation()).Join("<br/>"));
+            JS.InvokeVoidAsync("showViewer",CacheManager.Get(nameof(PostOnline) + ":" + Id).Select(s => KeyValuePair.Create(s,s.GetIPLocation())));
         }
     }
 

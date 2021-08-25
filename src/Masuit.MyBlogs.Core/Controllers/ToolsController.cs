@@ -56,13 +56,14 @@ namespace Masuit.MyBlogs.Core.Controllers
             var ipAddress = IPAddress.Parse(ip);
             ViewBag.IP = ip;
             var cityInfo = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ipAddress));
-            var location = ipAddress.GetIPLocation();
+            var loc = ipAddress.GetIPLocation();
             var address = new IpInfo()
             {
                 CityInfo = cityInfo,
-                Address = $"{location}（UTC{TZConvert.GetTimeZoneInfo(cityInfo.Location.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}）",
+                Address = loc.Location,
                 Asn = ipAddress.GetIPAsn(),
-                IsProxy = location.ToString().Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business" }) || await ipAddress.IsProxy()
+                TimeZone = $"UTC{TZConvert.GetTimeZoneInfo(cityInfo.Location.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}",
+                IsProxy = loc.Network.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business" }) || await ipAddress.IsProxy()
             };
             if (Request.Method.Equals(HttpMethods.Get))
             {

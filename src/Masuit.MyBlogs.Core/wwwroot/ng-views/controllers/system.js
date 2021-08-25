@@ -537,7 +537,6 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 	$scope.detail= function(text) {
         layer.open({
           type: 1,
-          skin: 'layui-layer-rim', //加上边框
           area: ['600px', '80%'], //宽高
           content: text
         });

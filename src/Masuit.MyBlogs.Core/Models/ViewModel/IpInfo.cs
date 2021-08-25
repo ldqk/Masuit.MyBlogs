@@ -8,5 +8,6 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         public CityResponse CityInfo { get; set; }
         public AsnResponse Asn { get; set; }
         public bool IsProxy { get; set; }
+        public string TimeZone { get; set; }
     }
 }
