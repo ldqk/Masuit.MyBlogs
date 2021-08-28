@@ -66,14 +66,11 @@
                                     {
                                         <div class="pull-right margin-right20">
                                             <div>
-                                                @foreach (string s in Model.Label.Split(',', '，'))
+                                                @foreach (string s in Model.Label.Split(new []{',', '，'},StringSplitOptions.RemoveEmptyEntries))
                                                 {
-                                                    if (!string.IsNullOrEmpty(s))
-                                                    {
-                                                        <a asp-controller="Home" asp-action="Tag" asp-route-tag="@s">
-                                                            <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
-                                                        </a>
-                                                    }
+                                                    <a asp-controller="Home" asp-action="Tag" asp-route-tag="@s">
+                                                        <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
+                                                    </a>
                                                 }
                                             </div>
                                         </div>

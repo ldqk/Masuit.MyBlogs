@@ -15,11 +15,6 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         public string NickName { get; set; }
 
         /// <summary>
-        /// 标题
-        /// </summary>
-        public string Title { get; set; }
-
-        /// <summary>
         /// 内容
         /// </summary>
         public string Content { get; set; }

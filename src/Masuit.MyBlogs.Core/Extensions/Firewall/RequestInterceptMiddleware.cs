@@ -62,7 +62,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     HttpVersion = request.Protocol,
                     Headers = request.Headers.ToJsonString()
                 });
-                context.Response.StatusCode = 400;
+                context.Response.StatusCode = 404;
                 context.Response.ContentType = "text/html; charset=utf-8";
                 return context.Response.WriteAsync("参数不合法！", Encoding.UTF8);
             }

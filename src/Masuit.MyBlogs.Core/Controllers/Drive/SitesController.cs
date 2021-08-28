@@ -10,10 +10,12 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 
 namespace Masuit.MyBlogs.Core.Controllers.Drive
 {
     [ApiController]
+    [ServiceFilter(typeof(FirewallAttribute))]
     [Route("api/")]
     public class SitesController : Controller
     {

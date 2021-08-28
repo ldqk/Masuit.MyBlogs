@@ -1,6 +1,7 @@
 ﻿using AngleSharp;
 using DocumentFormat.OpenXml.Packaging;
 using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.UEditor;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
@@ -31,6 +32,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// 文件上传
     /// </summary>
     [ApiExplorerSettings(IgnoreApi = true)]
+    [ServiceFilter(typeof(FirewallAttribute))]
     public class UploadController : Controller
     {
         public IWebHostEnvironment HostEnvironment { get; set; }

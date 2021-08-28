@@ -1,7 +1,6 @@
 ﻿@using CacheManager.Core
 @using System.Threading
 @using Masuit.MyBlogs.Core.Common
-@using Masuit.Tools
 @implements IAsyncDisposable
 @inject ICacheManager<HashSet<string>> CacheManager
 @inject IJSRuntime JS;
@@ -14,6 +13,9 @@
 
     [Parameter]
     public string IP { get; set; }
+
+    [Parameter]
+    public bool IsAdmin { get; set; }
 
     int online;
     Timer _timer;
@@ -36,7 +38,7 @@
     
     public void ShowViewer()
     {
-        if (online>0) {
+        if (online>0&&IsAdmin) {
             JS.InvokeVoidAsync("showViewer",CacheManager.Get(nameof(PostOnline) + ":" + Id).Select(s => KeyValuePair.Create(s,s.GetIPLocation())));
         }
     }

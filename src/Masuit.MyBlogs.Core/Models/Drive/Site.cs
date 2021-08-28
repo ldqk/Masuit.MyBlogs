@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.Drive
@@ -9,6 +10,7 @@ namespace Masuit.MyBlogs.Core.Models.Drive
         public string Name { get; set; }
         public string SiteId { get; set; }
         public string NickName { get; set; }
+        [JsonIgnore]
         public string[] HiddenFolders { get; set; }
     }
 }

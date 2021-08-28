@@ -217,6 +217,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                 foreach (var c in single.Flatten())
                 {
                     c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                    if (!CurrentUser.IsAdmin)
+                    {
+                        c.Email = null;
+                        c.IP = null;
+                        c.Location = null;
+                    }
                 }
 
                 return ResultData(new
@@ -238,6 +244,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             parent.Data.Flatten().ForEach(c =>
             {
                 c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                if (!CurrentUser.IsAdmin)
+                {
+                    c.Email = null;
+                    c.IP = null;
+                    c.Location = null;
+                }
             });
             if (total > 0)
             {
