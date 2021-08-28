@@ -34,15 +34,15 @@
     <table class="table table-bordered table-condensed table-hover">
         <tr>
             <td>IP路由信息：</td>
-            <td>@Model.Asn.Network</td>
+            <td>@Model.Network.Router</td>
         </tr>
         <tr>
             <td>IP机房信息：</td>
-            <td>@Model.Asn.AutonomousSystemOrganization</td>
+            <td>@Model.Network.Organization</td>
         </tr>
         <tr>
             <td>ASN：</td>
-            <td>@Model.Asn.AutonomousSystemNumber</td>
+            <td>@Model.Network.Asn</td>
         </tr>
         <tr>
             <td>参考地理位置：</td>
@@ -54,7 +54,7 @@
         </tr>
         <tr>
             <td>经纬度：</td>
-            <td>(经度：@(Model.CityInfo.Location.Longitude),纬度：@(Model.CityInfo.Location.Latitude))</td>
+            <td>(经度：@(Model.Location.Longitude),纬度：@(Model.Location.Latitude))</td>
         </tr>
         <tr>
             <td>代理或任播节点：</td>
@@ -63,17 +63,17 @@
     </table>
 </div>
 <div class="container-fluid">
-    @if (Model.CityInfo != null)
+    @if (Model.Location != null)
     {
         <div id="allmap"></div>
         <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=89772e94509a9b903724e247cbc175c2"></script>
         <script>
 	    var map = new BMap.Map("allmap"); // 创建Map实例,设置地图允许的最小/大级别
 
-	    map.centerAndZoom(new BMap.Point(@(Model.CityInfo.Location.Longitude), @(Model.CityInfo.Location.Latitude)), 16);
+	    map.centerAndZoom(new BMap.Point(@(Model.Location.Longitude), @(Model.Location.Latitude)), 16);
 	    map.enableScrollWheelZoom(true);
 	    map.clearOverlays();
-	    var new_point = new BMap.Point(@(Model.CityInfo.Location.Longitude), @(Model.CityInfo.Location.Latitude));
+	    var new_point = new BMap.Point(@(Model.Location.Longitude), @(Model.Location.Latitude));
 	    var marker = new BMap.Marker(new_point); // 创建标注
 	    map.addOverlay(marker); // 将标注添加到地图中
 	    marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画

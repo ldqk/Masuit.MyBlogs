@@ -64,26 +64,25 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (feature != null)
             {
                 string err;
-                var req = HttpContext.Request;
                 var ip = HttpContext.Connection.RemoteIpAddress;
                 switch (feature.Error)
                 {
                     case DbUpdateConcurrencyException ex:
-                        err = $"数据库并发更新异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString}，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{await GetRequestBody(req)}\n堆栈信息：";
+                        err = $"数据库并发更新异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString}，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{await GetRequestBody(Request)}\n堆栈信息：";
                         LogManager.Error(err, ex);
                         break;
                     case DbUpdateException ex:
-                        err = $"数据库更新时异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{await GetRequestBody(req)}\n堆栈信息：";
+                        err = $"数据库更新时异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString} ，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{await GetRequestBody(Request)}\n堆栈信息：";
                         LogManager.Error(err, ex);
                         break;
                     case AggregateException ex:
                         LogManager.Debug("↓↓↓" + ex.Message + "↓↓↓");
                         ex.Flatten().Handle(e =>
                         {
-                            LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t", e);
+                            LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString} ，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t", e);
                             return true;
                         });
-                        var body = await GetRequestBody(req);
+                        var body = await GetRequestBody(Request);
                         if (!string.IsNullOrEmpty(body))
                         {
                             LogManager.Debug("↑↑↑请求参数：\n" + body);
@@ -104,7 +103,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                             Message = $"检测到您的IP（{ip}）访问过于频繁，已被本站暂时禁止访问，请稍后再试！"
                         }) : View("TempDeny");
                     default:
-                        LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，请求路径：{req.Scheme}://{req.Host}{HttpUtility.UrlDecode(feature.Path)}{req.QueryString} ，客户端用户代理：{req.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}，请求参数：\n{await GetRequestBody(req)}\n堆栈信息：", feature.Error);
+                        LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString} ，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}，请求参数：\n{await GetRequestBody(Request)}\n堆栈信息：", feature.Error);
                         break;
                 }
             }
