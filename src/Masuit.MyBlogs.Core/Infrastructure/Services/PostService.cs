@@ -53,7 +53,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                     Total = searchResult.TotalHits
                 };
             });
-            _cacheManager.Expire(cacheKey, TimeSpan.FromHours(1));
             return result;
         }
 

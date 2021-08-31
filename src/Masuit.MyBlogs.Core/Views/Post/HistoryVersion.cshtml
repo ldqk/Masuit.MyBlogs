@@ -3,6 +3,7 @@
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
+@using Masuit.Tools.Systems
 @model Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion
 @{
     ViewBag.Title = Model.Post.Title + "于" + Model.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone)) + "的历史版本：" + Model.Title;
@@ -87,7 +88,7 @@
                             @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
                             @if (!string.IsNullOrEmpty(Model.ProtectContent))
                             {
-                                <div class="row protected">
+                                <div class="row protected-content" id="@SnowFlake.NewId">
                                     此处为加密内容，历史版本不可查看！
                                 </div>
                             }
@@ -126,26 +127,10 @@
                         }
                     </div>
                 </section>
+                <hr class="margin-top10 marginbot10" />
                 @if (ad != null)
                 {
-                    <section class="protected">
-                        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
-                            <h3>
-                                @ad.Title
-                                <span class="text-red">[推广]</span>
-                            </h3>
-                            <div class="row padding-bot10">
-                                <div class="col-md-2 col-sm-3 col-xs-4 paddingright-clear">
-                                    <img class="img-thumbnail img-responsive" src="@ad.ThumbImgUrl" alt="@ad.Title" title="@ad.Title ">
-                                </div>
-                                <div class="col-md-10 col-sm-9">
-                                    <p>
-                                        @ad.Description
-                                    </p>
-                                </div>
-                            </div>
-                        </a>
-                    </section>
+                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
                 }
             </div>
         </div>

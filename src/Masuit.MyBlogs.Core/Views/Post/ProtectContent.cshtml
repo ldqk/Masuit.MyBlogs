@@ -3,11 +3,12 @@
 @using Masuit.Tools.Security
 @using Masuit.MyBlogs.Core.Configs
 @using Masuit.MyBlogs.Core.Common
+@using Masuit.Tools.Systems
 @model Masuit.MyBlogs.Core.Models.Entity.Post
 
 @if (!string.IsNullOrEmpty(Model.ProtectContent)&&Model.ProtectContentMode==ProtectContentMode.AuthorizeVisiable)
 {
-    <div class="row protected">
+    <div class="row protected-content" id="@SnowFlake.NewId">
         @if (!string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")) || Context.Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Context.Request.Cookies["PostAccessToken"]))
         {
             <p class="text-red text-center size20">↓↓↓以下是文章加密部分↓↓↓</p>
@@ -44,7 +45,7 @@
 }
 @if (!string.IsNullOrEmpty(Model.ProtectContent)&&Model.ProtectContentMode==ProtectContentMode.CommentVisiable)
 {
-    <div class="row protected">
+    <div class="row protected-content">
         @if (string.IsNullOrEmpty(Context.Request.Cookies["Comment_" + Model.Id]))
         {
             <p class="text-red text-center size24 margin-bot10">此处内容回复后刷新页面可见</p>

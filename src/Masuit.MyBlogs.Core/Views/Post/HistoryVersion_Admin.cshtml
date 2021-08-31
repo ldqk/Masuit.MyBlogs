@@ -125,27 +125,10 @@
                         }
                     </div>
                 </section>
+                <hr class="margin-top10 marginbot10" />
                 @if (ad != null)
                 {
-                    <section class="protected">
-                        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
-                            <h3>
-                                @ad.Title
-                                <span class="text-red">[推广]</span>
-                            </h3>
-
-                            <div class="row padding-bot10">
-                                <div class="col-md-2 col-sm-3 col-xs-4 paddingright-clear">
-                                    <img class="img-thumbnail img-responsive" src="@ad.ThumbImgUrl" alt="@ad.Title" title="@ad.Title ">
-                                </div>
-                                <div class="col-md-10 col-sm-9">
-                                    <p>
-                                        @ad.Description
-                                    </p>
-                                </div>
-                            </div>
-                        </a>
-                    </section>
+                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
                 }
             </div>
         </div>

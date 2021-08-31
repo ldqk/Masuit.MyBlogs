@@ -1,6 +1,7 @@
 ﻿@using System.Diagnostics
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.Tools.Systems
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @{
     string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
@@ -54,7 +55,7 @@
     </section>
     @foreach (var ad in Model.SidebarAds)
     {
-        <section>
+        <section class="wow animated fadeIn" id="@SnowFlake.NewId">
             <article class="panel panel-info">
                 <div class="panel-heading">
                     @ad.Title
