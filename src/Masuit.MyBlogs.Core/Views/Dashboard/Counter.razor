@@ -56,7 +56,7 @@
             <th>@_driveInfos.Select(kv => kv.Name + " " + (kv.TotalSize * 1.0 / 1073741824).ToDecimal(2) + "GB").Join(" | ")</th>
             <td>磁盘剩余空间</td>
             <th>@_driveInfos.Select(kv => kv.Name + " " + (kv.TotalFreeSpace * 1.0 / 1073741824).ToDecimal(2) + "GB").Join(" | ")</th>
-            <td>磁盘使用率</td>
+            <td>磁盘可用率</td>
             <th>@_driveInfos.Select(kv => kv.Name + " " + (kv.AvailableFreeSpace * 1m / kv.TotalSize).ToString("P")).Join(" | ")</th>
         </tr>
         <tr>

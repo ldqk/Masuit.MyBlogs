@@ -173,6 +173,17 @@ var clearSelect= "getSelection" in window ? function(){
  document.selection.empty();
 };
 
+function hackClip() {
+    let transfer = document.createElement('input');
+    document.body.appendChild(transfer);
+    transfer.value = '1';
+    transfer.select();
+    if (document.execCommand('copy')) {
+        document.execCommand('copy');
+    }
+    document.body.removeChild(transfer);
+}
+
 /**禁止复制 */
 function CopyrightProtect() {
     setInterval(function() {
@@ -198,14 +209,17 @@ function CopyrightProtect() {
                     return false;
                 }
             }
-            document.ondragstart=function () {
+            document.ondragstart=async function () {
+                hackClip();
                 return false;
             }
             $(".article-content").on("copy",function (e) {
+                hackClip();
                 e.returnValue = false;
                 return false;
             });
             document.oncontextmenu = function (e) {
+                hackClip();
                 e.returnValue = false;
                 return false;
             }
@@ -231,10 +245,12 @@ function CopyrightProtect4Editor() {
                 }
             }
             document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function (e) {
+                hackClip();
                 e.returnValue = false;
                 return false;
             }
             document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function (e) {
+                hackClip();
                 e.returnValue = false;
                 return false;
             }
@@ -269,13 +285,16 @@ function GlobalCopyrightProtect() {
                 }
             }
             document.ondragstart=function () {
+                hackClip();
                 return false;
             }
             $(".article-content").on("copy",function (e) {
+                hackClip();
                 e.returnValue = false;
                 return false;
             });
             document.oncontextmenu = function () {
+                hackClip();
                 event.returnValue = false;
                 return false;
             }

@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             lang ??= context.Request.Cookies["lang"];
             if (string.IsNullOrEmpty(lang))
             {
-                if (context.Request.Location().Location.Contains(new[] { "台湾", "香港", "澳门", "Taiwan", "TW", "HongKong", "HK" }))
+                if (context.Request.Location().Address.Contains(new[] { "台湾", "香港", "澳门", "Taiwan", "TW", "HongKong", "HK" }))
                 {
                     return Traditional(context);
                 }

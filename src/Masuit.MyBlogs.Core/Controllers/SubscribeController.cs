@@ -22,7 +22,6 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 订阅服务
     /// </summary>
-    [ServiceFilter(typeof(FirewallAttribute))]
     public class SubscribeController : Controller
     {
         public IPostService PostService { get; set; }

@@ -30,17 +30,17 @@ namespace Masuit.MyBlogs.Core.Common
             if (robotUA)
             {
                 var nslookup = new LookupClient();
-                using var cts = new CancellationTokenSource(100);
+                using var cts = new CancellationTokenSource(1000);
                 return nslookup.QueryReverseAsync(req.HttpContext.Connection.RemoteIpAddress, cts.Token).ContinueWith(t => t.IsCompletedSuccessfully && t.Result.Answers.Any(r => r.ToString().Contains(new[]
-                   {
-                        "baidu.com",
-                        "google.com",
-                        "bing.com",
-                        "sogou.com",
-                        "soso.com",
-                        "yandex.com",
-                        "sm.cn"
-                     }))).Result;
+                {
+                    "baidu.com",
+                    "google.com",
+                    "bing.com",
+                    "sogou.com",
+                    "soso.com",
+                    "yandex.com",
+                    "sm.cn"
+                 }))).Result;
             }
 
             return robotUA;

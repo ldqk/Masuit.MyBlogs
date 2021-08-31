@@ -8,6 +8,7 @@ using Masuit.Tools;
 using Masuit.Tools.Media;
 using MaxMind.GeoIP2;
 using MaxMind.GeoIP2.Exceptions;
+using MaxMind.GeoIP2.Model;
 using MaxMind.GeoIP2.Responses;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -21,6 +22,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TimeZoneConverter;
 
@@ -143,17 +145,24 @@ namespace Masuit.MyBlogs.Core.Common
         /// 是否是代理ip
         /// </summary>
         /// <param name="ip"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<bool> IsProxy(this IPAddress ip)
+        public static async Task<bool> IsProxy(this IPAddress ip, CancellationToken cancellationToken = default)
         {
             var httpClient = Startup.ServiceProvider.GetRequiredService<IHttpClientFactory>().CreateClient();
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36 Edg/92.0.902.62");
-            var html = await httpClient.GetStringAsync("https://ipinfo.io/" + ip);
-            var ctx = BrowsingContext.New(Configuration.Default);
-            var doc = await ctx.OpenAsync(res => res.Content(html));
-            var isAnycast = doc.DocumentElement.QuerySelectorAll(".title").Where(e => e.TextContent.Contains("Anycast")).Select(e => e.Parent).Any(n => n.TextContent.Contains("True"));
-            var isproxy = doc.DocumentElement.QuerySelectorAll("#block-privacy img").Any(e => e.OuterHtml.Contains("right"));
-            return isAnycast || isproxy;
+            return await httpClient.GetStringAsync("https://ipinfo.io/" + ip, cancellationToken).ContinueWith(t =>
+            {
+                if (t.IsCompletedSuccessfully)
+                {
+                    var ctx = BrowsingContext.New(Configuration.Default);
+                    var doc = ctx.OpenAsync(res => res.Content(t.Result)).Result;
+                    var isAnycast = doc.DocumentElement.QuerySelectorAll(".title").Where(e => e.TextContent.Contains("Anycast")).Select(e => e.Parent).Any(n => n.TextContent.Contains("True"));
+                    var isproxy = doc.DocumentElement.QuerySelectorAll("#block-privacy img").Any(e => e.OuterHtml.Contains("right"));
+                    return isAnycast || isproxy;
+                }
+                return false;
+            });
         }
 
         public static AsnResponse GetIPAsn(this string ip)
@@ -192,6 +201,11 @@ namespace Masuit.MyBlogs.Core.Common
             {
                 return new IPLocation("内网", null, null, "内网IP", null);
             }
+
+            var city = GetCityResp(ip);
+            var asn = GetIPAsn(ip);
+            var countryName = city.Country.Names.GetValueOrDefault("zh-CN") ?? city.Country.Name;
+            var cityName = city.City.Names.GetValueOrDefault("zh-CN") ?? city.City.Name;
             switch (ip.AddressFamily)
             {
                 case AddressFamily.InterNetworkV6 when ip.IsIPv4MappedToIPv6:
@@ -201,19 +215,22 @@ namespace Masuit.MyBlogs.Core.Common
                     var parts = IPSearcher.MemorySearch(ip.ToString())?.Region.Split('|');
                     if (parts != null)
                     {
-                        var asn = GetIPAsn(ip);
-                        var network = parts[^1] == "0" ? asn.AutonomousSystemOrganization : parts[^1] + "(" + asn.AutonomousSystemOrganization + ")";
-                        var city = new Lazy<CityResponse>(() => GetCityResp(ip));
-                        parts[0] = parts[0] != "0" ? parts[0] : city.Value.Country.Names.GetValueOrDefault("zh-CN");
-                        parts[3] = parts[3] != "0" ? parts[3] : city.Value.City.Names.GetValueOrDefault("zh-CN");
-                        return new IPLocation(parts[0], parts[2], parts[3], network, asn.AutonomousSystemNumber);
+                        var network = parts[^1] == "0" ? asn.AutonomousSystemOrganization : parts[^1] + "/" + asn.AutonomousSystemOrganization;
+                        parts[0] = parts[0] != "0" ? parts[0] : countryName;
+                        parts[3] = parts[3] != "0" ? parts[3] : cityName;
+                        return new IPLocation(parts[0], parts[2], parts[3], network.TrimEnd('/'), asn.AutonomousSystemNumber)
+                        {
+                            Address2 = countryName + cityName,
+                            Coodinate = city.Location
+                        };
                     }
 
                     goto default;
                 default:
-                    var cityResp = GetCityResp(ip);
-                    var asnResp = GetIPAsn(ip);
-                    return new IPLocation(cityResp.Country.Names.GetValueOrDefault("zh-CN"), null, cityResp.City.Names.GetValueOrDefault("zh-CN"), asnResp.AutonomousSystemOrganization, asnResp.AutonomousSystemNumber);
+                    return new IPLocation(countryName, null, cityName, asn.AutonomousSystemOrganization, asn.AutonomousSystemNumber)
+                    {
+                        Coodinate = city.Location
+                    };
             }
         }
 
@@ -407,24 +424,26 @@ namespace Masuit.MyBlogs.Core.Common
         public string City { get; set; }
         public string ISP { get; set; }
         public long? ASN { get; set; }
-        public string Location => new[] { Country, Province, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
+        public string Address => new[] { Country, Province, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
+        public string Address2 { get; set; }
         public string Network => ASN.HasValue ? ISP + "(AS" + ASN + ")" : ISP;
+        public Location Coodinate { get; set; }
 
         public override string ToString()
         {
-            string location = Location;
+            string address = Address;
             string network = Network;
-            if (string.IsNullOrWhiteSpace(location))
+            if (string.IsNullOrWhiteSpace(address))
             {
-                location = string.Intern("未知地区");
+                address = "未知地区";
             }
 
             if (string.IsNullOrWhiteSpace(network))
             {
-                network = string.Intern("未知网络");
+                network = "未知网络";
             }
 
-            return location + "|" + network;
+            return new[] { address, Address2, network }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("|");
         }
 
         public static implicit operator string(IPLocation entry)
@@ -434,7 +453,7 @@ namespace Masuit.MyBlogs.Core.Common
 
         public void Deconstruct(out string location, out string network, out string info)
         {
-            location = Location;
+            location = new[] { Address, Address2 }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("|");
             network = Network;
             info = ToString();
         }

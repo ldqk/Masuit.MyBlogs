@@ -63,7 +63,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 throw new AccessDenyException("访问地区限制");
             }
 
-            if (Regex.IsMatch(request.Method, "OPTIONS|HEAD", RegexOptions.IgnoreCase) || agent.IsRobot)
+            if (Regex.IsMatch(request.Method, "OPTIONS|HEAD", RegexOptions.IgnoreCase) || request.IsRobot())
             {
                 return;
             }

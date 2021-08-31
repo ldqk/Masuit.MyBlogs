@@ -20,7 +20,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,15 +38,12 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public ActionResult ResultData(object data, bool isTrue = true, string message = "")
         {
-            return Content(JsonConvert.SerializeObject(new
+            return Json(new
             {
                 Success = isTrue,
                 Message = message,
                 Data = data
-            }, new JsonSerializerSettings
-            {
-                MissingMemberHandling = MissingMemberHandling.Ignore
-            }), "application/json", Encoding.UTF8);
+            });
         }
 
         #region Word上传转码

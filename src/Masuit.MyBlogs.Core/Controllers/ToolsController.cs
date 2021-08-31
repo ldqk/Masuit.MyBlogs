@@ -1,24 +1,25 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using DnsClient;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Models;
 using MaxMind.GeoIP2.Exceptions;
 using MaxMind.GeoIP2.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Polly;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TimeZoneConverter;
-
-#if DEBUG
-#endif
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -55,23 +56,27 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var ipAddress = IPAddress.Parse(ip);
             ViewBag.IP = ip;
-            var cityInfo = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ipAddress));
             var loc = ipAddress.GetIPLocation();
             var asn = ipAddress.GetIPAsn();
-            var address = new IpInfo()
+            var nslookup = new LookupClient();
+            using var cts = new CancellationTokenSource(2000);
+            var domain = await nslookup.QueryReverseAsync(ipAddress, cts.Token).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result.Answers.Select(r => r.ToString()).Join("; ") : "无");
+            var address = new IpInfo
             {
-                Location = cityInfo.Location,
-                Address = loc.Location,
-                Network = new NetworkInfo()
+                Location = loc.Coodinate,
+                Address = loc.Address,
+                Address2 = loc.Address2,
+                Network = new NetworkInfo
                 {
                     Asn = asn.AutonomousSystemNumber,
                     Router = asn.Network + "",
-                    Organization = asn.AutonomousSystemOrganization
+                    Organization = loc.ISP
                 },
-                TimeZone = $"UTC{TZConvert.GetTimeZoneInfo(cityInfo.Location.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}",
-                IsProxy = loc.Network.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business" }) || await ipAddress.IsProxy()
+                TimeZone = loc.Coodinate.TimeZone + $"  UTC{TZConvert.GetTimeZoneInfo(loc.Coodinate.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}",
+                IsProxy = loc.Network.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business" }) || domain.Length > 1 || await ipAddress.IsProxy(cts.Token),
+                Domain = domain
             };
-            if (Request.Method.Equals(HttpMethods.Get))
+            if (Request.Method.Equals(HttpMethods.Get) || (Request.Headers[HeaderNames.Accept] + "").StartsWith(ContentType.Json))
             {
                 return View(address);
             }
@@ -101,7 +106,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Status = 0,
                     AddressResult = new AddressResult()
                     {
-                        FormattedAddress = ip.GetIPLocation(),
+                        FormattedAddress = IPAddress.Parse(ip).GetIPLocation().Address,
                         Location = new Location()
                         {
                             Lng = location.Location.Longitude ?? 0,
@@ -146,7 +151,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Status = 0,
                     AddressResult = new AddressResult()
                     {
-                        FormattedAddress = ip.GetIPLocation(),
+                        FormattedAddress = IPAddress.Parse(ip).GetIPLocation().Address,
                         Location = new Location()
                         {
                             Lng = location.Location.Longitude ?? 0,
@@ -155,7 +160,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     }
                 };
                 ViewBag.Address = address.AddressResult.FormattedAddress;
-                if (Request.Method.Equals(HttpMethods.Get))
+                if (Request.Method.Equals(HttpMethods.Get) || (Request.Headers[HeaderNames.Accept] + "").StartsWith(ContentType.Json))
                 {
                     return View(address.AddressResult.Location);
                 }
@@ -173,7 +178,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
                  return new PhysicsAddress();
              });
-            if (Request.Method.Equals(HttpMethods.Get))
+            if (Request.Method.Equals(HttpMethods.Get) || (Request.Headers[HeaderNames.Accept] + "").StartsWith(ContentType.Json))
             {
                 return View(physicsAddress?.AddressResult?.Location);
             }
