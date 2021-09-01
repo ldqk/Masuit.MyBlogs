@@ -28,9 +28,9 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public bool Recommend { get; set; }
 
         /// <summary>
-        /// 友链权重
+        /// 最近回链次数
         /// </summary>
-        public int Weight { get; set; }
+        public int Loopbacks { get; set; }
 
         /// <summary>
         /// 更新时间

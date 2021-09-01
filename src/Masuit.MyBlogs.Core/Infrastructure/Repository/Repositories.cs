@@ -73,6 +73,20 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
     }
 
+    public partial class LinkLoopbackRepository : BaseRepository<LinkLoopback>, ILinkLoopbackRepository
+    {
+        /// <summary>
+        /// 添加实体
+        /// </summary>
+        /// <param name="t">需要添加的实体</param>
+        /// <returns>添加成功</returns>
+        public override LinkLoopback AddEntity(LinkLoopback t)
+        {
+            DataContext.Add(t);
+            return t;
+        }
+    }
+
     public partial class LoginRecordRepository : BaseRepository<LoginRecord>, ILoginRecordRepository
     {
         /// <summary>

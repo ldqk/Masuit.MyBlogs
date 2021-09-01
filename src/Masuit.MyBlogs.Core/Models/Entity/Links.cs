@@ -1,5 +1,6 @@
 using Masuit.MyBlogs.Core.Models.Enum;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -21,13 +22,13 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 名字
         /// </summary>
-        [Required(ErrorMessage = "站点名不能为空！"),MaxLength(32,ErrorMessage = "站点名称最长限制32个字")]
+        [Required(ErrorMessage = "站点名不能为空！"), MaxLength(32, ErrorMessage = "站点名称最长限制32个字")]
         public string Name { get; set; }
 
         /// <summary>
         /// URL
         /// </summary>
-        [Required(ErrorMessage = "站点的URL不能为空！"),MaxLength(64,ErrorMessage = "站点的URL限制64个字符")]
+        [Required(ErrorMessage = "站点的URL不能为空！"), MaxLength(64, ErrorMessage = "站点的URL限制64个字符")]
         public string Url { get; set; }
 
         /// <summary>
@@ -41,13 +42,10 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public bool Recommend { get; set; }
 
         /// <summary>
-        /// 友链权重
-        /// </summary>
-        public int Weight { get; set; }
-
-        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdateTime { get; set; }
+
+        public virtual ICollection<LinkLoopback> Loopbacks { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Configs;
@@ -117,8 +119,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Desc = CommonHelper.SystemSettings["Description"];
             var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-            //user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoDto>();
-            //filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
+            user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoDto>();
+            filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
 #endif
             if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true" && user?.IsAdmin != true)
             {
@@ -173,7 +175,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ViewBag.menus = MenuService.GetQueryFromCache(m => m.ParentId == null && m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
                 var model = new PageFootViewModel //页脚
                 {
-                    Links = LinksService.GetQueryFromCache<LinksDto>(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Weight).Take(30).ToList()
+                    Links = LinksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.Count).Take(30).ProjectTo<LinksDto>(MapperConfig).Cacheable().ToList()
                 };
                 ViewBag.Footer = model;
             }

@@ -32,7 +32,7 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<LeaveMessage, LeaveMessageViewModel>().ForMember(l => l.PostDate, e => e.MapFrom(l => l.PostDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
 
             CreateMap<Links, LinksCommand>().ReverseMap();
-            CreateMap<Links, LinksDto>().ReverseMap();
+            CreateMap<Links, LinksDto>().ForMember(e => e.Loopbacks, e => e.MapFrom(m => m.Loopbacks.Count)).ReverseMap();
 
             CreateMap<MenuCommand, Menu>().ForMember(m => m.ParentId, e => e.MapFrom(c => (c.ParentId ?? 0) == 0 ? null : c.ParentId)).ReverseMap();
             CreateMap<Menu, MenuDto>().ForMember(m => m.Children, e => e.MapFrom(m => m.Children.OrderBy(c => c.Sort))).ReverseMap();

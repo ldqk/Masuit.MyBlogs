@@ -48,7 +48,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// 更新友链权重
         /// </summary>
         /// <param name="referer"></param>
-        void UpdateLinkWeight(string referer);
+        /// <param name="ip"></param>
+        void UpdateLinkWeight(string referer, string ip);
 
         /// <summary>
         /// 重建Lucene索引库

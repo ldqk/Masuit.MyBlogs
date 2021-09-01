@@ -9,6 +9,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
     public partial interface IInternalMessageService : IBaseService<InternalMessage> { }
 
     public partial interface ILinksService : IBaseService<Links> { }
+    public partial interface ILinkLoopbackService : IBaseService<LinkLoopback> { }
 
     public partial interface ILoginRecordService : IBaseService<LoginRecord> { }
 

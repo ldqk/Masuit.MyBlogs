@@ -28,6 +28,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         private readonly ISystemSettingService _settingService;
         private readonly ISearchDetailsService _searchDetailsService;
         private readonly ILinksService _linksService;
+        private readonly ILinkLoopbackService _loopbackService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly ISearchEngine<DataContext> _searchEngine;
@@ -45,7 +46,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="httpClientFactory"></param>
         /// <param name="HostEnvironment"></param>
         /// <param name="searchEngine"></param>
-        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IWebHostEnvironment HostEnvironment, ISearchEngine<DataContext> searchEngine, IAdvertisementService advertisementService, INoticeService noticeService)
+        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IWebHostEnvironment HostEnvironment, ISearchEngine<DataContext> searchEngine, IAdvertisementService advertisementService, INoticeService noticeService, ILinkLoopbackService loopbackService)
         {
             _userInfoService = userInfoService;
             _postService = postService;
@@ -57,6 +58,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             _searchEngine = searchEngine;
             _advertisementService = advertisementService;
             _noticeService = noticeService;
+            _loopbackService = loopbackService;
         }
 
         /// <summary>
@@ -193,11 +195,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                     {
                         link.UpdateTime = DateTime.Now;
                     }
-
-                    if (link.Status == Status.Unavailable)
-                    {
-                        link.Weight -= 1;
-                    }
                 }).Wait();
             });
             _linksService.SaveChanges();
@@ -207,13 +204,22 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// 更新友链权重
         /// </summary>
         /// <param name="referer"></param>
-        public void UpdateLinkWeight(string referer)
+        /// <param name="ip"></param>
+        public void UpdateLinkWeight(string referer, string ip)
         {
             var uri = new Uri(referer);
-            _linksService.GetQuery(l => l.Url.Contains(uri.Host)).UpdateFromQuery(link => new Links()
+            _linksService.GetQuery(l => l.Url.Contains(uri.Host)).AsParallel().ForAll(l =>
             {
-                Weight = link.Weight + 1
+                l.Loopbacks.Add(new LinkLoopback()
+                {
+                    IP = ip,
+                    Referer = referer,
+                    Time = DateTime.Now
+                });
             });
+            _linksService.SaveChanges();
+            var time = DateTime.Now.AddMonths(-1);
+            _loopbackService.GetQuery(b => b.Time < time).DeleteFromQuery();
         }
 
         /// <summary>

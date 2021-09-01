@@ -33,6 +33,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
     }
 
+    public partial class LinkLoopbackService : BaseService<LinkLoopback>, ILinkLoopbackService
+    {
+        public LinkLoopbackService(IBaseRepository<LinkLoopback> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
+        {
+        }
+    }
+
     public partial class LoginRecordService : BaseService<LoginRecord>, ILoginRecordService
     {
         public LoginRecordService(IBaseRepository<LoginRecord> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
