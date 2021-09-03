@@ -43,12 +43,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("special/{id:int}"), Route("c/{id:int}", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Index(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            var s = await SeminarService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            var s = await SeminarService.GetByIdAsync(id) ?? throw new NotFoundException("专题未找到");
             var posts = await PostService.GetQuery(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+            ViewBag.Id = s.Id;
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList, Request.Location());
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
             ViewData["page"] = new Pagination(page, size, posts.TotalCount, orderBy);
             CheckPermission(posts.Data);
             return View(posts);

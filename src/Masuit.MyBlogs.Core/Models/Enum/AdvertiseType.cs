@@ -10,7 +10,7 @@ namespace Masuit.MyBlogs.Core.Models.Enum
         [Description("首页头图")]
         Banner = 1,
         [Description("文章列表")]
-        PostList = 2,
+        ListItem = 2,
         [Description("边栏")]
         SideBar = 3,
         [Description("内页")]

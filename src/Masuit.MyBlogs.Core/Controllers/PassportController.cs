@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using CacheManager.Core;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
@@ -10,11 +11,13 @@ using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Net;
 using System.Web;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -29,6 +32,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 用户
         /// </summary>
         public IUserInfoService UserInfoService { get; set; }
+
+        public IFirewallRepoter FirewallRepoter { get; set; }
 
         /// <summary>
         /// 客户端的真实IP
@@ -124,7 +129,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="remem"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult Login(string username, string password, string valid, string remem)
+        public ActionResult Login([FromServices] ICacheManager<int> cacheManager, string username, string password, string valid, string remem)
         {
             string validSession = HttpContext.Session.Get<string>("valid") ?? string.Empty; //将验证码从Session中取出来，用于登录验证比较
             if (string.IsNullOrEmpty(validSession) || !valid.Trim().Equals(validSession, StringComparison.InvariantCultureIgnoreCase))
@@ -142,6 +147,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             var userInfo = UserInfoService.Login(username, password);
             if (userInfo == null)
             {
+                var times = cacheManager.AddOrUpdate("LoginError:" + ClientIP, 1, i => i + 1, 5);
+                if (times > 30)
+                {
+                    FirewallRepoter.ReportAsync(IPAddress.Parse(ClientIP)).ContinueWith(_ => LogManager.Info($"多次登录用户名或密码错误，疑似爆破行为，已上报IP{ClientIP}至：" + FirewallRepoter.ReporterName));
+                }
+
                 return ResultData(null, false, "用户名或密码错误");
             }
 

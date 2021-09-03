@@ -45,7 +45,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 n.Content = ReplaceVariables(n.Content);
             }
 
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList, Request.Location());
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
             return CurrentUser.IsAdmin ? View("Index_Admin", list.Data) : View(list.Data);
         }
 

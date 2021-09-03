@@ -46,6 +46,9 @@
     <div class="header-content text-center">
         <h1 class="size48">
             @ViewBag.Title
+            <a class="btn btn-lg btn-danger" asp-controller="Subscribe" asp-action="SeminarRss" asp-route-id="@ViewBag.Id" target="_blank">
+                <i class="icon-rss4"></i>
+            </a>
         </h1>
         <div class="divider"></div>
         <p class="size24">

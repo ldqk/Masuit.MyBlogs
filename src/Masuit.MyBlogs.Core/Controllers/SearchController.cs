@@ -62,7 +62,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 CheckPermission(posts.Results);
                 if (posts.Results.Count > 1)
                 {
-                    ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.PostList, Request.Location());
+                    ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
                 }
 
                 ViewBag.hotSearches = new List<KeywordsRank>();

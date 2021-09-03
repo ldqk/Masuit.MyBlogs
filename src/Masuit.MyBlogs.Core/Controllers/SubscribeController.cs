@@ -158,6 +158,59 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
+        /// RSS专题订阅
+        /// </summary>
+        /// <returns></returns>
+        [Route("/special/{id}/rss"), ResponseCache(Duration = 3600)]
+        public async Task<IActionResult> SeminarRss([FromServices] ISeminarService seminarService, int id)
+        {
+            var time = DateTime.Today.AddDays(-1);
+            string scheme = Request.Scheme;
+            var host = Request.Host;
+            var seminar = await seminarService.GetByIdAsync(id) ?? throw new NotFoundException("专题未找到");
+            var raw = PostService.GetQueryFromCache(p => p.Rss && p.Seminar.Any(s => s.Id == id) && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).ToList();
+            CheckPermission(raw);
+            var data = await raw.SelectAsync(async p =>
+            {
+                var summary = await p.Content.GetSummary(300, 50);
+                return new Item()
+                {
+                    Author = new Author
+                    {
+                        Name = p.Modifier
+                    },
+                    Body = summary,
+                    Categories = new List<string>
+                    {
+                        p.Category.Name
+                    },
+                    Link = new Uri(scheme + "://" + host + "/" + p.Id),
+                    PublishDate = p.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone)),
+                    Title = p.Title,
+                    Permalink = scheme + "://" + host + "/" + p.Id,
+                    Guid = p.Id.ToString(),
+                    FullHtmlContent = summary
+                };
+            });
+            var posts = data.ToList();
+            InsertAdvertisement(posts, id);
+            var feed = new Feed()
+            {
+                Title = Request.Host + $":专题{seminar.Title}文章订阅",
+                Description = seminar.Description,
+                Link = new Uri(scheme + "://" + host + "/rss"),
+                Copyright = CommonHelper.SystemSettings["Title"],
+                Language = "zh-cn",
+                Items = posts
+            };
+            var rss = feed.Serialize(new SerializeOption()
+            {
+                Encoding = Encoding.UTF8
+            });
+            return Content(rss, ContentType.Xml);
+        }
+
+        /// <summary>
         /// RSS文章订阅
         /// </summary>
         /// <returns></returns>

@@ -66,7 +66,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.FastShare = fastShares;
             viewModel.PageParams = new Pagination(1, 15, posts.TotalCount, OrderBy.ModifyDate);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
-            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.PostList, Request.Location());
+            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
             return View(viewModel);
         }
 
@@ -92,7 +92,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.Posts = posts;
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
-            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.PostList, Request.Location());
+            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
             return View(viewModel);
         }
 
@@ -115,7 +115,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.Posts = posts;
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
-            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.PostList, Request.Location());
+            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
             return View(viewModel);
         }
 
@@ -140,7 +140,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.Posts = posts;
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
-            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.PostList, Request.Location());
+            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
             return View(viewModel);
         }
 
@@ -163,7 +163,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Category = cat;
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location(), id);
-            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.PostList, Request.Location(), id);
+            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location(), id);
             return View(viewModel);
         }
 
