@@ -72,6 +72,11 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         public bool Rss { get; set; }
 
         /// <summary>
+        /// 锁定编辑
+        /// </summary>
+        public bool Locked { get; set; }
+
+        /// <summary>
         /// 同时浏览人数
         /// </summary>
         public int Online { get; set; }

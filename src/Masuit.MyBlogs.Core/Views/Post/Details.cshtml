@@ -92,9 +92,11 @@
                                             <text> </text>
                                         }
                                     }
-                                    <div class="pull-right">
-                                        <a asp-controller="Post" asp-action="PushMerge" asp-route-id="@Model.Id" class="btn btn-danger">我要编辑</a>
-                                    </div>
+                                    @if (!Model.Locked) {
+                                        <div class="pull-right">
+                                            <a asp-controller="Post" asp-action="PushMerge" asp-route-id="@Model.Id" class="btn btn-danger">我要编辑</a>
+                                        </div>
+                                    }
                                 </div>
                                 @if (DateTime.Now - Model.ModifyDate > TimeSpan.FromDays(365))
                                 {

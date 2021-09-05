@@ -106,6 +106,12 @@
                     <span class="el-switch-style" ng-click="rssSwitch(row.Id)"></span>
                 </label>
             </td>
+            <td data-title="'锁定编辑'" ng-if="aclMode">
+                <label class="el-switch">
+                    <input type="checkbox" name="switch" ng-checked="row.Locked">
+                    <span class="el-switch-style" ng-click="lockedSwitch(row.Id)"></span>
+                </label>
+            </td>
             <td data-title="'操作'" style="width: 160px;">
                 <div class="btn-group">
                     <button class="btn btn-default btn-sm waves-effect" ng-click="list.pass(row)" ng-if="row.Status=='审核中'">

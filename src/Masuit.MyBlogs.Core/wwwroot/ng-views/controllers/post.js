@@ -244,6 +244,16 @@
 			});
 		});
     }
+
+    $scope.lockedSwitch= function(id) {
+        $scope.request("/post/"+id+"/locked-switch",null, function(data) {
+			window.notie.alert({
+				type: 1,
+				text: data.Message,
+				time: 4
+			});
+		});
+    }
 }]);
 myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
 	clearInterval(window.interval);

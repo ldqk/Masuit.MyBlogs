@@ -438,7 +438,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet("{id}/merge")]
         public async Task<ActionResult> PushMerge(int id)
         {
-            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetAsync(p => p.Id == id && !p.Locked) ?? throw new NotFoundException("文章未找到");
             CheckPermission(post);
             return View(post);
         }
@@ -452,7 +452,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet("{id}/merge/{mid}")]
         public async Task<ActionResult> RepushMerge(int id, int mid)
         {
-            var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetAsync(p => p.Id == id && !p.Locked) ?? throw new NotFoundException("文章未找到");
             CheckPermission(post);
             var merge = post.PostMergeRequests.FirstOrDefault(p => p.Id == mid && p.MergeState != MergeStatus.Merged) ?? throw new NotFoundException("待合并文章未找到");
             return View(merge);
@@ -473,7 +473,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "验证码错误！");
             }
 
-            var post = await PostService.GetByIdAsync(dto.PostId) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetAsync(p => p.Id == dto.PostId && !p.Locked) ?? throw new NotFoundException("文章未找到");
             var htmlDiff = new HtmlDiff.HtmlDiff(post.Content.RemoveHtmlTag(), dto.Content.RemoveHtmlTag());
             var diff = htmlDiff.Build();
             if (post.Title.Equals(dto.Title) && !diff.Contains(new[] { "diffmod", "diffdel", "diffins" }))
@@ -1009,6 +1009,22 @@ namespace Masuit.MyBlogs.Core.Controllers
             await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
             {
                 Rss = !p.Rss
+            });
+            return ResultData(null, message: "操作成功");
+        }
+
+        /// <summary>
+        /// 切换锁定编辑
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [MyAuthorize]
+        [HttpPost("post/{id}/locked-switch")]
+        public async Task<ActionResult> LockedSwitch(int id)
+        {
+            await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
+            {
+                Locked = !p.Locked
             });
             return ResultData(null, message: "操作成功");
         }

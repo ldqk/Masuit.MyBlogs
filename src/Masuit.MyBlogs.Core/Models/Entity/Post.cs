@@ -167,6 +167,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public bool Rss { get; set; }
 
         /// <summary>
+        /// À¯∂®±‡º≠
+        /// </summary>
+        public bool Locked { get; set; }
+
+        /// <summary>
         /// ∑÷¿‡
         /// </summary>
         public virtual Category Category { get; set; }
