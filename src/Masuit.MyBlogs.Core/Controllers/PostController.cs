@@ -30,7 +30,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -98,65 +97,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             return View(post);
-        }
-
-        private void CheckPermission(Post post)
-        {
-            if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot())
-            {
-                return;
-            }
-
-            var location = Request.Location() + "|" + string.Join("", Request.Headers.Values);
-            switch (post.LimitMode)
-            {
-                case RegionLimitMode.AllowRegion:
-                    if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
-                    {
-                        Disallow(post);
-                    }
-
-                    break;
-                case RegionLimitMode.ForbidRegion:
-                    if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
-                    {
-                        Disallow(post);
-                    }
-
-                    break;
-                case RegionLimitMode.AllowRegionExceptForbidRegion:
-                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
-                    {
-                        Disallow(post);
-                    }
-
-                    goto case RegionLimitMode.AllowRegion;
-                case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
-                    {
-                        break;
-                    }
-
-                    goto case RegionLimitMode.ForbidRegion;
-            }
-        }
-
-        private void Disallow(Post post)
-        {
-            RedisHelper.IncrBy("interceptCount");
-            RedisHelper.LPush("intercept", new IpIntercepter()
-            {
-                IP = ClientIP,
-                RequestUrl = $"//{Request.Host}/{post.Id}",
-                Referer = Request.Headers[HeaderNames.Referer],
-                Time = DateTime.Now,
-                UserAgent = Request.Headers[HeaderNames.UserAgent],
-                Remark = "无权限查看该文章",
-                Address = Request.Location(),
-                HttpVersion = Request.Protocol,
-                Headers = Request.Headers.ToJsonString()
-            });
-            throw new NotFoundException("文章未找到");
         }
 
         /// <summary>

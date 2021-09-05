@@ -364,6 +364,11 @@
             }
         });
         loadingDone();
+        @if(Model.DisableComment) {
+            <text>
+                $(".msg-list article .panel-body a").remove();
+            </text>
+        }
     };
 
     /**

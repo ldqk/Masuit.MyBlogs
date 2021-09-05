@@ -68,6 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             Post post = await PostService.GetByIdAsync(cmd.PostId) ?? throw new NotFoundException("评论失败，文章未找到");
+            CheckPermission(post);
             if (post.DisableComment)
             {
                 return ResultData(null, false, "本文已禁用评论功能，不允许任何人回复！");

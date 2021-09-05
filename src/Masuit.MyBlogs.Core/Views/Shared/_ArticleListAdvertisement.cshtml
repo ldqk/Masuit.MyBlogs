@@ -1,6 +1,6 @@
 ﻿@using System.Diagnostics
 @model Masuit.MyBlogs.Core.Models.Entity.Advertisement
-<div class="ibox">
+<div class="ibox wow fadeIn" id="@Stopwatch.GetTimestamp()">
     <div class="ibox-content" id="@Stopwatch.GetTimestamp()">
         <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
             <h4>
