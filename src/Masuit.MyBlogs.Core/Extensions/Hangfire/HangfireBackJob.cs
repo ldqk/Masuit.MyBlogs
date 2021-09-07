@@ -208,18 +208,19 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void UpdateLinkWeight(string referer, string ip)
         {
             var uri = new Uri(referer);
-            _linksService.GetQuery(l => l.Url.Contains(uri.Host)).AsParallel().ForAll(l =>
+            var list = _linksService.GetQuery(l => l.Url.Contains(uri.Host)).ToList();
+            foreach (var link in list)
             {
-                l.Loopbacks.Add(new LinkLoopback()
+                link.Loopbacks.Add(new LinkLoopback()
                 {
                     IP = ip,
                     Referer = referer,
                     Time = DateTime.Now
                 });
-            });
-            _linksService.SaveChanges();
+            }
             var time = DateTime.Now.AddMonths(-1);
             _loopbackService.GetQuery(b => b.Time < time).DeleteFromQuery();
+            _linksService.SaveChanges();
         }
 
         /// <summary>

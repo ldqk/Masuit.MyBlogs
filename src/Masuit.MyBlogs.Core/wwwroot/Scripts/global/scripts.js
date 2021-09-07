@@ -209,18 +209,19 @@ function CopyrightProtect() {
                     return false;
                 }
             }
-            document.ondragstart=async function () {
+            document.ondragstart=function (e) {
+                e.returnValue = false;
                 hackClip();
                 return false;
             }
             $(".article-content").on("copy",function (e) {
-                hackClip();
                 e.returnValue = false;
+                hackClip();
                 return false;
             });
             document.oncontextmenu = function (e) {
-                hackClip();
                 e.returnValue = false;
+                hackClip();
                 return false;
             }
         } catch (ex) {
@@ -245,13 +246,13 @@ function CopyrightProtect4Editor() {
                 }
             }
             document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function (e) {
-                hackClip();
                 e.returnValue = false;
+                hackClip();
                 return false;
             }
             document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function (e) {
-                hackClip();
                 e.returnValue = false;
+                hackClip();
                 return false;
             }
         } catch (ex) {
@@ -268,9 +269,9 @@ function GlobalCopyrightProtect() {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
                 if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83)|| (evt.ctrlKey && currKey == 85)) { //禁止F12，Ctrl+C，Ctrl+U
-                    clearSelect();
                     evt.cancelBubble = true;
                     evt.returnValue = false;
+                    clearSelect();
                     return false;
                 }
             });
@@ -278,24 +279,25 @@ function GlobalCopyrightProtect() {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
                 if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
-                    clearSelect();
                     evt.cancelBubble = true;
                     evt.returnValue = false;
+                    clearSelect();
                     return false;
                 }
             }
-            document.ondragstart=function () {
+            document.ondragstart=function (e) {
+                e.returnValue = false;
                 hackClip();
                 return false;
             }
             $(".article-content").on("copy",function (e) {
-                hackClip();
                 e.returnValue = false;
+                hackClip();
                 return false;
             });
             document.oncontextmenu = function () {
-                hackClip();
                 event.returnValue = false;
+                hackClip();
                 return false;
             }
         } catch (ex) {

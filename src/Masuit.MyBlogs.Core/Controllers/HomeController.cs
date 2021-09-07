@@ -107,8 +107,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("tag/{tag}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Tag(string tag, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            tag = tag.Replace(",", "|").Replace("，", "|").Split('|').Select(Regex.Escape).Join("|");
-            var posts = await PostService.GetQuery(p => Regex.IsMatch(p.Label, tag) && p.Status == Status.Published).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+            Expression<Func<Post, bool>> where = p => p.Status == Status.Published;
+            var posts = await PostService.GetQuery(tag.Split(",").Aggregate(where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s)))).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
             CheckPermission(posts.Data);
             var viewModel = await GetIndexPageViewModel();
             ViewBag.Tag = tag;
