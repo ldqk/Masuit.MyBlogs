@@ -83,7 +83,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     }
                     catch
                     {
-                        context.Response.StatusCode = 504;
+                        context.Response.StatusCode = 405;
                         context.Response.ContentType = "text/html; charset=utf-8";
                         return context.Response.WriteAsync("您的浏览器不支持访问本站！", Encoding.UTF8);
                     }

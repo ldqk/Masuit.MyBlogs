@@ -89,6 +89,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             CheckPermission(posts.Data);
+            while (posts.CurrentCount < 5 && posts.HasNext)
+            {
+                page++;
+                var tempPage = await postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+                CheckPermission(tempPage.Data);
+                posts.Data.AddRange(tempPage.Data);
+                posts.CurrentPage++;
+            }
+
             viewModel.Posts = posts;
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
@@ -110,6 +119,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             Expression<Func<Post, bool>> where = p => p.Status == Status.Published;
             var posts = await PostService.GetQuery(tag.Split(",").Aggregate(where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s)))).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
             CheckPermission(posts.Data);
+            while (posts.CurrentCount < 5 && posts.HasNext)
+            {
+                page++;
+                var tempPage = await PostService.GetQuery(tag.Split(",").Aggregate(where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s)))).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+                CheckPermission(tempPage.Data);
+                posts.Data.AddRange(tempPage.Data);
+                posts.CurrentPage++;
+            }
+
             var viewModel = await GetIndexPageViewModel();
             ViewBag.Tag = tag;
             viewModel.Posts = posts;
@@ -134,6 +152,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             where = where.And(p => p.Status == Status.Published);
             var posts = await PostService.GetQuery(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
             CheckPermission(posts.Data);
+            while (posts.CurrentCount < 5 && posts.HasNext)
+            {
+                page++;
+                var tempPage = await PostService.GetQuery(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+                CheckPermission(tempPage.Data);
+                posts.Data.AddRange(tempPage.Data);
+                posts.CurrentPage++;
+            }
+
             var viewModel = await GetIndexPageViewModel();
             ViewBag.Author = author;
             ViewBag.Total = posts.TotalCount;
@@ -158,6 +185,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
             var posts = await PostService.GetQuery(p => p.CategoryId == cat.Id && p.Status == Status.Published).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
             CheckPermission(posts.Data);
+            while (posts.CurrentCount < 5 && posts.HasNext)
+            {
+                page++;
+                var tempPage = await PostService.GetQuery(p => p.CategoryId == cat.Id && p.Status == Status.Published).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+                CheckPermission(tempPage.Data);
+                posts.Data.AddRange(tempPage.Data);
+                posts.CurrentPage++;
+            }
+
             var viewModel = await GetIndexPageViewModel();
             viewModel.Posts = posts;
             ViewBag.Category = cat;

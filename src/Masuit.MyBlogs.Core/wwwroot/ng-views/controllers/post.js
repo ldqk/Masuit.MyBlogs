@@ -779,12 +779,13 @@ myApp.controller("category", ["$scope", "$http", "NgTableParams", function ($sco
 			}
 		}).catch(swal.noop);
 	}
+
 	self.edit = function (row) {
 		swal({
 			title: '修改分类',
 			html:
 			'<div class="input-group"><span class="input-group-addon">分类名称： </span><input id="name" type="text" class="form-control input-lg" autofocus placeholder="请输入新的分类名" value="'+row.Name+'"></div>' +
-			'<div class="input-group"><span class="input-group-addon">分类描述： </span><input id="desc" type="text" class="form-control input-lg" placeholder="请输入分类描述" value="'+row.Description+'"></div>',
+			'<div class="input-group"><span class="input-group-addon">分类描述： </span><textarea id="desc" type="text" class="form-control input-lg" placeholder="请输入分类描述"" rows="4">'+row.Description+'</textarea></div>',
 			showCloseButton: true,
 			showCancelButton: true,
 			confirmButtonColor: "#DD6B55",

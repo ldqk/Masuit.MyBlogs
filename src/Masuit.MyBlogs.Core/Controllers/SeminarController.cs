@@ -8,7 +8,6 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -45,13 +44,22 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var s = await SeminarService.GetByIdAsync(id) ?? throw new NotFoundException("专题未找到");
             var posts = await PostService.GetQuery(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+            CheckPermission(posts.Data);
+            while (posts.CurrentCount < 5 && posts.HasNext)
+            {
+                page++;
+                var tempPage = await PostService.GetQuery(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+                CheckPermission(tempPage.Data);
+                posts.Data.AddRange(tempPage.Data);
+                posts.CurrentPage++;
+            }
+
             ViewBag.Id = s.Id;
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
             ViewData["page"] = new Pagination(page, size, posts.TotalCount, orderBy);
-            CheckPermission(posts.Data);
             return View(posts);
         }
 
