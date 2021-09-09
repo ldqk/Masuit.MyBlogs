@@ -42,5 +42,10 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 提交时间
         /// </summary>
         public DateTime SubmitTime { get; set; }
+
+        /// <summary>
+        /// 提交人IP
+        /// </summary>
+        public string IP { get; set; }
     }
 }

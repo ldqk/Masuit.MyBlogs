@@ -461,7 +461,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 merge.SubmitTime = DateTime.Now;
                 post.PostMergeRequests.Add(merge);
             }
-
+            merge.IP = ClientIP;
             var b = await PostService.SaveChangesAsync() > 0;
             if (!b)
             {

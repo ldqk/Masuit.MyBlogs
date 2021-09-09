@@ -47,5 +47,10 @@ namespace Masuit.MyBlogs.Core.Models.Entity
 
         [ForeignKey("PostId")]
         public virtual Post Post { get; set; }
+
+        /// <summary>
+        /// Ã·Ωª»ÀIP
+        /// </summary>
+        public string IP { get; set; }
     }
 }

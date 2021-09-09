@@ -21,7 +21,7 @@
                 <a ng-href="/{{row.PostId}}" target="_blank">{{row.PostTitle}}</a>
             </td>
             <td title="'新标题'">
-                <a ng-href="/{{row.PostId}}" target="_blank">{{row.Title}}</a>
+                <a ng-href="#/merge/compare?id={{row.Id}}" target="_blank">{{row.Title}}</a>
             </td>
             <td title="'修改人'">
                 <a ng-href="/author/{{row.Modifier}}" target="_blank">{{row.Modifier}}</a>
@@ -31,6 +31,10 @@
             </td>
             <td title="'提交时间'">
                 {{row.SubmitTime|date:'yyyy-MM-dd HH:mm:ss'}}
+            </td>
+            <td title="'IP'">
+                <a ng-href="/tools/ip/{{row.IP}}" target="_blank">{{row.IP}}</a>
+                <button class="badge btn btn-primary pull-right" ng-click="addToBlackList(row.IP)">黑名单</button>
             </td>
             <td title="'状态'">
                 <span ng-if="row.MergeState==0" class="text-warning">待合并</span>

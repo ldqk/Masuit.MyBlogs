@@ -92,34 +92,4 @@
 			}, function() {
 			}).catch(swal.noop);
 		}
-		$scope.addToBlackList = function(ip) {
-			swal({
-				title: "确认添加黑名单吗？",
-				text: "将"+ip+"添加到黑名单",
-				showCancelButton: true,
-				confirmButtonColor: "#DD6B55",
-				confirmButtonText: "确定",
-				cancelButtonText: "取消",
-				animation: true,
-				allowOutsideClick: false,
-				showLoaderOnConfirm: true,
-				preConfirm: function () {
-					return new Promise(function (resolve, reject) {
-						$http.post("/system/AddToBlackList", {ip}, {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						}).then(function(res) {
-							resolve(res.data);
-						}, function() {
-							reject("请求服务器失败！");
-						});
-					});
-				}
-			}).then(function (data) {
-				if (data.Success) {
-					swal("添加成功",'','success');
-				} else {
-					swal("添加失败",'','error');
-				}
-			}).catch(swal.noop);
-		}
 	}]);

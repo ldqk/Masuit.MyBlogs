@@ -128,17 +128,17 @@
                             </button>
                         </div>
                     </div>
-                    <div class="col-xs-6 text-right">
-                        @if (Model.Rss) {
+                    @if (Model.Rss) {
+                        <div class="col-xs-6 text-right">
                             <div class="btn-group">
                                 <a class="btn btn-danger btn-lg" asp-controller="Subscribe" asp-action="PostRss" asp-route-id="@Model.Id" target="_blank">
                                     <i class="icon-rss4"></i><span>订阅本文更新</span>
                                 </a>
                             </div>
-                        }
-                    </div>
-                    <div class="col-xs-6">
-                        <p class="text-red">如果你喜欢这篇文章，欢迎点赞或分享本文！</p>
+                        </div>
+                    }
+                    <div class="col-xs-12">
+                        <p class="text-red">如果你喜欢这篇文章，欢迎点赞、评论、分享本文！</p>
                     </div>
                 </section>
                 <section class="wow fadeInUp row size16">
