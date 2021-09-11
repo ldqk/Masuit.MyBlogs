@@ -126,7 +126,6 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Content/common/style.css")
                     .Include("/Content/common/articlestyle.css")
                     .Include("/Content/common/leaderboard.css")
-                    .Include("/Content/microtip.min.css")
                     .Include("/Assets/breadcrumb/style.css")
                     .Include("/Assets/nav/css/style.css");
                 bundles.AddCss("/filemanager.css")
@@ -141,7 +140,6 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Assets/jedate/jedate.css")
                     .Include("/Assets/fileupload/filestyle.css")
                     .Include("/Content/common/loading.min.css")
-                    .Include("/Content/microtip.min.css")
                     .Include("/Content/checkbox.min.css")
                     .Include("/ng-views/css/app.css");
                 bundles.AddCss("/article.css")

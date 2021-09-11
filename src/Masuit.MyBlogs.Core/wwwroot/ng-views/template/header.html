@@ -32,23 +32,23 @@
         <ul class="top-menu">
 
             <li id="toggle-width">
-                <div class="toggle-switch" data-microtip="切换宽屏" data-microtip-position="bottom">
+                <div class="toggle-switch">
                     <input id="tw-switch" type="checkbox" hidden="hidden" data-change-layout="mactrl.layoutType">
                     <label for="tw-switch" class="ts-helper"></label>
                 </div>
             </li>
 
             <li>
-                <a href="/" ng-click="loading()" data-microtip="回主页" data-microtip-position="bottom"><i class="tm-icon zmdi zmdi-home"></i></a>
+                <a href="/" ng-click="loading()"><i class="tm-icon zmdi zmdi-home"></i></a>
             </li>
             <li>
-                <a data-ui-sref="write-blog" data-microtip="写文章" data-microtip-position="bottom"><i class="tm-icon zmdi zmdi-edit"></i></a>
+                <a data-ui-sref="write-blog"><i class="tm-icon zmdi zmdi-edit"></i></a>
             </li>
             <li>
-                <a data-ui-sref="filemanager" data-microtip="资源管理器" data-microtip-position="bottom"><i class="tm-icon zmdi zmdi-archive"></i></a>
+                <a data-ui-sref="filemanager"><i class="tm-icon zmdi zmdi-archive"></i></a>
             </li>
             <li>
-                <a data-ui-sref="taskcenter" data-microtip="任务管理器" data-microtip-position="bottom"><i class="tm-icon zmdi zmdi-view-list"></i></a>
+                <a data-ui-sref="taskcenter"><i class="tm-icon zmdi zmdi-view-list"></i></a>
             </li>
             <li class="dropdown" uib-dropdown ng-if="Msgs.post.length>0">
                 <a uib-dropdown-toggle href="">

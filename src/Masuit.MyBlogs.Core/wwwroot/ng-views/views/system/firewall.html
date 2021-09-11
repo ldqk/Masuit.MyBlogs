@@ -100,7 +100,7 @@
     <table class="table table-bordered table-condensed table-hover" disable-filter="list.isAdding" ng-form="list.tableForm" ng-table="list.tableParams" tracked-table="list.tableTracker">
         <tr ng-form="rowForm" ng-repeat="row in $data" tracked-table-row="row">
             <td filter="{IP: 'text'}" sortable="'IP'" title="'IP'">
-                <a data-microtip="查看{{row.IP}}的详细信息" data-microtip-position="bottom" ng-href="/tools/ip/{{row.IP}}" style="font-size: 20px;" target="_blank">{{row.IP}}</a>
+                <a ng-href="/tools/ip/{{row.IP}}" style="font-size: 20px;" target="_blank">{{row.IP}}</a>
                 <button class="badge btn btn-primary pull-right" ng-click="addToWhiteList(row.IP)">添加到白名单</button>
             </td>
             <td filter="{Address: 'text'}" title="'IP地理位置'">
