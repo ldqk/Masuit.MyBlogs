@@ -218,7 +218,7 @@ namespace Masuit.MyBlogs.Core.Common
                         var network = parts[^1] == "0" ? asn.AutonomousSystemOrganization : parts[^1] + "/" + asn.AutonomousSystemOrganization;
                         parts[0] = parts[0] != "0" ? parts[0] : countryName;
                         parts[3] = parts[3] != "0" ? parts[3] : cityName;
-                        return new IPLocation(parts[0], parts[2], parts[3], network.TrimEnd('/'), asn.AutonomousSystemNumber)
+                        return new IPLocation(parts[0], parts[2], parts[3], network?.TrimEnd('/'), asn.AutonomousSystemNumber)
                         {
                             Address2 = countryName + cityName,
                             Coodinate = city.Location
