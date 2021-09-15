@@ -3,8 +3,8 @@ using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
-using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
@@ -179,9 +179,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 100, VaryByQueryKeys = new[] { "email" })]
         public ActionResult GetViewToken([FromServices] IUserInfoService userInfoService, string email)
         {
-            if (string.IsNullOrEmpty(email) || !email.MatchEmail().isMatch)
+            var validator = new IsEmailAttribute();
+            if (!validator.IsValid(email))
             {
-                return ResultData(null, false, "请输入正确的邮箱！");
+                return ResultData(null, false, validator.ErrorMessage);
             }
 
             if (RedisHelper.Exists("get:" + email))

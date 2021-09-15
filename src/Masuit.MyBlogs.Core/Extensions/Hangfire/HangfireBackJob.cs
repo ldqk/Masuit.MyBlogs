@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire
@@ -171,7 +170,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void CheckLinks()
         {
             var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+            client.DefaultRequestHeaders.UserAgent.TryParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.47");
             client.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
             client.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
             client.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");

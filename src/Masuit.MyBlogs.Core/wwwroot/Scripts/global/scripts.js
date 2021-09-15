@@ -224,6 +224,11 @@ function CopyrightProtect() {
                 hackClip();
                 return false;
             }
+
+            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {  
+                // 如果打开控制台，则刷新页面
+                window.location.reload();  
+            }
         } catch (ex) {
             console.error(ex);
         }
@@ -254,6 +259,11 @@ function CopyrightProtect4Editor() {
                 e.returnValue = false;
                 hackClip();
                 return false;
+            }
+
+            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {  
+                // 如果打开控制台，则刷新页面
+                window.location.reload();  
             }
         } catch (ex) {
             console.error(ex);
@@ -299,6 +309,10 @@ function GlobalCopyrightProtect() {
                 event.returnValue = false;
                 hackClip();
                 return false;
+            }
+            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {  
+                // 如果打开控制台，则刷新页面
+                window.location.reload();  
             }
         } catch (ex) {
             console.error(ex);

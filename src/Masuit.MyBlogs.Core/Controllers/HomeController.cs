@@ -113,7 +113,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        [Route("tag/{tag}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
+        [Route("tag/{tag}"), Route("tag", Order = 2), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Tag(string tag, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             Expression<Func<Post, bool>> where = p => p.Status == Status.Published;
@@ -163,7 +163,6 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var viewModel = await GetIndexPageViewModel();
             ViewBag.Author = author;
-            ViewBag.Total = posts.TotalCount;
             viewModel.Posts = posts;
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());

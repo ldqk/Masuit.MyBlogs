@@ -20,6 +20,7 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.MyBlogs.Core.Views.Post;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Html;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Logging;
@@ -346,9 +347,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall]
         public ActionResult GetViewToken(string email)
         {
-            if (string.IsNullOrEmpty(email) || !email.MatchEmail().isMatch)
+            var validator = new IsEmailAttribute();
+            if (!validator.IsValid(email))
             {
-                return ResultData(null, false, "请输入正确的邮箱！");
+                return ResultData(null, false, validator.ErrorMessage);
             }
 
             if (RedisHelper.Exists("get:" + email))
@@ -721,6 +723,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             p.Modifier = p.Author;
             p.ModifierEmail = p.Email;
             p.IP = ClientIP;
+            p.Rss = p.LimitMode is null or RegionLimitMode.All;
             if (!string.IsNullOrEmpty(post.Seminars))
             {
                 var tmp = post.Seminars.Split(',').Distinct();

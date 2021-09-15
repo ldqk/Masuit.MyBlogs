@@ -40,27 +40,25 @@
             return;
         }
         if ($("#Author").val().trim().length <= 1 || $("#Author").val().trim().length > 24) {
-	        window.notie.alert({
-		        type: 3,
-                text: '昵称不能少于2个字符或超过36个字符！',
-		        time: 4
-	        });
+	        layer.tips('昵称不能少于2个字符或超过36个字符！', '#Author', {
+                tips: [1, '#d9534f'],
+                time: 5000
+            });
             loadingDone();
             return;
         }
         if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($("#Email").val().trim())) {
-	        window.notie.alert({
-		        type: 3,
-                text: '请输入正确的邮箱格式！',
-		        time: 4
-	        });
+	        layer.tips('请输入正确的邮箱格式！', '#Email', {
+                tips: [1, '#d9534f'],
+                time: 5000
+            });
             loadingDone();
             return;
         }
         if (ue.getContent().length < 20 || ue.getContent().length > 1000000) {
 	        window.notie.alert({
 		        type: 3,
-                text: '文章内容过短或者超长的，请修改后再提交！',
+                text: '文章内容过短或者超长，请修改后再提交！',
 		        time: 4
 	        });
             loadingDone();
@@ -119,7 +117,7 @@
                 }, 1000);
             } else {
                 layer.tips(data.Message, '#getcode', {
-                  tips: [1, '#3595CC'],
+                  tips: [1, '#d9534f'],
                   time: 4000
                 });
                 $("#getcode").attr('disabled', false);

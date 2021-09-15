@@ -116,17 +116,12 @@
 	}
 	self.check= function(link) {
 		$scope.request("/links/check", {
-			link
+			link:link.Url
 		}, function (data) {
-			if (data.Success) {
-				window.notie.alert({
-					type: 1,
-					text: data.Message,
-					time: 4
-				});
-			} else {
-				swal(data.Message, "", "error");
-			}
+			layer.tips(data.Message, '#link-'+link.Id, {
+                tips: [1, '#3595CC'],
+                time: 5000
+            });
 		});
 	}
 	$scope.toggleWhite= function(row) {

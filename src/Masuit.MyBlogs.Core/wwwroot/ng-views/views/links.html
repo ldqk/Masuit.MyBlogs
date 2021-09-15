@@ -65,7 +65,7 @@
                     <button class="btn btn-danger btn-sm waves-effect" ng-click="list.del(row)" ng-if="!row.isEditing">
                         <i class="icon-cross"></i>
                     </button>
-                    <button class="btn btn-info btn-sm waves-effect" ng-click="list.check(row.Url)" ng-if="!row.isEditing">
+                    <button class="btn btn-info btn-sm waves-effect" id="link-{{row.Id}}" ng-click="list.check(row)" ng-if="!row.isEditing">
                         <i class="icon-shuffle"></i>
                     </button>
                 </div>

@@ -11,7 +11,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -51,13 +50,18 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "添加失败！链接非法！");
             }
 
+            if (links.Url.Contains(new[] { "?", "&", "=" }))
+            {
+                return ResultData(null, false, "添加失败！请移除链接中的查询字符串后再试！如遇特殊情况，请联系站长进行处理。");
+            }
+
             var host = new Uri(links.Url).Host;
             if (LinksService.Any(l => l.Url.Contains(host)))
             {
                 return ResultData(null, false, "添加失败！检测到您的网站已经是本站的友情链接了！");
             }
 
-            HttpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+            HttpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.47");
             HttpClient.DefaultRequestHeaders.Referrer = new Uri(Request.Scheme + "://" + Request.Host);
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
@@ -81,21 +85,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     return ResultData(null, false, $"添加失败！检测到您的网站上未将本站设置成友情链接，请先将本站主域名：{Request.Host}在您的网站设置为友情链接，并且能够展示后，再次尝试添加即可！");
                 }
 
-                var entry = await LinksService.GetAsync(l => l.Url.Equals(links.Url));
-                bool b;
-                if (entry is null)
-                {
-                    b = LinksService.AddEntitySaved(links) != null;
-                }
-                else
-                {
-                    entry.Url = links.Url;
-                    entry.Except = links.Except;
-                    entry.Name = links.Name;
-                    entry.Recommend = links.Recommend;
-                    b = await LinksService.SaveChangesAsync() > 0;
-                }
-
+                var b = LinksService.AddEntitySaved(links) != null;
                 return ResultData(null, b, b ? "添加成功！这可能有一定的延迟，如果没有看到您的链接，请稍等几分钟后刷新页面即可，如有疑问，请联系站长。" : "添加失败！这可能是由于网站服务器内部发生了错误，如有疑问，请联系站长。");
             });
         }
@@ -108,21 +98,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Add(Links links)
         {
-            var entry = await LinksService.GetByIdAsync(links.Id);
-            bool b;
-            if (entry is null)
-            {
-                b = await LinksService.AddEntitySavedAsync(links) > 0;
-            }
-            else
-            {
-                entry.Url = links.Url;
-                entry.Except = links.Except;
-                entry.Name = links.Name;
-                entry.Recommend = links.Recommend;
-                b = await LinksService.SaveChangesAsync() > 0;
-            }
-
+            bool b = await LinksService.AddOrUpdateSavedAsync(l => l.Id, links) > 0;
             return b ? ResultData(null, message: "添加成功！") : ResultData(null, false, "添加失败！");
         }
 
@@ -134,7 +110,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Check(string link)
         {
-            HttpClient.DefaultRequestHeaders.UserAgent.Add(ProductInfoHeaderValue.Parse("Mozilla/5.0"));
+            HttpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.47");
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
@@ -143,7 +119,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {
-                    return ResultData(null, false, link + " 似乎挂了！错误信息：" + t.Exception?.Message);
+                    return ResultData(null, false, link + " 似乎挂了！错误信息：" + t.Exception?.Flatten().InnerException?.Message);
                 }
 
                 using var res = t.Result;

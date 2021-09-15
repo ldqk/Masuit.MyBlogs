@@ -15,8 +15,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="email"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" })]
-        public async Task<ActionResult> SendCode([IsEmail] string email)
+        public async Task<ActionResult> SendCode(string email)
         {
+            var validator = new IsEmailAttribute();
+            if (!validator.IsValid(email))
+            {
+                return ResultData(null, false, validator.ErrorMessage);
+            }
+
             if (await RedisHelper.ExistsAsync("get:" + email))
             {
                 await RedisHelper.ExpireAsync("get:" + email, 120);

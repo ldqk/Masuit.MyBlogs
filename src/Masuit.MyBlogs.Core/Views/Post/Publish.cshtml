@@ -15,8 +15,12 @@
         <li><a asp-controller="Home" asp-action="Index">首页</a></li>
         <li class="current"><em>@ViewBag.Title</em></li>
     </ol>
-    <p class="text-red size20">投稿须知：投稿前请先站内搜索同类文章进行编辑修改操作，本页的重复投稿将不会接受，作直接删除处理！</p>
-    <hr />
+    <p class="text-red size20">
+        投稿须知：投稿前请先站内搜索同类文章进行编辑修改操作，本页的重复投稿将不会接受，作直接删除处理！<br/>
+        投稿通过后若文章的内容有任何更新，请及时修改更新，若后期发现内容有更新而长期未更新的，作删除处理！<br/>
+        投稿通过后若文章的评论区有任何问题，长期未回复解释情况的，文章将作删除处理！
+    </p>
+    <hr/>
     <form class="form-group" id="article-form" method="post" onsubmit="return false">
         @*文章表单*@
         @Html.AntiForgeryToken()
