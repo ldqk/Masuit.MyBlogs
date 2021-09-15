@@ -73,7 +73,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Organization = loc.ISP
                 },
                 TimeZone = loc.Coodinate.TimeZone + $"  UTC{TZConvert.GetTimeZoneInfo(loc.Coodinate.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}",
-                IsProxy = loc.Network.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business" }) || domain.Length > 1 || await ipAddress.IsProxy(cts.Token),
+                IsProxy = loc.Network.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business", "ASN" }) || domain.Length > 1 || await ipAddress.IsProxy(cts.Token),
                 Domain = domain
             };
             if (Request.Method.Equals(HttpMethods.Get) || (Request.Headers[HeaderNames.Accept] + "").StartsWith(ContentType.Json))
