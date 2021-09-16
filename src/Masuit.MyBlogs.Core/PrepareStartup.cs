@@ -29,6 +29,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core
@@ -96,7 +97,14 @@ namespace Masuit.MyBlogs.Core
                 app.UseHttpsRedirection();
             }
 
-            var options = new RewriteOptions().AddRewrite(@"\w+/_blazor(.*)", "_blazor$1", true);
+            var options = new RewriteOptions().Add(c =>
+            {
+                if (c.HttpContext.Request.Path.Equals("/tag") && c.HttpContext.Request.Query.ContainsKey("tag"))
+                {
+                    c.Result = RuleResult.EndResponse;
+                    c.HttpContext.Response.Redirect("/tag/" + HttpUtility.UrlEncode(c.HttpContext.Request.Query["tag"]), true);
+                }
+            }).AddRewrite(@"\w+/_blazor(.*)", "_blazor$1", true);
             switch (config["UseRewriter"])
             {
                 case "NonWww":

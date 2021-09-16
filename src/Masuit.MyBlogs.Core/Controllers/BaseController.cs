@@ -133,11 +133,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 filterContext.Result = ResultData("网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", false, "网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", user != null, HttpStatusCode.BadRequest);
             }
 
-            if (user == null && Request.Cookies.Any(x => x.Key == "username" || x.Key == "password")) //执行自动登录
+            if (user == null && Request.Cookies.ContainsKey("username") && Request.Cookies.ContainsKey("password")) //执行自动登录
             {
-                string name = Request.Cookies["username"];
-                string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.BaiduAK);
-                var userInfo = UserInfoService.Login(name, pwd);
+                var name = Request.Cookies["username"];
+                var pwd = Request.Cookies["password"];
+                var userInfo = UserInfoService.Login(name, pwd.DesDecrypt(AppConfig.BaiduAK));
                 if (userInfo != null)
                 {
                     Response.Cookies.Append("username", name, new CookieOptions
@@ -145,7 +145,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         Expires = DateTime.Now.AddYears(1),
                         SameSite = SameSiteMode.Lax
                     });
-                    Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions
+                    Response.Cookies.Append("password", pwd, new CookieOptions
                     {
                         Expires = DateTime.Now.AddYears(1),
                         SameSite = SameSiteMode.Lax
@@ -155,16 +155,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             if (ModelState.IsValid) return;
-            var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).ToList();
-            if (errmsgs.Any())
+            var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).Select((s, i) => $"{i + 1}. {s}").ToList();
+            filterContext.Result = true switch
             {
-                for (var i = 0; i < errmsgs.Count; i++)
-                {
-                    errmsgs[i] = i + 1 + ". " + errmsgs[i];
-                }
-            }
-
-            filterContext.Result = ResultData(errmsgs, false, "数据校验失败，错误信息：" + errmsgs.Join(" | "), user != null, HttpStatusCode.BadRequest);
+                _ when (Request.Headers[HeaderNames.Accept] + "").StartsWith("application/json") || Request.Method == HttpMethods.Post => ResultData(errmsgs, false, "数据校验失败，错误信息：" + errmsgs.Join(" | "), user != null, HttpStatusCode.BadRequest),
+                _ => base.BadRequest("参数错误：" + errmsgs.Join(" | "))
+            };
         }
 
         /// <summary>在调用操作方法后调用。</summary>
