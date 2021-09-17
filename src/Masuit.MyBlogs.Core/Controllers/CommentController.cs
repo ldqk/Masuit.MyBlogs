@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
@@ -120,7 +121,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var emails = new HashSet<string>();
             var email = CommonHelper.SystemSettings["ReceiveEmail"]; //站长邮箱
             emails.Add(email);
-            var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/notify.html"))
+            var content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/notify.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8))
                 .Set("title", post.Title)
                 .Set("time", DateTime.Now.ToTimeZoneF(HttpContext.Session.Get<string>(SessionKey.TimeZone)))
                 .Set("nickname", comment.NickName)
@@ -281,7 +282,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             bool b = await CommentService.SaveChangesAsync() > 0;
             if (b)
             {
-                var content = new Template(await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")))
+                var content = new Template(await new FileInfo(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8))
                     .Set("title", post.Title)
                     .Set("time", DateTime.Now.ToTimeZoneF(HttpContext.Session.Get<string>(SessionKey.TimeZone)))
                     .Set("nickname", comment.NickName)

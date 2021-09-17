@@ -1,11 +1,14 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Files;
 using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Polly;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -50,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             if (System.IO.File.Exists(filename))
             {
-                string text = System.IO.File.ReadAllText(filename);
+                string text = new FileInfo(filename).ShareReadWrite().ReadAllText(Encoding.UTF8);
                 return ResultData(text);
             }
             return ResultData(null, false, "文件不存在！");
@@ -66,7 +69,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             try
             {
-                System.IO.File.WriteAllText(filename, content);
+                new FileInfo(filename).ShareReadWrite().WriteAllText(content, Encoding.UTF8);
                 return ResultData(null, message: "保存成功");
             }
             catch (IOException e)
@@ -132,11 +135,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                         s = Path.Combine(root, s.TrimStart('\\', '/'));
                         try
                         {
-                            System.IO.File.Delete(s);
+                            Policy.Handle<IOException>().WaitAndRetry(5, i => TimeSpan.FromSeconds(1)).Execute(() => System.IO.File.Delete(s));
                         }
                         catch
                         {
-                            Directory.Delete(s, true);
+                            Policy.Handle<IOException>().WaitAndRetry(5, i => TimeSpan.FromSeconds(1)).Execute(() => Directory.Delete(s, true));
                         }
                     });
                     list.Add(new
@@ -196,7 +199,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     });
                     break;
                 case "edit":
-                    System.IO.File.WriteAllText(Path.Combine(root, req.Item.TrimStart('\\', '/')), req.Content, Encoding.UTF8);
+                    new FileInfo(Path.Combine(root, req.Item.TrimStart('\\', '/'))).ShareReadWrite().WriteAllText(req.Content, Encoding.UTF8);
                     list.Add(new
                     {
                         success = "true"
@@ -205,7 +208,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 case "getContent":
                     return Json(new
                     {
-                        result = System.IO.File.ReadAllText(Path.Combine(root, req.Item.TrimStart('\\', '/')), Encoding.UTF8)
+                        result = new FileInfo(Path.Combine(root, req.Item.TrimStart('\\', '/'))).ShareReadWrite().ReadAllText(Encoding.UTF8)
                     });
                 case "createFolder":
                     list.Add(new

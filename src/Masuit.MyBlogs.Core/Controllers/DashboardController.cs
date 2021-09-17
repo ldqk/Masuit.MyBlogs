@@ -1,10 +1,14 @@
 ﻿using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools;
 using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Polly;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -82,7 +86,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             if (System.IO.File.Exists(Path.Combine(LogManager.LogDirectory, filename)))
             {
-                string text = System.IO.File.ReadAllText(Path.Combine(LogManager.LogDirectory, filename));
+                string text = new FileInfo(Path.Combine(LogManager.LogDirectory, filename)).ShareReadWrite().ReadAllText(Encoding.UTF8);
                 return ResultData(text);
             }
             return ResultData(null, false, "文件不存在！");
@@ -95,15 +99,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult DeleteFile(string filename)
         {
-            try
-            {
-                System.IO.File.Delete(Path.Combine(LogManager.LogDirectory, filename));
-                return ResultData(null, message: "文件删除成功!");
-            }
-            catch (IOException)
-            {
-                return ResultData(null, false, "文件删除失败！");
-            }
+            Policy.Handle<IOException>().WaitAndRetry(5, i => TimeSpan.FromSeconds(1)).Execute(() => System.IO.File.Delete(Path.Combine(LogManager.LogDirectory, filename)));
+            return ResultData(null, message: "文件删除成功!");
         }
 
         /// <summary>

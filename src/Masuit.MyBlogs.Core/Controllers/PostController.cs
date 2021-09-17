@@ -34,9 +34,11 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -274,7 +276,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             await RedisHelper.ExpireAsync("code:" + p.Email, 1);
-            var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/publish.html"))
+            var content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/publish.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8))
                 .Set("link", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
                 .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Set("title", p.Title).Render();
@@ -477,7 +479,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Content = dto.Title,
                 Link = "#/merge/compare?id=" + merge.Id
             });
-            var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/merge-request.html"))
+            var content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/merge-request.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8))
                 .Set("title", post.Title)
                 .Set("link", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id)
                 .Set("diff", diff)

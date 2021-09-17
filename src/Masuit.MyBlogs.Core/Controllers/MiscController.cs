@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -55,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (bool.Parse(CommonHelper.SystemSettings.GetOrAdd("EnableDonate", "true")))
             {
                 ViewBag.Ads = ads;
-                var text = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "donate.html"));
+                var text = await new FileInfo(Path.Combine(HostEnvironment.WebRootPath, "template", "donate.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8);
                 return CurrentUser.IsAdmin ? View("Donate_Admin", text) : View(model: text);
             }
 
@@ -97,7 +98,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("about"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> About()
         {
-            var text = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "about.html"));
+            var text = await new FileInfo(Path.Combine(HostEnvironment.WebRootPath, "template", "about.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8);
             return View(model: text);
         }
 
@@ -108,7 +109,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("agreement"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Agreement()
         {
-            var text = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "agreement.html"));
+            var text = await new FileInfo(Path.Combine(HostEnvironment.WebRootPath, "template", "agreement.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8);
             return View(model: text);
         }
 
@@ -119,7 +120,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("disclaimer"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Disclaimer()
         {
-            var text = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "disclaimer.html"));
+            var text = await new FileInfo(Path.Combine(HostEnvironment.WebRootPath, "template", "disclaimer.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8);
             return View(model: text);
         }
 

@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
@@ -58,7 +59,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Index()
         {
             ViewBag.TotalCount = LeaveMessageService.Count(m => m.ParentId == 0 && m.Status == Status.Published);
-            var text = await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "agreement.html"));
+            var text = await new FileInfo(Path.Combine(HostEnvironment.WebRootPath, "template", "agreement.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8);
             return CurrentUser.IsAdmin ? View("Index_Admin", text) : View(model: text);
         }
 
@@ -199,7 +200,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             MsgFeq.AddOrUpdate("Comments:" + ClientIP, 1, i => i + 1, 5);
             MsgFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
             var email = CommonHelper.SystemSettings["ReceiveEmail"];
-            var content = new Template(await System.IO.File.ReadAllTextAsync(HostEnvironment.WebRootPath + "/template/notify.html")).Set("title", "网站留言板").Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
+            var content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/notify.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8)).Set("title", "网站留言板").Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
             if (msg.Status == Status.Published)
             {
                 if (!msg.IsMaster)
@@ -250,7 +251,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (b)
             {
                 var root = msg.Root();
-                var content = new Template(await System.IO.File.ReadAllTextAsync(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html"))).Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
+                var content = new Template(await new FileInfo(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8)).Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
                 var emails = root.Flatten().Select(c => c.Email).Except(new List<string> { msg.Email, CurrentUser.Email }).ToHashSet();
                 var link = Url.Action("Index", "Msg", new { cid = root.Id }, Request.Scheme);
                 foreach (var s in emails)

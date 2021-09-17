@@ -11,6 +11,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,7 +33,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Index([FromServices] IWebHostEnvironment hostEnvironment)
         {
             var list = await LinksService.GetQueryFromCacheAsync<bool, LinksDto>(l => l.Status == Status.Available, l => l.Recommend, false);
-            ViewBag.Html = await System.IO.File.ReadAllTextAsync(Path.Combine(hostEnvironment.WebRootPath, "template", "links.html"));
+            ViewBag.Html = await new FileInfo(Path.Combine(hostEnvironment.WebRootPath, "template", "links.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8);
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location());
             return CurrentUser.IsAdmin ? View("Index_Admin", list) : View(list);
         }
@@ -66,20 +67,21 @@ namespace Masuit.MyBlogs.Core.Controllers
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
-            return await await HttpClient.GetAsync(links.Url, cancellationToken).ContinueWith(async t =>
+            return await HttpClient.GetAsync(links.Url, cancellationToken).ContinueWith(t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {
                     return ResultData(null, false, "添加失败！检测到您的网站疑似挂了，或者连接到你网站的时候超时，请检查下！");
                 }
 
-                var res = await t;
+                var res = t.Result;
                 if (!res.IsSuccessStatusCode)
                 {
                     return ResultData(null, false, "添加失败！检测到您的网站疑似挂了！返回状态码为：" + res.StatusCode);
                 }
 
-                var s = await res.Content.ReadAsStringAsync();
+                using var httpContent = res.Content;
+                var s = httpContent.ReadAsStringAsync().Result;
                 if (!s.Contains(Request.Host.Host))
                 {
                     return ResultData(null, false, $"添加失败！检测到您的网站上未将本站设置成友情链接，请先将本站主域名：{Request.Host}在您的网站设置为友情链接，并且能够展示后，再次尝试添加即可！");

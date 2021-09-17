@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OpenXmlPowerTools;
+using Polly;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -125,7 +126,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 if (System.IO.File.Exists(docfile))
                 {
-                    System.IO.File.Delete(docfile);
+                    Policy.Handle<IOException>().WaitAndRetry(5, i => TimeSpan.FromSeconds(1)).Execute(() => System.IO.File.Delete(docfile));
                 }
             }
         }

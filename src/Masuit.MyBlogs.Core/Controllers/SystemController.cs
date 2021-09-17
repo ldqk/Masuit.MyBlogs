@@ -232,18 +232,19 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetIPRangeBlackList()
         {
-            return ResultData(System.IO.File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "DenyIPRange.txt")));
+            return ResultData(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "DenyIPRange.txt")).ShareReadWrite().ReadAllText(Encoding.UTF8));
         }
 
         /// <summary>
         /// 设置IP地址段黑名单
         /// </summary>
         /// <returns></returns>
-        public ActionResult SetIPRangeBlackList(string content)
+        public async Task<ActionResult> SetIPRangeBlackList(string content)
         {
-            System.IO.File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "DenyIPRange.txt"), content, Encoding.UTF8);
+            var file = new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "DenyIPRange.txt")).ShareReadWrite();
+            await file.WriteAllTextAsync(content, Encoding.UTF8, false);
             CommonHelper.DenyIPRange.Clear();
-            var lines = System.IO.File.ReadAllLines(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "DenyIPRange.txt")).Where(s => s.Split(' ').Length > 2);
+            var lines = (await file.ReadAllLinesAsync(Encoding.UTF8)).Where(s => s.Split(' ').Length > 2);
             foreach (var line in lines)
             {
                 try
@@ -265,7 +266,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult IpWhiteList()
         {
-            return ResultData(System.IO.File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt")));
+            return ResultData(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt")).ShareReadWrite().ReadAllText(Encoding.UTF8));
         }
 
         /// <summary>
@@ -276,7 +277,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> SetIpBlackList(string content)
         {
             CommonHelper.DenyIP = content + "";
-            await System.IO.File.WriteAllTextAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
+            await new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt")).ShareReadWrite().WriteAllTextAsync(CommonHelper.DenyIP, Encoding.UTF8);
             return ResultData(null);
         }
 
@@ -287,7 +288,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public async Task<ActionResult> SetIpWhiteList(string content)
         {
-            await System.IO.File.WriteAllTextAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory!, "App_Data", "whitelist.txt"), content, Encoding.UTF8);
+            await new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt")).ShareReadWrite().WriteAllTextAsync(content, Encoding.UTF8);
             CommonHelper.IPWhiteList.Add(content);
             return ResultData(null);
         }
@@ -342,11 +343,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false);
             }
 
-            var basedir = AppDomain.CurrentDomain.BaseDirectory;
-            string ips = await System.IO.File.ReadAllTextAsync(Path.Combine(basedir, "App_Data", "whitelist.txt"));
+            var fs = new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt")).ShareReadWrite();
+            string ips = await fs.ReadAllTextAsync(Encoding.UTF8, false);
             List<string> list = ips.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
             list.Add(ip);
-            await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "whitelist.txt"), string.Join(",", list.Distinct()), Encoding.UTF8);
+            await fs.WriteAllTextAsync(string.Join(",", list.Distinct()), Encoding.UTF8);
             CommonHelper.IPWhiteList = list;
             return ResultData(null);
         }
@@ -366,9 +367,9 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             CommonHelper.DenyIP += "," + ip;
             var basedir = AppDomain.CurrentDomain.BaseDirectory;
-            await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "denyip.txt"), CommonHelper.DenyIP, Encoding.UTF8);
+            await new FileInfo(Path.Combine(basedir, "App_Data", "denyip.txt")).ShareReadWrite().WriteAllTextAsync(CommonHelper.DenyIP, Encoding.UTF8);
             CommonHelper.IPWhiteList.Remove(ip);
-            await System.IO.File.WriteAllTextAsync(Path.Combine(basedir, "App_Data", "whitelist.txt"), string.Join(",", CommonHelper.IPWhiteList.Distinct()), Encoding.UTF8);
+            await new FileInfo(Path.Combine(basedir, "App_Data", "whitelist.txt")).ShareReadWrite().WriteAllTextAsync(string.Join(",", CommonHelper.IPWhiteList.Distinct()), Encoding.UTF8);
             await firewallRepoter.ReportAsync(IPAddress.Parse(ip));
             return ResultData(null);
         }
