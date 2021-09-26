@@ -75,7 +75,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取所有实体
+        /// 从二级缓存获取所有实体
         /// </summary>
         /// <typeparam name="TDto">映射实体</typeparam>
         /// <returns>还未执行的SQL语句</returns>
@@ -85,7 +85,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取所有实体
+        /// 从二级缓存获取所有实体
         /// </summary>
         /// <typeparam name="TDto">映射实体</typeparam>
         /// <returns>还未执行的SQL语句</returns>
@@ -107,7 +107,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取所有实体
+        /// 获取所有实体（不跟踪）
         /// </summary>
         /// <typeparam name="TS">排序</typeparam>
         /// <param name="orderby">排序字段</param>
@@ -119,7 +119,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取所有实体
+        /// 从二级缓存获取所有实体
         /// </summary>
         /// <typeparam name="TS">排序</typeparam>
         /// <param name="orderby">排序字段</param>
@@ -131,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取所有实体
+        /// 从二级缓存获取所有实体
         /// </summary>
         /// <typeparam name="TS">排序</typeparam>
         /// <param name="orderby">排序字段</param>
@@ -156,7 +156,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取所有实体
+        /// 从二级缓存获取所有实体
         /// </summary>
         /// <typeparam name="TS">排序</typeparam>
         /// <typeparam name="TDto">映射实体</typeparam>
@@ -169,7 +169,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取所有实体
+        /// 从二级缓存获取所有实体
         /// </summary>
         /// <typeparam name="TS">排序</typeparam>
         /// <typeparam name="TDto">映射实体</typeparam>
@@ -357,7 +357,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取第一条数据
+        /// 从二级缓存获取第一条数据
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>实体</returns>
@@ -367,7 +367,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取第一条数据
+        /// 从二级缓存获取第一条数据
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>实体</returns>
@@ -390,7 +390,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取第一条数据
+        /// 从二级缓存获取第一条数据
         /// </summary>
         /// <typeparam name="TS">排序</typeparam>
         /// <param name="where">查询条件</param>
@@ -403,7 +403,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取第一条数据
+        /// 从二级缓存获取第一条数据
         /// </summary>
         /// <typeparam name="TS">排序</typeparam>
         /// <param name="where">查询条件</param>
@@ -426,7 +426,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取第一条被AutoMapper映射后的数据
+        /// 从二级缓存获取第一条被AutoMapper映射后的数据
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>实体</returns>
@@ -436,7 +436,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取第一条被AutoMapper映射后的数据
+        /// 从二级缓存获取第一条被AutoMapper映射后的数据
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>实体</returns>
@@ -474,7 +474,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取第一条被AutoMapper映射后的数据
+        /// 从二级缓存获取第一条被AutoMapper映射后的数据
         /// </summary>
         /// <typeparam name="TS">排序</typeparam>
         /// <typeparam name="TDto">映射实体</typeparam>
@@ -488,7 +488,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
 
         /// <summary>
-        /// 获取第一条被AutoMapper映射后的数据
+        /// 从二级缓存获取第一条被AutoMapper映射后的数据
         /// </summary>
         /// <typeparam name="TS">排序</typeparam>
         /// <typeparam name="TDto">映射实体</typeparam>

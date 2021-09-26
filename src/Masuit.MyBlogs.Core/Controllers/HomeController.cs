@@ -1,4 +1,5 @@
-﻿using AutoMapper.QueryableExtensions;
+﻿using AngleSharp;
+using AutoMapper.QueryableExtensions;
 using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
@@ -10,18 +11,22 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Systems;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -202,6 +207,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             return View(viewModel);
         }
 
+        /// <summary>
+        /// 切换语言
+        /// </summary>
+        /// <param name="lang"></param>
+        /// <returns></returns>
         [Route("lang/{lang}")]
         public ActionResult SetLang(string lang)
         {
@@ -211,6 +221,39 @@ namespace Masuit.MyBlogs.Core.Controllers
             });
             var referer = Request.Headers[HeaderNames.Referer].ToString();
             return Redirect(string.IsNullOrEmpty(referer) ? "/" : referer);
+        }
+
+        /// <summary>
+        /// 站点地图
+        /// </summary>
+        /// <param name="env"></param>
+        /// <param name="ext"></param>
+        /// <returns></returns>
+        [HttpGet("/sitemaps.{ext}")]
+        public async Task<ActionResult> Sitemap([FromServices] IWebHostEnvironment env, string ext)
+        {
+            var sitemap = Path.Combine(env.WebRootPath, "sitemap." + ext);
+            if (System.IO.File.Exists(sitemap))
+            {
+                var fs = new FileInfo(sitemap).ShareReadWrite();
+                switch (ext)
+                {
+                    case "txt":
+                        return Content((await fs.ReadAllLinesAsync(Encoding.UTF8)).Select(s => Request.Scheme + "://" + Request.Host.Host + new Uri(s).GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped)).Join("\r\n"), ContentType.Txt);
+                    case "html":
+                        var context = BrowsingContext.New(Configuration.Default);
+                        var doc = await context.OpenAsync(req => req.Content(fs.ReadAllText(Encoding.UTF8)));
+                        foreach (var e in doc.Body.QuerySelectorAll("li a"))
+                        {
+                            e.SetAttribute("href", Request.Scheme + "://" + Request.Host.Host + new Uri(e.GetAttribute("href")).GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped));
+                        }
+
+                        return Content(doc.DocumentElement.OuterHtml, ContentType.Html);
+                }
+                return File("/sitemap." + ext, new MimeMapper().GetMimeFromExtension("." + ext));
+            }
+
+            return NotFound();
         }
 
         /// <summary>
