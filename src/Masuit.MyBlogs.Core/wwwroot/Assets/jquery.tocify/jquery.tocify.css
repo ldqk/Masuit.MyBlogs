@@ -1,6 +1,6 @@
 .tocify {
     position: fixed;
-    top: 160px;
+    top: 156px;
     z-index: 3;
     min-width: 160px;
     max-height: 66vh;
@@ -23,16 +23,16 @@
     }
 }
 
-@media only screen and (min-width: 1900px) {
+@media only screen and (min-width: 1499px) {
     .tocify {
-        right: 50px;
+        left: calc(50% + 575px);
         max-width: 320px;
     }
 }
 
 @media only screen and (min-width: 2100px) {
     .tocify {
-        right: 100px;
+        left: 80%;
         max-width: 420px;
     }
 }

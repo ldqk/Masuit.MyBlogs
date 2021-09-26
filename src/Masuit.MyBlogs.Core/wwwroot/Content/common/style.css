@@ -520,3 +520,8 @@ Custom bottom spacer
 .mp-popup {
     max-height: 100vh !important;
 }
+@media (min-width: 2100px) {
+    .container {
+        width: 60vw;
+    }
+}
