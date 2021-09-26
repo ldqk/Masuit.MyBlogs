@@ -117,7 +117,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Tag(string tag, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             Expression<Func<Post, bool>> where = p => p.Status == Status.Published;
-            var posts = await PostService.GetQuery(tag.Split(",", StringSplitOptions.RemoveEmptyEntries).Aggregate(where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s)))).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+            var posts = await PostService.GetQuery(tag.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).Aggregate(where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s)))).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
             CheckPermission(posts.Data);
             while (posts.CurrentCount < 5 && posts.HasNext)
             {

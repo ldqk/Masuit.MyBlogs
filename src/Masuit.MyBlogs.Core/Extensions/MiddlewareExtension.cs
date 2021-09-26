@@ -71,7 +71,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
-            }).AddXmlDataContractSerializerFormatters().AddControllersAsServices().AddViewComponentsAsServices().AddTagHelpersAsServices(); // MVC
+            }).AddControllersAsServices().AddViewComponentsAsServices().AddTagHelpersAsServices(); // MVC
             services.Configure<WebEncoderOptions>(options =>
             {
                 options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);

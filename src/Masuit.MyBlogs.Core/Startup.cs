@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using CLRStats;
 using CSRedis;
 using EFCoreSecondLevelCacheInterceptor;
@@ -129,7 +128,7 @@ namespace Masuit.MyBlogs.Core
             services.AddOneDrive();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddMapper().AddAutofac().AddMyMvc();
+            services.AddMapper().AddMyMvc();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
