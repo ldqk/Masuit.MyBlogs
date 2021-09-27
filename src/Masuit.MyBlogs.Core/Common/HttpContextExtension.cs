@@ -35,6 +35,7 @@ namespace Masuit.MyBlogs.Core.Common
                 {
                     "baidu.com",
                     "google.com",
+                    "googlebot.com",
                     "bing.com",
                     "sogou.com",
                     "soso.com",

@@ -335,7 +335,7 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
 }
 
 .ibox-content .thumb {
-    max-height: 125px;
+    max-height: 160px;
     transition: ease-in-out .3s;
     overflow: hidden;
 }
