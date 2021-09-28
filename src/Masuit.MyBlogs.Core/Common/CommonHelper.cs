@@ -1,4 +1,6 @@
 ﻿using AngleSharp;
+using AngleSharp.Css.Dom;
+using AngleSharp.Dom;
 using AutoMapper;
 using Hangfire;
 using IP2Region;
@@ -331,6 +333,20 @@ namespace Masuit.MyBlogs.Core.Common
                     node.SetAttribute("alt", SystemSettings["Title"]);
                     node.SetAttribute("title", title);
                 }
+            }
+
+            var elements = doc.DocumentElement.QuerySelectorAll("p,br");
+            var els = elements.OrderByRandom().Take(Math.Max(elements.Length / 5, 3)).ToList();
+            var href = "https://" + SystemSettings["Domain"].Split('|').OrderByRandom().FirstOrDefault();
+            foreach (var el in els)
+            {
+                var a = doc.CreateElement("a");
+                a.SetAttribute("href", href);
+                a.SetAttribute("target", "_blank");
+                a.SetAttribute("title", SystemSettings["Title"]);
+                a.SetStyle("position: absolute;color: transparent;z-index: -1");
+                a.TextContent = SystemSettings["Title"] + SystemSettings["Domain"];
+                el.InsertAfter(a);
             }
 
             return doc.Body.InnerHtml;
