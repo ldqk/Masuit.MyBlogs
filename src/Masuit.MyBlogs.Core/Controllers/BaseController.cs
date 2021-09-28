@@ -22,6 +22,7 @@ using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -243,24 +244,24 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return;
             }
 
-            var location = Request.Location() + "|" + string.Join("", Request.Headers.Values);
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
             posts.RemoveAll(p =>
             {
                 switch (p.LimitMode)
                 {
                     case RegionLimitMode.AllowRegion:
-                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries));
+                        return !Regex.IsMatch(location, p.Regions);
                     case RegionLimitMode.ForbidRegion:
-                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries));
+                        return Regex.IsMatch(location, p.Regions);
                     case RegionLimitMode.AllowRegionExceptForbidRegion:
-                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                        if (Regex.IsMatch(location, p.ExceptRegions))
                         {
                             return true;
                         }
 
                         goto case RegionLimitMode.AllowRegion;
                     case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                        if (Regex.IsMatch(location, p.ExceptRegions))
                         {
                             return false;
                         }
@@ -272,6 +273,21 @@ namespace Masuit.MyBlogs.Core.Controllers
             });
         }
 
+        protected Expression<Func<Post, bool>> PostBaseWhere()
+        {
+            if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot())
+            {
+                return _ => true;
+            }
+
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+            return p => p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true :
+                   p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions) :
+                   p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions) :
+                   p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions) && !Regex.IsMatch(location, p.ExceptRegions) : !Regex.IsMatch(location, p.Regions) || Regex.IsMatch(location, p.ExceptRegions);
+
+        }
+
         protected void CheckPermission(Post post)
         {
             if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot())
@@ -279,32 +295,32 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return;
             }
 
-            var location = Request.Location() + "|" + string.Join("", Request.Headers.Values);
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
             switch (post.LimitMode)
             {
                 case RegionLimitMode.AllowRegion:
-                    if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                    if (!Regex.IsMatch(location, post.Regions))
                     {
                         Disallow(post);
                     }
 
                     break;
                 case RegionLimitMode.ForbidRegion:
-                    if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                    if (Regex.IsMatch(location, post.Regions))
                     {
                         Disallow(post);
                     }
 
                     break;
                 case RegionLimitMode.AllowRegionExceptForbidRegion:
-                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                    if (Regex.IsMatch(location, post.ExceptRegions))
                     {
                         Disallow(post);
                     }
 
                     goto case RegionLimitMode.AllowRegion;
                 case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                    if (Regex.IsMatch(location, post.ExceptRegions))
                     {
                         break;
                     }
@@ -330,5 +346,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             });
             throw new NotFoundException("文章未找到");
         }
+
+
     }
 }

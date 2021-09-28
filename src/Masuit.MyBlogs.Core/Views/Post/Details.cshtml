@@ -94,17 +94,17 @@
                                     }
                                     @if (!Model.Locked) {
                                         <div class="pull-right">
-                                            <a asp-controller="Post" asp-action="PushMerge" asp-route-id="@Model.Id" class="btn btn-danger">我要编辑</a>
+                                            <a asp-controller="Post" asp-action="PushMerge" asp-route-id="@Model.Id" class="btn btn-danger">我要参与编辑</a>
                                         </div>
                                     }
                                 </div>
-                                @if (DateTime.Now - Model.ModifyDate > TimeSpan.FromDays(365))
-                                {
-                                    <p class="text-focus text-center">该文章已经超过1年未更新，可能无法为您提供及时准确的资讯，请根据当下实际情况，酌情参考本文内容。</p>
-                                }
                             </div>
                         </header>
                         <article class="article" id="article">
+                            @if (DateTime.Now - Model.ModifyDate > TimeSpan.FromDays(365))
+                            {
+                                <p class="text-focus text-center">该文章已经超过1年未更新，可能无法为您提供及时准确的资讯，请根据当下实际情况，酌情参考本文内容。</p>
+                            }
                             @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
                             @{
                                 await Html.RenderPartialAsync("ProtectContent",Model);

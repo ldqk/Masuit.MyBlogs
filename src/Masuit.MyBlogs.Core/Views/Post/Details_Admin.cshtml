@@ -121,12 +121,12 @@
                                     </div>
                                 }
                             </div>
+                        </header>
+                        <article class="article" id="article">
                             @if (DateTime.Now - Model.ModifyDate > TimeSpan.FromDays(365))
                             {
                                 <p class="text-focus text-center">该文章已经超过1年未更新，可能无法为您提供及时准确的资讯，请根据当下实际情况，酌情参考本文内容。</p>
                             }
-                        </header>
-                        <article class="article" id="article">
                             @Html.Raw(Model.Content)
                             @Html.Raw(Model.ProtectContent)
                         </article>

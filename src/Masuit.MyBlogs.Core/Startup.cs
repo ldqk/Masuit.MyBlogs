@@ -15,6 +15,7 @@ using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Models.DTO;
+using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Config;
@@ -30,6 +31,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using Polly;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -146,8 +148,9 @@ namespace Masuit.MyBlogs.Core
         /// <param name="luceneIndexerOptions"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext db, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
-            ServiceProvider = app.ApplicationServices;
             db.Database.EnsureCreated();
+            Migration(db);
+            ServiceProvider = app.ApplicationServices;
             app.InitSettings();
             app.UseLuceneSearch(env, hangfire, luceneIndexerOptions);
             app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For
@@ -187,6 +190,20 @@ namespace Masuit.MyBlogs.Core
             });
 
             Console.WriteLine("网站启动完成");
+        }
+
+        /// <summary>
+        /// TODO:期初迁移数据，下个release删除
+        /// </summary>
+        /// <param name="db"></param>
+        [Obsolete("期初迁移数据，下个release删除")]
+        private void Migration(DataContext db)
+        {
+            db.Post.Where(p => p.Regions.Contains(",") || p.ExceptRegions.Contains(",")).UpdateFromQuery(p => new Post()
+            {
+                Regions = p.Regions.Replace(",", "|"),
+                ExceptRegions = p.ExceptRegions.Replace(",", "|")
+            });
         }
     }
 }

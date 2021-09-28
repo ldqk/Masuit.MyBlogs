@@ -138,6 +138,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             CheckPermission(post.Post);
             post.Content = ReplaceVariables(post.Content);
             post.ProtectContent = ReplaceVariables(post.ProtectContent);
+            post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             var next = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
             var prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
             ViewBag.Next = next;
@@ -165,7 +166,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             var diff = new HtmlDiff.HtmlDiff(right.Content, left.Content);
             var diffOutput = diff.Build();
             right.Content = ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty));
+            right.ModifyDate = right.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             left.Content = ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty));
+            left.ModifyDate = left.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location(), main.CategoryId);
             ViewBag.DisableCopy = post.DisableCopy;
             return View(new[] { main, left, right });
@@ -781,6 +784,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         return false;
                     }
 
+                    post.Regions = post.Regions.Replace(",", "|").Replace("，", "|");
                     break;
                 case RegionLimitMode.AllowRegionExceptForbidRegion:
                 case RegionLimitMode.ForbidRegionExceptAllowRegion:
@@ -790,6 +794,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         return false;
                     }
 
+                    post.ExceptRegions = post.ExceptRegions.Replace(",", "|").Replace("，", "|");
                     goto case RegionLimitMode.AllowRegion;
             }
 

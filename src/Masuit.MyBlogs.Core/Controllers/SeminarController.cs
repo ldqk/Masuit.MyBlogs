@@ -6,6 +6,9 @@ using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.Core.Net;
+using Masuit.Tools.Linq;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -43,23 +46,19 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Index(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var s = await SeminarService.GetByIdAsync(id) ?? throw new NotFoundException("专题未找到");
-            var posts = await PostService.GetQuery(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
-            CheckPermission(posts.Data);
-            while (posts.CurrentCount < 5 && posts.HasNext)
-            {
-                page++;
-                var tempPage = await PostService.GetQuery(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
-                CheckPermission(tempPage.Data);
-                posts.Data.AddRange(tempPage.Data);
-                posts.CurrentPage++;
-            }
-
+            var posts = await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published)).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
             ViewBag.Id = s.Id;
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
             ViewData["page"] = new Pagination(page, size, posts.TotalCount, orderBy);
+            foreach (var item in posts.Data)
+            {
+                item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
+
             return View(posts);
         }
 

@@ -152,12 +152,12 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public RegionLimitMode? LimitMode { get; set; }
 
         /// <summary>
-        /// 限制地区，逗号分隔
+        /// 限制地区，竖线分隔
         /// </summary>
         public string Regions { get; set; }
 
         /// <summary>
-        /// 限制排除地区，逗号分隔
+        /// 限制排除地区，竖线分隔
         /// </summary>
         public string ExceptRegions { get; set; }
 

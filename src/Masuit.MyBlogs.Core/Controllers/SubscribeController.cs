@@ -8,12 +8,15 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WilderMinds.RssSyndication;
 
@@ -37,8 +40,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var raw = PostService.GetQueryFromCache(p => p.Rss && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).ToList();
-            CheckPermission(raw);
+            var raw = PostService.GetQueryFromCache(PostBaseWhere().And(p => p.Rss && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).ToList();
             var data = await raw.SelectAsync(async p =>
             {
                 var summary = await p.Content.GetSummary(300, 50);
@@ -115,8 +117,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string scheme = Request.Scheme;
             var host = Request.Host;
             var category = await categoryService.GetByIdAsync(id) ?? throw new NotFoundException("分类未找到");
-            var raw = PostService.GetQueryFromCache(p => p.Rss && p.CategoryId == id && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).ToList();
-            CheckPermission(raw);
+            var raw = PostService.GetQueryFromCache(PostBaseWhere().And(p => p.Rss && p.CategoryId == id && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).ToList();
             var data = await raw.SelectAsync(async p =>
             {
                 var summary = await p.Content.GetSummary(300, 50);
@@ -168,8 +169,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string scheme = Request.Scheme;
             var host = Request.Host;
             var seminar = await seminarService.GetByIdAsync(id) ?? throw new NotFoundException("专题未找到");
-            var raw = PostService.GetQueryFromCache(p => p.Rss && p.Seminar.Any(s => s.Id == id) && p.Status == Status.Published && p.ModifyDate >= time, p => p.ModifyDate, false).ToList();
-            CheckPermission(raw);
+            var raw = PostService.GetQueryFromCache(PostBaseWhere().And(p => p.Rss && p.Seminar.Any(s => s.Id == id) && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).ToList();
             var data = await raw.SelectAsync(async p =>
             {
                 var summary = await p.Content.GetSummary(300, 50);
@@ -256,70 +256,44 @@ namespace Masuit.MyBlogs.Core.Controllers
             return Content(rss, ContentType.Xml);
         }
 
-        private void CheckPermission(List<Post> posts)
+        protected Expression<Func<Post, bool>> PostBaseWhere()
         {
-            var location = Request.Location() + "|" + string.Join("", Request.Headers.Values);
-            posts.RemoveAll(p =>
-            {
-                switch (p.LimitMode)
-                {
-                    case RegionLimitMode.AllowRegion:
-                        return !location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries));
-                    case RegionLimitMode.ForbidRegion:
-                        return location.Contains(p.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries));
-                    case RegionLimitMode.AllowRegionExceptForbidRegion:
-                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
-                        {
-                            return true;
-                        }
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+            return p => p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true :
+                   p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions) :
+                   p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions) :
+                   p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions) && !Regex.IsMatch(location, p.ExceptRegions) : !Regex.IsMatch(location, p.Regions) || Regex.IsMatch(location, p.ExceptRegions);
 
-                        goto case RegionLimitMode.AllowRegion;
-                    case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                        if (location.Contains(p.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
-                        {
-                            return false;
-                        }
-
-                        goto case RegionLimitMode.ForbidRegion;
-                    default:
-                        return false;
-                }
-            });
-            foreach (var item in posts)
-            {
-                item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-                item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-            }
         }
 
         private void CheckPermission(Post post)
         {
-            var location = Request.Location() + "|" + string.Join("", Request.Headers.Values);
+            var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
             switch (post.LimitMode)
             {
                 case RegionLimitMode.AllowRegion:
-                    if (!location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !Request.IsRobot())
+                    if (!Regex.IsMatch(location, post.Regions) && !Request.IsRobot())
                     {
                         Disallow(post);
                     }
 
                     break;
                 case RegionLimitMode.ForbidRegion:
-                    if (location.Contains(post.Regions.Split(',', StringSplitOptions.RemoveEmptyEntries)) && !Request.IsRobot())
+                    if (Regex.IsMatch(location, post.Regions) && !Request.IsRobot())
                     {
                         Disallow(post);
                     }
 
                     break;
                 case RegionLimitMode.AllowRegionExceptForbidRegion:
-                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                    if (Regex.IsMatch(location, post.ExceptRegions))
                     {
                         Disallow(post);
                     }
 
                     goto case RegionLimitMode.AllowRegion;
                 case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                    if (location.Contains(post.ExceptRegions.Split(',', StringSplitOptions.RemoveEmptyEntries)))
+                    if (Regex.IsMatch(location, post.ExceptRegions))
                     {
                         break;
                     }
