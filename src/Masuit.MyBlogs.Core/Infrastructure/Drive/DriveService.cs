@@ -167,9 +167,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 
         private string ReplaceCDNUrls(string downloadUrl)
         {
-            if (OneDriveConfiguration.CDNUrls.Length != 0)
+            if (OneDriveConfiguration.CDNUrls.Length > 0)
             {
-                return OneDriveConfiguration.CDNUrls.Select(item => item.Split(";")).Where(strings => strings.Length > 1).Aggregate(downloadUrl, (current, strings) => current.Replace(strings[0], strings[1..].OrderByRandom().First()));
+                return OneDriveConfiguration.CDNUrls.Select(item => item.Split(";", StringSplitOptions.RemoveEmptyEntries)).Where(strings => strings.Length > 1).Aggregate(downloadUrl, (current, strings) => current.Replace(strings[0], strings[1..][DateTime.Now.Second % (strings.Length - 1)]));
             }
 
             return downloadUrl;
