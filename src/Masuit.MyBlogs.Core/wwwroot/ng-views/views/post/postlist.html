@@ -112,7 +112,7 @@
                     <span class="el-switch-style" ng-click="lockedSwitch(row.Id)"></span>
                 </label>
             </td>
-            <td data-title="'操作'" style="width: 160px;">
+            <td data-title="'操作'" style="width: 195px;">
                 <div class="btn-group">
                     <button class="btn btn-default btn-sm waves-effect" ng-click="list.pass(row)" ng-if="row.Status=='审核中'">
                         <i class="icon-checkmark"></i>
@@ -134,6 +134,9 @@
                     </a>
                     <a class="btn  btn-sm waves-effect" ng-class="{true:'btn-success',false:'btn-primary'}[row.IsFixedTop]" ng-click="list.fixtop(row.Id)" ng-if="row.Status!='已删除'">
                         <i class="icon-pushpin" ng-class="{true:'text-danger'}[row.IsFixedTop]"></i>
+                    </a>
+                    <a class="btn btn-info btn-sm waves-effect" ng-click="list.insight(row)">
+                        <i class="icon-chart"></i>
                     </a>
                 </div>
             </td>

@@ -66,8 +66,6 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<Seminar, SeminarDto>().ReverseMap();
             CreateMap<SeminarCommand, SeminarDto>().ReverseMap();
 
-            //CreateMap<SeminarPost, SeminarPostHistoryVersion>().ForMember(s => s.PostHistoryVersionId, e => e.MapFrom(s => s.PostId)).ReverseMap();
-
             CreateMap<PostMergeRequestCommandBase, PostMergeRequest>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.MergeState, e => e.Ignore()).ReverseMap();
             CreateMap<PostMergeRequestCommand, PostMergeRequest>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.MergeState, e => e.Ignore()).ReverseMap();
             CreateMap<PostMergeRequestCommand, Post>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.Status, e => e.Ignore()).ReverseMap();
@@ -80,6 +78,8 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<AdvertisementDto, Advertisement>().ForMember(a => a.Status, e => e.Ignore()).ForMember(a => a.UpdateTime, e => e.MapFrom(a => DateTime.Now));
 
             CreateMap<Donate, DonateDto>();
+
+            CreateMap<PostVisitRecord, PostVisitRecordViewModel>().ForMember(m => m.Time, e => e.MapFrom(m => m.Time.ToString("yyyy-MM-dd HH:mm:ss")));
         }
     }
 }

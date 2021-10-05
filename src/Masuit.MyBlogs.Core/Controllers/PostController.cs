@@ -24,6 +24,7 @@ using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Html;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Logging;
+using Masuit.Tools.Models;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
 using Masuit.Tools.Systems;
@@ -39,6 +40,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -59,6 +61,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IWebHostEnvironment HostEnvironment { get; set; }
         public ISearchEngine<DataContext> SearchEngine { get; set; }
         public ImagebedClient ImagebedClient { get; set; }
+        public IPostVisitRecordService PostVisitRecordService { get; set; }
 
         /// <summary>
         /// 文章详情页
@@ -1018,6 +1021,51 @@ namespace Masuit.MyBlogs.Core.Controllers
                 mostView,
                 mostAverage
             });
+        }
+
+        /// <summary>
+        /// 文章访问记录
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        [HttpGet("/{id}/records"), MyAuthorize]
+        [ProducesResponseType(typeof(PagedList<PostVisitRecordViewModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PostVisitRecords(int id, int page = 1, int size = 15)
+        {
+            var pages = await PostVisitRecordService.GetPagesAsync<DateTime, PostVisitRecordViewModel>(page, size, e => e.PostId == id, e => e.Time, false);
+            return Ok(pages);
+        }
+
+        /// <summary>
+        /// 文章访问记录图表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet("/{id}/records-chart"), MyAuthorize]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PostVisitRecordChart(int id, CancellationToken cancellationToken)
+        {
+            var list = await PostVisitRecordService.GetQuery(e => e.PostId == id, e => e.Time).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
+            {
+                Date = g.Key,
+                Count = g.Count()
+            }).ToListAsync(cancellationToken);
+            return Ok(list);
+        }
+
+        /// <summary>
+        /// 文章访问记录分析
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("/{id}/insight"), MyAuthorize]
+        [ProducesResponseType(typeof(PagedList<PostVisitRecordViewModel>), (int)HttpStatusCode.OK)]
+        public IActionResult PostVisitRecordInsight(int id)
+        {
+            return View(PostService[id]);
         }
 
         #endregion

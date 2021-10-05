@@ -119,6 +119,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="refer"></param>
         public void RecordPostVisit(int pid, string ip, string refer)
         {
+            var time = DateTime.Now.AddMonths(-3);
+            _recordService.GetQuery(b => b.Time < time).DeleteFromQuery();
             var post = _postService.GetById(pid);
             if (post == null)
             {
@@ -126,7 +128,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             }
 
             post.TotalViewCount += 1;
-            post.AverageViewCount = post.TotalViewCount / Math.Ceiling((DateTime.Now - post.PostDate).TotalDays);
+            post.AverageViewCount = _recordService.Count(e => e.PostId == pid) / Math.Ceiling((DateTime.Now - _recordService.GetQuery(r => r.PostId == pid).Select(r => r.Time).DefaultIfEmpty().Min()).TotalDays);
             _recordService.AddEntity(new PostVisitRecord()
             {
                 IP = ip,
@@ -136,8 +138,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 PostId = pid
             });
             _postService.SaveChanges();
-            var time = DateTime.Now.AddMonths(-3);
-            _recordService.GetQuery(b => b.Time < time).DeleteFromQuery();
         }
 
         /// <summary>

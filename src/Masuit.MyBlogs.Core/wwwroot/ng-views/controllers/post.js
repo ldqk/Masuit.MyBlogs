@@ -254,6 +254,15 @@
 			});
 		});
     }
+	self.insight= function(row) {
+        layer.full(layer.open({
+          type: 2,
+          title: '文章《'+row.Title+'》洞察分析',
+          maxmin: true, //开启最大化最小化按钮
+          area: ['893px', '100vh'],
+          content: '/'+row.Id+'/insight'
+        }));
+    }
 }]);
 myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
 	clearInterval(window.interval);

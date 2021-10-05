@@ -111,6 +111,7 @@
                                             <a asp-controller="Dashboard" asp-action="Index" asp-fragment="/post/edit?id=@Model.Id" class="btn btn-primary" target="_blank">修改</a>
                                             <a asp-controller="Dashboard" asp-action="Index" asp-fragment="/writeblog?refer=@Model.Id" class="btn btn-info" target="_blank">复制</a>
                                             <button class="btn btn-danger" id="del">删除</button>
+                                            <a asp-controller="Post" asp-action="PostVisitRecordInsight" asp-route-id="@Model.Id" class="btn btn-primary" target="_blank">洞察</a>
                                         </div>
                                     </div>
                                 </div>

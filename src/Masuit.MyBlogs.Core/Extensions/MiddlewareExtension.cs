@@ -119,7 +119,7 @@ namespace Masuit.MyBlogs.Core.Extensions
             app.UseBundling(bundles =>
             {
                 bundles.AddCss("/main.css")
-                    .Include("/fonts/icomoon.min.css")
+                    .Include("/fonts/icomoon.css")
                     .Include("/Content/jquery.paging.css")
                     .Include("/Content/common/reset.css")
                     .Include("/Content/common/loading.css")
@@ -130,13 +130,13 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Assets/nav/css/style.css");
                 bundles.AddCss("/filemanager.css")
                     .Include("/Content/bootswatch.min.css")
-                    .Include("/fonts/icomoon.min.css")
+                    .Include("/fonts/icomoon.css")
                     .Include("/ng-views/filemanager/css/animations.css")
                     .Include("/ng-views/filemanager/css/dialogs.css")
                     .Include("/ng-views/filemanager/css/main.css")
                     .Include("/Content/common/loading.min.css");
                 bundles.AddCss("/dashboard.css")
-                    .Include("/fonts/icomoon.min.css")
+                    .Include("/fonts/icomoon.css")
                     .Include("/Assets/jedate/jedate.css")
                     .Include("/Assets/fileupload/filestyle.css")
                     .Include("/Content/common/loading.min.css")
