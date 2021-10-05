@@ -178,16 +178,6 @@ namespace Masuit.MyBlogs.Core.Common
             });
         }
 
-        public static AsnResponse GetIPAsn(this string ip)
-        {
-            if (ip.IsPrivateIP())
-            {
-                return new AsnResponse();
-            }
-
-            return Policy<AsnResponse>.Handle<AddressNotFoundException>().Fallback(new AsnResponse()).Execute(() => MaxmindAsnReader.Asn(ip));
-        }
-
         public static AsnResponse GetIPAsn(this IPAddress ip)
         {
             if (ip.IsPrivateIP())

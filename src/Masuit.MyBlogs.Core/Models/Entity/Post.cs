@@ -195,6 +195,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 文章修改请求
         /// </summary>
         public virtual ICollection<PostMergeRequest> PostMergeRequests { get; set; }
+
+        /// <summary>
+        /// 访问记录
+        /// </summary>
+        public virtual ICollection<PostVisitRecord> PostVisitRecords { get; set; }
     }
 
     /// <summary>

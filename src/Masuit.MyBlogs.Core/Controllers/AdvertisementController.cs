@@ -28,7 +28,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id">广告id</param>
         /// <returns></returns>
-        [HttpGet("{id:int}"), ResponseCache(Duration = 3600)]
+        [HttpGet("/p{id:int}"), HttpGet("{id:int}", Order = 1), ResponseCache(Duration = 3600)]
         public async Task<IActionResult> Redirect(int id)
         {
             var ad = await AdsService.GetByIdAsync(id) ?? throw new NotFoundException("推广链接不存在");

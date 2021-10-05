@@ -22,12 +22,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Category>().HasMany(e => e.Post).WithOne(e => e.Category).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Category>().HasMany(e => e.PostHistoryVersion).WithOne(e => e.Category).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Category>().HasMany(e => e.PostHistoryVersion).WithOne(e => e.Category).HasForeignKey(r => r.CategoryId).OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Post>().HasMany(e => e.Comment).WithOne(e => e.Post).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Post>().HasMany(e => e.PostHistoryVersion).WithOne(e => e.Post).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Post>().HasMany(e => e.Comment).WithOne(e => e.Post).HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Post>().HasMany(e => e.PostHistoryVersion).WithOne(e => e.Post).HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Post>().HasMany(e => e.Seminar).WithMany(s => s.Post).UsingEntity(builder => builder.ToTable("SeminarPost"));
-            modelBuilder.Entity<Post>().HasMany(e => e.PostMergeRequests).WithOne(s => s.Post).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Post>().HasMany(e => e.PostMergeRequests).WithOne(s => s.Post).HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Post>().HasMany(e => e.PostVisitRecords).WithOne().HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<PostHistoryVersion>().HasMany(e => e.Seminar).WithMany(s => s.PostHistoryVersion).UsingEntity(builder => builder.ToTable("SeminarPostHistoryVersion"));
 
             modelBuilder.Entity<UserInfo>().HasMany(e => e.LoginRecord).WithOne(e => e.UserInfo).OnDelete(DeleteBehavior.Cascade);

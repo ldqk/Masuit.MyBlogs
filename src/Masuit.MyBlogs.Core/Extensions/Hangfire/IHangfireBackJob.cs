@@ -27,7 +27,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// 文章访问记录
         /// </summary>
         /// <param name="pid"></param>
-        void RecordPostVisit(int pid);
+        /// <param name="ip"></param>
+        /// <param name="refer"></param>
+        void RecordPostVisit(int pid, string ip, string refer);
 
         /// <summary>
         /// 每日任务
