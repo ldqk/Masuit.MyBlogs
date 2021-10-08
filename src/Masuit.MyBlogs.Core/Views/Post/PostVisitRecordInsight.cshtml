@@ -38,6 +38,7 @@
                 ]
             ],
             page: true,
+            limit:20,
             request: {
                 limitName: 'size' //每页数据量的参数名，默认：limit
             },
@@ -96,18 +97,6 @@
             yAxis: {
                 type: 'value'
             },
-            dataZoom: [
-                {
-                    type: 'inside',
-                    start: 70,
-                    end: 100,
-                    minValueSpan: 100
-                }, {
-                    start: 70,
-                    end: 100,
-                    minValueSpan: 100
-                }
-            ],
             series: [
                 {
                     name: '访问量',
@@ -115,7 +104,18 @@
                     smooth: true,
                     symbol: 'none',
                     areaStyle: {},
-                    data: data
+                    data: data,
+                    markPoint: {
+                        data: [
+                            { type: 'max', name: '最大值' },
+                            { type: 'min', name: '最小值' }
+                        ]
+                    },
+                    markLine: {
+                        data: [
+                            { type: 'average', name: '平均值' }
+                        ]
+                    }
                 }
             ]
         };
