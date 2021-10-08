@@ -128,7 +128,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             }
 
             post.TotalViewCount += 1;
-            post.AverageViewCount = _recordService.Count(e => e.PostId == pid) / Math.Ceiling((DateTime.Now - _recordService.GetQuery(r => r.PostId == pid).Select(r => r.Time).DefaultIfEmpty().Min()).TotalDays);
+            post.AverageViewCount = _recordService.GetQuery(e => e.PostId == pid).GroupBy(r => r.Time.Date).Select(g => g.Count()).DefaultIfEmpty().Average();
             _recordService.AddEntity(new PostVisitRecord()
             {
                 IP = ip,
