@@ -12,7 +12,6 @@ namespace Masuit.MyBlogs.Core.Configs
         {
             builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly()).AsImplementedInterfaces().Where(t => t.Name.EndsWith("Repository") || t.Name.EndsWith("Service") || t.Name.EndsWith("Controller") || t.Name.EndsWith("Attribute")).PropertiesAutowired().AsSelf().InstancePerDependency();
             builder.RegisterType<BackgroundJobClient>().SingleInstance();
-            builder.RegisterType<FirewallAttribute>().PropertiesAutowired().AsSelf().InstancePerDependency();
             builder.RegisterType<HangfireBackJob>().As<IHangfireBackJob>().PropertiesAutowired(PropertyWiringOptions.PreserveSetValues).InstancePerDependency();
         }
     }
