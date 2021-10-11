@@ -92,7 +92,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var viewModel = await GetIndexPageViewModel();
             var postsQuery = PostService.GetQuery(PostBaseWhere().And(p => p.Status == Status.Published)); //准备文章的查询
-            var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+            var posts = orderBy switch
+            {
+                OrderBy.Trending => await postsQuery.Where(p => !p.IsFixedTop).OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= DateTime.Today)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                _ => await postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            };
             if (page == 1)
             {
                 posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ProjectTo<PostDto>(MapperConfig).ToList());
@@ -122,7 +126,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Tag(string tag, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             Expression<Func<Post, bool>> where = PostBaseWhere().And(p => p.Status == Status.Published);
-            var posts = await PostService.GetQuery(tag.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).Aggregate(where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s)))).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+            var queryable = PostService.GetQuery(tag.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).Aggregate(@where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s))));
+            var posts = orderBy switch
+            {
+                OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= DateTime.Today)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                _ => await queryable.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            };
             var viewModel = await GetIndexPageViewModel();
             ViewBag.Tag = tag;
             viewModel.Posts = posts;
@@ -150,7 +159,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             Expression<Func<Post, bool>> where = p => p.Author.Equals(author) || p.Modifier.Equals(author) || p.Email.Equals(author) || p.PostHistoryVersion.Any(v => v.Modifier.Equals(author) || v.ModifierEmail.Equals(author));
             where = where.And(p => p.Status == Status.Published).And(PostBaseWhere());
-            var posts = await PostService.GetQuery(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+            var posts = orderBy switch
+            {
+                OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= DateTime.Today)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                _ => await PostService.GetQuery(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            };
             var viewModel = await GetIndexPageViewModel();
             ViewBag.Author = author;
             viewModel.Posts = posts;
@@ -177,7 +190,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Category(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
-            var posts = await PostService.GetQuery(PostBaseWhere().And(p => p.CategoryId == cat.Id && p.Status == Status.Published)).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+            var posts = orderBy switch
+            {
+                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => p.CategoryId == cat.Id && p.Status == Status.Published)).OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= DateTime.Today)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                _ => await PostService.GetQuery(PostBaseWhere().And(p => p.CategoryId == cat.Id && p.Status == Status.Published)).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            };
             var viewModel = await GetIndexPageViewModel();
             viewModel.Posts = posts;
             ViewBag.Category = cat;

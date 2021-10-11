@@ -16,10 +16,18 @@
 </head>
 <body style="overflow-x: hidden">
     <h3 align="center">文章《@Model.Title》洞察分析</h3>
+    <div class="searchTable">
+        <div class="layui-inline">
+            <input class="layui-input" name="kw" id="kw">
+        </div>
+        <button class="layui-btn" data-type="reload">搜索</button>
+    </div>
     <table class="layui-hide" id="table" lay-filter="tableEvent"></table>
     <div id="chart" style="height: 500px"></div>
+    <mini-profiler max-traces="5" />
 </body>
 </html>
+
 <script src="/Assets/layui/layui.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js" type="text/javascript"></script>
 <script>
@@ -59,6 +67,18 @@
             if(obj.event === 'visit'){
                 window.open(data.Referer);
             }
+        });
+
+        var $ = layui.$;
+        $('.searchTable .layui-btn').on('click', function () {
+            table.reload('table', {
+                page: {
+                    curr: 1
+                },
+                where: {
+                    kw: $('#kw').val()
+                }
+            });
         });
     });
     window.fetch("/@Model.Id/records-chart", {

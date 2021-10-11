@@ -1015,11 +1015,18 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Title = p.Title,
                 ViewCount = (int)p.AverageViewCount
             }).Cacheable().ToListAsync();
+            var trending = await postsQuery.OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= DateTime.Today)).Take(10).Select(p => new PostModelBase()
+            {
+                Id = p.Id,
+                Title = p.Title,
+                ViewCount = p.PostVisitRecords.Count(e => e.Time >= DateTime.Today)
+            }).Cacheable().ToListAsync();
             return ResultData(new
             {
                 mostHots,
                 mostView,
-                mostAverage
+                mostAverage,
+                trending
             });
         }
 
@@ -1032,9 +1039,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         [HttpGet("/{id}/records"), MyAuthorize]
         [ProducesResponseType(typeof(PagedList<PostVisitRecordViewModel>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> PostVisitRecords(int id, int page = 1, int size = 15)
+        public async Task<IActionResult> PostVisitRecords(int id, int page = 1, int size = 15, string kw = "")
         {
-            var pages = await PostVisitRecordService.GetPagesAsync<DateTime, PostVisitRecordViewModel>(page, size, e => e.PostId == id, e => e.Time, false);
+            Expression<Func<PostVisitRecord, bool>> where = e => e.PostId == id;
+            if (!string.IsNullOrEmpty(kw))
+            {
+                kw = Regex.Escape(kw);
+                where = where.And(e => Regex.IsMatch(e.IP + e.Referer, kw));
+            }
+
+            var pages = await PostVisitRecordService.GetPagesAsync<DateTime, PostVisitRecordViewModel>(page, size, where, e => e.Time, false);
             return Ok(pages);
         }
 

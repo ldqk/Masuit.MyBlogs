@@ -49,5 +49,12 @@ namespace Masuit.MyBlogs.Core.Models.Enum
         [Description("最热门")]
         [Display(Name = nameof(AverageViewCount))]
         AverageViewCount,
+
+        /// <summary>
+        /// 今日热榜
+        /// </summary>
+        [Description("今日热榜")]
+        [Display(Name = nameof(Trending))]
+        Trending,
     }
 }

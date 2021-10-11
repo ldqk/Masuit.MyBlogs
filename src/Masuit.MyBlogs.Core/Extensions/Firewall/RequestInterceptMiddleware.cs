@@ -116,6 +116,15 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 context.Session.Set(SessionKey.TimeZone, context.Connection.RemoteIpAddress.GetClientTimeZone());
             }
 
+            if (!context.Request.Cookies.ContainsKey(SessionKey.RawIP))
+            {
+                context.Response.Cookies.Append(SessionKey.RawIP, ip, new CookieOptions()
+                {
+                    Expires = DateTimeOffset.Now.AddDays(1),
+                    SameSite = SameSiteMode.Lax
+                });
+            }
+
             return _next(context);
         }
     }

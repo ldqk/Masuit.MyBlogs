@@ -145,7 +145,28 @@
     <tm-pagination conf="paginationConf"></tm-pagination>
 </div>
 <div class="row">
-    <div class="col-md-4" ng-if="agg.mostHots.length>0">
+    <div class="col-md-6" ng-if="agg.trending.length>0">
+        <div class="page-header">
+            <h3 class="text-center">今日热榜</h3>
+        </div>
+        <table class="table table-bordered table-condensed table-responsive">
+            <thead>
+                <tr>
+                    <th style="min-width: 40px">序号</th>
+                    <th>标题</th>
+                    <th style="min-width: 60px">今日访问量</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in agg.trending">
+                    <td>{{$index+1}}</td>
+                    <td><a ng-href="/{{item.Id}}" target="_blank">{{item.Title}}</a></td>
+                    <td>{{item.ViewCount}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6" ng-if="agg.mostHots.length>0">
         <div class="page-header">
             <h3 class="text-center">当前在看排行榜</h3>
         </div>
@@ -166,7 +187,28 @@
             </tbody>
         </table>
     </div>
-    <div class="col-md-4" ng-if="agg.mostView.length>0">
+    <div class="col-md-6" ng-if="agg.mostAverage.length>0">
+        <div class="page-header">
+            <h3 class="text-center">日均访问量排行榜</h3>
+        </div>
+        <table class="table table-bordered table-condensed table-responsive">
+            <thead>
+                <tr>
+                    <th style="min-width: 40px">序号</th>
+                    <th>标题</th>
+                    <th style="min-width: 60px">日均访问量</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in agg.mostAverage">
+                    <td>{{$index+1}}</td>
+                    <td><a ng-href="/{{item.Id}}" target="_blank">{{item.Title}}</a></td>
+                    <td>{{item.ViewCount}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6" ng-if="agg.mostView.length>0">
         <div class="page-header">
             <h3 class="text-center">访问量最高排行榜</h3>
         </div>
@@ -180,27 +222,6 @@
             </thead>
             <tbody>
                 <tr ng-repeat="item in agg.mostView">
-                    <td>{{$index+1}}</td>
-                    <td><a ng-href="/{{item.Id}}" target="_blank">{{item.Title}}</a></td>
-                    <td>{{item.ViewCount}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="col-md-4" ng-if="agg.mostAverage.length>0">
-        <div class="page-header">
-            <h3 class="text-center">日均访问量排行榜</h3>
-        </div>
-        <table class="table table-bordered table-condensed table-responsive">
-            <thead>
-                <tr>
-                    <th style="min-width: 40px">序号</th>
-                    <th>标题</th>
-                    <th style="min-width: 60px">访问量</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="item in agg.mostAverage">
                     <td>{{$index+1}}</td>
                     <td><a ng-href="/{{item.Id}}" target="_blank">{{item.Title}}</a></td>
                     <td>{{item.ViewCount}}</td>

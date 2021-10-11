@@ -245,6 +245,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+            if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
+            {
+                location += "|" + rawip.GetIPLocation();
+            }
+
             posts.RemoveAll(p =>
             {
                 switch (p.LimitMode)
@@ -281,11 +286,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+            if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
+            {
+                location += "|" + rawip.GetIPLocation();
+            }
+
             return p => p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true :
                    p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions) :
                    p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions) :
                    p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions) && !Regex.IsMatch(location, p.ExceptRegions) : !Regex.IsMatch(location, p.Regions) || Regex.IsMatch(location, p.ExceptRegions);
-
         }
 
         protected void CheckPermission(Post post)
@@ -296,6 +305,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+            if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
+            {
+                location += "|" + rawip.GetIPLocation();
+            }
+
             switch (post.LimitMode)
             {
                 case RegionLimitMode.AllowRegion:
@@ -331,6 +345,12 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private void Disallow(Post post)
         {
+            var remark = "无权限查看该文章";
+            if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
+            {
+                remark += "，发生了IP切换，原始IP：" + rawip;
+            }
+
             RedisHelper.IncrBy("interceptCount");
             RedisHelper.LPush("intercept", new IpIntercepter()
             {
@@ -339,7 +359,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Referer = Request.Headers[HeaderNames.Referer],
                 Time = DateTime.Now,
                 UserAgent = Request.Headers[HeaderNames.UserAgent],
-                Remark = "无权限查看该文章",
+                Remark = remark,
                 Address = Request.Location(),
                 HttpVersion = Request.Protocol,
                 Headers = Request.Headers.ToJsonString()

@@ -23,7 +23,8 @@
             var list = Model.PostsQueryable.OrderByRandom().Take(5).ToList();
             if (list.Any())
             {
-                if (Model.Posts.CurrentPage==1) {
+                if (Model.Posts.CurrentPage == 1)
+                {
                     <div class="page-header">
                         <h3>Oops！抱歉~没有找到相关的文章或资源！如果您有相关的结果，您可以 <a asp-controller="Post" asp-action="Publish" class="btn btn-info btn-lg">点击这里</a> 投稿哦！以下是一些随机推荐：</h3>
                     </div>
@@ -51,6 +52,9 @@
                         </li>
                         <li>
                             <a href="@($"{Context.Request.Path}?orderby={OrderBy.PostDate}".TrimQuery())">最后发表日期</a>
+                        </li>
+                        <li>
+                            <a href="@($"{Context.Request.Path}?orderby={OrderBy.Trending}".TrimQuery())">今日热榜</a>
                         </li>
                         <li role="separator" class="divider"></li>
                         <li>

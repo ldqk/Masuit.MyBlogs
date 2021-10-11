@@ -11,6 +11,7 @@ using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -46,7 +47,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Index(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var s = await SeminarService.GetByIdAsync(id) ?? throw new NotFoundException("专题未找到");
-            var posts = await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published)).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig);
+            var posts = orderBy switch
+            {
+                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published)).OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= DateTime.Today)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                _ => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published)).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            };
             ViewBag.Id = s.Id;
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
