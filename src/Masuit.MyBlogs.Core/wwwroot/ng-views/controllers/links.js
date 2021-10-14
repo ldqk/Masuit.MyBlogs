@@ -52,7 +52,7 @@
 	self.save = function (row, rowForm) {
 		swal({
 			title: "确认修改" + row.Name+"地址为：",
-			text: row.Url,
+			text: "友链地址："+row.Url+"，主页地址："+row.UrlBase,
 			showCancelButton: true,
 			confirmButtonColor: "#DD6B55",
 			confirmButtonText: "确定",
@@ -85,7 +85,8 @@
 		swal({
 			title: '添加联系方式',
 			html:'<div class="input-group"><span class="input-group-addon">链接名称</span><input id="title" class="form-control" autofocus placeholder="链接名称"></div>' +
-			'<div class="input-group"><span class="input-group-addon">地址</span><input id="url" class="form-control" placeholder="地址"></div>',
+			'<div class="input-group"><span class="input-group-addon">链接地址</span><input id="url" class="form-control" placeholder="链接地址"></div>' +
+			'<div class="input-group"><span class="input-group-addon">主页地址</span><input id="urlbase" class="form-control" placeholder="主页地址"></div>',
 			showCloseButton: true,
 			confirmButtonColor: "#DD6B55",
 			confirmButtonText: "确定",
@@ -97,7 +98,8 @@
 				return new Promise(function (resolve) {
 					$scope.request("/links/add", {
 						Name: $('#title').val(),
-						Url: $('#url').val()
+						Url: $('#url').val(),
+						UrlBase: $('#urlbase').val()
 					}, function (res) {
 						resolve(res);
 					});

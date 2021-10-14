@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using Hangfire;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -14,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -166,6 +168,19 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 return ResultData(null, false, "邮件配置测试失败！错误信息：\r\n" + e.Message + "\r\n\r\n详细堆栈跟踪：\r\n" + e.StackTrace);
             }
+        }
+
+        /// <summary>
+        /// 发送一封系统邮件
+        /// </summary>
+        /// <param name="tos"></param>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public ActionResult SendMail([Required(ErrorMessage = "收件人不能为空")] string tos, [Required(ErrorMessage = "邮件标题不能为空")] string title, [Required(ErrorMessage = "邮件内容不能为空")] string content)
+        {
+            BackgroundJob.Enqueue(() => CommonHelper.SendMail(title, content + "<p style=\"color: red\">本邮件由系统自动发出，请勿回复本邮件！</p>", tos, "127.0.0.1"));
+            return Ok();
         }
 
         /// <summary>

@@ -32,6 +32,12 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string Url { get; set; }
 
         /// <summary>
+        /// 主页地址
+        /// </summary>
+        [Required(ErrorMessage = "站点的主页URL不能为空！"), MaxLength(64, ErrorMessage = "站点的主页URL限制64个字符")]
+        public string UrlBase { get; set; }
+
+        /// <summary>
         /// 是否检测白名单
         /// </summary>
         public bool Except { get; set; }

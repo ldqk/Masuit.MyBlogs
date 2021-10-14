@@ -16,7 +16,6 @@
     }
 })(jQuery);
 $(function() {
-    popBrowserTips();
     $("img").lazyload({
         effect: "fadeIn", //渐现，show(直接显示),fadeIn(淡入),slideDown(下拉)
         threshold: 2700, //预加载，在图片距离屏幕180px时提前载入
@@ -91,7 +90,7 @@ $(function() {
             }, true);
         });
     }
-
+    
     window.fetch("/notice/last").then(function(response) {
         return response.json();
     }).then(function(data) {
@@ -348,29 +347,6 @@ function GetBrowser(browser) {
 
 function getFile(obj, inputName) {
     $("input[name='" + inputName + "']").val($(obj).val());
-}
-
-function popBrowserTips() {
-    if (window.sessionStorage) {
-        var deny = window.sessionStorage.getItem("deny") || false;
-        if (window.screen.width <= 320 && !deny) {
-            swal({
-                title: '访问受限制?',
-                html: "由于检测到您的设备<span style='color:red'>屏幕宽度过小</span>，网站的部分功能可能不会兼容你的设备，但是您<span style='color:red'>可以继续浏览</span>，为确保最佳用户体验，建议使用<span style='color:red'>5寸以上移动设备</span>，或分辨率大于<span style='color:red'>1360 x 768</span>的<span style='color:red'>电脑浏览器</span>访问本站，感谢您的来访和支持！",
-                type: 'error',
-                showCloseButton: true,
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: '我知道了',
-                cancelButtonText: '哦哦'
-            }).then(function(isConfirm) {
-                if (isConfirm) {
-                    window.sessionStorage.setItem("deny", true);
-                }
-            });
-        }
-    }
 }
 
 function post(url, params, callback, error) {

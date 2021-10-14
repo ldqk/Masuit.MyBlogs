@@ -18,6 +18,11 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public string Url { get; set; }
 
         /// <summary>
+        /// 主页地址
+        /// </summary>
+        public string UrlBase { get; set; }
+
+        /// <summary>
         /// 是否检测白名单
         /// </summary>
         public bool Except { get; set; }

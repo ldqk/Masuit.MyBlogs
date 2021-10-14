@@ -97,6 +97,10 @@
         <span class="icon icon-bin"></span>
     </button>
     <span class="text-right">累计拦截{{interceptCount}}次。</span>
+    <label class="el-switch">
+        <input type="checkbox" name="switch">
+        <span class="el-switch-style" ng-click="duplicate()"></span>
+    </label>按IP去重
     <table class="table table-bordered table-condensed table-hover" disable-filter="list.isAdding" ng-form="list.tableForm" ng-table="list.tableParams" tracked-table="list.tableTracker">
         <tr ng-form="rowForm" ng-repeat="row in $data" tracked-table-row="row">
             <td filter="{IP: 'text'}" sortable="'IP'" title="'IP'">

@@ -27,6 +27,16 @@
                     </div>
                 </div>
             </td>
+            <td title="'主页'" ng-switch="row.isEditing" ng-class="Url.$dirty ? 'bg-warning' : ''" ng-form="UrlBase" tracked-table-cell>
+                <span ng-switch-default>
+                    <a ng-href="{{row.UrlBase}}" target="_blank">{{row.UrlBase}}</a>
+                </span>
+                <div ng-class="Url.$invalid && Url.$dirty ? 'has-error' : ''" ng-switch-when="true">
+                    <div class="fg-line">
+                        <input type="text" name="name" ng-model="row.UrlBase" class="form-control input-sm" required />
+                    </div>
+                </div>
+            </td>
             <td title="'最近来源次数'" sortable="'Loopbacks'">
                 {{row.Loopbacks}}
             </td>

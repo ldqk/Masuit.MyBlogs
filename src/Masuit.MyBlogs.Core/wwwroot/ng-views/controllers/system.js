@@ -282,7 +282,6 @@ myApp.controller("email", ["$scope", "$http", function ($scope) {
 }]);
 myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", function ($scope, $http,NgTableParams,$timeout) {
     var self = this;
-	var data = [];
 	self.data = {};
 	$scope.request("/system/getsettings", null, function(data) {
 		var settings = {};
@@ -302,7 +301,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 				filterDelay: 0,
 				dataset: res.Data.list
 			});
-			data = res.Data.list;
+			$scope.logs=res.Data.list;
 			$scope.interceptCount=res.Data.interceptCount;
 			$scope.ranking=res.Data.ranking;
 		});
@@ -482,10 +481,62 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 		$('.layui-layer-content').jsonViewer(eval("("+text+")"), {withQuotes: true, withLinks: true});
 		$('.layui-layer-content').css("word-wrap"," break-word");
     }
+
+	$scope.distinct=false;
+	$scope.duplicate= function() {
+		$scope.distinct=!$scope.distinct;
+        if ($scope.distinct) {
+            const res = new Map();
+			self.tableParams = new NgTableParams({}, {
+				filterDelay: 0,
+				dataset: angular.copy($scope.logs).filter(item => !res.has(item["IP"]) && res.set(item["IP"], 1))
+			});
+        } else {
+			self.tableParams = new NgTableParams({}, {
+				filterDelay: 0,
+				dataset: $scope.logs
+			});
+        }
+    }
 }]);
 
 myApp.controller("sendbox", ["$scope", "$http", function ($scope, $http) {
-	$http.post("/system/sendbox").then(function (res) {
-		$scope.Mails = res.data;
-	});
+	UEDITOR_CONFIG.autoHeightEnabled=false;
+	$scope.load= function() {
+        $http.post("/system/sendbox").then(function (res) {
+		    $scope.Mails = res.data;
+	    });
+    };
+
+	$scope.newmail= function() {
+        layer.open({
+			type: 1,
+			zIndex: 8,
+			title: '发送邮件',
+			area: (window.screen.width > 800 ? 800 : window.screen.width) + 'px',
+			content: $("#modal"),
+			end: function() {
+				$("#modal").css("display", "none");
+			}
+		});
+    }
+
+	$scope.send= function(mail) {
+        $http.post("/system/sendmail",mail, {
+			'Content-Type':'application/x-www-form-urlencoded'
+		}).then(function (res) {
+            if (res.data) {
+                layer.alert(res.data.Message);
+            } else {
+                layer.msg('发送成功');
+				layer.closeAll();
+				setTimeout(function() {
+			        $("#modal").css("display", "none");
+	                $scope.load();
+		        }, 500);
+            }
+	    });
+    }
+
+	$scope.load();
 }]);

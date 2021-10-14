@@ -72,17 +72,17 @@
     </environment>
 </head>
 <body>
-<noscript>
-    <meta http-equiv="Refresh" content="3;url=/ServiceUnavailable"/>
-    <style>
-        .header {
-            display: none !important;
-        }
-    </style>
-    <div style="position: absolute;top: 0;left: 0;right: 0;bottom: 0;">
-        <p class="size48">检测到您的浏览器不支持javascript或已禁用javascript功能，当前页面无法正常显示！</p>
-    </div>
-</noscript>
+    <noscript>
+        <meta http-equiv="Refresh" content="3;url=/ServiceUnavailable" />
+        <style>
+            .header {
+                display: none !important;
+            }
+        </style>
+        <div style="position: absolute;top: 0;left: 0;right: 0;bottom: 0;">
+            <p class="size48">检测到您的浏览器不支持javascript或已禁用javascript功能，当前页面无法正常显示！</p>
+        </div>
+    </noscript>
     <div id="toc" style="display: none;">
         <a class="close">
             <i class="icon-cross"></i>
@@ -285,9 +285,9 @@
                                 <a href="/taskcenter" target="_blank">任务管理器</a>
                                 <span> | </span>
                             }
-                            foreach (LinksDto link in footer.Links)
+                            foreach (var link in footer.Links)
                             {
-                                <a href="@link.Url" target="_blank">@link.Name</a>
+                                <a href="@link.Url" target="_blank" referrerpolicy="unsafe-url">@link.Name</a>
                                 <span> | </span>
                             }
                         }

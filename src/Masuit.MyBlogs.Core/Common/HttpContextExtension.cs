@@ -38,6 +38,7 @@ namespace Masuit.MyBlogs.Core.Common
                     "googlebot.com",
                     "googleusercontent.com",
                     "bing.com",
+                    "search.msn.com",
                     "sogou.com",
                     "soso.com",
                     "yandex.com",

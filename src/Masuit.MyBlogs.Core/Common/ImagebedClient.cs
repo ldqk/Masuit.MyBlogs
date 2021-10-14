@@ -191,14 +191,19 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         private async Task<(string url, bool success)> UploadKieng(Stream stream, CancellationToken cancellationToken)
         {
-            using var formData = new MultipartFormDataContent
+            if (bool.TryParse(_config["Imgbed:EnableExternalImgbed"], out var b) && b)
             {
-                { new StreamContent(stream), "image","1.jpg" }
-            };
-            var resp = await _httpClient.PostAsync("https://image.kieng.cn/upload.html?type=" + new[] { "tt", "jd", "c58", "sg", "sh", "wy" }.OrderByRandom().First(), formData, cancellationToken);
-            var json = await resp.Content.ReadAsStringAsync();
-            var result = JObject.Parse(json);
-            return ((string)result["data"]["url"], (int)result["code"] == 200);
+                using var formData = new MultipartFormDataContent
+                {
+                    { new StreamContent(stream), "image","1.jpg" }
+                };
+                var resp = await _httpClient.PostAsync("https://image.kieng.cn/upload.html?type=" + new[] { "tt", "jd", "c58", "sg", "sh", "wy" }.OrderByRandom().First(), formData, cancellationToken);
+                var json = await resp.Content.ReadAsStringAsync();
+                var result = JObject.Parse(json);
+                return ((string)result["data"]["url"], (int)result["code"] == 200);
+            }
+
+            return (null, false);
         }
 
         /// <summary>

@@ -41,22 +41,27 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 申请友链
         /// </summary>
-        /// <param name="links"></param>
+        /// <param name="link"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<ActionResult> Apply(Links links, CancellationToken cancellationToken)
+        public async Task<ActionResult> Apply(Links link, CancellationToken cancellationToken)
         {
-            if (!links.Url.MatchUrl() || links.Url.Contains(Request.Host.Host))
+            if (!link.Url.MatchUrl() || link.Url.Contains(Request.Host.Host))
             {
                 return ResultData(null, false, "添加失败！链接非法！");
             }
 
-            if (links.Url.Contains(new[] { "?", "&", "=" }))
+            if (link.Url.Contains(new[] { "?", "&", "=" }))
             {
                 return ResultData(null, false, "添加失败！请移除链接中的查询字符串后再试！如遇特殊情况，请联系站长进行处理。");
             }
 
-            var host = new Uri(links.Url).Host;
+            if (!link.Url.Contains(link.UrlBase))
+            {
+                return ResultData(null, false, "站点主页和友链地址不匹配，请检查");
+            }
+
+            var host = new Uri(link.Url).Host;
             if (LinksService.Any(l => l.Url.Contains(host)))
             {
                 return ResultData(null, false, "添加失败！检测到您的网站已经是本站的友情链接了！");
@@ -67,7 +72,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
-            return await HttpClient.GetAsync(links.Url, cancellationToken).ContinueWith(t =>
+            return await HttpClient.GetAsync(link.Url, cancellationToken).ContinueWith(t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {
@@ -87,7 +92,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     return ResultData(null, false, $"添加失败！检测到您的网站上未将本站设置成友情链接，请先将本站主域名：{Request.Host}在您的网站设置为友情链接，并且能够展示后，再次尝试添加即可！");
                 }
 
-                var b = LinksService.AddEntitySaved(links) != null;
+                var b = LinksService.AddEntitySaved(link) != null;
                 return ResultData(null, b, b ? "添加成功！这可能有一定的延迟，如果没有看到您的链接，请稍等几分钟后刷新页面即可，如有疑问，请联系站长。" : "添加失败！这可能是由于网站服务器内部发生了错误，如有疑问，请联系站长。");
             });
         }

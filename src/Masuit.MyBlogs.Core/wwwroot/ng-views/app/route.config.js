@@ -324,7 +324,10 @@ myApp.config([
             controller: "sendbox as list",
             resolve: {
                 deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/system.js"]);
+                        return $ocLazyLoad.load([{
+                            files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
+                            cache: true
+                        },cpath + "/system.js"]);
                     }
                 ]
             }

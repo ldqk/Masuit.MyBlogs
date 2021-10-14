@@ -220,8 +220,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="ip"></param>
         public void UpdateLinkWeight(string referer, string ip)
         {
-            var uri = new Uri(referer);
-            var list = _linksService.GetQuery(l => l.Url.Contains(uri.Host)).ToList();
+            var list = _linksService.GetQuery(l => referer.Contains(l.UrlBase)).ToList();
             foreach (var link in list)
             {
                 link.Loopbacks.Add(new LinkLoopback()

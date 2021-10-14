@@ -22,7 +22,7 @@
         <div class="button-effect">
             @foreach (LinksDto link in Model)
             {
-                <a class="effect effect-5" href="@link.Url" title="@link.Name" target="_blank">@link.Name</a>
+                <a class="effect effect-5" href="@link.Url" title="@link.Name" target="_blank" referrerpolicy="unsafe-url">@link.Name</a>
             }
             <a class="effect effect-5" onclick="add()">👉点我自助申请友链👈</a>
         </div>
@@ -37,7 +37,8 @@
         swal({
             title: '申请友情链接',
             html: '<div class="input-group"><span class="input-group-addon">网站名称</span><input id="title" class="form-control" autofocus placeholder="您的网站名称"></div>' +
-                '<div class="input-group"><span class="input-group-addon">链接地址</span><input id="url" class="form-control" placeholder="链接地址" value="https://"></div>',
+                '<div class="input-group"><span class="input-group-addon">链接地址</span><input id="url" class="form-control" placeholder="https://masuit.com/links"></div>' +
+                '<div class="input-group"><span class="input-group-addon">主页地址</span><input id="urlbase" class="form-control" placeholder="https://masuit.com"></div>',
             showCloseButton: true,
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "确定",
@@ -49,7 +50,8 @@
                 return new Promise(function (resolve) {
                     $.post("/links/apply", {
                         Name: $('#title').val(),
-                        Url: $('#url').val()
+                        Url: $('#url').val(),
+                        UrlBase: $('#urlbase').val()
                     }, function (res) {
                         resolve(res);
                     });
