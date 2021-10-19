@@ -31,7 +31,7 @@ namespace Masuit.MyBlogs.Core.Common
             {
                 var nslookup = new LookupClient();
                 using var cts = new CancellationTokenSource(1000);
-                return nslookup.QueryReverseAsync(req.HttpContext.Connection.RemoteIpAddress, cts.Token).ContinueWith(t => t.IsCompletedSuccessfully && t.Result.Answers.Any(r => r.ToString().Contains(new[]
+                return nslookup.QueryReverseAsync(req.HttpContext.Connection.RemoteIpAddress, cts.Token).ContinueWith(t => t.IsCompletedSuccessfully && t.Result.Answers.Any(r => r.ToString().Trim('.').EndsWith(new[]
                 {
                     "baidu.com",
                     "google.com",
@@ -42,6 +42,7 @@ namespace Masuit.MyBlogs.Core.Common
                     "sogou.com",
                     "soso.com",
                     "yandex.com",
+                    "apple.com",
                     "sm.cn"
                  }))).Result;
             }

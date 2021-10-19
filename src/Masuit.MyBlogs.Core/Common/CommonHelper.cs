@@ -193,7 +193,7 @@ namespace Masuit.MyBlogs.Core.Common
             return Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(new CityResponse()).Execute(() => MaxmindReader.City(ip));
         }
 
-        public static string GetIPLocation(this string ips)
+        public static IPLocation GetIPLocation(this string ips)
         {
             return GetIPLocation(IPAddress.Parse(ips));
         }
@@ -473,6 +473,11 @@ namespace Masuit.MyBlogs.Core.Common
             location = new[] { Address, Address2 }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("|");
             network = Network;
             info = ToString();
+        }
+
+        public bool Contains(string s)
+        {
+            return ToString().Contains(s, StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }

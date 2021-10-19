@@ -1045,7 +1045,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (!string.IsNullOrEmpty(kw))
             {
                 kw = Regex.Escape(kw);
-                where = where.And(e => Regex.IsMatch(e.IP + e.Referer, kw));
+                where = where.And(e => Regex.IsMatch(e.IP + e.Location + e.Referer, kw));
             }
 
             var pages = await PostVisitRecordService.GetPagesAsync<DateTime, PostVisitRecordViewModel>(page, size, where, e => e.Time, false);

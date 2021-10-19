@@ -191,11 +191,12 @@ namespace Masuit.MyBlogs.Core.Common
         internal static readonly Dictionary<string, string> Robots = new Dictionary<string, string>()
         {
             {"googlebot", "Googlebot"},
+            {"applebot", "AppleBot"},
             {"msnbot", "MSNBot"},
             {"baiduspider", "Baiduspider"},
             {"bingbot", "Bing"},
             {"slurp", "Inktomi Slurp"},
-            {"yahoo", "Yahoo"},
+            {"yahoo", "Yahoo!"},
             {"ask jeeves", "Ask Jeeves"},
             {"fastcrawler", "FastCrawler"},
             {"infoseek", "InfoSeek Robot 1.0"},
