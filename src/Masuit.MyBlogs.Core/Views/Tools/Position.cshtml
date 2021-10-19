@@ -25,7 +25,7 @@
             </p>
         </li>
     </ul>
-    @if (Model != null && Model.Status == 0)
+    @if (Model?.Status == 0)
     {
         <form method="get" asp-action="Position">
             <div class="row">
@@ -105,9 +105,8 @@
         <script>
 	    var map = new BMap.Map("allmap"); // 创建Map实例,设置地图允许的最小/大级别
 
-	    map.centerAndZoom(new BMap.Point(@(Model.AddressResult.Location?.Lng), @(Model.AddressResult.Location?.Lat)), 16);
+	    map.centerAndZoom(new BMap.Point(@(Model.AddressResult.Location?.Lng), @(Model.AddressResult.Location?.Lat)), 15);
 	    map.enableScrollWheelZoom(true);
-	    map.clearOverlays();
 	    var new_point = new BMap.Point(@(Model.AddressResult.Location?.Lng), @(Model.AddressResult.Location?.Lat));
 	    var marker = new BMap.Marker(new_point); // 创建标注
 	    map.addOverlay(marker); // 将标注添加到地图中

@@ -79,18 +79,23 @@
     @if (Model.Location != null)
     {
         <div id="allmap"></div>
-        <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=89772e94509a9b903724e247cbc175c2"></script>
+        <script type="text/javascript" src="https://api.map.baidu.com/api?type=webgl&v=2.0&ak=89772e94509a9b903724e247cbc175c2"></script>
         <script>
-	    var map = new BMap.Map("allmap"); // 创建Map实例,设置地图允许的最小/大级别
+            var map = new BMapGL.Map("allmap"); // 创建Map实例,设置地图允许的最小/大级别
 
-	    map.centerAndZoom(new BMap.Point(@(Model.Location.Longitude), @(Model.Location.Latitude)), 16);
-	    map.enableScrollWheelZoom(true);
-	    map.clearOverlays();
-	    var new_point = new BMap.Point(@(Model.Location.Longitude), @(Model.Location.Latitude));
-	    var marker = new BMap.Marker(new_point); // 创建标注
-	    map.addOverlay(marker); // 将标注添加到地图中
-	    marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
-	    map.panTo(new_point);
+            map.centerAndZoom(new BMapGL.Point(@(Model.Location.Longitude), @(Model.Location.Latitude)), 14-@Model.Location.AccuracyRadius.GetValueOrDefault().ToString().Length);
+	        map.enableScrollWheelZoom(true);
+	        var new_point = new BMapGL.Point(@(Model.Location.Longitude), @(Model.Location.Latitude));
+            var marker = new BMapGL.Marker(new_point); // 创建标注
+            var circle = new BMapGL.Circle(new_point, @Model.Location.AccuracyRadius.GetValueOrDefault()* 100, {
+                strokeColor: 'blue',
+                strokeWeight: 2,
+                strokeOpacity: 0.1
+            });
+	        map.addOverlay(marker); // 将标注添加到地图中
+            map.addOverlay(circle); // 将标注添加到地图中
+	        marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+	        map.panTo(new_point);
         </script>
     }
 </div>
