@@ -1,0 +1,28 @@
+﻿@using Masuit.MyBlogs.Core.Common
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>继续访问请输入验证码</title>
+    <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <h3>继续访问请输入验证码：</h3>
+    <img src="/challenge-captcha.jpg" onclick="this.src='/challenge-captcha.jpg?'+new Date" />
+    <form asp-action="CaptchaChallenge" asp-controller="Firewall" method="post">
+        @Html.AntiForgeryToken()
+        <input type="text" name="code" placeholder="验证码" required="" />
+        <button type="submit">提交</button>
+    </form>
+    @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Scripts", ""))
+</body>
+</html>

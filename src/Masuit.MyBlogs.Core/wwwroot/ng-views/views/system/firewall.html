@@ -53,6 +53,16 @@
                         <span class="input-group-addon">次，上报防火墙永久冻结该IP。</span>
                     </div>
                 </div>
+                <div class="col-md-12 form-inline">
+                    <div class="input-group">
+                        <span class="input-group-addon">挑战模式：</span>
+                        <select ng-model="Settings.ChallengeMode" ng-init="Settings.ChallengeMode = ' '" class="form-control">
+                            <option value=" ">无</option>
+                            <option value="JSChallenge">JS挑战</option>
+                            <option value="CaptchaChallenge">验证码挑战</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="col-md-12">
                     <div class="input-group">
                         <span class="input-group-addon">受限制的地区或运营商：</span>

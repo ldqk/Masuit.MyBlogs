@@ -1,0 +1,54 @@
+﻿@using Masuit.Tools.Core.Net
+@using Masuit.MyBlogs.Core.Common
+@using Masuit.Tools.Security
+
+@{
+    Layout = null;
+    var value = Guid.NewGuid().ToString();
+    var keys = RsaCrypt.GenerateRsaKeys(RsaKeyType.PKCS8);
+    Context.Session.Set("challenge-private-key", keys.PrivateKey);
+    Context.Session.Set("challenge-value", value);
+    Context.Response.Cookies.Append("challenge-key", keys.PublicKey);
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>正在检测您的浏览器环境，请稍候......</title>
+    <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jsencrypt/3.0.0-rc.1/jsencrypt.min.js"></script>
+</head>
+<body>
+    <form>
+        @Html.AntiForgeryToken()
+    </form>
+    正在检测您的浏览器环境，请稍候......
+    @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Scripts", ""))
+</body>
+</html>
+<script>
+    $(function () {
+        var encrypt = new JSEncrypt();
+        encrypt.setPublicKey($.cookie("challenge-key"));
+        setTimeout(function () {
+            var formData = new FormData();
+            formData.append("__RequestVerificationToken", $("[name='__RequestVerificationToken']").val());
+            formData.append("token", encrypt.encrypt("@value"));
+            window.fetch("/challenge", {
+                credentials: 'include',
+                method: 'POST',
+                mode: 'cors',
+                body: formData
+            }).then(function (response) {
+                if (response.ok) {
+                    location.reload();
+                }
+            });
+        }, 3000);
+    });
+</script>

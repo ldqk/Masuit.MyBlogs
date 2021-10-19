@@ -68,6 +68,26 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 return;
             }
 
+            if (!context.HttpContext.Session.TryGetValue("js-challenge", out _))
+            {
+                var mode = CommonHelper.SystemSettings.GetOrAdd("ChallengeMode", "");
+                if (mode == "JSChallenge")
+                {
+                    context.Result = new ViewResult()
+                    {
+                        ViewName = "/Views/Shared/JSChallenge.cshtml"
+                    };
+                }
+
+                if (mode == "CaptchaChallenge")
+                {
+                    context.Result = new ViewResult()
+                    {
+                        ViewName = "/Views/Shared/CaptchaChallenge.cshtml"
+                    };
+                }
+            }
+
             var times = CacheManager.AddOrUpdate("Frequency:" + ip, 1, i => i + 1, 5);
             CacheManager.Expire("Frequency:" + ip, ExpirationMode.Absolute, TimeSpan.FromSeconds(CommonHelper.SystemSettings.GetOrAdd("LimitIPFrequency", "60").ToInt32()));
             var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPRequestTimes", "90").ToInt32();
