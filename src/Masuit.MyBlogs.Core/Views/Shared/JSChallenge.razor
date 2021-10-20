@@ -1,0 +1,21 @@
+﻿@implements IDisposable
+@inject IJSRuntime JS
+
+@code {
+    [Parameter]
+    public string Token { get; set; }
+    private DotNetObjectReference<JSChallenge> objRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        objRef = DotNetObjectReference.Create(this);
+        await JS.InvokeAsync<string>("checkBrowser", objRef);
+    }
+
+    [JSInvokable]
+    public string GetToken() =>Token;
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
+}

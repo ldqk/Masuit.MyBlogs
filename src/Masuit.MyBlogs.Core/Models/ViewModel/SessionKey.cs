@@ -5,5 +5,8 @@
         public const string UserInfo = "userinfo";
         public const string TimeZone = "TimeZone";
         public const string RawIP = "rawip";
+        public const string ChallengeMode = nameof(ChallengeMode);
+        public const string CaptchaChallenge = nameof(CaptchaChallenge);
+        public const string JSChallenge = nameof(JSChallenge);
     }
 }

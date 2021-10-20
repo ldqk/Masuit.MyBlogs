@@ -1,6 +1,7 @@
 ﻿using CacheManager.Core;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
+using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Logging;
@@ -70,8 +71,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
 
             if (!context.HttpContext.Session.TryGetValue("js-challenge", out _))
             {
-                var mode = CommonHelper.SystemSettings.GetOrAdd("ChallengeMode", "");
-                if (mode == "JSChallenge")
+                var mode = CommonHelper.SystemSettings.GetOrAdd(SessionKey.ChallengeMode, "");
+                if (mode == SessionKey.JSChallenge)
                 {
                     context.Result = new ViewResult()
                     {
@@ -79,7 +80,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     };
                 }
 
-                if (mode == "CaptchaChallenge")
+                if (mode == SessionKey.CaptchaChallenge)
                 {
                     context.Result = new ViewResult()
                     {
