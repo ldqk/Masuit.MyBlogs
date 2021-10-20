@@ -67,7 +67,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
-        /// 保存banner
+        /// 保存广告
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -96,7 +96,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
-        /// 删除banner
+        /// 删除广告
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -109,7 +109,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
 
         /// <summary>
-        /// 禁用或开启文章评论
+        /// 广告上下架
         /// </summary>
         /// <param name="id">文章id</param>
         /// <returns></returns>
@@ -119,6 +119,24 @@ namespace Masuit.MyBlogs.Core.Controllers
             var ad = await AdsService.GetByIdAsync(id) ?? throw new NotFoundException("广告不存在！");
             ad.Status = ad.Status == Status.Available ? Status.Unavailable : Status.Available;
             return ResultData(null, await AdsService.SaveChangesAsync() > 0, ad.Status == Status.Available ? $"【{ad.Title}】已上架！" : $"【{ad.Title}】已下架！");
+        }
+
+        /// <summary>
+        /// 随机前往一个广告
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("/partner-random")]
+        public async Task<ActionResult> RandomGo()
+        {
+            var ad = AdsService.GetByWeightedPrice((AdvertiseType)new Random().Next(1, 4), Request.Location());
+            if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("ads" + ad.Id)))
+            {
+                HttpContext.Session.Set("ads" + ad.Id, ad.Id.ToString());
+                ad.ViewCount++;
+                await AdsService.SaveChangesAsync();
+            }
+
+            return Redirect(ad.Url);
         }
     }
 }

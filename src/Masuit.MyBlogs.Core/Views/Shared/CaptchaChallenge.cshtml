@@ -1,4 +1,5 @@
 ﻿@using Masuit.MyBlogs.Core.Common
+@using System.Diagnostics
 
 @{
     Layout = null;
@@ -17,7 +18,7 @@
 </head>
 <body>
     <h3>继续访问请输入验证码：</h3>
-    <img src="/challenge-captcha.jpg" onclick="this.src='/challenge-captcha.jpg?'+new Date" />
+    <img src="/challenge-captcha.jpg?@Stopwatch.GetTimestamp()" onclick="this.src='/challenge-captcha.jpg?'+new Date" />
     <form asp-action="CaptchaChallenge" asp-controller="Firewall" method="post">
         @Html.AntiForgeryToken()
         <input type="text" name="code" placeholder="验证码" required="" />

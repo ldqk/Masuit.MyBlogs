@@ -1015,11 +1015,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Title = p.Title,
                 ViewCount = (int)p.AverageViewCount
             }).Cacheable().ToListAsync();
-            var trending = await postsQuery.OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= DateTime.Today)).Take(10).Select(p => new PostModelBase()
+            var h24 = DateTime.Now.AddDays(-1);
+            var trending = await postsQuery.OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= h24)).Take(10).Select(p => new PostModelBase()
             {
                 Id = p.Id,
                 Title = p.Title,
-                ViewCount = p.PostVisitRecords.Count(e => e.Time >= DateTime.Today)
+                ViewCount = p.PostVisitRecords.Count(e => e.Time >= h24)
             }).Cacheable().ToListAsync();
             return ResultData(new
             {

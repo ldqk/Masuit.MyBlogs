@@ -17,6 +17,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
     public partial class AdvertisementService : BaseService<Advertisement>, IAdvertisementService
     {
         public ICacheManager<List<Advertisement>> CacheManager { get; set; }
+        public ICategoryRepository CategoryRepository { get; set; }
 
         public AdvertisementService(IBaseRepository<Advertisement> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
@@ -46,6 +47,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             {
                 var atype = type.ToString("D");
                 Expression<Func<Advertisement, bool>> where = a => a.Types.Contains(atype) && a.Status == Status.Available;
+                var catCount = CategoryRepository.Count(_ => true);
                 where = where.And(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions) : !Regex.IsMatch(location, a.Regions)));
                 if (cid.HasValue)
                 {
@@ -56,7 +58,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                     }
                 }
 
-                var list = GetQuery(where).OrderBy(a => -Math.Log(DataContext.Random()) / ((double)a.Price / a.Types.Length) * (string.IsNullOrEmpty(a.CategoryIds) ? 5 : 1)).Take(count).ToList();
+                var list = GetQuery(where).OrderBy(a => -Math.Log(DataContext.Random()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1)))).Take(count).ToList();
                 var ids = list.Select(a => a.Id).ToArray();
                 GetQuery(a => ids.Contains(a.Id)).UpdateFromQuery(a => new Advertisement()
                 {
