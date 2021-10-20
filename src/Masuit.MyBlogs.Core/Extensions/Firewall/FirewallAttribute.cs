@@ -31,6 +31,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             var request = context.HttpContext.Request;
             var ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
             var tokenValid = request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]);
+
+            //黑名单
             if (ip.IsDenyIpAddress() && !tokenValid)
             {
                 AccessDeny(ip, request, "黑名单IP地址");
@@ -38,16 +40,18 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 return;
             }
 
+            //bypass
             if (CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true") == "false" || context.Filters.Any(m => m.ToString().Contains(new[] { nameof(AllowAccessFirewallAttribute), nameof(MyAuthorizeAttribute) })) || tokenValid)
             {
                 return;
             }
 
+            //UserAgent
             var ua = request.Headers[HeaderNames.UserAgent] + "";
-            var agent = UserAgent.Parse(ua);
             var blocked = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlocked", "").Split(new[] { ',', '|' }, StringSplitOptions.RemoveEmptyEntries);
             if (ua.Contains(blocked))
             {
+                var agent = UserAgent.Parse(ua);
                 AccessDeny(ip, request, $"UA黑名单({agent.Browser} {agent.BrowserVersion}/{agent.Platform})");
                 var msg = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlockedMsg", "当前浏览器不支持访问本站");
                 context.Result = new ContentResult()
@@ -58,19 +62,62 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 };
                 return;
             }
-            if (ip.IsInDenyArea())
-            {
-                AccessDeny(ip, request, "访问地区限制");
-                throw new AccessDenyException("访问地区限制");
-            }
 
+            //搜索引擎
             if (Regex.IsMatch(request.Method, "OPTIONS|HEAD", RegexOptions.IgnoreCase) || request.IsRobot())
             {
                 return;
             }
 
+            DenyArea(ip, request);//禁区
+            Challenge(context, request);//挑战模式
+            ThrottleLimit(ip, request);//限流
+        }
+
+        private void DenyArea(string ip, HttpRequest request)
+        {
+            if (ip.IsInDenyArea())
+            {
+                AccessDeny(ip, request, "访问地区限制");
+                throw new AccessDenyException("访问地区限制");
+            }
+        }
+
+        private void ThrottleLimit(string ip, HttpRequest request)
+        {
+            var times = CacheManager.AddOrUpdate("Frequency:" + ip, 1, i => i + 1, 5);
+            CacheManager.Expire("Frequency:" + ip, ExpirationMode.Absolute, TimeSpan.FromSeconds(CommonHelper.SystemSettings.GetOrAdd("LimitIPFrequency", "60").ToInt32()));
+            var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPRequestTimes", "90").ToInt32();
+            if (times <= limit)
+            {
+                return;
+            }
+
+            if (times > limit * 1.2)
+            {
+                CacheManager.Expire("Frequency:" + ip, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
+                AccessDeny(ip, request, "访问频次限制");
+            }
+
+            throw new TempDenyException("访问频次限制");
+        }
+
+        private static void Challenge(ActionExecutingContext context, HttpRequest request)
+        {
             if (!context.HttpContext.Session.TryGetValue("js-challenge", out _))
             {
+                try
+                {
+                    if (request.Cookies.TryGetValue(SessionKey.ChallengeBypass, out var time) && time.AESDecrypt(AppConfig.BaiduAK).ToDateTime() > DateTime.Now)
+                    {
+                        return;
+                    }
+                }
+                catch
+                {
+                    // ignored
+                }
+
                 var mode = CommonHelper.SystemSettings.GetOrAdd(SessionKey.ChallengeMode, "");
                 if (mode == SessionKey.JSChallenge)
                 {
@@ -88,22 +135,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     };
                 }
             }
-
-            var times = CacheManager.AddOrUpdate("Frequency:" + ip, 1, i => i + 1, 5);
-            CacheManager.Expire("Frequency:" + ip, ExpirationMode.Absolute, TimeSpan.FromSeconds(CommonHelper.SystemSettings.GetOrAdd("LimitIPFrequency", "60").ToInt32()));
-            var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPRequestTimes", "90").ToInt32();
-            if (times <= limit)
-            {
-                return;
-            }
-
-            if (times > limit * 1.2)
-            {
-                CacheManager.Expire("Frequency:" + ip, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
-                AccessDeny(ip, request, "访问频次限制");
-            }
-
-            throw new TempDenyException("访问频次限制");
         }
 
         private async void AccessDeny(string ip, HttpRequest request, string remark)

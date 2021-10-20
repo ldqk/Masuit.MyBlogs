@@ -8,5 +8,6 @@
         public const string ChallengeMode = nameof(ChallengeMode);
         public const string CaptchaChallenge = nameof(CaptchaChallenge);
         public const string JSChallenge = nameof(JSChallenge);
+        public const string ChallengeBypass = "challenge-bypass";
     }
 }

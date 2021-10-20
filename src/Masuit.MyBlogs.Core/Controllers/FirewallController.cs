@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Extensions;
+﻿using Masuit.MyBlogs.Core.Configs;
+using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System;
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -37,9 +39,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                     HttpContext.Session.Remove("challenge-private-key");
                     HttpContext.Session.Remove("challenge-value");
                     Response.Cookies.Delete("challenge-key");
+                    Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.BaiduAK), new CookieOptions()
+                    {
+                        SameSite = SameSiteMode.Lax,
+                        Expires = DateTime.Now.AddDays(1)
+                    });
                     return Ok();
                 }
-                
+
                 return BadRequest("token解密失败");
             }
             catch
@@ -65,6 +72,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 HttpContext.Session.Set("js-challenge", 1);
                 HttpContext.Session.Remove("challenge-captcha");
+                Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.BaiduAK), new CookieOptions()
+                {
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTime.Now.AddDays(1)
+                });
             }
 
             return Redirect(Request.Headers[HeaderNames.Referer]);
