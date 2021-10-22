@@ -32,7 +32,7 @@ namespace Masuit.MyBlogs.Core.Common
             File.WriteAllText(logPath, RequestLogs.ToJsonString(new JsonSerializerSettings() { Formatting = Formatting.Indented }), Encoding.UTF8);
 
             logPath = Path.Combine(AppContext.BaseDirectory + "logs", DateTime.Now.ToString("yyyyMMdd"), "ip.txt").CreateFileIfNotExist();
-            File.WriteAllLines(logPath, RequestLogs.Keys.Select(s => new { s, loc = s.GetIPLocation() }).OrderBy(x => x.loc).Select(g => g.s + "\t" + g.loc), Encoding.UTF8);
+            File.WriteAllLines(logPath, RequestLogs.Keys.Select(s => new { s, loc = s.GetIPLocation().ToString() }).OrderBy(x => x.loc).Select(g => g.s + "\t" + g.loc), Encoding.UTF8);
             RequestLogs.Clear();
         }
 

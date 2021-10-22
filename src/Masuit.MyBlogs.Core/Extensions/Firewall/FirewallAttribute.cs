@@ -4,6 +4,7 @@ using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.Core.Net;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
@@ -110,12 +111,13 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 {
                     if (request.Cookies.TryGetValue(SessionKey.ChallengeBypass, out var time) && time.AESDecrypt(AppConfig.BaiduAK).ToDateTime() > DateTime.Now)
                     {
+                        context.HttpContext.Session.Set("js-challenge", 1);
                         return;
                     }
                 }
                 catch
                 {
-                    // ignored
+                    context.HttpContext.Response.Cookies.Delete(SessionKey.ChallengeBypass);
                 }
 
                 var mode = CommonHelper.SystemSettings.GetOrAdd(SessionKey.ChallengeMode, "");

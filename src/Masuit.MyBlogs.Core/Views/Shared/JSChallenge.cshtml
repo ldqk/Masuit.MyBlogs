@@ -43,9 +43,9 @@
 </html>
 <script src="/_framework/blazor.server.js"></script>
 <script>
-    window.checkBrowser =async function(dotNetHelper) {
+    window.checkBrowser = async function (dotNetHelper) {
         let token = await dotNetHelper.invokeMethodAsync('GetToken');
-        setTimeout(function () { 
+        setTimeout(function () {
             var formData = new FormData();
             formData.append("__RequestVerificationToken", document.querySelector("[name='__RequestVerificationToken']").value);
             formData.append("token", token);
@@ -55,7 +55,7 @@
                 mode: 'cors',
                 body: formData
             }).then(function (response) {
-                    location.reload();
+                location.reload();
             }).catch(function (e) {
                 alert("页面加载失败，请关闭掉额外的浏览器插件扩展后刷新重试！");
             });

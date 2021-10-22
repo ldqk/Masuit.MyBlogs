@@ -164,7 +164,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             var b = await LinksService.GetQuery(m => m.Id == model.Id).UpdateFromQueryAsync(m => new Links()
             {
                 Name = model.Name,
-                Url = model.Url
+                Url = model.Url,
+                UrlBase = model.UrlBase
             }) > 0;
             return ResultData(null, b, b ? "保存成功" : "保存失败");
         }

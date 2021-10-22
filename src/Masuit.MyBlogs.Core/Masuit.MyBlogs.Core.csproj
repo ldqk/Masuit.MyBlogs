@@ -54,7 +54,7 @@
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.13" />
         <PackageReference Include="TimeZoneConverter" Version="3.5.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.0" />
-        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.2.14" />
+        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.2.15" />
     </ItemGroup>
     <ItemGroup>
         <Content Update="appsettings.json">
