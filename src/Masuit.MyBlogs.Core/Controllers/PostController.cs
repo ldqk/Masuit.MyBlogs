@@ -276,6 +276,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             p.Modifier = p.Author;
             p.ModifierEmail = p.Email;
             p.DisableCopy = true;
+            p.Rss = true;
             p = PostService.AddEntitySaved(p);
             if (p == null)
             {
@@ -728,7 +729,6 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             post.Status = Status.Published;
             Post p = post.Mapper<Post>();
-            p.Rss = true;
             p.Modifier = p.Author;
             p.ModifierEmail = p.Email;
             p.IP = ClientIP;

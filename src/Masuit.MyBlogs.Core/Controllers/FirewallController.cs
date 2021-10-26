@@ -1,5 +1,4 @@
 ﻿using Masuit.MyBlogs.Core.Configs;
-using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
@@ -22,32 +21,17 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="token"></param>
         /// <returns></returns>
         [HttpPost("/challenge"), AutoValidateAntiforgeryToken]
-        public ActionResult JsChallenge(string token)
+        public ActionResult JsChallenge()
         {
-            if (string.IsNullOrEmpty(token) || token.Length < 20)
-            {
-                return BadRequest("请求token无效");
-            }
-
             try
             {
-                var privateKey = HttpContext.Session.Get<string>("challenge-private-key") ?? throw new NotFoundException("请求私钥无效");
-                var crypto = HttpContext.Session.Get<string>("challenge-value") ?? throw new NotFoundException("请求私钥无效");
-                if (token.RSADecrypt(privateKey) == crypto)
+                HttpContext.Session.Set("js-challenge", 1);
+                Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.BaiduAK), new CookieOptions()
                 {
-                    HttpContext.Session.Set("js-challenge", 1);
-                    HttpContext.Session.Remove("challenge-private-key");
-                    HttpContext.Session.Remove("challenge-value");
-                    Response.Cookies.Delete("challenge-key");
-                    Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.BaiduAK), new CookieOptions()
-                    {
-                        SameSite = SameSiteMode.Lax,
-                        Expires = DateTime.Now.AddDays(1)
-                    });
-                    return Ok();
-                }
-
-                return BadRequest("token解密失败");
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTime.Now.AddDays(1)
+                });
+                return Ok();
             }
             catch
             {

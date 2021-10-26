@@ -105,37 +105,39 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
 
         private static void Challenge(ActionExecutingContext context, HttpRequest request)
         {
-            if (!context.HttpContext.Session.TryGetValue("js-challenge", out _))
+            if (context.HttpContext.Session.TryGetValue("js-challenge", out _))
             {
-                try
-                {
-                    if (request.Cookies.TryGetValue(SessionKey.ChallengeBypass, out var time) && time.AESDecrypt(AppConfig.BaiduAK).ToDateTime() > DateTime.Now)
-                    {
-                        context.HttpContext.Session.Set("js-challenge", 1);
-                        return;
-                    }
-                }
-                catch
-                {
-                    context.HttpContext.Response.Cookies.Delete(SessionKey.ChallengeBypass);
-                }
+                return;
+            }
 
-                var mode = CommonHelper.SystemSettings.GetOrAdd(SessionKey.ChallengeMode, "");
-                if (mode == SessionKey.JSChallenge)
+            try
+            {
+                if (request.Cookies.TryGetValue(SessionKey.ChallengeBypass, out var time) && time.AESDecrypt(AppConfig.BaiduAK).ToDateTime() > DateTime.Now)
                 {
-                    context.Result = new ViewResult()
-                    {
-                        ViewName = "/Views/Shared/JSChallenge.cshtml"
-                    };
+                    context.HttpContext.Session.Set("js-challenge", 1);
+                    return;
                 }
+            }
+            catch
+            {
+                context.HttpContext.Response.Cookies.Delete(SessionKey.ChallengeBypass);
+            }
 
-                if (mode == SessionKey.CaptchaChallenge)
+            var mode = CommonHelper.SystemSettings.GetOrAdd(SessionKey.ChallengeMode, "");
+            if (mode == SessionKey.JSChallenge)
+            {
+                context.Result = new ViewResult()
                 {
-                    context.Result = new ViewResult()
-                    {
-                        ViewName = "/Views/Shared/CaptchaChallenge.cshtml"
-                    };
-                }
+                    ViewName = "/Views/Shared/JSChallenge.cshtml"
+                };
+            }
+
+            if (mode == SessionKey.CaptchaChallenge)
+            {
+                context.Result = new ViewResult()
+                {
+                    ViewName = "/Views/Shared/CaptchaChallenge.cshtml"
+                };
             }
         }
 

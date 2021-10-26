@@ -18,7 +18,7 @@ namespace Masuit.MyBlogs.Core
     {
         public static void Main(string[] args)
         {
-            if (!"114.114.114.114".GetIPLocation().Contains("114DNS"))
+            if (!"223.5.5.5".GetIPLocation().Contains("阿里"))
             {
                 throw new Exception("IP地址库初始化失败，请重启应用！");
             }
