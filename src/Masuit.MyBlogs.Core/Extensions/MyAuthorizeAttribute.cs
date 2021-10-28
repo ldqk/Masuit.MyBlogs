@@ -24,7 +24,7 @@ namespace Masuit.MyBlogs.Core.Extensions
         /// <param name="filterContext">筛选器上下文。</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (filterContext.Filters.Any(m => m.ToString().Contains(nameof(AllowAnonymousAttribute))))
+            if (filterContext.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any())
             {
                 return;
             }

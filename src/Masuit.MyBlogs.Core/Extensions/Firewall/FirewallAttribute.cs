@@ -105,7 +105,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
 
         private static void Challenge(ActionExecutingContext context, HttpRequest request)
         {
-            if (context.HttpContext.Session.TryGetValue("js-challenge", out _))
+            if (context.HttpContext.Session.TryGetValue("js-challenge", out _) || request.Path.ToUriComponent().Contains("."))
             {
                 return;
             }

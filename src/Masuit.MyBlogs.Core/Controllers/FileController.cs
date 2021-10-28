@@ -5,6 +5,8 @@ using Masuit.Tools;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Files;
 using Masuit.Tools.Logging;
+using Masuit.Tools.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Polly;
@@ -254,19 +256,38 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Handle(string path, string[] items, string toFilename)
         {
             path = path?.TrimStart('\\', '/') ?? "";
-            var root = CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/');
-            var file = Path.Combine(HostEnvironment.ContentRootPath, root, path);
-            switch (Request.Query["action"])
+            var token = Guid.NewGuid().ToString().MDString(Guid.NewGuid().ToString()).FromBinaryBig(16).ToBinary(62);
+            RedisHelper.Set("FileManager:Token:" + token, "1");
+            RedisHelper.Expire("FileManager:Token:" + token, TimeSpan.FromDays(1));
+            return RedirectToAction("Download", "File", new { path, items, toFilename, token });
+        }
+
+        /// <summary>
+        /// 下载文件
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="items"></param>
+        /// <param name="toFilename"></param>
+        /// <param name="token">访问token</param>
+        /// <returns></returns>
+        [HttpGet("{**path}"), AllowAnonymous]
+        public ActionResult Download(string path, string[] items, string toFilename, string token)
+        {
+            if (RedisHelper.Exists("FileManager:Token:" + token))
             {
-                case "download":
-                    if (System.IO.File.Exists(file))
-                    {
-                        return this.ResumePhysicalFile(file, Path.GetFileName(file));
-                    }
-                    break;
-                case "downloadMultiple":
-                    var buffer = SevenZipCompressor.ZipStream(items.Select(s => Path.Combine(HostEnvironment.ContentRootPath, root, s.TrimStart('\\', '/')))).ToArray();
+                var root = CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/');
+                if (items.Length > 0)
+                {
+                    using var ms = SevenZipCompressor.ZipStream(items.Select(s => Path.Combine(HostEnvironment.ContentRootPath, root, s.TrimStart('\\', '/'))));
+                    var buffer = ms.ToArray();
                     return this.ResumeFile(buffer, Path.GetFileName(toFilename));
+                }
+
+                var file = Path.Combine(HostEnvironment.ContentRootPath, root, path);
+                if (System.IO.File.Exists(file))
+                {
+                    return this.ResumePhysicalFile(file, Path.GetFileName(file));
+                }
             }
 
             throw new NotFoundException("文件未找到");
