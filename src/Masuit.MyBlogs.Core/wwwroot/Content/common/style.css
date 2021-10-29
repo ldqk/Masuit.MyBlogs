@@ -421,7 +421,10 @@ Custom bottom spacer
 }
 .text-red {
     font-size: 16px;
-    color: #F44336;
+    color: #F44336 !important;
+}
+.text-bold {
+    font-weight: bold;
 }
 .text-green {
     color: #009900;

@@ -219,6 +219,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 foreach (var c in single.Flatten())
                 {
                     c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                    c.IsAuthor = c.Email == comment.Post.Email || c.Email == comment.Post.ModifierEmail;
                     if (!CurrentUser.IsAdmin)
                     {
                         c.Email = null;
@@ -246,6 +247,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             parent.Data.Flatten().ForEach(c =>
             {
                 c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+                c.IsAuthor = c.Email == c.Post.Email || c.Email == c.Post.ModifierEmail;
                 if (!CurrentUser.IsAdmin)
                 {
                     c.Email = null;

@@ -434,7 +434,7 @@ function loadParentComments(data) {
             html += `<li class="msg-list media animated fadeInRight" id='${rows[i].Id}'>
                         <div class="media-body">
                             <article class="panel panel-info">
-                                <header class="panel-heading">${startfloor--}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""} | ${rows[i].CommentDate}
+                                <header class="panel-heading ${rows[i].IsMaster ? "text-red" : ""} ${rows[i].IsAuthor ? "text-bold" : ""}">${startfloor--}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""}${rows[i].IsAuthor ? `(文章作者)` : ""} | ${rows[i].CommentDate}
                                     <span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span>
                                 </header>
                                 <div class="panel-body">
@@ -465,8 +465,8 @@ function loadComments(comments, depth = 0) {
     for (let item of comments) {
         var color = colors[depth%5];
 		html += `<article id="${item.Id}" class="panel panel-${color}">
-                        <div class="panel-heading">
-                            ${depth}-${floor++}# ${item.IsMaster ?`<i class="icon icon-user"></i>`:""}${item.NickName}${item.IsMaster ?`(管理员)`:""} | ${item.CommentDate}
+                        <div class="panel-heading ${item.IsMaster ? "text-red" : ""} ${item.IsAuthor ? "text-bold" : ""}">
+                            ${depth}-${floor++}# ${item.IsMaster ?`<i class="icon icon-user"></i>`:""}${item.NickName}${item.IsMaster ?`(管理员)`:""}${item.IsAuthor ?`(文章作者)`:""} | ${item.CommentDate}
                             <span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span>
                         </div>
                         <div class="panel-body">

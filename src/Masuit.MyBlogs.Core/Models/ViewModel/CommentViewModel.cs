@@ -50,9 +50,14 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         public string OperatingSystem { get; set; }
 
         /// <summary>
-        /// 是否是博主
+        /// 是否是管理员
         /// </summary>
         public bool IsMaster { get; set; }
+
+        /// <summary>
+        /// 是否是作者
+        /// </summary>
+        public bool IsAuthor { get; set; }
 
         /// <summary>
         /// 支持数

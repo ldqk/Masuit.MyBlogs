@@ -73,6 +73,9 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         [DefaultValue(false)]
         public bool IsMaster { get; set; }
 
+        [NotMapped]
+        public bool IsAuthor { get; set; }
+
         /// <summary>
         /// Ö§³ÖÊý
         /// </summary>
