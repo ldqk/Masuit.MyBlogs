@@ -245,9 +245,13 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
-            if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
+            if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip))
             {
-                location += "|" + rawip.GetIPLocation();
+                var s = rawip.Base64Decrypt();
+                if (ClientIP != s)
+                {
+                    location += "|" + s.GetIPLocation();
+                }
             }
 
             posts.RemoveAll(p =>
@@ -288,7 +292,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
             if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
             {
-                location += "|" + rawip.GetIPLocation();
+                var s = rawip.Base64Decrypt();
+                if (ClientIP != s)
+                {
+                    location += "|" + s.GetIPLocation();
+                }
             }
 
             return p => p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true :
@@ -307,7 +315,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
             if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
             {
-                location += "|" + rawip.GetIPLocation();
+                var s = rawip.Base64Decrypt();
+                if (ClientIP != s)
+                {
+                    location += "|" + s.GetIPLocation();
+                }
             }
 
             switch (post.LimitMode)
@@ -346,9 +358,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         private void Disallow(Post post)
         {
             var remark = "无权限查看该文章";
-            if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
+            if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip.Base64Decrypt())
             {
-                remark += "，发生了IP切换，原始IP：" + rawip;
+                remark += "，发生了IP切换，原始IP：" + rawip.Base64Decrypt();
             }
 
             RedisHelper.IncrBy("interceptCount");

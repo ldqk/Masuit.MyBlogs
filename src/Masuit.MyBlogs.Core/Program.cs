@@ -22,7 +22,7 @@ namespace Masuit.MyBlogs.Core
             {
                 throw new Exception("IP地址库初始化失败，请重启应用！");
             }
-
+            
             InitOneDrive();
             PerfCounter.Init();
             CreateWebHostBuilder(args).Build().Run();

@@ -73,6 +73,14 @@
                 </div>
                 <div class="col-md-12">
                     <div class="input-group">
+                        <span class="input-group-addon">不受限制的地区或运营商：</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.AllowedArea" placeholder="不受访问限制的地区或网络，逗号分隔，支持地区、运营商、ASN、机房名称" type="text" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="input-group">
                         <span class="input-group-addon">受限制提示语：</span>
                         <div class="fg-line">
                             <textarea class="form-control" ng-model="Settings.AccessDenyTips" placeholder="基于主观因素考虑，您所在的地区暂时不允许访问本站，如有疑问，请联系站长！或者请联系站长开通本站的访问权限！" rows="4"></textarea>

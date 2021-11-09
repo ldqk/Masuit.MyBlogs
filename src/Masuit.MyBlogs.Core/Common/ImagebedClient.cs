@@ -197,7 +197,7 @@ namespace Masuit.MyBlogs.Core.Common
                 {
                     { new StreamContent(stream), "image","1.jpg" }
                 };
-                var resp = await _httpClient.PostAsync("https://image.kieng.cn/upload.html?type=" + new[] { "tt", "jd", "c58", "sg", "sh", "wy" }.OrderByRandom().First(), formData, cancellationToken);
+                var resp = await _httpClient.PostAsync("https://image.kieng.cn/upload.html?type=" + new[] { "jd", "c58", "sg", "sh", "wy" }.OrderByRandom().First(), formData, cancellationToken);
                 var json = await resp.Content.ReadAsStringAsync();
                 var result = JObject.Parse(json);
                 return ((string)result["data"]["url"], (int)result["code"] == 200);

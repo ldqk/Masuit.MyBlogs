@@ -42,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             }
 
             //bypass
-            if (CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true") == "false" || context.Filters.Any(m => m.ToString().Contains(new[] { nameof(AllowAccessFirewallAttribute), nameof(MyAuthorizeAttribute) })) || tokenValid)
+            if (CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true") == "false" || context.ActionDescriptor.EndpointMetadata.Any(o => o is MyAuthorizeAttribute or AllowAccessFirewallAttribute) || tokenValid)
             {
                 return;
             }
@@ -70,18 +70,27 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 return;
             }
 
-            DenyArea(ip, request);//禁区
+            //白名单地区
+            var (location, network, pos) = ip.GetIPLocation();
+            var allowedAreas = CommonHelper.SystemSettings.GetOrAdd("AllowedArea", "").Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries);
+            if (allowedAreas.Any() && pos.Contains(allowedAreas))
+            {
+                return;
+            }
+
+            //黑名单地区
+            var denyAreas = CommonHelper.SystemSettings.GetOrAdd("DenyArea", "").Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries);
+            if (denyAreas.Any())
+            {
+                if (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(network) || pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any()) // 未知地区的，未知网络的，禁区的
+                {
+                    AccessDeny(ip, request, "访问地区限制");
+                    throw new AccessDenyException("访问地区限制");
+                }
+            }
+
             Challenge(context, request);//挑战模式
             ThrottleLimit(ip, request);//限流
-        }
-
-        private void DenyArea(string ip, HttpRequest request)
-        {
-            if (ip.IsInDenyArea())
-            {
-                AccessDeny(ip, request, "访问地区限制");
-                throw new AccessDenyException("访问地区限制");
-            }
         }
 
         private void ThrottleLimit(string ip, HttpRequest request)

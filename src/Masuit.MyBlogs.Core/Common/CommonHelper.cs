@@ -130,26 +130,6 @@ namespace Masuit.MyBlogs.Core.Common
             return DenyIP.Contains(ip) || DenyIPRange.AsParallel().Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
         }
 
-        /// <summary>
-        /// 是否是禁区
-        /// </summary>
-        /// <param name="ips"></param>
-        /// <returns></returns>
-        public static bool IsInDenyArea(this string ips)
-        {
-            var denyAreas = SystemSettings.GetOrAdd("DenyArea", "").Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries);
-            if (denyAreas.Any())
-            {
-                foreach (var item in ips.Split(','))
-                {
-                    var (location, network, pos) = GetIPLocation(IPAddress.Parse(item));
-                    return string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(network) || pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any(); // 未知地区的，未知网络的，禁区的
-                }
-            }
-
-            return false;
-        }
-
         private static readonly DbSearcher IPSearcher = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
         public static readonly DatabaseReader MaxmindReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-City.mmdb"));
         private static readonly DatabaseReader MaxmindAsnReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-ASN.mmdb"));

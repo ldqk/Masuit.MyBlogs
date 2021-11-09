@@ -4,6 +4,7 @@ using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Linq;
@@ -118,7 +119,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
 
             if (!context.Request.Cookies.ContainsKey(SessionKey.RawIP))
             {
-                context.Response.Cookies.Append(SessionKey.RawIP, ip, new CookieOptions()
+                context.Response.Cookies.Append(SessionKey.RawIP, ip.Base64Encrypt(), new CookieOptions()
                 {
                     Expires = DateTimeOffset.Now.AddDays(1),
                     SameSite = SameSiteMode.Lax

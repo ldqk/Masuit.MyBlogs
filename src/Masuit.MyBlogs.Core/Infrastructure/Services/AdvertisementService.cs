@@ -1,5 +1,6 @@
 ﻿using CacheManager.Core;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
@@ -29,7 +30,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="type">广告类型</param>
         /// <param name="cid">分类id</param>
         /// <returns></returns>
-        public Advertisement GetByWeightedPrice(AdvertiseType type, string location, int? cid = null)
+        public Advertisement GetByWeightedPrice(AdvertiseType type, IPLocation location, int? cid = null)
         {
             return GetsByWeightedPrice(1, type, location, cid).FirstOrDefault();
         }
@@ -41,8 +42,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="type">广告类型</param>
         /// <param name="cid">分类id</param>
         /// <returns></returns>
-        public List<Advertisement> GetsByWeightedPrice(int count, AdvertiseType type, string location, int? cid = null)
+        public List<Advertisement> GetsByWeightedPrice(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null)
         {
+            var (location, _, _) = ipinfo;
             return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}", _ =>
             {
                 var atype = type.ToString("D");
