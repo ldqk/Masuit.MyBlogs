@@ -1,4 +1,5 @@
-﻿using CacheManager.Core;
+﻿using System.Linq;
+using CacheManager.Core;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
@@ -11,13 +12,9 @@ using Masuit.Tools;
 using Masuit.Tools.Html;
 using PanGu;
 using PanGu.HighLight;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {

@@ -43,7 +43,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// <returns></returns>
         public async Task AddSiteId(string siteName, string nickName)
         {
-            Site site = new Site();
+            Site site = new();
             //使用 Onedrive
             if (siteName == "onedrive")
             {
@@ -52,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             }
             else
             {
-                using HttpClient httpClient = new HttpClient
+                using var httpClient = new HttpClient
                 {
                     Timeout = TimeSpan.FromSeconds(20)
                 };
@@ -67,7 +67,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             if (!SiteContext.Sites.Any(s => s.SiteId == site.SiteId))
             {
                 //若是首次添加则设置为默认的驱动器
-                using (SettingService setting = new SettingService(new DriveContext()))
+                using (var setting = new SettingService(new DriveContext()))
                 {
                     if (!SiteContext.Sites.Any())
                     {
@@ -95,7 +95,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// <returns></returns>
         public async Task<List<DriveInfo>> GetDriveInfo()
         {
-            List<DriveInfo> drivesInfo = new List<DriveInfo>();
+            var drivesInfo = new List<DriveInfo>();
             foreach (var item in SiteContext.Sites.ToArray())
             {
                 Microsoft.Graph.Drive drive;

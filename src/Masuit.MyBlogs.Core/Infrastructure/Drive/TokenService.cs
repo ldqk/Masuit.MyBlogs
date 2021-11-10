@@ -84,7 +84,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// <returns></returns>
         public async Task<AuthenticationResult> Authorize(string code)
         {
-            AuthorizationCodeProvider authorizationCodeProvider = new AuthorizationCodeProvider(app);
+            var authorizationCodeProvider = new AuthorizationCodeProvider(app);
             authorizeResult = await authorizationCodeProvider.ClientApplication.AcquireTokenByAuthorizationCode(OneDriveConfiguration.Scopes, code).ExecuteAsync();
             return authorizeResult;
         }

@@ -104,7 +104,13 @@ namespace Masuit.MyBlogs.Core
                     c.Result = RuleResult.EndResponse;
                     c.HttpContext.Response.Redirect("/tag/" + HttpUtility.UrlEncode(c.HttpContext.Request.Query["tag"]), true);
                 }
-            }).AddRewrite(@"\w+/_blazor(.*)", "_blazor$1", true);
+
+                if ((c.HttpContext.Request.Path.Equals("/search") || c.HttpContext.Request.Path.Equals("/s"))&&c.HttpContext.Request.Query.ContainsKey("wd"))
+                {
+                    c.Result = RuleResult.EndResponse;
+                    c.HttpContext.Response.Redirect("/search/" + HttpUtility.UrlEncode(c.HttpContext.Request.Query["wd"]), true);
+                }
+            }).AddRewrite(@"\w+/_blazor(.*)", "_blazor$1", false);
             switch (config["UseRewriter"])
             {
                 case "NonWww":

@@ -7,15 +7,9 @@ using Masuit.Tools.Files;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Polly;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -26,8 +20,9 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class FileController : AdminController
     {
         public IWebHostEnvironment HostEnvironment { get; set; }
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ISevenZipCompressor SevenZipCompressor { get; set; }
 
@@ -131,6 +126,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         type = "file"
                     })));
                     break;
+
                 case "remove":
                     req.Items.ForEach(s =>
                     {
@@ -149,6 +145,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         success = "true"
                     });
                     break;
+
                 case "rename":
                 case "move":
                     string newpath;
@@ -185,6 +182,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         success = "true"
                     });
                     break;
+
                 case "copy":
                     if (!string.IsNullOrEmpty(req.Item))
                     {
@@ -200,6 +198,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         success = "true"
                     });
                     break;
+
                 case "edit":
                     new FileInfo(Path.Combine(root, req.Item.TrimStart('\\', '/'))).ShareReadWrite().WriteAllText(req.Content, Encoding.UTF8);
                     list.Add(new
@@ -207,20 +206,25 @@ namespace Masuit.MyBlogs.Core.Controllers
                         success = "true"
                     });
                     break;
+
                 case "getContent":
                     return Json(new
                     {
                         result = new FileInfo(Path.Combine(root, req.Item.TrimStart('\\', '/'))).ShareReadWrite().ReadAllText(Encoding.UTF8)
                     });
+
                 case "createFolder":
                     list.Add(new
                     {
                         success = Directory.CreateDirectory(Path.Combine(root, req.NewPath.TrimStart('\\', '/'))).Exists.ToString()
                     });
                     break;
+
                 case "changePermissions":
+
                     //todo:文件权限修改
                     break;
+
                 case "compress":
                     var filename = Path.Combine(Path.Combine(root, req.Destination.TrimStart('\\', '/')), Path.GetFileNameWithoutExtension(req.CompressedFilename) + ".zip");
                     SevenZipCompressor.Zip(req.Items.Select(s => Path.Combine(root, s.TrimStart('\\', '/'))), filename);
@@ -229,10 +233,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                         success = "true"
                     });
                     break;
+
                 case "extract":
                     var folder = Path.Combine(Path.Combine(root, req.Destination.TrimStart('\\', '/')), req.FolderName.Trim('/', '\\'));
                     var zip = Path.Combine(root, req.Item.TrimStart('\\', '/'));
-                    SevenZipCompressor.Extract(zip, folder);
+                    SevenZipCompressor.Decompress(zip, folder);
                     list.Add(new
                     {
                         success = "true"

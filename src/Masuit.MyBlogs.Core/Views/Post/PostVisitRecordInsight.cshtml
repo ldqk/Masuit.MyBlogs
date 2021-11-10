@@ -109,7 +109,7 @@
             },
             title: {
                 left: 'center',
-                text: '最近90天访问趋势'
+                text: '最近90天访问趋势，日均：' + (res.reduce((acr, cur) => acr + cur.Count, 0) / (new Date() - new Date(res[0].Date)) * (1000 * 60 * 60 * 24)).toFixed(2)
             },
             xAxis: {
                 type: 'time',

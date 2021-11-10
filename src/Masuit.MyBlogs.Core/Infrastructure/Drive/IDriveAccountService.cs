@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// 获取驱动器信息
         /// </summary>
         /// <returns></returns>
-        public Task<List<DriveInfo>> GetDriveInfo();
+        public Task<List<DriveAccountService.DriveInfo>> GetDriveInfo();
 
         /// <summary>
         /// 解除绑定

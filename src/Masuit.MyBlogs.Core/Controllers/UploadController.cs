@@ -87,7 +87,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Content = html
             });
         }
-        private async Task<string> ConvertToHtml(IFormFile file)
+        private static async Task<string> ConvertToHtml(IFormFile file)
         {
             var docfile = Path.Combine(Environment.GetEnvironmentVariable("temp") ?? "upload", file.FileName);
             try
@@ -152,7 +152,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Directory.CreateDirectory(dir);
                 await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 await image.CopyToAsync(fs);
-                img.Attributes["src"].Value = path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/");
+                img.Attributes["src"].Value = path[HostEnvironment.WebRootPath.Length..].Replace("\\", "/");
             }
 
             return body.InnerHtml.HtmlSantinizerStandard().HtmlSantinizerCustom(attributes: new[] { "dir", "lang" });
@@ -260,6 +260,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="imagebedClient"></param>
         /// <param name="file"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost("upload"), ApiExplorerSettings(IgnoreApi = false)]
         public async Task<ActionResult> UploadFile([FromServices] ImagebedClient imagebedClient, IFormFile file, CancellationToken cancellationToken)
@@ -282,7 +283,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         var dir = Path.GetDirectoryName(path);
                         Directory.CreateDirectory(dir);
                         await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                        await file.CopyToAsync(fs);
+                        await file.CopyToAsync(fs,CancellationToken.None);
                         break;
                     }
                 case var _ when file.ContentType.StartsWith("audio") || file.ContentType.StartsWith("video"):
@@ -298,7 +299,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             try
             {
                 await SaveFile(file, path);
-                return ResultData(path.Substring(HostEnvironment.WebRootPath.Length).Replace("\\", "/"));
+                return ResultData(path[HostEnvironment.WebRootPath.Length..].Replace("\\", "/"));
             }
             catch (Exception e)
             {

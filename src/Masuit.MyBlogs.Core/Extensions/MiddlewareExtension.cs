@@ -3,22 +3,18 @@ using AutoMapper.Extensions.ExpressionMapping;
 using CacheManager.Core;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools.AspNetCore.Mime;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.WebEncoders;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
 using System.IO.Compression;
-using System.Linq;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using ConfigurationBuilder = CacheManager.Core.ConfigurationBuilder;
 
 namespace Masuit.MyBlogs.Core.Extensions
 {
