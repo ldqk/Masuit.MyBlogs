@@ -1,6 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Core.AspNetCore;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -67,12 +66,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string Types { get; set; }
 
         /// <summary>
-        /// 访问次数
-        /// </summary>
-        [UpdateIgnore]
-        public int ViewCount { get; set; }
-
-        /// <summary>
         /// 曝光量
         /// </summary>
         [UpdateIgnore]
@@ -94,5 +87,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 地区，逗号或竖线分隔
         /// </summary>
         public string Regions { get; set; }
+
+        public virtual ICollection<AdvertisementClickRecord> ClickRecords { get; set; }
     }
 }

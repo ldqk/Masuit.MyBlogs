@@ -5,8 +5,6 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Systems;
-using System;
-using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Configs
 {
@@ -74,12 +72,14 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<PostMergeRequest, Post>().ForMember(p => p.Id, e => e.Ignore()).ForMember(p => p.Status, e => e.Ignore()).ReverseMap();
             CreateMap<Post, PostMergeRequestDto>().ReverseMap();
 
-            CreateMap<Advertisement, AdvertisementViewModel>();
+            CreateMap<Advertisement, AdvertisementViewModel>().ForMember(m => m.AverageViewCount, e => e.MapFrom(a => a.ClickRecords.GroupBy(r => r.Time.Date).Select(g => g.Count()).DefaultIfEmpty().Average())).ForMember(m => m.ViewCount, e => e.MapFrom(a => a.ClickRecords.Count));
             CreateMap<AdvertisementDto, Advertisement>().ForMember(a => a.Status, e => e.Ignore()).ForMember(a => a.UpdateTime, e => e.MapFrom(a => DateTime.Now));
 
             CreateMap<Donate, DonateDto>();
 
             CreateMap<PostVisitRecord, PostVisitRecordViewModel>().ForMember(m => m.Time, e => e.MapFrom(m => m.Time.ToString("yyyy-MM-dd HH:mm:ss")));
+
+            CreateMap<AdvertisementClickRecord, AdvertisementClickRecordViewModel>().ForMember(m => m.Time, e => e.MapFrom(m => m.Time.ToString("yyyy-MM-dd HH:mm:ss")));
         }
     }
 }

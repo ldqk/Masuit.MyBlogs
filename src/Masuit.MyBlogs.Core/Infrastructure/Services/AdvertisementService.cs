@@ -7,9 +7,6 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
@@ -18,7 +15,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
     public partial class AdvertisementService : BaseService<Advertisement>, IAdvertisementService
     {
         public ICacheManager<List<Advertisement>> CacheManager { get; set; }
+
         public ICategoryRepository CategoryRepository { get; set; }
+
+        public IAdvertisementClickRecordRepository AdvertisementClickRecordRepository { get; set; }
 
         public AdvertisementService(IBaseRepository<Advertisement> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {

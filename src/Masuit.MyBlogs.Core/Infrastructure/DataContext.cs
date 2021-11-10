@@ -1,9 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure
 {
@@ -36,6 +32,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             modelBuilder.Entity<Comment>().HasMany(e => e.Children).WithOne(c => c.Parent).HasForeignKey(c => c.ParentId).IsRequired(false).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<LeaveMessage>().HasMany(e => e.Children).WithOne(c => c.Parent).HasForeignKey(c => c.ParentId).IsRequired(false).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Links>().HasMany(e => e.Loopbacks).WithOne(l => l.Links).IsRequired().HasForeignKey(e => e.LinkId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Advertisement>().HasMany(e => e.ClickRecords).WithOne().HasForeignKey(e => e.AdvertisementId).IsRequired().OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.HasDbFunction(typeof(DataContext).GetMethod(nameof(Random))).HasName("RAND");
             modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("RAND");
@@ -88,28 +85,47 @@ namespace Masuit.MyBlogs.Core.Infrastructure
         }
 
         public virtual DbSet<Category> Category { get; set; }
+
         public virtual DbSet<Comment> Comment { get; set; }
+
         public virtual DbSet<LeaveMessage> LeaveMessage { get; set; }
+
         public virtual DbSet<Links> Links { get; set; }
+
         public virtual DbSet<Menu> Menu { get; set; }
+
         public virtual DbSet<Misc> Misc { get; set; }
+
         public virtual DbSet<Notice> Notice { get; set; }
+
         public virtual DbSet<Post> Post { get; set; }
+
         public virtual DbSet<PostHistoryVersion> PostHistoryVersion { get; set; }
+
         public virtual DbSet<SearchDetails> SearchDetails { get; set; }
+
         public virtual DbSet<SystemSetting> SystemSetting { get; set; }
+
         public virtual DbSet<UserInfo> UserInfo { get; set; }
+
         public virtual DbSet<LoginRecord> LoginRecord { get; set; }
+
         public virtual DbSet<Donate> Donate { get; set; }
+
         public virtual DbSet<Seminar> Seminar { get; set; }
+
         //public virtual DbSet<SeminarPost> SeminarPosts { get; set; }
         //public virtual DbSet<SeminarPostHistoryVersion> SeminarPostHistoryVersions { get; set; }
         public virtual DbSet<InternalMessage> InternalMessage { get; set; }
+
         public virtual DbSet<FastShare> FastShare { get; set; }
 
         public virtual DbSet<PostMergeRequest> PostMergeRequests { get; set; }
+
         public virtual DbSet<Advertisement> Advertisements { get; set; }
+
         public virtual DbSet<Variables> Variables { get; set; }
+
         public virtual DbSet<LinkLoopback> LinkLoopbacks { get; set; }
 
         [DbFunction]

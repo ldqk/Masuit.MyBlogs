@@ -2,10 +2,10 @@
 
 namespace Masuit.MyBlogs.Core.Models.Entity
 {
-    [Table("PostVisitRecord")]
-    public class PostVisitRecord : BaseEntity
+    [Table("AdvertisementClickRecord")]
+    public class AdvertisementClickRecord : BaseEntity
     {
-        public int PostId { get; set; }
+        public int AdvertisementId { get; set; }
 
         public string IP { get; set; }
 

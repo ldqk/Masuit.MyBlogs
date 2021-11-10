@@ -1,11 +1,7 @@
 ﻿using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
 {
@@ -645,45 +641,75 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         IEnumerable<T> AddEntities(IList<T> list);
 
         void Dispose(bool disposing);
+
         T this[int id] => GetById(id);
 
         List<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToList();
     }
 
-    public partial interface ICategoryRepository : IBaseRepository<Category> { }
+    public partial interface ICategoryRepository : IBaseRepository<Category>
+    { }
 
-    public partial interface ICommentRepository : IBaseRepository<Comment> { }
+    public partial interface ICommentRepository : IBaseRepository<Comment>
+    { }
 
-    public partial interface IDonateRepository : IBaseRepository<Donate> { }
+    public partial interface IDonateRepository : IBaseRepository<Donate>
+    { }
 
-    public partial interface IFastShareRepository : IBaseRepository<FastShare> { }
+    public partial interface IFastShareRepository : IBaseRepository<FastShare>
+    { }
 
-    public partial interface IInternalMessageRepository : IBaseRepository<InternalMessage> { }
+    public partial interface IInternalMessageRepository : IBaseRepository<InternalMessage>
+    { }
 
-    public partial interface ILeaveMessageRepository : IBaseRepository<LeaveMessage> { }
+    public partial interface ILeaveMessageRepository : IBaseRepository<LeaveMessage>
+    { }
 
-    public partial interface ILinksRepository : IBaseRepository<Links> { }
-    public partial interface ILinkLoopbackRepository : IBaseRepository<LinkLoopback> { }
+    public partial interface ILinksRepository : IBaseRepository<Links>
+    { }
 
-    public partial interface ILoginRecordRepository : IBaseRepository<LoginRecord> { }
+    public partial interface ILinkLoopbackRepository : IBaseRepository<LinkLoopback>
+    { }
 
-    public partial interface IMenuRepository : IBaseRepository<Menu> { }
+    public partial interface ILoginRecordRepository : IBaseRepository<LoginRecord>
+    { }
 
-    public partial interface IMiscRepository : IBaseRepository<Misc> { }
+    public partial interface IMenuRepository : IBaseRepository<Menu>
+    { }
 
-    public partial interface INoticeRepository : IBaseRepository<Notice> { }
+    public partial interface IMiscRepository : IBaseRepository<Misc>
+    { }
 
-    public partial interface IPostRepository : IBaseRepository<Post> { }
+    public partial interface INoticeRepository : IBaseRepository<Notice>
+    { }
 
-    public partial interface IPostHistoryVersionRepository : IBaseRepository<PostHistoryVersion> { }
+    public partial interface IPostRepository : IBaseRepository<Post>
+    { }
 
-    public partial interface ISeminarRepository : IBaseRepository<Seminar> { }
+    public partial interface IPostHistoryVersionRepository : IBaseRepository<PostHistoryVersion>
+    { }
 
-    public partial interface ISystemSettingRepository : IBaseRepository<SystemSetting> { }
+    public partial interface ISeminarRepository : IBaseRepository<Seminar>
+    { }
 
-    public partial interface IUserInfoRepository : IBaseRepository<UserInfo> { }
-    public partial interface IPostMergeRequestRepository : IBaseRepository<PostMergeRequest> { }
-    public partial interface IAdvertisementRepository : IBaseRepository<Advertisement> { }
-    public partial interface IVariablesRepository : IBaseRepository<Variables> { }
-    public partial interface IPostVisitRecordRepository : IBaseRepository<PostVisitRecord> { }
+    public partial interface ISystemSettingRepository : IBaseRepository<SystemSetting>
+    { }
+
+    public partial interface IUserInfoRepository : IBaseRepository<UserInfo>
+    { }
+
+    public partial interface IPostMergeRequestRepository : IBaseRepository<PostMergeRequest>
+    { }
+
+    public partial interface IAdvertisementRepository : IBaseRepository<Advertisement>
+    { }
+
+    public partial interface IAdvertisementClickRecordRepository : IBaseRepository<AdvertisementClickRecord>
+    { }
+
+    public partial interface IVariablesRepository : IBaseRepository<Variables>
+    { }
+
+    public partial interface IPostVisitRecordRepository : IBaseRepository<PostVisitRecord>
+    { }
 }

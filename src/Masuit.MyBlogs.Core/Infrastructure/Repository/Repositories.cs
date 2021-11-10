@@ -226,6 +226,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
             return t;
         }
     }
+
     public partial class AdvertisementRepository : BaseRepository<Advertisement>, IAdvertisementRepository
     {
         /// <summary>
@@ -234,6 +235,20 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="t">需要添加的实体</param>
         /// <returns>添加成功</returns>
         public override Advertisement AddEntity(Advertisement t)
+        {
+            DataContext.Add(t);
+            return t;
+        }
+    }
+
+    public partial class AdvertisementClickRecordRepository : BaseRepository<AdvertisementClickRecord>, IAdvertisementClickRecordRepository
+    {
+        /// <summary>
+        /// 添加实体
+        /// </summary>
+        /// <param name="t">需要添加的实体</param>
+        /// <returns>添加成功</returns>
+        public override AdvertisementClickRecord AddEntity(AdvertisementClickRecord t)
         {
             DataContext.Add(t);
             return t;

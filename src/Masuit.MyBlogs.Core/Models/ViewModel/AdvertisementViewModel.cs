@@ -1,10 +1,9 @@
 ﻿using Masuit.MyBlogs.Core.Models.Entity;
-using System;
 
 namespace Masuit.MyBlogs.Core.Models.ViewModel
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class AdvertisementViewModel : BaseEntity
     {
@@ -66,16 +65,10 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 日均点击量
         /// </summary>
-        public int AverageViewCount
-        {
-            get
-            {
-                var month = DateTime.Today.AddDays(-DateTime.Today.Day);
-                return (int)(ViewCount * 1.0 / ((CreateTime > month ? CreateTime : DateTime.Now) - month).TotalDays);
-            }
-        }
+        public double AverageViewCount { get; set; }
 
         public string CategoryIds { get; set; }
+
         public string CategoryNames { get; set; }
 
         /// <summary>
@@ -92,5 +85,16 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// 地区，逗号或竖线分隔
         /// </summary>
         public string Regions { get; set; }
+    }
+
+    public class AdvertisementClickRecordViewModel
+    {
+        public string IP { get; set; }
+
+        public string Location { get; set; }
+
+        public string Referer { get; set; }
+
+        public string Time { get; set; }
     }
 }

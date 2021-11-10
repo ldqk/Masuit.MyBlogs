@@ -88,15 +88,24 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         {
         }
     }
+
     public partial class VariablesService : BaseService<Variables>, IVariablesService
     {
         public VariablesService(IBaseRepository<Variables> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }
+
     public partial class PostVisitRecordService : BaseService<PostVisitRecord>, IPostVisitRecordService
     {
         public PostVisitRecordService(IBaseRepository<PostVisitRecord> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
+        {
+        }
+    }
+
+    public partial class AdvertisementClickRecordService : BaseService<AdvertisementClickRecord>, IAdvertisementClickRecordService
+    {
+        public AdvertisementClickRecordService(IBaseRepository<AdvertisementClickRecord> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
         }
     }

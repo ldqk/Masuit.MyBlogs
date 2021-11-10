@@ -7,13 +7,6 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.Strings;
-using Microsoft.AspNetCore.Hosting;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire
 {
@@ -173,8 +166,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         {
             _advertisementService.GetAll().UpdateFromQuery(a => new Advertisement()
             {
-                DisplayCount = 0,
-                ViewCount = 0
+                DisplayCount = 0
             });
         }
 

@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using AutoMapper.QueryableExtensions;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Repository;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -8,10 +9,13 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
+using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -19,6 +23,8 @@ namespace Masuit.MyBlogs.Core.Controllers
     [Route("partner/[action]")]
     public class AdvertisementController : BaseController
     {
+        public IAdvertisementClickRecordService ClickRecordService { get; set; }
+
         /// <summary>
         /// 前往
         /// </summary>
@@ -31,8 +37,16 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("ads" + id)))
             {
                 HttpContext.Session.Set("ads" + id, id.ToString());
-                ad.ViewCount++;
+                ad.ClickRecords.Add(new AdvertisementClickRecord()
+                {
+                    IP = ClientIP,
+                    Location = ClientIP.GetIPLocation(),
+                    Referer = Request.Headers[HeaderNames.Referer].ToString(),
+                    Time = DateTime.Now
+                });
                 await AdsService.SaveChangesAsync();
+                var start = DateTime.Today.AddMonths(-1);
+                await ClickRecordService.GetQuery(a => a.Time < start).DeleteFromQueryAsync();
             }
 
             return Redirect(ad.Url);
@@ -51,7 +65,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(kw) || p.Description.Contains(kw) || p.Url.Contains(kw));
             }
 
-            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ToPagedList<Advertisement, AdvertisementViewModel>(page, size, MapperConfig);
+            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ProjectTo<AdvertisementViewModel>(MapperConfig).ToPagedList(page, size);
             var cids = list.Data.Where(m => !string.IsNullOrEmpty(m.CategoryIds)).SelectMany(m => m.CategoryIds.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)).Distinct().ToArray();
             var dic = await categoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionaryAsync(c => c.Id + "", c => c.Name);
             foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
@@ -103,7 +117,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
 
-
         /// <summary>
         /// 广告上下架
         /// </summary>
@@ -128,11 +141,69 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("ads" + ad.Id)))
             {
                 HttpContext.Session.Set("ads" + ad.Id, ad.Id.ToString());
-                ad.ViewCount++;
+                ad.ClickRecords.Add(new AdvertisementClickRecord()
+                {
+                    IP = ClientIP,
+                    Location = ClientIP.GetIPLocation(),
+                    Referer = Request.Headers[HeaderNames.Referer].ToString(),
+                    Time = DateTime.Now
+                });
                 await AdsService.SaveChangesAsync();
+                var start = DateTime.Today.AddMonths(-1);
+                await ClickRecordService.GetQuery(a => a.Time < start).DeleteFromQueryAsync();
             }
 
             return Redirect(ad.Url);
+        }
+
+        /// <summary>
+        /// 广告访问记录
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        [HttpGet("/partner/{id}/records"), MyAuthorize]
+        public async Task<IActionResult> ClickRecords(int id, int page = 1, int size = 15, string kw = "")
+        {
+            Expression<Func<AdvertisementClickRecord, bool>> where = e => e.AdvertisementId == id;
+            if (!string.IsNullOrEmpty(kw))
+            {
+                kw = Regex.Escape(kw);
+                where = where.And(e => Regex.IsMatch(e.IP + e.Location + e.Referer, kw));
+            }
+
+            var pages = await ClickRecordService.GetPagesAsync<DateTime, AdvertisementClickRecordViewModel>(page, size, where, e => e.Time, false);
+            return Ok(pages);
+        }
+
+        /// <summary>
+        /// 广告访问记录图表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet("/partner/{id}/records-chart"), MyAuthorize]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ClickRecordsChart(int id, CancellationToken cancellationToken)
+        {
+            var list = await ClickRecordService.GetQuery(e => e.AdvertisementId == id, e => e.Time).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
+            {
+                Date = g.Key,
+                Count = g.Count()
+            }).ToListAsync(cancellationToken);
+            return Ok(list);
+        }
+
+        /// <summary>
+        /// 广告访问记录分析
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("/partner/{id}/insight"), MyAuthorize]
+        public IActionResult ClickRecordsInsight(int id)
+        {
+            return View(AdsService[id]);
         }
     }
 }

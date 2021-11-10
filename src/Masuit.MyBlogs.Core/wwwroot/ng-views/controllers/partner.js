@@ -260,6 +260,16 @@
 			}
 		});
 	}
+
+	$scope.insight= function(row) {
+        layer.full(layer.open({
+          type: 2,
+          title: '广告《'+row.Title+'》洞察分析',
+          maxmin: true, //开启最大化最小化按钮
+          area: ['893px', '100vh'],
+          content: '/partner/'+row.Id+'/insight'
+        }));
+    }
 	jeDate('#timespan',{
 		isinitVal: true,
 		festival: true,
