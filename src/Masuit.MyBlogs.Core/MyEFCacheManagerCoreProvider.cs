@@ -1,7 +1,5 @@
 ﻿using CacheManager.Core;
 using EFCoreSecondLevelCacheInterceptor;
-using System;
-using System.Collections.Generic;
 
 namespace Masuit.MyBlogs.Core
 {

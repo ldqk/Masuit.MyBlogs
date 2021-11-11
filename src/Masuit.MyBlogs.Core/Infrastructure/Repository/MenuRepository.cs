@@ -2,9 +2,6 @@
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using Z.EntityFramework.Plus;
 

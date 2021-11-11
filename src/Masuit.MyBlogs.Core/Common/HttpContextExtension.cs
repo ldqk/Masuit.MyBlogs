@@ -1,9 +1,6 @@
 ﻿using DnsClient;
 using Masuit.Tools;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
-using System.Linq;
-using System.Threading;
 
 namespace Masuit.MyBlogs.Core.Common
 {

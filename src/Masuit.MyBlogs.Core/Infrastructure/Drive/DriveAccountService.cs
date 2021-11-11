@@ -1,11 +1,6 @@
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Models.Drive;
 using Microsoft.Identity.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 {

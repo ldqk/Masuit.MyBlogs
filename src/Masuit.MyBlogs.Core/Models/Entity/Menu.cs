@@ -1,6 +1,5 @@
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.Models;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

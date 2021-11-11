@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using CacheManager.Core;
+﻿using CacheManager.Core;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;

@@ -1,8 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository
 {

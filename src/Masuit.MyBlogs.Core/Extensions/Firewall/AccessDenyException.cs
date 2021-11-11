@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Masuit.MyBlogs.Core.Extensions.Firewall
+﻿namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
     public class AccessDenyException : Exception
     {

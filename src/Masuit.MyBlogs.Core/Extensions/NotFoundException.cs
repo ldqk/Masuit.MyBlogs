@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Masuit.MyBlogs.Core.Extensions
+﻿namespace Masuit.MyBlogs.Core.Extensions
 {
     public class NotFoundException : Exception
     {

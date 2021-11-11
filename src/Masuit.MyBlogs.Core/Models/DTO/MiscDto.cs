@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Masuit.MyBlogs.Core.Models.DTO
+﻿namespace Masuit.MyBlogs.Core.Models.DTO
 {
     /// <summary>
     /// 杂项页输出模型

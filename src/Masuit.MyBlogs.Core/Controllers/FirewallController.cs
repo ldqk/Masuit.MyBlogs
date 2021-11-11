@@ -5,10 +5,8 @@ using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using System;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Masuit.MyBlogs.Core.Models.ViewModel
+﻿namespace Masuit.MyBlogs.Core.Models.ViewModel
 {
     /// <summary>
     /// 文章数据模型

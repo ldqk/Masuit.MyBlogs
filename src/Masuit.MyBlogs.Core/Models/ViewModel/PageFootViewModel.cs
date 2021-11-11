@@ -1,5 +1,4 @@
 ﻿using Masuit.MyBlogs.Core.Models.DTO;
-using System.Collections.Generic;
 
 namespace Masuit.MyBlogs.Core.Models.ViewModel
 {

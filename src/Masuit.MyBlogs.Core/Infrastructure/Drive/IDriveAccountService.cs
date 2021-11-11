@@ -1,7 +1,4 @@
 using Masuit.MyBlogs.Core.Models.Drive;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using static Masuit.MyBlogs.Core.Infrastructure.Drive.DriveAccountService;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 {

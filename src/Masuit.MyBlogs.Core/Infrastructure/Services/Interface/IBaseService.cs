@@ -1,10 +1,6 @@
 ﻿using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.Tools.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 {

@@ -1,12 +1,7 @@
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
-using System;
-using System.IO;
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 {

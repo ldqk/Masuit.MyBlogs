@@ -1,6 +1,5 @@
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Enum;
-using System;
 
 namespace Masuit.MyBlogs.Core.Models.ViewModel
 {

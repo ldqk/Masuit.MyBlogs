@@ -1,5 +1,4 @@
 ﻿using Masuit.MyBlogs.Core.Models.Enum;
-using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Masuit.MyBlogs.Core.Models.Entity

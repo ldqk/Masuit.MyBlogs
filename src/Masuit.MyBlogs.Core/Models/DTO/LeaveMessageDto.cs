@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Masuit.MyBlogs.Core.Models.DTO
+﻿namespace Masuit.MyBlogs.Core.Models.DTO
 {
     /// <summary>
     /// 留言板输出模型

@@ -20,19 +20,10 @@ using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Config;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Net;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using Polly;
-using System;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core
 {

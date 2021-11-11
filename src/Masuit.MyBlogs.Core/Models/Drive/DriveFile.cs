@@ -1,5 +1,3 @@
-using System;
-
 namespace Masuit.MyBlogs.Core.Models.Drive
 {
     public class DriveFile
@@ -10,5 +8,5 @@ namespace Masuit.MyBlogs.Core.Models.Drive
         public DateTimeOffset? CreatedTime { get; set; }
         public string Id { get; set; }
     }
-    
+
 }

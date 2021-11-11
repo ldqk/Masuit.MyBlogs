@@ -12,20 +12,12 @@ using MaxMind.GeoIP2;
 using MaxMind.GeoIP2.Exceptions;
 using MaxMind.GeoIP2.Model;
 using MaxMind.GeoIP2.Responses;
-using Microsoft.Extensions.DependencyInjection;
 using Polly;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using TimeZoneConverter;
 
 namespace Masuit.MyBlogs.Core.Common
@@ -417,13 +409,21 @@ namespace Masuit.MyBlogs.Core.Common
         }
 
         public string Country { get; set; }
+
         public string Province { get; set; }
+
         public string City { get; set; }
+
         public string ISP { get; set; }
+
         public long? ASN { get; set; }
+
         public string Address => new[] { Country, Province, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
+
         public string Address2 { get; set; }
+
         public string Network => ASN.HasValue ? ISP + "(AS" + ASN + ")" : ISP;
+
         public Location Coodinate { get; set; }
 
         public override string ToString()

@@ -1,7 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
-using System.Collections.Generic;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 {

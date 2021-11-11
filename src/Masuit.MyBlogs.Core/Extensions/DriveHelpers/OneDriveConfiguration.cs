@@ -1,7 +1,4 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
-using System.IO;
-using System.Linq;
 
 namespace Masuit.MyBlogs.Core.Extensions.DriveHelpers
 {

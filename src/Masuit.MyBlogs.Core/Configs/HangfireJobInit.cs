@@ -1,7 +1,6 @@
 ﻿using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using System;
 
 namespace Masuit.MyBlogs.Core.Configs
 {

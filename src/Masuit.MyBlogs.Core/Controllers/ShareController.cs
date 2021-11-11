@@ -1,8 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {

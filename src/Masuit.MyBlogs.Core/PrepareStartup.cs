@@ -13,22 +13,13 @@ using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Systems;
 using Masuit.Tools.Win32;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using StackExchange.Profiling;
-using System;
-using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -105,7 +96,7 @@ namespace Masuit.MyBlogs.Core
                     c.HttpContext.Response.Redirect("/tag/" + HttpUtility.UrlEncode(c.HttpContext.Request.Query["tag"]), true);
                 }
 
-                if ((c.HttpContext.Request.Path.Equals("/search") || c.HttpContext.Request.Path.Equals("/s"))&&c.HttpContext.Request.Query.ContainsKey("wd"))
+                if ((c.HttpContext.Request.Path.Equals("/search") || c.HttpContext.Request.Path.Equals("/s")) && c.HttpContext.Request.Query.ContainsKey("wd"))
                 {
                     c.Result = RuleResult.EndResponse;
                     c.HttpContext.Response.Redirect("/search/" + HttpUtility.UrlEncode(c.HttpContext.Request.Query["wd"]), true);

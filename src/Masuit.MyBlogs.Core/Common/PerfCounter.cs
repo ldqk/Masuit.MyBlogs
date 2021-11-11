@@ -2,9 +2,6 @@
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Hardware;
 using Masuit.Tools.Systems;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Common
 {

@@ -4,17 +4,7 @@ using Masuit.Tools;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Systems;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace Masuit.MyBlogs.Core.Common
@@ -71,7 +61,7 @@ namespace Masuit.MyBlogs.Core.Common
                 return UploadGitlab(gitlab, stream, file, cancellationToken);
             }
 
-            return UploadKieng(stream, cancellationToken);
+            return Task.FromResult<(string, bool)>((null, false));
         }
 
         /// <summary>
@@ -102,7 +92,7 @@ namespace Masuit.MyBlogs.Core.Common
                 }
 
                 LogManager.Info("图片上传到gitee失败。");
-                return UploadKieng(stream, cancellationToken).Result;
+                return (null, false);
             });
         }
 
@@ -140,7 +130,7 @@ namespace Masuit.MyBlogs.Core.Common
                 }
 
                 LogManager.Info("图片上传到gitee失败。");
-                return UploadKieng(stream, cancellationToken).Result;
+                return (null, false);
             });
         }
 
@@ -179,31 +169,8 @@ namespace Masuit.MyBlogs.Core.Common
 
                 LogManager.Info($"图片上传到gitlab({config.ApiUrl})失败。");
                 _failedList.Add(config.ApiUrl);
-                return UploadKieng(stream, cancellationToken).Result;
+                return (null, false);
             });
-        }
-
-        /// <summary>
-        /// 上传到聚合图床
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        private async Task<(string url, bool success)> UploadKieng(Stream stream, CancellationToken cancellationToken)
-        {
-            if (bool.TryParse(_config["Imgbed:EnableExternalImgbed"], out var b) && b)
-            {
-                using var formData = new MultipartFormDataContent
-                {
-                    { new StreamContent(stream), "image","1.jpg" }
-                };
-                var resp = await _httpClient.PostAsync("https://image.kieng.cn/upload.html?type=" + new[] { "jd", "c58", "sg", "sh", "wy" }.OrderByRandom().First(), formData, cancellationToken);
-                var json = await resp.Content.ReadAsStringAsync();
-                var result = JObject.Parse(json);
-                return ((string)result["data"]["url"], (int)result["code"] == 200);
-            }
-
-            return (null, false);
         }
 
         /// <summary>

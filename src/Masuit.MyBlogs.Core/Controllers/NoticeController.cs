@@ -7,12 +7,8 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.Net;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -44,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 n.PostDate = n.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 n.Content = ReplaceVariables(n.Content);
             }
-            
+
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
             return CurrentUser.IsAdmin ? View("Index_Admin", list.Data) : View(list.Data);
         }

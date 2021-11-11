@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Masuit.MyBlogs.Core.Extensions.Firewall
+﻿namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
     public static class FirewallServiceCollectionExt
     {

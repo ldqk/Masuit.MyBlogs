@@ -1,10 +1,8 @@
 ﻿using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Linq.Expressions;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {

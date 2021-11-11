@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Masuit.MyBlogs.Core.Configs
+﻿namespace Masuit.MyBlogs.Core.Configs
 {
     /// <summary>
     /// 应用程序配置

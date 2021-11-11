@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Masuit.MyBlogs.Core.Models.ViewModel
+﻿namespace Masuit.MyBlogs.Core.Models.ViewModel
 {
     public class SearchResult<T>
     {

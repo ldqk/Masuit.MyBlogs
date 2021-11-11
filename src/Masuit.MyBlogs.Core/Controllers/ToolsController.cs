@@ -8,17 +8,11 @@ using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Models;
 using MaxMind.GeoIP2.Exceptions;
 using MaxMind.GeoIP2.Responses;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Polly;
-using System;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using TimeZoneConverter;
 
 namespace Masuit.MyBlogs.Core.Controllers

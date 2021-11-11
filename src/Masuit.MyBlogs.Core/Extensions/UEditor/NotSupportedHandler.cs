@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-
-namespace Masuit.MyBlogs.Core.Extensions.UEditor
+﻿namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
     /// <summary>
     /// NotSupportedHandler 的摘要说明

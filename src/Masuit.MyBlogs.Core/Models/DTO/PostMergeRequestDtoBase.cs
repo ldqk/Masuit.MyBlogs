@@ -1,5 +1,4 @@
 using Masuit.MyBlogs.Core.Models.Enum;
-using System;
 
 namespace Masuit.MyBlogs.Core.Models.DTO
 {

@@ -3,7 +3,6 @@ using Masuit.MyBlogs.Core.Common;
 using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {

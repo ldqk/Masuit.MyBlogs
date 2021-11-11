@@ -2,8 +2,6 @@
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {

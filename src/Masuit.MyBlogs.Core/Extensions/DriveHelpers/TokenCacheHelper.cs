@@ -1,5 +1,4 @@
 using Microsoft.Identity.Client;
-using System.IO;
 
 namespace Masuit.MyBlogs.Core.Extensions.DriveHelpers
 {

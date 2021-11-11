@@ -11,19 +11,12 @@ using Masuit.Tools.Core.Net;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Systems;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OpenXmlPowerTools;
 using Polly;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -283,7 +276,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         var dir = Path.GetDirectoryName(path);
                         Directory.CreateDirectory(dir);
                         await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                        await file.CopyToAsync(fs,CancellationToken.None);
+                        await file.CopyToAsync(fs, CancellationToken.None);
                         break;
                     }
                 case var _ when file.ContentType.StartsWith("audio") || file.ContentType.StartsWith("video"):

@@ -8,9 +8,6 @@ using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Masuit.MyBlogs.Core.Controllers.Drive
 {
@@ -19,9 +16,9 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
     [Route("api/")]
     public class SitesController : Controller
     {
-        readonly IDriveAccountService _siteService;
-        readonly IDriveService _driveService;
-        readonly SettingService _setting;
+        private readonly IDriveAccountService _siteService;
+        private readonly IDriveService _driveService;
+        private readonly SettingService _setting;
 
         public UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
 
@@ -32,8 +29,8 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
             this._setting = setting;
         }
 
-
         #region Actions
+
         /// <summary>
         /// 返回所有sites
         /// </summary>
@@ -46,6 +43,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             });
         }
+
         /// <summary>
         /// 根据路径获取文件夹内容
         /// </summary>
@@ -92,7 +90,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
                         ContractResolver = new CamelCasePropertyNamesContractResolver()
                     });
                 }
-                catch (Exception e)
+                catch
                 {
                     return NotFound(new ErrorResponse()
                     {
@@ -150,6 +148,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             });
         }
+
         /// <summary>
         /// 获得readme
         /// </summary>
@@ -250,6 +249,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
                 return StatusCode(500, e.Message);
             }
         }
-        #endregion
+
+        #endregion Actions
     }
 }

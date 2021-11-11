@@ -7,11 +7,7 @@ using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository

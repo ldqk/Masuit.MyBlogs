@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Masuit.MyBlogs.Core.Common.Mails
+﻿namespace Masuit.MyBlogs.Core.Common.Mails
 {
     public static class MailServiceCollectionExt
     {
@@ -12,6 +9,7 @@ namespace Masuit.MyBlogs.Core.Common.Mails
                 case "Mailgun":
                     services.AddHttpClient<IMailSender, MailgunSender>();
                     break;
+
                 default:
                     services.AddSingleton<IMailSender, SmtpSender>();
                     break;

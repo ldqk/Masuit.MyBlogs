@@ -1,6 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Drive;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Masuit.MyBlogs.Core.Extensions.DriveHelpers
 {
