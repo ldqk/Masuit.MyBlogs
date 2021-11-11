@@ -22,12 +22,12 @@
 IDE：Visual Studio 2022 v17.0  
 数据库：SQL Server 2017/MySQL 8.0  
 Redis：redis-server-windows 3.2  
-运行时：必须是.NET 5 
+运行时：必须是.NET 6 
 ### 当前运行环境
 操作系统：Windows Server 2019  
 数据库：MySQL 8.0  
 Redis：redis-server-windows 3.2  
-运行时：.NET 5  
+运行时：.NET 6  
 服务器配置：2核+8GB+1000M  
 承载流量：单日请求量平均600w左右，单日带宽1TB左右  
 `请勿使用阿里云、百度云等活动超卖机运行本程序，否则卡出翔！！！`  
