@@ -119,8 +119,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("tag/{tag}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = nameof(HeaderNames.Cookie))]
         public async Task<ActionResult> Tag(string tag, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            Expression<Func<Post, bool>> where = PostBaseWhere().And(p => p.Status == Status.Published);
-            var queryable = PostService.GetQuery(tag.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).Aggregate(@where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s))));
+            if (string.IsNullOrWhiteSpace(tag))
+            {
+                throw new NotFoundException("");
+            }
+
+            var where = PostBaseWhere().And(p => p.Status == Status.Published);
+            var queryable = PostService.GetQuery(tag.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).Aggregate(where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s))));
             var h24 = DateTime.Now.AddDays(-1);
             var posts = orderBy switch
             {

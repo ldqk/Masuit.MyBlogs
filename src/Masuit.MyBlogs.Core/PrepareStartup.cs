@@ -99,7 +99,7 @@ namespace Masuit.MyBlogs.Core
                 if ((c.HttpContext.Request.Path.Equals("/search") || c.HttpContext.Request.Path.Equals("/s")) && c.HttpContext.Request.Query.ContainsKey("wd"))
                 {
                     c.Result = RuleResult.EndResponse;
-                    c.HttpContext.Response.Redirect("/search/" + HttpUtility.UrlEncode(c.HttpContext.Request.Query["wd"]), true);
+                    c.HttpContext.Response.Redirect("/search/" + HttpUtility.UrlEncode(c.HttpContext.Request.Query["wd"]).Replace("+", "%20"), true);
                 }
             }).AddRewrite(@"\w+/_blazor(.*)", "_blazor$1", false);
             switch (config["UseRewriter"])
@@ -107,6 +107,7 @@ namespace Masuit.MyBlogs.Core
                 case "NonWww":
                     options.AddRedirectToNonWww(301); // URL重写
                     break;
+
                 case "WWW":
                     options.AddRedirectToWww(301); // URL重写
                     break;

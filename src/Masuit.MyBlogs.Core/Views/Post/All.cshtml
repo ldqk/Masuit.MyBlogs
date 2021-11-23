@@ -1,21 +1,21 @@
 ﻿@{
-    ViewBag.Title = "分类云_标签云_专题云";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    Dictionary<string, int> tags = ViewBag.tags;
-    Dictionary<int,string> cats = ViewBag.cats;
-    Dictionary<int,string> seminars = ViewBag.seminars;
-    string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
-    Random r = new Random();
+	ViewBag.Title = "分类云_标签云_专题云";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	Dictionary<string, int> tags = ViewBag.tags;
+	Dictionary<int,string> cats = ViewBag.cats;
+	Dictionary<int,string> seminars = ViewBag.seminars;
+	string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
+	Random r = new Random();
 }
 <link href="~/Content/common/post-all.min.css" rel="stylesheet" />
 <div class="container-fluid">
-    <ol class="cd-breadcrumb triangle">
-        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-        <li class="current"><em>@ViewBag.Title</em></li>
-    </ol>
-    <svg id="svg-source" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position: absolute">
-        <g id="shopping-cart" data-iconmelon="e-commerce icons:7c96e2dece0152dc594d66b260f79db0">
-            <path d="M22.463,25.841c0.528,0,0.918-0.429,0.918-0.958v-6.786c0-0.529-0.39-0.958-0.918-0.958c-0.529,0-0.92,0.429-0.92,0.958
+	<ol class="cd-breadcrumb triangle">
+		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
+		<li class="current"><em>@ViewBag.Title</em></li>
+	</ol>
+	<svg id="svg-source" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position: absolute">
+		<g id="shopping-cart" data-iconmelon="e-commerce icons:7c96e2dece0152dc594d66b260f79db0">
+			<path d="M22.463,25.841c0.528,0,0.918-0.429,0.918-0.958v-6.786c0-0.529-0.39-0.958-0.918-0.958c-0.529,0-0.92,0.429-0.92,0.958
 	v6.786C21.543,25.413,21.934,25.841,22.463,25.841z M18.156,25.841c0.529,0,0.919-0.429,0.919-0.958v-6.786
 	c0-0.529-0.39-0.958-0.919-0.958s-0.919,0.429-0.919,0.958v6.786C17.237,25.413,17.627,25.841,18.156,25.841z M13.851,25.841
 	c0.528,0,0.919-0.429,0.919-0.958v-6.786c0-0.529-0.391-0.958-0.919-0.958c-0.529,0-0.919,0.429-0.919,0.958v6.786
@@ -30,15 +30,15 @@
 	L9.396,9.742h12.467l-2.76-4.32c-0.189-0.33-0.076-0.753,0.253-0.944c0.323-0.186,0.756-0.074,0.955,0.27l3.104,4.994h6.011
 	c0.741,0,1.344,0.603,1.344,1.344V12.556z M9.545,25.841c0.528,0,0.918-0.429,0.918-0.958v-6.786c0-0.529-0.39-0.958-0.918-0.958
 	c-0.529,0-0.919,0.429-0.919,0.958v6.786C8.626,25.413,9.016,25.841,9.545,25.841z"></path>
-        </g>
-        <g id="credit-card" data-iconmelon="e-commerce icons:c3144b166f93e0f6b73aee04a0a48397">
-            <path d="M29.018,4.751H2.981C1.337,4.751,0,6.089,0,7.733v16.534c0,1.644,1.337,2.981,2.981,2.981h26.036
+		</g>
+		<g id="credit-card" data-iconmelon="e-commerce icons:c3144b166f93e0f6b73aee04a0a48397">
+			<path d="M29.018,4.751H2.981C1.337,4.751,0,6.089,0,7.733v16.534c0,1.644,1.337,2.981,2.981,2.981h26.036
 	c1.645,0,2.982-1.338,2.982-2.981V7.733C32,6.089,30.662,4.751,29.018,4.751z M30.638,24.267c0,0.893-0.727,1.62-1.621,1.62H2.981
 	c-0.893,0-1.62-0.727-1.62-1.62V13.603h29.276V24.267z M30.638,10.236H1.362V7.733c0-0.894,0.727-1.62,1.62-1.62h26.036
 	c0.894,0,1.621,0.727,1.621,1.62V10.236z M8.848,22.494H2.724v1.338h6.124V22.494z M19.043,22.494H9.548v1.338h9.495V22.494z"></path>
-        </g>
-        <g id="gift" data-iconmelon="e-commerce icons:05fa65d254ada5a9cb5c2f1e8d87f02b">
-            <path d="M29.084,7.154h-4.807c0.157-0.146,0.731-0.497,0.866-0.678c0.757-1.01,1.016-2.355,0.677-3.51
+		</g>
+		<g id="gift" data-iconmelon="e-commerce icons:05fa65d254ada5a9cb5c2f1e8d87f02b">
+			<path d="M29.084,7.154h-4.807c0.157-0.146,0.731-0.497,0.866-0.678c0.757-1.01,1.016-2.355,0.677-3.51
 	c-0.473-1.612-1.773-2.575-3.479-2.575c-1.017,0-1.993,0.371-2.546,0.967c-0.759,0.818-2.841,3.57-3.764,4.8
 	c-0.923-1.23-3.004-3.982-3.764-4.8c-0.553-0.596-1.528-0.967-2.546-0.967c-1.706,0-3.007,0.962-3.479,2.575
 	c-0.339,1.155-0.08,2.5,0.677,3.51C7.053,6.657,7.5,7.007,7.657,7.154H2.915C1.308,7.154,0,8.462,0,10.07v5.262h1.356v13.362
@@ -50,105 +50,105 @@
 	c0.513,0,1.75,0.156,2.173,1.597c0.217,0.74,0.037,1.647-0.46,2.311c-0.227,0.303-0.716,0.811-1.447,0.811
 	c-0.894,0-3.493,0.006-5.115,0.011C18.504,5.139,20.169,2.956,20.792,2.285z M29.26,28.694c0,0.857-0.697,1.617-1.554,1.617h-10.02
 	v-14.91H29.26V28.694z M30.638,13.949H17.687V8.515h11.397c0.858,0,1.554,0.698,1.554,1.555V13.949z"></path>
-        </g>
-        <g id="package" data-iconmelon="e-commerce icons:de2d76203b2448ee25bda0d82fa73c00">
-            <path d="M31.666,7.132l0.028-0.014L16.191,0L0.264,7.285l0.027,0.013v17.39l15.094,7.266V32l0.05-0.023l0.012,0.006l0.006-0.013
+		</g>
+		<g id="package" data-iconmelon="e-commerce icons:de2d76203b2448ee25bda0d82fa73c00">
+			<path d="M31.666,7.132l0.028-0.014L16.191,0L0.264,7.285l0.027,0.013v17.39l15.094,7.266V32l0.05-0.023l0.012,0.006l0.006-0.013
 	l16.283-7.442V7.132H31.666z M16.191,1.415l12.553,5.73l-3.352,1.604L12.535,3.088L16.191,1.415z M1.669,23.879V7.887l13.993,6.388
 	l0.006,16.256L1.669,23.879z M3.202,7.285L8.223,5.06l12.553,5.897l-4.592,2.195L3.202,7.285z M30.358,23.698l-13.307,6.294
 	l0.019-15.722l4.873-2.396l0.031,7.692l4.169-2.288V9.777l4.215-2.062V23.698z"></path>
-        </g>
-    </svg>
-    <!-- ICONS -->
+		</g>
+	</svg>
+	<!-- ICONS -->
 
-    <div id="wrapper">
-        <div id="left-side">
-            <ul>
-                <li class="choose active">
-                    <div class="icon active">
-                        <svg viewBox="0 0 32 32">
-                            <g filter="">
-                                <use xlink:href="#shopping-cart"></use>
-                            </g>
-                        </svg>
-                    </div>
-                    分类云
-                </li>
-                <li class="pay">
-                    <div class="icon">
-                        <svg viewBox="0 0 32 32">
-                            <g filter="">
-                                <use xlink:href="#credit-card"></use>
-                            </g>
-                        </svg>
-                    </div>
-                    标签云
-                </li>
-                <li class="wrap">
-                    <div class="icon">
-                        <svg viewBox="0 0 32 32">
-                            <g filter="">
-                                <use xlink:href="#gift"></use>
-                            </g>
-                        </svg>
-                    </div>
-                    专题云
-                </li>
-            </ul>
-        </div>
+	<div id="wrapper">
+		<div id="left-side">
+			<ul>
+				<li class="choose active">
+					<div class="icon active">
+						<svg viewBox="0 0 32 32">
+							<g filter="">
+								<use xlink:href="#shopping-cart"></use>
+							</g>
+						</svg>
+					</div>
+					分类云
+				</li>
+				<li class="pay">
+					<div class="icon">
+						<svg viewBox="0 0 32 32">
+							<g filter="">
+								<use xlink:href="#credit-card"></use>
+							</g>
+						</svg>
+					</div>
+					标签云
+				</li>
+				<li class="wrap">
+					<div class="icon">
+						<svg viewBox="0 0 32 32">
+							<g filter="">
+								<use xlink:href="#gift"></use>
+							</g>
+						</svg>
+					</div>
+					专题云
+				</li>
+			</ul>
+		</div>
 
-        <div id="border">
-            <div id="line" class="one"></div>
-        </div>
+		<div id="border">
+			<div id="line" class="one"></div>
+		</div>
 
-        <div id="right-side">
-            <div id="first" class="active">
-                <p>
-                    @foreach (var (key, value) in cats)
-                    {
-                        <a asp-controller="Home" asp-action="Category" asp-route-id="@key" class="label label-@colors[r.Next(colors.Length)]">@value</a>
-                    }
-                </p>
-            </div>
-            <div id="second">
-                <p>
-                    @foreach (var (key, _) in tags)
-                    {
-                        <a asp-controller="Home" asp-action="Tag" asp-route-tag="@key" class="label label-@colors[r.Next(colors.Length)]">@key</a>
-                    }
-                </p>
-            </div>
-            <div id="third">
-                <p>
-                    @foreach (var (key, value) in seminars)
-                    {
-                        <a asp-controller="Seminar" asp-action="Index" asp-route-id="@key" class="label label-@colors[r.Next(colors.Length)]">@value</a>
-                    }
-                </p>
-            </div>
-        </div>
-    </div>
+		<div id="right-side">
+			<div id="first" class="active">
+				<p>
+					@foreach (var (key, value) in cats)
+					{
+						<a asp-controller="Home" asp-action="Category" asp-route-id="@key" class="label label-@colors[r.Next(colors.Length)]">@value</a>
+					}
+				</p>
+			</div>
+			<div id="second">
+				<p>
+					@foreach (var (key, _) in tags)
+					{
+						<a asp-controller="Home" asp-action="Tag" asp-route-tag="@key" class="label label-@colors[r.Next(colors.Length)]">@key</a>
+					}
+				</p>
+			</div>
+			<div id="third">
+				<p>
+					@foreach (var (key, value) in seminars)
+					{
+						<a asp-controller="Seminar" asp-action="Index" asp-route-id="@key" class="label label-@colors[r.Next(colors.Length)]">@value</a>
+					}
+				</p>
+			</div>
+		</div>
+	</div>
 </div>
 <script src="https://cdn.staticfile.org/three.js/r55/three.js"></script>
 <script src="~/Scripts/Detector.js"></script>
 <script id="vs" type="x-shader/x-vertex">
-    varying vec2 vUv;
-    void main() {
-    vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-    }
+	varying vec2 vUv;
+	void main() {
+	vUv = uv;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+	}
 </script>
 <script id="fs" type="x-shader/x-fragment">
-    uniform sampler2D map;
-    uniform vec3 fogColor;
-    uniform float fogNear;
-    uniform float fogFar;
-    varying vec2 vUv;
-    void main() {
-    float depth = gl_FragCoord.z / gl_FragCoord.w;
-    float fogFactor = smoothstep( fogNear, fogFar, depth );
-    gl_FragColor = texture2D( map, vUv );
-    gl_FragColor.w *= pow( gl_FragCoord.z, 20.0 );
-    gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
-    }
+	uniform sampler2D map;
+	uniform vec3 fogColor;
+	uniform float fogNear;
+	uniform float fogFar;
+	varying vec2 vUv;
+	void main() {
+	float depth = gl_FragCoord.z / gl_FragCoord.w;
+	float fogFactor = smoothstep( fogNear, fogFar, depth );
+	gl_FragColor = texture2D( map, vUv );
+	gl_FragColor.w *= pow( gl_FragCoord.z, 20.0 );
+	gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
+	}
 </script>
 <script src="~/Scripts/global/post-all.js"></script>
