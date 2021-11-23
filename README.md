@@ -1,5 +1,5 @@
 ### Masuit.MyBlogs
-<a href="https://gitee.com/masuit/Masuit.MyBlogs"><img src="https://gitee.com/static/images/logo-black.svg" height="32"></a> <a href="https://github.com/ldqk/Masuit.MyBlogs"><img src="https://p.pstatp.com/origin/13841000102b8e2ba20b2" height="32"></a>  
+<a href="https://gitee.com/masuit/Masuit.MyBlogs"><img src="https://gitee.com/static/images/logo-black.svg" height="32"></a> <a href="https://github.com/ldqk/Masuit.MyBlogs"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Font_Awesome_5_brands_github.svg/54px-Font_Awesome_5_brands_github.svg.png" height="32"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/GitHub_logo_2013.svg/128px-GitHub_logo_2013.svg.png" height="32"></a>  
 个人博客站项目源码，高性能低占用的博客系统，这也许是我写过的性能最高的web项目了。**仅1MB的代码量！** 目前日均处理请求数80-300w次，同时在线活跃用户数30-200人，**数据量累计已达到数百万条**，数据库+Redis+网站主程序同时运行在一台2核4GB的机器上，浏览器页面请求秒级响应，CPU平均使用率控制在10%左右，内存控制在1GB左右占用。  
 ![任务管理器](https://img11.360buyimg.com/ddimg/jfs/t1/170269/23/18655/93697/6076eb8fE82d545e7/78f0815f7311cd49.png)
 ![任务管理器](https://user-images.githubusercontent.com/20254980/129124177-37e0f98b-57ba-454f-955d-141201f50cc6.png)
@@ -19,15 +19,15 @@
 目前网站前端页面的代码比较零乱，到处都是，大家想吐槽的尽管吐槽吧，也想找个人帮忙设计下整体的前端页面，有兴趣愿意贡献代码的的小伙伴，欢迎Pull Request吧！😂😂
 ### 开发环境
 操作系统：Windows 10 2104  
-IDE：Visual Studio 2019 v16.10  
+IDE：Visual Studio 2022 v17.0  
 数据库：SQL Server 2017/MySQL 8.0  
 Redis：redis-server-windows 3.2  
-运行时：必须是.NET 5 
+运行时：必须是.NET 6 
 ### 当前运行环境
 操作系统：Windows Server 2019  
 数据库：MySQL 8.0  
 Redis：redis-server-windows 3.2  
-运行时：.NET 5  
+运行时：.NET 6  
 服务器配置：2核+8GB+1000M  
 承载流量：单日请求量平均600w左右，单日带宽1TB左右  
 `请勿使用阿里云、百度云等活动超卖机运行本程序，否则卡出翔！！！`  
