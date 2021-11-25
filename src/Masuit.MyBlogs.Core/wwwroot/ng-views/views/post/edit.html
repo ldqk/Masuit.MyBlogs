@@ -14,8 +14,14 @@
     <div class="form-group overlay animated bounceInDown">
         <div style="height: 56vh;" class="ueditor" ng-model="post.Content" type="text/plain"></div>
         <h3 class="size16">
+            <small ng-hide="showProtectContent==1">
+                <label class="el-switch">
+                    <input type="checkbox" name="switch" ng-checked="post.ProtectContent.length>1">
+                    <span class="el-switch-style" ng-click="showProtectContent=1"></span>
+                </label>
+            </small>
             文章加密内容：
-            <small>
+            <small ng-if="post.ProtectContent.length>1||showProtectContent==1">
                 授权可见
                 <label class="el-switch">
                     <input type="checkbox" name="switch" ng-checked="post.ProtectContentMode==1">
@@ -24,7 +30,7 @@
                 评论可见
             </small>
         </h3>
-        <div style="height: 200px;" class="ueditor" ng-model="post.ProtectContent" type="text/plain"></div>
+        <div style="height: 200px;" class="ueditor" ng-model="post.ProtectContent" type="text/plain" ng-if="post.ProtectContent.length>1||showProtectContent==1"></div>
     </div>
     <div class="row">
         <div class="col-md-2 col-sm-6">
