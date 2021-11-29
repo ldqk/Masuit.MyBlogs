@@ -42,7 +42,7 @@
                         <a asp-controller="Home" asp-action="Author" asp-route-author="@(Model.Modifier??Model.Author)">@(Model.Modifier??Model.Author)</a>
                     </strong>
                     <span class="text-muted">
-                        | 发表时间：<i class="fa fa-clock-o"></i> @Model.ModifyDate.ToString("yyyy-MM-dd HH:mm") | 分类：<i class="icon-map-pin"></i>
+                        | 更新时间：<i class="fa fa-clock-o"></i> @Model.ModifyDate.ToString("yyyy-MM-dd") | 分类：<i class="icon-map-pin"></i>
                         <a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.CategoryName</a>
                     </span>
                 </div>
@@ -67,9 +67,7 @@
             <div class="col-md-6 pull-right">
                 <div class="small text-right">
                     <i class="fa fa-eye"></i>@online 在看 |
-                    <i class="fa fa-comments-o"></i>@Model.CommentCount 评论 |
-                    <i class="fa fa-eye"></i>@Model.TotalViewCount 浏览 |
-                    <i class="icon-thumbsup"></i>@Model.VoteUpCount 支持
+                    <i class="fa fa-comments-o"></i>@Model.CommentCount 评论
                 </div>
             </div>
         </div>

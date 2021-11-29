@@ -37,6 +37,7 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -47,12 +48,19 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class PostController : BaseController
     {
         public IPostService PostService { get; set; }
+
         public ICategoryService CategoryService { get; set; }
+
         public ISeminarService SeminarService { get; set; }
+
         public IPostHistoryVersionService PostHistoryVersionService { get; set; }
+
         public IWebHostEnvironment HostEnvironment { get; set; }
+
         public ISearchEngine<DataContext> SearchEngine { get; set; }
+
         public ImagebedClient ImagebedClient { get; set; }
+
         public IPostVisitRecordService PostVisitRecordService { get; set; }
 
         /// <summary>
@@ -91,7 +99,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
             {
-                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.RecordPostVisit), args: new dynamic[] { id, ClientIP, Request.Headers[HeaderNames.Referer].ToString() });
+                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.RecordPostVisit), args: new dynamic[] { id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString), Request.Headers.ToJsonString() });
                 HttpContext.Session.Set("post" + id, id.ToString());
             }
 
@@ -371,7 +379,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, ClientIP));
             RedisHelper.Set("get:" + email, token, 120);
             return ResultData(null);
-
         }
 
         /// <summary>
@@ -437,7 +444,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "您已经提交过一次修改请求正在待处理，暂不能继续提交修改请求！");
             }
 
-            #endregion
+            #endregion 合并验证
 
             #region 直接合并
 
@@ -450,7 +457,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return await PostService.SaveChangesAsync() > 0 ? ResultData(null, true, "你是文章原作者，无需审核，文章已自动更新并在首页展示！") : ResultData(null, false, "操作失败！");
             }
 
-            #endregion
+            #endregion 直接合并
 
             var merge = post.PostMergeRequests.FirstOrDefault(r => r.Id == dto.Id && r.MergeState != MergeStatus.Merged);
             if (merge != null)
@@ -782,6 +789,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
                     post.Regions = post.Regions.Replace(",", "|").Replace("，", "|");
                     break;
+
                 case RegionLimitMode.AllowRegionExceptForbidRegion:
                 case RegionLimitMode.ForbidRegionExceptAllowRegion:
                     if (string.IsNullOrEmpty(post.ExceptRegions))
@@ -1038,7 +1046,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (!string.IsNullOrEmpty(kw))
             {
                 kw = Regex.Escape(kw);
-                where = where.And(e => Regex.IsMatch(e.IP + e.Location + e.Referer, kw));
+                where = where.And(e => Regex.IsMatch(e.IP + e.Location + e.Referer + e.RequestUrl, kw));
             }
 
             var pages = await PostVisitRecordService.GetPagesAsync<DateTime, PostVisitRecordViewModel>(page, size, where, e => e.Time, false);
@@ -1075,6 +1083,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             return View(PostService[id]);
         }
 
-        #endregion
+        #endregion 后端管理
     }
 }

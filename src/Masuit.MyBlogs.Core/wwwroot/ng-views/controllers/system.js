@@ -5,6 +5,8 @@ myApp.controller("task", ["$scope", "$http", function ($scope, $http) {
 myApp.controller("dashboard", ["$scope", function ($scope) {
 }]);
 myApp.controller("system", ["$scope", "$http", function($scope, $http) {
+	UEDITOR_CONFIG.autoHeightEnabled=false;
+	UEDITOR_CONFIG.initialFrameHeight=320;
 	$scope.request("/system/getsettings", null, function(data) {
 		var settings = {};
 		Enumerable.From(data.Data).Select(e => {
@@ -18,19 +20,19 @@ myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 		$scope.Settings = settings;
 	});
 	$scope.uploadImage = function() {
-        $("#setImageForm").ajaxSubmit({
+		$("#setImageForm").ajaxSubmit({
 			url: "/Upload",
 			type: "post",
 			success: function(data) {
 				
 				document.getElementById("setImageForm").reset();
 				$scope.$apply(function () {
-			     　$scope.Settings[$scope.property] = data.Data;
-			    });
+				  $scope.Settings[$scope.property] = data.Data;
+				});
 				layer.closeAll();
 			}
 		});
-    };
+	};
 	$scope.setImage = function(property) {
 		layer.open({
 			type: 1,
@@ -281,7 +283,7 @@ myApp.controller("email", ["$scope", "$http", function ($scope) {
 	}
 }]);
 myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", function ($scope, $http,NgTableParams,$timeout) {
-    var self = this;
+	var self = this;
 	self.data = {};
 	$scope.request("/system/getsettings", null, function(data) {
 		var settings = {};
@@ -332,7 +334,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 
 	$scope.EnableFirewall= function() {
 		if($scope.Settings.FirewallEnabled=="true") {
-            swal({
+			swal({
 				title: '确定要关闭网站防火墙么?',
 				text: "一旦关闭，网站将面临可能会被流量攻击的风险！",
 				showCancelButton: true,
@@ -342,7 +344,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 				cancelButtonText: '取消',
 			}).then(function(isConfirm) {
 				if (isConfirm) {
-			        $scope.Settings.FirewallEnabled="false";
+					$scope.Settings.FirewallEnabled="false";
 					$scope.$apply();
 				}
 			});
@@ -473,43 +475,43 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 	}
 
 	$scope.detail= function(text) {
-        layer.open({
-          type: 1,
-          area: ['600px', '80%'], //宽高
-          content: text
-        });
+		layer.open({
+		  type: 1,
+		  area: ['600px', '80%'], //宽高
+		  content: text
+		});
 		$('.layui-layer-content').jsonViewer(eval("("+text+")"), {withQuotes: true, withLinks: true});
 		$('.layui-layer-content').css("word-wrap"," break-word");
-    }
+	}
 
 	$scope.distinct=false;
 	$scope.duplicate= function() {
 		$scope.distinct=!$scope.distinct;
-        if ($scope.distinct) {
-            const res = new Map();
+		if ($scope.distinct) {
+			const res = new Map();
 			self.tableParams = new NgTableParams({}, {
 				filterDelay: 0,
 				dataset: angular.copy($scope.logs).filter(item => !res.has(item["IP"]) && res.set(item["IP"], 1))
 			});
-        } else {
+		} else {
 			self.tableParams = new NgTableParams({}, {
 				filterDelay: 0,
 				dataset: $scope.logs
 			});
-        }
-    }
+		}
+	}
 }]);
 
 myApp.controller("sendbox", ["$scope", "$http", function ($scope, $http) {
 	UEDITOR_CONFIG.autoHeightEnabled=false;
 	$scope.load= function() {
-        $http.post("/system/sendbox").then(function (res) {
-		    $scope.Mails = res.data;
-	    });
-    };
+		$http.post("/system/sendbox").then(function (res) {
+			$scope.Mails = res.data;
+		});
+	};
 
 	$scope.newmail= function() {
-        layer.open({
+		layer.open({
 			type: 1,
 			zIndex: 8,
 			title: '发送邮件',
@@ -519,24 +521,24 @@ myApp.controller("sendbox", ["$scope", "$http", function ($scope, $http) {
 				$("#modal").css("display", "none");
 			}
 		});
-    }
+	}
 
 	$scope.send= function(mail) {
-        $http.post("/system/sendmail",mail, {
+		$http.post("/system/sendmail",mail, {
 			'Content-Type':'application/x-www-form-urlencoded'
 		}).then(function (res) {
-            if (res.data) {
-                layer.alert(res.data.Message);
-            } else {
-                layer.msg('发送成功');
+			if (res.data) {
+				layer.alert(res.data.Message);
+			} else {
+				layer.msg('发送成功');
 				layer.closeAll();
 				setTimeout(function() {
-			        $("#modal").css("display", "none");
-	                $scope.load();
-		        }, 500);
-            }
-	    });
-    }
+					$("#modal").css("display", "none");
+					$scope.load();
+				}, 500);
+			}
+		});
+	}
 
 	$scope.load();
 }]);

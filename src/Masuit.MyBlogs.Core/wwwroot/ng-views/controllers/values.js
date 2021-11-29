@@ -1,5 +1,6 @@
 ﻿myApp.controller("values", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
 	UEDITOR_CONFIG.autoHeightEnabled=false;
+	UEDITOR_CONFIG.initialFrameHeight=320;
 	var self = this;
 	self.data = {};
 	this.load = function() {

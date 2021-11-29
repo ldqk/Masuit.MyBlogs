@@ -1,5 +1,5 @@
 ﻿myApp.controller("postlist", ["$scope", "$http", "NgTableParams", "$timeout", function ($scope, $http, NgTableParams, $timeout) {
-    var self = this;
+	var self = this;
 	self.stats = [];
 	self.data = {};
 	$scope.kw = "";
@@ -25,27 +25,27 @@
 		}
 	});
 
-    function stat() {
+	function stat() {
 		fetch("/post/Statistic",{
-            headers:{
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }).then(function(response) {
-            return response.json();
-        }).then(function(res) {
-		    if(res.Success) {
-			    $scope.agg = res.Data;
-			    $scope.$apply();
-		    } else {
-			    window.notie.alert({
-				    type:3,
-				    text:res.data.Message,
-				    time:4
-			    });
-		    }
-	    });
-    }
+			headers:{
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			}
+		}).then(function(response) {
+			return response.json();
+		}).then(function(res) {
+			if(res.Success) {
+				$scope.agg = res.Data;
+				$scope.$apply();
+			} else {
+				window.notie.alert({
+					type:3,
+					text:res.data.Message,
+					time:4
+				});
+			}
+		});
+	}
 
 	stat();
 	setInterval(stat,5000);
@@ -64,15 +64,15 @@
 				}
 			});
 			
-            var params = JSON.parse(localStorage.getItem("postlist-params"));
-	        if (params) {
-		        $scope.kw = params["kw"];
-		        $scope.paginationConf.currentPage= params["page"];
+			var params = JSON.parse(localStorage.getItem("postlist-params"));
+			if (params) {
+				$scope.kw = params["kw"];
+				$scope.paginationConf.currentPage= params["page"];
 				$timeout(() => {
-                    $('.category').dropdown('set selected', params["cid"]);
-	                $('.orderby').dropdown('set selected', params["orderby"]);
-                },10);
-            }
+					$('.category').dropdown('set selected', params["cid"]);
+					$('.orderby').dropdown('set selected', params["orderby"]);
+				},10);
+			}
 		} else {
 			window.notie.alert({
 				type: 3,
@@ -211,8 +211,8 @@
 		}, 500);
 	}
 	
-    $scope.toggleDisableComment= function(row) {
-        $scope.request("/post/DisableComment", {
+	$scope.toggleDisableComment= function(row) {
+		$scope.request("/post/DisableComment", {
 			id: row.Id
 		}, function(data) {
 			window.notie.alert({
@@ -221,10 +221,10 @@
 				time: 4
 			});
 		});
-    }
+	}
 
-    $scope.toggleDisableCopy= function(row) {
-        $scope.request("/post/DisableCopy", {
+	$scope.toggleDisableCopy= function(row) {
+		$scope.request("/post/DisableCopy", {
 			id: row.Id
 		}, function(data) {
 			window.notie.alert({
@@ -233,38 +233,40 @@
 				time: 4
 			});
 		});
-    }
+	}
 
-    $scope.rssSwitch= function(id) {
-        $scope.request("/post/"+id+"/rss-switch",null, function(data) {
+	$scope.rssSwitch= function(id) {
+		$scope.request("/post/"+id+"/rss-switch",null, function(data) {
 			window.notie.alert({
 				type: 1,
 				text: data.Message,
 				time: 4
 			});
 		});
-    }
+	}
 
-    $scope.lockedSwitch= function(id) {
-        $scope.request("/post/"+id+"/locked-switch",null, function(data) {
+	$scope.lockedSwitch= function(id) {
+		$scope.request("/post/"+id+"/locked-switch",null, function(data) {
 			window.notie.alert({
 				type: 1,
 				text: data.Message,
 				time: 4
 			});
 		});
-    }
+	}
 	self.insight= function(row) {
-        layer.full(layer.open({
-          type: 2,
-          title: '文章《'+row.Title+'》洞察分析',
-          maxmin: true, //开启最大化最小化按钮
-          area: ['893px', '100vh'],
-          content: '/'+row.Id+'/insight'
-        }));
-    }
+		layer.full(layer.open({
+		  type: 2,
+		  title: '文章《'+row.Title+'》洞察分析',
+		  maxmin: true, //开启最大化最小化按钮
+		  area: ['893px', '100vh'],
+		  content: '/'+row.Id+'/insight'
+		}));
+	}
 }]);
 myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
+	UEDITOR_CONFIG.autoHeightEnabled=false;
+	UEDITOR_CONFIG.initialFrameHeight=window.innerHeight*0.8;
 	clearInterval(window.interval);
 	$scope.post = {
 		Title: "",
@@ -279,24 +281,24 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 	$scope.post.Author =$scope.user.NickName || $scope.user.Username;
 	$scope.post.Email = $scope.user.Email;
 	var refer = $location.search()['refer'];
-    if (refer) {
-        $scope.request("/post/get", {
-		    id: refer
-	    }, function (data) {
-            $scope.post = data.Data;
+	if (refer) {
+		$scope.request("/post/get", {
+			id: refer
+		}, function (data) {
+			$scope.post = data.Data;
 			delete $scope.post.Id;
-            $('.ui.dropdown.keyword').dropdown({
-			    allowAdditions: true,
-			    onChange: function(value) {
-				    $scope.post.Keyword = value;
-			    }
-		    });
-		    $('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
-	    });
-    }
+			$('.ui.dropdown.keyword').dropdown({
+				allowAdditions: true,
+				onChange: function(value) {
+					$scope.post.Keyword = value;
+				}
+			});
+			$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
+		});
+	}
 	$scope.getCategory = function () {
-        $http.post("/category/getcategories", null).then(function (res) {
-            var data = res.data;
+		$http.post("/category/getcategories", null).then(function (res) {
+			var data = res.data;
 			if (data.Success) {
 				$scope.cat = data.Data;
 				$('.ui.dropdown.category').dropdown({
@@ -352,11 +354,11 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 	});
 	//上传Word文档
 	$scope.upload = function() {
-        $("#docform").ajaxSubmit({
+		$("#docform").ajaxSubmit({
 			url: "/Upload/UploadWord",
 			type: "post",
 			success: function(data) {
-                console.log(data);
+				console.log(data);
 				if (data.Success) {
 					window.notie.alert({
 						type: 1,
@@ -410,7 +412,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 		}
 		$http.post("/Post/write", post).then(function(res) {
 			var data = res.data;
-            if (data.Success) {
+			if (data.Success) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
@@ -432,8 +434,8 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 
 	// 定时发布
 	$scope.Scheduled= function() {
-        if ($scope.post.schedule) {
-            jeDate('#timespan',{
+		if ($scope.post.schedule) {
+			jeDate('#timespan',{
 				isinitVal: true,
 				festival: true,
 				isTime: true,
@@ -444,53 +446,54 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 				donefun: function (obj) {
 					$scope.post.timespan = obj.val;
 				},
-		        clearfun: function(elem, val) {
-                    delete $scope.post.timespan;
-                }
+				clearfun: function(elem, val) {
+					delete $scope.post.timespan;
+				}
 			});
-        }
+		}
 	}
 
 	//检查草稿
-    if (localStorage.getItem("write-post-draft")) {
-        notie.confirm({
-            text: "检查到上次有未提交的草稿，是否加载？",
-            submitText: "确定",
-            cancelText: "取消",
-            position: "bottom",
-            submitCallback: function () {
-                $scope.post = JSON.parse(localStorage.getItem("write-post-draft"));
-                $scope.$apply();
-                $timeout(function () {
-                    $('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
-                    if ($scope.post.Label) {
-                        $('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
-                    }
-                    if ($scope.post.Keyword) {
+	if (localStorage.getItem("write-post-draft")) {
+		notie.confirm({
+			text: "检查到上次有未提交的草稿，是否加载？",
+			submitText: "确定",
+			cancelText: "取消",
+			position: "bottom",
+			submitCallback: function () {
+				$scope.post = JSON.parse(localStorage.getItem("write-post-draft"));
+				$scope.$apply();
+				$timeout(function () {
+					$('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
+					if ($scope.post.Label) {
+						$('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
+					}
+					if ($scope.post.Keyword) {
 						$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
-                    }
-                    if ($scope.post.Seminars) {
-                        $('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
-                    }
-				    $scope.Scheduled();
-                }, 10);
-                window.interval = setInterval(function () {
-		            localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
-	            },5000);
-            },
-            cancelCallback: function() {
-                window.interval = setInterval(function () {
-		            localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
-	            },5000);
-            }
-        });
-    } else {
-        window.interval = setInterval(function () {
-		    localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
-	    },5000);
-    }
+					}
+					if ($scope.post.Seminars) {
+						$('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
+					}
+					$scope.Scheduled();
+				}, 10);
+				window.interval = setInterval(function () {
+					localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
+				},5000);
+			},
+			cancelCallback: function() {
+				window.interval = setInterval(function () {
+					localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
+				},5000);
+			}
+		});
+	} else {
+		window.interval = setInterval(function () {
+			localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
+		},5000);
+	}
 }]);
 myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
+	UEDITOR_CONFIG.initialFrameHeight=window.innerHeight*0.72;
 	$scope.id = $location.search()['id'];
 	
 	$scope.reserve = true;
@@ -541,8 +544,8 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 		$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
 	});
 	$scope.getCategory = function () {
-        $http.post("/category/getcategories", null).then(function (res) {
-            var data = res.data;
+		$http.post("/category/getcategories", null).then(function (res) {
+			var data = res.data;
 			if (data.Success) {
 				$scope.cat = data.Data;
 				$('.ui.dropdown.category').dropdown({
@@ -678,42 +681,42 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 	}
 	
 	//检查草稿
-    if (localStorage.getItem("post-draft-" + $scope.id)) {
-        notie.confirm({
-            text: "检查到上次有未提交的草稿，是否加载？",
-            submitText: "确定",
-            cancelText: "取消",
-            position: "bottom",
-            submitCallback: function () {
-                $scope.post = JSON.parse(localStorage.getItem("post-draft-" + $scope.id));
-                $scope.$apply();
-                $timeout(function () {
-                    $('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
+	if (localStorage.getItem("post-draft-" + $scope.id)) {
+		notie.confirm({
+			text: "检查到上次有未提交的草稿，是否加载？",
+			submitText: "确定",
+			cancelText: "取消",
+			position: "bottom",
+			submitCallback: function () {
+				$scope.post = JSON.parse(localStorage.getItem("post-draft-" + $scope.id));
+				$scope.$apply();
+				$timeout(function () {
+					$('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
 					if ($scope.post.Label) {
-                        $('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
-                    }
-                    if ($scope.post.Keyword) {
+						$('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
+					}
+					if ($scope.post.Keyword) {
 						$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
-                    }
-                    if ($scope.post.Seminars) {
-                        $('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
-                    }
-                }, 10);
-                window.interval = setInterval(function () {
-			        localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
-		        },5000);
-            },
-            cancelCallback: function() {
-                window.interval = setInterval(function () {
-			        localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
-		        },5000);
-            }
-        });
-    } else {
-        window.interval = setInterval(function () {
+					}
+					if ($scope.post.Seminars) {
+						$('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
+					}
+				}, 10);
+				window.interval = setInterval(function () {
+					localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
+				},5000);
+			},
+			cancelCallback: function() {
+				window.interval = setInterval(function () {
+					localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
+				},5000);
+			}
+		});
+	} else {
+		window.interval = setInterval(function () {
 			localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
 		},5000);
-    }
+	}
 }]);
 myApp.controller("category", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
 	var self = this;
