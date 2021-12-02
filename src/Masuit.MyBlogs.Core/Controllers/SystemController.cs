@@ -107,7 +107,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var dic = settings.ToDictionary(s => s.Name, s => s.Value); //同步设置
             foreach (var (key, value) in dic)
             {
-                CommonHelper.SystemSettings.AddOrUpdate(key, value);
+                CommonHelper.SystemSettings[key]= value;
             }
 
             return ResultData(null, b, b ? "设置保存成功！" : "设置保存失败！");

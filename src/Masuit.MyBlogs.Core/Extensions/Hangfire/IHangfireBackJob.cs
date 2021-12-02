@@ -30,7 +30,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="ip"></param>
         /// <param name="refer"></param>
         /// <param name="url"></param><param name="headers"></param>
-        void RecordPostVisit(int pid, string ip, string refer, string url, string headers);
+        void RecordPostVisit(int pid, string ip, string refer, string url);
 
         /// <summary>
         /// 每日任务

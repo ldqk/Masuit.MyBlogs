@@ -70,9 +70,6 @@
                                     <div class="col-md-6">
                                         <a asp-controller="Post" asp-action="Details" asp-route-id="@p.Id" class="search-link" target="_blank">@(Context.Request.Scheme + "://" + Context.Request.Host + "/" + p.Id)</a>
                                     </div>
-                                    <div class="col-md-6 pull-right text-right">
-                                        @p.CommentCount 评论 | @p.TotalViewCount 浏览
-                                    </div>
                                 </div>
                             </div>
                         </div>

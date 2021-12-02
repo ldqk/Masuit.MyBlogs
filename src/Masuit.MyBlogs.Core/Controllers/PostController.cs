@@ -99,7 +99,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
             {
-                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.RecordPostVisit), args: new dynamic[] { id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString), Request.Headers.ToJsonString() });
+                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.RecordPostVisit), args: new dynamic[] { id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString) });
                 HttpContext.Session.Set("post" + id, id.ToString());
             }
 

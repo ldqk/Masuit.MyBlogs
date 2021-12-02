@@ -15,8 +15,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
 
         public string RequestUrl { get; set; }
 
-        public string RequestHeader { get; set; }
-
         public DateTime Time { get; set; }
     }
 }

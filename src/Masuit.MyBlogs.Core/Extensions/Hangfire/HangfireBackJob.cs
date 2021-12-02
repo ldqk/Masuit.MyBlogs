@@ -112,7 +112,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="refer"></param>
         /// <param name="url"></param>
         /// <param name="headers"></param>
-        public void RecordPostVisit(int pid, string ip, string refer, string url, string headers)
+        public void RecordPostVisit(int pid, string ip, string refer, string url)
         {
             var time = DateTime.Now.AddMonths(-3);
             _recordService.GetQuery(b => b.Time < time).DeleteFromQuery();
@@ -130,7 +130,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 Referer = refer,
                 Location = ip.GetIPLocation(),
                 Time = DateTime.Now,
-                RequestHeader = headers,
                 RequestUrl = url,
                 PostId = pid
             });
