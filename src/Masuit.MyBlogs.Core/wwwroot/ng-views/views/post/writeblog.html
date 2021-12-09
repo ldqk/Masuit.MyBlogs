@@ -17,24 +17,26 @@
     }
 </style>
 <form class="form-group" id="article-form" method="post" onsubmit="return false">
-    <input type="hidden" ng-model="post.Author">
-    <input type="hidden" ng-model="post.Email">
+    <input ng-model="post.Author" type="hidden">
+    <input ng-model="post.Email" type="hidden">
     <div class="input-group">
         <span class="input-group-addon size18">文章标题：</span>
         <div class="fg-line">
-            <input type="text" class="form-control input-lg" ng-model="post.Title" required placeholder="请输入文章标题">
+            <input class="form-control input-lg" ng-model="post.Title" placeholder="请输入文章标题" required type="text">
         </div>
         <span class="input-group-btn">
-            <button type="button" class="btn btn-info btn-lg waves-effect" ng-click="showupload()" style="font-size: 15px;"><i class="icon-upload4 size18"></i>上传word文档</button>
+            <button class="btn btn-info btn-lg waves-effect" ng-click="showupload()" style="font-size: 15px;" type="button">
+                <i class="icon-upload4 size18"></i>上传word文档
+            </button>
         </span>
     </div>
     <!-- 加载编辑器的容器 -->
-    <div class="form-group overlay animated bounceInDown">
-        <div style="height: 56vh;" class="ueditor" ng-model="post.Content" type="text/plain"></div>
+    <div class="animated bounceInDown form-group overlay">
+        <div class="ueditor" ng-model="post.Content" style="height: 56vh;" type="text/plain"></div>
         <h3 class="size16">
             <small ng-hide="showProtectContent==1">
                 <label class="el-switch">
-                    <input type="checkbox" name="switch" ng-checked="post.ProtectContent.length>1">
+                    <input name="switch" ng-checked="post.ProtectContent.length>1" type="checkbox">
                     <span class="el-switch-style" ng-click="showProtectContent=1"></span>
                 </label>
             </small>
@@ -42,24 +44,24 @@
             <small ng-if="post.ProtectContent.length>1||showProtectContent==1">
                 授权可见
                 <label class="el-switch">
-                    <input type="checkbox" name="switch">
+                    <input name="switch" type="checkbox">
                     <span class="el-switch-style" ng-click="post.ProtectContentMode=1"></span>
                 </label>
                 评论可见
             </small>
         </h3>
-        <div style="height: 200px;" class="ueditor" ng-model="post.ProtectContent" type="text/plain" ng-if="post.ProtectContent.length>1||showProtectContent==1"></div>
+        <div class="ueditor" ng-if="post.ProtectContent.length>1||showProtectContent==1" ng-model="post.ProtectContent" style="height: 200px;" type="text/plain"></div>
     </div>
     <div class="row">
         <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">分类：</span>
-                <div class="ui fluid search selection dropdown category">
-                    <input name="category" type="hidden" id="category">
+                <div class="category dropdown fluid search selection ui">
+                    <input id="category" name="category" type="hidden">
                     <i class="dropdown icon"></i>
                     <div class="default text">请选择分类</div>
                     <div class="menu">
-                        <div class="item" ng-repeat="item in cat track by $index" data-value="{{item.Id}}">{{item.Name}}</div>
+                        <div class="item" data-value="{{item.Id}}" ng-repeat="item in cat track by $index">{{item.Name}}</div>
                     </div>
                 </div>
             </div>
@@ -67,12 +69,12 @@
         <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">标签：</span>
-                <div class="ui fluid multiple search selection dropdown tags">
-                    <input name="Label" type="hidden" id="Label">
+                <div class="dropdown fluid multiple search selection tags ui">
+                    <input id="Label" name="Label" type="hidden">
                     <i class="dropdown icon"></i>
                     <div class="default text">标签(选择或输入新标签)</div>
                     <div class="menu">
-                        <div class="item" ng-repeat="item in Tags track by $index" data-value="{{item}}">{{item}}</div>
+                        <div class="item" data-value="{{item}}" ng-repeat="item in Tags track by $index">{{item}}</div>
                     </div>
                 </div>
             </div>
@@ -80,8 +82,8 @@
         <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">文章关键词：</span>
-                <div class="ui fluid multiple search selection dropdown keyword">
-                    <input name="keyword" type="hidden" id="keyword">
+                <div class="dropdown fluid keyword multiple search selection ui">
+                    <input id="keyword" name="keyword" type="hidden">
                     <div class="default text">文章关键词</div>
                     <div class="menu"></div>
                 </div>
@@ -90,12 +92,12 @@
         <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">专题：</span>
-                <div class="ui fluid multiple search selection dropdown seminar">
-                    <input name="seminar" type="hidden" id="seminar">
+                <div class="dropdown fluid multiple search selection seminar ui">
+                    <input id="seminar" name="seminar" type="hidden">
                     <i class="dropdown icon"></i>
                     <div class="default text">选择专题(可选)</div>
                     <div class="menu">
-                        <div class="item" ng-repeat="item in Seminars track by $index" data-value="{{item.Id}}">{{item.Title}}</div>
+                        <div class="item" data-value="{{item.Id}}" ng-repeat="item in Seminars track by $index">{{item.Title}}</div>
                     </div>
                 </div>
             </div>
@@ -106,7 +108,7 @@
             <div class="input-group">
                 <span class="input-group-addon">作者：</span>
                 <div class="fg-line">
-                    <input type="text" class="form-control" ng-model="post.Author">
+                    <input class="form-control" ng-model="post.Author" type="text">
                 </div>
             </div>
         </div>
@@ -114,7 +116,7 @@
             <div class="input-group">
                 <span class="input-group-addon">邮箱：</span>
                 <div class="fg-line">
-                    <input type="text" class="form-control" ng-model="post.Email">
+                    <input class="form-control" ng-model="post.Email" type="text">
                 </div>
             </div>
         </div>
@@ -122,17 +124,17 @@
             <div class="input-group">
                 <span class="input-group-addon">
                     <label class="checkbox checkbox-inline m-r-20">
-                        <input type="checkbox" id="DisableCopy" ng-model="post.DisableCopy">
+                        <input id="DisableCopy" ng-model="post.DisableCopy" type="checkbox">
                         <i class="input-helper"></i>
                         禁止转载
                     </label>
                     <label class="checkbox checkbox-inline m-r-20">
-                        <input type="checkbox" id="DisableComment" ng-model="post.DisableComment">
+                        <input id="DisableComment" ng-model="post.DisableComment" type="checkbox">
                         <i class="input-helper"></i>
                         禁止评论
                     </label>
                     <label class="checkbox checkbox-inline m-r-20">
-                        <input type="checkbox" ng-model="post.schedule" ng-click="Scheduled()">
+                        <input ng-click="Scheduled()" ng-model="post.schedule" type="checkbox">
                         <i class="input-helper"></i>
                         定时发表
                     </label>
@@ -141,8 +143,10 @@
         </div>
         <div class="col-md-3" ng-if="post.schedule">
             <div class="input-group">
-                <span class="input-group-addon" ng-if="post.schedule"><label for="Label">定时：</label></span>
-                <input type="text" class="workinput wicon" id="timespan" ng-model="post.timespan" readonly="readonly" ng-if="post.schedule" />
+                <span class="input-group-addon" ng-if="post.schedule">
+                    <label for="Label">定时：</label>
+                </span>
+                <input class="wicon workinput" id="timespan" ng-if="post.schedule" ng-model="post.timespan" readonly="readonly" type="text"/>
             </div>
         </div>
     </div>
@@ -150,7 +154,7 @@
         <div class="col-md-3">
             <div class="input-group">
                 <span class="input-group-addon" id="sizing-addon2">按地区投放：</span>
-                <select ng-model="post.LimitMode" ng-init="post.LimitMode = 0" class="form-control">
+                <select class="form-control" ng-init="post.LimitMode = 0" ng-model="post.LimitMode">
                     <option ng-value="0" selected="selected">不限</option>
                     <optgroup label="可见性">
                         <option ng-value="1">指定地区可见</option>
@@ -162,19 +166,24 @@
                     </optgroup>
                 </select>
                 <span class="input-group-btn" ng-if="(post.LimitMode||0)==0">
-                    <button type="button" class="btn btn-info" ng-click="submit(post)">发布</button>
+                    <button class="btn btn-info" ng-click="submit(post)" type="button">发布</button>
                 </span>
             </div>
         </div>
         <div class="col-md-5" ng-if="post.LimitMode>0">
             <div class="input-group">
                 <span class="input-group-addon" ng-if="post.LimitMode%2==1">可见地区：</span>
-                <span class="input-group-addon" ng-if="post.LimitMode%2==0"><strong class="text-red">不可见地区：</strong></span>
+                <span class="input-group-addon" ng-if="post.LimitMode%2==0">
+                    <strong class="text-red">不可见地区：</strong>
+                </span>
                 <div class="fg-line">
-                    <input type="text" class="form-control" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.Regions">
+                    <input class="form-control" name="Regions" ng-model="post.Regions" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" type="text" list="Regions">
+                    <datalist id="Regions">
+                        <option ng-repeat="item in Regions track by $index">{{item}}</option>
+                    </datalist>
                 </div>
                 <span class="input-group-btn" ng-if="post.LimitMode<3">
-                    <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)">发布</button>
+                    <button class="btn btn-info waves-effect" ng-click="submit(post)" type="button">发布</button>
                 </span>
             </div>
         </div>
@@ -182,29 +191,32 @@
             <div class="input-group">
                 <span class="input-group-addon">排除地区：</span>
                 <div class="fg-line">
-                    <input type="text" class="form-control" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.ExceptRegions">
+                    <input class="form-control" name="ExceptRegions" ng-model="post.ExceptRegions" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" type="text" list="ExceptRegions">
+                    <datalist id="ExceptRegions">
+                        <option ng-repeat="item in ExceptRegions track by $index">{{item}}</option>
+                    </datalist>
                 </div>
                 <span class="input-group-btn">
-                    <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)">发布</button>
+                    <button class="btn btn-info waves-effect" ng-click="submit(post)" type="button">发布</button>
                 </span>
             </div>
         </div>
     </div>
 </form>
-<div style="position: absolute; left: -20000px; height: 0; overflow: hidden; ">
+<div style="position: absolute; left: -20000px; height: 0; overflow: hidden;">
     <div id="docfile">
-        <form id="docform" onsubmit="return false" enctype="multipart/form-data">
+        <form enctype="multipart/form-data" id="docform" onsubmit="return false">
             <h4 class="h4">注意：重复上传将会覆盖之前上传的内容！</h4>
             <div class="file-box">
                 <div class="input-group">
-                    <input type="text" name="copyFile" disabled class="form-control"/>
+                    <input class="form-control" disabled name="copyFile" type="text"/>
                     <span class="input-group-btn">
-                        <a href="javascript:void(0);" class="btn btn-info">浏览</a>
+                        <a class="btn btn-info" href="javascript:void(0);">浏览</a>
                     </span>
-                    <input type="file" class="uploadFile" name="upload" onchange="getFile(this, 'copyFile')"/>
+                    <input class="uploadFile" name="upload" onchange="getFile(this, 'copyFile')" type="file"/>
                 </div>
             </div>
         </form>
-        <button type="button" class="btn btn-primary waves-effect" ng-click="upload()"> 上传 </button>
+        <button class="btn btn-primary waves-effect" ng-click="upload()" type="button"> 上传 </button>
     </div>
 </div>

@@ -149,7 +149,10 @@
                 <span class="input-group-addon" ng-if="post.LimitMode%2==1">可见地区：</span>
                 <span class="input-group-addon" ng-if="post.LimitMode%2==0"><strong class="text-red">不可见地区：</strong></span>
                 <div class="fg-line">
-                    <input type="text" class="form-control" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.Regions">
+                    <input type="text" class="form-control" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.Regions" name="Regions" list="Regions">
+                    <datalist id="Regions">
+                        <option ng-repeat="item in Regions track by $index">{{item}}</option>
+                    </datalist>
                 </div>
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)" ng-if="post.LimitMode<3">确认修改</button>
@@ -160,7 +163,10 @@
             <div class="input-group">
                 <span class="input-group-addon">排除地区：</span>
                 <div class="fg-line">
-                    <input type="text" class="form-control" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.ExceptRegions">
+                    <input type="text" class="form-control" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" ng-model="post.ExceptRegions" name="ExceptRegions" list="ExceptRegions">
+                    <datalist id="ExceptRegions">
+                        <option ng-repeat="item in ExceptRegions track by $index">{{item}}</option>
+                    </datalist>
                 </div>
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)">确认修改</button>

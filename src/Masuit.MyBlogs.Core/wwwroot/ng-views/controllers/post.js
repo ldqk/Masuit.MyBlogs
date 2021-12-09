@@ -491,6 +491,13 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 			localStorage.setItem("write-post-draft",JSON.stringify($scope.post));
 		},5000);
 	}
+
+	$scope.get("/post/GetRegions?name=Regions", function(data) {
+		$scope.Regions=data.Data;
+	});
+	$scope.get("/post/GetRegions?name=ExceptRegions", function(data) {
+		$scope.ExceptRegions=data.Data;
+	});
 }]);
 myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
 	UEDITOR_CONFIG.initialFrameHeight=window.innerHeight*0.72;
@@ -717,6 +724,13 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 			localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
 		},5000);
 	}
+	
+	$scope.get("/post/GetRegions?name=Regions", function(data) {
+		$scope.Regions=data.Data;
+	});
+	$scope.get("/post/GetRegions?name=ExceptRegions", function(data) {
+		$scope.ExceptRegions=data.Data;
+	});
 }]);
 myApp.controller("category", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
 	var self = this;

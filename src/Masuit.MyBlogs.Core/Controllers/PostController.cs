@@ -1083,6 +1083,18 @@ namespace Masuit.MyBlogs.Core.Controllers
             return View(PostService[id]);
         }
 
+        /// <summary>
+        /// 获取地区集
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [MyAuthorize]
+        [ProducesResponseType(typeof(List<string>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetRegions(string name)
+        {
+            return ResultData(await PostService.GetAll().Select(name).Distinct().ToDynamicListAsync());
+        }
+
         #endregion 后端管理
     }
 }
