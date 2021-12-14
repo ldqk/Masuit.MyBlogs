@@ -31,26 +31,36 @@
         </span>
     </div>
     <!-- 加载编辑器的容器 -->
-    <div class="animated bounceInDown form-group overlay">
+    <div class="animated form-group overlay">
         <div class="ueditor" ng-model="post.Content" style="height: 56vh;" type="text/plain"></div>
         <h3 class="size16">
-            <small ng-hide="showProtectContent==1">
-                <label class="el-switch">
-                    <input name="switch" ng-checked="post.ProtectContent.length>1" type="checkbox">
-                    <span class="el-switch-style" ng-click="showProtectContent=1"></span>
-                </label>
-            </small>
             文章加密内容：
-            <small ng-if="post.ProtectContent.length>1||showProtectContent==1">
-                授权可见
-                <label class="el-switch">
-                    <input name="switch" type="checkbox">
-                    <span class="el-switch-style" ng-click="post.ProtectContentMode=1"></span>
-                </label>
-                评论可见
+            <small class="form-group form-inline">
+                <div class="input-group">
+                    <select class="form-control" ng-model="post.ProtectContentMode" ng-init="post.ProtectContentMode=0">
+                        <option ng-value="0">无加密</option>
+                        <option ng-value="1">评论可见</option>
+                        <option ng-value="2">地区可见：</option>
+                        <option ng-value="3">授权可见</option>
+                    </select>
+                </div>
+                <div class="input-group" ng-if="post.ProtectContentMode==2">
+                    <div class="fg-line">
+                        <input class="form-control" id="region" ng-model="post.ProtectContentRegions" placeholder="竖线分隔，支持国家、地区、城市、运营商、ASN" style="width: 460px" type="text" list="ProtectContentRegions">
+                        <datalist id="ProtectContentRegions">
+                            <option ng-repeat="item in Regions track by $index">{{item}}</option>
+                        </datalist>
+                        <select class="form-control" ng-init="post.ProtectContentLimitMode=post.ProtectContentLimitMode||1" ng-model="post.ProtectContentLimitMode"> 
+                            <option ng-value="1">以内</option>
+                            <option ng-value="2">以外</option>
+                        </select>
+                    </div>
+                </div>
             </small>
         </h3>
-        <div class="ueditor" ng-if="post.ProtectContent.length>1||showProtectContent==1" ng-model="post.ProtectContent" style="height: 200px;" type="text/plain"></div>
+        <div ng-if="post.ProtectContentMode>0">
+            <div class="ueditor" ng-model="post.ProtectContent" style="height: 200px;" type="text/plain"></div>
+        </div>
     </div>
     <div class="row">
         <div class="col-md-3 col-sm-6">
@@ -177,7 +187,7 @@
                     <strong class="text-red">不可见地区：</strong>
                 </span>
                 <div class="fg-line">
-                    <input class="form-control" name="Regions" ng-model="post.Regions" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" type="text" list="Regions">
+                    <input class="form-control" list="Regions" name="Regions" ng-model="post.Regions" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" type="text">
                     <datalist id="Regions">
                         <option ng-repeat="item in Regions track by $index">{{item}}</option>
                     </datalist>
@@ -191,7 +201,7 @@
             <div class="input-group">
                 <span class="input-group-addon">排除地区：</span>
                 <div class="fg-line">
-                    <input class="form-control" name="ExceptRegions" ng-model="post.ExceptRegions" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" type="text" list="ExceptRegions">
+                    <input class="form-control" list="ExceptRegions" name="ExceptRegions" ng-model="post.ExceptRegions" placeholder="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称" type="text">
                     <datalist id="ExceptRegions">
                         <option ng-repeat="item in ExceptRegions track by $index">{{item}}</option>
                     </datalist>

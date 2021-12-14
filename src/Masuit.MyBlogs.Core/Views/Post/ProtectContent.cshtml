@@ -4,6 +4,7 @@
 @using Masuit.MyBlogs.Core.Configs
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools.Systems
+@using System.Text.RegularExpressions
 @model Masuit.MyBlogs.Core.Models.Entity.Post
 
 @if (!string.IsNullOrEmpty(Model.ProtectContent)&&Model.ProtectContentMode==ProtectContentMode.AuthorizeVisiable)
@@ -55,4 +56,12 @@
             @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
         }
     </div>
+}
+@if(Model.ProtectContentMode==ProtectContentMode.Regions) {
+    if (Model.ProtectContentLimitMode==RegionLimitMode.AllowRegion&&Regex.IsMatch(Context.Request.Location(),Model.ProtectContentRegions)) {
+        @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
+    }
+    if (Model.ProtectContentLimitMode==RegionLimitMode.ForbidRegion&&!Regex.IsMatch(Context.Request.Location(),Model.ProtectContentRegions)) {
+        @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
+    }
 }

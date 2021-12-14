@@ -160,6 +160,16 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string ExceptRegions { get; set; }
 
         /// <summary>
+        /// 限制模式
+        /// </summary>
+        public RegionLimitMode? ProtectContentLimitMode { get; set; }
+
+        /// <summary>
+        /// 限制地区，竖线分隔
+        /// </summary>
+        public string ProtectContentRegions { get; set; }
+
+        /// <summary>
         /// 开启rss订阅
         /// </summary>
         public bool Rss { get; set; }
@@ -207,12 +217,16 @@ namespace Masuit.MyBlogs.Core.Models.Entity
     {
         [Description("不限")]
         All,
+
         [Description("指定地区可见：{0}")]
         AllowRegion,
+
         [Description("指定地区不可见：{0}")]
         ForbidRegion,
+
         [Description("可见地区：{0}，排除地区：{1}")]
         AllowRegionExceptForbidRegion,
+
         [Description("不可见地区：{0}，排除地区：{1}")]
         ForbidRegionExceptAllowRegion
     }
@@ -222,14 +236,21 @@ namespace Masuit.MyBlogs.Core.Models.Entity
     /// </summary>
     public enum ProtectContentMode
     {
-        /// <summary>
-        /// 授权可见
-        /// </summary>
-        AuthorizeVisiable,
+        None,
 
         /// <summary>
         /// 评论可见
         /// </summary>
-        CommentVisiable
+        CommentVisiable,
+
+        /// <summary>
+        /// 地区可见
+        /// </summary>
+        Regions,
+
+        /// <summary>
+        /// 授权可见
+        /// </summary>
+        AuthorizeVisiable,
     }
 }

@@ -142,5 +142,14 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// </summary>
         public string ExceptRegions { get; set; }
 
+        /// <summary>
+        /// 限制模式
+        /// </summary>
+        public RegionLimitMode? ProtectContentLimitMode { get; set; }
+
+        /// <summary>
+        /// 限制地区，竖线分隔
+        /// </summary>
+        public string ProtectContentRegions { get; set; }
     }
 }

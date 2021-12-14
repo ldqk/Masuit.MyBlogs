@@ -27,7 +27,9 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// </summary>
         [Required, MaxLength(24, ErrorMessage = "作者名最长支持24个字符！"), MinLength(2, ErrorMessage = "作者名最少2个字符！")]
         public string Author { get; set; }
+
         public string Modifier { get; set; }
+
         public string ModifierEmail { get; set; }
 
         /// <summary>
@@ -98,5 +100,15 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 限制排除地区，竖线分隔
         /// </summary>
         public string ExceptRegions { get; set; }
+
+        /// <summary>
+        /// 限制模式
+        /// </summary>
+        public RegionLimitMode? ProtectContentLimitMode { get; set; }
+
+        /// <summary>
+        /// 限制地区，竖线分隔
+        /// </summary>
+        public string ProtectContentRegions { get; set; }
     }
 }

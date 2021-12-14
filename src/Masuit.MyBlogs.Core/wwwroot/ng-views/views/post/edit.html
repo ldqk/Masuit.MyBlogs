@@ -11,26 +11,37 @@
         </span>
     </div>
     <!-- 加载编辑器的容器 -->
-    <div class="form-group overlay animated bounceInDown">
+    <div class="form-group overlay animated">
         <div style="height: 56vh;" class="ueditor" ng-model="post.Content" type="text/plain"></div>
         <h3 class="size16">
-            <small ng-hide="showProtectContent==1">
-                <label class="el-switch">
-                    <input type="checkbox" name="switch" ng-checked="post.ProtectContent.length>1">
-                    <span class="el-switch-style" ng-click="showProtectContent=1"></span>
-                </label>
-            </small>
             文章加密内容：
-            <small ng-if="post.ProtectContent.length>1||showProtectContent==1">
-                授权可见
-                <label class="el-switch">
-                    <input type="checkbox" name="switch" ng-checked="post.ProtectContentMode==1">
-                    <span class="el-switch-style" ng-click="post.ProtectContentMode=1"></span>
-                </label>
-                评论可见
+            <small class="form-group form-inline">
+                <div class="input-group">
+                    <select ng-model="post.ProtectContentMode" class="form-control">
+                        <option ng-value="0">无加密</option>
+                        <option ng-value="1">评论可见</option>
+                        <option ng-value="2">地区可见：</option>
+                        <option ng-value="3">授权可见</option>
+                    </select>
+                </div>
+                <div class="input-group" ng-if="post.ProtectContentMode==2">
+                    <div class="fg-line">
+                        <input type="text" class="form-control" id="region" placeholder="竖线分隔，支持国家、地区、城市、运营商、ASN" ng-model="post.ProtectContentRegions" style="width: 460px" list="ProtectContentRegions">
+                        <datalist id="ProtectContentRegions">
+                            <option ng-repeat="item in ExceptRegions track by $index">{{item}}</option>
+                            <option ng-repeat="item in Regions track by $index">{{item}}</option>
+                        </datalist>
+                        <select ng-model="post.ProtectContentLimitMode" ng-init="post.ProtectContentLimitMode=post.ProtectContentLimitMode||2" class="form-control">
+                            <option ng-value="1">以内</option>
+                            <option ng-value="2">以外</option>
+                        </select>
+                    </div>
+                </div>
             </small>
         </h3>
-        <div style="height: 200px;" class="ueditor" ng-model="post.ProtectContent" type="text/plain" ng-if="post.ProtectContent.length>1||showProtectContent==1"></div>
+        <div ng-if="post.ProtectContentMode>0">
+            <div style="height: 200px;" class="ueditor" ng-model="post.ProtectContent" type="text/plain"></div>
+        </div>
     </div>
     <div class="row">
         <div class="col-md-2 col-sm-6">
