@@ -48,11 +48,12 @@ namespace Masuit.MyBlogs.Core
                     var db = app.ApplicationServices.GetRequiredService<DataContext>();
                     var set = db.Post.Select(p => $"{p.Title},{p.Label},{p.Keyword}").AsParallel().SelectMany(s => Regex.Split(s, @"\p{P}(?<!\.|#)|\p{Z}|\p{S}")).Where(s => s.Length > 1).ToHashSet();
                     var lines = File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomKeywords.txt")).Union(set);
-                    var segmenter = new JiebaSegmenter();
-                    foreach (var word in lines)
+                    KeywordsManager.AddWords(lines);
+                    KeywordsManager.AddSynonyms(File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomSynonym.txt")).Where(s => s.Contains(" ")).Select(s =>
                     {
-                        segmenter.AddWord(word);
-                    }
+                        var arr = Regex.Split(s, "\\s");
+                        return (arr[0], arr[1]);
+                    }));
                 });
                 Console.WriteLine($"导入自定义词库完成，耗时{time}s");
                 Windows.ClearMemorySilent();
