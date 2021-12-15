@@ -14,6 +14,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using Masuit.MyBlogs.Core.Controllers;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall
@@ -21,6 +22,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
     public class FirewallAttribute : ActionFilterAttribute
     {
         public ICacheManager<int> CacheManager { get; set; }
+
         public IFirewallRepoter FirewallRepoter { get; set; }
 
         /// <inheritdoc />
@@ -55,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 context.Result = new ContentResult()
                 {
                     Content = Template.Create(msg).Set("browser", agent.Browser + " " + agent.BrowserVersion).Set("os", agent.Platform).Render(),
-                    ContentType = ContentType.Html,
+                    ContentType = ContentType.Html + "; charset=utf-8",
                     StatusCode = 403
                 };
                 return;
@@ -64,6 +66,18 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             //搜索引擎
             if (Regex.IsMatch(request.Method, "OPTIONS|HEAD", RegexOptions.IgnoreCase) || request.IsRobot())
             {
+                return;
+            }
+
+            // 反爬虫
+            if (CacheManager.GetOrAdd(nameof(FirewallController.AntiCrawler) + ":" + ip, 0) > 3)
+            {
+                context.Result = new ContentResult
+                {
+                    ContentType = ContentType.Html + "; charset=utf-8",
+                    StatusCode = 429,
+                    Content = "检测到访问异常，请在10分钟后再试！"
+                };
                 return;
             }
 

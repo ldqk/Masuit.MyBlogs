@@ -18,6 +18,7 @@ using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Masuit.Tools.Systems;
 using TimeZoneConverter;
 
 namespace Masuit.MyBlogs.Core.Common
@@ -309,6 +310,11 @@ namespace Masuit.MyBlogs.Core.Common
                 a.SetStyle("position: absolute;color: transparent;z-index: -1");
                 a.TextContent = SystemSettings["Title"] + SystemSettings["Domain"];
                 el.InsertAfter(a);
+                var a2 = doc.CreateElement("a");
+                a2.SetAttribute("href", "/craw/" + SnowFlake.NewId);
+                a2.SetStyle("position: absolute;color: transparent;z-index: -1");
+                a2.TextContent = title;
+                a.InsertAfter(a2);
             }
 
             return doc.Body.InnerHtml;

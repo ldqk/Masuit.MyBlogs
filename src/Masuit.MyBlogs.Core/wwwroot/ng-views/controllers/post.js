@@ -265,8 +265,8 @@
 	}
 }]);
 myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
-	UEDITOR_CONFIG.autoHeightEnabled=false;
-	UEDITOR_CONFIG.initialFrameHeight=window.innerHeight*0.8;
+	//UEDITOR_CONFIG.autoHeightEnabled=false;
+	//UEDITOR_CONFIG.initialFrameHeight=window.innerHeight*0.8;
 	clearInterval(window.interval);
 	$scope.post = {
 		Title: "",
@@ -500,7 +500,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 	});
 }]);
 myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
-	UEDITOR_CONFIG.initialFrameHeight=window.innerHeight*0.72;
+	//UEDITOR_CONFIG.initialFrameHeight=window.innerHeight*0.72;
 	$scope.id = $location.search()['id'];
 	
 	$scope.reserve = true;

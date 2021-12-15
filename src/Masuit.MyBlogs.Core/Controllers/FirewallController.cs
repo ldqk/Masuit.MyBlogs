@@ -1,5 +1,11 @@
-﻿using Masuit.MyBlogs.Core.Configs;
+﻿using System.Net;
+using System.Web;
+using CacheManager.Core;
+using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Configs;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
@@ -76,6 +82,40 @@ namespace Masuit.MyBlogs.Core.Controllers
             HttpContext.Session.Set("challenge-captcha", code);
             var buffer = HttpContext.CreateValidateGraphic(code);
             return this.ResumeFile(buffer, ContentType.Jpeg, "验证码.jpg");
+        }
+
+        /// <summary>
+        /// 反爬虫检测
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cacheManager"></param>
+        /// <param name="env"></param>
+        /// <returns></returns>
+        [HttpGet("/craw/{id}")]
+        public async Task<IActionResult> AntiCrawler(string id, [FromServices] ICacheManager<int> cacheManager, [FromServices] IWebHostEnvironment env)
+        {
+            if (Request.IsRobot())
+            {
+                return Ok();
+            }
+
+            var ip = HttpContext.Connection.RemoteIpAddress.ToString();
+            await RedisHelper.LPushAsync("intercept", new IpIntercepter()
+            {
+                IP = ip,
+                RequestUrl = HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + "/craw/" + id),
+                Time = DateTime.Now,
+                Referer = Request.Headers[HeaderNames.Referer],
+                UserAgent = Request.Headers[HeaderNames.UserAgent],
+                Remark = "检测到异常爬虫行为",
+                Address = Request.Location(),
+                HttpVersion = Request.Protocol,
+                Headers = Request.Headers.ToJsonString()
+            });
+            cacheManager.AddOrUpdate("AntiCrawler:" + ip, 1, i => i + 1, 5);
+            cacheManager.Expire("AntiCrawler:" + ip, ExpirationMode.Sliding, TimeSpan.FromMinutes(10));
+            var sitemap = Path.Combine(env.WebRootPath, "sitemap.txt");
+            return System.IO.File.Exists(sitemap) ? Redirect(System.IO.File.ReadLines(sitemap).OrderByRandom().FirstOrDefault() ?? "/") : Redirect("/");
         }
     }
 }
