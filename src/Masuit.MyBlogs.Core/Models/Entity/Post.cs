@@ -208,6 +208,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 访问记录
         /// </summary>
         public virtual ICollection<PostVisitRecord> PostVisitRecords { get; set; }
+
+        /// <summary>
+        /// 访问记录统计
+        /// </summary>
+        public virtual ICollection<PostVisitRecordStats> PostVisitRecordStats { get; set; }
     }
 
     /// <summary>

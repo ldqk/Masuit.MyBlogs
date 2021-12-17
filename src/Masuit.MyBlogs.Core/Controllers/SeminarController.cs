@@ -44,10 +44,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Index(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var s = await SeminarService.GetByIdAsync(id) ?? throw new NotFoundException("专题未找到");
-            var h24 = DateTime.Now.AddDays(-1);
+            var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
             {
-                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published)).OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= h24)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published)).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
                 _ => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id) && p.Status == Status.Published)).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
             };
             ViewBag.Id = s.Id;
@@ -172,12 +172,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             Seminar seminar = await SeminarService.GetByIdAsync(id);
             Post post = await PostService.GetByIdAsync(pid);
+
             //bool b = await seminarPostService.DeleteEntitySavedAsync(s => s.SeminarId == id && s.PostId == pid) > 0;
             seminar.Post.Remove(post);
             var b = await SeminarService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? $"已成功将【{post.Title}】从专题【{seminar.Title}】移除" : "添加失败！");
         }
 
-        #endregion
+        #endregion 管理端
     }
 }

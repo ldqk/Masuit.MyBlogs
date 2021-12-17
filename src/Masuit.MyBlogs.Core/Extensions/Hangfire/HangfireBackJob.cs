@@ -27,6 +27,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         private readonly IAdvertisementService _advertisementService;
         private readonly INoticeService _noticeService;
         private readonly IPostVisitRecordService _recordService;
+        private readonly IPostVisitRecordStatsService _recordStatsService;
 
         /// <summary>
         /// hangfire后台任务
@@ -39,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="httpClientFactory"></param>
         /// <param name="HostEnvironment"></param>
         /// <param name="searchEngine"></param>
-        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IWebHostEnvironment HostEnvironment, ISearchEngine<DataContext> searchEngine, IAdvertisementService advertisementService, INoticeService noticeService, ILinkLoopbackService loopbackService, IPostVisitRecordService recordService)
+        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IWebHostEnvironment HostEnvironment, ISearchEngine<DataContext> searchEngine, IAdvertisementService advertisementService, INoticeService noticeService, ILinkLoopbackService loopbackService, IPostVisitRecordService recordService, IPostVisitRecordStatsService recordStatsService)
         {
             _userInfoService = userInfoService;
             _postService = postService;
@@ -53,6 +54,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             _noticeService = noticeService;
             _loopbackService = loopbackService;
             _recordService = recordService;
+            _recordStatsService = recordStatsService;
         }
 
         /// <summary>
@@ -111,11 +113,11 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="ip"></param>
         /// <param name="refer"></param>
         /// <param name="url"></param>
-        /// <param name="headers"></param>
         public void RecordPostVisit(int pid, string ip, string refer, string url)
         {
             var time = DateTime.Now.AddMonths(-3);
             _recordService.GetQuery(b => b.Time < time).DeleteFromQuery();
+            _recordStatsService.GetQuery(b => b.Date < time).DeleteFromQuery();
             var post = _postService.GetById(pid);
             if (post == null)
             {
@@ -133,6 +135,21 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 RequestUrl = url,
                 PostId = pid
             });
+            var stats = _recordStatsService.Get(e => e.PostId == pid && e.Date >= DateTime.Today);
+            if (stats != null)
+            {
+                stats.Count++;
+            }
+            else
+            {
+                _recordStatsService.AddEntity(new PostVisitRecordStats()
+                {
+                    Count = 1,
+                    Date = DateTime.Today,
+                    PostId = pid
+                });
+            }
+
             _postService.SaveChanges();
         }
 

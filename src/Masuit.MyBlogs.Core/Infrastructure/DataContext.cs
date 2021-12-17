@@ -25,6 +25,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             modelBuilder.Entity<Post>().HasMany(e => e.Seminar).WithMany(s => s.Post).UsingEntity(builder => builder.ToTable("SeminarPost"));
             modelBuilder.Entity<Post>().HasMany(e => e.PostMergeRequests).WithOne(s => s.Post).HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Post>().HasMany(e => e.PostVisitRecords).WithOne().HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Post>().HasMany(e => e.PostVisitRecordStats).WithOne().HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<PostHistoryVersion>().HasMany(e => e.Seminar).WithMany(s => s.PostHistoryVersion).UsingEntity(builder => builder.ToTable("SeminarPostHistoryVersion"));
 
             modelBuilder.Entity<UserInfo>().HasMany(e => e.LoginRecord).WithOne(e => e.UserInfo).OnDelete(DeleteBehavior.Cascade);

@@ -44,6 +44,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
     public partial interface IPostVisitRecordService : IBaseService<PostVisitRecord>
     { }
 
+    public partial interface IPostVisitRecordStatsService : IBaseService<PostVisitRecordStats>
+    { }
+
     public partial interface IAdvertisementClickRecordService : IBaseService<AdvertisementClickRecord>
     { }
 }

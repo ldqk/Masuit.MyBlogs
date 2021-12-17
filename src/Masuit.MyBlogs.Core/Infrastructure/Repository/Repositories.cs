@@ -282,4 +282,18 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
             return t;
         }
     }
+
+    public partial class PostVisitRecordStatsRepository : BaseRepository<PostVisitRecordStats>, IPostVisitRecordStatsRepository
+    {
+        /// <summary>
+        /// 添加实体
+        /// </summary>
+        /// <param name="t">需要添加的实体</param>
+        /// <returns>添加成功</returns>
+        public override PostVisitRecordStats AddEntity(PostVisitRecordStats t)
+        {
+            DataContext.Add(t);
+            return t;
+        }
+    }
 }

@@ -85,10 +85,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var viewModel = await GetIndexPageViewModel();
             var postsQuery = PostService.GetQuery(PostBaseWhere().And(p => p.Status == Status.Published)); //准备文章的查询
-            var h24 = DateTime.Now.AddDays(-1);
+            var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
             {
-                OrderBy.Trending => await postsQuery.Where(p => !p.IsFixedTop).OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= h24)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                OrderBy.Trending => await postsQuery.Where(p => !p.IsFixedTop).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(t => t.Count)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
                 _ => await postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
             };
             if (page == 1)
@@ -126,10 +126,10 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var where = PostBaseWhere().And(p => p.Status == Status.Published);
             var queryable = PostService.GetQuery(tag.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).Aggregate(where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s))));
-            var h24 = DateTime.Now.AddDays(-1);
+            var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
             {
-                OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= h24)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
                 _ => await queryable.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
             };
             var viewModel = await GetIndexPageViewModel();
@@ -159,10 +159,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             Expression<Func<Post, bool>> where = p => p.Author.Equals(author) || p.Modifier.Equals(author) || p.Email.Equals(author) || p.PostHistoryVersion.Any(v => v.Modifier.Equals(author) || v.ModifierEmail.Equals(author));
             where = where.And(p => p.Status == Status.Published).And(PostBaseWhere());
-            var h24 = DateTime.Now.AddDays(-1);
+            var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
             {
-                OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= h24)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
                 _ => await PostService.GetQuery(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
             };
             var viewModel = await GetIndexPageViewModel();
@@ -191,10 +191,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Category(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
-            var h24 = DateTime.Now.AddDays(-1);
+            var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
             {
-                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => p.CategoryId == cat.Id && p.Status == Status.Published)).OrderByDescending(p => p.PostVisitRecords.Count(e => e.Time >= h24)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => p.CategoryId == cat.Id && p.Status == Status.Published)).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
                 _ => await PostService.GetQuery(PostBaseWhere().And(p => p.CategoryId == cat.Id && p.Status == Status.Published)).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
             };
             var viewModel = await GetIndexPageViewModel();
@@ -244,6 +244,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     case "txt":
                         return Content((await fs.ReadAllLinesAsync(Encoding.UTF8)).Select(s => Request.Scheme + "://" + Request.Host.Host + new Uri(s).GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped)).Join("\r\n"), ContentType.Txt);
+
                     case "html":
                         var context = BrowsingContext.New(Configuration.Default);
                         var doc = await context.OpenAsync(req => req.Content(fs.ReadAllText(Encoding.UTF8)));

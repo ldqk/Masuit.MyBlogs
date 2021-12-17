@@ -51,7 +51,7 @@ namespace Masuit.MyBlogs.Core.Extensions
 
         private async Task Traditional(HttpContext context)
         {
-            var accept = context.Request.Headers["Accept"][0];
+            var accept = context.Request.Headers["Accept"].ToString();
             if (accept.StartsWith("text") || accept.Contains(ContentType.Json))
             {
                 //设置stream存放ResponseBody

@@ -103,6 +103,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         }
     }
 
+    public partial class PostVisitRecordStatsService : BaseService<PostVisitRecordStats>, IPostVisitRecordStatsService
+    {
+        public PostVisitRecordStatsService(IBaseRepository<PostVisitRecordStats> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
+        {
+        }
+    }
+
     public partial class AdvertisementClickRecordService : BaseService<AdvertisementClickRecord>, IAdvertisementClickRecordService
     {
         public AdvertisementClickRecordService(IBaseRepository<AdvertisementClickRecord> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
