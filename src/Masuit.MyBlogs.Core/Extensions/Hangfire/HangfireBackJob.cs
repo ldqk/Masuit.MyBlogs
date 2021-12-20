@@ -115,9 +115,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="url"></param>
         public void RecordPostVisit(int pid, string ip, string refer, string url)
         {
-            var time = DateTime.Now.AddMonths(-3);
-            _recordService.GetQuery(b => b.Time < time).DeleteFromQuery();
-            _recordStatsService.GetQuery(b => b.Date < time).DeleteFromQuery();
+            var lastQuarter = DateTime.Now.AddMonths(-3);
+            var lastYear = DateTime.Now.AddYears(-1);
+            _recordService.GetQuery(b => b.Time < lastQuarter).DeleteFromQuery();
+            _recordStatsService.GetQuery(b => b.Date < lastYear).DeleteFromQuery();
             var post = _postService.GetById(pid);
             if (post == null)
             {
