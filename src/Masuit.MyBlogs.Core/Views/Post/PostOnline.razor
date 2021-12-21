@@ -22,35 +22,50 @@
 
     protected override void OnInitialized()
     {
-        var key = nameof(PostOnline) + ":" + Id;
-        online = CacheManager.AddOrUpdate(key, new HashSet<string>(), set =>
-        {
-            set.Add(IP);
-            return set;
-        }, 3).Count;
-        CacheManager.Expire(key, ExpirationMode.Sliding, TimeSpan.FromMinutes(5));
-        _timer = new Timer(_ =>
-        {
-            online = CacheManager.Get(key)?.Count ?? 0;
-            InvokeAsync(StateHasChanged);
-        }, null, 0, 1000);
+        try {
+            var key = nameof(PostOnline) + ":" + Id;
+            online = CacheManager.AddOrUpdate(key, new HashSet<string>(), set =>
+            {
+                set.Add(IP);
+                return set;
+            }, 3).Count;
+            CacheManager.Expire(key, ExpirationMode.Sliding, TimeSpan.FromMinutes(5));
+            _timer = new Timer(_ =>
+            {
+                online = CacheManager.Get(key)?.Count ?? 0;
+                InvokeAsync(StateHasChanged);
+            }, null, 0, 1000);
+        }
+        catch {
+            // ignored
+        }
     }
 
     public void ShowViewer()
     {
         if (online > 0 && IsAdmin)
         {
-            JS.InvokeVoidAsync("showViewer", CacheManager.Get(nameof(PostOnline) + ":" + Id).Select(s => KeyValuePair.Create(s, s.GetIPLocation().ToString())));
+            try {
+                JS.InvokeVoidAsync("showViewer", CacheManager.Get(nameof(PostOnline) + ":" + Id).Select(s => KeyValuePair.Create(s, s.GetIPLocation().ToString())));
+            }
+            catch {
+                // ignored
+            }
         }
     }
 
     public ValueTask DisposeAsync()
     {
-        online = CacheManager.AddOrUpdate(nameof(PostOnline) + ":" + Id, new HashSet<string>(), set =>
-        {
-            set.Remove(IP);
-            return set;
-        }).Count;
+        try {
+            online = CacheManager.AddOrUpdate(nameof(PostOnline) + ":" + Id, new HashSet<string>(), set =>
+            {
+                set.Remove(IP);
+                return set;
+            }).Count;
+        }
+        catch {
+            // ignored
+        }
         return _timer?.DisposeAsync() ?? ValueTask.CompletedTask;
     }
 }

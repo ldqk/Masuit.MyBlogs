@@ -4,6 +4,7 @@
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools
 @using System.IO
+@using Masuit.Tools.Logging
 @inject IJSRuntime JS;
 
 <h3 class="text-center">
@@ -140,7 +141,13 @@
     [JSInvokable]
     public static PerformanceCounter GetCurrentPerformanceCounter()
     {
-        return PerfCounter.GetCurrentPerformanceCounter();
+        try {
+            return PerfCounter.GetCurrentPerformanceCounter();
+        }
+        catch (Exception e) {
+            LogManager.Error(e);
+            return new PerformanceCounter();
+        }
     }
 
     public void ClearMemory()
