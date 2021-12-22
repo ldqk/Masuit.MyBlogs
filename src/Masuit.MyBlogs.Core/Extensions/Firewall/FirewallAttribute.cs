@@ -1,6 +1,7 @@
 ﻿using CacheManager.Core;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
+using Masuit.MyBlogs.Core.Controllers;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
@@ -14,7 +15,6 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using Masuit.MyBlogs.Core.Controllers;
 using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall
@@ -79,6 +79,17 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     Content = "检测到访问异常，请在10分钟后再试！"
                 };
                 return;
+            }
+
+            //安全模式
+            if (request.Query[SessionKey.SafeMode].Count > 0)
+            {
+                context.HttpContext.Session.Set(SessionKey.HideCategories, request.Query[SessionKey.SafeMode].ToString().Split(',').Select(s => s.ToInt32()).ToArray());
+                context.HttpContext.Response.Cookies.Append(SessionKey.HideCategories, request.Query[SessionKey.SafeMode].ToString(), new CookieOptions
+                {
+                    Expires = DateTime.Now.AddYears(1),
+                    SameSite = SameSiteMode.Lax
+                });
             }
 
             //白名单地区

@@ -70,8 +70,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="kw"></param>
         /// <returns></returns>
         [Route("{id:int}"), Route("{id:int}/comments/{cid:int}"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
-        public async Task<ActionResult> Details(int id, string kw)
+        public async Task<ActionResult> Details(int id, string kw, string t)
         {
+            var notRobot = !Request.IsRobot();
+            if (string.IsNullOrEmpty(t) && notRobot)
+            {
+                return RedirectToAction("Details", new { id, kw, t = SnowFlake.NewId });
+            }
+
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             CheckPermission(post);
             ViewBag.Keyword = post.Keyword + "," + post.Label;
@@ -97,7 +103,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return View("Details_Admin", post);
             }
 
-            if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
+            if (notRobot && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
             {
                 HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.RecordPostVisit), args: new dynamic[] { id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString) });
                 HttpContext.Session.Set("post" + id, id.ToString());

@@ -13,6 +13,7 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Linq;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Mvc;
@@ -31,23 +32,13 @@ namespace Masuit.MyBlogs.Core.Controllers
     [ApiExplorerSettings(IgnoreApi = true), ServiceFilter(typeof(FirewallAttribute))]
     public class BaseController : Controller
     {
-        /// <summary>
-        /// UserInfoService
-        /// </summary>
         public IUserInfoService UserInfoService { get; set; }
-
-        /// <summary>
-        /// MenuService
-        /// </summary>
         public IMenuService MenuService { get; set; }
-
-        /// <summary>
-        /// LinksService
-        /// </summary>
         public ILinksService LinksService { get; set; }
-
         public IAdvertisementService AdsService { get; set; }
         public IVariablesService VariablesService { get; set; }
+        public IMapper Mapper { get; set; }
+        public MapperConfiguration MapperConfig { get; set; }
 
         public UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
 
@@ -61,9 +52,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public bool VisitorTokenValid => Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Request.Cookies["FullAccessToken"]);
 
-
-        public IMapper Mapper { get; set; }
-        public MapperConfiguration MapperConfig { get; set; }
+        public int[] HideCategories => HttpContext.Session.Get<int[]>(SessionKey.HideCategories) ?? Request.Cookies[SessionKey.HideCategories]?.Split(',').Select(s => s.ToInt32()).ToArray() ?? Request.Query[SessionKey.SafeMode].ToString().Split(',').Select(s => s.ToInt32()).ToArray();
 
         /// <summary>
         /// 响应数据
@@ -275,13 +264,20 @@ namespace Masuit.MyBlogs.Core.Controllers
                         return false;
                 }
             });
+            posts.RemoveAll(p => HideCategories.Contains(p.CategoryId));
         }
 
         protected Expression<Func<Post, bool>> PostBaseWhere()
         {
+            Expression<Func<Post, bool>> where = _ => true;
+            if (HideCategories.Length > 0)
+            {
+                where = where.And(p => !HideCategories.Contains(p.CategoryId));
+            }
+
             if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot())
             {
-                return _ => true;
+                return where;
             }
 
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
@@ -294,10 +290,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            return p => p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true :
+            return where.And(p => p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true :
                    p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions) :
                    p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions) :
-                   p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions) && !Regex.IsMatch(location, p.ExceptRegions) : !Regex.IsMatch(location, p.Regions) || Regex.IsMatch(location, p.ExceptRegions);
+                   p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions) && !Regex.IsMatch(location, p.ExceptRegions) : !Regex.IsMatch(location, p.Regions) || Regex.IsMatch(location, p.ExceptRegions));
         }
 
         protected void CheckPermission(Post post)

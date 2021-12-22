@@ -34,7 +34,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<IActionResult> Redirect(int id)
         {
             var ad = await AdsService.GetByIdAsync(id) ?? throw new NotFoundException("推广链接不存在");
-            if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("ads" + id)))
+            if (!Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("ads" + id)))
             {
                 HttpContext.Session.Set("ads" + id, id.ToString());
                 ad.ClickRecords.Add(new AdvertisementClickRecord()
@@ -138,7 +138,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> RandomGo()
         {
             var ad = AdsService.GetByWeightedPrice((AdvertiseType)new Random().Next(1, 4), Request.Location());
-            if (!HttpContext.Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("ads" + ad.Id)))
+            if (!Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("ads" + ad.Id)))
             {
                 HttpContext.Session.Set("ads" + ad.Id, ad.Id.ToString());
                 ad.ClickRecords.Add(new AdvertisementClickRecord()

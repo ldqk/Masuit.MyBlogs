@@ -42,7 +42,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Keyword = wd;
             if (!string.IsNullOrWhiteSpace(wd))
             {
-                if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !HttpContext.Request.IsRobot())
+                if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !Request.IsRobot())
                 {
                     SearchDetailsService.AddEntity(new SearchDetails
                     {
