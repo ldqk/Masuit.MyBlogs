@@ -691,10 +691,10 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             Mapper.Map(post, p);
             p.IP = ClientIP;
+            p.Seminar.Clear();
             if (!string.IsNullOrEmpty(post.Seminars))
             {
                 var tmp = post.Seminars.Split(',').Distinct();
-                p.Seminar.Clear();
                 foreach (var s in tmp)
                 {
                     var seminar = await SeminarService.GetAsync(e => e.Title.Equals(s));
