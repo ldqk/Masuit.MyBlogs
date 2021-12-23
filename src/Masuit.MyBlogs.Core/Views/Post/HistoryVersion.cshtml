@@ -1,4 +1,5 @@
-﻿@using System.Diagnostics
+﻿@using System.Text.Encodings.Web
+@using System.Text.RegularExpressions
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
@@ -85,7 +86,12 @@
                             <p class="text-focus text-center">您目前正在查看该文章的历史版本，文章的历史版本可能无法为您提供最准确及时的资讯，不具备任何参考价值，<a asp-controller="Post" asp-action="Details" asp-route-id="@Model.PostId">点击前往</a>该文章的最新版本。</p>
                         </header>
                         <article class="article" id="article">
-                            @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
+                            @if(!Model.Post.DisableCopy||Context.Request.IsRobot()) {
+                                @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
+                            }
+                            else {
+                                @Html.Raw(Regex.Replace(await Model.Content.ReplaceImgAttribute(Model.Title), @"[\u4e00-\u9fa5]", m => HtmlEncoder.Default.Encode(m.Value)))
+                            }
                             @if (!string.IsNullOrEmpty(Model.ProtectContent))
                             {
                                 <div class="row protected-content" id="@SnowFlake.NewId">

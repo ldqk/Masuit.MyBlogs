@@ -1,4 +1,5 @@
-﻿@using System.Diagnostics
+﻿@using System.Text.Encodings.Web
+@using System.Text.RegularExpressions
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
@@ -83,6 +84,12 @@
                                     </div>
                                 </header>
                                 <article class="article" id="article">
+                                    @if(!Model[1].Post.DisableCopy||Context.Request.IsRobot()) {
+                                        @Html.Raw(await Model[1].Content.ReplaceImgAttribute(Model[1].Title))
+                                    }
+                                    else {
+                                        @Html.Raw(Regex.Replace(await Model[1].Content.ReplaceImgAttribute(Model[1].Title), @"[\u4e00-\u9fa5]", m => HtmlEncoder.Default.Encode(m.Value)))
+                                    }
                                     @Html.Raw(await Model[1].Content.ReplaceImgAttribute(Model[0].Title))
                                 </article>
                             </section>
@@ -146,7 +153,12 @@
                                     </div>
                                 </header>
                                 <article class="article" id="article">
-                                    @Html.Raw(await Model[2].Content.ReplaceImgAttribute(Model[0].Title))
+                                    @if(!Model[2].Post.DisableCopy||Context.Request.IsRobot()) {
+                                        @Html.Raw(await Model[2].Content.ReplaceImgAttribute(Model[2].Title))
+                                    }
+                                    else {
+                                        @Html.Raw(Regex.Replace(await Model[2].Content.ReplaceImgAttribute(Model[2].Title), @"[\u4e00-\u9fa5]", m => HtmlEncoder.Default.Encode(m.Value)))
+                                    }
                                 </article>
                             </section>
                             <hr class="margin-top10 marginbot10" />

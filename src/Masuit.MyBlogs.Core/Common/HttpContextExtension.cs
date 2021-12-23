@@ -17,7 +17,7 @@ namespace Masuit.MyBlogs.Core.Common
         }
 
         /// <summary>
-        /// 是否是机器人访问
+        /// 是否是搜索引擎访问
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
