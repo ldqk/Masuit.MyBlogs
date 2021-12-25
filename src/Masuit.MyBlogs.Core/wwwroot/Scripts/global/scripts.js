@@ -399,13 +399,23 @@ async function blockCategory(id,name) {
 		animation: true,
 		allowOutsideClick: false
 	}).then(async function() {
-		cookieStore.set("HideCategories",id+"%2C"+(await cookieStore.get("HideCategories")||{value:"0"}).value);
-		swal({
-			text: "屏蔽成功",type:"success",
-			showConfirmButton: false,
-			timer:1500
-		}).catch(swal.noop)
-	}, function() {
+		cookieStore.set({
+          name: "HideCategories",
+          value: id+"%2C"+(await cookieStore.get("HideCategories")||{value:"0"}).value,
+          expires: Date.now() + 24*60*60*365
+        }).then(
+          function() {
+            swal({
+			    text: "屏蔽成功",type:"success",
+			    showConfirmButton: false,
+			    timer:1500
+		    }).catch(swal.noop)
+          },
+          function(reason) {
+            console.error("It failed: ", reason);
+          }
+        );
+    }, function() {
 	}).catch(swal.noop);
 }
 

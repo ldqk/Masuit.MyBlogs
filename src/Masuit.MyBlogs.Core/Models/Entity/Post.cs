@@ -170,6 +170,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string ProtectContentRegions { get; set; }
 
         /// <summary>
+        /// 保护密码
+        /// </summary>
+        public string ProtectPassword { get; set; }
+        
+        /// <summary>
         /// 开启rss订阅
         /// </summary>
         public bool Rss { get; set; }
@@ -257,5 +262,10 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 授权可见
         /// </summary>
         AuthorizeVisiable,
+
+        /// <summary>
+        /// 密码可见
+        /// </summary>
+        Password
     }
 }

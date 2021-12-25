@@ -22,6 +22,7 @@
                         <option ng-value="1">评论可见</option>
                         <option ng-value="2">地区可见：</option>
                         <option ng-value="3">授权可见</option>
+                        <option ng-value="4">密码可见</option>
                     </select>
                 </div>
                 <div class="input-group" ng-if="post.ProtectContentMode==2">
@@ -35,6 +36,12 @@
                             <option ng-value="1">以内</option>
                             <option ng-value="2">以外</option>
                         </select>
+                    </div>
+                </div>
+                <div class="input-group" ng-if="post.ProtectContentMode==4">
+                    <span class="input-group-addon">密码：</span>
+                    <div class="fg-line">
+                        <input class="form-control" ng-model="post.ProtectPassword" style="width: 200px" type="text">
                     </div>
                 </div>
             </small>

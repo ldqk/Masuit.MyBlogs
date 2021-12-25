@@ -344,6 +344,11 @@ namespace Masuit.MyBlogs.Core.Controllers
 
                     goto case RegionLimitMode.ForbidRegion;
             }
+
+            if (HideCategories.Contains(post.CategoryId))
+            {
+                throw new NotFoundException("文章未找到");
+            }
         }
 
         private void Disallow(Post post)

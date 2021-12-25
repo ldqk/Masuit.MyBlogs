@@ -151,5 +151,11 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 限制地区，竖线分隔
         /// </summary>
         public string ProtectContentRegions { get; set; }
+
+        /// <summary>
+        /// 保护密码
+        /// </summary>
+        public string ProtectPassword { get; set; }
+        
     }
 }
