@@ -66,16 +66,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 文章详情页
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="kw"></param>
         /// <returns></returns>
         [Route("{id:int}"), Route("{id:int}/comments/{cid:int}"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
-        public async Task<ActionResult> Details(int id, string kw, string t)
+        public async Task<ActionResult> Details(int id, string kw, int cid, string t)
         {
             var notRobot = !Request.IsRobot();
             if (string.IsNullOrEmpty(t) && notRobot)
             {
-                return RedirectToAction("Details", new { id, kw, t = SnowFlake.NewId });
+                return RedirectToAction("Details", new { id, kw, cid, t = SnowFlake.NewId });
             }
 
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
