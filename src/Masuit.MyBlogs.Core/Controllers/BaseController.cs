@@ -52,7 +52,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public bool VisitorTokenValid => Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Request.Cookies["FullAccessToken"]);
 
-        public int[] HideCategories => HttpContext.Session.Get<int[]>(SessionKey.HideCategories) ?? Request.Cookies[SessionKey.HideCategories]?.Split(',').Select(s => s.ToInt32()).ToArray() ?? Request.Query[SessionKey.SafeMode].ToString().Split(',').Select(s => s.ToInt32()).ToArray();
+        public int[] HideCategories => Request.Cookies[SessionKey.HideCategories]?.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToInt32()).ToArray() ?? Request.Query[SessionKey.SafeMode].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToInt32()).ToArray();
 
         /// <summary>
         /// 响应数据

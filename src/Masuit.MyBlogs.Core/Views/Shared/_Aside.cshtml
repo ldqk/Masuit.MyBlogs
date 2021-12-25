@@ -1,93 +1,97 @@
 ﻿@using System.Diagnostics
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
+@using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Systems
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @{
-    string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
+	string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
 }
 <aside class="col-md-3 box-right">
-    @if (Model.Notices.Any())
-    {
-        <section class="wow animated fadeIn">
-            <article class="panel panel-info">
-                <div class="panel-heading">
-                    <i class="icon-clipboard2"></i><span>近期公告</span>
-                    <a class="pull-right text-success" asp-controller="Notice" asp-action="Index">所有公告</a>
-                </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <ul class="notices">
-                                @foreach (NoticeDto notice in Model.Notices)
-                                {
-                                    <li class="news-item">
-                                        <a asp-controller="Notice" asp-action="Details" asp-route-id="@notice.Id">@await notice.Content.GetSummary(45, 2)</a>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </article>
-        </section>
-    }
-    <section class="wow animated fadeIn">
-        <article class="panel panel-info">
-            <div class="panel-heading">
-                <i class="icon-lab2"></i>文章分类
-                <a asp-controller="Post" asp-action="All" class="pull-right text-success">所有分类</a>
-            </div>
-            <div class="panel-body">
-                <ul class="list-group">
-                    @foreach (var cat in Model.Categories.Where(c => c.PendedPostCount > 0))
-                    {
-                    <li class="list-group-item">
-                        <a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Name</a>
-                        <a class="pull-right" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
-                            <i class="icon-rss4"></i>
-                        </a>
-                    </li>
-                    }
-                </ul>
-            </div>
-        </article>
-    </section>
-    @foreach (var ad in Model.SidebarAds)
-    {
-        <section class="wow animated fadeIn" id="@SnowFlake.NewId">
-            <article class="panel panel-info">
-                <div class="panel-heading">
-                    @ad.Title
-                </div>
-                <div class="panel-body" id="@Stopwatch.GetTimestamp()">
-                    <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
-                        <img class="img img-responsive" src="@ad.ThumbImgUrl" alt="@ad.Title" title="@ad.Title" />
-                    </a>
-                </div>
-            </article>
-        </section>
-    }
+	@if (Model.Notices.Any())
+	{
+		<section class="wow animated fadeIn">
+			<article class="panel panel-info">
+				<div class="panel-heading">
+					<i class="icon-clipboard2"></i><span>近期公告</span>
+					<a class="pull-right text-success" asp-controller="Notice" asp-action="Index">所有公告</a>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-xs-12">
+							<ul class="notices">
+								@foreach (NoticeDto notice in Model.Notices)
+								{
+									<li class="news-item">
+										<a asp-controller="Notice" asp-action="Details" asp-route-id="@notice.Id">@await notice.Content.GetSummary(45, 2)</a>
+									</li>
+								}
+							</ul>
+						</div>
+					</div>
+				</div>
+			</article>
+		</section>
+	}
+	<section class="wow animated fadeIn">
+		<article class="panel panel-info">
+			<div class="panel-heading">
+				<i class="icon-lab2"></i>文章分类
+				<a asp-controller="Post" asp-action="All" class="pull-right text-success">所有分类</a>
+			</div>
+			<div class="panel-body">
+				<ul class="list-group">
+					@foreach (var cat in Model.Categories.Where(c => c.PendedPostCount > 0))
+					{
+					<li class="list-group-item">
+						<a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Name</a>
+						<a class="pull-right" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
+							<i class="icon-rss4"></i>
+						</a>
+						<a class="pull-right margin-right10" onclick='blockCategory("@cat.Id","@cat.Name")'>
+							<i class="icon-blocked"></i>
+						</a>
+					</li>
+					}
+				</ul>
+			</div>
+		</article>
+	</section>
+	@foreach (var ad in Model.SidebarAds)
+	{
+		<section class="wow animated fadeIn" id="@SnowFlake.NewId">
+			<article class="panel panel-info">
+				<div class="panel-heading">
+					@ad.Title
+				</div>
+				<div class="panel-body" id="@Stopwatch.GetTimestamp()">
+					<a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
+						<img class="img img-responsive" src="@ad.ThumbImgUrl" alt="@ad.Title" title="@ad.Title" />
+					</a>
+				</div>
+			</article>
+		</section>
+	}
 
-    <section class="wow animated fadeIn">
-        <div class="leaderboard-box">
-            <div class="leaderboard">
-                <h2>推荐文章</h2>
-                <ol>
-                    @foreach (PostDto post in Model.Top5Post)
-                    {
-                        <li>
-                            <a asp-controller="Post" asp-action="Details" asp-route-id="@post.Id">
-                                <mark>@(post.Title.Length >= 20 ? post.Title.Substring(0, 20) + "..." : post.Title) </mark>
-                                <small style="color:#00ffff"> @post.TotalViewCount</small>
-                            </a>
-                        </li>
-                    }
-                </ol>
-            </div>
-            <svg style="display: none;">
-                <symbol id="cup" x="0px" y="0px" width="25px" height="26px" viewBox="0 0 25 26" enable-background="new 0 0 25 26" xml:space="preserve">
-                <path fill="#F26856" d="M21.215,1.428c-0.744,0-1.438,0.213-2.024,0.579V0.865c0-0.478-0.394-0.865-0.88-0.865H6.69
+	<section class="wow animated fadeIn">
+		<div class="leaderboard-box">
+			<div class="leaderboard">
+				<h2>推荐文章</h2>
+				<ol>
+					@foreach (PostDto post in Model.Top5Post)
+					{
+						<li>
+							<a asp-controller="Post" asp-action="Details" asp-route-id="@post.Id">
+								<mark>@(post.Title.Length >= 20 ? post.Title.Substring(0, 20) + "..." : post.Title) </mark>
+								<small style="color:#00ffff"> @post.TotalViewCount</small>
+							</a>
+						</li>
+					}
+				</ol>
+			</div>
+			<svg style="display: none;">
+				<symbol id="cup" x="0px" y="0px" width="25px" height="26px" viewBox="0 0 25 26" enable-background="new 0 0 25 26" xml:space="preserve">
+				<path fill="#F26856" d="M21.215,1.428c-0.744,0-1.438,0.213-2.024,0.579V0.865c0-0.478-0.394-0.865-0.88-0.865H6.69
 				C6.204,0,5.81,0.387,5.81,0.865v1.142C5.224,1.641,4.53,1.428,3.785,1.428C1.698,1.428,0,3.097,0,5.148
 				C0,7.2,1.698,8.869,3.785,8.869h1.453c0.315,0,0.572,0.252,0.572,0.562c0,0.311-0.257,0.563-0.572,0.563
 				c-0.486,0-0.88,0.388-0.88,0.865c0,0.478,0.395,0.865,0.88,0.865c0.421,0,0.816-0.111,1.158-0.303
@@ -104,60 +108,60 @@
 				C13.195,16.578,13.344,17.436,13.673,18.301z M12.5,14.276c-2.856,0-4.93-2.638-4.93-6.273V1.73h9.859v6.273
 				C17.43,11.638,15.357,14.276,12.5,14.276z M21.215,7.138h-1.452c-0.197,0-0.39,0.024-0.572,0.07v-2.06
 				c0-1.097,0.908-1.99,2.024-1.99c1.117,0,2.025,0.893,2.025,1.99C23.241,6.246,22.333,7.138,21.215,7.138z" /></symbol>
-            </svg>
-        </div>
-    </section>
-    <section class="wow animated fadeIn">
-        <article class="panel panel-info">
-            <div class="panel-heading">
-                <i class="icon-lightbulb"></i>标签云 <a asp-controller="Post" asp-action="All" class="pull-right text-success">所有标签</a>
-            </div>
-            <div class="panel-body text-center">
-                <div id="tagscloud">
-                    @if (Model.Tags.Any())
-                    {
-                        foreach (var (key, value) in Model.Tags)
-                        {
-                            <a asp-controller="Home" asp-action="Tag" asp-route-tag="@key" class="tagc-@(new Random().Next(100) % 10)" style="font-size: @(value)px; line-height: @(value * 1.2)px;">@key</a>
-                        }
-                    }
-                    else
-                    {
-                        <a class="tagc-@(new Random().Next(100) % 10)">没有标签</a>
-                    }
-                </div>
-                <form action="/tag" method="get">
-                    <div class="input-group">
-                        <input type="text" placeholder="支持多个标签，逗号分隔" name="tag" maxlength="48" class="form-control" required>
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary">搜索</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </article>
-    </section>
+			</svg>
+		</div>
+	</section>
+	<section class="wow animated fadeIn">
+		<article class="panel panel-info">
+			<div class="panel-heading">
+				<i class="icon-lightbulb"></i>标签云 <a asp-controller="Post" asp-action="All" class="pull-right text-success">所有标签</a>
+			</div>
+			<div class="panel-body text-center">
+				<div id="tagscloud">
+					@if (Model.Tags.Any())
+					{
+						foreach (var (key, value) in Model.Tags)
+						{
+							<a asp-controller="Home" asp-action="Tag" asp-route-tag="@key" class="tagc-@(new Random().Next(100) % 10)" style="font-size: @(value)px; line-height: @(value * 1.2)px;">@key</a>
+						}
+					}
+					else
+					{
+						<a class="tagc-@(new Random().Next(100) % 10)">没有标签</a>
+					}
+				</div>
+				<form action="/tag" method="get">
+					<div class="input-group">
+						<input type="text" placeholder="支持多个标签，逗号分隔" name="tag" maxlength="48" class="form-control" required>
+						<div class="input-group-btn">
+							<button class="btn btn-primary">搜索</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</article>
+	</section>
 
-    <section class="wow animated fadeIn">
-        <article class="panel panel-info">
-            <div class="panel-heading">
-                <i class="icon-fire"></i>近期热搜 Top10
-            </div>
-            <div class="panel-body text-center line-height24">
-                @foreach (var s in Model.HotSearch)
-                {
-                    <a asp-controller="Search" asp-action="Search" asp-route-wd="@s.Keywords">
-                        @if (s.Keywords.Length > 15)
-                        {
-                            <span class="label label-@colors[s.Count % colors.Length]">@s.Keywords.Substring(0, 15)... (@s.Count)</span>
-                        }
-                        else
-                        {
-                            <span class="label label-@colors[s.Count % colors.Length]">@s.Keywords (@s.Count)</span>
-                        }
-                    </a>
-                }
-            </div>
-        </article>
-    </section>
+	<section class="wow animated fadeIn">
+		<article class="panel panel-info">
+			<div class="panel-heading">
+				<i class="icon-fire"></i>近期热搜 Top10
+			</div>
+			<div class="panel-body text-center line-height24">
+				@foreach (var s in Model.HotSearch)
+				{
+					<a asp-controller="Search" asp-action="Search" asp-route-wd="@s.Keywords">
+						@if (s.Keywords.Length > 15)
+						{
+							<span class="label label-@colors[s.Count % colors.Length]">@s.Keywords.Substring(0, 15)... (@s.Count)</span>
+						}
+						else
+						{
+							<span class="label label-@colors[s.Count % colors.Length]">@s.Keywords (@s.Count)</span>
+						}
+					</a>
+				}
+			</div>
+		</article>
+	</section>
 </aside>

@@ -4,55 +4,58 @@
 @using Masuit.Tools.Core.Net
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @{
-    Category cat = ViewBag.Category;
-    ViewBag.Title = "分类_" + cat.Name;
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    Random r = new Random();
+	Category cat = ViewBag.Category;
+	ViewBag.Title = "分类_" + cat.Name;
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	Random r = new Random();
 }
 <style>
-    .bg-title {
-        height: 50vh;
-        max-height: 400px;
-        position: relative;
-        background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
-        background-size:cover;
-        background-attachment: fixed;
-        margin-bottom: 10px;
-    }
-    .header-content {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%,-50%);
-    }
-    .header-content .divider {
-        width: inherit;
-        height: 20px;
-        margin-top: 20px;
-        border-top: 3px solid rebeccapurple;
-    }
+	.bg-title {
+		height: 50vh;
+		max-height: 400px;
+		position: relative;
+		background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
+		background-size:cover;
+		background-attachment: fixed;
+		margin-bottom: 10px;
+	}
+	.header-content {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%,-50%);
+	}
+	.header-content .divider {
+		width: inherit;
+		height: 20px;
+		margin-top: 20px;
+		border-top: 3px solid rebeccapurple;
+	}
 </style>
 <div class="container">
-    <ol class="cd-breadcrumb triangle">
-        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-        <li class="current"><em>@ViewBag.Title</em></li>
-    </ol>
+	<ol class="cd-breadcrumb triangle">
+		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
+		<li class="current"><em>@ViewBag.Title</em></li>
+	</ol>
 </div>
 <div class="bg-title">
-    <div class="header-content text-center">
-        <h1 class="size48">
-            @cat.Name
-            <a class="btn btn-lg btn-danger" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
-                <i class="icon-rss4"></i>
-            </a>
-        </h1>
-        <div class="divider"></div>
-        <p class="size24">
-            @cat.Description
-        </p>
-    </div>
+	<div class="header-content text-center">
+		<h1 class="size48">
+			@cat.Name
+			<a class="btn btn-lg btn-success" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
+				<i class="icon-rss4"></i>
+			</a>
+			<a class="btn btn-lg btn-danger" onclick='blockCategory("@cat.Id","@cat.Name")'>
+				<i class="icon-blocked"></i>
+			</a>
+		</h1>
+		<div class="divider"></div>
+		<p class="size24">
+			@cat.Description
+		</p>
+	</div>
 </div>
 @{
-    var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-    await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
+	var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
+	await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
 }

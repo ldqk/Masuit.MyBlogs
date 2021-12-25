@@ -84,8 +84,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             //安全模式
             if (request.Query[SessionKey.SafeMode].Count > 0)
             {
-                context.HttpContext.Session.Set(SessionKey.HideCategories, request.Query[SessionKey.SafeMode].ToString().Split(',').Select(s => s.ToInt32()).ToArray());
-                context.HttpContext.Response.Cookies.Append(SessionKey.HideCategories, request.Query[SessionKey.SafeMode].ToString(), new CookieOptions
+                request.Cookies.TryGetValue(SessionKey.HideCategories, out var s);
+                context.HttpContext.Response.Cookies.Append(SessionKey.HideCategories, request.Query[SessionKey.SafeMode] + "," + s, new CookieOptions
                 {
                     Expires = DateTime.Now.AddYears(1),
                     SameSite = SameSiteMode.Lax
