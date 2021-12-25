@@ -73,7 +73,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var notRobot = !Request.IsRobot();
             if (string.IsNullOrEmpty(t) && notRobot)
             {
-                return RedirectToAction("Details", new { id, kw, cid, t = SnowFlake.NewId });
+                return RedirectToAction("Details", cid > 0 ? new { id, kw, cid, t = SnowFlake.NewId } : new { id, kw, t = SnowFlake.NewId });
             }
 
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
