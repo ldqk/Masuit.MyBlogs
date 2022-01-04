@@ -1,7 +1,6 @@
 ﻿using AutoMapper.QueryableExtensions;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
-using Masuit.MyBlogs.Core.Infrastructure.Repository;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
@@ -84,6 +83,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, MyAuthorize]
         public async Task<IActionResult> Save(AdvertisementDto model)
         {
+            var entity = AdsService[model.Id];
             model.CategoryIds = model.CategoryIds?.Replace("null", "");
             model.Regions = Regex.Replace(model.Regions ?? "", @"(\p{P}|\p{Z}|\p{S})+", "|");
             if (model.RegionMode == RegionLimitMode.All)
@@ -101,7 +101,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "宣传小图不能为空");
             }
 
-            var b = await AdsService.AddOrUpdateSavedAsync(a => a.Id, model.Mapper<Advertisement>()) > 0;
+            Mapper.Map(model, entity);
+            var b = await AdsService.AddOrUpdateSavedAsync(a => a.Id, entity) > 0;
             return ResultData(null, b, b ? "保存成功" : "保存失败");
         }
 

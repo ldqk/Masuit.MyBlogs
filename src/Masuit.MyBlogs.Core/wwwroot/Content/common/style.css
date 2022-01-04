@@ -305,9 +305,6 @@ Custom bottom spacer
     margin-bottom: 10px;
     padding: 5px;
 }
-.notice img {
-    max-height: 80px;
-}
 .layui-layer-content img {
     max-height: 50vh;
     max-width: 100%;
