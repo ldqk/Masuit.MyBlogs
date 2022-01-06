@@ -6,7 +6,7 @@
     top: 0;
     bottom: 0;
     right: 0;
-    display: none;
+    /*display: none;*/
     background-color: transparent;
     z-index: 2147483647;
 }

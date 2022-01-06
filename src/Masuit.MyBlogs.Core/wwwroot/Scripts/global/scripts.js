@@ -16,6 +16,16 @@
 	}
 })(jQuery);
 $(function() {
+	$('body').css({
+	   'filter': 'blur(0)',
+	   '-webkit-filter' : 'blur(0)',
+	   '-moz-filter': 'blur(0)',
+	   '-o-filter': 'blur(0)',
+	   '-ms-filter': 'blur(0)',
+	   "transition": "all 1s ease-in-out"
+	});
+	loadingDone();
+
 	$("img").lazyload({
 		effect: "fadeIn", //渐现，show(直接显示),fadeIn(淡入),slideDown(下拉)
 		threshold: 2700, //预加载，在图片距离屏幕180px时提前载入
@@ -400,22 +410,22 @@ async function blockCategory(id,name) {
 		allowOutsideClick: false
 	}).then(async function() {
 		cookieStore.set({
-          name: "HideCategories",
-          value: id+"%2C"+(await cookieStore.get("HideCategories")||{value:"0"}).value,
-          expires: Date.now() + 24*60*60*365
-        }).then(
-          function() {
-            swal({
-			    text: "屏蔽成功",type:"success",
-			    showConfirmButton: false,
-			    timer:1500
-		    }).catch(swal.noop)
-          },
-          function(reason) {
-            console.error("It failed: ", reason);
-          }
-        );
-    }, function() {
+		  name: "HideCategories",
+		  value: id+"%2C"+(await cookieStore.get("HideCategories")||{value:"0"}).value,
+		  expires: Date.now() + 24*60*60*365
+		}).then(
+		  function() {
+			swal({
+				text: "屏蔽成功",type:"success",
+				showConfirmButton: false,
+				timer:1500
+			}).catch(swal.noop)
+		  },
+		  function(reason) {
+			console.error("It failed: ", reason);
+		  }
+		);
+	}, function() {
 	}).catch(swal.noop);
 }
 

@@ -78,8 +78,16 @@
             .header {
                 display: none !important;
             }
+
+            .noscript {
+                -webkit-filter : blur(0);
+                -moz-filter : blur(0);
+                -o-filter : blur(0);
+                -ms-filter : blur(0);
+                filter : blur(0);
+            }
         </style>
-        <div style="position: absolute;top: 0;left: 0;right: 0;bottom: 0;">
+        <div class="noscript" style="position: absolute;top: 0;left: 0;right: 0;bottom: 0;">
             <p class="size48">检测到您的浏览器不支持javascript或已禁用javascript功能，当前页面无法正常显示！</p>
         </div>
     </noscript>
@@ -303,19 +311,17 @@
         </main>
     </div>
     @*loading*@
-    <div id="loading">
-        <div class="loading1 animated fadeIn">
-            <div class="loadEffect">
-                @{
-                    var num = new Random().StrictNext();
-                    for (int i = 0; i < 7; i++)
-                    {
-                        <div>
-                            <span class="bg-@colors[(num+i) % 5]"></span>
-                        </div>
-                    }
+    <div class="loading1 animated fadeIn">
+        <div class="loadEffect">
+            @{
+                var num = new Random().StrictNext();
+                for (int i = 0; i < 7; i++)
+                {
+                    <div>
+                        <span class="bg-@colors[(num+i) % 5]"></span>
+                    </div>
                 }
-            </div>
+            }
         </div>
     </div>
     @*返回顶部火箭*@
