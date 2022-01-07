@@ -16,12 +16,12 @@
 	}
 })(jQuery);
 $(function() {
-	$('body').css({
-	   'filter': 'blur(0)',
-	   '-webkit-filter' : 'blur(0)',
-	   '-moz-filter': 'blur(0)',
-	   '-o-filter': 'blur(0)',
-	   '-ms-filter': 'blur(0)',
+	$('.header').css({
+	   'filter': 'unset',
+	   '-webkit-filter' : 'unset',
+	   '-moz-filter': 'unset',
+	   '-o-filter': 'unset',
+	   '-ms-filter': 'unset',
 	   "transition": "all 1s ease-in-out"
 	});
 	loadingDone();
