@@ -31,6 +31,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// </summary>
         /// <param name="p"></param>
         /// <param name="keyword"></param>
-        void Highlight(Post p, string keyword);
+        Task Highlight(Post p, string keyword);
     }
 }

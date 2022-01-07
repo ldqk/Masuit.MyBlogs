@@ -1,4 +1,5 @@
-﻿using CacheManager.Core;
+﻿using AngleSharp;
+using CacheManager.Core;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
@@ -15,6 +16,9 @@ using PanGu.HighLight;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using AngleSharp.Dom;
+using AngleSharp.Html.Parser;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -34,20 +38,51 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// </summary>
         /// <param name="p"></param>
         /// <param name="keyword"></param>
-        public void Highlight(Post p, string keyword)
+        public async Task Highlight(Post p, string keyword)
         {
-            var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
-            var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = int.MaxValue };
-            keyword = Regex.Replace(keyword, @"<|>|\(|\)|\{|\}|\[|\]", " ");
-            var keywords = Searcher.CutKeywords(keyword);
-            foreach (var s in keywords)
+            try
             {
-                string frag;
-                if (p.Content.Contains(s) && !string.IsNullOrEmpty(frag = highlighter.GetBestFragment(s, p.Content)))
+                var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
+                var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = int.MaxValue };
+                keyword = Regex.Replace(keyword, @"<|>|\(|\)|\{|\}|\[|\]", " ");
+                var keywords = Searcher.CutKeywords(keyword);
+                var context = BrowsingContext.New(Configuration.Default);
+                var document = await context.OpenAsync(req => req.Content(p.Content));
+                var elements = document.DocumentElement.GetElementsByTagName("p");
+                foreach (var e in elements)
                 {
-                    p.Content = frag;
-                    break;
+                    for (var index = 0; index < e.ChildNodes.Length; index++)
+                    {
+                        var node = e.ChildNodes[index];
+                        bool handled = false;
+                        foreach (var s in keywords)
+                        {
+                            string frag;
+                            if (handled == false && node.TextContent.Contains(s, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(frag = highlighter.GetBestFragment(s, node.TextContent)))
+                            {
+                                switch (node)
+                                {
+                                    case IElement el:
+                                        el.InnerHtml = frag;
+                                        handled = true;
+                                        break;
+
+                                    case IText t:
+                                        var parser = new HtmlParser();
+                                        var parseDoc = parser.ParseDocument(frag).Body;
+                                        e.ReplaceChild(parseDoc, t);
+                                        handled = true;
+                                        break;
+                                }
+                            }
+                        }
+                    }
                 }
+                p.Content = document.Body.InnerHtml;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 
