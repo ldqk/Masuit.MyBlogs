@@ -9,6 +9,7 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Html;
+using OpenXmlPowerTools;
 using PanGu;
 using PanGu.HighLight;
 using System.Linq.Expressions;
@@ -26,6 +27,28 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         {
             _cacheManager = cacheManager;
             _tagCacheManager = tagCacheManager;
+        }
+
+        /// <summary>
+        /// 文章高亮关键词处理
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="keyword"></param>
+        public void Highlight(Post p, string keyword)
+        {
+            var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
+            var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = int.MaxValue };
+            keyword = Regex.Replace(keyword, @"<|>|\(|\)|\{|\}|\[|\]", " ");
+            var keywords = Searcher.CutKeywords(keyword);
+            foreach (var s in keywords)
+            {
+                string frag;
+                if (p.Content.Contains(s) && !string.IsNullOrEmpty(frag = highlighter.GetBestFragment(s, p.Content)))
+                {
+                    p.Content = frag;
+                    break;
+                }
+            }
         }
 
         public SearchResult<PostDto> SearchPage(int page, int size, string keyword)

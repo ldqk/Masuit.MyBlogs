@@ -168,12 +168,10 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/ng-views/filemanager/js/controllers/main.js")
                     .Include("/ng-views/filemanager/js/controllers/selector-controller.js");
                 bundles.AddJs("/article.js")
-                    .Include("/Assets/highlight/js/highlight.js")
                     .Include("/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.js")
                     .Include("/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js")
                     .Include("/Assets/jquery.tocify/jquery.tocify.js")
-                    .Include("/Scripts/global/article.js")
-                    .Include("/Assets/highlight/js/highlight.js");
+                    .Include("/Scripts/global/article.js");
             });
             return app;
         }

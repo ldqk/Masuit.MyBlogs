@@ -25,5 +25,12 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// </summary>
         /// <returns></returns>
         Dictionary<string, int> GetTags();
+
+        /// <summary>
+        /// 高亮文章内容
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="keyword"></param>
+        void Highlight(Post p, string keyword);
     }
 }

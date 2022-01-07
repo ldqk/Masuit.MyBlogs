@@ -1,5 +1,4 @@
-﻿@using System.Diagnostics
-@using System.Text.Encodings.Web
+﻿@using System.Text.Encodings.Web
 @using System.Text.RegularExpressions
 @using System.Web
 @using Masuit.MyBlogs.Core.Common
@@ -21,13 +20,10 @@
 <environment names="Development">
     <link href="~/Assets/jquery.tocify/jquery.tocify.css" rel="stylesheet" />
     <link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.css" rel="stylesheet" />
-    <link href="~/Assets/highlight/css/highlight.css" rel="stylesheet" />
-    <script src="/Assets/highlight/js/highlight.js"></script>
     <script src="/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.js"></script>
     <script src="/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
     <script src="/Assets/jquery.tocify/jquery.tocify.js"></script>
     <script src="/Scripts/global/article.js"></script>
-    <script src="/Assets/highlight/js/highlight.js"></script>
 </environment>
 <environment names="Stage,Production">
     @await Styles.RenderAsync("/bundles/article.css")
@@ -48,7 +44,7 @@
                             <div class="text-center">
                                 <a>
                                     <h2 class="padding-bot10">
-                                        @Model.Title
+                                        @Html.Raw(Model.Title)
                                     </h2>
                                 </a>
                             </div>
@@ -347,13 +343,6 @@
         </text>
     }
     window.onload = function() {
-        var keywords = @Html.Raw(ViewData["keywords"] ?? "[]");
-        for (var i = 0; i < keywords.length; i++) {
-            $("#article p").highlight(keywords[i]);
-            $("#article div").highlight(keywords[i]);
-            $("#article h3").highlight(keywords[i]);
-            $("#article h4").highlight(keywords[i]);
-        }
         loading();
         $('#pageToolbar').Paging({ //异步加载评论
             pagesize: 10,
