@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Text;
+using Masuit.Tools.Systems;
 
 namespace Masuit.MyBlogs.Core.Common
 {
@@ -46,8 +47,10 @@ namespace Masuit.MyBlogs.Core.Common
 
     public class RequestLog
     {
-        public HashSet<string> UserAgents { get; } = new();
-        public HashSet<string> RequestUrls { get; } = new();
+        public ConcurrentHashSet<string> UserAgents { get; } = new();
+
+        public ConcurrentHashSet<string> RequestUrls { get; } = new();
+
         public int Count { get; set; }
     }
 }
