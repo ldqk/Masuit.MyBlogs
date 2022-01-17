@@ -1,5 +1,5 @@
 ﻿myApp.controller("partner", ["$scope", "$http", "$timeout","NgTableParams", function ($scope, $http, $timeout,NgTableParams) {
-    var self = this;
+	var self = this;
 	$scope.isAdd = true;
 	$scope.allowUpload=false;
 	$scope.partner = {};
@@ -32,19 +32,19 @@
 		});
 	}
 
-    $('.ui.dropdown.types').dropdown({
+	$('.ui.dropdown.types').dropdown({
 		onChange: function (value) {
 			$scope.partner.Types = value;
 		}
 	});
 
-    $('.ui.dropdown.region').dropdown({
+	$('.ui.dropdown.region').dropdown({
 		onChange: function (value) {
 			$scope.partner.RegionMode = value;
 		}
 	});
 
-    $scope.getCategory = function () {
+	$scope.getCategory = function () {
 		$http.post("/category/getcategories", null).then(function (res) {
 			var data = res.data;
 			if (data.Success) {
@@ -81,8 +81,12 @@
 		}).then(function(isConfirm) {
 			if (isConfirm) {
 				$scope.request("/partner/delete/"+partner.Id, null, function(data) {
-					swal(data.Message, null, 'success');
-			        self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+					window.notie.alert({
+						type:1,
+						text:data.Message,
+						time:4
+					});
+					self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 				});
 			}
 		}).catch(swal.noop);
@@ -90,8 +94,8 @@
 	$scope.add = function() {
 		$scope.partner = {
 			ExpireTime:"2099-12-31"
-        };
-        $scope.isAdd = true;
+		};
+		$scope.isAdd = true;
 		$scope.allowUpload=false;
 		layer.open({
 			type: 1,
@@ -106,10 +110,10 @@
 				return true;
 			}
 		});
-        $timeout(function () {
-		    $('.ui.dropdown.category').dropdown('clear');
-		    $('.ui.dropdown.types').dropdown('clear');
-		    $('.ui.dropdown.region').dropdown('clear');
+		$timeout(function () {
+			$('.ui.dropdown.category').dropdown('clear');
+			$('.ui.dropdown.types').dropdown('clear');
+			$('.ui.dropdown.region').dropdown('clear');
 		}, 10);
 	}
 
@@ -119,12 +123,12 @@
 		$scope.isAdd = false;
 		$scope.allowUpload=false;
 		layer.closeAll();
-        $timeout(function () {
-		    $('.ui.dropdown.category').dropdown('clear');
-		    $('.ui.dropdown.types').dropdown('clear');
-		    $('.ui.dropdown.region').dropdown('clear');
+		$timeout(function () {
+			$('.ui.dropdown.category').dropdown('clear');
+			$('.ui.dropdown.types').dropdown('clear');
+			$('.ui.dropdown.region').dropdown('clear');
 			$('.ui.dropdown.category').dropdown('set selected', (item.CategoryIds+"").split(','));
-		    $('.ui.dropdown.types').dropdown('set selected', item.Types.split(','));
+			$('.ui.dropdown.types').dropdown('set selected', item.Types.split(','));
 			$('.ui.dropdown.region').dropdown('set selected', item.RegionMode);
 		}, 10);
 		layer.open({
@@ -149,11 +153,11 @@
 		$scope.isAdd = true;
 		$scope.allowUpload=false;
 		layer.closeAll();
-        $timeout(function () {
-		    $('.ui.dropdown.category').dropdown('clear');
-		    $('.ui.dropdown.types').dropdown('clear');
+		$timeout(function () {
+			$('.ui.dropdown.category').dropdown('clear');
+			$('.ui.dropdown.types').dropdown('clear');
 			$('.ui.dropdown.category').dropdown('set selected', (item.CategoryIds+"").split(','));
-		    $('.ui.dropdown.types').dropdown('set selected', item.Types.split(','));
+			$('.ui.dropdown.types').dropdown('set selected', item.Types.split(','));
 		}, 10);
 		layer.open({
 			type: 1,
@@ -194,29 +198,29 @@
 		});
 	}
 	$scope.uploadImage = function(field) {
-        $("#uploadform").ajaxSubmit({
+		$("#uploadform").ajaxSubmit({
 			url: "/Upload",
 			type: "post",
 			success: function(data) {
 				document.getElementById("uploadform").reset();
 				$scope.$apply(function () {
 					$scope.partner[field] = data.Data;
-                    layer.close(layer.index);
-			    });
+					layer.close(layer.index);
+				});
 			}
 		});
-    };
+	};
 	
 	$scope.upload = function(field) {
 		$scope.imgField=field;
-        layer.open({
+		layer.open({
 			type: 1,
 			zIndex: 20,
 			title: '上传图片',
 			area: [(window.screen.width > 300 ? 300 : window.screen.width) + 'px', '80px'], //宽高
 			content: $("#img-upload"),
 			cancel: function(index, layero) {
-                return true;
+				return true;
 			}
 		});
 	}
@@ -233,17 +237,17 @@
 		}, 500);
 	}
 
-    $scope.changeState= function(row) {
-        $scope.request("/partner/ChangeState/"+row.Id, null, function(data) {
+	$scope.changeState= function(row) {
+		$scope.request("/partner/ChangeState/"+row.Id, null, function(data) {
 			window.notie.alert({
 				type: 1,
 				text: data.Message,
 				time: 4
 			});
 		});
-    }
+	}
 
-    $scope.detail = function (item) {
+	$scope.detail = function (item) {
 		$scope.partner = angular.copy(item);
 		layer.closeAll();
 		$('.ui.dropdown.types').dropdown('clear');
@@ -251,7 +255,7 @@
 		layer.open({
 			type: 1,
 			zIndex: 20,
-            offset: '50px',
+			offset: '50px',
 			title: item.Title,
 			area: (window.screen.width > 850 ? 850 : window.screen.width) + 'px',// '340px'], //宽高
 			content: $("#detail"),
@@ -262,14 +266,14 @@
 	}
 
 	$scope.insight= function(row) {
-        layer.full(layer.open({
-          type: 2,
-          title: '广告《'+row.Title+'》洞察分析',
-          maxmin: true, //开启最大化最小化按钮
-          area: ['893px', '100vh'],
-          content: '/partner/'+row.Id+'/insight'
-        }));
-    }
+		layer.full(layer.open({
+		  type: 2,
+		  title: '广告《'+row.Title+'》洞察分析',
+		  maxmin: true, //开启最大化最小化按钮
+		  area: ['893px', '100vh'],
+		  content: '/partner/'+row.Id+'/insight'
+		}));
+	}
 	jeDate('#timespan',{
 		isinitVal: true,
 		festival: true,

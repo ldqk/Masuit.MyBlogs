@@ -16,6 +16,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text.RegularExpressions;
+using EFCoreSecondLevelCacheInterceptor;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -64,7 +65,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(kw) || p.Description.Contains(kw) || p.Url.Contains(kw));
             }
 
-            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ProjectTo<AdvertisementViewModel>(MapperConfig).ToPagedList(page, size);
+            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ProjectTo<AdvertisementViewModel>(MapperConfig).NotCacheable().ToPagedList(page, size);
             var cids = list.Data.Where(m => !string.IsNullOrEmpty(m.CategoryIds)).SelectMany(m => m.CategoryIds.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)).Distinct().ToArray();
             var dic = await categoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionaryAsync(c => c.Id + "", c => c.Name);
             foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))

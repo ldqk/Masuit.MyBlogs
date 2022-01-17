@@ -35,7 +35,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// 返回所有sites
         /// </summary>
         /// <returns></returns>
-        [HttpGet("sites"), ResponseCache(Duration = 600)]
+        [HttpGet("sites"), ResponseCache(Duration = 600, Location = ResponseCacheLocation.Client)]
         public IActionResult GetSites()
         {
             return Json(_siteService.GetSites(), new JsonSerializerSettings()
@@ -48,7 +48,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// 根据路径获取文件夹内容
         /// </summary>
         /// <returns></returns>
-        [HttpGet("sites/{siteName}/{**path}"), ResponseCache(Duration = 600)]
+        [HttpGet("sites/{siteName}/{**path}"), ResponseCache(Duration = 600, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> GetDirectory(string siteName, string path)
         {
             if (string.IsNullOrEmpty(siteName))
@@ -105,7 +105,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        [HttpGet("files/{siteName}/{**path}"), ResponseCache(Duration = 600)]
+        [HttpGet("files/{siteName}/{**path}"), ResponseCache(Duration = 600, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> Download(string siteName, string path)
         {
             try
@@ -131,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// 获取基本信息
         /// </summary>
         /// <returns></returns>
-        [HttpGet("info"), ResponseCache(Duration = 600)]
+        [HttpGet("info"), ResponseCache(Duration = 600, Location = ResponseCacheLocation.Client)]
         public IActionResult GetInfo()
         {
             bool isAollowAnonymous = !string.IsNullOrEmpty(_setting.Get("AllowAnonymouslyUpload")) && Convert.ToBoolean(_setting.Get("AllowAnonymouslyUpload"));
@@ -153,7 +153,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// 获得readme
         /// </summary>
         /// <returns></returns>
-        [HttpGet("readme"), ResponseCache(Duration = 600)]
+        [HttpGet("readme"), ResponseCache(Duration = 600, Location = ResponseCacheLocation.Client)]
         public IActionResult GetReadme()
         {
             return Json(new
@@ -169,7 +169,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// 获取文件分片上传路径
         /// </summary>
         /// <returns></returns>
-        [HttpGet("upload/{siteName}/{**fileName}"), ResponseCache(Duration = 600)]
+        [HttpGet("upload/{siteName}/{**fileName}"), ResponseCache(Duration = 600, Location = ResponseCacheLocation.Client)]
         public async Task<IActionResult> GetUploadUrl(string siteName, string fileName)
         {
             bool isAollowAnonymous = !string.IsNullOrEmpty(_setting.Get("AllowAnonymouslyUpload")) && Convert.ToBoolean(_setting.Get("AllowAnonymouslyUpload"));

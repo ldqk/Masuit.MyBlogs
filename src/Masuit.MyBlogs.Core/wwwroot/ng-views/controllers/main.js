@@ -165,19 +165,19 @@
 				$scope.CheckLogin(res.data);
 			}
 		}, function(e) {
-            if (e.data) {
-                window.notie.alert({
-				    type:3,
-				    text:e.data.Message,
-				    time:4
-			    });
-            } else {
-                window.notie.alert({
-				    type:3,
-				    text:'服务请求失败！',
-				    time:4
-			    });
-            }
+			if (e.data) {
+				window.notie.alert({
+					type:3,
+					text:e.data.Message,
+					time:4
+				});
+			} else {
+				window.notie.alert({
+					type:3,
+					text:'服务请求失败！',
+					time:4
+				});
+			}
 		});
 	}
 
@@ -217,38 +217,38 @@
 
 	function getmsgs() {
 		fetch("/dashboard/getmessages",{
-            headers:{
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }).then(function(response) {
-            return response.json();
-        }).then(function(res) {
-            $scope.Msgs = res.Data;
+			headers:{
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			}
+		}).then(function(response) {
+			return response.json();
+		}).then(function(res) {
+			$scope.Msgs = res.Data;
 			$scope.$apply();
-        }).catch(function(e) {
-            console.log("Oops, error");
-        });
-        if (($scope.InternalMsgs||[]).length==0) {
+		}).catch(function(e) {
+			console.log("Oops, error");
+		});
+		if (($scope.InternalMsgs||[]).length==0) {
 			getUnreadMsgs();
-        }
-    }
+		}
+	}
 
-    function getUnreadMsgs() {
-        fetch("/msg/GetUnreadMsgs",{
-                headers:{
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            }).then(function(response) {
-                return response.json();
-            }).then(function(res) {
-                $scope.InternalMsgs = res.Data;
-			    $scope.$apply();
-            }).catch(function(e) {
-                console.log("Oops, error");
-            });
-    }
+	function getUnreadMsgs() {
+		fetch("/msg/GetUnreadMsgs",{
+				headers:{
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				}
+			}).then(function(response) {
+				return response.json();
+			}).then(function(res) {
+				$scope.InternalMsgs = res.Data;
+				$scope.$apply();
+			}).catch(function(e) {
+				console.log("Oops, error");
+			});
+	}
 	getmsgs();
 	setInterval(getmsgs,5000);
 	$scope.read = function(id) {
@@ -328,17 +328,17 @@
 		}).catch(swal.noop);
 	}
 	$scope.submit = function() {
-        var form = new FormData(document.getElementById("fileform"));
+		var form = new FormData(document.getElementById("fileform"));
 		$http({
-            url: "upload",
-            method: "post",
-            data: form,
-            transformRequest: angular.identity,
-            headers: {
-                'Content-Type': undefined
-            }
-        }).then(function(response) {
-            $http.post("/user/changeavatar", {
+			url: "upload",
+			method: "post",
+			data: form,
+			transformRequest: angular.identity,
+			headers: {
+				'Content-Type': undefined
+			}
+		}).then(function(response) {
+			$http.post("/user/changeavatar", {
 				id:$scope.user.Id,
 				path:response.data.Data
 			}).then(function(res2) {
@@ -347,21 +347,21 @@
 			}, function(error) {
 				swal("头像修改失败", "请求失败，错误码：" + error.status, "error");
 			});
-        }, function(response) {
+		}, function(response) {
 			swal("头像修改失败", "", "error");
-        });
-    };
+		});
+	};
 	
 	$scope.changeAvatar = function() {
 		layui.use("layer", function() {
-		    var layer = layui.layer;
-		    layer.open({
-                type: 1,
-                title: '上传新头像',
-			    area: ['420px', '150px'], //宽高
-                content: $("#upfile")
-		    });
-	    });
+			var layer = layui.layer;
+			layer.open({
+				type: 1,
+				title: '上传新头像',
+				area: ['420px', '150px'], //宽高
+				content: $("#upfile")
+			});
+		});
 	}
 	$scope.changePassword = function() {
 		swal({

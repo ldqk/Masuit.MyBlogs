@@ -17,12 +17,14 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         private readonly IDriveAccountService _driveAccount;
         private readonly SettingService _setting;
         private readonly TokenService _tokenService;
+
         public AdminController(IDriveAccountService driveAccount, SettingService setting, TokenService tokenService)
         {
             _driveAccount = driveAccount;
             _setting = setting;
             _tokenService = tokenService;
         }
+
         /// <summary>
         /// 重定向到 M$ 的 Oauth
         /// </summary>
@@ -35,6 +37,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
             var result = new RedirectResult(url);
             return result;
         }
+
         /// <summary>
         /// 从 Oauth 重定向的url
         /// </summary>
@@ -64,6 +67,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
                 message = "未知错误"
             });
         }
+
         /// <summary>
         /// 添加 SharePoint Site
         /// </summary>
@@ -200,7 +204,6 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         /// <summary>
         /// 更新站点设置
         /// </summary>
-        /// <param name="nickName"></param>
         /// <returns></returns>
         [HttpPost("sites/settings")]
         public async Task<IActionResult> UpdateSiteSettings(SiteSettingsModel model)
@@ -227,28 +230,39 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         }
 
         #region 接收表单模型
+
         public class UpdateSettings
         {
             public string appName { get; set; }
+
             public string webName { get; set; }
+
             public string navImg { get; set; }
+
             public string defaultDrive { get; set; }
+
             public string readme { get; set; }
+
             public string footer { get; set; }
+
             public bool allowAnonymouslyUpload { get; set; }
+
             public string uploadPassword { get; set; }
         }
 
         public class AddSiteModel
         {
             public string siteName { get; set; }
+
             public string nickName { get; set; }
         }
 
         public class SiteSettingsModel
         {
             public string siteName { get; set; }
+
             public string nickName { get; set; }
+
             public string hiddenFolders { get; set; }
         }
 
@@ -256,6 +270,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         {
             public string text { get; set; }
         }
-        #endregion
+
+        #endregion 接收表单模型
     }
 }
