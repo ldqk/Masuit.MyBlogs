@@ -84,7 +84,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, MyAuthorize]
         public async Task<IActionResult> Save(AdvertisementDto model)
         {
-            var entity = AdsService[model.Id];
+            var entity = AdsService[model.Id] ?? new Advertisement();
             model.CategoryIds = model.CategoryIds?.Replace("null", "");
             model.Regions = Regex.Replace(model.Regions ?? "", @"(\p{P}|\p{Z}|\p{S})+", "|");
             if (model.RegionMode == RegionLimitMode.All)
