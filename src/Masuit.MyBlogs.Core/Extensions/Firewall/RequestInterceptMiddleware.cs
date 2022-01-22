@@ -17,7 +17,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
     /// </summary>
     public class RequestInterceptMiddleware
     {
-
         private readonly RequestDelegate _next;
 
         /// <summary>
@@ -32,11 +31,13 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
         public Task Invoke(HttpContext context)
         {
             var request = context.Request;
+
             //启用读取request
             request.EnableBuffering();
             if (!AppConfig.EnableIPDirect && request.Host.Host.MatchInetAddress() && !request.Host.Host.IsPrivateIP())
             {
                 context.Response.Redirect("https://www.baidu.com", true);
+
                 //context.Response.StatusCode = 404;
                 return Task.CompletedTask;
             }
@@ -89,7 +90,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
 
             if (!context.Request.IsRobot())
             {
-                if (request.QueryString.HasValue)
+                if (request.QueryString.HasValue && request.QueryString.Value.Contains("="))
                 {
                     var q = request.QueryString.Value.Trim('?');
                     requestUrl = requestUrl.Replace(q, q.Split('&').Where(s => !s.StartsWith("cid") && !s.StartsWith("uid")).Join("&"));

@@ -1,4 +1,5 @@
-﻿using Autofac.Extensions.DependencyInjection;
+﻿using System.Diagnostics;
+using Autofac.Extensions.DependencyInjection;
 using Masuit.MyBlogs.Core;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
@@ -7,16 +8,20 @@ using Masuit.MyBlogs.Core.Infrastructure.Drive;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
+// 设置相关进程优先级为实时，防止其他进程影响应用程序的运行性能
+Process.GetProcessesByName("mysqld").ForEach(p => p.PriorityClass = ProcessPriorityClass.RealTime);
+Process.GetProcessesByName("redis-server").ForEach(p => p.PriorityClass = ProcessPriorityClass.RealTime);
+Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.RealTime;
+
+// 确保IP数据库正常
 if (!"223.5.5.5".GetIPLocation().Contains("阿里"))
 {
     throw new Exception("IP地址库初始化失败，请重启应用！");
 }
 
-InitOneDrive();
-PerfCounter.Init();
-CreateWebHostBuilder(args).Build().Run();
-
-static IHostBuilder CreateWebHostBuilder(string[] args) => Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureWebHostDefaults(hostBuilder => hostBuilder.UseKestrel(opt =>
+InitOneDrive(); // 初始化Onedrive程序
+PerfCounter.Init(); // 初始化性能计数器
+Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureWebHostDefaults(hostBuilder => hostBuilder.UseKestrel(opt =>
 {
     var config = opt.ApplicationServices.GetService<IConfiguration>();
     var port = config["Port"] ?? "5000";
@@ -37,7 +42,7 @@ static IHostBuilder CreateWebHostBuilder(string[] args) => Host.CreateDefaultBui
 
     opt.Limits.MaxRequestBodySize = null;
     Console.WriteLine($"应用程序监听端口：http：{port}，https：{sslport}");
-}).UseStartup<Startup>());
+}).UseStartup<Startup>()).Build().Run();
 
 static void InitOneDrive()
 {
