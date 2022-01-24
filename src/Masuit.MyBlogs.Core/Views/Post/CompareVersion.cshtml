@@ -90,7 +90,6 @@
                                     else {
                                         @Html.Raw(Regex.Replace(await Model[1].Content.ReplaceImgAttribute(Model[1].Title), @"[\u4e00-\u9fa5]", m => HtmlEncoder.Default.Encode(m.Value)))
                                     }
-                                    @Html.Raw(await Model[1].Content.ReplaceImgAttribute(Model[0].Title))
                                 </article>
                             </section>
                             <hr class="margin-top10 marginbot10" />
