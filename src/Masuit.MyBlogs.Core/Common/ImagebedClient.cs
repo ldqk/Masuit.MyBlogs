@@ -5,6 +5,7 @@ using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Systems;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace Masuit.MyBlogs.Core.Common
@@ -43,7 +44,7 @@ namespace Masuit.MyBlogs.Core.Common
                 return Task.FromResult<(string, bool)>((null, false));
             }
 
-            file = Path.GetFileName(file);
+            file = Regex.Replace(Path.GetFileName(file), @"\p{P}|\p{S}", "");
             var gitlabs = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length && !_failedList.Contains(c.ApiUrl)).OrderByRandom().ToList();
             if (gitlabs.Count > 0)
             {
