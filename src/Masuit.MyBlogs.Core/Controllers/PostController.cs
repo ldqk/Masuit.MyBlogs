@@ -1,5 +1,6 @@
 ﻿using AngleSharp;
 using CacheManager.Core;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using EFCoreSecondLevelCacheInterceptor;
 using Hangfire;
 using JiebaNet.Segmenter;
@@ -103,7 +104,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (notRobot && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
             {
-                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.RecordPostVisit), args: new dynamic[] { id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString) });
+                BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString)));
                 HttpContext.Session.Set("post" + id, id.ToString());
             }
 
@@ -757,7 +758,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 p.Status = Status.Schedule;
                 p.PostDate = timespan.Value.ToUniversalTime();
                 p.ModifyDate = timespan.Value.ToUniversalTime();
-                HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.PublishPost), args: p);
+                BackgroundJob.Enqueue<IHangfireBackJob>(job => job.PublishPost(p));
                 return ResultData(p.Mapper<PostDto>(), message: $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！");
             }
 

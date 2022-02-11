@@ -21,6 +21,7 @@ using Masuit.Tools.Config;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Net;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Polly;
 using System.Net;
@@ -88,8 +89,9 @@ namespace Masuit.MyBlogs.Core
             });
             services.AddSession().AddAntiforgery(); //注入Session
             services.AddResponseCache().AddCacheConfig();
-            services.AddHangfire((_, configuration) =>
+            services.AddHangfireServer().AddHangfire((serviceProvider, configuration) =>
             {
+                configuration.UseActivator(new HangfireActivator(serviceProvider));
                 configuration.UseFilter(new AutomaticRetryAttribute());
                 configuration.UseMemoryStorage();
             }); //配置hangfire

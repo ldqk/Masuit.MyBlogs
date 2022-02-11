@@ -17,6 +17,7 @@ using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Web;
+using Hangfire;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -39,7 +40,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public string ClientIP => HttpContext.Connection.RemoteIpAddress.ToString();
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="data"></param>
         /// <param name="isTrue"></param>
@@ -105,7 +106,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         SameSite = SameSiteMode.Lax
                     });
                     HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
-                    HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, ClientIP, LoginType.Default);
+                    BackgroundJob.Enqueue<IHangfireBackJob>(job => job.LoginRecord(userInfo, ClientIP, LoginType.Default));
                     if (string.IsNullOrEmpty(from))
                     {
                         return RedirectToAction("Index", "Home");
@@ -168,7 +169,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                     SameSite = SameSiteMode.Lax
                 });
             }
-            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", userInfo, ClientIP, LoginType.Default);
+
+            BackgroundJob.Enqueue<IHangfireBackJob>(job => job.LoginRecord(userInfo, ClientIP, LoginType.Default));
             string refer = Request.Cookies["refer"];
             Response.Cookies.Delete(nameof(RsaKey.PublicKey), new CookieOptions()
             {

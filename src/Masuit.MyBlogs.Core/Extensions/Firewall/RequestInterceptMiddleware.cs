@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using Hangfire;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Models.ViewModel;
@@ -76,7 +77,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                         new Uri(referer);//判断是不是一个合法的referer
                         if (!referer.Contains(context.Request.Host.Value) && !referer.Contains(new[] { "baidu.com", "google", "sogou", "so.com", "bing.com", "sm.cn" }))
                         {
-                            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(IHangfireBackJob.UpdateLinkWeight), args: new dynamic[] { referer, ip });
+                            BackgroundJob.Enqueue<IHangfireBackJob>(job => job.UpdateLinkWeight(referer, ip));
                         }
                     }
                     catch

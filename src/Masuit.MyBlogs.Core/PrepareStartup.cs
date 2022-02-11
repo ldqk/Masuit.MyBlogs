@@ -72,7 +72,7 @@ namespace Masuit.MyBlogs.Core
 
         public static void SetupHangfire(this IApplicationBuilder app)
         {
-            app.UseHangfireServer().UseHangfireDashboard("/taskcenter", new DashboardOptions()
+            app.UseHangfireDashboard("/taskcenter", new DashboardOptions()
             {
                 Authorization = new[]
                 {

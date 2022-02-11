@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using Hangfire;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -47,7 +48,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
                 SameSite = SameSiteMode.Lax
             });
             HttpContext.Session.Set(SessionKey.UserInfo, user);
-            HangfireHelper.CreateJob(typeof(IHangfireBackJob), nameof(HangfireBackJob.LoginRecord), "default", user, HttpContext.Connection.RemoteIpAddress.ToString(), LoginType.Default);
+            BackgroundJob.Enqueue<IHangfireBackJob>(job => job.LoginRecord(user, HttpContext.Connection.RemoteIpAddress.ToString(), LoginType.Default));
             return Ok(new
             {
                 error = false,
@@ -57,6 +58,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
             });
         }
     }
+
     public class AuthenticateModel
     {
         public string Username { get; set; }
