@@ -32,29 +32,22 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <summary>
         /// hangfire后台任务
         /// </summary>
-        /// <param name="userInfoService"></param>
-        /// <param name="postService"></param>
-        /// <param name="settingService"></param>
-        /// <param name="searchDetailsService"></param>
-        /// <param name="linksService"></param>
-        /// <param name="httpClientFactory"></param>
-        /// <param name="HostEnvironment"></param>
-        /// <param name="searchEngine"></param>
-        public HangfireBackJob(IUserInfoService userInfoService, IPostService postService, ISystemSettingService settingService, ISearchDetailsService searchDetailsService, ILinksService linksService, IHttpClientFactory httpClientFactory, IWebHostEnvironment HostEnvironment, ISearchEngine<DataContext> searchEngine, IAdvertisementService advertisementService, INoticeService noticeService, ILinkLoopbackService loopbackService, IPostVisitRecordService recordService, IPostVisitRecordStatsService recordStatsService)
+        public HangfireBackJob(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IWebHostEnvironment hostEnvironment)
         {
-            _userInfoService = userInfoService;
-            _postService = postService;
-            _settingService = settingService;
-            _searchDetailsService = searchDetailsService;
-            _linksService = linksService;
             _httpClientFactory = httpClientFactory;
-            _hostEnvironment = HostEnvironment;
-            _searchEngine = searchEngine;
-            _advertisementService = advertisementService;
-            _noticeService = noticeService;
-            _loopbackService = loopbackService;
-            _recordService = recordService;
-            _recordStatsService = recordStatsService;
+            _hostEnvironment = hostEnvironment;
+            var scope = serviceProvider.CreateScope();
+            _userInfoService = scope.ServiceProvider.GetRequiredService<IUserInfoService>();
+            _postService = scope.ServiceProvider.GetRequiredService<IPostService>();
+            _settingService = scope.ServiceProvider.GetRequiredService<ISystemSettingService>();
+            _searchDetailsService = scope.ServiceProvider.GetRequiredService<ISearchDetailsService>();
+            _linksService = scope.ServiceProvider.GetRequiredService<ILinksService>();
+            _searchEngine = scope.ServiceProvider.GetRequiredService<ISearchEngine<DataContext>>();
+            _advertisementService = scope.ServiceProvider.GetRequiredService<IAdvertisementService>();
+            _noticeService = scope.ServiceProvider.GetRequiredService<INoticeService>();
+            _loopbackService = scope.ServiceProvider.GetRequiredService<ILinkLoopbackService>();
+            _recordService = scope.ServiceProvider.GetRequiredService<IPostVisitRecordService>();
+            _recordStatsService = scope.ServiceProvider.GetRequiredService<IPostVisitRecordStatsService>();
         }
 
         /// <summary>
