@@ -276,7 +276,7 @@ namespace Masuit.MyBlogs.Core.Common
         }
 
         /// <summary>
-        /// 将html的img标签的src属性名替换成data-original
+        /// 将html的img标签懒加载
         /// </summary>
         /// <param name="html"></param>
         /// <param name="title"></param>
@@ -292,7 +292,9 @@ namespace Masuit.MyBlogs.Core.Common
                 {
                     string src = node.Attributes["src"].Value;
                     node.RemoveAttribute("src");
-                    node.SetAttribute("data-original", src);
+                    node.SetAttribute("data-src", src);
+                    node.SetAttribute("class", node.Attributes["class"]?.Value + " lazyload");
+                    node.SetAttribute("loading", "lazy");
                     node.SetAttribute("alt", SystemSettings["Title"]);
                     node.SetAttribute("title", title);
                 }

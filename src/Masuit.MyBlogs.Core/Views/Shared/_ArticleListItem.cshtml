@@ -31,7 +31,7 @@
                 if (!string.IsNullOrEmpty(imgSrc))
                 {
                     <div class="col-md-2 paddingright-clear hidden-xs">
-                        <img class="img-thumbnail img-responsive thumb" data-original="@imgSrc" alt="@CommonHelper.SystemSettings["Title"]" title="@CommonHelper.SystemSettings["Title"] ">
+                        <img class="img-thumbnail img-responsive thumb lazyload" loading="lazy" data-src="@imgSrc" alt="@CommonHelper.SystemSettings["Title"]" title="@CommonHelper.SystemSettings["Title"] ">
                     </div>
                 }
             }

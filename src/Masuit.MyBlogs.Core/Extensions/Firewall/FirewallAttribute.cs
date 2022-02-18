@@ -19,14 +19,13 @@ using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
-    public class FirewallAttribute : ActionFilterAttribute
+    public class FirewallAttribute : IAsyncActionFilter
     {
         public ICacheManager<int> CacheManager { get; set; }
 
         public IFirewallRepoter FirewallRepoter { get; set; }
 
-        /// <inheritdoc />
-        public override void OnActionExecuting(ActionExecutingContext context)
+        public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var request = context.HttpContext.Request;
             var ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
@@ -37,13 +36,13 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             {
                 AccessDeny(ip, request, "黑名单IP地址");
                 context.Result = new BadRequestObjectResult("您当前所在的网络环境不支持访问本站！");
-                return;
+                return Task.CompletedTask;
             }
 
             //bypass
             if (CommonHelper.SystemSettings.GetOrAdd("FirewallEnabled", "true") == "false" || context.ActionDescriptor.EndpointMetadata.Any(o => o is MyAuthorizeAttribute or AllowAccessFirewallAttribute) || tokenValid)
             {
-                return;
+                return next();
             }
 
             //UserAgent
@@ -60,13 +59,13 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     ContentType = ContentType.Html + "; charset=utf-8",
                     StatusCode = 403
                 };
-                return;
+                return Task.CompletedTask;
             }
 
             //搜索引擎
             if (Regex.IsMatch(request.Method, "OPTIONS|HEAD", RegexOptions.IgnoreCase) || request.IsRobot())
             {
-                return;
+                return next();
             }
 
             // 反爬虫
@@ -78,7 +77,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                     StatusCode = 429,
                     Content = "检测到访问异常，请在10分钟后再试！"
                 };
-                return;
+                return Task.CompletedTask;
             }
 
             //安全模式
@@ -97,7 +96,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
             var allowedAreas = CommonHelper.SystemSettings.GetOrAdd("AllowedArea", "").Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries);
             if (allowedAreas.Any() && pos.Contains(allowedAreas))
             {
-                return;
+                return next();
             }
 
             //黑名单地区
@@ -111,34 +110,10 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 }
             }
 
-            Challenge(context, request);//挑战模式
-            ThrottleLimit(ip, request);//限流
-        }
-
-        private void ThrottleLimit(string ip, HttpRequest request)
-        {
-            var times = CacheManager.AddOrUpdate("Frequency:" + ip, 1, i => i + 1, 5);
-            CacheManager.Expire("Frequency:" + ip, ExpirationMode.Absolute, TimeSpan.FromSeconds(CommonHelper.SystemSettings.GetOrAdd("LimitIPFrequency", "60").ToInt32()));
-            var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPRequestTimes", "90").ToInt32();
-            if (times <= limit)
-            {
-                return;
-            }
-
-            if (times > limit * 1.2)
-            {
-                CacheManager.Expire("Frequency:" + ip, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
-                AccessDeny(ip, request, "访问频次限制");
-            }
-
-            throw new TempDenyException("访问频次限制");
-        }
-
-        private static void Challenge(ActionExecutingContext context, HttpRequest request)
-        {
+            //挑战模式
             if (context.HttpContext.Session.TryGetValue("js-challenge", out _) || request.Path.ToUriComponent().Contains("."))
             {
-                return;
+                return next();
             }
 
             try
@@ -146,7 +121,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 if (request.Cookies.TryGetValue(SessionKey.ChallengeBypass, out var time) && time.AESDecrypt(AppConfig.BaiduAK).ToDateTime() > DateTime.Now)
                 {
                     context.HttpContext.Session.Set("js-challenge", 1);
-                    return;
+                    return next();
                 }
             }
             catch
@@ -154,6 +129,17 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 context.HttpContext.Response.Cookies.Delete(SessionKey.ChallengeBypass);
             }
 
+            if (Challenge(context, out var completedTask))
+            {
+                return completedTask;
+            }
+
+            //限流
+            return ThrottleLimit(ip, request, next);
+        }
+
+        private static bool Challenge(ActionExecutingContext context, out Task completedTask)
+        {
             var mode = CommonHelper.SystemSettings.GetOrAdd(SessionKey.ChallengeMode, "");
             if (mode == SessionKey.JSChallenge)
             {
@@ -161,6 +147,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 {
                     ViewName = "/Views/Shared/JSChallenge.cshtml"
                 };
+                completedTask = Task.CompletedTask;
+                return true;
             }
 
             if (mode == SessionKey.CaptchaChallenge)
@@ -169,7 +157,32 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall
                 {
                     ViewName = "/Views/Shared/CaptchaChallenge.cshtml"
                 };
+                completedTask = Task.CompletedTask;
+                return true;
             }
+
+            completedTask = Task.CompletedTask;
+            return false;
+        }
+
+        private Task ThrottleLimit(string ip, HttpRequest request, ActionExecutionDelegate next)
+        {
+            var times = CacheManager.AddOrUpdate("Frequency:" + ip, 1, i => i + 1, 5);
+            CacheManager.Expire("Frequency:" + ip, ExpirationMode.Absolute, TimeSpan.FromSeconds(CommonHelper.SystemSettings.GetOrAdd("LimitIPFrequency", "60").ToInt32()));
+            var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPRequestTimes", "90").ToInt32();
+            if (times <= limit)
+            {
+                return next();
+            }
+
+            if (times > limit * 1.2)
+            {
+                CacheManager.Expire("Frequency:" + ip, TimeSpan.FromMinutes(CommonHelper.SystemSettings.GetOrAdd("BanIPTimespan", "10").ToInt32()));
+                AccessDeny(ip, request, "访问频次限制");
+                throw new TempDenyException("访问频次限制");
+            }
+
+            return next();
         }
 
         private async void AccessDeny(string ip, HttpRequest request, string remark)

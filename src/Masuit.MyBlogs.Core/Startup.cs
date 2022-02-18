@@ -21,7 +21,6 @@ using Masuit.Tools.Config;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Net;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Polly;
 using System.Net;

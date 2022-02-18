@@ -33,11 +33,17 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class BaseController : Controller
     {
         public IUserInfoService UserInfoService { get; set; }
+
         public IMenuService MenuService { get; set; }
+
         public ILinksService LinksService { get; set; }
+
         public IAdvertisementService AdsService { get; set; }
+
         public IVariablesService VariablesService { get; set; }
+
         public IMapper Mapper { get; set; }
+
         public MapperConfiguration MapperConfig { get; set; }
 
         public UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
@@ -143,7 +149,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).Select((s, i) => $"{i + 1}. {s}").ToList();
             filterContext.Result = true switch
             {
-                _ when (Request.Headers[HeaderNames.Accept] + "").StartsWith("application/json") || Request.Method == HttpMethods.Post => ResultData(errmsgs, false, "数据校验失败，错误信息：" + errmsgs.Join(" | "), user != null, HttpStatusCode.BadRequest),
+                _ when Request.HasJsonContentType() || Request.Method == HttpMethods.Post => ResultData(errmsgs, false, "数据校验失败，错误信息：" + errmsgs.Join(" | "), user != null, HttpStatusCode.BadRequest),
                 _ => base.BadRequest("参数错误：" + errmsgs.Join(" | "))
             };
         }
@@ -244,8 +250,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     case RegionLimitMode.AllowRegion:
                         return !Regex.IsMatch(location, p.Regions);
+
                     case RegionLimitMode.ForbidRegion:
                         return Regex.IsMatch(location, p.Regions);
+
                     case RegionLimitMode.AllowRegionExceptForbidRegion:
                         if (Regex.IsMatch(location, p.ExceptRegions))
                         {
@@ -322,6 +330,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     }
 
                     break;
+
                 case RegionLimitMode.ForbidRegion:
                     if (Regex.IsMatch(location, post.Regions))
                     {
@@ -329,6 +338,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     }
 
                     break;
+
                 case RegionLimitMode.AllowRegionExceptForbidRegion:
                     if (Regex.IsMatch(location, post.ExceptRegions))
                     {
@@ -374,7 +384,5 @@ namespace Masuit.MyBlogs.Core.Controllers
             });
             throw new NotFoundException("文章未找到");
         }
-
-
     }
 }

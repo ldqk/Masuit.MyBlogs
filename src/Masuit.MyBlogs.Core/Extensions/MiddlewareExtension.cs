@@ -178,7 +178,7 @@ namespace Masuit.MyBlogs.Core.Extensions
         }
     }
 
-    public class ExceptionFilter : IExceptionFilter, IFilterMetadata
+    public class ExceptionFilter : IExceptionFilter
     {
         public void OnException(ExceptionContext context)
         {
@@ -189,7 +189,7 @@ namespace Masuit.MyBlogs.Core.Extensions
                 context.Result = true switch
                 {
                     _ when accept.StartsWith("image") => new VirtualFileResult("/Assets/images/404/4044.jpg", ContentType.Jpeg),
-                    _ when accept.StartsWith("application/json") || context.HttpContext.Request.Method == HttpMethods.Post => new JsonResult(new
+                    _ when context.HttpContext.Request.HasJsonContentType() || context.HttpContext.Request.Method == HttpMethods.Post => new JsonResult(new
                     {
                         StatusCode = 404,
                         Success = false,

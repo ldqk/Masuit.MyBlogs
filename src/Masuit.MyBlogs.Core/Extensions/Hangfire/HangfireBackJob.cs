@@ -7,27 +7,18 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.Strings;
+using Masuit.Tools.Systems;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire
 {
     /// <summary>
     /// hangfire后台任务
     /// </summary>
-    public class HangfireBackJob : IHangfireBackJob
+    public class HangfireBackJob : Disposable, IHangfireBackJob
     {
-        private readonly IUserInfoService _userInfoService;
-        private readonly IPostService _postService;
-        private readonly ISystemSettingService _settingService;
-        private readonly ISearchDetailsService _searchDetailsService;
-        private readonly ILinksService _linksService;
-        private readonly ILinkLoopbackService _loopbackService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IWebHostEnvironment _hostEnvironment;
-        private readonly ISearchEngine<DataContext> _searchEngine;
-        private readonly IAdvertisementService _advertisementService;
-        private readonly INoticeService _noticeService;
-        private readonly IPostVisitRecordService _recordService;
-        private readonly IPostVisitRecordStatsService _recordStatsService;
+        private readonly IServiceScope _serviceScope;
 
         /// <summary>
         /// hangfire后台任务
@@ -36,18 +27,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         {
             _httpClientFactory = httpClientFactory;
             _hostEnvironment = hostEnvironment;
-            var scope = serviceProvider.CreateScope();
-            _userInfoService = scope.ServiceProvider.GetRequiredService<IUserInfoService>();
-            _postService = scope.ServiceProvider.GetRequiredService<IPostService>();
-            _settingService = scope.ServiceProvider.GetRequiredService<ISystemSettingService>();
-            _searchDetailsService = scope.ServiceProvider.GetRequiredService<ISearchDetailsService>();
-            _linksService = scope.ServiceProvider.GetRequiredService<ILinksService>();
-            _searchEngine = scope.ServiceProvider.GetRequiredService<ISearchEngine<DataContext>>();
-            _advertisementService = scope.ServiceProvider.GetRequiredService<IAdvertisementService>();
-            _noticeService = scope.ServiceProvider.GetRequiredService<INoticeService>();
-            _loopbackService = scope.ServiceProvider.GetRequiredService<ILinkLoopbackService>();
-            _recordService = scope.ServiceProvider.GetRequiredService<IPostVisitRecordService>();
-            _recordStatsService = scope.ServiceProvider.GetRequiredService<IPostVisitRecordStatsService>();
+            _serviceScope = serviceProvider.CreateScope();
         }
 
         /// <summary>
@@ -65,15 +45,17 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 LoginType = type,
                 PhysicAddress = ip.GetIPLocation()
             };
-            var u = _userInfoService.GetByUsername(userInfo.Username);
+            var userInfoService = _serviceScope.ServiceProvider.GetRequiredService<IUserInfoService>();
+            var settingService = _serviceScope.ServiceProvider.GetRequiredService<ISystemSettingService>();
+            var u = userInfoService.GetByUsername(userInfo.Username);
             u.LoginRecord.Add(record);
-            _userInfoService.SaveChanges();
+            userInfoService.SaveChanges();
             var content = new Template(File.ReadAllText(Path.Combine(_hostEnvironment.WebRootPath, "template", "login.html")))
                 .Set("name", u.Username)
                 .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
                 .Set("ip", record.IP)
                 .Set("address", record.PhysicAddress).Render();
-            CommonHelper.SendMail(_settingService.Get(s => s.Name.Equals("Title")).Value + "账号登录通知", content, _settingService.Get(s => s.Name.Equals("ReceiveEmail")).Value, "127.0.0.1");
+            CommonHelper.SendMail(settingService.Get(s => s.Name.Equals("Title")).Value + "账号登录通知", content, settingService.Get(s => s.Name.Equals("ReceiveEmail")).Value, "127.0.0.1");
         }
 
         /// <summary>
@@ -85,17 +67,18 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             p.Status = Status.Published;
             p.PostDate = DateTime.Now;
             p.ModifyDate = DateTime.Now;
-            var post = _postService.GetById(p.Id);
+            var postService = _serviceScope.ServiceProvider.GetRequiredService<IPostService>();
+            var post = postService.GetById(p.Id);
             if (post is null)
             {
-                _postService.AddEntitySaved(p);
+                postService.AddEntitySaved(p);
             }
             else
             {
                 post.Status = Status.Published;
                 post.PostDate = DateTime.Now;
                 post.ModifyDate = DateTime.Now;
-                _postService.SaveChanges();
+                postService.SaveChanges();
             }
         }
 
@@ -110,17 +93,20 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         {
             var lastQuarter = DateTime.Now.AddMonths(-3);
             var lastYear = DateTime.Now.AddYears(-1);
-            _recordService.GetQuery(b => b.Time < lastQuarter).DeleteFromQuery();
-            _recordStatsService.GetQuery(b => b.Date < lastYear).DeleteFromQuery();
-            var post = _postService.GetById(pid);
+            var recordService = _serviceScope.ServiceProvider.GetRequiredService<IPostVisitRecordService>();
+            var recordStatsService = _serviceScope.ServiceProvider.GetRequiredService<IPostVisitRecordStatsService>();
+            var postService = _serviceScope.ServiceProvider.GetRequiredService<IPostService>();
+            recordService.GetQuery(b => b.Time < lastQuarter).DeleteFromQuery();
+            recordStatsService.GetQuery(b => b.Date < lastYear).DeleteFromQuery();
+            var post = postService.GetById(pid);
             if (post == null)
             {
                 return;
             }
 
             post.TotalViewCount += 1;
-            post.AverageViewCount = _recordService.GetQuery(e => e.PostId == pid).GroupBy(r => r.Time.Date).Select(g => g.Count()).DefaultIfEmpty().Average();
-            _recordService.AddEntity(new PostVisitRecord()
+            post.AverageViewCount = recordService.GetQuery(e => e.PostId == pid).GroupBy(r => r.Time.Date).Select(g => g.Count()).DefaultIfEmpty().Average();
+            recordService.AddEntity(new PostVisitRecord()
             {
                 IP = ip,
                 Referer = refer,
@@ -129,14 +115,14 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 RequestUrl = url,
                 PostId = pid
             });
-            var stats = _recordStatsService.Get(e => e.PostId == pid && e.Date >= DateTime.Today);
+            var stats = recordStatsService.Get(e => e.PostId == pid && e.Date >= DateTime.Today);
             if (stats != null)
             {
                 stats.Count++;
             }
             else
             {
-                _recordStatsService.AddEntity(new PostVisitRecordStats()
+                recordStatsService.AddEntity(new PostVisitRecordStats()
                 {
                     Count = 1,
                     Date = DateTime.Today,
@@ -144,7 +130,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 });
             }
 
-            _postService.SaveChanges();
+            postService.SaveChanges();
         }
 
         /// <summary>
@@ -154,19 +140,22 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         {
             CommonHelper.IPErrorTimes.RemoveWhere(kv => kv.Value < 100); //将访客访问出错次数少于100的移开
             DateTime time = DateTime.Now.AddMonths(-1);
-            _searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
+            var searchDetailsService = _serviceScope.ServiceProvider.GetRequiredService<ISearchDetailsService>();
+            var advertisementService = _serviceScope.ServiceProvider.GetRequiredService<IAdvertisementService>();
+            var noticeService = _serviceScope.ServiceProvider.GetRequiredService<INoticeService>();
+            searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
             TrackData.DumpLog();
-            _advertisementService.GetQuery(a => DateTime.Now >= a.ExpireTime).UpdateFromQuery(a => new Advertisement()
+            advertisementService.GetQuery(a => DateTime.Now >= a.ExpireTime).UpdateFromQuery(a => new Advertisement()
             {
                 Status = Status.Unavailable
             });
-            _noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.UnStart && n.StartTime < DateTime.Now).UpdateFromQuery(n => new Notice()
+            noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.UnStart && n.StartTime < DateTime.Now).UpdateFromQuery(n => new Notice()
             {
                 NoticeStatus = NoticeStatus.Normal,
                 PostDate = DateTime.Now,
                 ModifyDate = DateTime.Now
             });
-            _noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal && n.EndTime < DateTime.Now).UpdateFromQuery(n => new Notice()
+            noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal && n.EndTime < DateTime.Now).UpdateFromQuery(n => new Notice()
             {
                 NoticeStatus = NoticeStatus.Expired,
                 ModifyDate = DateTime.Now
@@ -178,7 +167,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// </summary>
         public void EverymonthJob()
         {
-            _advertisementService.GetAll().UpdateFromQuery(a => new Advertisement()
+            var advertisementService = _serviceScope.ServiceProvider.GetRequiredService<IAdvertisementService>();
+            advertisementService.GetAll().UpdateFromQuery(a => new Advertisement()
             {
                 DisplayCount = 0
             });
@@ -196,7 +186,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             client.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
             client.DefaultRequestHeaders.Referrer = new Uri("https://google.com");
             client.Timeout = TimeSpan.FromSeconds(10);
-            _linksService.GetQuery(l => !l.Except).AsParallel().ForAll(link =>
+            var linksService = _serviceScope.ServiceProvider.GetRequiredService<ILinksService>();
+            linksService.GetQuery(l => !l.Except).AsParallel().ForAll(link =>
             {
                 var prev = link.Status;
                 client.GetStringAsync(link.Url, new CancellationTokenSource(client.Timeout).Token).ContinueWith(t =>
@@ -216,7 +207,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                     }
                 }).Wait();
             });
-            _linksService.SaveChanges();
+            linksService.SaveChanges();
         }
 
         /// <summary>
@@ -226,7 +217,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="ip"></param>
         public void UpdateLinkWeight(string referer, string ip)
         {
-            var list = _linksService.GetQuery(l => referer.Contains(l.UrlBase)).ToList();
+            var linksService = _serviceScope.ServiceProvider.GetRequiredService<ILinksService>();
+            var loopbackService = _serviceScope.ServiceProvider.GetRequiredService<ILinkLoopbackService>();
+            var list = linksService.GetQuery(l => referer.Contains(l.UrlBase)).ToList();
             foreach (var link in list)
             {
                 link.Loopbacks.Add(new LinkLoopback()
@@ -237,8 +230,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
                 });
             }
             var time = DateTime.Now.AddMonths(-1);
-            _loopbackService.GetQuery(b => b.Time < time).DeleteFromQuery();
-            _linksService.SaveChanges();
+            loopbackService.GetQuery(b => b.Time < time).DeleteFromQuery();
+            linksService.SaveChanges();
         }
 
         /// <summary>
@@ -246,13 +239,15 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// </summary>
         public void CreateLuceneIndex()
         {
-            _searchEngine.LuceneIndexer.DeleteAll();
-            _searchEngine.CreateIndex(new List<string>()
+            var searchEngine = _serviceScope.ServiceProvider.GetRequiredService<ISearchEngine<DataContext>>();
+            var postService = _serviceScope.ServiceProvider.GetRequiredService<IPostService>();
+            searchEngine.LuceneIndexer.DeleteAll();
+            searchEngine.CreateIndex(new List<string>()
             {
                 nameof(DataContext.Post),
             });
-            var list = _postService.GetQuery(i => i.Status != Status.Published).ToList();
-            _searchEngine.LuceneIndexer.Delete(list);
+            var list = postService.GetQuery(i => i.Status != Status.Published).ToList();
+            searchEngine.LuceneIndexer.Delete(list);
         }
 
         /// <summary>
@@ -260,9 +255,19 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// </summary>
         public void StatisticsSearchKeywords()
         {
-            RedisHelper.Set("SearchRank:Month", _searchDetailsService.GetRanks(DateTime.Today.AddMonths(-1)));
-            RedisHelper.Set("SearchRank:Week", _searchDetailsService.GetRanks(DateTime.Today.AddDays(-7)));
-            RedisHelper.Set("SearchRank:Today", _searchDetailsService.GetRanks(DateTime.Today));
+            var searchDetailsService = _serviceScope.ServiceProvider.GetRequiredService<ISearchDetailsService>();
+            RedisHelper.Set("SearchRank:Month", searchDetailsService.GetRanks(DateTime.Today.AddMonths(-1)));
+            RedisHelper.Set("SearchRank:Week", searchDetailsService.GetRanks(DateTime.Today.AddDays(-7)));
+            RedisHelper.Set("SearchRank:Today", searchDetailsService.GetRanks(DateTime.Today));
+        }
+
+        /// <summary>
+        /// 释放
+        /// </summary>
+        /// <param name="disposing"></param>
+        public override void Dispose(bool disposing)
+        {
+            _serviceScope.Dispose();
         }
     }
 }

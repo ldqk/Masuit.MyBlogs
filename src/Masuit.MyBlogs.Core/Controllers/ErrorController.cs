@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             return true switch
             {
                 _ when accept.StartsWith("image") => File("/Assets/images/404/4044.jpg", ContentType.Jpeg),
-                _ when accept.StartsWith("application/json") || Request.Method == HttpMethods.Post => Json(new
+                _ when Request.HasJsonContentType() || Request.Method == HttpMethods.Post => Json(new
                 {
                     StatusCode = 404,
                     Success = false,
@@ -66,10 +66,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                         err = $"数据库并发更新异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString}，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{await GetRequestBody(Request)}\n堆栈信息：";
                         LogManager.Error(err, ex);
                         break;
+
                     case DbUpdateException ex:
                         err = $"数据库更新时异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString} ，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{await GetRequestBody(Request)}\n堆栈信息：";
                         LogManager.Error(err, ex);
                         break;
+
                     case AggregateException ex:
                         LogManager.Debug("↓↓↓" + ex.Message + "↓↓↓");
                         ex.Flatten().Handle(e =>
@@ -83,20 +85,23 @@ namespace Masuit.MyBlogs.Core.Controllers
                             LogManager.Debug("↑↑↑请求参数：\n" + body);
                         }
                         break;
+
                     case AccessDenyException:
                         var entry = ip.GetIPLocation();
                         var tips = Template.Create(CommonHelper.SystemSettings.GetOrAdd("AccessDenyTips", @"<h4>遇到了什么问题？</h4>
                 <h4>基于主观因素考虑，您所在的地区暂时不允许访问本站，如有疑问，请联系站长！或者请联系站长开通本站的访问权限！</h4>")).Set("clientip", ip.ToString()).Set("location", entry.Address).Set("network", entry.Network).Render();
                         Response.StatusCode = 403;
                         return View("AccessDeny", tips);
+
                     case TempDenyException:
-                        Response.StatusCode = 403;
-                        return accept.StartsWith("application/json") || Request.Method == HttpMethods.Post ? Json(new
+                        Response.StatusCode = 429;
+                        return Request.HasJsonContentType() || Request.Method == HttpMethods.Post ? Json(new
                         {
-                            StatusCode = 404,
+                            StatusCode = 429,
                             Success = false,
                             Message = $"检测到您的IP（{ip}）访问过于频繁，已被本站暂时禁止访问，请稍后再试！"
                         }) : View("TempDeny");
+
                     default:
                         LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString} ，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}，请求参数：\n{await GetRequestBody(Request)}\n堆栈信息：", feature.Error);
                         break;
@@ -104,7 +109,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             Response.StatusCode = 503;
-            return accept.StartsWith("application/json") || Request.Method == HttpMethods.Post ? Json(new
+            return Request.HasJsonContentType() || Request.Method == HttpMethods.Post ? Json(new
             {
                 StatusCode = 503,
                 Success = false,
@@ -196,7 +201,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, HttpContext.Connection.RemoteIpAddress.ToString()));
             RedisHelper.Set("get:" + email, token, 120);
             return ResultData(null);
-
         }
 
         /// <summary>
