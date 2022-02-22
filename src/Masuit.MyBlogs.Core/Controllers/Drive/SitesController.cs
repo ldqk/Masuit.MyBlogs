@@ -1,3 +1,4 @@
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Drive;
@@ -6,6 +7,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -28,8 +30,6 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
             this._driveService = driveService;
             this._setting = setting;
         }
-
-        #region Actions
 
         /// <summary>
         /// 返回所有sites
@@ -250,6 +250,14 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
             }
         }
 
-        #endregion Actions
+        public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true")
+            {
+                context.Result = new BadRequestObjectResult(new { code = 403 });
+                return Task.CompletedTask;
+            }
+            return next();
+        }
     }
 }

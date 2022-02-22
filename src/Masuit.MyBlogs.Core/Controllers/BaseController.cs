@@ -34,8 +34,6 @@ namespace Masuit.MyBlogs.Core.Controllers
     {
         public IUserInfoService UserInfoService { get; set; }
 
-        public IMenuService MenuService { get; set; }
-
         public ILinksService LinksService { get; set; }
 
         public IAdvertisementService AdsService { get; set; }
@@ -104,9 +102,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             return text;
         }
 
-        /// <summary>在调用操作方法前调用。</summary>
-        /// <param name="filterContext">有关当前请求和操作的信息。</param>
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        public override Task OnActionExecutionAsync(ActionExecutingContext filterContext, ActionExecutionDelegate next)
         {
             ViewBag.Desc = CommonHelper.SystemSettings["Description"];
             var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
@@ -117,11 +113,13 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true" && user?.IsAdmin != true)
             {
                 filterContext.Result = RedirectToAction("ComingSoon", "Error");
+                return Task.CompletedTask;
             }
 
             if (Request.Method == HttpMethods.Post && !Request.Path.Value.Contains("get", StringComparison.InvariantCultureIgnoreCase) && CommonHelper.SystemSettings.GetOrAdd("DataReadonly", "false") == "true" && !filterContext.Filters.Any(m => m.ToString().Contains(nameof(MyAuthorizeAttribute))))
             {
                 filterContext.Result = ResultData("网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", false, "网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", user != null, HttpStatusCode.BadRequest);
+                return Task.CompletedTask;
             }
 
             if (user == null && Request.Cookies.ContainsKey("username") && Request.Cookies.ContainsKey("password")) //执行自动登录
@@ -145,28 +143,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
 
-            if (ModelState.IsValid) return;
+            if (ModelState.IsValid) return next();
             var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).Select((s, i) => $"{i + 1}. {s}").ToList();
             filterContext.Result = true switch
             {
                 _ when Request.HasJsonContentType() || Request.Method == HttpMethods.Post => ResultData(errmsgs, false, "数据校验失败，错误信息：" + errmsgs.Join(" | "), user != null, HttpStatusCode.BadRequest),
                 _ => base.BadRequest("参数错误：" + errmsgs.Join(" | "))
             };
-        }
-
-        /// <summary>在调用操作方法后调用。</summary>
-        /// <param name="filterContext">有关当前请求和操作的信息。</param>
-        public override void OnActionExecuted(ActionExecutedContext filterContext)
-        {
-            if (filterContext.Result is ViewResult)
-            {
-                ViewBag.menus = MenuService.GetQueryFromCache(m => m.ParentId == null && m.Status == Status.Available).OrderBy(m => m.Sort).ToList(); //菜单
-                var model = new PageFootViewModel //页脚
-                {
-                    Links = LinksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.Count).Take(30).ProjectTo<LinksDto>(MapperConfig).Cacheable().ToList()
-                };
-                ViewBag.Footer = model;
-            }
+            return Task.CompletedTask;
         }
 
         /// <summary>

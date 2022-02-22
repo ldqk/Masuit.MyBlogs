@@ -293,6 +293,7 @@ namespace Masuit.MyBlogs.Core.Common
                     string src = node.Attributes["src"].Value;
                     node.RemoveAttribute("src");
                     node.SetAttribute("data-src", src);
+                    node.SetAttribute("decoding", "async");
                     node.SetAttribute("class", node.Attributes["class"]?.Value + " lazyload");
                     node.SetAttribute("loading", "lazy");
                     node.SetAttribute("alt", SystemSettings["Title"]);

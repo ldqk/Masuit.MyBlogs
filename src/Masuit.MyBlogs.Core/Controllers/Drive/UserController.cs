@@ -1,5 +1,4 @@
 ﻿using Hangfire;
-using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;

@@ -32,7 +32,7 @@
                 if (!string.IsNullOrEmpty(imgSrc))
                 {
                     <div class="col-sm-2 paddingright-clear hidden-xs">
-                        <img class="img-thumbnail img-responsive thumb lazyload" loading="lazy" data-src="@imgSrc" alt="@Model.Title">
+                        <img class="img-thumbnail img-responsive thumb lazyload" decoding="async" loading="lazy" data-src="@imgSrc" alt="@Model.Title">
                     </div>
                 }
             }
