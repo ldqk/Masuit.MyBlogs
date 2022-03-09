@@ -1,6 +1,7 @@
 ﻿using DnsClient;
 using Masuit.Tools;
 using Microsoft.Net.Http.Headers;
+using Polly;
 
 namespace Masuit.MyBlogs.Core.Common
 {
@@ -23,25 +24,31 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public static bool IsRobot(this HttpRequest req)
         {
-            var robotUA = UserAgent.Parse(req.Headers[HeaderNames.UserAgent].ToString()).IsRobot;
+            var robotUA = UserAgent.Parse(req.Headers[HeaderNames.UserAgent].ToString()).IsRobot || req.Location().Contains("Spider", "蜘蛛");
             if (robotUA)
             {
                 var nslookup = new LookupClient();
-                using var cts = new CancellationTokenSource(1000);
-                return nslookup.QueryReverseAsync(req.HttpContext.Connection.RemoteIpAddress, cts.Token).ContinueWith(t => t.IsCompletedSuccessfully && t.Result.Answers.Any(r => r.ToString().Trim('.').EndsWith(new[]
+                var fallbackPolicy = Policy<bool>.Handle<Exception>().FallbackAsync(false);
+                var retryPolicy = Policy<bool>.Handle<Exception>().RetryAsync(3);
+                return Policy.WrapAsync(fallbackPolicy, retryPolicy).ExecuteAsync(async () =>
                 {
-                    "baidu.com",
-                    "google.com",
-                    "googlebot.com",
-                    "googleusercontent.com",
-                    "bing.com",
-                    "search.msn.com",
-                    "sogou.com",
-                    "soso.com",
-                    "yandex.com",
-                    "apple.com",
-                    "sm.cn"
-                 }))).Result;
+                    using var cts = new CancellationTokenSource(1000);
+                    var query = await nslookup.QueryReverseAsync(req.HttpContext.Connection.RemoteIpAddress, cts.Token);
+                    return query.Answers.Any(r => r.ToString().Trim('.').EndsWith(new[]
+                    {
+                        "baidu.com",
+                        "google.com",
+                        "googlebot.com",
+                        "googleusercontent.com",
+                        "bing.com",
+                        "search.msn.com",
+                        "sogou.com",
+                        "soso.com",
+                        "yandex.com",
+                        "apple.com",
+                        "sm.cn"
+                    }));
+                }).Result;
             }
 
             return robotUA;

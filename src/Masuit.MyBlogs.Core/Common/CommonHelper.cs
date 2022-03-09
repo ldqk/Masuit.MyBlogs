@@ -468,5 +468,10 @@ namespace Masuit.MyBlogs.Core.Common
         {
             return ToString().Contains(s, StringComparison.CurrentCultureIgnoreCase);
         }
+
+        public bool Contains(params string[] s)
+        {
+            return ToString().Contains(s);
+        }
     }
 }

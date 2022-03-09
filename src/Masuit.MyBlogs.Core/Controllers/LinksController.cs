@@ -16,6 +16,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class LinksController : BaseController
     {
         public IHttpClientFactory HttpClientFactory { get; set; }
+
         private HttpClient HttpClient => HttpClientFactory.CreateClient();
 
         /// <summary>
@@ -65,6 +66,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
+            HttpClient.DefaultRequestVersion = new Version(2, 0);
             return await HttpClient.GetAsync(link.Url, cancellationToken).ContinueWith(t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
@@ -108,14 +110,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="link"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Check(string link)
+        public Task<ActionResult> Check(string link)
         {
             HttpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.47");
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
+            HttpClient.DefaultRequestVersion = new Version(2, 0);
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            return await HttpClient.GetAsync(link, cts.Token).ContinueWith(t =>
+            return HttpClient.GetAsync(link, cts.Token).ContinueWith(t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {

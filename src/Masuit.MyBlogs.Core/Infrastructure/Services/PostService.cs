@@ -10,7 +10,6 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Html;
-using OpenXmlPowerTools;
 using PanGu;
 using PanGu.HighLight;
 using System.Linq.Expressions;
@@ -18,7 +17,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
-using DocumentFormat.OpenXml.Bibliography;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
