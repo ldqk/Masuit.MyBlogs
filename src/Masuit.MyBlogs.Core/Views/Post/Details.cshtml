@@ -53,10 +53,10 @@
                                     <div class="padding-bot10">
                                         <span class="label label-info">
                                             <a asp-controller="Home" asp-action="Author" asp-route-author="@Model.Author">@Model.Author</a>
-                                        </span>发表于<span class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm")</span> |
+                                        </span>发表于<time class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm")</time> |
                                         <span class="label label-info">
                                             <a asp-controller="Home" asp-action="Author" asp-route-author="@Model.Modifier">@Model.Modifier</a>
-                                        </span>最后修改于<span class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm")</span>
+                                        </span>最后修改于<time class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm")</time>
                                     </div>
                                 </div>
                                 @{

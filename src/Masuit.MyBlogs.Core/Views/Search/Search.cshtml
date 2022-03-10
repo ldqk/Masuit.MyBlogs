@@ -63,7 +63,7 @@
                                 </a>
                                 <div>
                                     作者：
-                                    <label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：@(p.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone))) | 分类：<a asp-controller="Home" asp-action="Category" asp-route-id="@p.CategoryId">@p.CategoryName</a>
+                                    <label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：<time>@(p.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone)))</time> | 分类：<a asp-controller="Home" asp-action="Category" asp-route-id="@p.CategoryId">@p.CategoryName</a>
                                 </div>
                                 <p class="size14">@Html.Raw(p.Content)</p>
                                 <div class="row">

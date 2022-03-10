@@ -42,7 +42,7 @@
         </h1>
         <div class="divider"></div>
         <p class="size24">
-            发布于：@Model.PostDate.ToString("yyyy-MM-dd") | 修改于：@Model.ModifyDate.ToString("yyyy-MM-dd") | 浏览人数：@Model.ViewCount
+            发布于：<time>@Model.PostDate.ToString("yyyy-MM-dd")</time> | 修改于：<time>@Model.ModifyDate.ToString("yyyy-MM-dd")</time> | 浏览人数：@Model.ViewCount
         </p>
     </div>
 </div>

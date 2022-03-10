@@ -48,7 +48,7 @@
                             <div class="row">
                                 <div class="col-sm-7">
                                     <div class="padding-bot10">
-                                        <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Modifier</span>修改于<span class="text-success">@Model.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone))</span> |
+                                        <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Modifier</span>修改于<time class="text-success">@Model.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone))</time> |
                                         原分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model.Category.Name</a>
                                         @if (Model.Seminar.Any())
                                         {
