@@ -37,7 +37,7 @@
 				<td>
 					<a asp-controller="Home" asp-action="Category" asp-route-id="@post.CategoryId">@post.Category.Name</a>
 				</td>
-				<td><time>@post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</time></td>
+				<td><a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@post.ModifyDate.Year" asp-route-mm="@post.ModifyDate.Month" asp-route-dd="@post.ModifyDate.Day"><time>@post.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</time></a></td>
 				<td>@post.Modifier</td>
 			</tr>
 			@foreach (var p in Model.Data)
@@ -52,7 +52,7 @@
 					<td>
 						<a asp-controller="Home" asp-action="Category" asp-route-id="@post.CategoryId">@p.Category.Name</a>
 					</td>
-					<td>@p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+					<td><a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@p.ModifyDate.Year" asp-route-mm="@p.ModifyDate.Month" asp-route-dd="@p.ModifyDate.Day"><time>@p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss")</time></a></td>
 					<td>@p.Modifier</td>
 				</tr>
 			}

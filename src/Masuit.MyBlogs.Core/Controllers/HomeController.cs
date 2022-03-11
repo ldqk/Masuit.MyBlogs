@@ -147,6 +147,45 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
+        /// 存档文章页
+        /// </summary>
+        /// <param name="yyyy"></param>
+        /// <param name="mm"></param>
+        /// <param name="dd"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
+        [Route("{yyyy:int}/{mm:int}/{dd:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = nameof(HeaderNames.Cookie))]
+        public async Task<ActionResult> Archieve([Range(2010, 2099)] int yyyy, [Range(1, 12)] int mm, [Range(1, 31)] int dd, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        {
+            if (!DateTime.TryParse(yyyy + "-" + mm + "-" + dd, out var date))
+            {
+                date = DateTime.Today;
+            }
+
+            var where = PostBaseWhere().And(p => p.Status == Status.Published && p.ModifyDate.Date == date);
+            var queryable = PostService.GetQuery(where);
+            var h24 = DateTime.Today.AddDays(-1);
+            var posts = orderBy switch
+            {
+                OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                _ => await queryable.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            };
+            var viewModel = await GetIndexPageViewModel();
+            viewModel.Posts = posts;
+            viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
+            viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
+            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
+            foreach (var item in posts.Data)
+            {
+                item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            }
+
+            return View(viewModel);
+        }
+
+        /// <summary>
         /// 作者文章页
         /// </summary>
         /// <param name="author"></param>
