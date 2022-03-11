@@ -51,7 +51,7 @@
                                     <div class="row">
                                         <div class="col-sm-8">
                                             <div class="padding-bot10">
-                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Modifier</span>修改于<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@Model[1].ModifyDate.Year" asp-route-mm="@Model[1].ModifyDate.Month" asp-route-dd="@Model[1].ModifyDate.Day"><time class="text-success">@Model[1].ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone))</time></a> | 原分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model[1].CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Category.Name</a>
+                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Modifier</span>修改于<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@Model[1].ModifyDate.Year" asp-route-mm="@Model[1].ModifyDate.Month" asp-route-dd="@Model[1].ModifyDate.Day" asp-route-mode="@nameof(Post.ModifyDate)"><time class="text-success">@Model[1].ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone))</time></a> | 原分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model[1].CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Category.Name</a>
                                                 @if (Model[1].Seminar.Any())
                                                 {
                                                     <span> | 原所属专题：</span>
@@ -119,7 +119,7 @@
                                     <div class="row">
                                         <div class="col-sm-8">
                                             <div class="padding-bot10">
-                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Modifier</span>修改于<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@Model[2].ModifyDate.Year" asp-route-mm="@Model[2].ModifyDate.Month" asp-route-dd="@Model[2].ModifyDate.Day"><time class="text-success">@Model[2].ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone))</time></a> | 原分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model[2].CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Category.Name</a>
+                                                <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Modifier</span>修改于<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@Model[2].ModifyDate.Year" asp-route-mm="@Model[2].ModifyDate.Month" asp-route-dd="@Model[2].ModifyDate.Day" asp-route-mode="@nameof(Post.ModifyDate)"><time class="text-success">@Model[2].ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone))</time></a> | 原分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model[2].CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Category.Name</a>
                                                 @if (Model[2].Seminar.Any())
                                                 {
                                                     <span> | 原所属专题：</span>

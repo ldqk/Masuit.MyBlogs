@@ -63,7 +63,7 @@
                                 </a>
                                 <div>
                                     作者：
-                                    <label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@p.ModifyDate.Year" asp-route-mm="@p.ModifyDate.Month" asp-route-dd="@p.ModifyDate.Day"><time>@(p.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone)))</time></a> | 分类：<a asp-controller="Home" asp-action="Category" asp-route-id="@p.CategoryId">@p.CategoryName</a>
+                                    <label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@p.ModifyDate.Year" asp-route-mm="@p.ModifyDate.Month" asp-route-dd="@p.ModifyDate.Day" asp-route-mode="@nameof(p.ModifyDate)"><time>@(p.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone)))</time></a> | 分类：<a asp-controller="Home" asp-action="Category" asp-route-id="@p.CategoryId">@p.CategoryName</a>
                                 </div>
                                 <p class="size14">@Html.Raw(p.Content)</p>
                                 <div class="row">

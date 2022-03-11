@@ -156,15 +156,20 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        [Route("{yyyy:int}/{mm:int}/{dd:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = nameof(HeaderNames.Cookie))]
-        public async Task<ActionResult> Archieve([Range(2010, 2099)] int yyyy, [Range(1, 12)] int mm, [Range(1, 31)] int dd, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        [Route("{yyyy:int}/{mm:int}/{dd:int}/{mode}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = nameof(HeaderNames.Cookie))]
+        public async Task<ActionResult> Archieve([Range(2010, 2099)] int yyyy, [Range(1, 12)] int mm, [Range(1, 31)] int dd, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string mode = nameof(Models.Entity.Post.ModifyDate))
         {
             if (!DateTime.TryParse(yyyy + "-" + mm + "-" + dd, out var date))
             {
                 date = DateTime.Today;
             }
 
-            var where = PostBaseWhere().And(p => p.Status == Status.Published && p.ModifyDate.Date == date);
+            var where = PostBaseWhere().And(p => p.Status == Status.Published);
+            where = mode switch
+            {
+                nameof(Models.Entity.Post.PostDate) => where.And(p => p.PostDate.Date == date),
+                _ => where.And(p => p.ModifyDate.Date == date),
+            };
             var queryable = PostService.GetQuery(where);
             var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
