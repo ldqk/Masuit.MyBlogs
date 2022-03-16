@@ -25,7 +25,7 @@ namespace Masuit.MyBlogs.Core.Common.Mails
         public void Send(string title, string content, string tos)
         {
             EmailAddress email = _configuration["MailgunConfig:from"];
-            var form = new MultipartFormDataContent
+            using var form = new MultipartFormDataContent
             {
                 { new StringContent(email,Encoding.UTF8), "from" },
                 { new StringContent(tos,Encoding.UTF8), "to" },

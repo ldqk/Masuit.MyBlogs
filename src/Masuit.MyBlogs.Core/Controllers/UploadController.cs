@@ -80,6 +80,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Content = html
             });
         }
+
         private static async Task<string> ConvertToHtml(IFormFile file)
         {
             var docfile = Path.Combine(Environment.GetEnvironmentVariable("temp") ?? "upload", file.FileName);
@@ -159,7 +160,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             await file.CopyToAsync(fs);
         }
 
-        #endregion
+        #endregion Word上传转码
 
         /// <summary>
         /// 文件下载
@@ -235,6 +236,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                             UploadFieldName = UeditorConfig.GetString("fileFieldName")
                         });
                         break;
+
                         //case "listimage":
                         //    action = new ListFileManager(context, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "/upload") + UeditorConfig.GetString("imageManagerListPath"), UeditorConfig.GetStringList("imageManagerAllowFiles"));
                         //    break;
@@ -282,9 +284,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 case var _ when file.ContentType.StartsWith("audio") || file.ContentType.StartsWith("video"):
                     path = Path.Combine(HostEnvironment.WebRootPath, pathBase, "media", filename);
                     break;
+
                 case var _ when file.ContentType.StartsWith("text") || (ContentType.Doc + "," + ContentType.Xls + "," + ContentType.Ppt + "," + ContentType.Pdf).Contains(file.ContentType):
                     path = Path.Combine(HostEnvironment.WebRootPath, pathBase, "docs", filename);
                     break;
+
                 default:
                     path = Path.Combine(HostEnvironment.WebRootPath, pathBase, "files", filename);
                     break;
