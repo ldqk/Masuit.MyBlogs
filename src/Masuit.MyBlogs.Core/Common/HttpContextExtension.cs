@@ -24,8 +24,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public static bool IsRobot(this HttpRequest req)
         {
-            var robotUA = UserAgent.Parse(req.Headers[HeaderNames.UserAgent].ToString()).IsRobot || req.Location().Contains("Spider", "蜘蛛");
-            if (robotUA)
+            if (UserAgent.Parse(req.Headers[HeaderNames.UserAgent].ToString()).IsRobot || req.Location().Contains("Spider", "蜘蛛"))
             {
                 var nslookup = new LookupClient();
                 var fallbackPolicy = Policy<bool>.Handle<Exception>().FallbackAsync(false);
@@ -51,7 +50,7 @@ namespace Masuit.MyBlogs.Core.Common
                 }).Result;
             }
 
-            return robotUA;
+            return false;
         }
     }
 }
