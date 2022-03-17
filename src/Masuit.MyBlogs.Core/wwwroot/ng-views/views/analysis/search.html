@@ -20,6 +20,9 @@
             <td title="'搜索时间'">
                 {{row.SearchTime|date:'yyyy-MM-dd HH:mm:ss'}}
             </td>
+            <td title="'搜索耗时'">
+                {{row.Elapsed|number:2}} ms
+            </td>
             <td title="'客户端IP'">
                 <a ng-href="/tools/ip?ip={{row.IP}}" target="_blank" style="font-size: 20px;">{{row.IP}}</a> ({{row.Region}})
                 <button class="badge btn btn-primary pull-right" ng-click="addToBlackList(row.IP)">黑名单</button>

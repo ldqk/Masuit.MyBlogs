@@ -31,5 +31,10 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 地区
         /// </summary>
         public string Region => IP.GetIPLocation();
+
+        /// <summary>
+        /// 搜索耗时
+        /// </summary>
+        public double Elapsed { get; set; }
     }
 }

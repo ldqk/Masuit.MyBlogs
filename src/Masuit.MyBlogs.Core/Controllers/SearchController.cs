@@ -42,18 +42,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Keyword = wd;
             if (!string.IsNullOrWhiteSpace(wd))
             {
-                if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !Request.IsRobot())
-                {
-                    SearchDetailsService.AddEntity(new SearchDetails
-                    {
-                        Keywords = wd,
-                        SearchTime = DateTime.Now,
-                        IP = ClientIP
-                    });
-                    await SearchDetailsService.SaveChangesAsync();
-                    HttpContext.Session.Set("search:" + wd, wd);
-                }
-
                 var posts = postService.SearchPage(page, size, wd);
                 CheckPermission(posts.Results);
                 if (posts.Results.Count > 1)
@@ -66,6 +54,20 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     ViewBag.RelateKeywords = SearchDetailsService.GetQuery(s => s.Keywords.Contains(wd) && s.Keywords != wd).Select(s => s.Keywords).GroupBy(s => s).OrderByDescending(g => g.Count()).Select(g => g.Key).Take(10).Cacheable().ToList();
                 }
+
+                if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !Request.IsRobot())
+                {
+                    SearchDetailsService.AddEntity(new SearchDetails
+                    {
+                        Keywords = wd,
+                        SearchTime = DateTime.Now,
+                        IP = ClientIP,
+                        Elapsed = posts.Elapsed
+                    });
+                    await SearchDetailsService.SaveChangesAsync();
+                    HttpContext.Session.Set("search:" + wd, wd);
+                }
+
                 return View(posts);
             }
 

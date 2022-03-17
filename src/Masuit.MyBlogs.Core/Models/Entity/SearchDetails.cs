@@ -30,11 +30,17 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// ·ÃÎÊÕßIP
         /// </summary>
         public string IP { get; set; }
+
+        /// <summary>
+        /// ËÑË÷ºÄÊ±
+        /// </summary>
+        public double Elapsed { get; set; }
     }
 
     public class SearchRank
     {
         public string Keywords { get; set; }
+
         public int Count { get; set; }
     }
 }
