@@ -96,12 +96,12 @@ namespace Masuit.MyBlogs.Core.Common
         /// <summary>
         /// 每IP错误的次数统计
         /// </summary>
-        public static ConcurrentDictionary<string, int> IPErrorTimes { get; set; } = new();
+        public static NullableConcurrentDictionary<string, int> IPErrorTimes { get; set; } = new();
 
         /// <summary>
         /// 系统设定
         /// </summary>
-        public static ConcurrentDictionary<string, string> SystemSettings { get; set; } = new();
+        public static NullableConcurrentDictionary<string, string> SystemSettings { get; set; } = new();
 
         /// <summary>
         /// IP黑名单地址段

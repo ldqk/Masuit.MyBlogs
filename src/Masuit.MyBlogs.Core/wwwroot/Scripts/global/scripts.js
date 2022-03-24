@@ -17,14 +17,14 @@
 })(jQuery);
 
 $(function() {
-	$('.header').css({
-	   'filter': 'unset',
-	   '-webkit-filter' : 'unset',
-	   '-moz-filter': 'unset',
-	   '-o-filter': 'unset',
-	   '-ms-filter': 'unset',
-	   "transition": "all 1s ease-in-out"
-	});
+	//$('.header').css({
+	//   'filter': 'unset',
+	//   '-webkit-filter' : 'unset',
+	//   '-moz-filter': 'unset',
+	//   '-o-filter': 'unset',
+	//   '-ms-filter': 'unset',
+	//   "transition": "all 0.1s ease-in-out"
+	//});
 	loadingDone();
 	
 	$(".notices").bootstrapNews({
