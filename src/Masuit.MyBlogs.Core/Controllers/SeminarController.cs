@@ -54,7 +54,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Title = s.Title;
             ViewBag.Desc = s.Description;
             ViewBag.SubTitle = s.SubTitle;
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location(), keywords: s.Title);
             ViewData["page"] = new Pagination(page, size, posts.TotalCount, orderBy);
             foreach (var item in posts.Data)
             {

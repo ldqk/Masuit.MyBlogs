@@ -21,6 +21,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 公告
         /// </summary>
         public INoticeService NoticeService { get; set; }
+
         public ImagebedClient ImagebedClient { get; set; }
 
         /// <summary>

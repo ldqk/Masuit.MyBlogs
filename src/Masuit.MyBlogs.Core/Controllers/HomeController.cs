@@ -136,8 +136,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.Tag = tag;
             viewModel.Posts = posts;
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
-            viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
-            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
+            viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location(), keywords: tag);
+            viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location(), keywords: tag);
             foreach (var item in posts.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));

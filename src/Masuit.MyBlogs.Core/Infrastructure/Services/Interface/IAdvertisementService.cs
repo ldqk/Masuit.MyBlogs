@@ -10,17 +10,21 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// 按价格随机筛选一个元素
         /// </summary>
         /// <param name="type">广告类型</param>
+        /// <param name="location"></param>
         /// <param name="cid">分类id</param>
+        /// <param name="keywords"></param>
         /// <returns></returns>
-        Advertisement GetByWeightedPrice(AdvertiseType type, IPLocation location, int? cid = null);
+        Advertisement GetByWeightedPrice(AdvertiseType type, IPLocation location, int? cid = null, string keywords = null);
 
         /// <summary>
         /// 按价格随机筛选多个元素
         /// </summary>
         /// <param name="count">数量</param>
         /// <param name="type">广告类型</param>
+        /// <param name="location"></param>
         /// <param name="cid">分类id</param>
+        /// <param name="keywords"></param>
         /// <returns></returns>
-        List<Advertisement> GetsByWeightedPrice(int count, AdvertiseType type, IPLocation location, int? cid = null);
+        List<Advertisement> GetsByWeightedPrice(int count, AdvertiseType type, IPLocation location, int? cid = null, string keywords = null);
     }
 }

@@ -29,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [HttpGet("search/{**wd}"), HttpGet("search", Order = 2), HttpGet("s/{**wd}", Order = 3), HttpGet("s", Order = 4)]
+        [HttpGet("search/{**wd:maxlength(64)}"), HttpGet("search", Order = 2), HttpGet("s/{**wd:maxlength(64)}", Order = 3), HttpGet("s", Order = 4)]
         public async Task<ActionResult> Search([FromServices] IPostService postService, string wd = "", [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             wd = ChineseConverter.Convert(wd?.Trim() ?? "", ChineseConversionDirection.TraditionalToSimplified);
@@ -46,7 +46,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 CheckPermission(posts.Results);
                 if (posts.Results.Count > 1)
                 {
-                    ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
+                    ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location(), keywords: wd);
                 }
 
                 ViewBag.hotSearches = new List<KeywordsRank>();

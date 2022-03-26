@@ -24,6 +24,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class SubscribeController : Controller
     {
         public IPostService PostService { get; set; }
+
         public IAdvertisementService AdvertisementService { get; set; }
 
         /// <summary>
@@ -77,11 +78,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             return Content(rss, ContentType.Xml);
         }
 
-        private void InsertAdvertisement(List<Item> posts, int? cid = null)
+        private void InsertAdvertisement(List<Item> posts, int? cid = null, string keywords = "")
         {
             if (posts.Count > 2)
             {
-                var ad = AdvertisementService.GetByWeightedPrice((AdvertiseType)(DateTime.Now.Second % 4 + 1), Request.Location(), cid);
+                var ad = AdvertisementService.GetByWeightedPrice((AdvertiseType)(DateTime.Now.Second % 4 + 1), Request.Location(), cid, keywords);
                 if (ad is not null)
                 {
                     posts.Insert(new Random().Next(1, posts.Count), new Item()
@@ -137,7 +138,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 };
             });
             var posts = data.ToList();
-            InsertAdvertisement(posts, id);
+            InsertAdvertisement(posts, id, category.Name);
             var feed = new Feed()
             {
                 Title = Request.Host + $":分类{category.Name}文章订阅",
@@ -189,7 +190,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 };
             });
             var posts = data.ToList();
-            InsertAdvertisement(posts, id);
+            InsertAdvertisement(posts, id, seminar.Title);
             var feed = new Feed()
             {
                 Title = Request.Host + $":专题{seminar.Title}文章订阅",
@@ -259,7 +260,6 @@ namespace Masuit.MyBlogs.Core.Controllers
                    p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions) :
                    p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions) :
                    p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions) && !Regex.IsMatch(location, p.ExceptRegions) : !Regex.IsMatch(location, p.Regions) || Regex.IsMatch(location, p.ExceptRegions);
-
         }
 
         private void CheckPermission(Post post)
@@ -274,6 +274,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     }
 
                     break;
+
                 case RegionLimitMode.ForbidRegion:
                     if (Regex.IsMatch(location, post.Regions) && !Request.IsRobot())
                     {
@@ -281,6 +282,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     }
 
                     break;
+
                 case RegionLimitMode.AllowRegionExceptForbidRegion:
                     if (Regex.IsMatch(location, post.ExceptRegions))
                     {
@@ -315,6 +317,5 @@ namespace Masuit.MyBlogs.Core.Controllers
             });
             throw new NotFoundException("文章未找到");
         }
-
     }
 }

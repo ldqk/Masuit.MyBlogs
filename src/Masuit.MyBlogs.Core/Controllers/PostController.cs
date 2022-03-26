@@ -89,8 +89,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 await PostService.Highlight(post, kw);
             }
 
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId);
             var regex = SearchEngine.LuceneIndexSearcher.CutKeywords(string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label).Select(Regex.Escape).Join("|");
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId, regex);
             var related = await PostService.GetQuery(PostBaseWhere().And(p => p.Id != id && Regex.IsMatch(p.Title + (p.Keyword ?? "") + (p.Label ?? ""), regex)), p => p.AverageViewCount, false).Take(10).Select(p => new { p.Id, p.Title }).Cacheable().ToDictionaryAsync(p => p.Id, p => p.Title);
             ViewBag.Related = related;
             post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -130,7 +130,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             }
 
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId);
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId, post.Keyword + "," + post.Label);
             return View(list);
         }
 
@@ -152,7 +152,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
             ViewBag.Next = next;
             ViewBag.Prev = prev;
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId);
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId, post.Label);
             return CurrentUser.IsAdmin ? View("HistoryVersion_Admin", post) : View(post);
         }
 
@@ -178,7 +178,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             right.ModifyDate = right.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             left.Content = ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty));
             left.ModifyDate = left.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-            ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location(), main.CategoryId);
+            ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location(), main.CategoryId, main.Label);
             ViewBag.DisableCopy = post.DisableCopy;
             return View(new[] { main, left, right });
         }

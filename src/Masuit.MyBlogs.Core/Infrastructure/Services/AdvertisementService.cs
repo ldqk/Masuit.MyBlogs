@@ -18,21 +18,24 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
 
         public ICategoryRepository CategoryRepository { get; set; }
 
-        public IAdvertisementClickRecordRepository AdvertisementClickRecordRepository { get; set; }
+        private readonly ILuceneIndexSearcher _luceneIndexSearcher;
 
         public AdvertisementService(IBaseRepository<Advertisement> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
         {
+            _luceneIndexSearcher = searcher;
         }
 
         /// <summary>
         /// 按价格随机筛选一个元素
         /// </summary>
         /// <param name="type">广告类型</param>
+        /// <param name="location"></param>
         /// <param name="cid">分类id</param>
+        /// <param name="keywords"></param>
         /// <returns></returns>
-        public Advertisement GetByWeightedPrice(AdvertiseType type, IPLocation location, int? cid = null)
+        public Advertisement GetByWeightedPrice(AdvertiseType type, IPLocation location, int? cid = null, string keywords = "")
         {
-            return GetsByWeightedPrice(1, type, location, cid).FirstOrDefault();
+            return GetsByWeightedPrice(1, type, location, cid, keywords).FirstOrDefault();
         }
 
         /// <summary>
@@ -40,12 +43,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// </summary>
         /// <param name="count">数量</param>
         /// <param name="type">广告类型</param>
+        /// <param name="ipinfo"></param>
         /// <param name="cid">分类id</param>
+        /// <param name="keywords"></param>
         /// <returns></returns>
-        public List<Advertisement> GetsByWeightedPrice(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null)
+        public List<Advertisement> GetsByWeightedPrice(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null, string keywords = "")
         {
             var (location, _, _) = ipinfo;
-            return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}", _ =>
+            return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}-{keywords}", _ =>
             {
                 var atype = type.ToString("D");
                 Expression<Func<Advertisement, bool>> where = a => a.Types.Contains(atype) && a.Status == Status.Available;
@@ -60,9 +65,20 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                     }
                 }
 
+                if (!keywords.IsNullOrEmpty())
+                {
+                    var regex = _luceneIndexSearcher.CutKeywords(keywords).Select(Regex.Escape).Join("|");
+                    where = where.And(a => Regex.IsMatch(a.Title + a.Description, regex));
+                }
+
                 var list = GetQuery(where).OrderBy(a => -Math.Log(DataContext.Random()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1)))).Take(count).ToList();
+                if (list.Count == 0 && keywords is { Length: > 0 })
+                {
+                    return GetsByWeightedPrice(count, type, ipinfo, cid);
+                }
+
                 var ids = list.Select(a => a.Id).ToArray();
-                GetQuery(a => ids.Contains(a.Id)).UpdateFromQuery(a => new Advertisement()
+                GetQuery(a => ids.Contains(a.Id)).UpdateFromQuery(a => new Advertisement
                 {
                     DisplayCount = a.DisplayCount + 1
                 });

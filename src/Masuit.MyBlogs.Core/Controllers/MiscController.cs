@@ -21,7 +21,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// MiscService
         /// </summary>
         public IMiscService MiscService { get; set; }
+
         public IWebHostEnvironment HostEnvironment { get; set; }
+
         public ImagebedClient ImagebedClient { get; set; }
 
         /// <summary>
