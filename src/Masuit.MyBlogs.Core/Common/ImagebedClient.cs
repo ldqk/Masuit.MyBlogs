@@ -49,11 +49,6 @@ namespace Masuit.MyBlogs.Core.Common
             if (gitlabs.Count > 0)
             {
                 var gitlab = gitlabs[0];
-                if (gitlab.ApiUrl.Contains("gitee.com"))
-                {
-                    return UploadGitee(gitlab, stream, file, cancellationToken);
-                }
-
                 if (gitlab.ApiUrl.Contains("api.github.com"))
                 {
                     return UploadGithub(gitlab, stream, file, cancellationToken);
@@ -63,38 +58,6 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             return Task.FromResult<(string, bool)>((null, false));
-        }
-
-        /// <summary>
-        /// 码云图床
-        /// </summary>
-        /// <param name="config"></param>
-        /// <param name="stream"></param>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        private Task<(string url, bool success)> UploadGitee(GitlabConfig config, Stream stream, string file, CancellationToken cancellationToken)
-        {
-            var path = $"{DateTime.Now:yyyy\\/MM\\/dd}/{file}";
-            return _httpClient.PostAsJsonAsync(config.ApiUrl + HttpUtility.UrlEncode(path), new
-            {
-                access_token = config.AccessToken,
-                content = Convert.ToBase64String(stream.ToArray()),
-                message = SnowFlake.NewId
-            }, cancellationToken).ContinueWith(t =>
-            {
-                if (t.IsCompletedSuccessfully)
-                {
-                    using var resp = t.Result;
-                    using var content = resp.Content;
-                    if (resp.IsSuccessStatusCode || content.ReadAsStringAsync().Result.Contains("already exists"))
-                    {
-                        return (config.RawUrl + path, true);
-                    }
-                }
-
-                LogManager.Info("图片上传到gitee失败。");
-                return (null, false);
-            });
         }
 
         /// <summary>
