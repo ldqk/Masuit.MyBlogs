@@ -131,7 +131,7 @@
                             </button>
                         </div>
                     </div>
-                    @if (Model.Rss) {
+                    @if (Model.Rss&&CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") == "true") {
                         <div class="col-xs-6 text-right">
                             <div class="btn-group">
                                 <a class="btn btn-danger btn-lg" asp-controller="Subscribe" asp-action="PostRss" asp-route-id="@Model.Id" target="_blank">

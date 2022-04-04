@@ -2,6 +2,7 @@
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
+@using Masuit.MyBlogs.Core.Common
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @{
 	Category cat = ViewBag.Category;
@@ -42,9 +43,11 @@
 	<div class="header-content text-center">
 		<h1 class="size48">
 			@cat.Name
-			<a class="btn btn-lg btn-success" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
-				<i class="icon-rss4"></i>
-			</a>
+			@if(CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") == "true"){
+			    <a class="btn btn-lg btn-success" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
+				    <i class="icon-rss4"></i>
+			    </a>
+			}
 			<a class="btn btn-lg btn-danger" onclick='blockCategory("@cat.Id","@cat.Name")'>
 				<i class="icon-blocked"></i>
 			</a>

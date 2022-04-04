@@ -149,6 +149,14 @@ myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 		}
 	}
 
+	$scope.EnableRss= function() {
+		if($scope.Settings.EnableRss=="true") {
+			$scope.Settings.EnableRss="false";
+		} else {
+			$scope.Settings.EnableRss="true";
+		}
+	}
+
 	$scope.CloseSite= function() {
 		if($scope.Settings.CloseSite=="true") {
 			$scope.Settings.CloseSite="false";

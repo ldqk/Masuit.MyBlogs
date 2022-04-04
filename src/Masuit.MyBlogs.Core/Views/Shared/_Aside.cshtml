@@ -45,9 +45,11 @@
 					{
 					<li class="list-group-item">
 						<a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Name</a>
-						<a class="pull-right" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
-							<i class="icon-rss4"></i>
-						</a>
+						@if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") == "true") {
+						    <a class="pull-right" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
+							    <i class="icon-rss4"></i>
+						    </a>
+						}
 						<a class="pull-right margin-right10" onclick='blockCategory("@cat.Id","@cat.Name")'>
 							<i class="icon-blocked"></i>
 						</a>

@@ -10,6 +10,7 @@
 @using Masuit.Tools
 @using Masuit.Tools.Core.Net
 @using EFCoreSecondLevelCacheInterceptor
+@using Microsoft.AspNetCore.Http.Extensions
 @{
     string[] colors = { "success", "info", "warning", "danger", "default" };
     List<Menu> menus = _menuService.GetQueryFromCache(m => m.ParentId == null && m.Status == Status.Available).OrderBy(m => m.Sort).ToList();
@@ -27,6 +28,15 @@
     <title>@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])</title>
     <meta name="keywords" content="@(CommonHelper.SystemSettings["Keyword"]+","+ViewBag.Keyword)" />
     <meta name="description" content="@ViewBag.Desc" />
+    <meta content="telephone=no" name="format-detection">
+    <meta content="#ffffff" name="theme-color">
+    <meta content="website" property="og:type">
+    <meta content="@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])" property="og:title">
+    <meta content="@Context.Request.GetEncodedUrl()" property="og:url">
+    <meta content="zh_CN" property="og:locale">
+    <meta content="summary" name="twitter:card">
+    <link href="@Context.Request.GetEncodedUrl()" rel="canonical">
+    <link href="//cdn.staticfile.org" rel="preconnect">
     @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Styles", ""))
     <link href="https://cdn.staticfile.org/normalize/8.0.1/normalize.min.css" rel="stylesheet" async defer>
     <link href="https://cdn.staticfile.org/limonte-sweetalert2/6.11.5/sweetalert2.min.css" rel="stylesheet" async defer>

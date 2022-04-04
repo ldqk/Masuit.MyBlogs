@@ -34,6 +34,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("/rss"), ResponseCache(Duration = 3600)]
         public async Task<IActionResult> Rss()
         {
+            if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") != "true")
+            {
+                throw new NotFoundException("不允许订阅");
+            }
+
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
@@ -110,6 +115,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("/cat/{id}/rss"), ResponseCache(Duration = 3600)]
         public async Task<IActionResult> CategoryRss([FromServices] ICategoryService categoryService, int id)
         {
+            if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") != "true")
+            {
+                throw new NotFoundException("不允许订阅");
+            }
+
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
@@ -162,6 +172,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("/special/{id}/rss"), ResponseCache(Duration = 3600)]
         public async Task<IActionResult> SeminarRss([FromServices] ISeminarService seminarService, int id)
         {
+            if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") != "true")
+            {
+                throw new NotFoundException("不允许订阅");
+            }
+
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
@@ -214,6 +229,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("/{id}/rss"), ResponseCache(Duration = 3600)]
         public async Task<IActionResult> PostRss(int id)
         {
+            if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") != "true")
+            {
+                throw new NotFoundException("不允许订阅");
+            }
+
             string scheme = Request.Scheme;
             var host = Request.Host;
             var post = await PostService.GetAsync(p => p.Rss && p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章未找到");
