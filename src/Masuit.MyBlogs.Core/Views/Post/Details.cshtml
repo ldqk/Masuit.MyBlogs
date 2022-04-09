@@ -110,7 +110,7 @@
                                 @Html.Raw(Regex.Replace(await Model.Content.ReplaceImgAttribute(Model.Title), @"[\u4e00-\u9fa5]", m => HtmlEncoder.Default.Encode(m.Value)))
                             }
                             @{
-                                await Html.RenderPartialAsync("ProtectContent",Model);
+                                await Html.RenderPartialAsync("/Views/Post/ProtectContent.cshtml",Model);
                             }
                         </article>
                     </section>
