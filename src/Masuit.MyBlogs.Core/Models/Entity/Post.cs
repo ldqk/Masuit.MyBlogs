@@ -173,7 +173,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 保护密码
         /// </summary>
         public string ProtectPassword { get; set; }
-        
+
         /// <summary>
         /// 开启rss订阅
         /// </summary>
@@ -183,6 +183,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 锁定编辑
         /// </summary>
         public bool Locked { get; set; }
+
+        /// <summary>
+        /// 重定向到第三方链接
+        /// </summary>
+        public string Redirect { get; set; }
 
         /// <summary>
         /// 分类

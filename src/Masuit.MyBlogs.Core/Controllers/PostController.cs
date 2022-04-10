@@ -79,6 +79,17 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
             CheckPermission(post);
+            if (!string.IsNullOrEmpty(post.Redirect))
+            {
+                if (notRobot && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
+                {
+                    BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString)));
+                    HttpContext.Session.Set("post" + id, id.ToString());
+                }
+
+                return Redirect(post.Redirect);
+            }
+
             ViewBag.Keyword = post.Keyword + "," + post.Label;
             ViewBag.Desc = await post.Content.GetSummary(200);
             var modifyDate = post.ModifyDate;

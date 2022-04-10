@@ -51,7 +51,7 @@
                         <datalist id="ProtectContentRegions">
                             <option ng-repeat="item in Regions track by $index">{{item}}</option>
                         </datalist>
-                        <select class="form-control" ng-init="post.ProtectContentLimitMode=post.ProtectContentLimitMode||1" ng-model="post.ProtectContentLimitMode"> 
+                        <select class="form-control" ng-init="post.ProtectContentLimitMode=post.ProtectContentLimitMode||1" ng-model="post.ProtectContentLimitMode">
                             <option ng-value="1">以内</option>
                             <option ng-value="2">以外</option>
                         </select>
@@ -163,7 +163,17 @@
                 <span class="input-group-addon" ng-if="post.schedule">
                     <label for="Label">定时：</label>
                 </span>
-                <input class="wicon workinput" id="timespan" ng-if="post.schedule" ng-model="post.timespan" readonly="readonly" type="text"/>
+                <input class="wicon workinput" id="timespan" ng-if="post.schedule" ng-model="post.timespan" readonly="readonly" type="text" />
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="input-group">
+                <span class="input-group-addon">跳转到第三方链接：</span>
+                <div class="fg-line">
+                    <input type="text" class="form-control" placeholder="https://baidu.com 留空不跳转" ng-model="post.Redirect" name="Regions" list="Regions">
+                </div>
             </div>
         </div>
     </div>
