@@ -279,3 +279,5 @@ material_admin_v-1.5-2
 /src/Masuit.MyBlogs.Core/App_Data/OneDrive.template.db
 /src/Masuit.MyBlogs.Core/App_Data/OneDrive.db
 /src/Masuit.MyBlogs.Core/.config
+/src/Masuit.MyBlogs.Core/wwwroot/drive/css/chunk-vendors.39ab6aaa.css
+/src/Masuit.MyBlogs.Core/wwwroot/drive/js/chunk-vendors.b37660ae.js
