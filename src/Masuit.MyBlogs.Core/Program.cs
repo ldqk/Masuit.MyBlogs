@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Autofac.Extensions.DependencyInjection;
+﻿using Autofac.Extensions.DependencyInjection;
 using Masuit.MyBlogs.Core;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
@@ -7,11 +6,12 @@ using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Drive;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Diagnostics;
 
-// 设置相关进程优先级为实时，防止其他进程影响应用程序的运行性能
-Process.GetProcessesByName("mysqld").ForEach(p => p.PriorityClass = ProcessPriorityClass.RealTime);
-Process.GetProcessesByName("redis-server").ForEach(p => p.PriorityClass = ProcessPriorityClass.RealTime);
-Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.RealTime;
+// 设置相关进程优先级为高于正常，防止其他进程影响应用程序的运行性能
+Process.GetProcessesByName("mysqld").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+Process.GetProcessesByName("redis-server").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.AboveNormal;
 
 // 确保IP数据库正常
 if (!"223.5.5.5".GetIPLocation().Contains("阿里"))
