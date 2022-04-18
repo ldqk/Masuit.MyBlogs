@@ -6,7 +6,7 @@
 ![image](https://user-images.githubusercontent.com/20254980/129124476-88a324ac-cfd2-4e9b-8fb9-e84e12d04051.png)
 
 ### 演示站点
-测试站点1：[https://ldqk.org](https://ldqk.org)，测试站点2：[https://masuit.com](https://masuit.com)，测试站点3：[https://masuit.tk](https://masuit.tk)，测试站点4：[https://ldqk.tk](https://ldqk.tk)
+测试站点1：[https://masuit.org](https://masuit.org)，测试站点2：[https://masuit.com](https://masuit.com)，测试站点3：[https://masuit.tk](https://masuit.tk)，测试站点4：[https://ldqk.tk](https://ldqk.tk)
 
 [![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE) ![codeSize](https://img.shields.io/github/languages/code-size/ldqk/Masuit.MyBlogs.svg) ![language](https://img.shields.io/github/languages/top/ldqk/Masuit.MyBlogs.svg)
 
