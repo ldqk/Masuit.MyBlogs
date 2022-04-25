@@ -27,6 +27,7 @@
 			<input class="layui-input" name="kw" id="kw">
 		</div>
 		<button class="layui-btn" data-type="reload">搜索</button>
+		<a class="layui-btn" asp-controller="Post" asp-action="ExportPostVisitRecords" asp-route-id="@Model.Id">导出</a>
 	</div>
 	<table class="layui-hide" id="table" lay-filter="tableEvent"></table>
 	<div id="chart" style="height: 500px"></div>

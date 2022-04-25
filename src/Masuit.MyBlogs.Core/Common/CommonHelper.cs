@@ -8,18 +8,18 @@ using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.Tools;
 using Masuit.Tools.Media;
+using Masuit.Tools.Systems;
 using MaxMind.GeoIP2;
 using MaxMind.GeoIP2.Exceptions;
 using MaxMind.GeoIP2.Model;
 using MaxMind.GeoIP2.Responses;
 using Polly;
-using System.Collections.Concurrent;
 using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Masuit.Tools.Systems;
 using TimeZoneConverter;
+using ArgumentException = System.ArgumentException;
 
 namespace Masuit.MyBlogs.Core.Common
 {
@@ -166,9 +166,15 @@ namespace Masuit.MyBlogs.Core.Common
             return Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(new CityResponse()).Execute(() => MaxmindReader.City(ip));
         }
 
-        public static IPLocation GetIPLocation(this string ips)
+        public static IPLocation GetIPLocation(this string ip)
         {
-            return GetIPLocation(IPAddress.Parse(ips));
+            var b = IPAddress.TryParse(ip, out var ipAddress);
+            if (b)
+            {
+                return GetIPLocation(ipAddress);
+            }
+
+            throw new ArgumentException("不能将" + ip + "转换成IP地址");
         }
 
         public static IPLocation GetIPLocation(this IPAddress ip)

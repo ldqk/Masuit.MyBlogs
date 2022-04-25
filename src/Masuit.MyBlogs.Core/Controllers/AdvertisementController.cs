@@ -1,4 +1,5 @@
 ﻿using AutoMapper.QueryableExtensions;
+using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -6,7 +7,11 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
+using Masuit.Tools.Database;
+using Masuit.Tools.Excel;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +21,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text.RegularExpressions;
-using EFCoreSecondLevelCacheInterceptor;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -177,6 +181,21 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var pages = await ClickRecordService.GetPagesAsync<DateTime, AdvertisementClickRecordViewModel>(page, size, where, e => e.Time, false);
             return Ok(pages);
+        }
+
+        /// <summary>
+        /// 导出广告访问记录
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        [HttpGet("/partner/{id}/records-export"), MyAuthorize]
+        public IActionResult ExportClickRecords(int id)
+        {
+            using var ms = ClickRecordService.GetQuery<DateTime, AdvertisementClickRecordViewModel>(e => e.AdvertisementId == id, e => e.Time, false).ToList().ToDataTable().ToExcel();
+            var advertisement = AdsService[id];
+            return this.ResumeFile(ms.ToArray(), ContentType.Xlsx, advertisement.Title + "访问记录.xlsx");
         }
 
         /// <summary>

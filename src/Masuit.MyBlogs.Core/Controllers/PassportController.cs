@@ -1,4 +1,5 @@
 ﻿using CacheManager.Core;
+using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
@@ -17,7 +18,6 @@ using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Web;
-using Hangfire;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -142,7 +142,16 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "用户名或密码不能为空");
             }
 
-            password = password.RSADecrypt(HttpContext.Session.Get<string>(nameof(RsaKey.PrivateKey)));
+            try
+            {
+                var privateKey = HttpContext.Session.Get<string>(nameof(RsaKey.PrivateKey));
+                password = password.RSADecrypt(privateKey);
+            }
+            catch (Exception e)
+            {
+                LogManager.Info("登录失败，私钥：" + HttpContext.Session.Get<string>(nameof(RsaKey.PrivateKey)));
+                throw;
+            }
             var userInfo = UserInfoService.Login(username, password);
             if (userInfo == null)
             {

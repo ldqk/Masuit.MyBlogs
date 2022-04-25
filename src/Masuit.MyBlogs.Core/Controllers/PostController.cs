@@ -19,8 +19,12 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.MyBlogs.Core.Views.Post;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Core.Validator;
+using Masuit.Tools.Database;
+using Masuit.Tools.Excel;
 using Masuit.Tools.Html;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Logging;
@@ -1065,6 +1069,20 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var pages = await PostVisitRecordService.GetPagesAsync<DateTime, PostVisitRecordViewModel>(page, size, where, e => e.Time, false);
             return Ok(pages);
+        }
+
+        /// <summary>
+        /// 导出文章访问记录
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("/{id}/records-export"), MyAuthorize]
+        [ProducesResponseType(typeof(PagedList<PostVisitRecordViewModel>), (int)HttpStatusCode.OK)]
+        public IActionResult ExportPostVisitRecords(int id)
+        {
+            using var ms = PostVisitRecordService.GetQuery<DateTime, PostVisitRecordViewModel>(e => e.PostId == id, e => e.Time, false).ToList().ToDataTable().ToExcel();
+            var post = PostService[id];
+            return this.ResumeFile(ms.ToArray(), ContentType.Xlsx, post.Title + "访问记录.xlsx");
         }
 
         /// <summary>
