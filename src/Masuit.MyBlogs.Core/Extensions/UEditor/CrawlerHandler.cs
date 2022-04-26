@@ -2,6 +2,7 @@
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Logging;
+using SixLabors.ImageSharp;
 using System.Net;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
@@ -47,8 +48,11 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
     public class Crawler
     {
         public string SourceUrl { get; set; }
+
         public string ServerUrl { get; set; }
+
         public string State { get; set; }
+
         private static readonly HttpClient HttpClient = new(new HttpClientHandler()
         {
             ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
@@ -76,7 +80,19 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 }
 
                 ServerUrl = PathFormatter.Format(Path.GetFileNameWithoutExtension(SourceUrl), CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload") + UeditorConfig.GetString("catcherPathFormat")) + MimeMapper.ExtTypes[response.Content.Headers.ContentType?.MediaType ?? "image/jpeg"];
-                await using var stream = await response.Content.ReadAsStreamAsync();
+                var stream = await response.Content.ReadAsStreamAsync();
+                var format = await Image.DetectFormatAsync(stream).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
+                stream.Position = 0;
+                if (!format.Name.Equals("JPEG", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    using var image = await Image.LoadAsync(stream);
+                    var memoryStream = new MemoryStream();
+                    await image.SaveAsJpegAsync(memoryStream);
+                    await stream.DisposeAsync();
+                    stream = memoryStream;
+                    ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), ".jpg");
+                }
+
                 var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
                 var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath, token);
                 if (success)
@@ -88,6 +104,8 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     Directory.CreateDirectory(Path.GetDirectoryName(savePath));
                     await File.WriteAllBytesAsync(savePath, await stream.ToArrayAsync());
                 }
+
+                await stream.DisposeAsync();
                 State = "SUCCESS";
             }
             catch (Exception e)

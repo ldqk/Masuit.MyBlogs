@@ -1,6 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.Tools;
 using Masuit.Tools.Logging;
+using SixLabors.ImageSharp;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -10,6 +11,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
     public class UploadHandler : Handler
     {
         public UploadConfig UploadConfig { get; }
+
         public UploadResult Result { get; }
 
         public UploadHandler(HttpContext context, UploadConfig config) : base(context)
@@ -41,12 +43,24 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
 
                 Result.OriginFileName = uploadFileName;
                 var savePath = PathFormatter.Format(uploadFileName, UploadConfig.PathFormat);
-                var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
                 var cts = new CancellationTokenSource(20000);
                 var stream = file.OpenReadStream();
                 try
                 {
                     stream = stream.AddWatermark();
+                    var format = await Image.DetectFormatAsync(stream).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
+                    stream.Position = 0;
+                    if (!format.Name.Equals("JPEG", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        using var image = await Image.LoadAsync(stream);
+                        var memoryStream = new MemoryStream();
+                        await image.SaveAsJpegAsync(memoryStream);
+                        await stream.DisposeAsync();
+                        stream = memoryStream;
+                        savePath = savePath.Replace(Path.GetExtension(savePath), ".jpg");
+                    }
+
+                    var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
                     var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath, cts.Token);
                     if (success)
                     {
@@ -96,12 +110,16 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             {
                 case UploadState.Success:
                     return "SUCCESS";
+
                 case UploadState.FileAccessError:
                     return "文件访问出错，请检查写入权限";
+
                 case UploadState.SizeLimitExceed:
                     return "文件大小超出服务器限制";
+
                 case UploadState.TypeNotAllow:
                     return "不允许的文件格式";
+
                 case UploadState.NetworkError:
                     return "网络错误";
             }
@@ -155,7 +173,9 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
     public class UploadResult
     {
         public UploadState State { get; set; }
+
         public string Url { get; set; }
+
         public string OriginFileName { get; set; }
 
         public string ErrorMessage { get; set; }
