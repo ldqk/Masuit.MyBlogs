@@ -4,6 +4,7 @@ using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Logging;
 using SixLabors.ImageSharp;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -83,14 +84,18 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 var stream = await response.Content.ReadAsStreamAsync();
                 var format = await Image.DetectFormatAsync(stream).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
                 stream.Position = 0;
-                if (!format.Name.Equals("JPEG", StringComparison.CurrentCultureIgnoreCase))
+                if (format != null)
                 {
-                    using var image = await Image.LoadAsync(stream);
-                    var memoryStream = new MemoryStream();
-                    await image.SaveAsJpegAsync(memoryStream);
-                    await stream.DisposeAsync();
-                    stream = memoryStream;
-                    ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), ".jpg");
+                    ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), "." + format.Name.ToLower());
+                    if (!Regex.IsMatch(format.Name, "JPEG|PNG|Webp", RegexOptions.IgnoreCase))
+                    {
+                        using var image = await Image.LoadAsync(stream);
+                        var memoryStream = new MemoryStream();
+                        await image.SaveAsJpegAsync(memoryStream);
+                        await stream.DisposeAsync();
+                        stream = memoryStream;
+                        ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), ".jpg");
+                    }
                 }
 
                 var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;

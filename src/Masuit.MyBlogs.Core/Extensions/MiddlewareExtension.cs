@@ -3,6 +3,7 @@ using AutoMapper.Extensions.ExpressionMapping;
 using CacheManager.Core;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -61,6 +62,7 @@ namespace Masuit.MyBlogs.Core.Extensions
         {
             services.AddMvc(options =>
             {
+                options.ModelBinderProviders.InsertBodyOrDefaultBinding();
                 options.ReturnHttpNotAcceptable = true;
                 options.Filters.Add<ExceptionFilter>();
             }).AddNewtonsoftJson(options =>

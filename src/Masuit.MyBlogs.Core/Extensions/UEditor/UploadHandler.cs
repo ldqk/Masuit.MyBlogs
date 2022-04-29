@@ -2,6 +2,7 @@
 using Masuit.Tools;
 using Masuit.Tools.Logging;
 using SixLabors.ImageSharp;
+using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
 {
@@ -50,7 +51,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     stream = stream.AddWatermark();
                     var format = await Image.DetectFormatAsync(stream).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
                     stream.Position = 0;
-                    if (!format.Name.Equals("JPEG", StringComparison.CurrentCultureIgnoreCase))
+                    if (format != null && !Regex.IsMatch(format.Name, "JPEG|PNG|Webp", RegexOptions.IgnoreCase))
                     {
                         using var image = await Image.LoadAsync(stream);
                         var memoryStream = new MemoryStream();

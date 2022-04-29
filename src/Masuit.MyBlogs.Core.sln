@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29424.173
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.LuceneEFCore.SearchEngine", "..\..\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine.csproj", "{3C73BA9B-EBD5-41AF-9B83-D2D5F9BBE022}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.Tools.Core", "..\..\Masuit.Tools\Masuit.Tools.Core\Masuit.Tools.Core.csproj", "{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.MyBlogs.Core", "Masuit.MyBlogs.Core\Masuit.MyBlogs.Core.csproj", "{2F8270E4-5E57-4CE4-AB5F-8008F9FC8C7C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.Tools.AspNetCore", "..\..\Masuit.Tools\Masuit.Tools.AspNetCore\Masuit.Tools.AspNetCore.csproj", "{F67A19C8-5ACE-4111-8DB5-51A0159AF5A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{2F8270E4-5E57-4CE4-AB5F-8008F9FC8C7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F8270E4-5E57-4CE4-AB5F-8008F9FC8C7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F8270E4-5E57-4CE4-AB5F-8008F9FC8C7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F67A19C8-5ACE-4111-8DB5-51A0159AF5A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F67A19C8-5ACE-4111-8DB5-51A0159AF5A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F67A19C8-5ACE-4111-8DB5-51A0159AF5A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F67A19C8-5ACE-4111-8DB5-51A0159AF5A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
