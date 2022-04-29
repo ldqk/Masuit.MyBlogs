@@ -1,5 +1,5 @@
 ﻿myApp.controller("mergelist", ["$scope", "$http", "NgTableParams", "$timeout", function ($scope, $http, NgTableParams, $timeout) {
-    var self = this;
+	var self = this;
 	$scope.kw = "";
 	$scope.orderby = 1;
 	$scope.paginationConf = {
@@ -26,7 +26,7 @@
 		});
 	};
 	self.pass = function(row) {
-        swal({
+		swal({
 			title: "确认直接合并这篇文章吗？",
 			text: row.Title,
 			showCancelButton: true,
@@ -38,22 +38,22 @@
 			allowOutsideClick: false
 		}).then(function() {
 			$scope.request("/merge/"+row.Id, null, function(data) {
-			    window.notie.alert({
-				    type: 1,
-				    text: data.Message,
-				    time: 4
-			    });
-			    self.stats = [];
-			    self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-		    });
+				window.notie.alert({
+					type: 1,
+					text: data.Message,
+					time: 4
+				});
+				self.stats = [];
+				self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+			});
 		}, function() {
 		}).catch(swal.noop);
-    }
+	}
 
 	self.reject = function(row) {
 		swal({
 			title: "拒绝合并理由：",
-            input: 'textarea',
+			input: 'textarea',
 			showCancelButton: true,
 			confirmButtonColor: "#DD6B55",
 			confirmButtonText: "确定",
@@ -61,28 +61,28 @@
 			showLoaderOnConfirm: true,
 			animation: true,
 			allowOutsideClick: false,
-            inputValidator: function(value) {
-            return new Promise(function(resolve, reject) {
-              if (value) {
-                resolve();
-              } else {
-                reject('请填写拒绝理由!');
-              }
-            });
-          }
+			inputValidator: function(value) {
+			return new Promise(function(resolve, reject) {
+			  if (value) {
+				resolve();
+			  } else {
+				reject('请填写拒绝理由!');
+			  }
+			});
+		  }
 		}).then(function(reason) {
-            $scope.request("/merge/reject/"+row.Id, {reason:reason}, function(data) {
-			    window.notie.alert({
-				    type: 1,
-				    text: data.Message,
-				    time: 4
-			    });
-			    self.stats = [];
-			    self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-		    });
+			$scope.request("/merge/reject/"+row.Id, {reason:reason}, function(data) {
+				window.notie.alert({
+					type: 1,
+					text: data.Message,
+					time: 4
+				});
+				self.stats = [];
+				self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+			});
 		}, function() {
 		}).catch(swal.noop);
-    }
+	}
 
 	self.block = function(row) {
 		swal({
@@ -96,18 +96,18 @@
 			animation: true,
 			allowOutsideClick: false
 		}).then(function() {
-            $scope.request("/merge/block/"+row.Id, null, function(data) {
-			    window.notie.alert({
-				    type: 1,
-				    text: data.Message,
-				    time: 4
-			    });
-			    self.stats = [];
-			    self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-		    });
+			$scope.request("/merge/block/"+row.Id, null, function(data) {
+				window.notie.alert({
+					type: 1,
+					text: data.Message,
+					time: 4
+				});
+				self.stats = [];
+				self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+			});
 		}, function() {
 		}).catch(swal.noop);
-    }
+	}
 
 	var _timeout;
 	$scope.search = function (kw) {
@@ -126,12 +126,12 @@ myApp.controller("mergecompare", ["$scope","$location", function ($scope, $locat
 	$scope.id = $location.search()['id'];
 	$scope.get("/merge/compare/"+$scope.id, function(res) {
 		var data = res.Data;
-        $scope.old=data.old;
-        $scope.newer=data.newer;
+		$scope.old=data.old;
+		$scope.newer=data.newer;
 	});
-    
+	
 	$scope.pass = function() {
-        swal({
+		swal({
 			title: "确认直接合并这篇文章吗？",
 			showCancelButton: true,
 			confirmButtonColor: "#DD6B55",
@@ -142,21 +142,21 @@ myApp.controller("mergecompare", ["$scope","$location", function ($scope, $locat
 			allowOutsideClick: false
 		}).then(function() {
 			$scope.request("/merge/"+$scope.id, null, function(data) {
-			    window.notie.alert({
-				    type: 1,
-				    text: data.Message,
-				    time: 4
-			    });
-                window.location.href = "#/merge/list";
-		    });
+				window.notie.alert({
+					type: 1,
+					text: data.Message,
+					time: 4
+				});
+				window.location.href = "#/merge/list";
+			});
 		}, function() {
 		}).catch(swal.noop);
-    }
+	}
 
 	$scope.reject = function() {
-        swal({
+		swal({
 			title: "拒绝合并理由：",
-            input: 'textarea',
+			input: 'textarea',
 			showCancelButton: true,
 			confirmButtonColor: "#DD6B55",
 			confirmButtonText: "确定",
@@ -164,30 +164,30 @@ myApp.controller("mergecompare", ["$scope","$location", function ($scope, $locat
 			showLoaderOnConfirm: true,
 			animation: true,
 			allowOutsideClick: false,
-            inputValidator: function(value) {
-            return new Promise(function(resolve, reject) {
-              if (value) {
-                resolve();
-              } else {
-                reject('请填写拒绝理由!');
-              }
-            });
-          }
+			inputValidator: function(value) {
+			return new Promise(function(resolve, reject) {
+			  if (value) {
+				resolve();
+			  } else {
+				reject('请填写拒绝理由!');
+			  }
+			});
+		  }
 		}).then(function(reason) {
-            $scope.request("/merge/reject/" + $scope.id, {reason:reason}, function(data) {
-			    window.notie.alert({
-				    type: 1,
-				    text: data.Message,
-				    time: 4
-			    });
-                window.location.href = "#/merge/list";
-		    });
+			$scope.request("/merge/reject/" + $scope.id, {reason:reason}, function(data) {
+				window.notie.alert({
+					type: 1,
+					text: data.Message,
+					time: 4
+				});
+				window.location.href = "#/merge/list";
+			});
 		}, function() {
 		}).catch(swal.noop);
-    }
+	}
 
 	$scope.block = function() {
-        swal({
+		swal({
 			title: "确认标记为恶意修改吗？",
 			showCancelButton: true,
 			confirmButtonColor: "#DD6B55",
@@ -198,17 +198,17 @@ myApp.controller("mergecompare", ["$scope","$location", function ($scope, $locat
 			allowOutsideClick: false
 		}).then(function() {
 			$scope.request("/merge/block/"+$scope.id, null, function(data) {
-			    window.notie.alert({
-				    type: 1,
-				    text: data.Message,
-				    time: 4
-			    });
-			    self.stats = [];
-			    self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-		    });
+				window.notie.alert({
+					type: 1,
+					text: data.Message,
+					time: 4
+				});
+				self.stats = [];
+				self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+			});
 		}, function() {
 		}).catch(swal.noop);
-    }
+	}
 
 }]);
 myApp.controller("mergeedit", ["$scope", "$location", function ($scope, $location) {
@@ -216,16 +216,15 @@ myApp.controller("mergeedit", ["$scope", "$location", function ($scope, $locatio
 	$scope.id = $location.search()['id'];
 	$scope.get("/merge/"+$scope.id, function(res) {
 		$scope.post= res.Data;
-	    
 	});
-    $scope.merge= function() {
-        $scope.request("/merge",$scope.post, function(res) {
-		    window.notie.alert({
+	$scope.merge= function() {
+		$scope.request("/merge",$scope.post, function(res) {
+			window.notie.alert({
 				type: 1,
 				text: res.Message,
 				time: 4
 			});
-            window.location.href = "#/merge/list";
-	    });
-    }
+			window.location.href = "#/merge/list";
+		});
+	}
 }]);

@@ -15,11 +15,7 @@
 		}
 	};
 	this.GetPageData = function (page, size) {
-		$http.post("/partner/getpagedata", {
-			page,
-			size,
-			kw: $scope.kw
-		}).then(function(res) {
+		$http.get(`/partner/getpagedata?page=${page}&size=${size}&kw=${$scope.kw}`).then(function(res) {
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$("div[ng-table-pagination]").remove();
 			self.tableParams = new NgTableParams({
@@ -45,7 +41,7 @@
 	});
 
 	$scope.getCategory = function () {
-		$http.post("/category/getcategories", null).then(function (res) {
+		$http.get("/category/getcategories").then(function (res) {
 			var data = res.data;
 			if (data.Success) {
 				$scope.cat = data.Data;

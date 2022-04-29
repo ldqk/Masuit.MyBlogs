@@ -1,8 +1,8 @@
 ﻿myApp.controller("menu", ["$scope", "$http", "$timeout", function($scope, $http, $timeout) {
 	$scope.menu = {};
 	$scope.init = function() {
-		$scope.request("/menu/getmenus", null, function(data) {
-			$scope.data = data.Data;//transData(data.Data, "Id", "ParentId", "nodes");
+		$scope.get("/menu/getmenus", function(data) {
+			$scope.data = data.Data;
 			$scope.collapse = true;
 			$timeout(function() {
 				$scope.expandAll();
@@ -231,9 +231,7 @@
 			animation: true,
 			allowOutsideClick: false
 		}).then(function() {
-			$scope.request("/menu/delete", {
-				id: id
-			}, function(data) {
+			$scope.request("/menu/delete/"+id, null, function(data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
@@ -246,21 +244,12 @@
 	}
 	
 	$scope.getMenuType = function() {
-		$scope.request("/menu/getmenutype", null, function(data) {
+		$scope.get("/menu/getmenutype", function(data) {
 			$scope.MenuType = data.Data;
 		});
 	}
 	$scope.edit= function(menu) {
 		$scope.menu = menu;
-		//Custombox.open({
-		//	target: '#menu',
-		//	zIndex: 100,
-		//	height: 900,
-		//	close: function () {
-		//		$scope.menu = {};
-		//	},
-		//	overlayOpacity: 0.5
-		//});
 		layer.open({
 			type: 1,
 			zIndex: 20,
@@ -304,18 +293,18 @@
 		}
 	}
 	$scope.uploadImage = function() {
-        $("#uploadform").ajaxSubmit({
+		$("#uploadform").ajaxSubmit({
 			url: "/Upload",
 			type: "post",
 			success: function(data) {
 				document.getElementById("uploadform").reset();
 				$scope.$apply(function () {
-			     　$scope.allowUpload=false;
+				  $scope.allowUpload=false;
 					$scope.menu.Icon = data.Data;
-			    });
+				});
 			}
 		});
-    };
+	};
 	$scope.upload = function() {
 		$scope.allowUpload=true;
 	}

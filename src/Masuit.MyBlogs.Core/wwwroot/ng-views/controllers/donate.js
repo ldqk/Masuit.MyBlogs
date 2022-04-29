@@ -11,10 +11,7 @@
 		}
 	};
 	this.GetPageData = function(page, size) {
-		$http.post("/donate/getpagedata", {
-			page,
-			size
-		}).then(function(res) {
+		$http.post(`/donate/getpagedata?page=${page}&size=${size}`).then(function(res) {
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$("div[ng-table-pagination]").remove();
 			self.tableParams = new NgTableParams({
@@ -37,9 +34,7 @@
 			animation: true,
 			allowOutsideClick: false
 		}).then(function() {
-			$scope.request("/donate/delete", {
-				id: row.Id
-			}, function(data) {
+			$scope.request("/donate/delete/" + row.Id, null, function(data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,

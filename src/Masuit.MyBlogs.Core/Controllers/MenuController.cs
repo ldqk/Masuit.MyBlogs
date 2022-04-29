@@ -4,6 +4,7 @@ using Masuit.MyBlogs.Core.Models.Command;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 
@@ -65,7 +66,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public async Task<ActionResult> Save(MenuCommand model)
+        public async Task<ActionResult> Save([FromBodyOrDefault] MenuCommand model)
         {
             if (string.IsNullOrEmpty(model.Icon) || !model.Icon.Contains("/"))
             {

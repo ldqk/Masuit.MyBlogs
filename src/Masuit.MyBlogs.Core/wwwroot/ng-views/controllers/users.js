@@ -1,8 +1,8 @@
 ﻿myApp.controller("users", ["$scope", "$http", "$timeout","NgTableParams", function ($scope, $http, $timeout,NgTableParams) {
-    var self = this;
+	var self = this;
 	$scope.isAdd = true;
 	$scope.allowUpload=false;
-    $scope.userinfo = {};
+	$scope.userinfo = {};
 	$scope.kw = "";
 	$scope.paginationConf = {
 		currentPage:  1,
@@ -16,12 +16,12 @@
 	};
 
 	this.GetPageData = function (page, size) {
-        $http.get("/user/getusers?page="+page+"&size="+size+"&search="+$scope.kw).then(function(res) {
+		$http.get("/user/getusers?page="+page+"&size="+size+"&search="+$scope.kw).then(function(res) {
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$("div[ng-table-pagination]").remove();
 			self.tableParams = new NgTableParams({count: 50000}, { filterDelay: 0, dataset: res.data.Data });
 			self.data = res.data.Data;
-        });
+		});
 	}
 
 	$scope.remove = function(userinfo) {
@@ -36,9 +36,9 @@
 			cancelButtonText: '取消'
 		}).then(function(isConfirm) {
 			if (isConfirm) {
-                $scope.request("/user/delete?id="+userinfo.Id, null, function(data) {
+				$scope.request("/user/delete?id="+userinfo.Id, null, function(data) {
 					swal(data.Message, null, 'success');
-			        self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+					self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 				});
 			}
 		}).catch(swal.noop);
@@ -93,7 +93,7 @@
 				time: 4
 			});
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-        });
+		});
 	}
 
 	var _timeout;
@@ -140,7 +140,7 @@
 			if (result) {
 				if (result.Success) {
 					swal(result.Message, "", "success");
-                } else {
+				} else {
 					swal(result.Message, "", "error");
 				}
 			}

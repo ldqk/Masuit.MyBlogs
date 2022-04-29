@@ -2,7 +2,7 @@
 	var self = this;
 	var source = [];
 	this.load = function() {
-		$http.post("/links/get", null).then(function(res) {
+		$http.get("/links/get").then(function(res) {
 			self.tableParams = new NgTableParams({}, {
 				filterDelay: 0,
 				dataset: res.data.Data
@@ -24,9 +24,7 @@
 			animation: true,
 			allowOutsideClick: false
 		}).then(function() {
-			$scope.request("/links/delete", {
-				id: row.Id
-			}, function(data) {
+			$scope.request("/links/delete/" + row.Id, null, function(data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
@@ -61,7 +59,7 @@
 			animation: true,
 			allowOutsideClick: false
 		}).then(function () {
-			$scope.request("/links/edit", row, function (data) {
+			$scope.request("/links/add", { Id: row.Id, Name: row.Name, Url: row.Url, UrlBase:row.UrlBase}, function (data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
@@ -116,34 +114,27 @@
 			}
 		}).catch(swal.noop);
 	}
+
 	self.check= function(link) {
 		$scope.request("/links/check", {
 			link:link.Url
 		}, function (data) {
 			layer.tips(data.Message, '#link-'+link.Id, {
-                tips: [1, '#3595CC'],
-                time: 5000
-            });
-		});
-	}
-	$scope.toggleWhite= function(row) {
-		$scope.request("/links/ToggleWhitelist", {
-			id:row.Id
-		}, function (data) {
-        });
-	}
-	$scope.toggleState= function(row) {
-		$scope.request("/links/Toggle", {
-			id:row.Id
-		}, function (data) {
-			
+				tips: [1, '#3595CC'],
+				time: 5000
+			});
 		});
 	}
 
+	$scope.toggleWhite = function (row) {
+		$scope.request("/links/ToggleWhitelist/" + row.Id);
+	}
+
+	$scope.toggleState= function(row) {
+		$scope.request("/links/Toggle/" + row.Id);
+	}
+
 	$scope.toggleRecommend = function(row) {
-		$scope.request("/links/ToggleRecommend", {
-			id:row.Id
-		}, function (data) {
-        });
+		$scope.request("/links/ToggleRecommend/" + row.Id);
 	}
 }]);

@@ -1,6 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -44,7 +45,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="donate"></param>
         /// <returns></returns>
-        public async Task<ActionResult> Save(Donate donate)
+        public async Task<ActionResult> Save([FromBodyOrDefault] Donate donate)
         {
             var b = await DonateService.AddOrUpdateSavedAsync(d => d.Id, donate) > 0;
             return ResultData(null, b, b ? "保存成功！" : "保存失败！");

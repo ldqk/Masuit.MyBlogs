@@ -7,6 +7,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Systems;
@@ -73,7 +74,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="seminar"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult Save(Seminar seminar)
+        public ActionResult Save([FromBodyOrDefault] Seminar seminar)
         {
             if (seminar.Id > 0 ? SeminarService.Any(s => s.Id != seminar.Id && s.Title == seminar.Title) : SeminarService.Any(s => s.Title == seminar.Title))
             {

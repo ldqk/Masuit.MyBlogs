@@ -1,24 +1,11 @@
 ﻿var myApp = angular.module('myApp', ["ui.router", "oc.lazyLoad", 'ngAnimate', 'ngResource', 'ui.bootstrap', 'angular-loading-bar', 'ng.ueditor', "ngTable", "tm.pagination", 'ui.tree', 'ui.bootstrap','ngFileUpload']);
-myApp.config(["$provide", "$compileProvider", "$controllerProvider", "$filterProvider", "$httpProvider",function($provide, $compileProvider, $controllerProvider, $filterProvider, $httpProvider) {
+myApp.config(["$provide", "$compileProvider", "$controllerProvider", "$filterProvider",function($provide, $compileProvider, $controllerProvider, $filterProvider) {
 		myApp.controller = $controllerProvider.register;
 		myApp.directive = $compileProvider.directive;
 		myApp.filter = $filterProvider.register;
 		myApp.factory = $provide.factory;
 		myApp.service = $provide.service;
 		myApp.constant = $provide.constant;
-		$httpProvider.defaults.transformRequest = function(obj) {
-			var str = [];
-			for (var p in obj) {
-				if (obj.hasOwnProperty(p)) {
-					str.push(window.encodeURIComponent(p) + "=" + window.encodeURIComponent(obj[p]));
-				}
-			}
-			return str.join("&");
-		};
-
-		$httpProvider.defaults.headers.post = {
-			'Content-Type': 'application/x-www-form-urlencoded; charser=UTF-8'
-		}
 }]);
 myApp.directive("trackedTable", function () {
 	return {

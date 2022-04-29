@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -75,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="notice"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Write(Notice notice, CancellationToken cancellationToken)
+        public async Task<ActionResult> Write([FromBodyOrDefault] Notice notice, CancellationToken cancellationToken)
         {
             notice.Content = await ImagebedClient.ReplaceImgSrc(await notice.Content.ClearImgAttributes(), cancellationToken);
             if (notice.StartTime.HasValue && notice.EndTime.HasValue && notice.StartTime >= notice.EndTime)
@@ -125,7 +126,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="notice"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Edit(NoticeDto notice, CancellationToken cancellationToken)
+        public async Task<ActionResult> Edit([FromBodyOrDefault] NoticeDto notice, CancellationToken cancellationToken)
         {
             var entity = await NoticeService.GetByIdAsync(notice.Id) ?? throw new NotFoundException("公告已经被删除！");
             if (notice.StartTime.HasValue && notice.EndTime.HasValue && notice.StartTime >= notice.EndTime)

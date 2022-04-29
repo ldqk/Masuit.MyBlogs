@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
@@ -98,7 +99,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="links"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Add(Links links)
+        public async Task<ActionResult> Add([FromBodyOrDefault] Links links)
         {
             bool b = await LinksService.AddOrUpdateSavedAsync(l => l.Id, links) > 0;
             return b ? ResultData(null, message: "添加成功！") : ResultData(null, false, "添加失败！");
@@ -110,7 +111,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="link"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public Task<ActionResult> Check(string link)
+        public Task<ActionResult> Check([FromBodyOrDefault] string link)
         {
             HttpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.47");
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
@@ -147,23 +148,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             bool b = await LinksService.DeleteByIdAsync(id) > 0;
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
-        }
-
-        /// <summary>
-        /// 编辑友链
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [MyAuthorize]
-        public async Task<ActionResult> Edit(Links model)
-        {
-            var b = await LinksService.GetQuery(m => m.Id == model.Id).UpdateFromQueryAsync(m => new Links()
-            {
-                Name = model.Name,
-                Url = model.Url,
-                UrlBase = model.UrlBase
-            }) > 0;
-            return ResultData(null, b, b ? "保存成功" : "保存失败");
         }
 
         /// <summary>

@@ -20,6 +20,7 @@ using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.MyBlogs.Core.Views.Post;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Core.Validator;
@@ -676,7 +677,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost, MyAuthorize]
-        public async Task<ActionResult> Edit(PostCommand post, bool reserve = true, CancellationToken cancellationToken = default)
+        public async Task<ActionResult> Edit([FromBodyOrDefault] PostCommand post, CancellationToken cancellationToken = default)
         {
             post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.Trim().ClearImgAttributes(), cancellationToken);
             if (!ValidatePost(post, out var resultData))
@@ -685,7 +686,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             Post p = await PostService.GetByIdAsync(post.Id);
-            if (reserve && p.Status == Status.Published)
+            if (post.Reserve && p.Status == Status.Published)
             {
                 var context = BrowsingContext.New(Configuration.Default);
                 var doc1 = await context.OpenAsync(req => req.Content(p.Content), cancellationToken);
@@ -735,9 +736,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="post"></param>
         /// <param name="timespan"></param>
         /// <param name="schedule"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [MyAuthorize, HttpPost]
-        public async Task<ActionResult> Write(PostCommand post, DateTime? timespan, bool schedule = false, CancellationToken cancellationToken = default)
+        public async Task<ActionResult> Write([FromBodyOrDefault] PostCommand post, [FromBodyOrDefault] DateTime? timespan, [FromBodyOrDefault] bool schedule = false, CancellationToken cancellationToken = default)
         {
             post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.Trim().ClearImgAttributes(), cancellationToken);
             if (!ValidatePost(post, out var resultData))

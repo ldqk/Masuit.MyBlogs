@@ -1,6 +1,6 @@
 ﻿myApp.controller("seminar", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
-    var self = this;
-    $scope.paginationConf = {
+	var self = this;
+	$scope.paginationConf = {
 		currentPage: $scope.currentPage ? $scope.currentPage : 1,
 		itemsPerPage: 10,
 		pagesLength: 25,
@@ -11,10 +11,7 @@
 		}
 	};
 	this.GetPageData = function (page, size) {
-		$http.post("/seminar/getpagedata", {
-			page,
-			size
-		}).then(function (res) {
+		$http.get(`/seminar/getpagedata?page=${page}&size=${size}`).then(function (res) {
 			$scope.paginationConf.currentPage = page;
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$("div[ng-table-pagination]").remove();
@@ -24,7 +21,7 @@
 				filterDelay: 0,
 				dataset: res.data.Data
 			});
-        });
+		});
 	};
 	self.del = function (row) {
 		swal({
@@ -38,9 +35,7 @@
 			animation: true,
 			allowOutsideClick: false
 		}).then(function () {
-			$scope.request("/seminar/delete", {
-				id: row.Id
-			}, function (data) {
+			$scope.request("/seminar/delete/" + row.Id, null, function (data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
@@ -102,5 +97,4 @@
 			}
 		}).catch(swal.noop);
 	}
-	
 }]);

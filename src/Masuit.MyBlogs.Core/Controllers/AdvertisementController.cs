@@ -8,6 +8,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Database;
@@ -86,7 +87,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost, MyAuthorize]
-        public async Task<IActionResult> Save(AdvertisementDto model)
+        public async Task<IActionResult> Save([FromBodyOrDefault] AdvertisementDto model)
         {
             var entity = AdsService[model.Id] ?? new Advertisement();
             model.CategoryIds = model.CategoryIds?.Replace("null", "");

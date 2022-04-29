@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Models;
@@ -100,14 +101,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="sets"></param>
         /// <returns></returns>
-        public async Task<ActionResult> Save(string sets)
+        public async Task<ActionResult> Save([FromBodyOrDefault] string sets)
         {
             var settings = JsonConvert.DeserializeObject<List<SystemSetting>>(sets).ToArray();
             var b = await SystemSettingService.AddOrUpdateSavedAsync(s => s.Name, settings) > 0;
             var dic = settings.ToDictionary(s => s.Name, s => s.Value); //同步设置
             foreach (var (key, value) in dic)
             {
-                CommonHelper.SystemSettings[key]= value;
+                CommonHelper.SystemSettings[key] = value;
             }
 
             return ResultData(null, b, b ? "设置保存成功！" : "设置保存失败！");
@@ -142,7 +143,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="port"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public ActionResult MailTest(string smtp, string user, string pwd, int port, string to, bool ssl)
+        public ActionResult MailTest([FromBodyOrDefault] string smtp, [FromBodyOrDefault] string user, [FromBodyOrDefault] string pwd, [FromBodyOrDefault] int port, [FromBodyOrDefault] string to, [FromBodyOrDefault] bool ssl)
         {
             try
             {
@@ -172,7 +173,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="title"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-        public ActionResult SendMail([Required(ErrorMessage = "收件人不能为空")] string tos, [Required(ErrorMessage = "邮件标题不能为空")] string title, [Required(ErrorMessage = "邮件内容不能为空")] string content)
+        public ActionResult SendMail([Required(ErrorMessage = "收件人不能为空"), FromBodyOrDefault] string tos, [Required(ErrorMessage = "邮件标题不能为空"), FromBodyOrDefault] string title, [Required(ErrorMessage = "邮件内容不能为空"), FromBodyOrDefault] string content)
         {
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(title, content + "<p style=\"color: red\">本邮件由系统自动发出，请勿回复本邮件！</p>", tos, "127.0.0.1"));
             return Ok();
@@ -183,7 +184,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public ActionResult PathTest(string path)
+        public ActionResult PathTest([FromBodyOrDefault] string path)
         {
             if (!(path.EndsWith("/") || path.EndsWith("\\")))
             {
@@ -216,7 +217,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             return RedisHelper.SUnion(RedisHelper.Keys("Email:*")).Select(JObject.Parse).OrderByDescending(o => o["time"]).ToList();
         }
 
-        public ActionResult BounceEmail([FromServices] IMailSender mailSender, string email)
+        public ActionResult BounceEmail([FromServices] IMailSender mailSender, [FromBodyOrDefault] string email)
         {
             var msg = mailSender.AddRecipient(email);
             return Ok(new
@@ -249,7 +250,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 设置IP地址段黑名单
         /// </summary>
         /// <returns></returns>
-        public async Task<ActionResult> SetIPRangeBlackList(string content)
+        public async Task<ActionResult> SetIPRangeBlackList([FromBodyOrDefault] string content)
         {
             var file = new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "DenyIPRange.txt")).ShareReadWrite();
             await file.WriteAllTextAsync(content, Encoding.UTF8, false);
@@ -284,7 +285,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public async Task<ActionResult> SetIpBlackList(string content)
+        public async Task<ActionResult> SetIpBlackList([FromBodyOrDefault] string content)
         {
             CommonHelper.DenyIP = content + "";
             await new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "denyip.txt")).ShareReadWrite().WriteAllTextAsync(CommonHelper.DenyIP, Encoding.UTF8);
@@ -296,7 +297,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public async Task<ActionResult> SetIpWhiteList(string content)
+        public async Task<ActionResult> SetIpWhiteList([FromBodyOrDefault] string content)
         {
             await new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt")).ShareReadWrite().WriteAllTextAsync(content, Encoding.UTF8);
             CommonHelper.IPWhiteList.Add(content);
@@ -346,7 +347,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="ip"></param>
         /// <returns></returns>
-        public async Task<ActionResult> AddToWhiteList(string ip)
+        public async Task<ActionResult> AddToWhiteList([FromBodyOrDefault] string ip)
         {
             if (!ip.MatchInetAddress())
             {
@@ -368,7 +369,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="firewallRepoter"></param>
         /// <param name="ip"></param>
         /// <returns></returns>
-        public async Task<ActionResult> AddToBlackList([FromServices] IFirewallRepoter firewallRepoter, string ip)
+        public async Task<ActionResult> AddToBlackList([FromServices] IFirewallRepoter firewallRepoter, [FromBodyOrDefault] string ip)
         {
             if (!ip.MatchInetAddress())
             {
@@ -384,6 +385,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             return ResultData(null);
         }
 
-        #endregion
+        #endregion 网站防火墙
     }
 }

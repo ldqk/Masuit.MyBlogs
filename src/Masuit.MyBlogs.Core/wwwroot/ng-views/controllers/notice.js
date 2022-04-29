@@ -1,34 +1,34 @@
 ﻿myApp.controller("noticeAdd", ["$scope", "$http", "$location", function ($scope, $http, $location) {
-    $scope.notice = {};
+	$scope.notice = {};
 	$scope.notice.Id = $location.search()['id']||0;
 	if ($scope.notice.Id) {
-		$scope.request("/notice/get", { id: $scope.notice.Id }, function (res) {
+		$scope.get("/notice/get/" + $scope.notice.Id, function (res) {
 			$scope.notice = res.Data;
-            if ($scope.notice.StartTime+$scope.notice.EndTime) {
-                $scope.notice.Range=new Date($scope.notice.StartTime).Format("yyyy-MM-dd")+" 至 "+new Date($scope.notice.EndTime).Format("yyyy-MM-dd");
-            } else {
-                delete $scope.notice.StartTime;
-			    delete $scope.notice.EndTime;
-            }
+			if ($scope.notice.StartTime+$scope.notice.EndTime) {
+				$scope.notice.Range=new Date($scope.notice.StartTime).Format("yyyy-MM-dd")+" 至 "+new Date($scope.notice.EndTime).Format("yyyy-MM-dd");
+			} else {
+				delete $scope.notice.StartTime;
+				delete $scope.notice.EndTime;
+			}
 		});
 	}
 
-    jeDate("#timespan",{
-        multiPane:false,
-        range:" 至 ",
-        minDate:new Date().Format("yyyy-MM-dd"),
-        maxDate:'2099-06-16',
-        format: 'YYYY-MM-DD',
+	jeDate("#timespan",{
+		multiPane:false,
+		range:" 至 ",
+		minDate:new Date().Format("yyyy-MM-dd"),
+		maxDate:'2099-06-16',
+		format: 'YYYY-MM-DD',
 		donefun: function (obj) {
 			$scope.notice.StartTime = obj.date[0].YYYY+"-"+obj.date[0].MM+"-"+obj.date[0].DD;
 			$scope.notice.EndTime = obj.date[1].YYYY+"-"+obj.date[1].MM+"-"+obj.date[1].DD;
 		},
 		clearfun: function(elem, val) {
-            delete $scope.notice.StartTime;
+			delete $scope.notice.StartTime;
 			delete $scope.notice.EndTime;
 			delete $scope.notice.Range;
-        }
-    });
+		}
+	});
 	
 	//异步提交表单开始
 	$scope.submit = function (notice) {
@@ -71,10 +71,7 @@ myApp.controller("noticeList", ["$scope", "$http", "NgTableParams", function ($s
 		}
 	};
 	this.GetPageData = function (page, size) {
-		$http.post("/notice/getpagedata", {
-			page,
-			size
-		}).then(function (res) {
+		$http.post(`/notice/getpagedata?page=${page}&size=${size}`).then(function (res) {
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$("div[ng-table-pagination]").remove();
 			self.tableParams = new NgTableParams({
@@ -97,9 +94,7 @@ myApp.controller("noticeList", ["$scope", "$http", "NgTableParams", function ($s
 			animation: true,
 			allowOutsideClick: false
 		}).then(function () {
-			$scope.request("/notice/delete", {
-				id: row.Id
-			}, function (data) {
+			$scope.request("/notice/delete/"+row.Id,null, function (data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
@@ -119,7 +114,7 @@ myApp.controller("noticeList", ["$scope", "$http", "NgTableParams", function ($s
 		}).catch(swal.noop);
 	}
 	
-    $scope.changeState= function(row) {
+	$scope.changeState= function(row) {
 		$scope.request("/notice/ChangeState/"+row.Id, null, function(data) {
 			window.notie.alert({
 				type: 1,
@@ -128,6 +123,6 @@ myApp.controller("noticeList", ["$scope", "$http", "NgTableParams", function ($s
 			});
 			row.NoticeStatus=3-row.NoticeStatus;
 		});
-    }
+	}
 
 }]);

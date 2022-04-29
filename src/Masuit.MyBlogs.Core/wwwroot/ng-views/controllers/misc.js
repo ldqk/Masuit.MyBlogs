@@ -2,7 +2,7 @@
 	$scope.misc = {};
 	$scope.misc.Id = $location.search()['id'];
 	if ($scope.misc.Id) {
-		$scope.request("/misc/get", { id: $scope.misc.Id }, function (res) {
+		$scope.get("/misc/get/" + $scope.misc.Id, function (res) {
 			$scope.misc = res.Data;
 		});
 	}
@@ -52,10 +52,7 @@ myApp.controller("miscList", ["$scope", "$http", "NgTableParams", function ($sco
 		}
 	};
 	this.GetPageData = function (page, size) {
-		$http.post("/misc/getpagedata", {
-			page,
-			size
-		}).then(function (res) {
+		$http.get(`/misc/getpagedata?page=${page}&size=${size}`).then(function (res) {
 			$scope.paginationConf.currentPage = page;
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$("div[ng-table-pagination]").remove();
@@ -79,9 +76,7 @@ myApp.controller("miscList", ["$scope", "$http", "NgTableParams", function ($sco
 			animation: true,
 			allowOutsideClick: false
 		}).then(function () {
-			$scope.request("/misc/delete", {
-				id: row.Id
-			}, function (data) {
+			$scope.request("/misc/delete/" + row.Id, null, function (data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,

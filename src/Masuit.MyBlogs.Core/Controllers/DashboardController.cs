@@ -1,6 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Polly;
@@ -78,7 +79,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
-        public ActionResult Catlog(string filename)
+        public ActionResult Catlog([FromBodyOrDefault] string filename)
         {
             if (System.IO.File.Exists(Path.Combine(LogManager.LogDirectory, filename)))
             {
@@ -93,7 +94,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
-        public ActionResult DeleteFile(string filename)
+        public ActionResult DeleteFile([FromBodyOrDefault] string filename)
         {
             Policy.Handle<IOException>().WaitAndRetry(5, i => TimeSpan.FromSeconds(1)).Execute(() => System.IO.File.Delete(Path.Combine(LogManager.LogDirectory, filename)));
             return ResultData(null, message: "文件删除成功!");

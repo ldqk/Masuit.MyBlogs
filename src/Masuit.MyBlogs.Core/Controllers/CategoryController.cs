@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Models.Command;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -48,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Add(Category model)
+        public async Task<ActionResult> Add([FromBodyOrDefault] Category model)
         {
             bool exist = CategoryService.Any(c => c.Name.Equals(model.Name));
             if (exist)
@@ -70,7 +71,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Edit(CategoryCommand dto)
+        public async Task<ActionResult> Edit([FromBodyOrDefault] CategoryCommand dto)
         {
             var cat = await CategoryService.GetByIdAsync(dto.Id) ?? throw new NotFoundException("分类不存在！");
             cat.Name = dto.Name;

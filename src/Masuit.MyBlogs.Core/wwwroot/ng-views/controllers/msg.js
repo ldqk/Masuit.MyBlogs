@@ -1,5 +1,5 @@
-﻿myApp.controller("msg", ["$scope", "$http", "NgTableParams", "$timeout", function ($scope, $http, NgTableParams, $timeout) {
-    var self = this;
+﻿myApp.controller("msg", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
+	var self = this;
 	$scope.currentPage = 1;
 	$scope.paginationConf = {
 		currentPage: $scope.currentPage ||1,
@@ -12,10 +12,7 @@
 		}
 	};
 	this.GetPageData = function(page, size) {
-		$http.post("/msg/GetPendingMsgs", {
-			page,
-			size
-		}).then(function(res) {
+		$http.get(`/msg/GetPendingMsgs?page=${page}&size=${size}`).then(function(res) {
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$("div[ng-table-pagination]").remove();
 			self.tableParams = new NgTableParams({
@@ -38,9 +35,7 @@
 			animation: true,
 			allowOutsideClick: false
 		}).then(function() {
-			$scope.request("/msg/delete", {
-				id: row.Id
-			}, function(data) {
+			$scope.request("/msg/delete/" + row.Id, null, function(data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
@@ -85,19 +80,14 @@ myApp.controller("msgs", ["$scope", "$http", function ($scope, $http) {
 		}
 	};
 	this.GetPageData = function (page, size) {
-		$http.post("/msg/GetInternalMsgs", {
-			page,
-			size
-		}).then(function (res) {
+		$http.get(`/msg/GetInternalMsgs?page=${page}&size=${size}`).then(function (res) {
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$scope.Messages = res.data.Data;
 		});
 	};
 	$scope.MarkRead= function() {
 		var id = _.max($scope.Messages, m => m.Id).Id;
-		$http.post("/msg/MarkRead", {
-			id
-		}).then(function(res) {
+		$http.post("/msg/MarkRead/"+id).then(function(res) {
 			var data = res.data;
 			if (data.Success) {
 				self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
@@ -106,17 +96,9 @@ myApp.controller("msgs", ["$scope", "$http", function ($scope, $http) {
 	}
 	$scope.toggleRead= function(id,checked) {
 		if (checked) {
-			$http.post("/msg/read", {
-				id
-			}).then(function(res) {
-				
-			});
+			$http.post("/msg/read/"+id);
 		} else {
-			$http.post("/msg/unread", {
-				id
-			}).then(function(res) {
-				
-			});
+			$http.post("/msg/unread/"+id);
 		}
 	}
 	$scope.clearMsgs = function() {

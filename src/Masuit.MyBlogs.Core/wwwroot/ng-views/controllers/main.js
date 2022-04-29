@@ -60,9 +60,7 @@
 	}
 	this.clearNotification = function($event) {
 		$event.preventDefault();
-		$http.post("/msg/MarkRead", {
-			id:_.max($scope.InternalMsgs, m => m.Id).Id
-		}).then(function(res) {
+		$http.post("/msg/MarkRead/" + _.max($scope.InternalMsgs, m => m.Id).Id).then(function(res) {
 			var data = res.data;
 			if(data.Success) {
 				var x = angular.element($event.target).closest('.listview');
@@ -140,16 +138,14 @@
 		}
 	}
 
-	$http.post("/passport/getuserinfo", null).then(function(res) {
+	$http.get("/passport/getuserinfo").then(function(res) {
 		if(res.data.Success) {
 			$scope.user = res.data.Data;
 		}
 	});
 
 	$scope.request = function(url, data, success, error) {
-		$http.post(url, data, {
-			'Content-Type':'application/x-www-form-urlencoded'
-		}).then(function(res) {
+		$http.post(url, data).then(function(res) {
 			if(res.data.Success && res.data.IsLogin) {
 				success(res.data);
 			} else {
@@ -236,25 +232,23 @@
 
 	function getUnreadMsgs() {
 		fetch("/msg/GetUnreadMsgs",{
-				headers:{
-					'Accept': 'application/json',
-					'Content-Type': 'application/json'
-				}
-			}).then(function(response) {
-				return response.json();
-			}).then(function(res) {
-				$scope.InternalMsgs = res.Data;
-				$scope.$apply();
-			}).catch(function(e) {
-				console.log("Oops, error");
-			});
+			headers:{
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			}
+		}).then(function(response) {
+			return response.json();
+		}).then(function(res) {
+			$scope.InternalMsgs = res.Data;
+			$scope.$apply();
+		}).catch(function(e) {
+			console.log("Oops, error");
+		});
 	}
 	getmsgs();
 	setInterval(getmsgs,5000);
 	$scope.read = function(id) {
-		$http.post("/msg/read", {
-			id
-		}).then(getUnreadMsgs);
+		$http.post("/msg/read/"+id).then(getUnreadMsgs);
 	}
 
 	$scope.changeUsername = function() {
@@ -415,7 +409,7 @@
 			cancelButtonText:"取消",
 			preConfirm:function() {
 				return new Promise(function(resolve, reject) {
-					$http.post("/passport/logout", null).then(function(res) {
+					$http.post("/passport/logout").then(function(res) {
 						if(res.data.Success) {
 							resolve();
 						} else {

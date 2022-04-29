@@ -1,6 +1,7 @@
 ﻿using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Save(Variables model)
+        public async Task<ActionResult> Save([FromBodyOrDefault] Variables model)
         {
             var b = await VariablesService.AddOrUpdateSavedAsync(v => v.Key, model) > 0;
             return ResultData(null, b, b ? "保存成功" : "保存失败");

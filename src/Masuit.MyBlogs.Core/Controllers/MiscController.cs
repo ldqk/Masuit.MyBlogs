@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
@@ -126,7 +127,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Write(Misc model, CancellationToken cancellationToken)
+        public async Task<ActionResult> Write([FromBodyOrDefault] Misc model, CancellationToken cancellationToken)
         {
             model.Content = await ImagebedClient.ReplaceImgSrc(await model.Content.Trim().ClearImgAttributes(), cancellationToken);
             var e = MiscService.AddEntitySaved(model);
@@ -151,7 +152,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="misc"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Edit(Misc misc, CancellationToken cancellationToken)
+        public async Task<ActionResult> Edit([FromBodyOrDefault] Misc misc, CancellationToken cancellationToken)
         {
             var entity = await MiscService.GetByIdAsync(misc.Id) ?? throw new NotFoundException("杂项页未找到");
             entity.ModifyDate = DateTime.Now;

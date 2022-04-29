@@ -1,5 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -30,7 +31,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="share"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult Add(FastShare share)
+        public ActionResult Add([FromBodyOrDefault] FastShare share)
         {
             bool b = FastShareService.AddEntitySaved(share) != null;
             return ResultData(null, b, b ? "添加成功" : "添加失败");
@@ -54,7 +55,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> Update(FastShare model)
+        public async Task<ActionResult> Update([FromBodyOrDefault] FastShare model)
         {
             var b = await FastShareService.GetQuery(s => s.Id == model.Id).UpdateFromQueryAsync(s => new FastShare()
             {

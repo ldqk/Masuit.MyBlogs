@@ -10,6 +10,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Strings;
@@ -25,7 +26,9 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class MergeController : AdminController
     {
         public IPostMergeRequestService PostMergeRequestService { get; set; }
+
         public IWebHostEnvironment HostEnvironment { get; set; }
+
         public MapperConfiguration MapperConfig { get; set; }
 
         /// <summary>
@@ -120,7 +123,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Merge([FromForm] PostMergeRequestCommandBase dto)
+        public async Task<IActionResult> Merge([FromBodyOrDefault] PostMergeRequestCommandBase dto)
         {
             var merge = await PostMergeRequestService.GetByIdAsync(dto.Id) ?? throw new NotFoundException("待合并文章未找到");
             Mapper.Map(dto, merge);

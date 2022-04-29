@@ -12,10 +12,7 @@
 		}
 	};
 	this.GetPageData = function (page, size) {
-		$http.post("/comment/GetPendingComments", {
-			page,
-			size
-		}).then(function (res) {
+		$http.post(`/comment/GetPendingComments?page=${page}&size=${size}`).then(function (res) {
 			$scope.paginationConf.currentPage = page;
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$("div[ng-table-pagination]").remove();
@@ -39,9 +36,7 @@
 			animation: true,
 			allowOutsideClick: false
 		}).then(function () {
-			$scope.request("/comment/delete", {
-				id: row.Id
-			}, function (data) {
+			$scope.request("/comment/delete/" + row.Id,null, function (data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,

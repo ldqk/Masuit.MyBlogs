@@ -49,7 +49,7 @@
 
 	stat();
 	setInterval(stat,5000);
-	$http.post("/category/getcategories", null).then(function (res) {
+	$http.get("/category/getcategories").then(function (res) {
 		var data = res.data;
 		if (data.Success) {
 			$scope.cat = data.Data;
@@ -83,8 +83,8 @@
 	});
 
 	this.GetPageData = function (page, size) {
-		var params={ page, size, kw: $scope.kw, orderby:$scope.orderby, cid:$scope.CategoryId };
-		$http.post("/post/getpagedata", params).then(function(res) {
+		var params = { page, size, kw: $scope.kw, orderby: $scope.orderby, cid: $scope.CategoryId };
+		$http.get(`/post/getpagedata?page=${page}&size=${size}&kw=${$scope.kw}&orderby=${$scope.orderby}&cid=${$scope.CategoryId}`).then(function(res) {
 			$scope.paginationConf.totalItems = res.data.TotalCount;
 			$("div[ng-table-pagination]").remove();
 			self.tableParams = new NgTableParams({ count: 50000 }, {
@@ -99,7 +99,6 @@
 				});
 			});
 			self.stats = Enumerable.From(self.stats).Distinct().ToArray();
-			
 			localStorage.setItem("postlist-params",JSON.stringify(params));
 		});
 	}
@@ -141,9 +140,7 @@
 			animation: true,
 			allowOutsideClick: false
 		}).then(function() {
-			$scope.request("/post/truncate", {
-				id: row.Id
-			}, function(data) {
+			$scope.request("/post/truncate/" + row.Id, null, function(data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
@@ -174,9 +171,7 @@
 		});
 	}
 	self.restore = function(row) {
-		$scope.request("/post/restore", {
-			id: row.Id
-		}, function(data) {
+		$scope.request("/post/restore/"+row.Id,null, function(data) {
 			window.notie.alert({
 				type: 1,
 				text: data.Message,
@@ -187,9 +182,7 @@
 		});
 	}
 	self.fixtop = function(id) {
-		$scope.request("/post/Fixtop", {
-			id: id
-		}, function(data) {
+		$scope.request("/post/Fixtop/"+id,null, function(data) {
 			window.notie.alert({
 				type: 1,
 				text: data.Message,
@@ -504,11 +497,9 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 	$scope.id = $location.search()['id'];
 	
 	$scope.reserve = true;
-	$scope.request("/post/get", {
-		id: $scope.id
-	}, function (data) {
+	$scope.get("/post/get/" + $scope.id, function (data) {
 		$scope.post = data.Data;
-		$scope.request("/post/gettag", null, function (res) {
+		$scope.get("/post/gettag", function (res) {
 			$scope.Tags = res.Data;
 			$('.ui.dropdown.tags').dropdown({
 				allowAdditions: true,

@@ -1,5 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 using System.Net;
@@ -17,7 +18,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="username"></param>
         /// <returns></returns>
-        public async Task<ActionResult> ChangeUsername(int id, string username)
+        public async Task<ActionResult> ChangeUsername([FromBodyOrDefault] int id, [FromBodyOrDefault] string username)
         {
             UserInfo userInfo = await UserInfoService.GetByIdAsync(id);
             if (!username.Equals(userInfo.Username) && UserInfoService.UsernameExist(username))
@@ -36,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="username"></param>
         /// <returns></returns>
-        public async Task<ActionResult> ChangeNickName(int id, string username)
+        public async Task<ActionResult> ChangeNickName([FromBodyOrDefault] int id, [FromBodyOrDefault] string username)
         {
             UserInfo userInfo = await UserInfoService.GetByIdAsync(id);
             userInfo.NickName = username;
@@ -52,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="pwd"></param>
         /// <param name="pwd2"></param>
         /// <returns></returns>
-        public ActionResult ChangePassword(int id, string old, string pwd, string pwd2)
+        public ActionResult ChangePassword([FromBodyOrDefault] int id, [FromBodyOrDefault] string old, [FromBodyOrDefault] string pwd, [FromBodyOrDefault] string pwd2)
         {
             if (pwd.Equals(pwd2))
             {
@@ -69,7 +70,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="name">用户名</param>
         /// <param name="pwd"></param>
         /// <returns></returns>
-        public ActionResult ResetPassword(string name, string pwd)
+        public ActionResult ResetPassword([FromBodyOrDefault] string name, [FromBodyOrDefault] string pwd)
         {
             bool b = UserInfoService.ResetPassword(name, pwd);
             return ResultData(null, b, b ? $"密码重置成功，新密码为：{pwd}！" : "密码重置失败！");
@@ -81,7 +82,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public async Task<ActionResult> ChangeAvatar(int id, string path)
+        public async Task<ActionResult> ChangeAvatar([FromBodyOrDefault] int id, [FromBodyOrDefault] string path)
         {
             UserInfo userInfo = await UserInfoService.GetByIdAsync(id);
             userInfo.Avatar = path;
@@ -96,7 +97,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Save(UserInfoDto model)
+        public async Task<IActionResult> Save([FromBodyOrDefault] UserInfoDto model)
         {
             var userInfo = UserInfoService.GetByUsername(model.Username);
             if (userInfo is null)
@@ -119,7 +120,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete([FromBodyOrDefault] int id)
         {
             await UserInfoService.DeleteByIdAsync(id);
             return ResultData(null);

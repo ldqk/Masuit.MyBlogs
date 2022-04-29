@@ -120,5 +120,10 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 跳转到第三方链接
         /// </summary>
         public string Redirect { get; set; }
+
+        /// <summary>
+        /// 保留历史版本
+        /// </summary>
+        public bool Reserve { get; set; }
     }
 }

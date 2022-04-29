@@ -7,7 +7,7 @@ myApp.controller("dashboard", ["$scope", function ($scope) {
 myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 	UEDITOR_CONFIG.autoHeightEnabled=false;
 	UEDITOR_CONFIG.initialFrameHeight=320;
-	$scope.request("/system/getsettings", null, function(data) {
+	$scope.get("/system/getsettings", function(data) {
 		var settings = {};
 		Enumerable.From(data.Data).Select(e => {
 			return {
@@ -69,8 +69,6 @@ myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 					}
 					$http.post("/system/save", {
 						sets: JSON.stringify(result)
-					}, {
-						'Content-Type': 'application/x-www-form-urlencoded'
 					}).then(function(res) {
 						resolve(res.data);
 					}, function() {
@@ -201,7 +199,7 @@ myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 }]);
 myApp.controller("log", ["$scope", function ($scope) {
 	$scope.getfiles= function() {
-		$scope.request("/dashboard/GetLogfiles", null, function(data) {
+		$scope.get("/dashboard/GetLogfiles", function(data) {
 			$scope.files = data.Data;
 		});
 	}
@@ -293,7 +291,7 @@ myApp.controller("email", ["$scope", "$http", function ($scope) {
 myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", function ($scope, $http,NgTableParams,$timeout) {
 	var self = this;
 	self.data = {};
-	$scope.request("/system/getsettings", null, function(data) {
+	$scope.get("/system/getsettings", function(data) {
 		var settings = {};
 		Enumerable.From(data.Data).Select(e => {
 			return {
@@ -306,7 +304,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 		$scope.Settings = settings;
 	});
 	this.load = function() {
-		$scope.request("/system/InterceptLog", null, function(res) {
+		$scope.get("/system/InterceptLog", function(res) {
 			self.tableParams = new NgTableParams({}, {
 				filterDelay: 0,
 				dataset: res.Data.list
@@ -329,7 +327,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			cancelButtonText: '取消',
 			preConfirm: function() {
 				return new Promise(function (resolve) {
-					$scope.request("/system/ClearInterceptLog", null, function (res) {
+					$scope.request("/system/ClearInterceptLog",null, function (res) {
 						resolve(res.Message);
 					});
 				});
@@ -362,7 +360,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 	}
 
 	$scope.getIPBlackList= function() {
-		$scope.request("/system/IpBlackList",null, function (data) {
+		$scope.get("/system/IpBlackList",function (data) {
 			swal({
 				title:"编辑全局IP黑名单",
 				text:"多个IP之间用英文逗号分隔",
@@ -389,7 +387,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 	}
 
 	$scope.getIPWhiteList= function() {
-		$scope.request("/system/IpWhiteList",null, function (data) {
+		$scope.get("/system/IpWhiteList", function (data) {
 			swal({
 				title:"编辑全局IP白名单",
 				text:"多个IP之间用英文逗号分隔",
@@ -416,7 +414,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 	}
 
 	$scope.getIPRangeBlackList= function() {
-		$scope.request("/system/GetIPRangeBlackList",null, function (data) {
+		$scope.get("/system/GetIPRangeBlackList", function (data) {
 			swal({
 				title:"编辑IP地址段黑名单",
 				text:"每行一条地址段，起始地址和结束地址用空格分隔开，其余信息也用空格分隔开",
@@ -465,8 +463,6 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 					}
 					$http.post("/system/save", {
 						sets: JSON.stringify(result)
-					}, {
-						'Content-Type': 'application/x-www-form-urlencoded'
 					}).then(function(res) {
 						resolve(res.data);
 					}, function() {
@@ -513,7 +509,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 myApp.controller("sendbox", ["$scope", "$http", function ($scope, $http) {
 	UEDITOR_CONFIG.autoHeightEnabled=false;
 	$scope.load= function() {
-		$http.post("/system/sendbox").then(function (res) {
+		$http.get("/system/sendbox").then(function (res) {
 			$scope.Mails = res.data;
 		});
 	};
@@ -532,9 +528,7 @@ myApp.controller("sendbox", ["$scope", "$http", function ($scope, $http) {
 	}
 
 	$scope.send= function(mail) {
-		$http.post("/system/sendmail",mail, {
-			'Content-Type':'application/x-www-form-urlencoded'
-		}).then(function (res) {
+		$http.post("/system/sendmail",mail).then(function (res) {
 			if (res.data) {
 				layer.alert(res.data.Message);
 			} else {
