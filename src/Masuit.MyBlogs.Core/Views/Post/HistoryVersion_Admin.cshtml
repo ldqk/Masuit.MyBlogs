@@ -1,5 +1,4 @@
-﻿@using System.Diagnostics
-@using Masuit.MyBlogs.Core.Common
+﻿@using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
@@ -26,6 +25,10 @@
 	<ol class="cd-breadcrumb triangle">
 		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
 		<li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
+		@if(Model.Category.Parent!=null) {
+			<li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.Category.ParentId">@Model.Category.Parent.Name</a></li>
+		}
+		<li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.Category.Name</a></li>
 		<li>@Html.ActionLink(Model.Post.Title.Length > 20 ? Model.Post.Title.Substring(0, 20) + "..." : Model.Post.Title, "Details", "Post", new { id = Model.PostId }, null)</li>
 		<li><a asp-controller="Post" asp-action="History" asp-route-id="@Model.PostId">历史版本</a></li>
 		<li class="current"><em>@(Model.Title.Length > 35 ? Model.Title.Substring(0, 35) + "..." : Model.Title)</em></li>

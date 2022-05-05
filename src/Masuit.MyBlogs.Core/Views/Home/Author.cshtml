@@ -3,48 +3,49 @@
 @using Masuit.Tools.Core.Net
 @model HomePageViewModel
 @{
-    ViewBag.Title = "作者_" + ViewBag.Author;
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    Random r = new Random();
+	ViewBag.Title = "作者_" + ViewBag.Author;
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	Random r = new Random();
 }
 <style>
-    .bg-title {
-        height: 50vh;
-        max-height: 400px;
-        position: relative;
-        background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
-        background-size:cover;
-        background-attachment: fixed;
-        margin-bottom: 10px;
-    }
-    .header-content {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%,-50%);
-    }
-    .header-content .divider {
-        width: inherit;
-        height: 20px;
-        margin-top: 20px;
-        border-top: 3px solid rebeccapurple;
-    }
+	.bg-title {
+		height: 50vh;
+		max-height: 400px;
+		position: relative;
+		background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
+		background-size:cover;
+		background-attachment: fixed;
+		margin-bottom: 10px;
+	}
+	.header-content {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%,-50%);
+	}
+	.header-content .divider {
+		width: inherit;
+		height: 20px;
+		margin-top: 20px;
+		border-top: 3px solid rebeccapurple;
+	}
 </style>
 <div class="container">
-    <ol class="cd-breadcrumb triangle">
-        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-        <li class="current"><em>@ViewBag.Title</em></li>
-    </ol>
+	<ol class="cd-breadcrumb triangle">
+		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
+		<li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
+		<li class="current"><em>@ViewBag.Title</em></li>
+	</ol>
 </div>
 <div class="bg-title">
-    <div class="header-content text-center">
-        <h1 class="size48">
-            @ViewBag.Author 参与编辑的文章
-        </h1>
-        <div class="divider"></div>
-    </div>
+	<div class="header-content text-center">
+		<h1 class="size48">
+			@ViewBag.Author 参与编辑的文章
+		</h1>
+		<div class="divider"></div>
+	</div>
 </div>
 @{
-    var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-    await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
+	var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
+	await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
 }

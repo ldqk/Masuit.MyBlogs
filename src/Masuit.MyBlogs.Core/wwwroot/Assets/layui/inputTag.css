@@ -1,0 +1,87 @@
+@keyframes fariy-fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.fairy-tag-container {
+  width: auto;
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  background-color: #ffffff;
+}
+.fairy-tag-container:hover {
+  border-color: #d2d2d2;
+}
+    .fairy-tag-container span.fairy-tag {
+        float: left;
+        font-size: 13px;
+        padding: 5px 8px;
+        margin-bottom: 5px;
+        border-radius: 2px;
+        line-height: 16px;
+        margin-top: 4px;
+        margin-left: 5px;
+    }
+.fairy-tag-container span.fairy-tag a {
+  font-size: 11px;
+  font-weight: bolder;
+  color: #ffffff;
+  text-decoration: none;
+  margin-left: 6px;
+}
+.fairy-tag-container span.fairy-tag a:hover {
+  cursor: pointer;
+}
+.fairy-tag-container span.fairy-bg-red {
+  background-color: #FF5722;
+}
+.fairy-tag-container span.fairy-bg-orange {
+  background-color: #FFB800;
+}
+.fairy-tag-container span.fairy-bg-green {
+  background-color: #009688;
+}
+.fairy-tag-container span.fairy-bg-cyan {
+  background-color: #2F4056;
+}
+.fairy-tag-container span.fairy-bg-blue {
+  background-color: #1E9FFF;
+}
+.fairy-tag-container span.fairy-bg-black {
+  background-color: #393D49;
+}
+.fairy-tag-container span.fairy-bg-red,
+.fairy-tag-container span.fairy-bg-orange,
+.fairy-tag-container span.fairy-bg-green,
+.fairy-tag-container span.fairy-bg-cyan,
+.fairy-tag-container span.fairy-bg-blue,
+.fairy-tag-container span.fairy-bg-black {
+  color: #ffffff;
+}
+.fairy-tag-container .fairy-anim-fadein {
+  animation: fariy-fadein 0.3s both;
+}
+.fairy-tag-container .fairy-tag-input[type='text'] {
+  width: 80px;
+  font-size: 13px;
+  padding: 6px;
+  background: transparent;
+  border: 0 none;
+  outline: 0;
+}
+.fairy-tag-container .fairy-tag-input[type='text']:focus::-webkit-input-placeholder {
+  color: transparent;
+}
+.fairy-tag-container .fairy-tag-input[type='text']:focus:-moz-placeholder {
+  color: transparent;
+}
+.fairy-tag-container .fairy-tag-input[type='text']:focus:-moz-placeholder {
+  color: transparent;
+}
+.fairy-tag-container .fairy-tag-input[type='text']:focus:-ms-input-placeholder {
+  color: transparent;
+}
+/*# sourceMappingURL=inputTag.css.map */

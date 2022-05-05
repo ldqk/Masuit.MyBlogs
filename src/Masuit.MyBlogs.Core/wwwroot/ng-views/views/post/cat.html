@@ -1,22 +1,148 @@
-﻿<div>
-    <button class="btn btn-default waves-effect" ng-click="list.add()">
-        <span class="glyphicon glyphicon-plus"></span>
-    </button>
-    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
-        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'分类名称'" filter="{Name: 'text'}" sortable="'Name'">
-                <a ng-href="/cat/{{row.Id}}" target="_blank">{{row.Name}}</a>
-            </td>
-            <td title="'分类描述'" filter="{Description: 'text'}" sortable="'Description'">
-                {{row.Description}}
-            </td>
-            <td title="'文章数'" sortable="'TotalPostCount'">
-                {{row.TotalPostCount}}
-            </td>
-            <td title="'操作'">
-                <button class="btn btn-danger btn-sm waves-effect" ng-click="list.del(row)">删除</button>
-                <button class="btn btn-success btn-sm waves-effect" ng-click="list.edit(row)">修改</button>
-            </td>
-        </tr>
-    </table>
+﻿<style>
+    .angular-ui-tree-handle {
+        background: #f8faff;
+        border: 1px solid #dae2ea;
+        color: #7c9eb2;
+        padding: 10px 10px;
+        line-height: 26px;
+    }
+
+        .angular-ui-tree-handle:hover {
+            color: #438eb9;
+            background: #f4f6f7;
+            border-color: #dce2e8;
+        }
+
+    .angular-ui-tree-placeholder {
+        background: #f0f9ff;
+        border: 2px dashed #bed2db;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    tr.angular-ui-tree-empty {
+        height: 100px
+    }
+
+    .group-title {
+        background-color: #687074 !important;
+        color: #FFF !important;
+    }
+
+    .tree-node {
+        border: 1px solid #dae2ea;
+        background: #f8faff;
+        color: #7c9eb2;
+    }
+
+    .nodrop {
+        background-color: #f2dede;
+    }
+    .tree-handle {
+        padding: 10px;
+        background: #428bca;
+        color: #FFF;
+        margin-right: 10px;
+    }
+
+    .angular-ui-tree-placeholder {
+        background: #f0f9ff;
+        border: 2px dashed #bed2db;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+    body {
+        overflow-x: hidden;
+    }
+</style>
+<script type="text/ng-template" id="nodes_renderer.html">
+    <div ui-tree-handle class="tree-node tree-node-content">
+        <div class="row">
+            <div class="col-sm-2">
+                <a class="btn btn-success btn-xs waves-effect" ng-if="node.Children && node.Children.length > 0" data-nodrag ng-click="toggle(this)" style="margin-right:5px;">
+                    <span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}"></span>
+                </a>
+                <a ng-href="/cat/{{node.Id}}" style="font-size:16px;" target="_blank">{{node.Id}}：{{node.Name}}</a>
+            </div>
+            <div class="col-sm-8">
+                {{node.Description}}
+            </div>
+            <div class="col-sm-2">
+                <div class="btn-group">
+                    <a class="pull-right btn btn-danger waves-effect" data-nodrag ng-click="del(this)">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </a>
+                    <a class="pull-right btn btn-info waves-effect" data-nodrag ng-click="edit(node)">
+                        <span class="glyphicon glyphicon-edit"></span>
+                    </a>
+                    <a class="pull-right btn btn-primary waves-effect" data-nodrag ng-click="newSubItem(this)">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ol ui-tree-nodes="" ng-model="node.Children" ng-class="{hidden: collapsed}" class="animated fadeIn">
+        <li ng-repeat="node in node.Children" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+    </ol>
+</script>
+<h1>分类管理</h1>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-inline m-b-5">
+            <div class="btn-group">
+                <button class="btn btn-success waves-effect" ng-click="expandAll()">展开/收起所有</button>
+                <button class="btn btn-info waves-effect" ng-click="newItem()">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                <button class="btn btn-primary waves-effect" ng-click="init()">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                </button>
+            </div>
+            <div class="pull-right">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        搜索：
+                    </span>
+                    <div class="fg-line">
+                        <input ng-model="query" ng-change="findNodes()" type="search" class="form-control pull-right" placeholder="搜索">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-ui-tree="treeOptions" id="tree-root">
+            <ol data-ui-tree-nodes ng-model="data" class="animated fadeIn">
+                <li data-ng-repeat="node in data" data-ui-tree-node ng-include="'nodes_renderer.html'" ng-show="visible(node)"></li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<div id="modal" class="modal">
+    <div class="container-fluid" style="margin: 15px 0;">
+        <div class="bgm-white">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    分类名：
+                </span>
+                <div class="fg-line">
+                    <input type="text" class="form-control" id="category-name" ng-model="category.Name" />
+                </div>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    简介：
+                </span>
+                <div class="fg-line">
+                    <textarea class="form-control" id="category-sort" ng-model="category.Description" rows="5"></textarea>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-info waves-effect" ng-click="submit(category)">确认</button>
+                <button type="button" class="btn btn-danger waves-effect" ng-click="closeAll()">取消</button>
+            </div>
+        </div>
+    </div>
 </div>

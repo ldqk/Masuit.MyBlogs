@@ -11,6 +11,10 @@
 	<ol class="cd-breadcrumb triangle">
 		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
 		<li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
+		@if(post.Category.Parent!=null) {
+			<li><a asp-controller="Home" asp-action="Category" asp-route-id="@post.Category.ParentId">@post.Category.Parent.Name</a></li>
+		}
+		<li><a asp-controller="Home" asp-action="Category" asp-route-id="@post.CategoryId">@post.Category.Name</a></li>
 		<li>@Html.ActionLink(post.Title.Length > 40 ? post.Title.Substring(0, 40) + "..." : post.Title, "Details", "Post", new { id = post.Id }, null)</li>
 		<li class="current"><em>历史版本</em></li>
 	</ol>

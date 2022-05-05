@@ -28,30 +28,78 @@
 		});
 	}
 
-	$('.ui.dropdown.types').dropdown({
-		onChange: function (value) {
-			$scope.partner.Types = value;
+	$scope.typesDropdown =xmSelect.render({
+		el: '#types',
+		tips: '请选择推广区域',
+		model: { label: { type: 'text' } },
+		direction: 'up',
+		tree: {
+			show: true,
+			strict: false,
+			expandedKeys: true,
+		},
+		filterable: true, //搜索功能
+		autoRow: true, //选项过多,自动换行
+		data:[{name:"轮播图",value:1},{name:"列表项",value:2},{name:"边栏",value:3},{name:"内页",value:4}],
+		on: function (data) {
+			var arr=[];
+			for (var i = 0; i < data.arr.length; i++) {
+				arr.push(data.arr[i].name);
+			}
+			$scope.partner.Types=arr.join(",");
 		}
 	});
 
-	$('.ui.dropdown.region').dropdown({
-		onChange: function (value) {
-			$scope.partner.RegionMode = value;
+	$scope.regionDropdown =xmSelect.render({
+		el: '#regionMode',
+		tips: '区域',
+		model: { label: { type: 'text' } },
+		radio: true,
+		clickClose: true,
+		direction: 'up',
+		tree: {
+			show: true,
+			strict: false,
+		},
+		filterable: false, //搜索功能
+		autoRow: false, //选项过多,自动换行
+		data:[{name:"不限",value:0},{name:"以内",value:1},{name:"以外",value:2}],
+		on: function (data) {
+			if (data.arr.length>0) {
+				$scope.partner.RegionMode = data.arr[0].value;
+			}
 		}
 	});
-
+	$scope.regionDropdown.setValue([0]);
 	$scope.getCategory = function () {
 		$http.get("/category/getcategories").then(function (res) {
 			var data = res.data;
 			if (data.Success) {
 				$scope.cat = data.Data;
-				$('.ui.dropdown.category').dropdown({
-					onChange: function (value) {
-						$scope.partner.CategoryIds = value;
+				$scope.categoryDropdown = xmSelect.render({
+					el: '#category',
+					tips: '请选择分类',
+			        prop: {
+				        name: 'Name',
+				        value: 'Id',
+				        children: 'Children',
+			        },
+					model: { label: { type: 'text' } },
+					direction: 'up',
+					tree: {
+						show: true,
+						strict: false,
+						expandedKeys: true,
 					},
-					message: {
-						maxSelections: '最多选择 {maxCount} 项',
-						noResults: '无搜索结果！'
+					filterable: true, //搜索功能
+					autoRow: true, //选项过多,自动换行
+					data:data.Data,
+					on: function (data) {
+						var arr=[];
+						for (var i = 0; i < data.arr.length; i++) {
+							arr.push(data.arr[i].Id);
+						}
+						$scope.partner.CategoryIds = arr.join(",");
 					}
 				});
 			} else {
@@ -106,11 +154,6 @@
 				return true;
 			}
 		});
-		$timeout(function () {
-			$('.ui.dropdown.category').dropdown('clear');
-			$('.ui.dropdown.types').dropdown('clear');
-			$('.ui.dropdown.region').dropdown('clear');
-		}, 10);
 	}
 
 	$scope.edit = function (item) {
@@ -119,14 +162,9 @@
 		$scope.isAdd = false;
 		$scope.allowUpload=false;
 		layer.closeAll();
-		$timeout(function () {
-			$('.ui.dropdown.category').dropdown('clear');
-			$('.ui.dropdown.types').dropdown('clear');
-			$('.ui.dropdown.region').dropdown('clear');
-			$('.ui.dropdown.category').dropdown('set selected', (item.CategoryIds+"").split(','));
-			$('.ui.dropdown.types').dropdown('set selected', item.Types.split(','));
-			$('.ui.dropdown.region').dropdown('set selected', item.RegionMode);
-		}, 10);
+		$scope.categoryDropdown.setValue((item.CategoryIds+"").split(','));
+		$scope.typesDropdown.setValue(item.Types.split(','));
+		$scope.regionDropdown.setValue([item.RegionMode]);
 		layer.open({
 			type: 1,
 			zIndex: 20,
@@ -149,12 +187,9 @@
 		$scope.isAdd = true;
 		$scope.allowUpload=false;
 		layer.closeAll();
-		$timeout(function () {
-			$('.ui.dropdown.category').dropdown('clear');
-			$('.ui.dropdown.types').dropdown('clear');
-			$('.ui.dropdown.category').dropdown('set selected', (item.CategoryIds+"").split(','));
-			$('.ui.dropdown.types').dropdown('set selected', item.Types.split(','));
-		}, 10);
+		$scope.categoryDropdown.setValue((item.CategoryIds+"").split(','));
+		$scope.typesDropdown.setValue(item.Types.split(','));
+		$scope.regionDropdown.setValue([0]);
 		layer.open({
 			type: 1,
 			zIndex: 20,
@@ -191,6 +226,9 @@
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 			$scope.partner.ImageUrl = "";
 			$scope.partner.Description = "";
+			$scope.categoryDropdown.setValue([]);
+		$scope.typesDropdown.setValue([]);
+		$scope.regionDropdown.setValue([0]);
 		});
 	}
 	$scope.uploadImage = function(field) {
@@ -246,8 +284,7 @@
 	$scope.detail = function (item) {
 		$scope.partner = angular.copy(item);
 		layer.closeAll();
-		$('.ui.dropdown.types').dropdown('clear');
-		$('.ui.dropdown.types').dropdown('set selected', item.Types.split(','));
+		$scope.typesDropdown.setValue(item.Types.split(','));
 		layer.open({
 			type: 1,
 			zIndex: 20,

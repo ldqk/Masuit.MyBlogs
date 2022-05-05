@@ -250,10 +250,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 投稿页
         /// </summary>
         /// <returns></returns>
-        public async Task<ActionResult> Publish()
+        public ActionResult Publish()
         {
-            var list = await CategoryService.GetQueryFromCacheAsync(c => c.Status == Status.Available);
-            return View(list);
+            return View();
         }
 
         /// <summary>
@@ -609,7 +608,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             Post post = PostService[id] ?? throw new NotFoundException("文章未找到");
             PostDto model = post.Mapper<PostDto>();
-            model.Seminars = post.Seminar.Select(s => s.Title).Join(",");
+            model.Seminars = post.Seminar.Select(s => s.Id).Join(",");
             return ResultData(model);
         }
 
@@ -673,7 +672,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 编辑
         /// </summary>
         /// <param name="post"></param>
-        /// <param name="reserve">是否保留历史版本</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost, MyAuthorize]
@@ -708,15 +706,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             p.Seminar.Clear();
             if (!string.IsNullOrEmpty(post.Seminars))
             {
-                var tmp = post.Seminars.Split(',').Distinct();
-                foreach (var s in tmp)
-                {
-                    var seminar = await SeminarService.GetAsync(e => e.Title.Equals(s));
-                    if (seminar != null)
-                    {
-                        p.Seminar.Add(seminar);
-                    }
-                }
+                var tmp = post.Seminars.Split(',').Distinct().Select(int.Parse).ToArray();
+                var seminars = SeminarService.GetQuery(s => tmp.Contains(s.Id)).ToList();
+                p.Seminar.AddRange(seminars);
             }
 
             var js = new JiebaSegmenter();
@@ -945,14 +937,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 刷新文章
         /// </summary>
         /// <param name="id">文章id</param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Refresh(int id)
+        public async Task<ActionResult> Refresh(int id, CancellationToken cancellationToken = default)
         {
             await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
             {
                 ModifyDate = DateTime.Now
-            });
+            }, cancellationToken);
             return RedirectToAction("Details", new { id });
         }
 
@@ -960,15 +953,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 标记为恶意修改
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [MyAuthorize]
         [HttpPost("post/block/{id}")]
-        public async Task<ActionResult> Block(int id)
+        public async Task<ActionResult> Block(int id, CancellationToken cancellationToken = default)
         {
             var b = await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
             {
                 Status = Status.Forbidden
-            }) > 0;
+            }, cancellationToken) > 0;
             return b ? ResultData(null, true, "操作成功！") : ResultData(null, false, "操作失败！");
         }
 
@@ -976,15 +970,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 切换允许rss订阅
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [MyAuthorize]
         [HttpPost("post/{id}/rss-switch")]
-        public async Task<ActionResult> RssSwitch(int id)
+        public async Task<ActionResult> RssSwitch(int id, CancellationToken cancellationToken = default)
         {
             await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
             {
                 Rss = !p.Rss
-            });
+            }, cancellationToken);
             return ResultData(null, message: "操作成功");
         }
 
@@ -992,15 +987,16 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 切换锁定编辑
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [MyAuthorize]
         [HttpPost("post/{id}/locked-switch")]
-        public async Task<ActionResult> LockedSwitch(int id)
+        public async Task<ActionResult> LockedSwitch(int id, CancellationToken cancellationToken = default)
         {
             await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
             {
                 Locked = !p.Locked
-            });
+            }, cancellationToken);
             return ResultData(null, message: "操作成功");
         }
 
@@ -1009,7 +1005,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<IActionResult> Statistic()
+        public async Task<IActionResult> Statistic(CancellationToken cancellationToken = default)
         {
             var keys = await RedisHelper.KeysAsync(nameof(PostOnline) + ":*");
             var sets = await keys.SelectAsync(async s => (Id: s.Split(':')[1].ToInt32(), Clients: await RedisHelper.HGetAsync<HashSet<string>>(s, "value")));
@@ -1029,19 +1025,19 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Id = p.Id,
                 Title = p.Title,
                 ViewCount = p.TotalViewCount
-            }).Cacheable().ToListAsync();
+            }).Cacheable().ToListAsync(cancellationToken);
             var mostAverage = await postsQuery.OrderByDescending(p => p.AverageViewCount).Take(10).Select(p => new PostModelBase()
             {
                 Id = p.Id,
                 Title = p.Title,
                 ViewCount = (int)p.AverageViewCount
-            }).Cacheable().ToListAsync();
+            }).Cacheable().ToListAsync(cancellationToken);
             var trending = await postsQuery.Select(p => new PostModelBase()
             {
                 Id = p.Id,
                 Title = p.Title,
                 ViewCount = p.PostVisitRecordStats.Where(t => t.Date >= DateTime.Today).Sum(e => e.Count)
-            }).OrderByDescending(p => p.ViewCount).Take(10).Cacheable().ToListAsync();
+            }).OrderByDescending(p => p.ViewCount).Take(10).Cacheable().ToListAsync(cancellationToken);
             return ResultData(new
             {
                 mostHots,

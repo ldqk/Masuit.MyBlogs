@@ -15,13 +15,32 @@
 			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 		}
 	};
+	var params = JSON.parse(localStorage.getItem("postlist-params"));
+	if (params) {
+		$scope.kw = params["kw"];
+		$scope.orderby= params["orderby"];
+		$scope.CategoryId=params["cid"];
+	}
 
-	$('.orderby').dropdown('set value', $scope.orderby);
-	$('.orderby').dropdown({
-		allowAdditions: false,
-		onChange: function (value) {
-			$scope.orderby = value;
-			self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+	xmSelect.render({
+		el: '#orderby',
+		tips: '请选择排序方式',
+		model: { label: { type: 'text' } },
+		radio: true,
+		clickClose: true,
+		tree: {
+			show: true,
+			strict: false,
+			expandedKeys: true,
+		},
+		filterable: true, //搜索功能
+		autoRow: true, //选项过多,自动换行
+		data:[{name:"发表时间",value:0,selected:$scope.orderby==0},{name:"最后修改",value:1,selected:$scope.orderby==1},{name:"访问量最多",value:2,selected:$scope.orderby==2},{name:"支持数最多",value:3,selected:$scope.orderby==3},{name:"每日平均访问量",value:4,selected:$scope.orderby==4}],
+		on: function (data) {
+			if (data.arr.length>0) {
+				$scope.orderby = data.arr[0].value;
+				self.GetPageData($scope.paginationConf.currentPage||1, $scope.paginationConf.itemsPerPage);
+			}
 		}
 	});
 
@@ -52,27 +71,46 @@
 	$http.get("/category/getcategories").then(function (res) {
 		var data = res.data;
 		if (data.Success) {
-			$scope.cat = data.Data;
-			$('.ui.dropdown.category').dropdown({
-				onChange: function (value) {
-					$scope.CategoryId = value;
-					self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-				},
-				message: {
-					maxSelections: '最多选择 {maxCount} 项',
-					noResults: '无搜索结果！'
-				}
-			});
-			
+			data.Data=[{name:"全部",Id:"",children:[]}].concat(data.Data);
 			var params = JSON.parse(localStorage.getItem("postlist-params"));
 			if (params) {
 				$scope.kw = params["kw"];
 				$scope.paginationConf.currentPage= params["page"];
-				$timeout(() => {
-					$('.category').dropdown('set selected', params["cid"]);
-					$('.orderby').dropdown('set selected', params["orderby"]);
-				},10);
+				for (var i = 0; i < data.Data.length; i++) {
+					for (var j = 0; j < data.Data[i].children.length; j++) {
+						data.Data[i].children[j].selected=data.Data[i].children[j].Id==params["cid"];
+					}
+					data.Data[i].selected=data.Data[i].Id==params["cid"];
+				}
 			}
+
+			$scope.cat = data.Data;
+			xmSelect.render({
+				el: '#category',
+				tips: '请选择分类',
+			    prop: {
+				    name: 'Name',
+				    value: 'Id',
+				    children: 'Children',
+			    },
+				model: { label: { type: 'text' } },
+				radio: true,
+				clickClose: true,
+				tree: {
+					show: true,
+					strict: false,
+					expandedKeys: true,
+				},
+				filterable: true, //搜索功能
+				autoRow: true, //选项过多,自动换行
+				data:data.Data,
+				on: function (data) {
+					if (data.arr.length>0) {
+						$scope.CategoryId = data.arr[0].Id;
+						self.GetPageData($scope.paginationConf.currentPage||1, $scope.paginationConf.itemsPerPage);
+					}
+				}
+			});
 		} else {
 			window.notie.alert({
 				type: 3,
@@ -258,8 +296,6 @@
 	}
 }]);
 myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
-	//UEDITOR_CONFIG.autoHeightEnabled=false;
-	//UEDITOR_CONFIG.initialFrameHeight=window.innerHeight*0.8;
 	clearInterval(window.interval);
 	$scope.post = {
 		Title: "",
@@ -280,27 +316,37 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 		}, function (data) {
 			$scope.post = data.Data;
 			delete $scope.post.Id;
-			$('.ui.dropdown.keyword').dropdown({
-				allowAdditions: true,
-				onChange: function(value) {
-					$scope.post.Keyword = value;
-				}
-			});
-			$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
+			$scope.keywordsDropdown.update({data: $scope.post.Keyword.split(',')});
 		});
 	}
 	$scope.getCategory = function () {
-		$http.post("/category/getcategories", null).then(function (res) {
+		$http.get("/category/getcategories").then(function (res) {
 			var data = res.data;
 			if (data.Success) {
 				$scope.cat = data.Data;
-				$('.ui.dropdown.category').dropdown({
-					onChange: function (value) {
-						$scope.post.CategoryId = value;
+				$scope.categoryDropdown = xmSelect.render({
+					el: '#category',
+					tips: '请选择分类',
+			        prop: {
+				        name: 'Name',
+				        value: 'Id',
+				        children: 'Children',
+			        },
+					model: { label: { type: 'text' } },
+					radio: true,
+					clickClose: true,
+					tree: {
+						show: true,
+						strict: false,
+						expandedKeys: true,
 					},
-					message: {
-						maxSelections: '最多选择 {maxCount} 项',
-						noResults: '无搜索结果！'
+					filterable: true, //搜索功能
+					autoRow: true, //选项过多,自动换行
+					data:data.Data,
+					on: function (data) {
+						if (data.arr.length>0) {
+							$scope.post.CategoryId=data.arr[0].Id;
+						}
 					}
 				});
 			} else {
@@ -313,38 +359,92 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 		});
 	}
 	$scope.getCategory();
-	$scope.request("/post/gettag", null, function(res) {
+	$scope.get("/post/gettag", function(res) {
 		$scope.Tags = res.Data;
-		$('.ui.dropdown.tags').dropdown({
-			allowAdditions: true,
-			maxSelections: 5,
-			message: {
-				maxSelections: '最多选择 {maxCount} 项'
+		var tags=[];
+		for (var i = 0; i < res.Data.length; i++) {
+			tags.push({name:res.Data[i],value:res.Data[i]});
+		}
+
+		$scope.tagDropdown =xmSelect.render({
+			el: '#tags',
+			tips: '请选择标签',
+			toolbar: { //工具条,全选,清空,反选,自定义
+				show: true,
+				list: ['ALL', 'CLEAR', 'REVERSE']
 			},
-			onChange: function(value) {
-				$scope.post.Label = value;
+			data: tags,
+			//initValue: ['shuiguo','shucai'],//默认初始化,也可以数据中selected属性
+			filterable: true, //搜索功能
+			autoRow: true, //选项过多,自动换行
+			// repeat: true,//是否支持重复选择
+			//max: 2,//最多选择2个
+			// template({ item, sels, name, value }){
+			//    //template:自定义下拉框的模板
+			//     return item.name  + '<span style="position: absolute; right: 10px; color: #8799a3">'+value+'</span>'
+			// },
+			on: function (data) {
+				var arr=[];
+				for (let j = 0; j < data.arr.length; j++) {
+					arr.push(data.arr[j].value);
+				}
+				$scope.post.Label=arr.join(",");
 			}
 		});
 	});
 	$scope.request("/seminar/getall", null, function(res) {
 		$scope.Seminars = res.Data;
-		$('.ui.dropdown.seminar').dropdown({
-			allowAdditions: false,
-			onChange: function(value) {
-				$scope.post.Seminars = value;
+		for (var i = 0; i < res.Data.length; i++) {
+			res.Data[i].name=res.Data[i].Title;
+			res.Data[i].value=res.Data[i].Id;
+		}
+
+		$scope.seminarDropdown =xmSelect.render({
+			el: '#seminar',
+			tips: '请选择标签',
+			toolbar: { //工具条,全选,清空,反选,自定义
+				show: true,
+				list: ['ALL', 'CLEAR', 'REVERSE']
+			},
+			data: res.Data,
+			//initValue: ['shuiguo','shucai'],//默认初始化,也可以数据中selected属性
+			filterable: true, //搜索功能
+			autoRow: true, //选项过多,自动换行
+			// repeat: true,//是否支持重复选择
+			//max: 2,//最多选择2个
+			// template({ item, sels, name, value }){
+			//    //template:自定义下拉框的模板
+			//     return item.name  + '<span style="position: absolute; right: 10px; color: #8799a3">'+value+'</span>'
+			// },
+			on: function (data) {
+				var arr=[];
+				for (let j = 0; j < data.arr.length; j++) {
+					arr.push(data.arr[j].value);
+				}
+				$scope.post.Seminars=arr.join(",");
+			}
+		})
+	});
+
+	 layui.config({
+		base: './Assets/layui/'
+	}).use(['inputTag', 'jquery'], function () {
+		var $ = layui.jquery, inputTag = layui.inputTag;
+		$scope.keywordsDropdown = inputTag.render({
+			elem: '.keywords',
+			data: [],//初始值
+			permanentData: [],//不允许删除的值
+			removeKeyNum: 8,//删除按键编号 默认，BackSpace 键
+			createKeyNum: 13,//创建按键编号 默认，Enter 键
+			beforeCreate: function (data, value) {//添加前操作，必须返回字符串才有效
+				return value;
+			},
+			onChange: function (data, value, type) {
+				$scope.post.Keyword=data.join(",");
 			}
 		});
-		$timeout(function () {
-			$('.ui.dropdown.category').dropdown("set selected", [1]);
-		}, 100);
 	});
-	
-	$('.ui.dropdown.keyword').dropdown({
-		allowAdditions: true,
-		onChange: function(value) {
-			$scope.post.Keyword = value;
-		}
-	});
+
 	//上传Word文档
 	$scope.upload = function() {
 		$("#docform").ajaxSubmit({
@@ -457,15 +557,18 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 				$scope.post = JSON.parse(localStorage.getItem("write-post-draft"));
 				$scope.$apply();
 				$timeout(function () {
-					$('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
-					if ($scope.post.Label) {
-						$('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
+					if ($scope.post.CategoryId>0) {
+						$scope.categoryDropdown.setValue([$scope.post.CategoryId]);
 					}
-					if ($scope.post.Keyword) {
-						$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
+					if ($scope.post.Label) {
+						$scope.tagDropdown.setValue($scope.post.Label.split(','));
 					}
 					if ($scope.post.Seminars) {
-						$('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
+						$scope.seminarDropdown.setValue($scope.post.Seminars.split(','));
+					}
+					if ($scope.post.Keyword) {
+						console.log($scope.keywordsDropdown);
+						$scope.keywordsDropdown.render({data:$scope.post.Keyword.split(',')})
 					}
 					$scope.Scheduled();
 				}, 10);
@@ -493,7 +596,6 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
 	});
 }]);
 myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
-	//UEDITOR_CONFIG.initialFrameHeight=window.innerHeight*0.72;
 	$scope.id = $location.search()['id'];
 	
 	$scope.reserve = true;
@@ -501,63 +603,129 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 		$scope.post = data.Data;
 		$scope.get("/post/gettag", function (res) {
 			$scope.Tags = res.Data;
-			$('.ui.dropdown.tags').dropdown({
-				allowAdditions: true,
-				maxSelections: 5,
-				message: {
-					maxSelections: '最多选择 {maxCount} 项'
+			var tags=[];
+			for (var i = 0; i < res.Data.length; i++) {
+				tags.push({name:res.Data[i],value:res.Data[i]});
+			}
+
+			$scope.tagDropdown =xmSelect.render({
+				el: '#tags',
+				tips: '请选择标签',
+				toolbar: { //工具条,全选,清空,反选,自定义
+					show: true,
+					list: ['ALL', 'CLEAR', 'REVERSE']
 				},
-				onChange: function (value) {
-					$scope.post.Label = value;
+				data: tags,
+				//initValue: ['shuiguo','shucai'],//默认初始化,也可以数据中selected属性
+				filterable: true, //搜索功能
+				autoRow: true, //选项过多,自动换行
+				// repeat: true,//是否支持重复选择
+				//max: 2,//最多选择2个
+				// template({ item, sels, name, value }){
+				//    //template:自定义下拉框的模板
+				//     return item.name  + '<span style="position: absolute; right: 10px; color: #8799a3">'+value+'</span>'
+				// },
+				on: function (data) {
+					var arr=[];
+					for (let j = 0; j < data.arr.length; j++) {
+						arr.push(data.arr[j].value);
+					}
+					$scope.post.Label=arr.join(",");
 				}
 			});
+			if ($scope.post.Label) {
+				$scope.tagDropdown.setValue($scope.post.Label.split(','));
+			}
 		});
-		$('.ui.dropdown.tags').dropdown('set value', $scope.post.Label);
 		$scope.request("/seminar/getall", null, function (res) {
 			$scope.Seminars = res.Data;
-			$('.ui.dropdown.seminar').dropdown({
-				allowAdditions: true,
-				maxSelections: 5,
-				message: {
-					maxSelections: '最多选择 {maxCount} 项'
+			for (var i = 0; i < res.Data.length; i++) {
+				res.Data[i].name=res.Data[i].Title;
+				res.Data[i].value=res.Data[i].Id;
+			}
+
+			$scope.seminarDropdown =xmSelect.render({
+				el: '#seminar',
+				tips: '请选择专题',
+				toolbar: { //工具条,全选,清空,反选,自定义
+					show: true,
+					list: ['ALL', 'CLEAR', 'REVERSE']
 				},
-				onChange: function (value) {
-					$scope.post.Seminars = value;
+				data: res.Data,
+				//initValue: ['shuiguo','shucai'],//默认初始化,也可以数据中selected属性
+				filterable: true, //搜索功能
+				autoRow: true, //选项过多,自动换行
+				// repeat: true,//是否支持重复选择
+				//max: 2,//最多选择2个
+				// template({ item, sels, name, value }){
+				//    //template:自定义下拉框的模板
+				//     return item.name  + '<span style="position: absolute; right: 10px; color: #8799a3">'+value+'</span>'
+				// },
+				on: function (data) {
+					var arr=[];
+					for (let j = 0; j < data.arr.length; j++) {
+						arr.push(data.arr[j].value);
+					}
+					$scope.post.Seminars=arr.join(",");
 				}
 			});
 			if ($scope.post.Seminars) {
-				$timeout(function () {
-					$('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
-				}, 10);
+				$scope.seminarDropdown.setValue($scope.post.Seminars.split(','));
 			}
 		});
 		$scope.getCategory();
-		
-		$('.ui.dropdown.keyword').dropdown({
-			allowAdditions: true,
-			onChange: function(value) {
-				$scope.post.Keyword = value;
-			}
+		layui.config({
+			base: './Assets/layui/'
+		}).use(['inputTag', 'jquery'], function () {
+			var $ = layui.jquery, inputTag = layui.inputTag;
+			$scope.keywordsDropdown = inputTag.render({
+				elem: '.keywords',
+				data:  ($scope.post.Keyword+"").split(','),//初始值
+				permanentData: [],//不允许删除的值
+				removeKeyNum: 8,//删除按键编号 默认，BackSpace 键
+				createKeyNum: 13,//创建按键编号 默认，Enter 键
+				beforeCreate: function (data, value) {//添加前操作，必须返回字符串才有效
+					return value;
+				},
+				onChange: function (data, value, type) {
+					$scope.post.Keyword=data.join(",");
+				}
+			});
 		});
-		$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
 	});
 	$scope.getCategory = function () {
 		$http.post("/category/getcategories", null).then(function (res) {
 			var data = res.data;
 			if (data.Success) {
 				$scope.cat = data.Data;
-				$('.ui.dropdown.category').dropdown({
-					onChange: function (value) {
-						$scope.post.CategoryId = value;
+				$scope.categoryDropdown = xmSelect.render({
+					el: '#category',
+					tips: '请选择分类',
+			        prop: {
+				        name: 'Name',
+				        value: 'Id',
+				        children: 'Children',
+			        },
+					model: { label: { type: 'text' } },
+					radio: true,
+					clickClose: true,
+					tree: {
+						show: true,
+						strict: false,
+						expandedKeys: true,
 					},
-					message: {
-						maxSelections: '最多选择 {maxCount} 项',
-						noResults: '无搜索结果！'
+					filterable: true, //搜索功能
+					autoRow: true, //选项过多,自动换行
+					data:data.Data,
+					on: function (data) {
+						if (data.arr.length>0) {
+							$scope.post.CategoryId=data.arr[0].Id;
+						}
 					}
 				});
-				$timeout(function () {
-					$('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
-				}, 10);
+				if ($scope.post.CategoryId>0) {
+						$scope.categoryDropdown.setValue([$scope.post.CategoryId]);
+					}
 			} else {
 				window.notie.alert({
 					type: 3,
@@ -688,18 +856,19 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 			submitCallback: function () {
 				$scope.post = JSON.parse(localStorage.getItem("post-draft-" + $scope.id));
 				$scope.$apply();
-				$timeout(function () {
-					$('.ui.dropdown.category').dropdown('set selected', [$scope.post.CategoryId]);
-					if ($scope.post.Label) {
-						$('.ui.dropdown.tags').dropdown('set selected', $scope.post.Label.split(','));
-					}
-					if ($scope.post.Keyword) {
-						$('.ui.dropdown.keyword').dropdown('set selected', $scope.post.Keyword.split(','));
-					}
-					if ($scope.post.Seminars) {
-						$('.ui.dropdown.seminar').dropdown('set selected', $scope.post.Seminars.split(','));
-					}
-				}, 10);
+				if ($scope.post.CategoryId>0) {
+					$scope.categoryDropdown.setValue([$scope.post.CategoryId]);
+				}
+				if ($scope.post.Label) {
+					$scope.tagDropdown.setValue($scope.post.Label.split(','));
+				}
+				if ($scope.post.Seminars) {
+					$scope.seminarDropdown.setValue($scope.post.Seminars.split(','));
+				}
+				if ($scope.post.Keyword) {
+					console.log($scope.keywordsDropdown);
+					$scope.keywordsDropdown.render({data:$scope.post.Keyword.split(',')})
+				}
 				window.interval = setInterval(function () {
 					localStorage.setItem("post-draft-"+$scope.id,JSON.stringify($scope.post));
 				},5000);
@@ -723,23 +892,196 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
 		$scope.ExceptRegions=data.Data;
 	});
 }]);
-myApp.controller("category", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
-	var self = this;
-	var cats = [];
-	self.data = {};
-	this.load = function() {
-		$scope.request("/category/GetCategories", null, function(res) {
-			self.tableParams = new NgTableParams({}, {
-				filterDelay: 0,
-				dataset: res.Data
-			});
-			cats = res.Data;
+myApp.controller("category", ["$scope", "$http", "$timeout", function($scope, $http, $timeout) {
+	$scope.category = {};
+	$scope.init = function() {
+		$scope.get("/category/GetCategories", function(data) {
+			$scope.data = data.Data;
+			$scope.collapse = true;
+			$timeout(function() {
+				$scope.expandAll();
+			}, 0);
 		});
 	}
-	self.load();
-	self.del = function(row) {
+	var sourceId, destId, index, parent, sourceIndex;
+	$scope.treeOptions = {
+		dropped: function(e) {
+			var dest = e.dest.nodesScope;
+			destId = dest.$id;
+			var pid = dest.node ? dest.node.id : 0; //pid
+			var prev = null;
+			var next = null;
+			if (index > sourceIndex) {
+				next = dest.$modelValue[index + 1], prev = dest.$modelValue[index];
+			} else if (index < sourceIndex) {
+				next = dest.$modelValue[index], prev = dest.$modelValue[index - 1];
+			} else {
+				next = dest.$modelValue[index];
+			}
+			var current = e.source.nodeScope.$modelValue;
+			if (destId == sourceId) {
+				if (index == sourceIndex) {
+					//位置没改变
+					return;
+				}
+				//同级内改变位置，找出兄弟结点，排序号更新
+				if (prev || next) {
+					//有多个子节点
+					if (next) {
+						current.ParentId = pid;
+						$scope.request("/category/save", current, function(data) {
+							window.notie.alert({
+								type: 1,
+								text: data.Message,
+								time: 3
+							});
+						});
+					} else if (prev) {
+						current.ParentId = pid;
+						$scope.request("/category/save", current, function (data) {
+							window.notie.alert({
+								type: 1,
+								text: data.Message,
+								time: 3
+							});
+						});
+					}
+				}
+			} else {
+				//层级位置改变
+				if (parent) {
+					//非顶级元素
+					//找兄弟结点
+					next = dest.$modelValue[index], prev = dest.$modelValue[index - 1];
+					if (prev || next) {
+						//有多个子节点
+						if (next) {
+							current.ParentId = parent.Id;
+							$scope.request("/category/save", current, function (data) {
+								window.notie.alert({
+									type: 1,
+									text: data.Message,
+									time: 3
+								});
+							});
+						} else if (prev) {
+							current.ParentId = parent.Id;
+							$scope.request("/category/save", current, function (data) {
+								window.notie.alert({
+									type: 1,
+									text: data.Message,
+									time: 3
+								});
+							});
+						}
+					} else {
+						//只有一个元素
+						current.ParentId = parent.Id;
+						$scope.request("/category/save", current, function (data) {
+							window.notie.alert({
+								type: 1,
+								text: data.Message,
+								time: 3
+							});
+						});
+					}
+				} else {
+					//顶级元素
+					sourceIndex = e.source.nodesScope.$parent.index();
+					if (index < sourceIndex) {
+						next = dest.$modelValue[index + 1], prev = dest.$modelValue[index];
+					} else {
+						next = dest.$modelValue[index], prev = dest.$modelValue[index - 1];
+					}
+					if (next) {
+						current.ParentId = pid;
+						$scope.request("/category/save", current, function (data) {
+							window.notie.alert({
+								type: 1,
+								text: data.Message,
+								time: 3
+							});
+						});
+					} else if (prev) {
+						current.ParentId = pid;
+						$scope.request("/category/save", current, function (data) {
+							window.notie.alert({
+								type: 1,
+								text: data.Message,
+								time: 3
+							});
+						});
+					}
+				}
+				parent = null;
+			}
+		},
+		dragStart: function(e) {
+			sourceId = e.dest.nodesScope.$id;
+			sourceIndex = e.dest.index;
+		}
+	};
+	$scope.findNodes = function () {
+		
+	};
+	$scope.visible = function (item) {
+		return !($scope.query && $scope.query.length > 0 && item.Name.indexOf($scope.query) == -1);
+	};
+	$scope.category = {};
+	$scope.newItem = function() {
+		layer.open({
+			type: 1,
+			zIndex: 20,
+			title: '修改菜单信息',
+			area: (window.screen.width > 600 ? 600 : window.screen.width) + 'px',// '340px'], //宽高
+			content: $("#modal"),
+			success: function(layero, index) {
+				$scope.category = {};
+			},
+			end: function() {
+				$("#modal").css("display", "none");
+			}
+		});
+	};
+	$scope.subcategory = {};
+
+	$scope.closeAll = function() {
+		layer.closeAll();
+		setTimeout(function() {
+			$("#modal").css("display", "none");
+		}, 500);
+	}
+	$scope.newSubItem = function (scope) {
+		layer.open({
+			type: 1,
+			zIndex: 20,
+			title: '修改菜单信息',
+			area: (window.screen.width > 600 ? 600 : window.screen.width) + 'px',// '340px'], //宽高
+			content: $("#modal"),
+			success: function(layero, index) {
+				$scope.category = {};
+			},
+			end: function() {
+				$("#modal").css("display", "none");
+			}
+		});
+		var nodeData = scope.$modelValue;
+		$scope.subcategory = nodeData;
+		$scope.category.ParentId = nodeData.Id;
+	};
+	$scope.expandAll = function() {
+		if ($scope.collapse) {
+			$scope.$broadcast('angular-ui-tree:collapse-all');
+		} else {
+			$scope.$broadcast('angular-ui-tree:expand-all');
+		}
+		$scope.collapse = !$scope.collapse;
+	};
+	
+	$scope.del = function(scope) {
+		var model = scope.$nodeScope.$modelValue;
 		var select = {};
-		Enumerable.From(cats).Where(e => e.Name != row.Name).Select(e => {
+		Enumerable.From($scope.data).Where(e => e.Id != model.Id).Select(e => {
 			return {
 				id: e.Id,
 				name: e.Name
@@ -768,105 +1110,65 @@ myApp.controller("category", ["$scope", "$http", "NgTableParams", function ($sco
 			}
 		}).then(function(result) {
 			if (result) {
-				if (row.Id == 1) {
+				if (model.Id == 1) {
 					swal({
 						type: 'error',
 						html: "默认分类不能被删除！"
 					});
 				} else {
-					$scope.request("/category/delete", {
-						id: row.Id,
-						cid:result
-					}, function(data) {
+					$scope.request("/category/delete?id="+model.Id+"&cid="+result, null, function(data) {
 						swal({
 							type: 'success',
 							html: data.Message
 						});
 					});
-					_.remove(self.tableParams.settings().dataset, function(item) {
-						return row === item;
-					});
-					self.tableParams.reload().then(function(data) {
-						if (data.length === 0 && self.tableParams.total() > 0) {
-							self.tableParams.page(self.tableParams.page() - 1);
-							self.tableParams.reload();
-						}
-					});
+					$scope.init();
 				}
 			}
 		}).catch(swal.noop);
 	}
-
-	self.edit = function (row) {
-		swal({
-			title: '修改分类',
-			html:
-			'<div class="input-group"><span class="input-group-addon">分类名称： </span><input id="name" type="text" class="form-control input-lg" autofocus placeholder="请输入新的分类名" value="'+row.Name+'"></div>' +
-			'<div class="input-group"><span class="input-group-addon">分类描述： </span><textarea id="desc" type="text" class="form-control input-lg" placeholder="请输入分类描述"" rows="4">'+row.Description+'</textarea></div>',
-			showCloseButton: true,
-			showCancelButton: true,
-			confirmButtonColor: "#DD6B55",
-			confirmButtonText: "确定",
-			cancelButtonText: "取消",
-			showLoaderOnConfirm: true,
-			allowOutsideClick: false,
-			preConfirm: function () {
-				return new Promise(function (resolve, reject) {
-					row.Name = $('#name').val();
-					row.Description = $('#desc').val();
-					$http.post("/category/edit", row).then(function (res) {
-						if (res.data.Success) {
-							resolve(res.data.Message);
-						} else {
-							reject(res.data.Message);
-						}
-					}, function (error) {
-						reject("操作失败");
-					});
-				});
+	
+	$scope.edit= function(category) {
+		$scope.category = category;
+		layer.open({
+			type: 1,
+			zIndex: 20,
+			title: '修改菜单信息',
+			area: (window.screen.width > 600 ? 600 : window.screen.width) + 'px',// '340px'], //宽高
+			//area: ['600px', '270px'], //宽高
+			content: $("#modal"),
+			success: function(layero, index) {
+				$scope.category = category;
+			},
+			end: function() {
+				$("#modal").css("display", "none");
 			}
-		}).then(function (msg) {
-			if (msg) {
-				swal({
-					type: 'success',
-					html: msg
-				});
-				self.load();
-			}
-		}).catch(swal.noop);
+		});
 	}
-	self.add = function() {
-		swal({
-			title: '请输入分类名',
-			input: 'text',
-			inputPlaceholder: '请输入分类',
-			showCancelButton: true,
-			confirmButtonColor: "#DD6B55",
-			confirmButtonText: "确定",
-			cancelButtonText: "取消",
-			inputValidator: function(value) {
-				return new Promise(function(resolve, reject) {
-					if (value) {
-						resolve();
-					} else {
-						reject('分类名不能为空');
-					}
+	
+	$scope.submit = function (category) {
+		if (category.Id) {
+			//修改
+			$scope.request("/category/save", category, function (data) {
+				swal(data.Message, null, 'info');
+				$scope.category = {};
+				$scope.closeAll();
+			});
+		}else {
+			//添加
+			$scope.request("/category/save", category, function (data) {
+				window.notie.alert({
+					type: 1,
+					text: data.Message,
+					time: 3
 				});
-			}
-		}).then(function(result) {
-			if (result) {
-				$scope.request("/category/add", {
-					Name: result
-				}, function(data) {
-					swal({
-						type: 'success',
-						html: data.Message
-					});
-					self.load();
-				});
-			}
-		}).catch(swal.noop);
+				$scope.category = {};
+				$scope.closeAll();
+				$scope.init();
+			});
+		}
 	}
+	$scope.init();
 }]);
 myApp.controller("postpending", ["$scope", "$http", "NgTableParams", "$timeout", function ($scope, $http, NgTableParams, $timeout) {
 	var self = this;

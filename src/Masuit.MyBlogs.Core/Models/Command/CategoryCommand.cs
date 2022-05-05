@@ -24,5 +24,10 @@ namespace Masuit.MyBlogs.Core.Models.Command
         /// ∑÷¿‡√Ë ˆ
         /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// ∏∏º∂id
+        /// </summary>
+        public int? ParentId { get; set; }
     }
 }

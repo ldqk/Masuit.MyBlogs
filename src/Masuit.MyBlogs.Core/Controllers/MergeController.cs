@@ -138,7 +138,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="reason"></param>
         /// <returns></returns>
         [HttpPost("reject/{id}")]
-        public async Task<ActionResult> Reject(int id, [Required(ErrorMessage = "请填写拒绝理由")] string reason)
+        public async Task<ActionResult> Reject(int id, [Required(ErrorMessage = "请填写拒绝理由"), FromBodyOrDefault] string reason)
         {
             var merge = await PostMergeRequestService.GetByIdAsync(id) ?? throw new NotFoundException("待合并文章未找到");
             merge.MergeState = MergeStatus.Reject;

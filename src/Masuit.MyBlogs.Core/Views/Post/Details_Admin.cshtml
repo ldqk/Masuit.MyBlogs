@@ -33,6 +33,10 @@
 	<ol class="cd-breadcrumb triangle">
 		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
 		<li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
+		@if(Model.Category.Parent!=null) {
+			<li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.Category.ParentId">@Model.Category.Parent.Name</a></li>
+		}
+		<li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.Category.Name</a></li>
 		<li class="current"><em>@ViewBag.Title</em></li>
 	</ol>
 	<div class="wrapper-content article">
@@ -78,7 +82,9 @@
 							<div class="row">
 								<div class="col-md-12 line-height24">
 									分类：<i class="icon-map-pin"></i>
-									<a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId" class="label label-info">@Model.Category.Name</a>
+									@{
+										await Html.RenderPartialAsync("CategoryPath", Model.Category);
+									}
 									| 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | 热度：<span class="text-danger">@Model.TotalViewCount</span>℃ | @(await Html.RenderComponentAsync<PostOnline>(RenderMode.ServerPrerendered, new { Model.Id,IP=Context.Connection.RemoteIpAddress.ToString(),IsAdmin=true })) | 状态：@Model.Status.GetDisplay()
 									@if (Model.Seminar.Any())
 									{

@@ -148,40 +148,20 @@
             <div class="form-group">
                 <div class="input-group">
                     <label for="desc" class="input-group-addon control-label">分类：</label>
-                    <div class="ui fluid top search multiple selection dropdown category">
-                        <input name="category" type="hidden" id="category">
-                        <i class="dropdown icon"></i>
-                        <div class="default text">请选择分类</div>
-                        <div class="menu">
-                            <div class="item" data-value>无</div>
-                            <div class="item" ng-repeat="item in cat track by $index" data-value="{{item.Id}}">{{item.Name}}</div>
-                        </div>
-                    </div>
+                    <div class="form-control" id="category"></div>
                 </div>
             </div>
             <div class="form-group">
                 <div class="input-group">
                     <label for="desc" class="input-group-addon control-label">推广区域：</label>
-                    <div class="ui fluid search multiple selection dropdown types">
-                        <input name="types" type="hidden" id="types">
-                        <i class="dropdown icon"></i>
-                        <div class="default text">请选择推广区域</div>
-                        <div class="menu">
-                            <div class="item" data-value="1">轮播图</div>
-                            <div class="item" data-value="2">列表项</div>
-                            <div class="item" data-value="3">边栏</div>
-                            <div class="item" data-value="4">内页</div>
-                        </div>
-                    </div>
+                    <div class="form-control" id="types"></div>
                 </div>
             </div>
             <div class="form-inline">
                 <div class="form-group">
                     <div class="input-group">
                         <label for="desc" class="input-group-addon control-label">当前竞价：</label>
-                        <div class="fg-line">
                             <input type="number" class="form-control" id="price" placeholder="竞价" ng-model="partner.Price">
-                        </div>
                     </div>
                 </div>
                 <div class="input-group">
@@ -195,17 +175,8 @@
                     <div class="input-group">
                         <label for="region" class="input-group-addon control-label">投放地区：</label>
                         <div class="fg-line">
-                            <input type="text" class="form-control" id="region" placeholder="竖线分隔，支持国家、地区、城市、运营商、ASN" ng-model="partner.Regions" style="width: 460px">
-                            <div class="ui selection dropdown region" style="min-width: 60px">
-                                <input name="category" type="hidden">
-                                <i class="dropdown icon"></i>
-                                <div class="default text">不限</div>
-                                <div class="menu">
-                                    <div class="item" data-value="0">不限</div>
-                                    <div class="item" data-value="1">以内</div>
-                                    <div class="item" data-value="2">以外</div>
-                                </div>
-                            </div>
+                            <input type="text" class="form-control" id="region" placeholder="竖线分隔，支持国家、地区、城市、运营商、ASN" ng-model="partner.Regions" style="width: 420px">
+                            <div class="form-control" id="regionMode" style="width: 100px"></div>
                         </div>
                     </div>
                 </div>

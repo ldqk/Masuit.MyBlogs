@@ -3,16 +3,17 @@
 @using Masuit.Tools.Core.Net
 @model HomePageViewModel
 @{
-    ViewBag.Title = "标签_" + ViewBag.Tag;
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewBag.Title = "标签_" + ViewBag.Tag;
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="container">
-    <ol class="cd-breadcrumb triangle">
-        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-        <li class="current"><em>@ViewBag.Title</em></li>
-    </ol>
+	<ol class="cd-breadcrumb triangle">
+		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
+		<li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
+		<li class="current"><em>@ViewBag.Title</em></li>
+	</ol>
 </div>
 @{
-    UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-    await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
+	UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
+	await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
 }

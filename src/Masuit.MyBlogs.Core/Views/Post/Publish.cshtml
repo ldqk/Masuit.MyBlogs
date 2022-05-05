@@ -1,12 +1,9 @@
-﻿@model IEnumerable<Category>
-@using Masuit.MyBlogs.Core.Models.Entity
-@{
+﻿@{
     ViewBag.Title = "投稿";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <link href="~/Assets/fileupload/filestyle.css" rel="stylesheet" />
-<link href="~/Assets/semantic/semantic.css" rel="stylesheet" />
-<script src="https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"></script>
+<script src="https://maplemei.gitee.io/xm-select/xm-select.js"></script>
 <script src="~/Assets/UEditor/ueditor.config.front.js"></script>
 <script src="~/Assets/UEditor/ueditor.all.min.js"></script>
 <script src="~/Scripts/publish/publish.js"></script>
@@ -41,17 +38,8 @@
             <div class="col-md-6 col-sm-6">
                 <div class="input-group">
                     <span class="input-group-addon">分类：</span>
-                    <div class="ui fluid search selection dropdown category">
-                        <input name="CategoryId" type="hidden" id="CategoryId">
-                        <i class="dropdown icon"></i>
-                        <div class="default text">选择分类</div>
-                        <div class="menu">
-                            @foreach (var s in Model)
-                            {
-                                <div class="item" data-value="@s.Id">@s.Name</div>
-                            }
-                        </div>
-                    </div>
+                    <div id="category"></div>
+                    <input type="hidden" value="1" name="CategoryId" />
                 </div>
             </div>
             <div class="col-md-6 col-sm-6">

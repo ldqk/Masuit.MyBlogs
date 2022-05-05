@@ -143,7 +143,7 @@
 		//,theme:'default'
 		//,themePath:URL +"themes/"
 		,
-		zIndex: 9 //编辑器层级的基数,默认是900
+		zIndex: 1 //编辑器层级的基数,默认是900
 
 		//针对getAllHtml方法，会在对应的head标签中增加该编码设置。
 		//,charset:"utf-8"

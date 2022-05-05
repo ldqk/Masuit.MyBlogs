@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Configs;
@@ -9,7 +7,6 @@ using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
@@ -79,21 +76,27 @@ namespace Masuit.MyBlogs.Core.Controllers
             });
         }
 
-        protected string ReplaceVariables(string text)
+        protected string ReplaceVariables(string text, int depth = 0)
         {
             if (string.IsNullOrEmpty(text))
             {
                 return text;
             }
 
-            var keys = Regex.Matches(text, @"\{\{[\w._-]+\}\}").Select(m => m.Value).Join(",");
-            if (!string.IsNullOrEmpty(keys))
+            var pattern = @"\{\{[\w._-]+\}\}";
+            var keys = Regex.Matches(text, pattern).Select(m => m.Value.Trim('{', '}')).ToArray();
+            if (keys.Length > 0)
             {
                 var dic = VariablesService.GetQueryFromCache(v => keys.Contains(v.Key)).ToDictionary(v => v.Key, v => v.Value);
                 var template = Template.Create(text);
                 foreach (var (key, value) in dic)
                 {
-                    template.Set(key, value);
+                    string valve = value;
+                    if (Regex.IsMatch(valve, pattern) && depth < 32)
+                    {
+                        valve = ReplaceVariables(valve, depth++);
+                    }
+                    template.Set(key, valve);
                 }
 
                 return template.Render();

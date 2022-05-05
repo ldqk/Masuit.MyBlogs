@@ -21,29 +21,11 @@
         </div>
         <div class="input-group">
             <span class="input-group-addon">分类：</span>
-            <div class="ui search selection dropdown category">
-                <input name="category" type="hidden" id="category">
-                <i class="dropdown icon"></i>
-                <div class="default text">请选择分类</div>
-                <div class="menu">
-                    <div class="item" data-value="">无</div>
-                    <div class="item" ng-repeat="item in cat track by $index" data-value="{{item.Id}}">{{item.Name}}</div>
-                </div>
-            </div>
+            <div class="form-control" id="category" style="width: 200px"></div>
         </div>
         <div class="input-group">
             <span class="input-group-addon">服务端排序方式：</span>
-            <div class="ui selection dropdown orderby">
-                <input name="gender" type="hidden" value="default">
-                <i class="dropdown icon"></i>
-                <div class="text">最后修改</div>
-                <div class="menu">
-                    <div class="item" data-value="0">发表时间</div>
-                    <div class="item" data-value="1">最后修改</div>
-                    <div class="item" data-value="2">访问量最多</div>
-                    <div class="item" data-value="4">支持数最多</div>
-                    <div class="item" data-value="5">每日平均访问量</div>
-                </div>
+            <div class="form-control" id="orderby" style="width: 200px"></div>
             </div>
         </div>
     </div>

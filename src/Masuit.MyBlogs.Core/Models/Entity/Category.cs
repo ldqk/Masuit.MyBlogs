@@ -1,4 +1,5 @@
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,13 +9,14 @@ namespace Masuit.MyBlogs.Core.Models.Entity
     /// 文章分类
     /// </summary>
     [Table("Category")]
-    public class Category : BaseEntity
+    public class Category : BaseEntity, ITree<Category>
     {
         public Category()
         {
             Post = new HashSet<Post>();
             Status = Status.Available;
         }
+
         /// <summary>
         /// 分类名
         /// </summary>
@@ -26,7 +28,23 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        /// 父级id
+        /// </summary>
+        public int? ParentId { get; set; }
+
         public virtual ICollection<Post> Post { get; set; }
+
         public virtual ICollection<PostHistoryVersion> PostHistoryVersion { get; set; }
+
+        /// <summary>
+        /// 父节点
+        /// </summary>
+        public virtual Category Parent { get; set; }
+
+        /// <summary>
+        /// 子级
+        /// </summary>
+        public virtual ICollection<Category> Children { get; set; }
     }
 }

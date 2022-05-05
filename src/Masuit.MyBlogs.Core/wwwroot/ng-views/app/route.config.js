@@ -25,8 +25,7 @@ myApp.config([
                         return $ocLazyLoad.load([
                             {
                                 files: [
-                                    "/Assets/semantic/semantic.css",
-                                    "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"
+                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
                                 ],
                                 cache: true
                             }, cpath + "/post.js"
@@ -65,8 +64,8 @@ myApp.config([
                             {
                                 files: [
                                     "https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js",
-                                    "/Assets/semantic/semantic.css",
-                                    "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"
+                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
+                                    "/Assets/layui/inputTag.css",
                                 ],
                                 cache: true
                             }, cpath + "/merge.js"
@@ -80,15 +79,7 @@ myApp.config([
             controller: "postpending as list",
             resolve: {
                 deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: ["/Assets/semantic/semantic.css"],
-                                cache: true
-                            }, {
-                                files: ["https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"],
-                                cache: true
-                            }, cpath + "/post.js"
-                        ]);
+                        return $ocLazyLoad.load([cpath + "/post.js"]);
                     }
                 ]
             }
@@ -102,8 +93,8 @@ myApp.config([
                             {
                                 files: [
                                     "https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js",
-                                    "/Assets/semantic/semantic.css",
-                                    "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"
+                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
+                                    "/Assets/layui/inputTag.css",
                                 ],
                                 cache: true
                             },
@@ -121,8 +112,8 @@ myApp.config([
                         return $ocLazyLoad.load([{
                                 files: [
                                     "https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js",
-                                    "/Assets/semantic/semantic.css",
-                                    "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"
+                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
+                                    "/Assets/layui/inputTag.css",
                                 ],
                                 cache: true
                             },
@@ -139,8 +130,7 @@ myApp.config([
                 deps: ["$ocLazyLoad", function($ocLazyLoad) {
                         return $ocLazyLoad.load([{
                                 files: [
-                                    "/Assets/semantic/semantic.css",
-                                    "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"
+                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
                                 ],
                                 cache: true
                             }, cpath + "/partner.js"
@@ -156,8 +146,7 @@ myApp.config([
                 deps: ["$ocLazyLoad", function($ocLazyLoad) {
                         return $ocLazyLoad.load([{
                                 files: [
-                                    "/Assets/semantic/semantic.css",
-                                    "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"
+                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
                                 ],
                                 cache: true
                             }, cpath + "/users.js"
@@ -247,9 +236,7 @@ myApp.config([
                         return $ocLazyLoad.load([
                             {
                                 files: [
-                                    "/Assets/semantic/semantic.css",
                                     "https://cdn.jsdelivr.net/gh/abodelot/jquery.json-viewer@master/json-viewer/jquery.json-viewer.css",
-                                    "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js",
                                     "https://cdn.jsdelivr.net/gh/abodelot/jquery.json-viewer@master/json-viewer/jquery.json-viewer.js"
                                 ],
                                 cache: true
@@ -340,9 +327,7 @@ myApp.config([
                         return $ocLazyLoad.load([
                             {
                                 files: [
-                                    "/assets/jedate/jedate.css", "/Assets/semantic/semantic.css",
                                     "/assets/jedate/jedate.js", 
-                                    "https://cdn.staticfile.org/semantic-ui/2.4.1/semantic.min.js"
                                 ],
                                 cache: true
                             }, cpath + "/analysis.js"

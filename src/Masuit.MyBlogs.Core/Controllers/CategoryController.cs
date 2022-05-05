@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using EFCoreSecondLevelCacheInterceptor;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Command;
@@ -27,7 +28,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600)]
         public ActionResult GetCategories()
         {
-            var list = CategoryService.GetQuery<string, CategoryDto>(c => c.Status == Status.Available, c => c.Name).ToList();
+            var list = CategoryService.GetQuery<string, CategoryDto>(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).NotCacheable().ToList();
             return ResultData(list);
         }
 
@@ -44,36 +45,20 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
-        /// 添加分类
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [MyAuthorize]
-        public async Task<ActionResult> Add([FromBodyOrDefault] Category model)
-        {
-            bool exist = CategoryService.Any(c => c.Name.Equals(model.Name));
-            if (exist)
-            {
-                return ResultData(null, false, $"分类{model.Name}已经存在！");
-            }
-            var b = await CategoryService.AddEntitySavedAsync(model) > 0;
-            if (b)
-            {
-                return ResultData(null, true, "分类添加成功！");
-            }
-
-            return ResultData(null, false, "分类添加失败！");
-        }
-
-        /// <summary>
-        /// 编辑分类
+        /// 保存分类
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Edit([FromBodyOrDefault] CategoryCommand dto)
+        public async Task<ActionResult> Save([FromBodyOrDefault] CategoryCommand dto)
         {
-            var cat = await CategoryService.GetByIdAsync(dto.Id) ?? throw new NotFoundException("分类不存在！");
+            var cat = await CategoryService.GetByIdAsync(dto.Id);
+            if (cat == null)
+            {
+                var b1 = await CategoryService.AddEntitySavedAsync(Mapper.Map<Category>(dto)) > 0;
+                return ResultData(null, b1, b1 ? "分类添加成功！" : "分类添加失败！");
+            }
+
             cat.Name = dto.Name;
             cat.Description = dto.Description;
             bool b = await CategoryService.SaveChangesAsync() > 0;

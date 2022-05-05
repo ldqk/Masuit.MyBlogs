@@ -3,15 +3,13 @@ using EFCoreSecondLevelCacheInterceptor;
 
 namespace Masuit.MyBlogs.Core
 {
-    /// <summary>
-    /// Using ICacheManager as a cache service.
-    /// </summary>
     public class MyEFCacheManagerCoreProvider : IEFCacheServiceProvider
     {
         private readonly IReaderWriterLockProvider _readerWriterLockProvider;
         private readonly ICacheManager<ISet<string>> _dependenciesCacheManager;
         private readonly ICacheManager<EFCachedData> _valuesCacheManager;
         private readonly string _keyPrefix = "EFCache:";
+
         /// <summary>
         /// Using IMemoryCache as a cache service.
         /// </summary>

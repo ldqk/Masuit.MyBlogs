@@ -3,12 +3,18 @@
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
 @using Masuit.MyBlogs.Core.Common
+@using Masuit.MyBlogs.Core.Infrastructure.Services.Interface
+@using Masuit.MyBlogs.Core.Models.Enum
+@using EFCoreSecondLevelCacheInterceptor
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
+@inject ICategoryService CategoryService
 @{
 	Category cat = ViewBag.Category;
 	ViewBag.Title = "分类_" + cat.Name;
 	Layout = "~/Views/Shared/_Layout.cshtml";
 	Random r = new Random();
+	var alllist = CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).Select(c => new{c.Id,c.Name}).Cacheable().ToList();
+	var children = cat.ParentId==null?cat.Children:cat.Parent.Children;
 }
 <style>
 	.bg-title {
@@ -36,7 +42,11 @@
 <div class="container">
 	<ol class="cd-breadcrumb triangle">
 		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
-		<li class="current"><em>@ViewBag.Title</em></li>
+		<li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
+		@if(cat.Parent!=null) {
+		    <li><a asp-controller="Home" asp-action="Category" asp-route-id="@cat.ParentId">@cat.Parent.Name</a></li>
+		}
+		<li class="current"><em>@cat.Name</em></li>
 	</ol>
 </div>
 <div class="bg-title">
@@ -44,9 +54,9 @@
 		<h1 class="size48">
 			@cat.Name
 			@if(CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") == "true"){
-			    <a class="btn btn-lg btn-success" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
-				    <i class="icon-rss4"></i>
-			    </a>
+				<a class="btn btn-lg btn-success" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
+					<i class="icon-rss4"></i>
+				</a>
 			}
 			<a class="btn btn-lg btn-danger" onclick='blockCategory("@cat.Id","@cat.Name")'>
 				<i class="icon-blocked"></i>
@@ -57,6 +67,32 @@
 			@cat.Description
 		</p>
 	</div>
+</div>
+<div class="container">
+	<p>
+		一级分类：
+		@foreach (var category in alllist)
+		{
+			if (cat.Id==category.Id||cat.ParentId==category.Id) {
+				<a class="text-red">@category.Name</a><text> | </text>
+			} else {
+				<a asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
+			}
+		}
+	</p>
+	@if(children.Count>0) {
+		<p>
+			<text>二级分类：</text>
+			@foreach (var category in children)
+			{
+				if (cat.Id==category.Id) {
+					<a class="text-red">@category.Name</a><text> | </text>
+				} else {
+					<a asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
+				}
+			}
+		</p>
+	}
 </div>
 @{
 	var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();

@@ -14,6 +14,7 @@ using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
+using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -235,11 +236,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Category(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
+            var cids = cat.Flatten().Select(c => c.Id).ToArray();
             var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
             {
-                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => p.CategoryId == cat.Id && p.Status == Status.Published)).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-                _ => await PostService.GetQuery(PostBaseWhere().And(p => p.CategoryId == cat.Id && p.Status == Status.Published)).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId) && p.Status == Status.Published)).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                _ => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId) && p.Status == Status.Published)).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
             };
             var viewModel = await GetIndexPageViewModel();
             viewModel.Posts = posts;

@@ -73,50 +73,27 @@
         <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">分类：</span>
-                <div class="category dropdown fluid search selection ui">
-                    <input id="category" name="category" type="hidden">
-                    <i class="dropdown icon"></i>
-                    <div class="default text">请选择分类</div>
-                    <div class="menu">
-                        <div class="item" data-value="{{item.Id}}" ng-repeat="item in cat track by $index">{{item.Name}}</div>
-                    </div>
-                </div>
+                <div class="form-control" id="category"></div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">标签：</span>
-                <div class="dropdown fluid multiple search selection tags ui">
-                    <input id="Label" name="Label" type="hidden">
-                    <i class="dropdown icon"></i>
-                    <div class="default text">标签(选择或输入新标签)</div>
-                    <div class="menu">
-                        <div class="item" data-value="{{item}}" ng-repeat="item in Tags track by $index">{{item}}</div>
-                    </div>
-                </div>
+                <div class="form-control" id="tags"></div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">文章关键词：</span>
-                <div class="dropdown fluid keyword multiple search selection ui">
-                    <input id="keyword" name="keyword" type="hidden">
-                    <div class="default text">文章关键词</div>
-                    <div class="menu"></div>
+                <div class="form-control fairy-tag-container">
+                    <input type="text" class="fairy-tag-input keywords" autocomplete="off">
                 </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="input-group">
                 <span class="input-group-addon">专题：</span>
-                <div class="dropdown fluid multiple search selection seminar ui">
-                    <input id="seminar" name="seminar" type="hidden">
-                    <i class="dropdown icon"></i>
-                    <div class="default text">选择专题(可选)</div>
-                    <div class="menu">
-                        <div class="item" data-value="{{item.Id}}" ng-repeat="item in Seminars track by $index">{{item.Title}}</div>
-                    </div>
-                </div>
+                <div class="form-control" id="seminar"></div>
             </div>
         </div>
     </div>
