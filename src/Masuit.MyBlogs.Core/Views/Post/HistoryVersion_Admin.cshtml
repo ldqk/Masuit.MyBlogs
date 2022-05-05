@@ -25,7 +25,7 @@
 	<ol class="cd-breadcrumb triangle">
 		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
 		<li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
-		@if(Model.Category.Parent!=null) {
+		@if(Model.Category.ParentId>0) {
 			<li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.Category.ParentId">@Model.Category.Parent.Name</a></li>
 		}
 		<li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.Category.Name</a></li>
