@@ -271,13 +271,8 @@ Test
 /src/Masuit.MyBlogs.Core/appsettings.prod.json
 /src/Masuit.MyBlogs.Core/Controllers/TestController.cs
 /src/Masuit.MyBlogs.Core/*.DotSettings
-material_admin_v-1.5-2
-/src/Masuit.MyBlogs.Core/App_Data/subjects.json
-/src/Masuit.MyBlogs.Core/wwwroot/subjects.json
 /src/Masuit.MyBlogs.Core/TokenCache.bin
 /src/Masuit.MyBlogs.Core/OneDrive.db
 /src/Masuit.MyBlogs.Core/App_Data/OneDrive.template.db
 /src/Masuit.MyBlogs.Core/App_Data/OneDrive.db
 /src/Masuit.MyBlogs.Core/.config
-/src/Masuit.MyBlogs.Core/wwwroot/drive/css/chunk-vendors.39ab6aaa.css
-/src/Masuit.MyBlogs.Core/wwwroot/drive/js/chunk-vendors.b37660ae.js
