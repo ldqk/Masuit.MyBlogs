@@ -1,8 +1,11 @@
 ﻿@using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.Tools.Systems
 @using Masuit.MyBlogs.Core.Common
+@using Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 @using Masuit.MyBlogs.Core.Models.Enum
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
+@inject IPostService PostService
+
 <div class="col-md-9 padding-clear">
     <div class="animated fadeIn blog">
         @if (Model.Posts.Data.Any())
@@ -27,6 +30,7 @@
                 <div class="page-header">
                     <h3>Oops！抱歉~没有找到相关的文章或资源！如果您有相关的结果，您可以 <a asp-controller="Post" asp-action="Publish" class="btn btn-info btn-lg">点击这里</a> 投稿哦！以下是一些随机推荐：</h3>
                 </div>
+                PostService.SolvePostsCategory(list);
                 foreach (PostDto post in list)
                 {
                     await Html.RenderPartialAsync("_ArticleListItem_Admin", post);

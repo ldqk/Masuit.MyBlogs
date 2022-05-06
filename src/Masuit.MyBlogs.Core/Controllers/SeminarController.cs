@@ -57,6 +57,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.SubTitle = s.SubTitle;
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location(), keywords: s.Title);
             ViewData["page"] = new Pagination(page, size, posts.TotalCount, orderBy);
+            PostService.SolvePostsCategory(posts.Data);
             foreach (var item in posts.Data)
             {
                 item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));

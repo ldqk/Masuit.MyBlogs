@@ -14,7 +14,7 @@
 	Layout = "~/Views/Shared/_Layout.cshtml";
 	Random r = new Random();
 	var alllist = CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).Select(c => new{c.Id,c.Name}).Cacheable().ToList();
-	var children = cat.ParentId==null?cat.Children:cat.Parent.Children;
+	var children = cat.ParentId==null?cat.Children:cat.Parent.Children.OrderBy(c => c.Id).ToList();
 }
 <style>
 	.bg-title {

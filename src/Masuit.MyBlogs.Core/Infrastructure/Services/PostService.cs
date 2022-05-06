@@ -105,9 +105,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
                 var keywords = Searcher.CutKeywords(keyword);
                 HighlightSegment(posts, keywords, highlighter);
-                var cids = posts.Select(p => p.CategoryId).Distinct().ToArray();
-                var categories = _categoryRepository.GetQuery(c => cids.Contains(c.Id)).Include(c => c.Parent).Cacheable().ToDictionary(c => c.Id);
-                posts.ForEach(p => p.Category = _mapper.Map<CategoryDto_P>(categories[p.CategoryId]));
+                SolvePostsCategory(posts);
                 return new SearchResult<PostDto>()
                 {
                     Results = posts,
@@ -116,6 +114,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 };
             });
             return result;
+        }
+
+        public void SolvePostsCategory(List<PostDto> posts)
+        {
+            var cids = posts.Select(p => p.CategoryId).Distinct().ToArray();
+            var categories = _categoryRepository.GetQuery(c => cids.Contains(c.Id)).Include(c => c.Parent).Cacheable().ToDictionary(c => c.Id);
+            posts.ForEach(p => p.Category = _mapper.Map<CategoryDto_P>(categories[p.CategoryId]));
         }
 
         /// <summary>

@@ -17,6 +17,7 @@ using Masuit.Tools.Linq;
 using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Dynamic.Core;
@@ -66,6 +67,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.PageParams = new Pagination(1, 15, posts.TotalCount, OrderBy.ModifyDate);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
             viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
+            PostService.SolvePostsCategory(posts.Data);
             foreach (var item in posts.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -101,6 +103,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
             viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
+            PostService.SolvePostsCategory(posts.Data);
             foreach (var item in posts.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -139,6 +142,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location(), keywords: tag);
             viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location(), keywords: tag);
+            PostService.SolvePostsCategory(posts.Data);
             foreach (var item in posts.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -183,6 +187,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
             viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
+            PostService.SolvePostsCategory(posts.Data);
             foreach (var item in posts.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -216,6 +221,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
             viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
+            PostService.SolvePostsCategory(posts.Data);
             foreach (var item in posts.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -249,6 +255,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
             viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location(), id);
             viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location(), id);
+            PostService.SolvePostsCategory(posts.Data);
             foreach (var item in posts.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -315,7 +322,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var postsQuery = PostService.GetQuery<PostDto>(PostBaseWhere().And(p => p.Status == Status.Published)); //准备文章的查询
             var notices = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(1, 5, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false); //加载前5条公告
-            var cats = await CategoryService.GetQueryFromCacheAsync<string, CategoryDto>(c => c.Status == Status.Available, c => c.Name); //加载分类目录
+            var cats = await CategoryService.GetQuery(c => c.Status == Status.Available && c.Post.Count > 0, c => c.Name).Include(c => c.Parent).Cacheable().ToListAsync(); //加载分类目录
             var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList(); //热词统计
             var hot5Post = postsQuery.OrderBy((new Random().Next() % 3) switch
             {
@@ -323,10 +330,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 2 => nameof(OrderBy.AverageViewCount),
                 _ => nameof(OrderBy.TotalViewCount)
             } + " desc").Skip(0).Take(5).Cacheable().ToList(); //热门文章
-            var tagdic = PostService.GetTags().OrderByRandom().Take(20).ToDictionary(x => x.Key, x => x.Value + 12 >= 32 ? 32 : x.Value + 12); //统计标签
-            return new HomePageViewModel()
+            var tagdic = PostService.GetTags().OrderByRandom().Take(20).ToDictionary(x => x.Key, x => Math.Min(x.Value + 12, 32)); //统计标签
+            return new HomePageViewModel
             {
-                Categories = cats,
+                Categories = Mapper.Map<List<CategoryDto_P>>(cats.OrderBy(c => c.Path()).ToList()),
                 HotSearch = hotSearches,
                 Notices = notices.Data,
                 Tags = tagdic,

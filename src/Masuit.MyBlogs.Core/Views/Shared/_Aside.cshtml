@@ -2,6 +2,7 @@
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.ViewModel
+@using Masuit.Tools.Models
 @using Masuit.Tools.Systems
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @{
@@ -41,10 +42,10 @@
 			</div>
 			<div class="panel-body">
 				<ul class="list-group">
-					@foreach (var cat in Model.Categories.Where(c => c.PendedPostCount > 0))
+					@foreach (var cat in Model.Categories)
 					{
 					<li class="list-group-item">
-						<a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Name</a>
+						<a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Id">@cat.Path(p => p.Name)</a>
 						@if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") == "true") {
 						    <a class="pull-right" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
 							    <i class="icon-rss4"></i>

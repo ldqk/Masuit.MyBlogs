@@ -22,7 +22,7 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 分类列表
         /// </summary>
-        public List<CategoryDto> Categories { get; set; }
+        public List<CategoryDto_P> Categories { get; set; }
 
         /// <summary>
         /// 标签列表

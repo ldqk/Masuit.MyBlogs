@@ -5,71 +5,73 @@
 @model Masuit.MyBlogs.Core.Models.DTO.PostDto
 @inject ICacheManager<HashSet<string>> CacheManager
 @{
-    string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
-    var online = CacheManager.Get(nameof(PostOnline) + ":" + Model.Id)?.Count ?? 0;
+	string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
+	var online = CacheManager.Get(nameof(PostOnline) + ":" + Model.Id)?.Count ?? 0;
 }
 
 <div class="ibox wow fadeIn">
-    <div class="ibox-content">
-        <a asp-controller="Post" asp-action="Details" asp-route-id="@Model.Id" target="_blank">
-            <h4>
-                @if (Model.IsFixedTop)
-                {
-                    <i class="icon-thumbsup fixtop">[顶]</i>
-                }
-                @if (DateTime.Now - Model.ModifyDate < TimeSpan.FromDays(1))
-                {
-                    <i class="new">[新]</i>
-                }
-                @Model.Title
-            </h4>
-        </a>
-        <div class="row padding-bot10">
-            @{
-                //取第一张图片
-                string imgSrc = Model.Content.MatchFirstImgSrc();
-                if (!string.IsNullOrEmpty(imgSrc))
-                {
-                    <div class="col-md-2 paddingright-clear hidden-xs">
-                        <img class="img-thumbnail img-responsive thumb lazyload" decoding="async" loading="lazy" data-src="@imgSrc" alt="@CommonHelper.SystemSettings["Title"]" title="@CommonHelper.SystemSettings["Title"] ">
-                    </div>
-                }
-            }
-            <div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 10)">
-                <div class="small padding-bot10">
-                    作者：<i class="icon-user-check"></i>
-                    <strong class="label label-primary">
-                        <a asp-controller="Home" asp-action="Author" asp-route-author="@(Model.Modifier??Model.Author)">@(Model.Modifier??Model.Author)</a>
-                    </strong>
-                    <span class="text-muted">
-                        | 更新时间：<i class="fa fa-clock-o"></i> <a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@Model.ModifyDate.Year" asp-route-mm="@Model.ModifyDate.Month" asp-route-dd="@Model.ModifyDate.Day" asp-route-mode="@nameof(Model.ModifyDate)"><time>@Model.ModifyDate.ToString("yyyy-MM-dd")</time></a> | 分类：<i class="icon-map-pin"></i>
-                        <a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.CategoryName</a>
-                    </span>
-                </div>
-                <p>
-                    @Html.Raw(await Model.Content.GetSummary(150, 50))
-                </p>
-            </div>
-        </div>
-        <div class="row">
-            @if (!string.IsNullOrEmpty(Model.Label))
-            {
-                var tags = Model.Label.Split(',', '，');
-                <div class="col-md-6">
-                    @for (var i = 0; i < tags.Length; i++)
-                    {
-                        <a asp-controller="Home" asp-action="Tag" asp-route-tag="@tags[i]" target="_blank">
-                            <span class="label label-@colors[i]">@tags[i]</span>
-                        </a>
-                    }
-                </div>
-            }
-            <div class="col-md-6 pull-right">
-                <div class="small text-right">
-                    <i class="fa fa-eye"></i>@online 在看 |
-                    <i class="fa fa-comments-o"></i>@Model.CommentCount 评论
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="ibox-content">
+		<a asp-controller="Post" asp-action="Details" asp-route-id="@Model.Id" target="_blank">
+			<h4>
+				@if (Model.IsFixedTop)
+				{
+					<i class="icon-thumbsup fixtop">[顶]</i>
+				}
+				@if (DateTime.Now - Model.ModifyDate < TimeSpan.FromDays(1))
+				{
+					<i class="new">[新]</i>
+				}
+				@Model.Title
+			</h4>
+		</a>
+		<div class="row padding-bot10">
+			@{
+				//取第一张图片
+				string imgSrc = Model.Content.MatchFirstImgSrc();
+				if (!string.IsNullOrEmpty(imgSrc))
+				{
+					<div class="col-md-2 paddingright-clear hidden-xs">
+						<img class="img-thumbnail img-responsive thumb lazyload" decoding="async" loading="lazy" data-src="@imgSrc" alt="@CommonHelper.SystemSettings["Title"]" title="@CommonHelper.SystemSettings["Title"] ">
+					</div>
+				}
+			}
+			<div class="col-md-@(string.IsNullOrEmpty(imgSrc) ? 12 : 10)">
+				<div class="small padding-bot10">
+					作者：<i class="icon-user-check"></i>
+					<strong class="label label-primary">
+						<a asp-controller="Home" asp-action="Author" asp-route-author="@(Model.Modifier??Model.Author)">@(Model.Modifier??Model.Author)</a>
+					</strong>
+					<span class="text-muted">
+						| 更新时间：<i class="fa fa-clock-o"></i> <a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@Model.ModifyDate.Year" asp-route-mm="@Model.ModifyDate.Month" asp-route-dd="@Model.ModifyDate.Day" asp-route-mode="@nameof(Model.ModifyDate)"><time>@Model.ModifyDate.ToString("yyyy-MM-dd")</time></a> | 分类：<i class="icon-map-pin"></i>
+						@{
+							await Html.RenderPartialAsync("CategoryPath", Model.Category);
+						}
+					</span>
+				</div>
+				<p>
+					@Html.Raw(await Model.Content.GetSummary(150, 50))
+				</p>
+			</div>
+		</div>
+		<div class="row">
+			@if (!string.IsNullOrEmpty(Model.Label))
+			{
+				var tags = Model.Label.Split(',', '，');
+				<div class="col-md-6">
+					@for (var i = 0; i < tags.Length; i++)
+					{
+						<a asp-controller="Home" asp-action="Tag" asp-route-tag="@tags[i]" target="_blank">
+							<span class="label label-@colors[i]">@tags[i]</span>
+						</a>
+					}
+				</div>
+			}
+			<div class="col-md-6 pull-right">
+				<div class="small text-right">
+					<i class="fa fa-eye"></i>@online 在看 |
+					<i class="fa fa-comments-o"></i>@Model.CommentCount 评论
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

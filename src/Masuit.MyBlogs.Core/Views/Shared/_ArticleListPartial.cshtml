@@ -1,7 +1,10 @@
 ﻿@using Masuit.Tools.Systems
 @using Masuit.MyBlogs.Core.Common
+@using Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 @using Masuit.MyBlogs.Core.Models.Enum
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
+@inject IPostService PostService
+
 <div class="col-md-9 padding-clear">
     <div class="animated fadeIn blog">
         @if (Model.Posts.Data.Any())
@@ -30,6 +33,7 @@
                     </div>
                 }
 
+                PostService.SolvePostsCategory(list);
                 foreach (var post in list)
                 {
                     await Html.RenderPartialAsync("_ArticleListItem", post);
