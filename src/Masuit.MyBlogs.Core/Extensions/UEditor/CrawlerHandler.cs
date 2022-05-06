@@ -73,6 +73,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             }
             try
             {
+                HttpClient.DefaultRequestHeaders.Referrer = new Uri(SourceUrl);
                 using var response = await HttpClient.GetAsync(SourceUrl);
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
