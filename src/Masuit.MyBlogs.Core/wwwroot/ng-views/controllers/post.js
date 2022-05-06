@@ -33,7 +33,6 @@
 			strict: false,
 			expandedKeys: true,
 		},
-		filterable: true, //搜索功能
 		autoRow: true, //选项过多,自动换行
 		data:[{name:"发表时间",value:0,selected:$scope.orderby==0},{name:"最后修改",value:1,selected:$scope.orderby==1},{name:"访问量最多",value:2,selected:$scope.orderby==2},{name:"支持数最多",value:3,selected:$scope.orderby==3},{name:"每日平均访问量",value:4,selected:$scope.orderby==4}],
 		on: function (data) {
@@ -77,8 +76,8 @@
 				$scope.kw = params["kw"];
 				$scope.paginationConf.currentPage= params["page"];
 				for (var i = 0; i < data.Data.length; i++) {
-					for (var j = 0; j < data.Data[i].children.length; j++) {
-						data.Data[i].children[j].selected=data.Data[i].children[j].Id==params["cid"];
+					for (var j = 0; j < data.Data[i].Children.length; j++) {
+						data.Data[i].Children[j].selected=data.Data[i].Children[j].Id==params["cid"];
 					}
 					data.Data[i].selected=data.Data[i].Id==params["cid"];
 				}
