@@ -17,10 +17,11 @@
 		if (!data.Success) {
 			return ;
 		}
-		data = data.Data;
+		data = data.Data.sort((a,b)=>(b.Id==1)-(a.Id==1));
 		window.categoryDropdown = xmSelect.render({
 			el: '#category',
 			tips: '请选择分类',
+			name:"CategoryId",
 			prop: {
 				name: 'Name',
 				value: 'Id',
@@ -38,11 +39,11 @@
 			filterable: true, //搜索功能
 			autoRow: true, //选项过多,自动换行
 			data:data,
+			initValue:[1],
 			on: function (data) {
 				$("[name='CategoryId']").val(data.arr[0].Id);
 			}
 		});
-		window.categoryDropdown.setValue([1]);
 	});
 	
 	$("#submit").on("click", function (e) {
@@ -160,6 +161,7 @@
 				$("#article").val(post.Title);
 				ue.setContent(post.Content);
 				window.categoryDropdown.setValue([post.CategoryId]);
+				window.categoryDropdown.options.data.sort((a,b)=>(b.Id==post.CategoryId)-(a.Id==post.CategoryId));
 				$("[name='Author']").val(post.Author);
 				$("[name='Email']").val(post.Email);
 				window.interval = setInterval(function () {
