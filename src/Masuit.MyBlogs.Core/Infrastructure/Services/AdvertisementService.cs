@@ -59,9 +59,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 where = where.And(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions) : !Regex.IsMatch(location, a.Regions)));
                 if (cid.HasValue)
                 {
-                    var cids1 = CategoryRepository.GetQuery(c => c.ParentId == cid).Select(c => c.Id).Cacheable().ToArray();
-                    var cids2 = CategoryRepository.GetQuery(c => c.Id == cid && c.ParentId != null).Select(c => c.ParentId.Value).Cacheable().ToArray();
-                    var scid = cids1.Union(cids2).Append(cid.Value).Join("|");
+                    var cids = CategoryRepository.GetQuery(c => c.ParentId == cid).Select(c => c.Id).Cacheable().ToArray();
+                    var scid = cids.Append(cid.Value).Join("|");
                     if (Any(a => Regex.IsMatch(a.CategoryIds, scid)))
                     {
                         where = where.And(a => Regex.IsMatch(a.CategoryIds, scid) || string.IsNullOrEmpty(a.CategoryIds));
