@@ -16,6 +16,7 @@ namespace Masuit.MyBlogs.Core.Configs
         public MappingProfile()
         {
             CreateMap<Category, CategoryCommand>().ReverseMap();
+            CreateMap<Category, CategoryDto_P>().ReverseMap();
             CreateMap<Category, CategoryDto>().ForMember(c => c.TotalPostCount, e => e.MapFrom(c => c.Post.Count)).ForMember(c => c.PendedPostCount, e => e.MapFrom(c => c.Post.Count(p => p.Status == Status.Published))).ReverseMap();
             CreateMap<CategoryCommand, CategoryDto>().ReverseMap();
 
@@ -43,7 +44,7 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<PostCommand, Post>().ReverseMap();
             CreateMap<Post, PostModelBase>();
             CreateMap<Post, PostHistoryVersion>().ForMember(p => p.Id, e => e.Ignore()).ForMember(v => v.PostId, e => e.MapFrom(p => p.Id));
-            CreateMap<Post, PostDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ForMember(p => p.LimitMode, e => e.MapFrom(p => p.LimitMode ?? RegionLimitMode.All)).ReverseMap();
+            CreateMap<Post, PostDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ForMember(p => p.LimitMode, e => e.MapFrom(p => p.LimitMode ?? RegionLimitMode.All)).ForMember(p => p.Category, e => e.Ignore()).ReverseMap();
             CreateMap<PostCommand, PostDto>().ReverseMap();
             CreateMap<PostHistoryVersion, PostDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ReverseMap();
             CreateMap<Post, PostViewModel>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ForMember(p => p.PostDate, e => e.MapFrom(p => p.PostDate.ToString("yyyy-MM-dd HH:mm:ss"))).ForMember(p => p.ModifyDate, e => e.MapFrom(p => p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();

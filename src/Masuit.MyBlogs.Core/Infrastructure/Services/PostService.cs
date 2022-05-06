@@ -1,5 +1,9 @@
 ﻿using AngleSharp;
+using AngleSharp.Dom;
+using AngleSharp.Html.Parser;
+using AutoMapper;
 using CacheManager.Core;
+using EFCoreSecondLevelCacheInterceptor;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
@@ -10,13 +14,12 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Html;
+using Microsoft.EntityFrameworkCore;
 using PanGu;
 using PanGu.HighLight;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using AngleSharp.Dom;
-using AngleSharp.Html.Parser;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -24,11 +27,15 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
     {
         private readonly ICacheManager<SearchResult<PostDto>> _cacheManager;
         private readonly ICacheManager<Dictionary<string, int>> _tagCacheManager;
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly IMapper _mapper;
 
-        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, ICacheManager<SearchResult<PostDto>> cacheManager, ICacheManager<Dictionary<string, int>> tagCacheManager) : base(repository, searchEngine, searcher)
+        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, ICacheManager<SearchResult<PostDto>> cacheManager, ICacheManager<Dictionary<string, int>> tagCacheManager, ICategoryRepository categoryRepository, IMapper mapper) : base(repository, searchEngine, searcher)
         {
             _cacheManager = cacheManager;
             _tagCacheManager = tagCacheManager;
+            _categoryRepository = categoryRepository;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -98,6 +105,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
                 var keywords = Searcher.CutKeywords(keyword);
                 HighlightSegment(posts, keywords, highlighter);
+                var cids = posts.Select(p => p.CategoryId).Distinct().ToArray();
+                var categories = _categoryRepository.GetQuery(c => cids.Contains(c.Id)).Include(c => c.Parent).Cacheable().ToDictionary(c => c.Id);
+                posts.ForEach(p => p.Category = _mapper.Map<CategoryDto_P>(categories[p.CategoryId]));
                 return new SearchResult<PostDto>()
                 {
                     Results = posts,

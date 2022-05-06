@@ -5,7 +5,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO;
 /// <summary>
 /// 文章分类输出模型
 /// </summary>
-public class CategoryDto : BaseDto, ITreeChildren<CategoryDto>
+public class CategoryDto_P : BaseDto, ITreeParent<CategoryDto_P>
 {
     /// <summary>
     /// 分类名
@@ -17,14 +17,8 @@ public class CategoryDto : BaseDto, ITreeChildren<CategoryDto>
     /// </summary>
     public string Description { get; set; }
 
-    public int? ParentId { get; set; }
-
-    public virtual int TotalPostCount { get; set; }
-
-    public virtual int PendedPostCount { get; set; }
-
     /// <summary>
-    /// 子级
+    /// 父节点
     /// </summary>
-    public ICollection<CategoryDto> Children { get; set; }
+    public CategoryDto_P Parent { get; set; }
 }

@@ -71,7 +71,7 @@
 	$http.get("/category/getcategories").then(function (res) {
 		var data = res.data;
 		if (data.Success) {
-			data.Data=[{name:"全部",Id:"",children:[]}].concat(data.Data);
+			data.Data=[{Name:"全部",Id:"",Children:[]}].concat(data.Data);
 			var params = JSON.parse(localStorage.getItem("postlist-params"));
 			if (params) {
 				$scope.kw = params["kw"];

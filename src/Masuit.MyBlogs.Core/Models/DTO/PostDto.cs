@@ -161,5 +161,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 跳转到第三方链接
         /// </summary>
         public string Redirect { get; set; }
+
+        public CategoryDto_P Category { get; set; }
     }
 }

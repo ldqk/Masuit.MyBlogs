@@ -1,5 +1,5 @@
-﻿@model Masuit.MyBlogs.Core.Models.Entity.Category
-@if(Model.ParentId>0) {
+﻿@model Masuit.MyBlogs.Core.Models.DTO.CategoryDto_P
+@if(Model.Parent!=null) {
     await Html.RenderPartialAsync("CategoryPath", Model.Parent);
     <text>/</text>
 }

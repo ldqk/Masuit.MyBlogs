@@ -6,154 +6,157 @@
 @using Microsoft.AspNetCore.Mvc.Rendering
 @model SearchResult<Masuit.MyBlogs.Core.Models.DTO.PostDto>
 @{
-    ViewBag.Title = "站内搜索：" + ViewBag.Keyword;
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    List<KeywordsRank> hotSearches = ViewBag.hotSearches;
-    List<string> relateKeywords = ViewBag.RelateKeywords;
-    Advertisement ad = ViewBag.Ads;
+	ViewBag.Title = "站内搜索：" + ViewBag.Keyword;
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	List<KeywordsRank> hotSearches = ViewBag.hotSearches;
+	List<string> relateKeywords = ViewBag.RelateKeywords;
+	Advertisement ad = ViewBag.Ads;
 }
 <div class="container min-height610">
-    <ol class="cd-breadcrumb triangle">
-        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-        <li class="current"><em>@ViewBag.Title</em></li>
-    </ol>
-    <div class="wrapper wrapper-content animated fadeInRight">
-        <div class="row">
-            <div class="col-sm-12">
-                @if (!string.IsNullOrEmpty(ViewBag.Keyword))
-                {
-                    <small>搜索用时(@Model.Elapsed 毫秒)</small>
-                }
-                <div class="search-form">
-                    <form action="/search" method="get">
-                        <div class="input-group">
-                            <input type="text" placeholder="你要查找的关键词，支持部分指令：intitle，content，如：intitle:会声会影 content:懒得勤快，指令支持组合" id="search" name="wd" maxlength="32" value="@ViewBag.Keyword" class="form-control input-lg">
-                            <div class="input-group-btn">
-                                <button class="btn btn-lg btn-primary" type="submit">搜索</button>
-                            </div>
-                        </div>
-                    </form>
-                    @if (hotSearches.Any())
-                    {
-                        <span>搜索推荐：</span>
-                        foreach (var item in hotSearches)
-                        {
-                            @Html.ActionLink(item.Keywords + "(" + item.Count + ")", "Search", new { wd = item.Keywords }, new { @class = "label label-danger" }) <span>  </span>
-                        }
-                    }
-                </div>
-                @if (Model.Results.Any())
-                {
-                    <div class="hr-line-dashed"></div>
-                    var rnd = new Random().Next(Model.Results.Count > 2 ? 2 : 1, Model.Results.Count);
-                    for (var i = 0; i < Model.Results.Count; i++)
-                    {
-                        if (rnd > 1 && rnd == i && ad != null)
-                        {
-                            await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
-                        }
+	<ol class="cd-breadcrumb triangle">
+		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
+		<li class="current"><em>@ViewBag.Title</em></li>
+	</ol>
+	<div class="wrapper wrapper-content animated fadeInRight">
+		<div class="row">
+			<div class="col-sm-12">
+				@if (!string.IsNullOrEmpty(ViewBag.Keyword))
+				{
+					<small>搜索用时(@Model.Elapsed 毫秒)</small>
+				}
+				<div class="search-form">
+					<form action="/search" method="get">
+						<div class="input-group">
+							<input type="text" placeholder="你要查找的关键词，支持部分指令：intitle，content，如：intitle:会声会影 content:懒得勤快，指令支持组合" id="search" name="wd" maxlength="32" value="@ViewBag.Keyword" class="form-control input-lg">
+							<div class="input-group-btn">
+								<button class="btn btn-lg btn-primary" type="submit">搜索</button>
+							</div>
+						</div>
+					</form>
+					@if (hotSearches.Any())
+					{
+						<span>搜索推荐：</span>
+						foreach (var item in hotSearches)
+						{
+							@Html.ActionLink(item.Keywords + "(" + item.Count + ")", "Search", new { wd = item.Keywords }, new { @class = "label label-danger" }) <span>  </span>
+						}
+					}
+				</div>
+				@if (Model.Results.Any())
+				{
+					<div class="hr-line-dashed"></div>
+					var rnd = new Random().Next(Model.Results.Count > 2 ? 2 : 1, Model.Results.Count);
+					for (var i = 0; i < Model.Results.Count; i++)
+					{
+						if (rnd > 1 && rnd == i && ad != null)
+						{
+							await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
+						}
 
-                        var p = Model.Results[i];
-                        <div class="ibox">
-                            <div class="ibox-content">
-                                <a asp-controller="Post" asp-action="Details" asp-route-id="@p.Id" asp-route-kw="@ViewBag.Keyword" target="_blank">
-                                    <h2 class="size20 margin-bot10">
-                                        @Html.Raw(p.Title)
-                                    </h2>
-                                </a>
-                                <div>
-                                    作者：
-                                    <label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@p.ModifyDate.Year" asp-route-mm="@p.ModifyDate.Month" asp-route-dd="@p.ModifyDate.Day" asp-route-mode="@nameof(p.ModifyDate)"><time>@(p.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone)))</time></a> | 分类：<a asp-controller="Home" asp-action="Category" asp-route-id="@p.CategoryId">@p.CategoryName</a>
-                                </div>
-                                <p class="size14">@Html.Raw(p.Content)</p>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <a asp-controller="Post" asp-action="Details" asp-route-id="@p.Id" class="search-link" target="_blank">@(Context.Request.Scheme + "://" + Context.Request.Host + "/" + p.Id)</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                }
-                @if(relateKeywords?.Count>0) {
-                    <div class="margin-bot10">
-                        <h3>相关搜索：</h3>
-                        @foreach (var kw in relateKeywords)
-                        {
-                            <a asp-action="Search" asp-route-wd="@kw">@kw</a><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                        }
-                    </div>
-                }
-                @if (!string.IsNullOrEmpty((string)ViewBag.ErrorMsg))
-                {
-                    <h3>@ViewBag.ErrorMsg</h3>
-                }
+						var p = Model.Results[i];
+						<div class="ibox">
+							<div class="ibox-content">
+								<a asp-controller="Post" asp-action="Details" asp-route-id="@p.Id" asp-route-kw="@ViewBag.Keyword" target="_blank">
+									<h2 class="size20 margin-bot10">
+										@Html.Raw(p.Title)
+									</h2>
+								</a>
+								<div>
+									作者：
+									<label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@p.ModifyDate.Year" asp-route-mm="@p.ModifyDate.Month" asp-route-dd="@p.ModifyDate.Day" asp-route-mode="@nameof(p.ModifyDate)"><time>@(p.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone)))</time></a> | 分类：
+									@{
+										await Html.RenderPartialAsync("CategoryPath", p.Category);
+									}
+								</div>
+								<p class="size14">@Html.Raw(p.Content)</p>
+								<div class="row">
+									<div class="col-md-6">
+										<a asp-controller="Post" asp-action="Details" asp-route-id="@p.Id" class="search-link" target="_blank">@(Context.Request.Scheme + "://" + Context.Request.Host + "/" + p.Id)</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					}
+				}
+				@if(relateKeywords?.Count>0) {
+					<div class="margin-bot10">
+						<h3>相关搜索：</h3>
+						@foreach (var kw in relateKeywords)
+						{
+							<a asp-action="Search" asp-route-wd="@kw">@kw</a><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						}
+					</div>
+				}
+				@if (!string.IsNullOrEmpty((string)ViewBag.ErrorMsg))
+				{
+					<h3>@ViewBag.ErrorMsg</h3>
+				}
 
-                @*分页组件*@
-                @{
-                    int size = ViewBag.PageSize;
-                    int pages = Math.Ceiling(Model.Total / (size > 0 ? size : 10.0)).ToInt32();
-                    var page = Context.Request.Query["page"].ToString().ToInt32();
-                    int current = page > 0 ? page : 1;
-                    int pageStart = current - 3 > 0 ? current - 3 : 1;
-                    int pageEnd = current + 3 >= pages ? pages : current + 3;
-                    if (pageEnd - pageStart < 7)
-                    {
-                        if (pageStart == 1)
-                        {
-                            pageEnd = pageStart + 4 >= pages ? pages : pageStart + 4;
-                        }
-                        else
-                        {
-                            pageStart = pageEnd - 4 > 0 ? pageEnd - 4 : 1;
-                        }
-                    }
-                }
-                @if (pages > 1)
-                {
-                    <ul class="pagination margin-clear">
-                        @if (current == 1)
-                        {
-                            <li class="disabled"><a>首页</a></li>
-                            <li class="disabled"><a aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-                        }
-                        else
-                        {
-                            <li><a asp-action="Search" asp-route-wd="@ViewBag.Keyword" aria-label="Previous">首页</a></li>
-                            <li><a asp-action="Search" asp-route-wd="@ViewBag.Keyword" asp-route-page="@(page - 1 <= 0 ? 1 : page - 1)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-                        }
-                        @if (pageStart > 1)
-                        {
-                            <li class="disabled"><a aria-label="Previous"><span aria-hidden="true">...</span></a></li>
-                        }
-                        @for (int i = pageStart; i <= pageEnd; i++)
-                        {
-                            if (i == current)
-                            {
-                                <li class="disabled"><a>@i</a></li>
-                            }
-                            else
-                            {
-                                <li><a asp-action="Search" asp-route-page="@i" asp-route-wd="@ViewBag.Keyword">@i</a></li>
-                            }
-                        }
-                        @if (pageEnd < pages)
-                        {
-                            <li class="disabled"><a aria-label="Previous"><span aria-hidden="true">...</span></a></li>
-                        }
-                        @if (current == pages)
-                        {
-                            <li class="disabled"><a><span aria-hidden="true">&raquo;</span></a></li>
-                            <li class="disabled"><a>最后一页</a></li>
-                        }
-                        else
-                        {
-                            <li><a asp-action="Search" asp-route-page="@(current + 1)" asp-route-wd="@ViewBag.Keyword" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
-                            <li><a asp-action="Search" asp-route-page="@pages" asp-route-wd="@ViewBag.Keyword" aria-label="Next">最后一页</a></li>
-                        }
-                    </ul>
-                }
-            </div>
-        </div>
-    </div>
+				@*分页组件*@
+				@{
+					int size = ViewBag.PageSize;
+					int pages = Math.Ceiling(Model.Total / (size > 0 ? size : 10.0)).ToInt32();
+					var page = Context.Request.Query["page"].ToString().ToInt32();
+					int current = page > 0 ? page : 1;
+					int pageStart = current - 3 > 0 ? current - 3 : 1;
+					int pageEnd = current + 3 >= pages ? pages : current + 3;
+					if (pageEnd - pageStart < 7)
+					{
+						if (pageStart == 1)
+						{
+							pageEnd = pageStart + 4 >= pages ? pages : pageStart + 4;
+						}
+						else
+						{
+							pageStart = pageEnd - 4 > 0 ? pageEnd - 4 : 1;
+						}
+					}
+				}
+				@if (pages > 1)
+				{
+					<ul class="pagination margin-clear">
+						@if (current == 1)
+						{
+							<li class="disabled"><a>首页</a></li>
+							<li class="disabled"><a aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+						}
+						else
+						{
+							<li><a asp-action="Search" asp-route-wd="@ViewBag.Keyword" aria-label="Previous">首页</a></li>
+							<li><a asp-action="Search" asp-route-wd="@ViewBag.Keyword" asp-route-page="@(page - 1 <= 0 ? 1 : page - 1)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+						}
+						@if (pageStart > 1)
+						{
+							<li class="disabled"><a aria-label="Previous"><span aria-hidden="true">...</span></a></li>
+						}
+						@for (int i = pageStart; i <= pageEnd; i++)
+						{
+							if (i == current)
+							{
+								<li class="disabled"><a>@i</a></li>
+							}
+							else
+							{
+								<li><a asp-action="Search" asp-route-page="@i" asp-route-wd="@ViewBag.Keyword">@i</a></li>
+							}
+						}
+						@if (pageEnd < pages)
+						{
+							<li class="disabled"><a aria-label="Previous"><span aria-hidden="true">...</span></a></li>
+						}
+						@if (current == pages)
+						{
+							<li class="disabled"><a><span aria-hidden="true">&raquo;</span></a></li>
+							<li class="disabled"><a>最后一页</a></li>
+						}
+						else
+						{
+							<li><a asp-action="Search" asp-route-page="@(current + 1)" asp-route-wd="@ViewBag.Keyword" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+							<li><a asp-action="Search" asp-route-page="@pages" asp-route-wd="@ViewBag.Keyword" aria-label="Next">最后一页</a></li>
+						}
+					</ul>
+				}
+			</div>
+		</div>
+	</div>
 </div>
