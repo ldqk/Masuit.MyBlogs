@@ -324,14 +324,7 @@ myApp.config([
             controller: "searchAnalysis as list",
             resolve: {
                 deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: [
-                                    "/assets/jedate/jedate.js", 
-                                ],
-                                cache: true
-                            }, cpath + "/analysis.js"
-                        ]);
+                        return $ocLazyLoad.load([cpath + "/analysis.js"]);
                     }
                 ]
             }
@@ -411,12 +404,7 @@ myApp.config([
             controller: "donate as list",
             resolve: {
                 deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: ["/assets/jedate/jedate.css", "/assets/jedate/jedate.js"],
-                                cache: true
-                            }, cpath + "/donate.js"
-                        ]);
+                        return $ocLazyLoad.load([cpath + "/donate.js"]);
                     }
                 ]
             }

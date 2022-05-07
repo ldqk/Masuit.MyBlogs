@@ -3,22 +3,6 @@
         max-height: 800px;
         overflow-y: auto;
     }
-    .wicon {
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAASAgMAAAA1aVZ3AAAACVBMVEUAAAD///9nyrNdI4MmAAAAAXRSTlMAQObYZgAAAChJREFUCNdjWAUCCxjg9DQgtTKBAUN8aigQJGCho6KiYDSJ8ggaYR8Ao74zAKjm+cYAAAAASUVORK5CYII=");
-        background-repeat: no-repeat;
-        background-position: right center;
-    }
-
-    .workinput {
-        width: 100%;
-        line-height: 21px;
-        border: 1px #ddd solid;
-        border-radius: 4px;
-        padding: 5px;
-        background-color: transparent;
-        float: left;
-        font-size: 14px;
-    }
     td .xm-body {
         position: unset
     }
@@ -174,7 +158,7 @@
                 <div class="input-group">
                     <label for="desc" class="input-group-addon control-label">过期时间：</label>
                     <div class="fg-line">
-                        <input type="text" class="workinput wicon" id="timespan" ng-model="partner.ExpireTime" readonly="readonly" />
+                        <input type="text" id="timespan" ng-model="partner.ExpireTime"/>
                     </div>
                 </div>
             </div>

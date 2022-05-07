@@ -1,22 +1,4 @@
-﻿<style>
-    .wicon {
-        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAASAgMAAAA1aVZ3AAAACVBMVEUAAAD///9nyrNdI4MmAAAAAXRSTlMAQObYZgAAAChJREFUCNdjWAUCCxjg9DQgtTKBAUN8aigQJGCho6KiYDSJ8ggaYR8Ao74zAKjm+cYAAAAASUVORK5CYII=");
-        background-repeat: no-repeat;
-        background-position: right center;
-    }
-
-    .workinput {
-        width: 100%;
-        line-height: 21px;
-        border: 1px #ddd solid;
-        border-radius: 4px;
-        padding: 5px;
-        background-color: transparent;
-        float: left;
-        font-size: 14px;
-    }
-</style>
-<form class="form-group" id="article-form" method="post" onsubmit="return false">
+﻿<form class="form-group" id="article-form" method="post" onsubmit="return false">
     <input ng-model="post.Author" type="hidden">
     <input ng-model="post.Email" type="hidden">
     <div class="input-group">
@@ -138,9 +120,9 @@
         <div class="col-md-3" ng-if="post.schedule">
             <div class="input-group">
                 <span class="input-group-addon" ng-if="post.schedule">
-                    <label for="Label">定时：</label>
+                    <label for="timespan">定时：</label>
                 </span>
-                <input class="wicon workinput" id="timespan" ng-if="post.schedule" ng-model="post.timespan" readonly="readonly" type="text" />
+                <input id="timespan" class="form-control" ng-if="post.schedule" ng-model="post.timespan" readonly="readonly" type="datetime" placeholder="请选择时间"/>
             </div>
         </div>
     </div>

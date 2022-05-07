@@ -534,20 +534,22 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
     // 定时发布
     $scope.Scheduled= function() {
         if ($scope.post.schedule) {
-            jeDate('#timespan',{
-                isinitVal: true,
-                festival: true,
-                isTime: true,
-                ishmsVal: true,
-                format: 'YYYY-MM-DD hh:mm:ss',
-                minDate: new Date().Format("yyyy-MM-dd 00:00:00"),
-                maxDate: '2099-06-16 23:59:59',
-                donefun: function (obj) {
-                    $scope.post.timespan = obj.val;
-                },
-                clearfun: function(elem, val) {
-                    delete $scope.post.timespan;
+            layui.use('laydate', function(){
+              var laydate = layui.laydate;
+              laydate.render({
+                elem: '#timespan',
+                type: 'datetime',
+                calendar: true,
+                min: new Date(new Date().setMinutes(new Date().getMinutes()+10)).Format("yyyy-MM-dd hh:mm:ss"),
+                max: new Date(new Date().setDate(new Date().getDate()+3)).Format("yyyy-MM-dd hh:mm:ss"),
+                done: function(value, date, endDate) {
+                    if (value) {
+                        $scope.post.timespan=value;
+                    } else {
+                        delete $scope.post.timespan;
+                    }
                 }
+              });
             });
         }
     }

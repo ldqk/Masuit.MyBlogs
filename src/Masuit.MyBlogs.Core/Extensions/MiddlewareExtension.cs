@@ -135,7 +135,6 @@ namespace Masuit.MyBlogs.Core.Extensions
                     .Include("/Content/common/loading.min.css");
                 bundles.AddCss("/dashboard.css")
                     .Include("/fonts/icomoon.css")
-                    .Include("/Assets/jedate/jedate.css")
                     .Include("/Assets/fileupload/filestyle.css")
                     .Include("/Content/common/loading.min.css")
                     .Include("/Content/checkbox.min.css")

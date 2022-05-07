@@ -162,7 +162,7 @@
     }
     $scope.add = function() {
         $scope.partner = {
-            ExpireTime:"2099-12-31"
+            ExpireTime:"2049-12-31"
         };
         $scope.isAdd = true;
         $scope.allowUpload=false;
@@ -179,11 +179,22 @@
                 return true;
             }
         });
+        layui.use('laydate', function(){
+          var laydate = layui.laydate;
+          laydate.render({
+            elem: '#timespan',
+            type: 'datetime',
+            calendar: true,
+            done: function(value, date, endDate) {
+                $scope.partner.ExpireTime=value;
+            }
+          });
+        });
     }
 
     $scope.edit = function (item) {
         $scope.partner = angular.copy(item);
-        $scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2099-12-31":new Date($scope.partner.ExpireTime).Format("yyyy-MM-dd");
+        $scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2049-12-31":new Date($scope.partner.ExpireTime).Format("yyyy-MM-dd hh:mm:ss");
         $scope.isAdd = false;
         $scope.allowUpload=false;
         layer.closeAll();
@@ -203,12 +214,23 @@
                 return true;
             }
         });
+        layui.use('laydate', function(){
+          var laydate = layui.laydate;
+          laydate.render({
+            elem: '#timespan',
+            type: 'datetime',
+            calendar: true,
+            done: function(value, date, endDate) {
+                $scope.partner.ExpireTime=value;
+            }
+          });
+        });
     }
 
     $scope.copy = function (item) {
         $scope.partner = angular.copy(item);
         delete $scope.partner.Id;
-        $scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2099-12-31":new Date($scope.partner.ExpireTime).Format("yyyy-MM-dd");
+        $scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2049-12-31":new Date($scope.partner.ExpireTime).Format("yyyy-MM-dd hh:mm:ss");
         $scope.isAdd = true;
         $scope.allowUpload=false;
         layer.closeAll();
@@ -227,6 +249,17 @@
                 }, 500);
                 return true;
             }
+        });
+        layui.use('laydate', function(){
+          var laydate = layui.laydate;
+          laydate.render({
+            elem: '#timespan',
+            type: 'datetime',
+            calendar: true,
+            done: function(value, date, endDate) {
+                $scope.partner.ExpireTime=value;
+            }
+          });
         });
     }
 
@@ -367,16 +400,4 @@
           content: '/partner/'+row.Id+'/insight'
         }));
     }
-    jeDate('#timespan',{
-        isinitVal: true,
-        festival: true,
-        isTime: true,
-        ishmsVal: true,
-        format: 'YYYY-MM-DD hh:mm:ss',
-        minDate: new Date().Format("yyyy-MM-dd"),
-        maxDate: '2099-12-31 23:59:59',
-        donefun: function (obj) {
-            $scope.partner.ExpireTime = new Date(obj.val).Format("yyyy-MM-dd 23:59:59");
-        }
-    });
 }]);
