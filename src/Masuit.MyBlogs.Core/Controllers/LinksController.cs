@@ -99,7 +99,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="links"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Add([FromBodyOrDefault] Links links)
+        public async Task<ActionResult> Save([FromBodyOrDefault] Links links)
         {
             bool b = await LinksService.AddOrUpdateSavedAsync(l => l.Id, links) > 0;
             return b ? ResultData(null, message: "添加成功！") : ResultData(null, false, "添加失败！");

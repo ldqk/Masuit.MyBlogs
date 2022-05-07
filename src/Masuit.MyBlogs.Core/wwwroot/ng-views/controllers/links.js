@@ -59,7 +59,7 @@
 			animation: true,
 			allowOutsideClick: false
 		}).then(function () {
-			$scope.request("/links/add", { Id: row.Id, Name: row.Name, Url: row.Url, UrlBase:row.UrlBase}, function (data) {
+			$scope.request("/links/save", { Id: row.Id, Name: row.Name, Url: row.Url, UrlBase:row.UrlBase}, function (data) {
 				window.notie.alert({
 					type: 1,
 					text: data.Message,
@@ -94,7 +94,7 @@
 			allowOutsideClick: false,
 			preConfirm: function () {
 				return new Promise(function (resolve) {
-					$scope.request("/links/add", {
+					$scope.request("/links/save", {
 						Name: $('#title').val(),
 						Url: $('#url').val(),
 						UrlBase: $('#urlbase').val()

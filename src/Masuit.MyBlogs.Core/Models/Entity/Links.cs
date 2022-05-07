@@ -1,4 +1,5 @@
 using Masuit.MyBlogs.Core.Models.Enum;
+using Masuit.Tools.Core.AspNetCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -50,6 +51,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// </summary>
         public DateTime UpdateTime { get; set; }
 
+        [UpdateIgnore]
         public virtual ICollection<LinkLoopback> Loopbacks { get; set; }
     }
 }
