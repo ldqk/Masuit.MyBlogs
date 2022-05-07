@@ -19,6 +19,9 @@
         float: left;
         font-size: 14px;
     }
+    td .xm-body {
+        position: unset
+    }
 </style>
 <div>
     <div class="form-inline pull-right">
@@ -58,8 +61,9 @@
             <td title="'日均点击'">
                 {{row.AverageViewCount|number:2}}
             </td>
-            <td title="'分类'" style="max-width: 220px">
-                {{row.CategoryNames}}
+            <td title="'分类'" style="max-width: 270px">
+                <!--{{row.CategoryNames}}-->
+                <div id="category-{{row.Id}}"></div>
             </td>
             <td title="'创建时间'">
                 {{row.CreateTime|date:'yyyy-MM-dd HH:mm'}}
@@ -86,6 +90,9 @@
                     </button>
                     <a class="btn btn-info btn-sm waves-effect" ng-click="insight(row)">
                         <i class="icon-chart"></i>
+                    </a>
+                    <a class="btn btn-primary btn-sm waves-effect" ng-click="delayShow(row)">
+                        <i class="icon-stopwatch"></i>
                     </a>
                 </div>
             </td>
@@ -298,4 +305,20 @@
             </div>
         </div>
     </form>
+</div>
+<div id="delay" class="modal">
+    <h3>延期广告：{{partner.Title}}</h3>
+    <hr />
+    <div class="form-group">
+        <input type="hidden" ng-model="partner.Id">
+        <div class="input-group">
+            <div class="fg-line">
+                <input type="number" class="form-control" placeholder="请输入时间间隔" min="1" max="365" ng-model="partner.TimeSpan" style="width: 120px">
+                <div class="form-control" id="span" style="width: 80px"></div>
+            </div>
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-primary" ng-click="delay(partner)">确定</button>
+            </span>
+        </div>
+    </div>
 </div>

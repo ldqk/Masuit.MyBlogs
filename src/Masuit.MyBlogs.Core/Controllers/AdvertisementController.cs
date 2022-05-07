@@ -71,13 +71,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var list = AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ProjectTo<AdvertisementViewModel>(MapperConfig).NotCacheable().ToPagedList(page, size);
-            var cids = list.Data.Where(m => !string.IsNullOrEmpty(m.CategoryIds)).SelectMany(m => m.CategoryIds.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse)).Distinct().ToArray();
-            var dic = await categoryService.GetQuery(c => cids.Contains(c.Id)).ToDictionaryAsync(c => c.Id + "", c => c.Name);
-            foreach (var ad in list.Data.Where(ad => !string.IsNullOrEmpty(ad.CategoryIds)))
-            {
-                ad.CategoryNames = JiebaNet.Segmenter.Common.Extensions.Join(ad.CategoryIds.Split(",").Select(c => dic.GetValueOrDefault(c)), ",");
-            }
-
             return Ok(list);
         }
 
@@ -226,6 +219,37 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IActionResult ClickRecordsInsight(int id)
         {
             return View(AdsService[id]);
+        }
+
+        /// <summary>
+        /// 一键延期
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="days"></param>
+        /// <returns></returns>
+        [HttpPost("/partner/{id}/delay")]
+        public async Task<ActionResult> Delay(int id, float days)
+        {
+            var entity = await AdsService.GetByIdAsync(id) ?? throw new NotFoundException("广告未找到");
+            entity.ExpireTime = entity.ExpireTime.GetValueOrDefault(DateTime.Now).AddDays(days);
+            var b = await AdsService.SaveChangesAsync() > 0;
+            return Ok(b ? $"延期成功，广告【{entity.Title}】有效时间已延期至：{entity.ExpireTime:yyyy-MM-dd}" : "延期失败");
+        }
+
+        /// <summary>
+        /// 设置分类
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cids"></param>
+        /// <returns></returns>
+        /// <exception cref="NotFoundException"></exception>
+        [HttpPost("/partner/{id}/categories")]
+        public async Task<ActionResult> SetCategories(int id, [FromBodyOrDefault] string cids)
+        {
+            var entity = await AdsService.GetByIdAsync(id) ?? throw new NotFoundException("广告未找到");
+            entity.CategoryIds = cids;
+            await AdsService.SaveChangesAsync();
+            return Ok();
         }
     }
 }
