@@ -76,7 +76,7 @@
                 }
             }
 
-            data.Data.sort((a,b)=>b.selected-a.selected);
+            data.Data.sort((a,b)=> (b.selected||b.Children.some(c=>c.selected))- (a.selected||a.Children.some(c=>c.selected)));
             $scope.cat = data.Data;
             xmSelect.render({
                 el: '#category',
@@ -562,7 +562,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
                 $timeout(function () {
                     if ($scope.post.CategoryId>0) {
                         $scope.categoryDropdown.setValue([$scope.post.CategoryId]);
-                        $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId)-(a.Id==$scope.post.CategoryId));
+                        $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId||b.Children.some(c=>c.Id==$scope.post.CategoryId))-(a.Id==$scope.post.CategoryId||a.Children.some(c=>c.Id==$scope.post.CategoryId)));
                     }
                     if ($scope.post.Label) {
                         $scope.tagDropdown.setValue($scope.post.Label.split(','));
@@ -737,7 +737,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
                 });
                 if ($scope.post.CategoryId>0) {
                         $scope.categoryDropdown.setValue([$scope.post.CategoryId]);
-                        $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId)-(a.Id==$scope.post.CategoryId));
+                        $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId||b.Children.some(c=>c.Id==$scope.post.CategoryId))-(a.Id==$scope.post.CategoryId||a.Children.some(c=>c.Id==$scope.post.CategoryId)));
                     }
             } else {
                 window.notie.alert({
@@ -871,7 +871,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
                 $scope.$apply();
                 if ($scope.post.CategoryId>0) {
                     $scope.categoryDropdown.setValue([$scope.post.CategoryId]);
-                    $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId)-(a.Id==$scope.post.CategoryId));
+                    $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId||b.Children.some(c=>c.Id==$scope.post.CategoryId))-(a.Id==$scope.post.CategoryId||a.Children.some(c=>c.Id==$scope.post.CategoryId)));
                 }
                 if ($scope.post.Label) {
                     $scope.tagDropdown.setValue($scope.post.Label.split(','));
