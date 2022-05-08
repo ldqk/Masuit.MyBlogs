@@ -36,18 +36,13 @@
         on: function (data) {
             if (data.arr.length>0) {
                 $scope.orderby = data.arr[0].value;
-                self.GetPageData($scope.paginationConf.currentPage||1, $scope.paginationConf.itemsPerPage);
+                self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
             }
         }
     });
 
     function stat() {
-        fetch("/post/Statistic",{
-            headers:{
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }).then(function(response) {
+        fetch("/post/Statistic").then(function(response) {
             return response.json();
         }).then(function(res) {
             if(res.Success) {
@@ -105,7 +100,7 @@
                 on: function (data) {
                     if (data.arr.length>0) {
                         $scope.CategoryId = data.arr[0].Id;
-                        self.GetPageData($scope.paginationConf.currentPage||1, $scope.paginationConf.itemsPerPage);
+                        self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
                     }
                 }
             });
@@ -120,7 +115,7 @@
 
     this.GetPageData = function (page, size) {
         var params = { page, size, kw: $scope.kw, orderby: $scope.orderby, cid: $scope.CategoryId };
-        $http.get(`/post/getpagedata?page=${page}&size=${size}&kw=${$scope.kw}&orderby=${$scope.orderby}&cid=${$scope.CategoryId}`).then(function(res) {
+        $http.get(`/post/getpagedata?page=${page||1}&size=${size}&kw=${$scope.kw}&orderby=${$scope.orderby}&cid=${$scope.CategoryId}`).then(function(res) {
             $scope.paginationConf.totalItems = res.data.TotalCount;
             $("div[ng-table-pagination]").remove();
             self.tableParams = new NgTableParams({ count: 50000 }, {

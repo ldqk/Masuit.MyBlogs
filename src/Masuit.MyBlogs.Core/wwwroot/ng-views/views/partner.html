@@ -291,17 +291,14 @@
     </form>
 </div>
 <div id="delay" class="modal">
-    <h3>延期广告：{{partner.Title}}</h3>
-    <hr />
+    <h5>广告：{{partner.Title}}</h5>
+    <h5>当前有效期延期至：</h5>
     <div class="form-group">
         <input type="hidden" ng-model="partner.Id">
         <div class="input-group">
-            <div class="fg-line">
-                <input type="number" class="form-control" placeholder="请输入时间间隔" min="1" max="365" ng-model="partner.TimeSpan" style="width: 120px">
-                <div class="form-control" id="span" style="width: 80px"></div>
-            </div>
+            <input type="datetime" class="timespan form-control" placeholder="请选择过期时间" ng-model="partner.ExpireTime" readonly="">
             <span class="input-group-btn">
-                <button type="button" class="btn btn-primary" ng-click="delay(partner)">确定</button>
+                <button type="button" class="btn btn-primary" ng-click="submit(partner)">确定</button>
             </span>
         </div>
     </div>

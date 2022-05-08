@@ -62,7 +62,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> GetPageData([FromServices] ICategoryService categoryService, [Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, string kw = "")
+        public ActionResult GetPageData([FromServices] ICategoryService categoryService, [Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, string kw = "")
         {
             Expression<Func<Advertisement, bool>> where = p => true;
             if (!string.IsNullOrEmpty(kw))
@@ -219,21 +219,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IActionResult ClickRecordsInsight(int id)
         {
             return View(AdsService[id]);
-        }
-
-        /// <summary>
-        /// 一键延期
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="days"></param>
-        /// <returns></returns>
-        [HttpPost("/partner/{id}/delay")]
-        public async Task<ActionResult> Delay(int id, float days)
-        {
-            var entity = await AdsService.GetByIdAsync(id) ?? throw new NotFoundException("广告未找到");
-            entity.ExpireTime = entity.ExpireTime.GetValueOrDefault(DateTime.Now).AddDays(days);
-            var b = await AdsService.SaveChangesAsync() > 0;
-            return Ok(b ? $"延期成功，广告【{entity.Title}】有效时间已延期至：{entity.ExpireTime:yyyy-MM-dd}" : "延期失败");
         }
 
         /// <summary>

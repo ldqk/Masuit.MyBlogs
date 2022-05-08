@@ -358,39 +358,30 @@
 
     $scope.delayShow = function (item) {
         $scope.partner=item;
-        $scope.spanDropdown=xmSelect.render({
-            el: '#span',
-            model: {
-                 icon: 'hidden',
-                 label: { type: 'text' }
-            },
-            radio: true,
-            clickClose: true,
-            direction: 'up',
-            data:[{name:"天",value:1},{name:"月",value:30},{name:"年",value:365}],
-            initValue:[1]
-        });
+        $scope.isAdd = false;
+        $scope.partner.ExpireTime=new Date($scope.partner.ExpireTime).Format("yyyy-MM-dd hh:mm:ss");
         layer.open({
             type: 1,
             zIndex: 20,
             title: "延期广告",
-            area:  ['265px','240px'], //宽高
             content: $("#delay"),
             cancel: function(index, layero) {
                 return true;
             }
         });
-    }
-
-    $scope.delay = function (item) {
-        let value = $scope.spanDropdown.getValue()[0].value;
-        let days = item.TimeSpan*value;
-        $http.post(`/partner/${item.Id}/delay?days=`+days).then(function(res) {
-            layer.closeAll();
-            layer.msg(res.data);
+        layui.use('laydate', function(){
+          var laydate = layui.laydate;
+          laydate.render({
+            elem: '.timespan',
+            type: 'datetime',
+            calendar: true,
+            done: function(value, date, endDate) {
+                $scope.partner.ExpireTime=value;
+            }
+          });
         });
     }
-
+    
     $scope.insight= function(row) {
         layer.full(layer.open({
           type: 2,
