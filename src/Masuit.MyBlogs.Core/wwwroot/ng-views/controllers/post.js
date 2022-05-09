@@ -1231,9 +1231,7 @@ myApp.controller("postpending", ["$scope", "$http", "NgTableParams", "$timeout",
             animation: true,
             allowOutsideClick: false
         }).then(function() {
-            $scope.request("/post/delete", {
-                id: row.Id
-            }, function(data) {
+            $scope.request("/post/delete/"+row.Id, null, function(data) {
                 window.notie.alert({
                     type: 1,
                     text: data.Message,
