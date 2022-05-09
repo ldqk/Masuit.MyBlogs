@@ -85,7 +85,7 @@
                 Random r = new Random();
                 string imgPath = $"/Assets/images/503/503{r.StrictNext(Directory.GetFiles(_hostEnvironment.WebRootPath + "/Assets/images/503").Length) + 1}.jpg";
             }
-            <img class="img img-responsive img-thumbnail" width="100%" src="@imgPath" alt="@ViewBag.Keywords" />
+            <img class="img img-responsive img-thumbnail" width="100%" src="@imgPath" alt="@ViewBag.Keywords" decoding="async"/>
             <h3 class="margintop20">
                 <em>
                     <span class="STYLE1">503 Service Unavailable&nbsp;</span>

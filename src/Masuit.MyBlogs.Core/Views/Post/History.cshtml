@@ -12,6 +12,9 @@
 		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
 		<li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
 		@if(post.Category.ParentId>0) {
+		    if(post.Category.Parent.ParentId>0) {
+			    <li><a asp-controller="Home" asp-action="Category" asp-route-id="@post.Category.Parent.ParentId">@post.Category.Parent.Parent.Name</a></li>
+		    }
 			<li><a asp-controller="Home" asp-action="Category" asp-route-id="@post.Category.ParentId">@post.Category.Parent.Name</a></li>
 		}
 		<li><a asp-controller="Home" asp-action="Category" asp-route-id="@post.CategoryId">@post.Category.Name</a></li>

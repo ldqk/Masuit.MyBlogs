@@ -622,7 +622,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Expression<Func<Post, bool>> where = p => true;
             if (cid.HasValue)
             {
-                where = where.And(p => p.CategoryId == cid.Value || p.Category.ParentId == cid.Value);
+                where = where.And(p => p.CategoryId == cid.Value || p.Category.ParentId == cid.Value || p.Category.Parent.ParentId == cid.Value);
             }
 
             if (!string.IsNullOrEmpty(kw))

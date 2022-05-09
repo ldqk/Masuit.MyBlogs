@@ -25,7 +25,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取所有分类
         /// </summary>
         /// <returns></returns>
-        [ResponseCache(Duration = 600)]
         public ActionResult GetCategories()
         {
             var list = CategoryService.GetQuery<string, CategoryDto>(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).NotCacheable().ToList();
@@ -37,7 +36,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" })]
         public async Task<ActionResult> Get(int id)
         {
             var model = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("分类不存在！");

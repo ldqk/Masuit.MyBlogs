@@ -29,6 +29,9 @@
 		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
 		<li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
 		@if(Model.Category.ParentId>0) {
+		    if(Model.Category.Parent.ParentId>0) {
+			    <li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.Category.Parent.ParentId">@Model.Category.Parent.Parent.Name</a></li>
+		    }
 			<li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.Category.ParentId">@Model.Category.Parent.Name</a></li>
 		}
 		<li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.Category.Name</a></li>

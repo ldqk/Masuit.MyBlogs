@@ -6,100 +6,131 @@
 @using Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 @using Masuit.MyBlogs.Core.Models.Enum
 @using EFCoreSecondLevelCacheInterceptor
+@using Masuit.Tools.Models
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @inject ICategoryService CategoryService
 @{
-	Category cat = ViewBag.Category;
-	ViewBag.Title = "分类_" + cat.Name;
-	Layout = "~/Views/Shared/_Layout.cshtml";
-	Random r = new Random();
-	var alllist = CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == null&&c.Post.Count>0, c => c.Name).Select(c => new{c.Id,c.Name}).Cacheable().ToList();
-	var children = cat.ParentId==null?cat.Children:cat.Parent.Children.Where(c => c.Status == Status.Available && c.Post.Count>0).OrderBy(c => c.Id).ToList();
+    Category cat = ViewBag.Category;
+    ViewBag.Title = "分类_" + cat.Path();
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var level = cat.Level();
+    List<Category> children2 = new List<Category>();
+    List<Category> children3 = new List<Category>();
+    var parentId = cat.ParentId;
+    switch (level) {
+        case 1:
+            children2.AddRange(cat.Children.Where(c => c.Status == Status.Available).OrderBy(c => c.Id).ToList());
+            break;
+        case 2:
+            children2.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == parentId, c => c.Name).Cacheable().ToList());
+            children3.AddRange(cat.Children.Where(c => c.Status == Status.Available).OrderBy(c => c.Id).ToList());
+            break;
+        case 3:
+            var topid = cat.Parent.ParentId;
+            children2.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == topid, c => c.Name).Cacheable().ToList());
+            children3.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == parentId, c => c.Name).Cacheable().ToList());
+            break;
+    }
+    var alllist = CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).Select(c => new{c.Id,c.Name}).Cacheable().ToList();
 }
 <style>
-	.bg-title {
-		height: 50vh;
-		max-height: 400px;
-		position: relative;
-		background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
-		background-size:cover;
-		background-attachment: fixed;
-		margin-bottom: 10px;
-	}
-	.header-content {
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%,-50%);
-	}
-	.header-content .divider {
-		width: inherit;
-		height: 20px;
-		margin-top: 20px;
-		border-top: 3px solid rebeccapurple;
-	}
+    .bg-title {
+        height: 50vh;
+        max-height: 400px;
+        position: relative;
+        background: url(/Content/images/@(new Random().Next(1,9)).jpg) no-repeat center;
+        background-size:cover;
+        background-attachment: fixed;
+        margin-bottom: 10px;
+    }
+    .header-content {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+    }
+    .header-content .divider {
+        width: inherit;
+        height: 20px;
+        margin-top: 20px;
+        border-top: 3px solid rebeccapurple;
+    }
 </style>
 <div class="container">
-	<ol class="cd-breadcrumb triangle">
-		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
-		<li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
-		@if(cat.ParentId>0) {
-			<li><a asp-controller="Home" asp-action="Category" asp-route-id="@cat.ParentId">@cat.Parent.Name</a></li>
-		}
-		<li class="current"><em>@cat.Name</em></li>
-	</ol>
+    <ol class="cd-breadcrumb triangle">
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
+        <li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
+        @if(cat.ParentId>0) {
+            if(cat.Parent.ParentId>0) {
+                <li><a asp-controller="Home" asp-action="Category" asp-route-id="@cat.Parent.ParentId">@cat.Parent.Parent.Name</a></li>
+            }
+            <li><a asp-controller="Home" asp-action="Category" asp-route-id="@cat.ParentId">@cat.Parent.Name</a></li>
+        }
+        <li class="current"><em>@cat.Name</em></li>
+    </ol>
 </div>
 <div class="bg-title">
-	<div class="header-content text-center">
-		<h1 class="size48">
-			@if(cat.ParentId>0) {
-			    @(cat.Parent.Name+" / ")
-			}
-			@cat.Name
-			@if(CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") == "true"){
-				<a class="btn btn-lg btn-success" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
-					<i class="icon-rss4"></i>
-				</a>
-			}
-			<a class="btn btn-lg btn-danger" onclick='blockCategory("@cat.Id","@cat.Name")'>
-				<i class="icon-blocked"></i>
-			</a>
-		</h1>
-		<div class="divider"></div>
-		<p class="size24">
-			@cat.Description
-		</p>
-	</div>
+    <div class="header-content text-center">
+        <h1 class="size48">
+            @cat.Path()
+            @if(CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") == "true"){
+                <a class="btn btn-lg btn-success" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
+                    <i class="icon-rss4"></i>
+                </a>
+            }
+            <a class="btn btn-lg btn-danger" onclick='blockCategory("@cat.Id","@cat.Name")'>
+                <i class="icon-blocked"></i>
+            </a>
+        </h1>
+        <div class="divider"></div>
+        <p class="size24">
+            @cat.Description
+        </p>
+    </div>
 </div>
 <div class="container">
-	<p>
-		一级分类：
-		@foreach (var category in alllist)
-		{
-			if (cat.Id==category.Id||cat.ParentId==category.Id) {
-				<a class="text-red" asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
-			} else {
-				<a asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
-			}
-		}
-	</p>
-	@if(children.Count>0) {
-		<hr />
-		<p>
-			<text>二级分类：</text>
-			@foreach (var category in children)
-			{
-				if (cat.Id==category.Id) {
-					<a class="text-red" asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
-				} else {
-					<a asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
-				}
-			}
-		</p>
-	}
-	<hr />
+    <p>
+        一级分类：
+        @foreach (var category in alllist)
+        {
+            if (cat.Id==category.Id||cat.ParentId==category.Id|| (level==3&&cat.Parent.ParentId == category.Id)) {
+                <a class="text-red" asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
+            } else {
+                <a asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
+            }
+        }
+    </p>
+    @if(children2.Count>0) {
+        <hr />
+        <p>
+            <text>二级分类：</text>
+            @foreach (var category in children2)
+            {
+                if (cat.Id==category.Id||cat.ParentId==category.Id) {
+                    <a class="text-red" asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
+                } else {
+                    <a asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
+                }
+            }
+        </p>
+    }
+    @if(children3.Count>0) {
+        <hr />
+        <p>
+            <text>三级分类：</text>
+            @foreach (var category in children3)
+            {
+                if (cat.Id==category.Id) {
+                    <a class="text-red" asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
+                } else {
+                    <a asp-controller="Home" asp-action="Category" asp-route-id="@category.Id">@category.Name</a><text> | </text>
+                }
+            }
+        </p>
+    }
+    <hr />
 </div>
 @{
-	var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-	await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
+    var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
+    await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
 }
