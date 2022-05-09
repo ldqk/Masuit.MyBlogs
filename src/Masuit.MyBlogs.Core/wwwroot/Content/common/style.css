@@ -530,3 +530,12 @@ Custom bottom spacer
     top: unset !important;
     bottom: 0 !important;
 }
+.grid-30 {
+    display: grid;
+    grid-template-columns: repeat(30, 1fr);
+    grid-gap: 8px;
+}
+
+.span-col-28 {
+    grid-column: span 28 / auto;
+}

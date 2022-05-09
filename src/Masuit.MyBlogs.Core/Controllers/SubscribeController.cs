@@ -9,6 +9,7 @@ using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
+using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System.Linq.Expressions;
@@ -124,7 +125,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             string scheme = Request.Scheme;
             var host = Request.Host;
             var category = await categoryService.GetByIdAsync(id) ?? throw new NotFoundException("分类未找到");
-            var raw = PostService.GetQueryFromCache(PostBaseWhere().And(p => p.Rss && p.CategoryId == id && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).ToList();
+            var cids = category.Flatten().Select(c => c.Id).ToArray();
+            var raw = PostService.GetQueryFromCache(PostBaseWhere().And(p => p.Rss && cids.Contains(p.CategoryId) && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).ToList();
             var data = await raw.SelectAsync(async p =>
             {
                 var summary = await p.Content.GetSummary(300, 50);
