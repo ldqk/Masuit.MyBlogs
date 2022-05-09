@@ -19,10 +19,6 @@ public class CategoryDto : BaseDto, ITreeChildren<CategoryDto>
 
     public int? ParentId { get; set; }
 
-    public virtual int TotalPostCount { get; set; }
-
-    public virtual int PendedPostCount { get; set; }
-
     /// <summary>
     /// 子级
     /// </summary>

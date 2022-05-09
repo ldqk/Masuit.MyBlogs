@@ -161,7 +161,7 @@
 				$("#article").val(post.Title);
 				ue.setContent(post.Content);
 				window.categoryDropdown.setValue([post.CategoryId]);
-				window.categoryDropdown.options.data.sort((a,b)=>(b.Id==post.CategoryId||b.Children.some(c=>c.Id==post.CategoryId))-(a.Id==post.CategoryId||a.Children.some(c=>c.Id==post.CategoryId)));
+				window.categoryDropdown.options.data.sort((a,b)=>(b.Id==post.CategoryId||b.Children.some(c=>c.Id==post.CategoryId||c.Children.some(cc=>cc.Id==post.CategoryId)))-(a.Id==post.CategoryId||a.Children.some(c=>c.Id==post.CategoryId||c.Children.some(cc=>cc.Id==post.CategoryId))));
 				$("[name='Author']").val(post.Author);
 				$("[name='Email']").val(post.Email);
 				window.interval = setInterval(function () {

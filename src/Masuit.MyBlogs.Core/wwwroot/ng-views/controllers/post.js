@@ -76,7 +76,7 @@
                 }
             }
 
-            data.Data.sort((a,b)=> (b.selected||b.Children.some(c=>c.selected))- (a.selected||a.Children.some(c=>c.selected)));
+            data.Data.sort((a,b)=> (b.selected||b.Children.some(c=>c.selected||c.Children.some(cc=>cc.selected)))- (a.selected||a.Children.some(c=>c.selected||c.Children.some(cc=>cc.selected))));
             $scope.cat = data.Data;
             xmSelect.render({
                 el: '#category',
@@ -562,7 +562,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
                 $timeout(function () {
                     if ($scope.post.CategoryId>0) {
                         $scope.categoryDropdown.setValue([$scope.post.CategoryId]);
-                        $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId||b.Children.some(c=>c.Id==$scope.post.CategoryId))-(a.Id==$scope.post.CategoryId||a.Children.some(c=>c.Id==$scope.post.CategoryId)));
+                        $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId||b.Children.some(c=>c.Id==$scope.post.CategoryId||c.Children.some(cc=>cc.Id==$scope.post.CategoryId)))-(a.Id==$scope.post.CategoryId||a.Children.some(c=>c.Id==$scope.post.CategoryId||c.Children.some(cc=>cc.Id==$scope.post.CategoryId))));
                     }
                     if ($scope.post.Label) {
                         $scope.tagDropdown.setValue($scope.post.Label.split(','));
@@ -737,7 +737,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
                 });
                 if ($scope.post.CategoryId>0) {
                         $scope.categoryDropdown.setValue([$scope.post.CategoryId]);
-                        $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId||b.Children.some(c=>c.Id==$scope.post.CategoryId))-(a.Id==$scope.post.CategoryId||a.Children.some(c=>c.Id==$scope.post.CategoryId)));
+                        $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId||b.Children.some(c=>c.Id==$scope.post.CategoryId||c.Children.some(cc=>cc.Id==$scope.post.CategoryId)))-(a.Id==$scope.post.CategoryId||a.Children.some(c=>c.Id==$scope.post.CategoryId||c.Children.some(cc=>cc.Id==$scope.post.CategoryId))));
                     }
             } else {
                 window.notie.alert({
@@ -871,7 +871,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
                 $scope.$apply();
                 if ($scope.post.CategoryId>0) {
                     $scope.categoryDropdown.setValue([$scope.post.CategoryId]);
-                    $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId||b.Children.some(c=>c.Id==$scope.post.CategoryId))-(a.Id==$scope.post.CategoryId||a.Children.some(c=>c.Id==$scope.post.CategoryId)));
+                    $scope.categoryDropdown.options.data.sort((a,b)=>(b.Id==$scope.post.CategoryId||b.Children.some(c=>c.Id==$scope.post.CategoryId||c.Children.some(cc=>cc.Id==$scope.post.CategoryId)))-(a.Id==$scope.post.CategoryId||a.Children.some(c=>c.Id==$scope.post.CategoryId||c.Children.some(cc=>cc.Id==$scope.post.CategoryId))));
                 }
                 if ($scope.post.Label) {
                     $scope.tagDropdown.setValue($scope.post.Label.split(','));
@@ -919,10 +919,16 @@ myApp.controller("category", ["$scope", "$http", "$timeout", function($scope, $h
     }
     var sourceId, destId, index, parent, sourceIndex;
     $scope.treeOptions = {
+        beforeDrop: function(e) {
+            index = e.dest.index;
+            if (e.dest.nodesScope.$parent.$modelValue) {
+                parent = e.dest.nodesScope.$parent.$modelValue; //找出父级元素
+            }
+        },
         dropped: function(e) {
             var dest = e.dest.nodesScope;
             destId = dest.$id;
-            var pid = dest.node ? dest.node.id : 0; //pid
+            var pid = dest.node ? dest.node.id : null; //pid
             var prev = null;
             var next = null;
             if (index > sourceIndex) {

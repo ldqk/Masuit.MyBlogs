@@ -1,5 +1,4 @@
-﻿using EFCoreSecondLevelCacheInterceptor;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Command;
@@ -8,6 +7,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -27,8 +27,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetCategories()
         {
-            var list = CategoryService.GetQuery<string, CategoryDto>(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).NotCacheable().ToList();
-            return ResultData(list);
+            var list = CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).Include(c => c.Children).ThenInclude(c => c.Children).ToList();
+            return ResultData(list.Mapper<List<CategoryDto>>());
         }
 
         /// <summary>
@@ -45,20 +45,21 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 保存分类
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="cmd"></param>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> Save([FromBodyOrDefault] CategoryCommand dto)
+        public async Task<ActionResult> Save([FromBodyOrDefault] CategoryCommand cmd)
         {
-            var cat = await CategoryService.GetByIdAsync(dto.Id);
+            var cat = await CategoryService.GetByIdAsync(cmd.Id);
             if (cat == null)
             {
-                var b1 = await CategoryService.AddEntitySavedAsync(Mapper.Map<Category>(dto)) > 0;
+                var b1 = await CategoryService.AddEntitySavedAsync(Mapper.Map<Category>(cmd)) > 0;
                 return ResultData(null, b1, b1 ? "分类添加成功！" : "分类添加失败！");
             }
 
-            cat.Name = dto.Name;
-            cat.Description = dto.Description;
+            cat.Name = cmd.Name;
+            cat.Description = cmd.Description;
+            cat.ParentId = cmd.ParentId;
             bool b = await CategoryService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? "分类修改成功！" : "分类修改失败！");
         }
