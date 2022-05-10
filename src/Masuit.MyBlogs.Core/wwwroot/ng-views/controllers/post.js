@@ -32,7 +32,7 @@
         radio: true,
         clickClose: true,
         autoRow: true, //选项过多,自动换行
-        data:[{name:"发表时间",value:0,selected:$scope.orderby==0},{name:"最后修改",value:1,selected:$scope.orderby==1},{name:"访问量最多",value:2,selected:$scope.orderby==2},{name:"支持数最多",value:3,selected:$scope.orderby==3},{name:"每日平均访问量",value:4,selected:$scope.orderby==4}],
+        data:[{name:"发表时间",value:0,selected:$scope.orderby==0},{name:"最后修改",value:1,selected:$scope.orderby==1},{name:"访问量最多",value:2,selected:$scope.orderby==2},{name:"支持数最多",value:4,selected:$scope.orderby==4},{name:"每日平均访问量",value:5,selected:$scope.orderby==5}],
         on: function (data) {
             if (data.arr.length>0) {
                 $scope.orderby = data.arr[0].value;

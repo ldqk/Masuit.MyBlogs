@@ -617,7 +617,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPageData([FromServices] ICacheManager<HashSet<string>> cacheManager, [Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
+        public async Task<ActionResult> GetPageData([FromServices] ICacheManager<HashSet<string>> cacheManager, int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
         {
             Expression<Func<Post, bool>> where = p => true;
             if (cid.HasValue)
@@ -630,8 +630,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 kw = Regex.Escape(kw);
                 where = where.And(p => Regex.IsMatch(p.Title + p.Author + p.Email + p.Content, kw));
             }
-
-            var list = PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToPagedList<Post, PostDataModel>(page, size, MapperConfig);
+            var list = orderby switch
+            {
+                OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.Status).ThenByDescending(p => p.IsFixedTop).ThenByDescending(p => p.PostVisitRecordStats.Sum(t => t.Count) / p.PostVisitRecordStats.Count).ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig),
+                _ => await PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig)
+            };
             foreach (var item in list.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));

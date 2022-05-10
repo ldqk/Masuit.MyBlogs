@@ -84,8 +84,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="orderBy"></param>
         /// <returns></returns>
         [Route("posts"), Route("p", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = nameof(HeaderNames.Cookie))]
-        public async Task<ActionResult> Post([Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        public async Task<ActionResult> Post([Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
+            page = Math.Max(1, page);
             var viewModel = await GetIndexPageViewModel();
             var postsQuery = PostService.GetQuery(PostBaseWhere().And(p => p.Status == Status.Published)); //准备文章的查询
             var h24 = DateTime.Today.AddDays(-1);
@@ -121,8 +122,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="orderBy"></param>
         /// <returns></returns>
         [Route("tag/{tag}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = nameof(HeaderNames.Cookie))]
-        public async Task<ActionResult> Tag(string tag, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        public async Task<ActionResult> Tag(string tag, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
+            page = Math.Max(1, page);
             if (string.IsNullOrWhiteSpace(tag))
             {
                 throw new NotFoundException("");
@@ -162,8 +164,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="orderBy"></param>
         /// <returns></returns>
         [Route("{yyyy:int}/{mm:int}/{dd:int}/{mode}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = nameof(HeaderNames.Cookie))]
-        public async Task<ActionResult> Archieve([Range(2010, 2099)] int yyyy, [Range(1, 12)] int mm, [Range(1, 31)] int dd, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string mode = nameof(Models.Entity.Post.ModifyDate))
+        public async Task<ActionResult> Archieve([Range(2010, 2099)] int yyyy, [Range(1, 12)] int mm, [Range(1, 31)] int dd, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string mode = nameof(Models.Entity.Post.ModifyDate))
         {
+            page = Math.Max(1, page);
             if (!DateTime.TryParse(yyyy + "-" + mm + "-" + dd, out var date))
             {
                 date = DateTime.Today;
@@ -205,8 +208,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="orderBy"></param>
         /// <returns></returns>
         [Route("author/{author}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = nameof(HeaderNames.Cookie))]
-        public async Task<ActionResult> Author(string author, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        public async Task<ActionResult> Author(string author, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
+            page = Math.Max(1, page);
             Expression<Func<Post, bool>> where = p => p.Author.Equals(author) || p.Modifier.Equals(author) || p.Email.Equals(author) || p.PostHistoryVersion.Any(v => v.Modifier.Equals(author) || v.ModifierEmail.Equals(author));
             where = where.And(p => p.Status == Status.Published).And(PostBaseWhere());
             var h24 = DateTime.Today.AddDays(-1);
@@ -239,8 +243,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="orderBy"></param>
         /// <returns></returns>
         [Route("cat/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = nameof(HeaderNames.Cookie))]
-        public async Task<ActionResult> Category(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        public async Task<ActionResult> Category(int id, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
+            page = Math.Max(1, page);
             var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
             var cids = cat.Flatten().Select(c => c.Id).ToArray();
             var h24 = DateTime.Today.AddDays(-1);

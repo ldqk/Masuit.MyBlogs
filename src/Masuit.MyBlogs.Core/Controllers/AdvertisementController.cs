@@ -62,7 +62,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public ActionResult GetPageData([FromServices] ICategoryService categoryService, [Range(1, int.MaxValue, ErrorMessage = "页数必须大于0")] int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, string kw = "")
+        public ActionResult GetPageData(int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, string kw = "")
         {
             Expression<Func<Advertisement, bool>> where = p => true;
             if (!string.IsNullOrEmpty(kw))
