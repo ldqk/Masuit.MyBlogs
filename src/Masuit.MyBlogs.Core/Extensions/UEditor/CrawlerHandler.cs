@@ -3,6 +3,7 @@ using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Logging;
 using SixLabors.ImageSharp;
+using System.Diagnostics;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -117,7 +118,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             catch (Exception e)
             {
                 State = "抓取错误：" + e.Message;
-                LogManager.Error(e);
+                LogManager.Error(e.Demystify());
             }
 
             return this;

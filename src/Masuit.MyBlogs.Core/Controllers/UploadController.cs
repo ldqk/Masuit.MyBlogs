@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using OpenXmlPowerTools;
 using Polly;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -300,7 +301,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             catch (Exception e)
             {
-                LogManager.Error(e);
+                LogManager.Error(e.Demystify());
                 return ResultData(null, false, "文件上传失败！");
             }
         }

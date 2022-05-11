@@ -536,6 +536,9 @@ Custom bottom spacer
     grid-gap: 8px;
 }
 
+.span-col-27 {
+    grid-column: span 27 / auto;
+}
 .span-col-28 {
     grid-column: span 28 / auto;
 }

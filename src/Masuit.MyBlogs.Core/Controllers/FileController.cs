@@ -9,6 +9,7 @@ using Masuit.Tools.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Polly;
+using System.Diagnostics;
 using System.Text;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -71,7 +72,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             catch (IOException e)
             {
-                LogManager.Error(GetType(), e);
+                LogManager.Error(GetType(), e.Demystify());
                 return ResultData(null, false, "保存失败");
             }
         }

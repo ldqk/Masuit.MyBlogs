@@ -2,6 +2,7 @@
 using Masuit.Tools;
 using Masuit.Tools.Logging;
 using SixLabors.ImageSharp;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor
@@ -80,7 +81,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 {
                     Result.State = UploadState.FileAccessError;
                     Result.ErrorMessage = e.Message;
-                    LogManager.Error(e);
+                    LogManager.Error(e.Demystify());
                 }
                 finally
                 {

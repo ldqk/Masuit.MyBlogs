@@ -15,8 +15,10 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Net;
 using System.Text;
+using PerformanceCounter = Masuit.MyBlogs.Core.Common.PerformanceCounter;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -203,7 +205,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             catch (Exception e)
             {
-                LogManager.Error(GetType(), e);
+                LogManager.Error(GetType(), e.Demystify());
                 return ResultData(null, false, "路径格式不正确！错误信息：\r\n" + e.Message + "\r\n\r\n详细堆栈跟踪：\r\n" + e.StackTrace);
             }
         }

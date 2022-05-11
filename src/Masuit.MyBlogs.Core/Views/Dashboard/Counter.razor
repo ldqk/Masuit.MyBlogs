@@ -5,6 +5,7 @@
 @using Masuit.Tools
 @using System.IO
 @using Masuit.Tools.Logging
+@using PerformanceCounter = Masuit.MyBlogs.Core.Common.PerformanceCounter
 @inject IJSRuntime JS;
 
 <h3 class="text-center">
@@ -145,7 +146,7 @@
             return PerfCounter.GetCurrentPerformanceCounter();
         }
         catch (Exception e) {
-            LogManager.Error(e);
+            LogManager.Error(e.Demystify());
             return new PerformanceCounter();
         }
     }

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
+using System.Diagnostics;
 using System.Text;
 using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
@@ -55,7 +56,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> ServiceUnavailable()
         {
             var feature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
-            string accept = Request.Headers[HeaderNames.Accept] + "";
             if (feature != null)
             {
                 string err;
@@ -64,19 +64,19 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     case DbUpdateConcurrencyException ex:
                         err = $"数据库并发更新异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString}，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{await GetRequestBody(Request)}\n堆栈信息：";
-                        LogManager.Error(err, ex);
+                        LogManager.Error(err, ex.Demystify());
                         break;
 
                     case DbUpdateException ex:
                         err = $"数据库更新时异常，更新表：{ex.Entries.Select(e => e.Metadata.Name)}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString} ，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t{ex.InnerException?.Message}，请求参数：\n{await GetRequestBody(Request)}\n堆栈信息：";
-                        LogManager.Error(err, ex);
+                        LogManager.Error(err, ex.Demystify());
                         break;
 
                     case AggregateException ex:
                         LogManager.Debug("↓↓↓" + ex.Message + "↓↓↓");
                         ex.Flatten().Handle(e =>
                         {
-                            LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString} ，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t", e);
+                            LogManager.Error($"异常源：{e.Source}，异常类型：{e.GetType().Name}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString} ，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}\t", e.Demystify());
                             return true;
                         });
                         var body = await GetRequestBody(Request);
@@ -103,7 +103,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         }) : View("TempDeny");
 
                     default:
-                        LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString} ，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}，请求参数：\n{await GetRequestBody(Request)}\n堆栈信息：", feature.Error);
+                        LogManager.Error($"异常源：{feature.Error.Source}，异常类型：{feature.Error.GetType().Name}，请求路径({Request.Method})：{Request.Scheme}://{Request.Host}{HttpUtility.UrlDecode(feature.Path)}{Request.QueryString} ，客户端用户代理：{Request.Headers[HeaderNames.UserAgent]}，客户端IP：{ip}，请求参数：\n{await GetRequestBody(Request)}\n堆栈信息：", feature.Error.Demystify());
                         break;
                 }
             }

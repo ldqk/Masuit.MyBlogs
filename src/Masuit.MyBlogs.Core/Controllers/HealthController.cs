@@ -11,7 +11,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 心跳检测
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Route("health")]
+        [Route("health")]
         public OkResult Check()
         {
             return Ok();
