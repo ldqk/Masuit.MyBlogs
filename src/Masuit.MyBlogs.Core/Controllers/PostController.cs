@@ -1041,12 +1041,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Title = p.Title,
                 ViewCount = p.PostVisitRecordStats.Where(t => t.Date >= DateTime.Today).Sum(e => e.Count)
             }).OrderByDescending(p => p.ViewCount).Take(10).Cacheable().ToListAsync(cancellationToken);
+            var readCount = PostVisitRecordService.Count(e => e.Time >= DateTime.Today);
             return ResultData(new
             {
                 mostHots,
                 mostView,
                 mostAverage,
-                trending
+                trending,
+                readCount
             });
         }
 

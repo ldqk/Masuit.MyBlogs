@@ -7,7 +7,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
     /// </summary>
     public static class UeditorConfig
     {
-        public static JObject Items => JObject.Parse(File.ReadAllText(AppContext.BaseDirectory + "ueconfig.json"));
+        public static JObject Items => JObject.Parse(File.ReadAllText(AppContext.BaseDirectory + "App_Data/ueconfig.json"));
 
         public static T GetValue<T>(string key)
         {
