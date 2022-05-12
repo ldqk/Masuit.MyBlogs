@@ -354,6 +354,31 @@
                 return true;
             }
         });
+        xmSelect.render({
+            el: '#category-view',
+            tips: '未选择分类',
+            disabled: true,
+            prop: {
+                name: 'Name',
+                value: 'Id',
+                children: 'Children',
+            },
+            tree: {
+                show: true,
+                strict: false,
+                expandedKeys: true,
+            },
+            autoRow: true, //选项过多,自动换行
+            data:$scope.cat,
+            initValue:(item.CategoryIds+"").split(",")
+        });
+        xmSelect.render({
+            el: '#types-view',
+            disabled: true,
+            autoRow: true, //选项过多,自动换行
+            data:[{name:"轮播图",value:1},{name:"列表项",value:2},{name:"边栏",value:3},{name:"内页",value:4}],
+            initValue:(item.Types+"").split(",")
+        });
     }
 
     $scope.delayShow = function (item) {
