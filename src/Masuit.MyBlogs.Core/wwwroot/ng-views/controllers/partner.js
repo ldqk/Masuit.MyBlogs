@@ -58,7 +58,7 @@
                         }
                     });
                 });
-            },200);
+            },1);
         });
     }
 
@@ -71,7 +71,7 @@
         on: function (data) {
             var arr=[];
             for (var i = 0; i < data.arr.length; i++) {
-                arr.push(data.arr[i].name);
+                arr.push(data.arr[i].value);
             }
             $scope.partner.Types=arr.join(",");
         }

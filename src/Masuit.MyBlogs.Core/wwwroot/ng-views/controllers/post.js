@@ -289,6 +289,9 @@
     }
 }]);
 myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
+    UEDITOR_CONFIG.initialFrameHeight=null;
+    UEDITOR_CONFIG.autoHeightEnabled=true;
+    UEDITOR_CONFIG.zIndex=1;
     clearInterval(window.interval);
     $scope.post = {
         Title: "",
@@ -599,9 +602,12 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
         $scope.ExceptRegions=data.Data;
     });
 }]);
+
 myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
+    UEDITOR_CONFIG.initialFrameHeight=null;
+    UEDITOR_CONFIG.autoHeightEnabled=true;
+    UEDITOR_CONFIG.zIndex=1;
     $scope.id = $location.search()['id'];
-    
     $scope.reserve = true;
     $scope.get("/post/get/" + $scope.id, function (data) {
         $scope.post = data.Data;

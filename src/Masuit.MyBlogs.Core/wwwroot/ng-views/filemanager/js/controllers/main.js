@@ -1,6 +1,6 @@
 ﻿(function(angular) {
     'use strict';
-	angular.module('FileManagerApp').controller('FileManagerCtrl', ['$scope', '$rootScope', '$http', '$window', '$translate', 'fileManagerConfig', 'item', 'fileNavigator', 'apiMiddleware', function ($scope, $rootScope, $http, $window, $translate, fileManagerConfig, Item, FileNavigator, ApiMiddleware) {
+    angular.module('FileManagerApp').controller('FileManagerCtrl', ['$scope', '$rootScope', '$http', '$window', '$translate', 'fileManagerConfig', 'item', 'fileNavigator', 'apiMiddleware', function ($scope, $rootScope, $http, $window, $translate, fileManagerConfig, Item, FileNavigator, ApiMiddleware) {
         var $storage = $window.localStorage;
         $scope.config = fileManagerConfig;
         $scope.reverse = false;
@@ -13,10 +13,10 @@
         $scope.fileNavigator = new FileNavigator();
         $scope.apiMiddleware = new ApiMiddleware();
         $scope.uploadFileList = [];
-			$scope.viewTemplate = $storage.getItem('viewTemplate') || 'main-table.html';
+            $scope.viewTemplate = $storage.getItem('viewTemplate') || 'main-table.html';
         $scope.fileList = [];
         $scope.temps = [];
-			$scope.loading = false;
+            $scope.loading = false;
         $scope.$watch('temps', function() {
             if ($scope.singleSelection()) {
                 $scope.temp = $scope.singleSelection();
@@ -28,11 +28,11 @@
         });
 
    //     $scope.$watch('apiMiddleware.apiHandler.inprocess', function() {
-			//if ($scope.apiMiddleware.apiHandler.inprocess) {
-			//	$(".loading1").show();
-			//} else {
-			//	$(".loading1").hide();
-			//}
+            //if ($scope.apiMiddleware.apiHandler.inprocess) {
+            //	$(".loading1").show();
+            //} else {
+            //	$(".loading1").hide();
+            //}
    //     });
 
         $scope.fileNavigator.onRefresh = function() {
@@ -244,13 +244,13 @@
             }
 
             $scope.apiMiddleware.compress($scope.temps, name, $rootScope.selectedModalPath).then(function() {
-				$scope.fileNavigator.refresh();
+                $scope.fileNavigator.refresh();
                 if (! $scope.config.compressAsync) {
                     return $scope.modal('compress', true);
                 }
-				$scope.apiMiddleware.apiHandler.asyncSuccess = true;
-			}, function () { 
-				$scope.apiMiddleware.apiHandler.asyncSuccess = false;
+                $scope.apiMiddleware.apiHandler.asyncSuccess = true;
+            }, function () { 
+                $scope.apiMiddleware.apiHandler.asyncSuccess = false;
             });
         };
 
@@ -347,18 +347,18 @@
         $scope.getUrl = function(_item) {
             return $scope.apiMiddleware.getUrl(_item);
         };
-		$scope.changeroot= function(path) {
-			$http.post('/system/save?sets='+JSON.stringify([{
-				Name: "PathRoot",
-				Value:path
-			}])).then(function(res) {
-				if (res.data.Success) {
-					$scope.fileNavigator.goTo(-1);
-				}
-			}, function() {
+        $scope.changeroot= function(path) {
+            $http.post('/system/save',[{
+                Name: "PathRoot",
+                Value:path
+            }]).then(function(res) {
+                if (res.data.Success) {
+                    $scope.fileNavigator.goTo(-1);
+                }
+            }, function() {
 
-			});
-		}
+            });
+        }
         var validateSamePath = function(item) {
             var selectedPath = $rootScope.selectedModalPath.join('');
             var selectedItemsPath = item && item.model.path.join('');
