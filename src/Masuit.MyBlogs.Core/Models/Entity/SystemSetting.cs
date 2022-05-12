@@ -23,7 +23,6 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// ֵ
         /// </summary>
-        [Required]
         public string Value { get; set; }
 
     }

@@ -101,11 +101,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 保存设置
         /// </summary>
-        /// <param name="sets"></param>
+        /// <param name="settings"></param>
         /// <returns></returns>
-        public async Task<ActionResult> Save([FromBodyOrDefault] string sets)
+        public async Task<ActionResult> Save([FromBody] List<SystemSetting> settings)
         {
-            var settings = JsonConvert.DeserializeObject<List<SystemSetting>>(sets).ToArray();
             var b = await SystemSettingService.AddOrUpdateSavedAsync(s => s.Name, settings) > 0;
             var dic = settings.ToDictionary(s => s.Name, s => s.Value); //同步设置
             foreach (var (key, value) in dic)

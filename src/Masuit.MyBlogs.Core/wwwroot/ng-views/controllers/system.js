@@ -67,9 +67,7 @@ myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 							});
 						}
 					}
-					$http.post("/system/save", {
-						sets: JSON.stringify(result)
-					}).then(function(res) {
+					$http.post("/system/save", result).then(function(res) {
 						resolve(res.data);
 					}, function() {
 						reject("请求服务器失败！");
@@ -461,9 +459,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 							});
 						}
 					}
-					$http.post("/system/save", {
-						sets: JSON.stringify(result)
-					}).then(function(res) {
+					$http.post("/system/save", result).then(function(res) {
 						resolve(res.data);
 					}, function() {
 						reject("请求服务器失败！");
