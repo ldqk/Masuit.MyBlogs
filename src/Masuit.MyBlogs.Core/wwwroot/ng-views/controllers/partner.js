@@ -44,7 +44,7 @@
                         filterable: true, //搜索功能
                         autoRow: true, //选项过多,自动换行
                         data:$scope.cat,
-                        initValue:(item.CategoryIds+"").split(","),
+                        initValue:(item.CategoryIds||"").split(","),
                         on: function (data) {
                             var arr=[];
                             for (var i = 0; i < data.arr.length; i++) {
@@ -198,7 +198,7 @@
         $scope.isAdd = false;
         $scope.allowUpload=false;
         layer.closeAll();
-        $scope.categoryDropdown.setValue((item.CategoryIds+"").split(','));
+        $scope.categoryDropdown.setValue((item.CategoryIds||"").split(','));
         $scope.typesDropdown.setValue(item.Types.split(','));
         $scope.regionDropdown.setValue([item.RegionMode]);
         layer.open({
@@ -234,7 +234,7 @@
         $scope.isAdd = true;
         $scope.allowUpload=false;
         layer.closeAll();
-        $scope.categoryDropdown.setValue((item.CategoryIds+"").split(','));
+        $scope.categoryDropdown.setValue((item.CategoryIds||"").split(','));
         $scope.typesDropdown.setValue(item.Types.split(','));
         $scope.regionDropdown.setValue([0]);
         layer.open({
@@ -370,14 +370,14 @@
             },
             autoRow: true, //选项过多,自动换行
             data:$scope.cat,
-            initValue:(item.CategoryIds+"").split(",")
+            initValue:(item.CategoryIds||"").split(",")
         });
         xmSelect.render({
             el: '#types-view',
             disabled: true,
             autoRow: true, //选项过多,自动换行
             data:[{name:"轮播图",value:1},{name:"列表项",value:2},{name:"边栏",value:3},{name:"内页",value:4}],
-            initValue:(item.Types+"").split(",")
+            initValue:(item.Types||"").split(",")
         });
     }
 

@@ -312,7 +312,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
         }, function (data) {
             $scope.post = data.Data;
             delete $scope.post.Id;
-            $scope.keywordsDropdown.update({data: $scope.post.Keyword.split(',')});
+            $scope.keywordsDropdown.update({data: ($scope.post.Keyword||"").split(',')});
         });
     }
     $scope.getCategory = function () {
@@ -391,7 +391,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
                 if (tags.find(e=>e.value==val)==undefined) {
                     tags.push(temp);
                     $scope.tagDropdown.update({data:tags});
-                    $scope.tagDropdown.setValue($scope.post.Label.split(','));
+                    $scope.tagDropdown.setValue(($scope.post.Label||"").split(','));
                 }
             }
         });
@@ -647,7 +647,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
                     if (tags.find(e=>e.value==val)==undefined) {
                         tags.push(temp);
                         $scope.tagDropdown.update({data:tags});
-                        $scope.tagDropdown.setValue($scope.post.Label.split(','));
+                        $scope.tagDropdown.setValue(($scope.post.Label||"").split(','));
                     }
                 }
             });
@@ -698,7 +698,7 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
             var $ = layui.jquery, inputTag = layui.inputTag;
             $scope.keywordsDropdown = inputTag.render({
                 elem: '.keywords',
-                data:  ($scope.post.Keyword+"").split(','),//初始值
+                data:  ($scope.post.Keyword||"").split(','),//初始值
                 permanentData: [],//不允许删除的值
                 removeKeyNum: 8,//删除按键编号 默认，BackSpace 键
                 createKeyNum: 13,//创建按键编号 默认，Enter 键
