@@ -8,7 +8,7 @@ namespace Masuit.MyBlogs.Core.Common
         private static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
 
         internal static readonly Dictionary<string, string> Platforms = new Dictionary<string, string>() {
-            {"windows nt 10.0", "Windows 10"},
+            {"windows nt 10.0", "Windows 10/11"},
             {"windows nt 6.3", "Windows 8.1"},
             {"windows nt 6.2", "Windows 8"},
             {"windows nt 6.1", "Windows 7"},
@@ -213,15 +213,22 @@ namespace Masuit.MyBlogs.Core.Common
         };
 
         protected string agent;
+
         public bool IsBrowser { get; set; }
+
         public bool IsRobot { get; set; }
+
         public bool IsMobile { get; set; }
 
         // Current values
         public string Platform { get; set; } = "";
+
         public string Browser { get; set; } = "";
+
         public string BrowserVersion { get; set; } = "";
+
         public string Mobile { get; set; } = "";
+
         public string Robot { get; set; } = "";
 
         internal UserAgent(string userAgentString = null)

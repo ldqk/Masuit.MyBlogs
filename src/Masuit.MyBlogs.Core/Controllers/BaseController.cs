@@ -83,12 +83,19 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return text;
             }
 
+            var location = Request.Location();
+            var template = Template.Create(text).Set("clientip", ClientIP).Set("location", location.Address).Set("network", location.Network);
+            if (text.Contains("{{browser}}") || text.Contains("{{os}}"))
+            {
+                var agent = UserAgent.Parse(Request.Headers[HeaderNames.UserAgent] + "");
+                template.Set("browser", agent.Browser + " " + agent.BrowserVersion).Set("os", agent.Platform);
+            }
+
             var pattern = @"\{\{[\w._-]+\}\}";
-            var keys = Regex.Matches(text, pattern).Select(m => m.Value.Trim('{', '}')).ToArray();
+            var keys = Regex.Matches(template.Render(), pattern).Select(m => m.Value.Trim('{', '}')).ToArray();
             if (keys.Length > 0)
             {
                 var dic = VariablesService.GetQueryFromCache(v => keys.Contains(v.Key)).ToDictionary(v => v.Key, v => v.Value);
-                var template = Template.Create(text);
                 foreach (var (key, value) in dic)
                 {
                     string valve = value;
@@ -96,13 +103,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                     {
                         valve = ReplaceVariables(valve, depth++);
                     }
+
                     template.Set(key, valve);
                 }
-
-                return template.Render();
             }
 
-            return text;
+            return template.Render();
         }
 
         public override Task OnActionExecutionAsync(ActionExecutingContext filterContext, ActionExecutionDelegate next)

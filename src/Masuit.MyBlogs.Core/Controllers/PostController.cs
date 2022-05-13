@@ -318,7 +318,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public ActionResult GetTag()
         {
-            return ResultData(PostService.GetTags().Where(p => p.Value > 1).Select(x => x.Key).OrderBy(s => s));
+            return ResultData(PostService.GetTags().Select(x => x.Key).OrderBy(s => s));
         }
 
         /// <summary>
@@ -1035,13 +1035,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Title = p.Title,
                 ViewCount = (int)p.AverageViewCount
             }).Cacheable().ToListAsync(cancellationToken);
+            var yesterday = DateTime.Now.AddDays(-1);
             var trending = await postsQuery.Select(p => new PostModelBase()
             {
                 Id = p.Id,
                 Title = p.Title,
-                ViewCount = p.PostVisitRecordStats.Where(t => t.Date >= DateTime.Today).Sum(e => e.Count)
+                ViewCount = p.PostVisitRecordStats.Where(t => t.Date >= yesterday).Sum(e => e.Count)
             }).OrderByDescending(p => p.ViewCount).Take(10).Cacheable().ToListAsync(cancellationToken);
-            var readCount = PostVisitRecordService.Count(e => e.Time >= DateTime.Today);
+            var readCount = PostVisitRecordService.Count(e => e.Time >= yesterday);
             return ResultData(new
             {
                 mostHots,
