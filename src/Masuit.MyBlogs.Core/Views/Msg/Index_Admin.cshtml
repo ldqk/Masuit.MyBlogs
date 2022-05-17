@@ -204,9 +204,7 @@
             animation: true,
             allowOutsideClick: false
         }).then(function () {
-		    $.post("/msg/delete", {
-			    id: id
-		    }, function(res) {
+		    $.post("/msg/delete/"+id, function(res) {
 			    swal(res.Message, "", res.Success ? "success" : "error");
 			    getmsgs();
 		    });

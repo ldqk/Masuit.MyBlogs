@@ -334,19 +334,26 @@
 				animation: true,
 				allowOutsideClick: false
 			}).then(function () {
-				window.post("/post/delete", { id: @Model.Id}, function (data) {
-					window.notie.alert({
+				window.fetch("/post/delete/"+@Model.Id, {
+		            credentials: 'include',
+		            method: 'POST',
+		            mode: 'cors'
+	            }).then(function(response) {
+		            return response.json();
+	            }).then(function(data) {
+		            window.notie.alert({
 						type: 1,
 						text: data.Message,
 						time: 4
 					});
-				}, () => {
-					window.notie.alert({
+	            }).catch(function(e) {
+		            loadingDone();
+		            window.notie.alert({
 						type: 3,
 						text: "请求失败，请稍候再试！",
 						time: 4
 					});
-				});
+	            });
 			}, function () {
 			});
 		});
@@ -501,9 +508,7 @@
 			animation: true,
 			allowOutsideClick: false
 		}).then(function () {
-			$.post("/comment/delete", {
-				id: id
-			}, function (res) {
+			$.post("/comment/delete/"+id, function (res) {
 				swal(res.Message, "", res.Success ? "success" : "error");
 				getcomments();
 			});

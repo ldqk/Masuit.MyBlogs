@@ -51,9 +51,7 @@
             animation: true,
             allowOutsideClick: false
         }).then(function () {
-            $.post("/notice/delete", {
-                id: id
-            }, function (data) {
+            $.post("/notice/delete/"+id, function (data) {
                 window.notie.alert({
                     type: 1,
                     text: data.Message,

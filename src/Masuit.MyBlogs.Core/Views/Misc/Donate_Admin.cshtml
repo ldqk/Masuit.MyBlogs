@@ -167,9 +167,7 @@
                 animation: true,
                 allowOutsideClick: false
             }).then(function () {
-                $http.post("/donate/delete", {
-                    id: row.Id
-                }).then(function (res) {
+                $http.post("/donate/delete/"+row.Id).then(function (res) {
                     window.notie.alert({
                         type: 1,
                         text: res.data.Message,
