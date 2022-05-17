@@ -27,12 +27,16 @@
 <div id="modal" class="modal">
     <div class="container-fluid" style="margin: 15px 0;">
         <form class="bgm-white">
+            <p class="text-red">温馨提示：</p>
+            <p class="text-red">1. 变量支持关联引用，请注意不要造成循环引用！</p>
+            <p class="text-red">2. 关联引用层级不要太多，避免造成递归查找时的性能问题！</p>
+            <p class="text-red">3. 请不要使用如下系统变量名作为变量名：browser(浏览器版本)、os(操作系统)、clientip(客户端ip)、location(客户端地理位置)、network(客户端网络信息)</p>
             <div class="input-group">
                 <span class="input-group-addon">
                     变量名：
                 </span>
                 <div class="fg-line">
-                    <input type="text" class="form-control" ng-model="values.Key"  ng-disabled="values.Id>0"/>
+                    <input type="text" class="form-control" ng-model="values.Key" ng-disabled="values.Id>0" placeholder="变量名，以字母开头，请勿使用系统变量名：browser、os、clientip、location、network"/>
                 </div>
             </div>
             <div class="input-group">
