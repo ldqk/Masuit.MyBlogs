@@ -89,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 if (format != null)
                 {
                     ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), "." + format.Name.ToLower());
-                    if (!Regex.IsMatch(format.Name, "JPEG|PNG|Webp", RegexOptions.IgnoreCase))
+                    if (!Regex.IsMatch(format.Name, "JPEG|PNG|Webp|GIF", RegexOptions.IgnoreCase))
                     {
                         using var image = await Image.LoadAsync(stream);
                         var memoryStream = new MemoryStream();
