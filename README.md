@@ -197,12 +197,11 @@ angularjs
 如果Redis不在本机，需要在配置文件中的Redis节下配置，固定为Redis，值的格式：127.0.0.1:6379,allowadmin=true，若未正确配置，将按默认值“127.0.0.1:6379,allowadmin=true,abortConnect=false”。  
 其他配置请参考appsettings.json的注释按需配置即可。  
 #### 5.启动网站
-双击运行Masuit.MyBlogs.Core.exe即可
+配置好环境和配置文件后，可直接通过dotnet Masuit.MyBlogs.Core.dll命令或直接双击Masuit.MyBlogs.Core.exe运行，也可以通过nssm挂在为Windows服务运行，或者你也可以尝试在Linux下部署。  
 #### 其他方式部署
 IIS：部署时必须将应用程序池的标识设置为LocalSystem，否则无法监控服务器硬件，同时需要安装.NET Core Hosting运行时环境，IIS程序池改为无托管代码。  
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbf30b6a083.jpg)  
-独立运行：配置好环境和配置文件后，可直接通过dotnet Masuit.MyBlogs.Core.dll命令或直接双击Masuit.MyBlogs.Core.exe运行，也可以通过nssm挂在为Windows服务运行，或者你也可以尝试在Linux下部署。  
-docker：自行爬文。  
+docker/Linux：自行爬文。  
 ### 后台管理：
 https://127.0.0.1:5001/dashboard
 - 初始用户名：masuit  
