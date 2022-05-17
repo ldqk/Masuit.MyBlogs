@@ -176,20 +176,33 @@ angularjs
 - ip2region+MaxMind地址库实现请求来源审查；
 - 用户信息采用端到端RSA非对称加密进行数据传输；
 ### 项目部署
-#### 编译：
+以Windows系统为例，Linux系统请自行折腾。
+#### 1.安装基础设施：
+1. 安装.net6运行时：[https://dotnet.microsoft.com/zh-cn/download](https://dotnet.microsoft.com/zh-cn/download)
+2. 安装mysql：[mysql 8.0.29绿色版](https://masuit.org/1567)
+3. 安装redis：[redis for windows 5.0.14绿色版](https://masuit.org/1567)
+#### 2.生成网站应用
+#### 方式一：编译源代码：
 编译需要将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目也一起clone下来，和本项目平级目录存放，才能正常编译，否则，将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目移除，通过nuget安装也是可以的。  
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/20191019/6370710386639200004363431.png)  
-#### 配置文件：
+#### 方式二：下载编译好的现成的二进制文件
+前往[Release](https://github.com/ldqk/Masuit.MyBlogs/releases)下载最新的压缩包解压即可。
+#### 3.还原数据库脚本
+创建数据库，名称随意，如：myblogs，然后前往[Release](https://github.com/ldqk/Masuit.MyBlogs/releases)或[https://github.com/ldqk/Masuit.MyBlogs/tree/master/database/mysql](https://github.com/ldqk/Masuit.MyBlogs/tree/master/database/mysql)下载最新的数据库文件,还原到新建的数据库。
+#### 4.修改配置文件：
 主要需要配置的是https证书、数据库连接字符、redis、BaiduAK以及图床配置，其他配置均为可选项，不配置则表示不启用；
 ![](https://p.pstatp.com/origin/1381c000155b45481aeec)  
 同时，BaiduAK参与了数据库的加密，如果你没有BaiduAK，自行到百度地图开放平台申请，`免费的`。  
 如果你使用了CDN，需要配置TrueClientIPHeader选项为真实IP请求转发头，如cloudflare的叫CF-Connecting-IP。
 如果Redis不在本机，需要在配置文件中的Redis节下配置，固定为Redis，值的格式：127.0.0.1:6379,allowadmin=true，若未正确配置，将按默认值“127.0.0.1:6379,allowadmin=true,abortConnect=false”。  
+其他配置请参考appsettings.json的注释按需配置即可。  
+#### 5.启动网站
+双击运行Masuit.MyBlogs.Core.exe即可
+#### 其他方式部署
 IIS：部署时必须将应用程序池的标识设置为LocalSystem，否则无法监控服务器硬件，同时需要安装.NET Core Hosting运行时环境，IIS程序池改为无托管代码。  
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbf30b6a083.jpg)  
 独立运行：配置好环境和配置文件后，可直接通过dotnet Masuit.MyBlogs.Core.dll命令或直接双击Masuit.MyBlogs.Core.exe运行，也可以通过nssm挂在为Windows服务运行，或者你也可以尝试在Linux下部署。  
 docker：自行爬文。  
-
 ### 后台管理：
 https://127.0.0.1:5001/dashboard
 - 初始用户名：masuit  
