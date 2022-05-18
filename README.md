@@ -202,6 +202,9 @@ angularjs
 IIS：部署时必须将应用程序池的标识设置为LocalSystem，否则无法监控服务器硬件，同时需要安装.NET Core Hosting运行时环境，IIS程序池改为无托管代码。  
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbf30b6a083.jpg)  
 docker/Linux：自行爬文。  
+#### 有偿代部署服务
+请联系：admin@masuit.com
+
 ### 后台管理：
 https://127.0.0.1:5001/dashboard
 - 初始用户名：masuit  
