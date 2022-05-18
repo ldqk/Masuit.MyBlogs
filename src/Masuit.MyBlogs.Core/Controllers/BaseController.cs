@@ -53,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public bool VisitorTokenValid => Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Request.Cookies["FullAccessToken"]);
 
-        public int[] HideCategories => Request.Cookies[SessionKey.HideCategories]?.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToInt32()).ToArray() ?? Request.Query[SessionKey.SafeMode].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToInt32()).ToArray();
+        public int[] HideCategories => Request.GetHideCategories();
 
         /// <summary>
         /// 响应数据

@@ -78,9 +78,15 @@
                     <i class="icon-rss4"></i>
                 </a>
             }
-            <a class="btn btn-lg btn-danger" onclick='blockCategory("@cat.Id","@cat.Name")'>
-                <i class="icon-blocked"></i>
-            </a>
+            @if(Context.Request.GetHideCategories().Contains(cat.Id)) {
+                <a class="btn btn-lg btn-default" onclick='blockCategory("@cat.Id","@cat.Name")'>
+                    <i class="icon-blocked"></i>
+                </a>
+            }else {
+                <a class="btn btn-lg btn-danger" onclick='blockCategory("@cat.Id","@cat.Name")'>
+                    <i class="icon-blocked"></i>
+                </a>
+            }
         </h1>
         <div class="divider"></div>
         <p class="size24">

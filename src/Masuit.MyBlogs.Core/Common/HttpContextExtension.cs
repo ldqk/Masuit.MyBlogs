@@ -1,4 +1,5 @@
 ﻿using DnsClient;
+using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Microsoft.Net.Http.Headers;
 using Polly;
@@ -15,6 +16,11 @@ namespace Masuit.MyBlogs.Core.Common
         public static IPLocation Location(this HttpRequest request)
         {
             return (IPLocation)request.HttpContext.Items.GetOrAdd("ip.location", () => request.HttpContext.Connection.RemoteIpAddress.GetIPLocation());
+        }
+
+        public static int[] GetHideCategories(this HttpRequest request)
+        {
+            return request.Cookies[SessionKey.HideCategories]?.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToInt32()).ToArray() ?? request.Query[SessionKey.SafeMode].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.ToInt32()).ToArray();
         }
 
         /// <summary>
