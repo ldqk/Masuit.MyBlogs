@@ -21,6 +21,7 @@ using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.RegularExpressions;
+using Masuit.Tools.Systems;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -68,8 +69,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (cid != 0)
             {
                 var message = await LeaveMessageService.GetByIdAsync(cid) ?? throw new NotFoundException("留言未找到");
-                var single = new[] { message.Root() };
-                foreach (var m in single.Flatten())
+                var layer = LeaveMessageService.GetQueryNoTracking(e => e.GroupTag == message.GroupTag).ToList();
+                foreach (var m in layer)
                 {
                     m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                     if (!CurrentUser.IsAdmin)
@@ -86,7 +87,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     parentTotal = 1,
                     page,
                     size,
-                    rows = single.Mapper<IList<LeaveMessageViewModel>>()
+                    rows = layer.ToTree(e => e.Id, e => e.ParentId).Mapper<IList<LeaveMessageViewModel>>()
                 });
             }
 
@@ -96,7 +97,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "没有留言");
             }
             var total = parent.TotalCount;
-            parent.Data.Flatten().ForEach(m =>
+            var tags = parent.Data.Select(c => c.GroupTag).ToArray();
+            var messages = LeaveMessageService.GetQueryNoTracking(c => tags.Contains(c.GroupTag)).ToList();
+            messages.ForEach(m =>
             {
                 m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 if (!CurrentUser.IsAdmin)
@@ -114,7 +117,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     parentTotal = total,
                     page,
                     size,
-                    rows = Mapper.Map<List<LeaveMessageViewModel>>(parent.Data)
+                    rows = messages.OrderByDescending(c => c.PostDate).ToTree(c => c.Id, c => c.ParentId).Mapper<IList<LeaveMessageViewModel>>()
                 });
             }
 
@@ -156,6 +159,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var msg = cmd.Mapper<LeaveMessage>();
+            msg.GroupTag = cmd.ParentId > 0 ? LeaveMessageService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.GroupTag).FirstOrDefault() : SnowFlake.NewId;
             if (Regex.Match(cmd.NickName + cmd.Content, CommonHelper.ModRegex).Length <= 0)
             {
                 msg.Status = Status.Published;
@@ -378,6 +382,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             return ResultData(null, true, "站内消息清除成功！");
         }
 
-        #endregion
+        #endregion 站内消息
     }
 }

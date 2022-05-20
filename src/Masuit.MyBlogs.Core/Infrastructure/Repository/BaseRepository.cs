@@ -46,7 +46,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual IEnumerable<T> GetAllFromCache()
         {
-            return DataContext.Set<T>().Cacheable().AsEnumerable();
+            return DataContext.Set<T>().AsNoTracking().Cacheable().AsEnumerable();
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public Task<List<T>> GetAllFromCacheAsync()
         {
-            return DataContext.Set<T>().Cacheable().ToListAsync();
+            return DataContext.Set<T>().AsNoTracking().Cacheable().ToListAsync();
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual List<TDto> GetAllFromCache<TDto>() where TDto : class
         {
-            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
+            return DataContext.Set<T>().ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public Task<List<TDto>> GetAllFromCacheAsync<TDto>() where TDto : class
         {
-            return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig).Cacheable().ToListAsync();
+            return DataContext.Set<T>().ProjectTo<TDto>(MapperConfig).Cacheable().ToListAsync();
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual List<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return GetAll(orderby, isAsc).Cacheable().ToList();
+            return GetAllNoTracking(orderby, isAsc).Cacheable().ToList();
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public Task<List<T>> GetAllFromCacheAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return GetAll(orderby, isAsc).Cacheable().ToListAsync();
+            return GetAllNoTracking(orderby, isAsc).Cacheable().ToListAsync();
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>还未执行的SQL语句</returns>
         public virtual List<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
         {
-            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
+            return GetAll(orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public Task<List<TDto>> GetAllFromCacheAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
-            return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToListAsync();
+            return GetAll(orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToListAsync();
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual List<T> GetQueryFromCache(Expression<Func<T, bool>> @where)
         {
-            return DataContext.Set<T>().Where(where).Cacheable().ToList();
+            return DataContext.Set<T>().Where(where).AsNoTracking().Cacheable().ToList();
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public Task<List<T>> GetQueryFromCacheAsync(Expression<Func<T, bool>> @where)
         {
-            return DataContext.Set<T>().Where(where).Cacheable().ToListAsync();
+            return DataContext.Set<T>().Where(where).AsNoTracking().Cacheable().ToListAsync();
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual List<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return GetQuery(where, orderby, isAsc).Cacheable().ToList();
+            return GetQueryNoTracking(where, orderby, isAsc).Cacheable().ToList();
         }
 
         /// <summary>
@@ -241,7 +241,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public Task<List<T>> GetQueryFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return GetQuery(where, orderby, isAsc).Cacheable().ToListAsync();
+            return GetQueryNoTracking(where, orderby, isAsc).Cacheable().ToListAsync();
         }
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体集合</returns>
         public virtual List<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class
         {
-            return DataContext.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
+            return DataContext.Set<T>().Where(where).ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
         }
 
         /// <summary>
@@ -322,7 +322,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public Task<List<TDto>> GetQueryFromCacheAsync<TDto>(Expression<Func<T, bool>> @where) where TDto : class
         {
-            return DataContext.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).Cacheable().ToListAsync();
+            return DataContext.Set<T>().Where(where).ProjectTo<TDto>(MapperConfig).Cacheable().ToListAsync();
         }
 
         /// <summary>
@@ -336,7 +336,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual List<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
         {
-            return GetQueryNoTracking(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
+            return GetQuery(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
         }
 
         /// <summary>
@@ -356,7 +356,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual T GetFromCache(Expression<Func<T, bool>> where)
         {
-            return DataContext.Set<T>().Where(where).DeferredFirstOrDefault().Execute();
+            return DataContext.Set<T>().Where(where).AsNoTracking().DeferredFirstOrDefault().Execute();
         }
 
         /// <summary>
@@ -366,7 +366,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public Task<T> GetFromCacheAsync(Expression<Func<T, bool>> @where)
         {
-            return DataContext.Set<T>().Where(where).DeferredFirstOrDefault().ExecuteAsync();
+            return DataContext.Set<T>().Where(where).AsNoTracking().DeferredFirstOrDefault().ExecuteAsync();
         }
 
         /// <summary>
@@ -392,7 +392,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public virtual T GetFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).Where(where).DeferredFirstOrDefault().Execute() : DataContext.Set<T>().OrderByDescending(orderby).Where(where).DeferredFirstOrDefault().Execute();
+            return isAsc ? DataContext.Set<T>().OrderBy(orderby).Where(where).AsNoTracking().DeferredFirstOrDefault().Execute() : DataContext.Set<T>().OrderByDescending(orderby).Where(where).AsNoTracking().DeferredFirstOrDefault().Execute();
         }
 
         /// <summary>
@@ -405,7 +405,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>实体</returns>
         public Task<T> GetFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).Where(where).DeferredFirstOrDefault().ExecuteAsync() : DataContext.Set<T>().OrderByDescending(orderby).Where(where).DeferredFirstOrDefault().ExecuteAsync();
+            return isAsc ? DataContext.Set<T>().OrderBy(orderby).Where(where).AsNoTracking().DeferredFirstOrDefault().ExecuteAsync() : DataContext.Set<T>().OrderByDescending(orderby).Where(where).AsNoTracking().DeferredFirstOrDefault().ExecuteAsync();
         }
 
         /// <summary>
@@ -625,7 +625,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual PagedList<T> GetPagesFromCache<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc)
         {
-            var temp = DataContext.Set<T>().Where(where);
+            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
             return isAsc ? temp.OrderBy(orderby).ToCachedPagedList(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToCachedPagedList(pageIndex, pageSize);
         }
 
@@ -641,7 +641,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual Task<PagedList<T>> GetPagesFromCacheAsync<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
         {
-            var temp = DataContext.Set<T>().Where(where);
+            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
             return isAsc ? temp.OrderBy(orderby).ToCachedPagedListAsync(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToCachedPagedListAsync(pageIndex, pageSize);
         }
 

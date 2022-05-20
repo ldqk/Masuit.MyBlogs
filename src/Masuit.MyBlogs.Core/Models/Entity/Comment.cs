@@ -94,6 +94,8 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// </summary>
         public string Location { get; set; }
 
+        public string GroupTag { get; set; }
+
         [ForeignKey("PostId")]
         public virtual Post Post { get; set; }
 

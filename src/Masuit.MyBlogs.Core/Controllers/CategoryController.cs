@@ -6,8 +6,8 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.AspNetCore.ModelBinder;
+using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -27,7 +27,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetCategories()
         {
-            var list = CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).Include(c => c.Children).ThenInclude(c => c.Children).ToList();
+            var list = CategoryService.GetQueryNoTracking(c => c.Status == Status.Available, c => c.Name).ToList().ToTree(c => c.Id, c => c.ParentId);
             return ResultData(list.Mapper<List<CategoryDto>>());
         }
 

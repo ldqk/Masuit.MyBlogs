@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.Tools.Models;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -21,21 +22,24 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         {
             var category = await GetByIdAsync(id);
             var moveCat = await GetByIdAsync(mid);
-            for (var j = 0; j < category.Post.Count; j++)
+            foreach (var c in category.Flatten())
             {
-                var p = category.Post.ElementAt(j);
-                moveCat.Post.Add(p);
-                for (var i = 0; i < p.PostHistoryVersion.Count; i++)
+                for (var j = 0; j < c.Post.Count; j++)
                 {
-                    moveCat.PostHistoryVersion.Add(p.PostHistoryVersion.ElementAt(i));
+                    var p = c.Post.ElementAt(j);
+                    moveCat.Post.Add(p);
+                    for (var i = 0; i < p.PostHistoryVersion.Count; i++)
+                    {
+                        moveCat.PostHistoryVersion.Add(p.PostHistoryVersion.ElementAt(i));
+                    }
                 }
-            }
 
-            for (var i = 0; i < category.PostHistoryVersion.Count; i++)
-            {
-                var p = category.PostHistoryVersion.ElementAt(i);
-                p.CategoryId = moveCat.Id;
-                moveCat.PostHistoryVersion.Add(p);
+                for (var i = 0; i < c.PostHistoryVersion.Count; i++)
+                {
+                    var p = c.PostHistoryVersion.ElementAt(i);
+                    p.CategoryId = moveCat.Id;
+                    moveCat.PostHistoryVersion.Add(p);
+                }
             }
 
             bool b = await DeleteByIdAsync(id) > 0;

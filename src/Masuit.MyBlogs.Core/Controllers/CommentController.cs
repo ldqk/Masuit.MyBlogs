@@ -20,6 +20,8 @@ using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.RegularExpressions;
+using Masuit.Tools.Systems;
+using Microsoft.EntityFrameworkCore;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -30,8 +32,11 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class CommentController : BaseController
     {
         public ICommentService CommentService { get; set; }
+
         public IPostService PostService { get; set; }
+
         public IWebHostEnvironment HostEnvironment { get; set; }
+
         public ICacheManager<int> CommentFeq { get; set; }
 
         /// <summary>
@@ -62,7 +67,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             Post post = await PostService.GetByIdAsync(cmd.PostId) ?? throw new NotFoundException("评论失败，文章未找到");
-            CheckPermission(post);
             if (post.DisableComment)
             {
                 return ResultData(null, false, "本文已禁用评论功能，不允许任何人回复！");
@@ -76,6 +80,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var comment = cmd.Mapper<Comment>();
+            comment.GroupTag = cmd.ParentId > 0 ? CommentService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.GroupTag).FirstOrDefault() : SnowFlake.NewId;
             if (cmd.Email == post.Email || cmd.Email == post.ModifierEmail || Regex.Match(cmd.NickName + cmd.Content, CommonHelper.ModRegex).Length <= 0)
             {
                 comment.Status = Status.Published;
@@ -141,6 +146,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     emails.Add(post.Email);
                     emails.Add(post.ModifierEmail);
+
                     //新评论，只通知博主和楼主
                     foreach (var s in emails)
                     {
@@ -208,8 +214,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (cid != 0)
             {
                 var comment = await CommentService.GetByIdAsync(cid) ?? throw new NotFoundException("评论未找到");
-                var single = new[] { comment.Root() };
-                foreach (var c in single.Flatten())
+                var layer = CommentService.GetQueryNoTracking(c => c.GroupTag == comment.GroupTag).ToList();
+                foreach (var c in layer)
                 {
                     c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                     c.IsAuthor = c.Email == comment.Post.Email || c.Email == comment.Post.ModifierEmail;
@@ -227,7 +233,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     parentTotal = 1,
                     page,
                     size,
-                    rows = single.Mapper<IList<CommentViewModel>>()
+                    rows = layer.ToTree(c => c.Id, c => c.ParentId).Mapper<IList<CommentViewModel>>()
                 });
             }
 
@@ -237,7 +243,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "没有评论");
             }
             int total = parent.TotalCount; //总条数，用于前台分页
-            parent.Data.Flatten().ForEach(c =>
+            var tags = parent.Data.Select(c => c.GroupTag).ToArray();
+            var comments = CommentService.GetQuery(c => tags.Contains(c.GroupTag)).Include(c => c.Post).AsNoTracking().ToList();
+            comments.ForEach(c =>
             {
                 c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
                 c.IsAuthor = c.Email == c.Post.Email || c.Email == c.Post.ModifierEmail;
@@ -256,7 +264,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     parentTotal = total,
                     page,
                     size,
-                    rows = parent.Data.Mapper<IList<CommentViewModel>>()
+                    rows = comments.OrderByDescending(c => c.CommentDate).ToTree(c => c.Id, c => c.ParentId).Mapper<IList<CommentViewModel>>()
                 });
             }
 

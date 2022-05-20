@@ -1,5 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Masuit.MyBlogs.Core.Infrastructure
 {
@@ -11,7 +12,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.EnableDetailedErrors().UseLazyLoadingProxies().UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+            optionsBuilder.EnableDetailedErrors().UseLazyLoadingProxies().UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).ConfigureWarnings(builder => builder.Ignore(CoreEventId.DetachedLazyLoadingWarning));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

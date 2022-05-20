@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.AspNetCore.ModelBinder;
+using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +27,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetMenus()
         {
-            var menus = MenuService.GetQuery(m => m.ParentId == null, m => m.Sort).ThenBy(m => m.Sort).ToList();
+            var menus = MenuService.GetAllNoTracking(m => m.Sort).ToList().ToTree(m => m.Id, m => m.ParentId);
             return ResultData(Mapper.Map<List<MenuDto>>(menus));
         }
 
@@ -34,6 +35,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 获取菜单类型
         /// </summary>
         /// <returns></returns>
+        [ResponseCache(Duration = 86400)]
         public ActionResult GetMenuType()
         {
             var array = Enum.GetValues(typeof(MenuType));
@@ -56,7 +58,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public async Task<ActionResult> Delete(int id)
         {
-            var menus = MenuService.GetChildrenMenusByParentId(id);
+            var menus = MenuService[id].Flatten();
             bool b = await MenuService.DeleteEntitiesSavedAsync(menus) > 0;
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }

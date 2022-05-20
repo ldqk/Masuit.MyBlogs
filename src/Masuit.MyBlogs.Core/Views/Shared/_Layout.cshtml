@@ -10,10 +10,11 @@
 @using Masuit.Tools
 @using Masuit.Tools.Core.Net
 @using EFCoreSecondLevelCacheInterceptor
+@using Masuit.Tools.Models
 @using Microsoft.AspNetCore.Http.Extensions
 @{
     string[] colors = { "success", "info", "warning", "danger", "default" };
-    List<Menu> menus = _menuService.GetQueryFromCache(m => m.ParentId == null && m.Status == Status.Available).OrderBy(m => m.Sort).ToList();
+    List<Menu> menus = _menuService.GetQueryFromCache(m => m.Status == Status.Available,m => m.Sort).ToList().ToTree(m => m.Id,m => m.ParentId);
     var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
     var links = _linksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.GroupBy(x => x.IP).Count()).Take(30).Select(e => new{e.Url,e.Name}).Cacheable().ToList();
 }

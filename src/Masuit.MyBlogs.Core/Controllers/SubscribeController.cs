@@ -15,6 +15,8 @@ using Microsoft.Net.Http.Headers;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
+using EFCoreSecondLevelCacheInterceptor;
+using Microsoft.EntityFrameworkCore;
 using WilderMinds.RssSyndication;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -43,7 +45,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
-            var raw = PostService.GetQueryFromCache(PostBaseWhere().And(p => p.Rss && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).ToList();
+            var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().Cacheable().ToList();
             var data = await raw.SelectAsync(async p =>
             {
                 var summary = await p.Content.GetSummary(300, 50);
@@ -126,7 +128,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var host = Request.Host;
             var category = await categoryService.GetByIdAsync(id) ?? throw new NotFoundException("分类未找到");
             var cids = category.Flatten().Select(c => c.Id).ToArray();
-            var raw = PostService.GetQueryFromCache(PostBaseWhere().And(p => p.Rss && cids.Contains(p.CategoryId) && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).ToList();
+            var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && cids.Contains(p.CategoryId) && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().Cacheable().ToList();
             var data = await raw.SelectAsync(async p =>
             {
                 var summary = await p.Content.GetSummary(300, 50);
@@ -183,7 +185,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string scheme = Request.Scheme;
             var host = Request.Host;
             var seminar = await seminarService.GetByIdAsync(id) ?? throw new NotFoundException("专题未找到");
-            var raw = PostService.GetQueryFromCache(PostBaseWhere().And(p => p.Rss && p.Seminar.Any(s => s.Id == id) && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).ToList();
+            var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && p.Seminar.Any(s => s.Id == id) && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().Cacheable().ToList();
             var data = await raw.SelectAsync(async p =>
             {
                 var summary = await p.Content.GetSummary(300, 50);
@@ -250,7 +252,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Body = summary,
                 Categories = new List<string>
                 {
-                    post.Category.Name
+                    post.Category.Path()
                 },
                 Link = new Uri(scheme + "://" + host + "/" + post.Id),
                 PublishDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone)),
