@@ -329,7 +329,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> All()
         {
             ViewBag.tags = new Dictionary<string, int>(PostService.GetTags().Where(x => x.Value > 1).OrderBy(x => x.Key));
-            ViewBag.cats = await CategoryService.GetAll(c => c.Post.Count, false).ToDictionaryAsync(c => c.Id, c => c.Name); //category
+            ViewBag.cats = await CategoryService.GetQuery(c => c.Post.Count > 0, c => c.Post.Count, false).Include(c => c.Parent).ToDictionaryAsync(c => c.Id, c => c.Path()); //category
             ViewBag.seminars = await SeminarService.GetAll(c => c.Post.Count, false).ToDictionaryAsync(c => c.Id, c => c.Title); //seminars
             return View();
         }
