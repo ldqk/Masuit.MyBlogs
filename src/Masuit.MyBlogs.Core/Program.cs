@@ -8,8 +8,12 @@ using Masuit.Tools;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Diagnostics;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 // 设置相关进程优先级为高于正常，防止其他进程影响应用程序的运行性能
 Process.GetProcessesByName("mysqld").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+Process.GetProcessesByName("pg_ctl").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+Process.GetProcessesByName("postgres").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
 Process.GetProcessesByName("redis-server").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
 Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.AboveNormal;
 

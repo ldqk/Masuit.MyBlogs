@@ -37,8 +37,16 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             modelBuilder.Entity<Links>().HasMany(e => e.Loopbacks).WithOne(l => l.Links).IsRequired().HasForeignKey(e => e.LinkId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Advertisement>().HasMany(e => e.ClickRecords).WithOne().HasForeignKey(e => e.AdvertisementId).IsRequired().OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.HasDbFunction(typeof(DataContext).GetMethod(nameof(Random))).HasName("RAND");
-            modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("RAND");
+            if (Database.ProviderName.Contains("MySql"))
+            {
+                modelBuilder.HasDbFunction(typeof(DataContext).GetMethod(nameof(Random))).HasName("RAND");
+                modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("RAND");
+            }
+            else
+            {
+                modelBuilder.HasDbFunction(typeof(DataContext).GetMethod(nameof(Random))).HasName("random");
+                modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("random");
+            }
         }
 
         public override int SaveChanges()

@@ -55,7 +55,7 @@ namespace Masuit.MyBlogs.Core
             void BindConfig()
             {
                 Configuration = configuration;
-                AppConfig.ConnString = configuration[nameof(AppConfig.ConnString)];
+                AppConfig.ConnString = configuration["Database:" + nameof(AppConfig.ConnString)];
                 AppConfig.BaiduAK = configuration[nameof(AppConfig.BaiduAK)];
                 AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
                 AppConfig.TrueClientIPHeader = configuration[nameof(AppConfig.TrueClientIPHeader)] ?? "CF-Connecting-IP";
@@ -79,7 +79,16 @@ namespace Masuit.MyBlogs.Core
             services.AddEFSecondLevelCache(options => options.UseCustomCacheProvider<MyEFCacheManagerCoreProvider>(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true));
             services.AddDbContext<DataContext>((serviceProvider, opt) =>
             {
-                opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(10)).AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>()).EnableSensitiveDataLogging();
+                if (Configuration["Database:Provider"] == "pgsql")
+                {
+                    opt.UseNpgsql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10));
+                }
+                else
+                {
+                    opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(10));
+                }
+
+                opt.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>()).EnableSensitiveDataLogging();
             }); //配置数据库
             services.ConfigureOptions();
             services.AddHttpsRedirection(options =>
