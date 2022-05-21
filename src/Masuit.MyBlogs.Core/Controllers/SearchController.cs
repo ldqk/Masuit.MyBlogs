@@ -87,11 +87,6 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.Keywords.Contains(search);
             var pages = SearchDetailsService.GetPages<DateTime, SearchDetailsDto>(page, size, where, s => s.SearchTime, false);
-            foreach (var item in pages.Data)
-            {
-                item.SearchTime = item.SearchTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-            }
-
             return Ok(pages);
         }
 

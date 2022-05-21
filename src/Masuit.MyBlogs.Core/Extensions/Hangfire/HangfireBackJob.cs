@@ -118,7 +118,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             var stats = recordStatsService.Get(e => e.PostId == pid && e.Date >= DateTime.Today);
             if (stats != null)
             {
-                stats.Count++;
+                stats.Count = recordService.Count(e => e.PostId == pid & e.Time >= DateTime.Today) + 1;
             }
             else
             {
