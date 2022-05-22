@@ -20,13 +20,13 @@
 ### 开发环境
 操作系统：Windows 10 2104  
 IDE：Visual Studio 2022 v17.0  
-数据库：SQL Server 2017/MySQL 8.0  
-Redis：redis-server-windows 3.2  
+数据库：SQL Server 2017+/MySQL 8.x/PostgreSQL 14.x  
+Redis：redis-server-windows 5.x  
 运行时：必须是.NET 6 
 ### 当前运行环境
 操作系统：Windows Server 2019  
 数据库：MySQL 8.0  
-Redis：redis-server-windows 3.2  
+Redis：redis-server-windows 5.x  
 运行时：.NET 6  
 服务器配置：2核+6GB+1000M  
 承载流量：单日请求量平均600w左右，单日带宽1TB左右  
@@ -38,8 +38,8 @@ Redis：redis-server-windows 3.2
 |CPU|1核|2核|2核|4核|
 |内存|1GB|2GB|4GB|8GB|
 |带宽|1Mbps|1Mbps|5Mbps|1000Mbps|
-|数据库|MySQL 5/SQL Server 2008|MySQL 8/SQL Server 2012|MySQL 8/SQL Server 2016|MySQL 8/SQL Server 2016|
-|缓存组件|Redis 3.2+|Redis 3.2+|Redis 3.2+|Redis 3.2+|
+|数据库|MySQL 5/SQL Server 2008/pgsql 9|MySQL 8/SQL Server 2012/pgsql 14|MySQL 8/SQL Server 2016/pgsql 14|MySQL 8/SQL Server 2016/pgsql 14|
+|缓存组件|Redis 3.2+|Redis 5.0+|Redis 5.0+|Redis 5.0+|
 |备注|玩玩而已|几个人同时访问|几百个人同时访问，单日请求量600w以下|单日请求量600w以上|
 ### 主要功能
 #### 服务器性能监控
@@ -179,7 +179,7 @@ angularjs
 以Windows系统为例，Linux系统请自行折腾。
 #### 1.安装基础设施：
 1. 安装.net6运行时：[https://dotnet.microsoft.com/zh-cn/download](https://dotnet.microsoft.com/zh-cn/download)
-2. 安装mysql：[mysql 8.0.29绿色版](https://masuit.org/1567)
+2. 安装mysql：[mysql 8 绿色版](https://masuit.org/1567),或pgsql：[pgsql 14 绿色版](https://masuit.org/2160)
 3. 安装redis：[redis for windows 5.0.14绿色版](https://masuit.org/1567)
 #### 2.生成网站应用
 #### 方式一：编译源代码：
