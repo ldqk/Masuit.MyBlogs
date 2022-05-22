@@ -1,6 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Masuit.MyBlogs.Core.Infrastructure
 {
@@ -37,15 +38,40 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             modelBuilder.Entity<Links>().HasMany(e => e.Loopbacks).WithOne(l => l.Links).IsRequired().HasForeignKey(e => e.LinkId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Advertisement>().HasMany(e => e.ClickRecords).WithOne().HasForeignKey(e => e.AdvertisementId).IsRequired().OnDelete(DeleteBehavior.Cascade);
 
-            if (Database.ProviderName.Contains("MySql"))
-            {
-                modelBuilder.HasDbFunction(typeof(DataContext).GetMethod(nameof(Random))).HasName("RAND");
-                modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("RAND");
-            }
-            else
+            modelBuilder.Entity<Advertisement>().HasIndex(a => a.Price).HasSortOrder(SortOrder.Descending);
+            modelBuilder.Entity<AdvertisementClickRecord>().HasIndex(a => a.Time).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<AdvertisementClickRecord>().HasIndex(a => a.AdvertisementId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<Category>().HasIndex(a => a.ParentId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<Comment>().HasIndex(a => a.PostId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<LeaveMessage>().HasIndex(a => a.PostDate).HasSortOrder(SortOrder.Descending);
+            modelBuilder.Entity<LinkLoopback>().HasIndex(a => a.LinkId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<Links>().HasIndex(a => a.Recommend).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<LoginRecord>().HasIndex(a => a.UserInfoId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<Menu>().HasIndex(a => a.Sort).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<Menu>().HasIndex(a => a.ParentId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<Notice>().HasIndex(a => a.ModifyDate).HasSortOrder(SortOrder.Descending);
+            modelBuilder.Entity<Post>().HasIndex(a => a.CategoryId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<Post>().HasIndex(a => a.ModifyDate).HasSortOrder(SortOrder.Descending);
+            modelBuilder.Entity<Post>().HasIndex(a => a.AverageViewCount).HasSortOrder(SortOrder.Descending);
+            modelBuilder.Entity<Post>().HasIndex(a => a.TotalViewCount).HasSortOrder(SortOrder.Descending);
+            modelBuilder.Entity<PostHistoryVersion>().HasIndex(a => a.CategoryId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<PostHistoryVersion>().HasIndex(a => a.PostId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<PostMergeRequest>().HasIndex(a => a.PostId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<PostVisitRecord>().HasIndex(a => a.PostId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<PostVisitRecord>().HasIndex(a => a.Time).HasSortOrder(SortOrder.Descending);
+            modelBuilder.Entity<PostVisitRecordStats>().HasIndex(a => a.Date).HasSortOrder(SortOrder.Descending);
+            modelBuilder.Entity<PostVisitRecordStats>().HasIndex(a => a.PostId).HasSortOrder(SortOrder.Ascending);
+            modelBuilder.Entity<SearchDetails>().HasIndex(a => a.SearchTime).HasSortOrder(SortOrder.Descending);
+
+            if (Database.ProviderName.Contains("Postgre"))
             {
                 modelBuilder.HasDbFunction(typeof(DataContext).GetMethod(nameof(Random))).HasName("random");
                 modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("random");
+            }
+            else
+            {
+                modelBuilder.HasDbFunction(typeof(DataContext).GetMethod(nameof(Random))).HasName("RAND");
+                modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("RAND");
             }
         }
 
