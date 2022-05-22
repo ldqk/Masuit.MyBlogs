@@ -179,7 +179,7 @@ angularjs
 以Windows系统为例，Linux系统请自行折腾。
 #### 1.安装基础设施：
 1. 安装.net6运行时：[https://dotnet.microsoft.com/zh-cn/download](https://dotnet.microsoft.com/zh-cn/download)
-2. 安装mysql：[mysql 8.0.29绿色版](https://masuit.org/1567)
+2. 安装mysql：[mysql 8 绿色版](https://masuit.org/1567),或pgsql：(pgsql 14 绿色版)[https://masuit.org/2160]
 3. 安装redis：[redis for windows 5.0.14绿色版](https://masuit.org/1567)
 #### 2.生成网站应用
 #### 方式一：编译源代码：
