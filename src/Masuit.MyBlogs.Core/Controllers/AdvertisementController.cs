@@ -202,11 +202,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> ClickRecordsChart(int id, CancellationToken cancellationToken)
         {
-            var list = await ClickRecordService.GetQuery(e => e.AdvertisementId == id, e => e.Time).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
+            var list = await ClickRecordService.GetQuery(e => e.AdvertisementId == id).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
             {
                 Date = g.Key,
                 Count = g.Count()
-            }).ToListAsync(cancellationToken);
+            }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
             return Ok(list);
         }
 

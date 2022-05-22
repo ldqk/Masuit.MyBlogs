@@ -1099,11 +1099,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> PostVisitRecordChart(int id, CancellationToken cancellationToken)
         {
-            var list = await PostVisitRecordService.GetQuery(e => e.PostId == id, e => e.Time).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
+            var list = await PostVisitRecordService.GetQuery(e => e.PostId == id).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
             {
                 Date = g.Key,
                 Count = g.Count()
-            }).ToListAsync(cancellationToken);
+            }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
             return Ok(list);
         }
 
