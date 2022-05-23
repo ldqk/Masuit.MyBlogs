@@ -79,13 +79,23 @@ namespace Masuit.MyBlogs.Core
             services.AddEFSecondLevelCache(options => options.UseCustomCacheProvider<MyEFCacheManagerCoreProvider>(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true));
             services.AddDbContext<DataContext>((serviceProvider, opt) =>
             {
-                if (Configuration["Database:Provider"] == "pgsql")
+                switch (Configuration["Database:Provider"])
                 {
-                    opt.UseNpgsql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10));
-                }
-                else
-                {
-                    opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(10));
+                    case "pgsql":
+                        opt.UseNpgsql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10));
+                        break;
+
+                    case "mysql":
+                        opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(10));
+                        break;
+
+                    case "mssql":
+                        opt.UseSqlServer(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10));
+                        break;
+
+                    case "sqlite":
+                        opt.UseSqlite(AppConfig.ConnString);
+                        break;
                 }
 
                 opt.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>()).EnableSensitiveDataLogging();

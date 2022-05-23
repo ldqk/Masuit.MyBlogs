@@ -91,7 +91,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// <param name="url"></param>
         public void RecordPostVisit(int pid, string ip, string refer, string url)
         {
-            var lastQuarter = DateTime.Now.AddMonths(-3);
+            var lastQuarter = DateTime.Now.AddMonths(-6);
             var lastYear = DateTime.Now.AddYears(-1);
             var recordService = _serviceScope.ServiceProvider.GetRequiredService<IPostVisitRecordService>();
             var recordStatsService = _serviceScope.ServiceProvider.GetRequiredService<IPostVisitRecordStatsService>();

@@ -58,6 +58,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.5" />
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.5" />
         <PackageReference Include="Microsoft.Graph" Version="4.29.0" />
         <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.7" />

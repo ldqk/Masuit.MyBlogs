@@ -50,7 +50,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     Time = DateTime.Now
                 });
                 await AdsService.SaveChangesAsync();
-                var start = DateTime.Today.AddMonths(-1);
+                var start = DateTime.Today.AddMonths(-6);
                 await ClickRecordService.GetQuery(a => a.Time < start).DeleteFromQueryAsync();
             }
 
