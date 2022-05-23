@@ -1,6 +1,6 @@
 ### Masuit.MyBlogs
 <a href="https://gitee.com/masuit/Masuit.MyBlogs"><img src="https://gitee.com/static/images/logo-black.svg" height="32"></a> <a href="https://github.com/ldqk/Masuit.MyBlogs"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Font_Awesome_5_brands_github.svg/54px-Font_Awesome_5_brands_github.svg.png" height="32"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/GitHub_logo_2013.svg/128px-GitHub_logo_2013.svg.png" height="32"></a>  
-个人博客站项目源码，高性能低占用的博客系统，这也许是我写过的性能最高的web项目了。**仅1MB的代码量！** 目前日均处理请求数80-300w次，同时在线活跃用户数30-200人，**数据量累计已达到数百万条**，数据库+Redis+网站主程序同时运行在一台2核4GB的机器上，浏览器页面请求秒级响应，CPU平均使用率控制在10%左右，内存控制在1GB左右占用。  
+个人博客站项目源码，高性能低占用的博客系统，这也许是我写过的性能最高的web项目了。**仅1MB的代码量！** 目前日均处理请求数80-300w次，同时在线活跃用户数30-200人，**数据量累计已达到数百万条**，数据库+Redis+网站主程序同时运行在一台2核4GB的机器上，浏览器页面请求秒级响应，CPU平均使用率控制在10%左右，内存控制在1GB左右占用。**数据库支持SQL Server、mysql、PostgreSQL、sqlite的无缝切换。**  
 ![任务管理器](https://img11.360buyimg.com/ddimg/jfs/t1/170269/23/18655/93697/6076eb8fE82d545e7/78f0815f7311cd49.png)
 ![任务管理器](https://user-images.githubusercontent.com/20254980/129124177-37e0f98b-57ba-454f-955d-141201f50cc6.png)
 ![image](https://user-images.githubusercontent.com/20254980/129124476-88a324ac-cfd2-4e9b-8fb9-e84e12d04051.png)
@@ -180,7 +180,7 @@ angularjs
 #### 1.安装基础设施：
 1. 安装.net6运行时：[https://dotnet.microsoft.com/zh-cn/download](https://dotnet.microsoft.com/zh-cn/download)
 2. 安装mysql：[mysql 8 绿色版](https://masuit.org/1567),或pgsql：[pgsql 14 绿色版](https://masuit.org/2160)
-3. 安装redis：[redis for windows 5.0.14绿色版](https://masuit.org/1567)
+3. 安装redis：[redis for windows绿色版](https://masuit.org/1567)
 #### 2.生成网站应用
 #### 方式一：编译源代码：
 编译需要将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目也一起clone下来，和本项目平级目录存放，才能正常编译，否则，将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目移除，通过nuget安装也是可以的。  
@@ -188,10 +188,11 @@ angularjs
 #### 方式二：下载编译好的现成的二进制文件
 前往[Release](https://github.com/ldqk/Masuit.MyBlogs/releases)下载最新的压缩包解压即可。
 #### 3.还原数据库脚本
-创建数据库，名称随意，如：myblogs，然后前往[Release](https://github.com/ldqk/Masuit.MyBlogs/releases)或[https://github.com/ldqk/Masuit.MyBlogs/tree/master/database/mysql](https://github.com/ldqk/Masuit.MyBlogs/tree/master/database/mysql)下载最新的数据库文件,还原到新建的数据库。
+创建数据库，名称随意，如：myblogs，然后前往[Release](https://github.com/ldqk/Masuit.MyBlogs/releases)或[https://github.com/ldqk/Masuit.MyBlogs/tree/master/database/mysql](https://github.com/ldqk/Masuit.MyBlogs/tree/master/database/mysql)下载最新的数据库文件,还原到新建的数据库。   
+如果没有你目标数据库类型的还原文件，你可以先还原到mysql或pgsql中，然后使用[Full Convert](https://masuit.org/2163)转换成你需要的目标数据库类型即可。
 #### 4.修改配置文件：
-主要需要配置的是https证书、数据库连接字符、redis、BaiduAK以及图床配置，其他配置均为可选项，不配置则表示不启用；
-![](https://p.pstatp.com/origin/1381c000155b45481aeec)  
+主要需要配置的是以下内容，其他配置均为可选项，不配置则表示不启用；
+![image](https://user-images.githubusercontent.com/20254980/169738528-ba0cc1a4-cb19-4e9d-b6cd-2f146a633c35.png)  
 同时，BaiduAK参与了数据库的加密，如果你没有BaiduAK，自行到百度地图开放平台申请，`免费的`。  
 如果你使用了CDN，需要配置TrueClientIPHeader选项为真实IP请求转发头，如cloudflare的叫CF-Connecting-IP。
 如果Redis不在本机，需要在配置文件中的Redis节下配置，固定为Redis，值的格式：127.0.0.1:6379,allowadmin=true，若未正确配置，将按默认值“127.0.0.1:6379,allowadmin=true,abortConnect=false”。  
