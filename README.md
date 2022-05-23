@@ -191,8 +191,8 @@ angularjs
 创建数据库，名称随意，如：myblogs，然后前往[Release](https://github.com/ldqk/Masuit.MyBlogs/releases)或[https://github.com/ldqk/Masuit.MyBlogs/tree/master/database/mysql](https://github.com/ldqk/Masuit.MyBlogs/tree/master/database/mysql)下载最新的数据库文件,还原到新建的数据库。   
 如果没有你目标数据库类型的还原文件，你可以先还原到mysql或pgsql中，然后使用[Full Convert](https://masuit.org/2163)转换成你需要的目标数据库类型即可。
 #### 4.修改配置文件：
-主要需要配置的是https证书、数据库连接字符、redis、BaiduAK以及图床配置，其他配置均为可选项，不配置则表示不启用；
-![](https://p.pstatp.com/origin/1381c000155b45481aeec)  
+主要需要配置的是以下内容，其他配置均为可选项，不配置则表示不启用；
+![image](https://user-images.githubusercontent.com/20254980/169738528-ba0cc1a4-cb19-4e9d-b6cd-2f146a633c35.png)  
 同时，BaiduAK参与了数据库的加密，如果你没有BaiduAK，自行到百度地图开放平台申请，`免费的`。  
 如果你使用了CDN，需要配置TrueClientIPHeader选项为真实IP请求转发头，如cloudflare的叫CF-Connecting-IP。
 如果Redis不在本机，需要在配置文件中的Redis节下配置，固定为Redis，值的格式：127.0.0.1:6379,allowadmin=true，若未正确配置，将按默认值“127.0.0.1:6379,allowadmin=true,abortConnect=false”。  
