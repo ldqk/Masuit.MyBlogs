@@ -131,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var where = PostBaseWhere().And(p => p.Status == Status.Published);
-            var queryable = PostService.GetQuery(tag.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).Aggregate(where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s))));
+            var queryable = PostService.GetQuery(tag.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => Regex.Escape(s.Trim())).Aggregate(where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s))));
             var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
             {
