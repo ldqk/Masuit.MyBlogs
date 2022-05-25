@@ -23,6 +23,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Masuit.Tools.Systems;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using OpenXmlPowerTools;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -146,7 +147,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, error);
             }
 
-            if (cmd.ParentId > 0 && DateTime.Now - LeaveMessageService[cmd.ParentId, m => m.PostDate] > TimeSpan.FromDays(180))
+            if (cmd.ParentId > 0 && DateTime.Now - LeaveMessageService[cmd.ParentId.Value, m => m.PostDate] > TimeSpan.FromDays(180))
             {
                 return ResultData(null, false, "当前留言过于久远，不再允许回复！");
             }
@@ -159,7 +160,17 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var msg = cmd.Mapper<LeaveMessage>();
-            msg.GroupTag = cmd.ParentId > 0 ? LeaveMessageService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.GroupTag).FirstOrDefault() : SnowFlake.NewId;
+            if (cmd.ParentId > 0)
+            {
+                msg.GroupTag = LeaveMessageService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.GroupTag).FirstOrDefault();
+                msg.Path = (LeaveMessageService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.Path).FirstOrDefault() + "," + cmd.ParentId).Trim(',');
+            }
+            else
+            {
+                msg.GroupTag = SnowFlake.NewId;
+                msg.Path = SnowFlake.NewId;
+            }
+
             if (Regex.Match(cmd.NickName + cmd.Content, CommonHelper.ModRegex).Length <= 0)
             {
                 msg.Status = Status.Published;
@@ -217,7 +228,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 else
                 {
                     //通知博主和上层所有关联的评论访客
-                    var emails = (await LeaveMessageService.GetByIdAsync(msg.Id)).Root().Flatten().Select(c => c.Email).Append(email).Except(new[] { msg.Email }).ToHashSet();
+                    var emails = LeaveMessageService.GetQuery(e => e.GroupTag == msg.GroupTag).Select(c => c.Email).Distinct().AsEnumerable().Append(email).Except(new[] { msg.Email }).ToHashSet();
                     string link = Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme);
                     foreach (var s in emails)
                     {

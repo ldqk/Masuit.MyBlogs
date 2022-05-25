@@ -23,6 +23,7 @@ using System.Text.RegularExpressions;
 using Masuit.Tools.Systems;
 using Microsoft.EntityFrameworkCore;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using Masuit.MyBlogs.Core.Infrastructure.Services;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -61,7 +62,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, error);
             }
 
-            if (cmd.ParentId > 0 && DateTime.Now - CommentService[cmd.ParentId, c => c.CommentDate] > TimeSpan.FromDays(180))
+            if (cmd.ParentId > 0 && DateTime.Now - CommentService[cmd.ParentId.Value, c => c.CommentDate] > TimeSpan.FromDays(180))
             {
                 return ResultData(null, false, "当前评论过于久远，不再允许回复！");
             }
@@ -80,7 +81,17 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var comment = cmd.Mapper<Comment>();
-            comment.GroupTag = cmd.ParentId > 0 ? CommentService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.GroupTag).FirstOrDefault() : SnowFlake.NewId;
+            if (cmd.ParentId > 0)
+            {
+                comment.GroupTag = CommentService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.GroupTag).FirstOrDefault();
+                comment.Path = (CommentService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.Path).FirstOrDefault() + "," + cmd.ParentId).Trim(',');
+            }
+            else
+            {
+                comment.GroupTag = SnowFlake.NewId;
+                comment.Path = SnowFlake.NewId;
+            }
+
             if (cmd.Email == post.Email || cmd.Email == post.ModifierEmail || Regex.Match(cmd.NickName + cmd.Content, CommonHelper.ModRegex).Length <= 0)
             {
                 comment.Status = Status.Published;
@@ -155,9 +166,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
                 else
                 {
-                    //通知博主和上层所有关联的评论访客
-                    var parent = await CommentService.GetByIdAsync(comment.ParentId);
-                    emails.AddRange(parent.Root().Flatten().Select(c => c.Email).ToArray());
+                    //通知博主和所有关联的评论访客
+                    emails.AddRange(await CommentService.GetQuery(c => c.GroupTag == comment.GroupTag).Select(c => c.Email).Distinct().ToArrayAsync());
                     emails.AddRange(post.Email, post.ModifierEmail);
                     emails.Remove(comment.Email);
                     string link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment";

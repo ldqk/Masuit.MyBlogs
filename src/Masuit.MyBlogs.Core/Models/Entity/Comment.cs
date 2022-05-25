@@ -41,7 +41,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// ¸¸¼¶ID
         /// </summary>
-        public int ParentId { get; set; }
+        public int? ParentId { get; set; }
 
         /// <summary>
         /// ÎÄÕÂID
@@ -95,6 +95,8 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string Location { get; set; }
 
         public string GroupTag { get; set; }
+
+        public string Path { get; set; }
 
         [ForeignKey("PostId")]
         public virtual Post Post { get; set; }

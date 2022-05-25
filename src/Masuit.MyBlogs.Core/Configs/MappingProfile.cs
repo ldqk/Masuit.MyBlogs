@@ -15,17 +15,17 @@ namespace Masuit.MyBlogs.Core.Configs
     {
         public MappingProfile()
         {
-            CreateMap<Category, CategoryCommand>().ReverseMap();
+            CreateMap<CategoryCommand, Category>().ForMember(c => c.ParentId, e => e.MapFrom(c => c.ParentId > 0 ? c.ParentId : null)).ReverseMap();
             CreateMap<Category, CategoryDto_P>().ReverseMap();
             CreateMap<Category, CategoryDto>().ReverseMap();
             CreateMap<CategoryCommand, CategoryDto>().ReverseMap();
 
-            CreateMap<CommentCommand, Comment>().ForMember(c => c.Status, e => e.MapFrom(c => Status.Pending)).ReverseMap();
+            CreateMap<CommentCommand, Comment>().ForMember(c => c.Status, e => e.MapFrom(c => Status.Pending)).ForMember(c => c.ParentId, e => e.MapFrom(c => c.ParentId > 0 ? c.ParentId : null)).ReverseMap();
             CreateMap<Comment, CommentDto>().ReverseMap();
             CreateMap<CommentCommand, CommentDto>().ReverseMap();
             CreateMap<Comment, CommentViewModel>().ForMember(c => c.CommentDate, e => e.MapFrom(c => c.CommentDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
 
-            CreateMap<LeaveMessageCommand, LeaveMessage>().ForMember(c => c.Status, e => e.MapFrom(c => Status.Pending)).ReverseMap();
+            CreateMap<LeaveMessageCommand, LeaveMessage>().ForMember(c => c.Status, e => e.MapFrom(c => Status.Pending)).ForMember(c => c.ParentId, e => e.MapFrom(c => c.ParentId > 0 ? c.ParentId : null)).ReverseMap();
             CreateMap<LeaveMessage, LeaveMessageDto>().ReverseMap();
             CreateMap<LeaveMessageCommand, LeaveMessageDto>().ReverseMap();
             CreateMap<LeaveMessage, LeaveMessageViewModel>().ForMember(l => l.PostDate, e => e.MapFrom(l => l.PostDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
@@ -34,7 +34,7 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<Links, LinksDto>().ForMember(e => e.Loopbacks, e => e.MapFrom(m => m.Loopbacks.GroupBy(e =>
                 e.IP).Count())).ReverseMap();
 
-            CreateMap<MenuCommand, Menu>().ForMember(m => m.ParentId, e => e.MapFrom(c => (c.ParentId ?? 0) == 0 ? null : c.ParentId)).ReverseMap();
+            CreateMap<MenuCommand, Menu>().ForMember(c => c.ParentId, e => e.MapFrom(c => c.ParentId > 0 ? c.ParentId : null)).ReverseMap();
             CreateMap<Menu, MenuDto>().ForMember(m => m.Children, e => e.MapFrom(m => m.Children.OrderBy(c => c.Sort).ToList())).ReverseMap();
 
             CreateMap<Misc, MiscCommand>().ReverseMap();

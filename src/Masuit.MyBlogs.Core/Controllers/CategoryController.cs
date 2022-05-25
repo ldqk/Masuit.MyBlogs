@@ -7,6 +7,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Models;
+using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -53,13 +54,16 @@ namespace Masuit.MyBlogs.Core.Controllers
             var cat = await CategoryService.GetByIdAsync(cmd.Id);
             if (cat == null)
             {
-                var b1 = await CategoryService.AddEntitySavedAsync(Mapper.Map<Category>(cmd)) > 0;
+                var category = Mapper.Map<Category>(cmd);
+                category.Path = cmd.ParentId > 0 ? (CategoryService[cmd.ParentId.Value].Path + "," + cmd.ParentId).Trim(',') : SnowFlake.NewId;
+                var b1 = await CategoryService.AddEntitySavedAsync(category) > 0;
                 return ResultData(null, b1, b1 ? "分类添加成功！" : "分类添加失败！");
             }
 
             cat.Name = cmd.Name;
             cat.Description = cmd.Description;
             cat.ParentId = cmd.ParentId;
+            cat.Path = cmd.ParentId > 0 ? (CategoryService[cmd.ParentId.Value].Path + "," + cmd.ParentId).Trim(',') : SnowFlake.NewId;
             bool b = await CategoryService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? "分类修改成功！" : "分类修改失败！");
         }

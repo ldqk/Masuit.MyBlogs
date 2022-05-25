@@ -64,5 +64,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// 是否在新标签页打开
         /// </summary>
         public bool NewTab { get; set; }
+
+        public string Path { get; set; }
     }
 }

@@ -48,7 +48,7 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 父级ID
         /// </summary>
-        public int ParentId { get; set; }
+        public int? ParentId { get; set; }
 
         /// <summary>
         /// 浏览器版本
@@ -79,6 +79,8 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string Location { get; set; }
 
         public string GroupTag { get; set; }
+
+        public string Path { get; set; }
 
         /// <summary>
         /// 父节点

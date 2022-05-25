@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using DocumentFormat.OpenXml.Office.Word;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Command;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -8,6 +9,7 @@ using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Graph;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -77,10 +79,13 @@ namespace Masuit.MyBlogs.Core.Controllers
             var m = await MenuService.GetByIdAsync(model.Id);
             if (m == null)
             {
-                return await MenuService.AddEntitySavedAsync(model.Mapper<Menu>()) > 0 ? ResultData(model, true, "添加成功") : ResultData(null, false, "添加失败");
+                var menu = model.Mapper<Menu>();
+                menu.Path = model.ParentId > 0 ? (MenuService[model.ParentId.Value].Path + "," + model.ParentId).Trim(',') : SnowFlake.NewId;
+                return await MenuService.AddEntitySavedAsync(menu) > 0 ? ResultData(model, true, "添加成功") : ResultData(null, false, "添加失败");
             }
 
             Mapper.Map(model, m);
+            m.Path = model.ParentId > 0 ? (MenuService[model.ParentId.Value].Path + "," + model.ParentId).Trim(',') : SnowFlake.NewId;
             bool b = await MenuService.SaveChangesAsync() > 0;
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }

@@ -33,6 +33,8 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// </summary>
         public int? ParentId { get; set; }
 
+        public string Path { get; set; }
+
         public virtual ICollection<Post> Post { get; set; }
 
         public virtual ICollection<PostHistoryVersion> PostHistoryVersion { get; set; }

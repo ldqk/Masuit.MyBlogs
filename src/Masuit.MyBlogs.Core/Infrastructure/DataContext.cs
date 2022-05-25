@@ -63,7 +63,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             modelBuilder.Entity<PostVisitRecordStats>().HasIndex(a => a.PostId).HasSortOrder(SortOrder.Ascending);
             modelBuilder.Entity<SearchDetails>().HasIndex(a => a.SearchTime).HasSortOrder(SortOrder.Descending);
 
-            if (Database.ProviderName.Contains("Postgre"))
+            if (Database.IsNpgsql() || Database.IsSqlite())
             {
                 modelBuilder.HasDbFunction(typeof(DataContext).GetMethod(nameof(Random))).HasName("random");
                 modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("random");

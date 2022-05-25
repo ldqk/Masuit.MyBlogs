@@ -2,7 +2,6 @@
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.Tools.Models;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -21,8 +20,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public async Task<bool> Delete(int id, int mid)
         {
             var category = await GetByIdAsync(id);
+            var categories = GetQuery(c => c.Path.StartsWith(category.Path)).ToList();
             var moveCat = await GetByIdAsync(mid);
-            foreach (var c in category.Flatten())
+            foreach (var c in categories)
             {
                 for (var j = 0; j < c.Post.Count; j++)
                 {

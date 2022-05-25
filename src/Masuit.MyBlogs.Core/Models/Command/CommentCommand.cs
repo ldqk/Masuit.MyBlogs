@@ -37,7 +37,7 @@ namespace Masuit.MyBlogs.Core.Models.Command
         /// <summary>
         /// ¸¸¼¶ID
         /// </summary>
-        public int ParentId { get; set; }
+        public int? ParentId { get; set; }
 
         /// <summary>
         /// ÎÄÕÂID
