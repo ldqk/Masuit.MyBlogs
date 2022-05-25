@@ -23,7 +23,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Masuit.Tools.Systems;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
-using OpenXmlPowerTools;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -65,11 +64,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="cid"></param>
         /// <returns></returns>
-        public async Task<ActionResult> GetMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, int cid = 0)
+        public async Task<ActionResult> GetMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, int? cid = null)
         {
-            if (cid != 0)
+            if (cid > 0)
             {
-                var message = await LeaveMessageService.GetByIdAsync(cid) ?? throw new NotFoundException("留言未找到");
+                var message = await LeaveMessageService.GetByIdAsync(cid.Value) ?? throw new NotFoundException("留言未找到");
                 var layer = LeaveMessageService.GetQueryNoTracking(e => e.GroupTag == message.GroupTag).ToList();
                 foreach (var m in layer)
                 {
@@ -92,7 +91,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 });
             }
 
-            var parent = await LeaveMessageService.GetPagesAsync(page, size, m => m.ParentId == 0 && (m.Status == Status.Published || CurrentUser.IsAdmin), m => m.PostDate, false);
+            var parent = await LeaveMessageService.GetPagesAsync(page, size, m => m.ParentId == null && (m.Status == Status.Published || CurrentUser.IsAdmin), m => m.PostDate, false);
             if (!parent.Data.Any())
             {
                 return ResultData(null, false, "没有留言");

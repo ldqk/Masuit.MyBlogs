@@ -23,7 +23,6 @@ using System.Text.RegularExpressions;
 using Masuit.Tools.Systems;
 using Microsoft.EntityFrameworkCore;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
-using Masuit.MyBlogs.Core.Infrastructure.Services;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -219,11 +218,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <param name="cid"></param>
         /// <returns></returns>
-        public async Task<ActionResult> GetComments(int? id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, int cid = 0)
+        public async Task<ActionResult> GetComments(int? id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, int? cid = null)
         {
-            if (cid != 0)
+            if (cid > 0)
             {
-                var comment = await CommentService.GetByIdAsync(cid) ?? throw new NotFoundException("评论未找到");
+                var comment = await CommentService.GetByIdAsync(cid.Value) ?? throw new NotFoundException("评论未找到");
                 var layer = CommentService.GetQueryNoTracking(c => c.GroupTag == comment.GroupTag).ToList();
                 foreach (var c in layer)
                 {
@@ -247,7 +246,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 });
             }
 
-            var parent = await CommentService.GetPagesAsync(page, size, c => c.PostId == id && c.ParentId == 0 && (c.Status == Status.Published || CurrentUser.IsAdmin), c => c.CommentDate, false);
+            var parent = await CommentService.GetPagesAsync(page, size, c => c.PostId == id && c.ParentId == null && (c.Status == Status.Published || CurrentUser.IsAdmin), c => c.CommentDate, false);
             if (!parent.Data.Any())
             {
                 return ResultData(null, false, "没有评论");

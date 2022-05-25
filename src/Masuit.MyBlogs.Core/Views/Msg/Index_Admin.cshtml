@@ -5,7 +5,7 @@
     ViewBag.Title = "留言板";
     Layout = "~/Views/Shared/_Layout.cshtml";
     UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo);
-    var cid = Context.Request.RouteValues["cid"]?? (string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"]);
+    var cid = Context.Request.RouteValues["cid"]?? Context.Request.Query["cid"];
 }
 <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
 <script src="~/Assets/layui/layui.all.js"></script>
@@ -215,7 +215,7 @@
    * 获取留言
    */
     function getmsgs() {
-		$.get("/msg/getmsgs?page=1&size=10&cid=" +@cid, (data) => {
+		$.get("/msg/getmsgs?page=1&size=10&cid=@cid", (data) => {
             data = data.Data;
 			document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
 			bindReplyBtn();

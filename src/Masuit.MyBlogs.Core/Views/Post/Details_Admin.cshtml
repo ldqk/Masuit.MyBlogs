@@ -13,7 +13,7 @@
 	Layout = "~/Views/Shared/_Layout.cshtml";
 	string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
 	UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo);
-	var cid = Context.Request.RouteValues["cid"] ?? (string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"]);
+	var cid = Context.Request.RouteValues["cid"] ?? Context.Request.Query["cid"];
 	Advertisement ad = ViewBag.Ads;
 }
 <script src="https://cdn.staticfile.org/jqueryui/1.12.1/jquery-ui.min.js" async defer></script>
@@ -298,7 +298,7 @@
 </div>
 <script>
 	function getcomments() {
-		window.get("/comment/getcomments?id=" + $("#postId").val()+"&page=1&size=10&cid="+@cid,function(data) {
+		window.get("/comment/getcomments?id=" + $("#postId").val()+"&page=1&size=10&cid=@cid",function(data) {
 			data = data.Data;
 			document.querySelector(".media-list").innerHTML = loadParentComments(data);
 			bindReplyBtn();

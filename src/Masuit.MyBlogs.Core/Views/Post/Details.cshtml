@@ -12,7 +12,7 @@
 	ViewBag.Title = Model.Title;
 	Layout = "~/Views/Shared/_Layout.cshtml";
 	string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
-	var cid = Context.Request.RouteValues["cid"]??(string.IsNullOrEmpty(Context.Request.Query["cid"]) ? "0" : Context.Request.Query["cid"]);
+	var cid = Context.Request.RouteValues["cid"]??Context.Request.Query["cid"];
 	string hidden = string.IsNullOrEmpty(Context.Request.Cookies["ValidateKey"]) ? "" : "hidden";
 	Advertisement ad = ViewBag.Ads;
 }
@@ -380,7 +380,7 @@
    * 获取评论
    */
 	function getcomments() {
-		window.get("/comment/getcomments?id=" + $("#postId").val()+"&page=1&size=10&cid="+@cid, function(data) {
+		window.get("/comment/getcomments?id=" + $("#postId").val()+"&page=1&size=10&cid=@cid", function(data) {
 			data = data.Data;
 			if (data) {
 				document.querySelector(".media-list").innerHTML = loadParentComments(data);
