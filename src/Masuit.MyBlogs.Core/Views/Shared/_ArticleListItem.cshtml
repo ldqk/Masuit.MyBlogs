@@ -60,7 +60,7 @@
 				<div class="col-md-6">
 					@for (var i = 0; i < tags.Length; i++)
 					{
-						<a asp-controller="Home" asp-action="Tag" asp-route-tag="@tags[i]" target="_blank">
+						<a asp-controller="Home" asp-action="Tag" asp-route-tag="@tags[i]">
 							<span class="label label-@colors[i]">@tags[i]</span>
 						</a>
 					}

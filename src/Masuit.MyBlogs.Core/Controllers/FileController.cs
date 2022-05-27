@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using Collections.Pooled;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
@@ -34,11 +35,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetFiles(string path)
         {
-            var files = Directory.GetFiles(HostEnvironment.WebRootPath + path).OrderByDescending(s => s).Select(s => new
+            using var files = Directory.GetFiles(HostEnvironment.WebRootPath + path).OrderByDescending(s => s).Select(s => new
             {
                 filename = Path.GetFileName(s),
                 path = s
-            }).ToList();
+            }).ToPooledList();
             return ResultData(files);
         }
 

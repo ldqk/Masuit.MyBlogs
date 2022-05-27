@@ -1,13 +1,15 @@
-﻿using Masuit.MyBlogs.Core.Models.DTO;
+﻿using Collections.Pooled;
+using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools.Models;
+using Masuit.Tools.Systems;
 
 namespace Masuit.MyBlogs.Core.Models.ViewModel
 {
     /// <summary>
     /// 首页视图模型
     /// </summary>
-    public class HomePageViewModel
+    public class HomePageViewModel : Disposable
     {
         /// <summary>
         /// 文章列表
@@ -22,7 +24,7 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 分类列表
         /// </summary>
-        public List<CategoryDto_P> Categories { get; set; }
+        public PooledList<CategoryDto_P> Categories { get; set; }
 
         /// <summary>
         /// 标签列表
@@ -32,12 +34,12 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// <summary>
         /// 近期热搜
         /// </summary>
-        public List<KeywordsRank> HotSearch { get; set; }
+        public PooledList<KeywordsRank> HotSearch { get; set; }
 
         /// <summary>
         /// 热门文章
         /// </summary>
-        public List<PostDto> Top5Post { get; set; }
+        public PooledList<PostDto> Top5Post { get; set; }
 
         /// <summary>
         /// 文章列表查询
@@ -63,5 +65,16 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// 分页参数
         /// </summary>
         public Pagination PageParams { get; set; }
+
+        /// <summary>
+        /// 释放
+        /// </summary>
+        /// <param name="disposing"></param>
+        public override void Dispose(bool disposing)
+        {
+            Categories.Dispose();
+            HotSearch.Dispose();
+            Top5Post.Dispose();
+        }
     }
 }

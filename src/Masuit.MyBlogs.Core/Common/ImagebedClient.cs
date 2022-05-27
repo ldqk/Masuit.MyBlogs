@@ -7,6 +7,7 @@ using Masuit.Tools.Systems;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Web;
+using Collections.Pooled;
 
 namespace Masuit.MyBlogs.Core.Common
 {
@@ -45,7 +46,7 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             file = Regex.Replace(Path.GetFileName(file), @"\p{P}|\p{S}", "");
-            var gitlabs = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length && !_failedList.Contains(c.ApiUrl)).OrderByRandom().ToList();
+            using var gitlabs = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length && !_failedList.Contains(c.ApiUrl)).OrderByRandom().ToPooledList();
             if (gitlabs.Count > 0)
             {
                 var gitlab = gitlabs[0];

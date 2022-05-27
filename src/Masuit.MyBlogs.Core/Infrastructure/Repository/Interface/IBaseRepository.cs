@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools.Models;
 using System.Linq.Expressions;
+using Collections.Pooled;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
 {
@@ -43,7 +44,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// </summary>
         /// <typeparam name="TDto">映射实体</typeparam>
         /// <returns></returns>
-        List<TDto> GetAllFromCache<TDto>() where TDto : class;
+        PooledList<TDto> GetAllFromCache<TDto>() where TDto : class;
 
         /// <summary>
         /// 从二级缓存获取所有实体
@@ -77,7 +78,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns></returns>
-        List<T> GetAllFromCache<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true);
+        PooledList<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true);
 
         /// <summary>
         /// 从二级缓存获取所有实体
@@ -106,7 +107,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns></returns>
-        List<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class;
+        PooledList<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class;
 
         /// <summary>
         /// 从二级缓存获取所有实体
@@ -159,7 +160,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns></returns>
-        List<T> GetQueryFromCache(Expression<Func<T, bool>> @where);
+        PooledList<T> GetQueryFromCache(Expression<Func<T, bool>> where);
 
         /// <summary>
         /// 基本查询方法，获取一个集合，优先从二级缓存读取
@@ -176,7 +177,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// <param name="orderby">排序方式</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns></returns>
-        List<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
+        PooledList<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true);
 
         /// <summary>
         /// 基本查询方法，获取一个集合，优先从二级缓存读取
@@ -193,7 +194,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns></returns>
-        List<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> @where) where TDto : class;
+        PooledList<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class;
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取
@@ -211,7 +212,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
         /// <param name="orderby">排序方式</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns></returns>
-        List<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class;
+        PooledList<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class;
 
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取
@@ -644,7 +645,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
 
         T this[int id] => GetById(id);
 
-        List<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToList();
+        PooledList<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToPooledList();
     }
 
     public partial interface ICategoryRepository : IBaseRepository<Category>

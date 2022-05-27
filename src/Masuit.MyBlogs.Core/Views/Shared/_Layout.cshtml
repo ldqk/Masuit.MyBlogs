@@ -12,11 +12,14 @@
 @using EFCoreSecondLevelCacheInterceptor
 @using Masuit.Tools.Models
 @using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using StackExchange.Profiling
+@using Collections.Pooled
 @{
     string[] colors = { "success", "info", "warning", "danger", "default" };
-    List<Menu> menus = _menuService.GetQueryFromCache(m => m.Status == Status.Available,m => m.Sort).ToList().ToTree(m => m.Id,m => m.ParentId);
+    List<Menu> menus = _menuService.GetQueryFromCache(m => m.Status == Status.Available,m => m.Sort).ToPooledList().ToTree(m => m.Id,m => m.ParentId);
     var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-    var links = _linksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.GroupBy(x => x.IP).Count()).Take(30).Select(e => new{e.Url,e.Name}).Cacheable().ToList();
+    using var links = _linksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.GroupBy(x => x.IP).Count()).Take(30).Select(e => new{e.Url,e.Name}).Cacheable().ToPooledList();
 }
 
 <!DOCTYPE html>

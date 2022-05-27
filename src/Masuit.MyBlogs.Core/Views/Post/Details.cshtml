@@ -88,7 +88,7 @@
 									@{
 										await Html.RenderPartialAsync("CategoryPath", Model.Category);
 									}
-									| 评论总数：<span class="text-danger">@Model.Comment.Count</span>条 | @(await Html.RenderComponentAsync<PostOnline>(RenderMode.ServerPrerendered, new{ Model.Id,IP=Context.Connection.RemoteIpAddress.ToString()}))
+									| 评论总数：<span class="text-danger">@ViewBag.CommentsCount</span>条 | @(await Html.RenderComponentAsync<PostOnline>(RenderMode.ServerPrerendered, new{ Model.Id,IP=Context.Connection.RemoteIpAddress.ToString()}))
 									@if (Model.Seminar.Any())
 									{
 										<span> | 所属专题：</span>
@@ -183,12 +183,12 @@
 						}
 					</div>
 				</section>
-				@if (Model.PostHistoryVersion.Any())
+				@if (ViewBag.HistoryCount>0)
 				{
 					<section class="wow margintop20 animated fadeIn">
 						<h3>文章历史版本：</h3>
 						<p>
-							修改次数：@Model.PostHistoryVersion.Count 次
+							修改次数：@ViewBag.HistoryCount 次
 							<a asp-controller="Post" asp-action="History" asp-route-id="@Model.Id">查看历史版本</a>
 						</p>
 					</section>
@@ -281,7 +281,7 @@
 							<h4>本篇文章已禁用评论和回复功能</h4>
 						}
 						<ul class="wow media-list"></ul>
-						@if (Model.Comment.Any(c => c.Status == Status.Published))
+						@if (ViewBag.CommentsCount>0)
 						{
 							<div class="row">
 								<div class="col-md-12 text-center">
@@ -355,7 +355,7 @@
 		loading();
 		$('#pageToolbar').Paging({ //异步加载评论
 			pagesize: 10,
-			count: @Model.Comment.Count(c =>c.ParentId==0&& c.Status==Status.Published),
+			count: @ViewBag.CommentsCount,
 			toolbar: true,
 			callback: function(page, size, count) {
 				window.get("/comment/getcomments?id=" +@Model.Id+"&page=" + page + "&size=" + size, function(data) {

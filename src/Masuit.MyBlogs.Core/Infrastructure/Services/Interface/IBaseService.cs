@@ -1,4 +1,5 @@
-﻿using Masuit.LuceneEFCore.SearchEngine;
+﻿using Collections.Pooled;
+using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.Tools.Models;
 using System.Linq.Expressions;
 
@@ -735,15 +736,23 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         Task<IEnumerable<T>> AddEntitiesAsync(IList<T> list);
 
         T this[int id] => GetById(id);
+
         string this[int id, Expression<Func<T, string>> selector] => GetQuery(t => t.Id == id).Select(selector).FirstOrDefault();
+
         int this[int id, Expression<Func<T, int>> selector] => GetQuery(t => t.Id == id).Select(selector).FirstOrDefault();
+
         DateTime this[int id, Expression<Func<T, DateTime>> selector] => GetQuery(t => t.Id == id).Select(selector).FirstOrDefault();
+
         long this[int id, Expression<Func<T, long>> selector] => GetQuery(t => t.Id == id).Select(selector).FirstOrDefault();
+
         decimal this[int id, Expression<Func<T, decimal>> selector] => GetQuery(t => t.Id == id).Select(selector).FirstOrDefault();
 
-        List<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToList();
+        PooledList<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToPooledList();
+
         public static T operator +(IBaseService<T> left, T right) => left.AddEntitySaved(right);
+
         public static bool operator -(IBaseService<T> left, T right) => left.DeleteEntitySaved(right);
+
         public static bool operator -(IBaseService<T> left, int id) => left.DeleteById(id);
     }
 }

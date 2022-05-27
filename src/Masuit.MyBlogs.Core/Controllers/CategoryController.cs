@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using Collections.Pooled;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Command;
@@ -28,7 +29,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetCategories()
         {
-            var list = CategoryService.GetQueryNoTracking(c => c.Status == Status.Available, c => c.Name).ToList().ToTree(c => c.Id, c => c.ParentId);
+            using var categories = CategoryService.GetQueryNoTracking(c => c.Status == Status.Available, c => c.Name).ToPooledList();
+            var list = categories.ToTree(c => c.Id, c => c.ParentId);
             return ResultData(list.Mapper<List<CategoryDto>>());
         }
 

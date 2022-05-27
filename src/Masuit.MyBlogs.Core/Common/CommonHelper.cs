@@ -18,6 +18,7 @@ using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Collections.Pooled;
 using TimeZoneConverter;
 using ArgumentException = System.ArgumentException;
 
@@ -308,7 +309,7 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             var elements = doc.DocumentElement.QuerySelectorAll("p,br");
-            var els = elements.OrderByRandom().Take(Math.Max(elements.Length / 5, 3)).ToList();
+            using var els = elements.OrderByRandom().Take(Math.Max(elements.Length / 5, 3)).ToPooledList();
             var href = "https://" + SystemSettings["Domain"].Split('|').OrderByRandom().FirstOrDefault();
             foreach (var el in els)
             {

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Collections.Pooled;
 using EFCoreSecondLevelCacheInterceptor;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
@@ -73,9 +74,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <typeparam name="TDto">映射实体</typeparam>
         /// <returns></returns>
-        public virtual List<TDto> GetAllFromCache<TDto>() where TDto : class
+        public virtual PooledList<TDto> GetAllFromCache<TDto>() where TDto : class
         {
-            return DataContext.Set<T>().ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
+            return DataContext.Set<T>().ProjectTo<TDto>(MapperConfig).Cacheable().ToPooledList();
         }
 
         /// <summary>
@@ -119,9 +120,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns></returns>
-        public virtual List<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true)
+        public virtual PooledList<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return GetAllNoTracking(orderby, isAsc).Cacheable().ToList();
+            return GetAllNoTracking(orderby, isAsc).Cacheable().ToPooledList();
         }
 
         /// <summary>
@@ -157,9 +158,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">排序字段</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns>还未执行的SQL语句</returns>
-        public virtual List<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
+        public virtual PooledList<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
         {
-            return GetAll(orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
+            return GetAll(orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToPooledList();
         }
 
         /// <summary>
@@ -203,9 +204,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns></returns>
-        public virtual List<T> GetQueryFromCache(Expression<Func<T, bool>> @where)
+        public virtual PooledList<T> GetQueryFromCache(Expression<Func<T, bool>> where)
         {
-            return DataContext.Set<T>().Where(where).AsNoTracking().Cacheable().ToList();
+            return DataContext.Set<T>().Where(where).AsNoTracking().Cacheable().ToPooledList();
         }
 
         /// <summary>
@@ -226,9 +227,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">排序方式</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns></returns>
-        public virtual List<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
+        public virtual PooledList<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return GetQueryNoTracking(where, orderby, isAsc).Cacheable().ToList();
+            return GetQueryNoTracking(where, orderby, isAsc).Cacheable().ToPooledList();
         }
 
         /// <summary>
@@ -310,9 +311,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>实体集合</returns>
-        public virtual List<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class
+        public virtual PooledList<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class
         {
-            return DataContext.Set<T>().Where(where).ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
+            return DataContext.Set<T>().Where(where).ProjectTo<TDto>(MapperConfig).Cacheable().ToPooledList();
         }
 
         /// <summary>
@@ -334,9 +335,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <param name="orderby">排序方式</param>
         /// <param name="isAsc">是否升序</param>
         /// <returns></returns>
-        public virtual List<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
+        public virtual PooledList<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
         {
-            return GetQuery(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToList();
+            return GetQuery(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToPooledList();
         }
 
         /// <summary>

@@ -23,6 +23,7 @@ using System.Text.RegularExpressions;
 using Masuit.Tools.Systems;
 using Microsoft.EntityFrameworkCore;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using Collections.Pooled;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -152,7 +153,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         Link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }) + "#comment"
                     });
                 }
-                if (comment.ParentId == 0)
+                if (comment.ParentId == null)
                 {
                     emails.Add(post.Email);
                     emails.Add(post.ModifierEmail);
@@ -223,7 +224,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (cid > 0)
             {
                 var comment = await CommentService.GetByIdAsync(cid.Value) ?? throw new NotFoundException("评论未找到");
-                var layer = CommentService.GetQueryNoTracking(c => c.GroupTag == comment.GroupTag).ToList();
+                using var layer = CommentService.GetQueryNoTracking(c => c.GroupTag == comment.GroupTag).ToPooledList();
                 foreach (var c in layer)
                 {
                     c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -253,7 +254,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             int total = parent.TotalCount; //总条数，用于前台分页
             var tags = parent.Data.Select(c => c.GroupTag).ToArray();
-            var comments = CommentService.GetQuery(c => tags.Contains(c.GroupTag)).Include(c => c.Post).AsNoTracking().ToList();
+            using var comments = CommentService.GetQuery(c => tags.Contains(c.GroupTag)).Include(c => c.Post).AsNoTracking().ToPooledList();
             comments.ForEach(c =>
             {
                 c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -288,7 +289,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Pass(int id)
         {
-            Comment comment = await CommentService.GetByIdAsync(id) ?? throw new NotFoundException("评论不存在！");
+            var comment = await CommentService.GetByIdAsync(id) ?? throw new NotFoundException("评论不存在！");
             comment.Status = Status.Published;
             Post post = await PostService.GetByIdAsync(comment.PostId);
             bool b = await CommentService.SaveChangesAsync() > 0;
@@ -299,12 +300,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                     .Set("time", DateTime.Now.ToTimeZoneF(HttpContext.Session.Get<string>(SessionKey.TimeZone)))
                     .Set("nickname", comment.NickName)
                     .Set("content", comment.Content);
-                var root = comment.Root();
-                var emails = root.Flatten().Select(c => c.Email).Append(post.ModifierEmail).Except(new List<string> { comment.Email, CurrentUser.Email }).ToHashSet();
+                using var emails = CommentService.GetQuery(c => c.GroupTag == comment.GroupTag).Select(c => c.Email).Distinct().ToPooledList().Append(post.ModifierEmail).Except(new List<string> { comment.Email, CurrentUser.Email }).ToPooledSet();
                 var link = Url.Action("Details", "Post", new
                 {
                     id = comment.PostId,
-                    cid = root.Id
+                    cid = id
                 }, Request.Scheme) + "#comment";
                 foreach (var email in emails)
                 {

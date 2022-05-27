@@ -23,6 +23,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Masuit.Tools.Systems;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using Collections.Pooled;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -52,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("msg"), Route("msg/{cid:int}"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Index()
         {
-            ViewBag.TotalCount = LeaveMessageService.Count(m => m.ParentId == 0 && m.Status == Status.Published);
+            ViewBag.TotalCount = LeaveMessageService.Count(m => m.ParentId == null && m.Status == Status.Published);
             var text = await new FileInfo(Path.Combine(HostEnvironment.WebRootPath, "template", "agreement.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8);
             return CurrentUser.IsAdmin ? View("Index_Admin", text) : View(model: text);
         }
@@ -69,7 +70,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (cid > 0)
             {
                 var message = await LeaveMessageService.GetByIdAsync(cid.Value) ?? throw new NotFoundException("留言未找到");
-                var layer = LeaveMessageService.GetQueryNoTracking(e => e.GroupTag == message.GroupTag).ToList();
+                using var layer = LeaveMessageService.GetQueryNoTracking(e => e.GroupTag == message.GroupTag).ToPooledList();
                 foreach (var m in layer)
                 {
                     m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -98,7 +99,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
             var total = parent.TotalCount;
             var tags = parent.Data.Select(c => c.GroupTag).ToArray();
-            var messages = LeaveMessageService.GetQueryNoTracking(c => tags.Contains(c.GroupTag)).ToList();
+            using var messages = LeaveMessageService.GetQueryNoTracking(c => tags.Contains(c.GroupTag)).ToPooledList();
             messages.ForEach(m =>
             {
                 m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -219,7 +220,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         Link = Url.Action("Index", "Msg", new { cid = msg.Id })
                     });
                 }
-                if (msg.ParentId == 0)
+                if (msg.ParentId == null)
                 {
                     //新评论，只通知博主
                     BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言：", content.Set("link", Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)).Render(false), email, ClientIP));
@@ -227,7 +228,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 else
                 {
                     //通知博主和上层所有关联的评论访客
-                    var emails = LeaveMessageService.GetQuery(e => e.GroupTag == msg.GroupTag).Select(c => c.Email).Distinct().AsEnumerable().Append(email).Except(new[] { msg.Email }).ToHashSet();
+                    using var emails = LeaveMessageService.GetQuery(e => e.GroupTag == msg.GroupTag).Select(c => c.Email).Distinct().AsEnumerable().Append(email).Except(new[] { msg.Email }).ToPooledSet();
                     string link = Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme);
                     foreach (var s in emails)
                     {
@@ -257,10 +258,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             bool b = await LeaveMessageService.SaveChangesAsync() > 0;
             if (b)
             {
-                var root = msg.Root();
                 var content = new Template(await new FileInfo(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8)).Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
-                var emails = root.Flatten().Select(c => c.Email).Except(new List<string> { msg.Email, CurrentUser.Email }).ToHashSet();
-                var link = Url.Action("Index", "Msg", new { cid = root.Id }, Request.Scheme);
+                using var emails = LeaveMessageService.GetQuery(m => m.GroupTag == msg.GroupTag).Select(m => m.Email).Distinct().ToPooledList().Except(new List<string> { msg.Email, CurrentUser.Email }).ToPooledSet();
+                var link = Url.Action("Index", "Msg", new { cid = id }, Request.Scheme);
                 foreach (var s in emails)
                 {
                     BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(false), s, ClientIP));
@@ -377,7 +377,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetUnreadMsgs()
         {
-            var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).NotCacheable().ToList();
+            using var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).NotCacheable().ToPooledList();
             return ResultData(msgs);
         }
 

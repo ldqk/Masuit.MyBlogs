@@ -33,6 +33,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
         /// <param name="keyword"></param>
         Task Highlight(Post p, string keyword);
 
-        void SolvePostsCategory(List<PostDto> posts);
+        void SolvePostsCategory(IList<PostDto> posts);
     }
 }

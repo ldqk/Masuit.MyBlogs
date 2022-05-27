@@ -1,5 +1,6 @@
 ﻿using AngleSharp;
 using CacheManager.Core;
+using Collections.Pooled;
 using EFCoreSecondLevelCacheInterceptor;
 using Hangfire;
 using JiebaNet.Segmenter;
@@ -68,6 +69,8 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public IPostVisitRecordService PostVisitRecordService { get; set; }
 
+        public ICommentService CommentService { get; set; }
+
         /// <summary>
         /// 文章详情页
         /// </summary>
@@ -81,7 +84,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return RedirectToAction("Details", cid > 0 ? new { id, kw, cid, t = SnowFlake.NewId } : new { id, kw, t = SnowFlake.NewId });
             }
 
-            var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetQuery(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)).Include(p => p.Seminar).FirstOrDefaultAsync() ?? throw new NotFoundException("文章未找到");
             CheckPermission(post);
             if (!string.IsNullOrEmpty(post.Redirect))
             {
@@ -94,6 +97,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return Redirect(post.Redirect);
             }
 
+            post.Category = CategoryService[post.CategoryId];
+            ViewBag.CommentsCount = CommentService.Count(c => c.PostId == id && c.ParentId == null && c.Status == Status.Published);
+            ViewBag.HistoryCount = PostHistoryVersionService.Count(c => c.PostId == id);
             ViewBag.Keyword = post.Keyword + "," + post.Label;
             ViewBag.Desc = await post.Content.GetSummary(200);
             var modifyDate = post.ModifyDate;
@@ -1084,7 +1090,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [ProducesResponseType(typeof(PagedList<PostVisitRecordViewModel>), (int)HttpStatusCode.OK)]
         public IActionResult ExportPostVisitRecords(int id)
         {
-            using var ms = PostVisitRecordService.GetQuery<DateTime, PostVisitRecordViewModel>(e => e.PostId == id, e => e.Time, false).ToList().ToDataTable().ToExcel();
+            using var list = PostVisitRecordService.GetQuery<DateTime, PostVisitRecordViewModel>(e => e.PostId == id, e => e.Time, false).ToPooledList();
+            using var ms = list.ToDataTable().ToExcel();
             var post = PostService[id];
             return this.ResumeFile(ms.ToArray(), ContentType.Xlsx, post.Title + "访问记录.xlsx");
         }

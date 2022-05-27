@@ -4,13 +4,14 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 {
     public interface IDriveAccountService
     {
-
         public DriveContext SiteContext { get; set; }
+
         /// <summary>
         /// 返回 Oauth 验证url
         /// </summary>
         /// <returns></returns>
         public Task<string> GetAuthorizationRequestUrl();
+
         /// <summary>
         /// 添加 SharePoint Site-ID
         /// </summary>
@@ -24,6 +25,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         /// </summary>
         /// <value></value>
         public Microsoft.Graph.GraphServiceClient Graph { get; set; }
+
         /// <summary>
         /// 返回所有 sharepoint site
         /// </summary>

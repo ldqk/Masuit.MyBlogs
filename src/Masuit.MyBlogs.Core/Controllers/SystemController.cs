@@ -12,7 +12,6 @@ using Masuit.Tools.Logging;
 using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -357,7 +356,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var fs = new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "whitelist.txt")).ShareReadWrite();
             string ips = await fs.ReadAllTextAsync(Encoding.UTF8, false);
-            List<string> list = ips.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+            var list = ips.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
             list.Add(ip);
             await fs.WriteAllTextAsync(string.Join(",", list.Distinct()), Encoding.UTF8);
             CommonHelper.IPWhiteList = list;

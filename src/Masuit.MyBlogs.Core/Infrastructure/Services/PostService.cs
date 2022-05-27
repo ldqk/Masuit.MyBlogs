@@ -3,6 +3,7 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using AutoMapper;
 using CacheManager.Core;
+using Collections.Pooled;
 using EFCoreSecondLevelCacheInterceptor;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
@@ -97,7 +98,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             var result = _cacheManager.GetOrAdd(cacheKey, _ =>
             {
                 var searchResult = SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
-                var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).DistinctBy(s => s.Entity.Id).ToList();
+                using var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).DistinctBy(s => s.Entity.Id).ToPooledList();
                 var ids = entities.Select(s => s.Entity.Id).ToArray();
                 var dic = GetQuery<PostDto>(p => ids.Contains(p.Id)).ToDictionary(p => p.Id);
                 var posts = entities.Where(s => dic.ContainsKey(s.Entity.Id)).Select(s => dic[s.Entity.Id]).ToList();
@@ -116,7 +117,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             return result;
         }
 
-        public void SolvePostsCategory(List<PostDto> posts)
+        public void SolvePostsCategory(IList<PostDto> posts)
         {
             var cids = posts.Select(p => p.CategoryId).Distinct().ToArray();
             var categories = _categoryRepository.GetQuery(c => cids.Contains(c.Id)).Include(c => c.Parent).Cacheable().ToDictionary(c => c.Id);
@@ -129,7 +130,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <param name="posts"></param>
         /// <param name="keywords"></param>
         /// <param name="highlighter"></param>
-        private static void HighlightSegment(List<PostDto> posts, List<string> keywords, Highlighter highlighter)
+        private static void HighlightSegment(IList<PostDto> posts, List<string> keywords, Highlighter highlighter)
         {
             foreach (var p in posts)
             {

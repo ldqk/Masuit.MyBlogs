@@ -8,8 +8,8 @@
 @{
 	ViewBag.Title = "站内搜索：" + ViewBag.Keyword;
 	Layout = "~/Views/Shared/_Layout.cshtml";
-	List<KeywordsRank> hotSearches = ViewBag.hotSearches;
-	List<string> relateKeywords = ViewBag.RelateKeywords;
+	IList<KeywordsRank> hotSearches = ViewBag.hotSearches;
+	IList<string> relateKeywords = ViewBag.RelateKeywords;
 	Advertisement ad = ViewBag.Ads;
 }
 <div class="container min-height610">

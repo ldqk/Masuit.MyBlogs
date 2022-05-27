@@ -1,5 +1,6 @@
 ﻿using AngleSharp;
 using AutoMapper.QueryableExtensions;
+using Collections.Pooled;
 using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
@@ -327,18 +328,18 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var postsQuery = PostService.GetQuery<PostDto>(PostBaseWhere().And(p => p.Status == Status.Published)); //准备文章的查询
             var notices = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(1, 5, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false); //加载前5条公告
-            var cats = await CategoryService.GetQuery(c => c.Status == Status.Available && c.Post.Count > 0, c => c.Name).Include(c => c.Parent).Cacheable().ToListAsync(); //加载分类目录
-            var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList(); //热词统计
+            using var cats = CategoryService.GetQuery(c => c.Status == Status.Available && c.Post.Count > 0).Include(c => c.Parent).OrderBy(c => c.Name).ThenBy(c => c.Path).AsNoTracking().Cacheable().ToPooledList(); //加载分类目录
+            var hotSearches = RedisHelper.Get<PooledList<KeywordsRank>>("SearchRank:Week").Take(10).ToPooledList(); //热词统计
             var hot5Post = postsQuery.OrderBy((new Random().Next() % 3) switch
             {
                 1 => nameof(OrderBy.VoteUpCount),
                 2 => nameof(OrderBy.AverageViewCount),
                 _ => nameof(OrderBy.TotalViewCount)
-            } + " desc").Skip(0).Take(5).Cacheable().ToList(); //热门文章
+            } + " desc").Skip(0).Take(5).Cacheable().ToPooledList(); //热门文章
             var tagdic = PostService.GetTags().OrderByRandom().Take(20).ToDictionary(x => x.Key, x => Math.Min(x.Value + 12, 32)); //统计标签
             return new HomePageViewModel
             {
-                Categories = Mapper.Map<List<CategoryDto_P>>(cats.OrderBy(c => c.Path()).ToList()),
+                Categories = Mapper.Map<PooledList<CategoryDto_P>>(cats.ToTree(c => c.Id, c => c.ParentId).Flatten().ToPooledList()),
                 HotSearch = hotSearches,
                 Notices = notices.Data,
                 Tags = tagdic,

@@ -9,7 +9,7 @@
 	ViewBag.Title = Model[0].Title + "版本对比";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 	string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
-	List<Advertisement> ads = ViewBag.Ads;
+	IList<Advertisement> ads = ViewBag.Ads;
 }
 <style>
 	ins {

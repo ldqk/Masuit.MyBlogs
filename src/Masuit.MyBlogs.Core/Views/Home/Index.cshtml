@@ -58,7 +58,7 @@
 @if (Model.Notices.Any())
 {
     <div class="container notice">
-        <a asp-controller="Notice" asp-action="Details" asp-route-id="@(Model.Notices.FirstOrDefault()?.Id)">
+        <a asp-controller="Notice" asp-action="Details" asp-route-id="@(Model.Notices[0].Id)">
             <h3 class="size18 text-red text-center">网站最新公告</h3>
         </a>
         @Html.Raw(Model.Notices[0].Content.Replace("img src=", $"img class='lazyload' title='{CommonHelper.SystemSettings["Title"]}' alt='{CommonHelper.SystemSettings["Title"]}' decoding='async' loading='lazy' data-src="))

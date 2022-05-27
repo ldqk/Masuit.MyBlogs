@@ -21,6 +21,7 @@ using Microsoft.Net.Http.Headers;
 using StackExchange.Profiling;
 using System.Text.RegularExpressions;
 using System.Web;
+using Collections.Pooled;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core
@@ -46,7 +47,7 @@ namespace Masuit.MyBlogs.Core
                 double time = HiPerfTimer.Execute(() =>
                 {
                     var db = app.ApplicationServices.GetRequiredService<DataContext>();
-                    var set = db.Post.Select(p => $"{p.Title},{p.Label},{p.Keyword}").AsParallel().SelectMany(s => Regex.Split(s, @"\p{P}(?<!\.|#)|\p{Z}|\p{S}")).Where(s => s.Length > 1).ToHashSet();
+                    using var set = db.Post.Select(p => $"{p.Title},{p.Label},{p.Keyword}").AsParallel().SelectMany(s => Regex.Split(s, @"\p{P}(?<!\.|#)|\p{Z}|\p{S}")).Where(s => s.Length > 1).ToPooledSet();
                     var lines = File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomKeywords.txt")).Union(set);
                     KeywordsManager.AddWords(lines);
                     KeywordsManager.AddSynonyms(File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomSynonym.txt")).Where(s => s.Contains(" ")).Select(s =>

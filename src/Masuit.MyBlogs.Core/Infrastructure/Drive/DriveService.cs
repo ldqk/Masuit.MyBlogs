@@ -1,15 +1,14 @@
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Models.Drive;
-using Masuit.Tools;
 using Microsoft.Graph;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 {
     public class DriveService : IDriveService
     {
-        readonly IDriveAccountService _accountService;
-        readonly GraphServiceClient _graph;
-        readonly DriveContext _driveContext;
+        private readonly IDriveAccountService _accountService;
+        private readonly GraphServiceClient _graph;
+        private readonly DriveContext _driveContext;
 
         public DriveService(IDriveAccountService accountService, DriveContext driveContext)
         {
@@ -17,26 +16,28 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             _graph = accountService.Graph;
             _driveContext = driveContext;
         }
+
         /// <summary>
         /// 获取根目录的所有项目
         /// </summary>
         /// <returns></returns>
-        public async Task<List<DriveFile>> GetRootItems(string siteName = "onedrive", bool showHiddenFolders = false)
+        public async Task<List<DriveFile>> GetRootItems(string siteName, bool showHiddenFolders)
         {
             var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
             var request = drive.Root.Children.Request();
             var result = await request.GetAsync();
             var files = await GetItems(result, siteName, showHiddenFolders);
-            files = files.OrderByDescending(f => f.CreatedTime).ToList();
-            return files;
+            return files.OrderByDescending(f => f.CreatedTime).ToList();
         }
 
         /// <summary>
         /// 根据路径获取文件夹下所有项目
         /// </summary>
         /// <param name="path"></param>
+        /// <param name="siteName"></param>
+        /// <param name="showHiddenFolders"></param>
         /// <returns></returns>
-        public async Task<List<DriveFile>> GetDriveItemsByPath(string path, string siteName = "onedrive", bool showHiddenFolders = false)
+        public async Task<List<DriveFile>> GetDriveItemsByPath(string path, string siteName, bool showHiddenFolders)
         {
             var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
             var result = await drive.Root.ItemWithPath(path).Children.Request().GetAsync();
@@ -55,6 +56,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             string[] imgArray = { ".png", ".jpg", ".jpeg", ".bmp", ".webp" };
             var extension = Path.GetExtension(path);
             var drive = siteName != "onedrive" ? _graph.Sites[GetSiteId(siteName)].Drive : _graph.Me.Drive;
+
             //这么写是因为：分块上传图片后直接获取会报错。
             if (imgArray.Contains(extension))
             {
@@ -84,6 +86,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         }
 
         #region PrivateMethod
+
         private DriveFile GetItem(DriveItem result)
         {
             var file = new DriveFile()
@@ -168,6 +171,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 
             return downloadUrl;
         }
-        #endregion
+
+        #endregion PrivateMethod
     }
 }

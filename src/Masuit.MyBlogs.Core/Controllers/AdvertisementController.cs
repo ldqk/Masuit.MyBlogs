@@ -1,4 +1,5 @@
 ﻿using AutoMapper.QueryableExtensions;
+using Collections.Pooled;
 using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
@@ -187,7 +188,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet("/partner/{id}/records-export"), MyAuthorize]
         public IActionResult ExportClickRecords(int id)
         {
-            using var ms = ClickRecordService.GetQuery<DateTime, AdvertisementClickRecordViewModel>(e => e.AdvertisementId == id, e => e.Time, false).ToList().ToDataTable().ToExcel();
+            using var list = ClickRecordService.GetQuery<DateTime, AdvertisementClickRecordViewModel>(e => e.AdvertisementId == id, e => e.Time, false).ToPooledList();
+            using var ms = list.ToDataTable().ToExcel();
             var advertisement = AdsService[id];
             return this.ResumeFile(ms.ToArray(), ContentType.Xlsx, advertisement.Title + "访问记录.xlsx");
         }

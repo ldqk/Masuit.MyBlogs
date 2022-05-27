@@ -4,6 +4,7 @@
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools
 @using System.IO
+@using Collections.Pooled
 @using Masuit.Tools.Logging
 @using PerformanceCounter = Masuit.MyBlogs.Core.Common.PerformanceCounter
 @inject IJSRuntime JS;
@@ -123,7 +124,7 @@
     private readonly CpuInfo cpu = SystemInfo.GetCpuInfo()[0];
     private readonly RamInfo memory = SystemInfo.GetRamInfo();
     private readonly IList<string> macs = SystemInfo.GetMacAddress();
-    private readonly IList<string> ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToList();
+    private readonly IList<string> ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToPooledList();
     private readonly DriveInfo[] _driveInfos = DriveInfo.GetDrives().Where(d => d.IsReady).ToArray();
 
     protected override void OnInitialized()

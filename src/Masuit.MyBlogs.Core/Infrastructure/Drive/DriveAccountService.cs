@@ -7,6 +7,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
     public class DriveAccountService : IDriveAccountService
     {
         private readonly IConfidentialClientApplication _app;
+
         public DriveContext SiteContext { get; set; }
 
         /// <summary>
@@ -21,6 +22,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             _app = tokenService.app;
             Graph = tokenService.Graph;
         }
+
         /// <summary>
         /// 返回 Oauth 验证url
         /// </summary>
@@ -30,6 +32,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             var redirectUrl = await _app.GetAuthorizationRequestUrl(OneDriveConfiguration.Scopes).ExecuteAsync();
             return redirectUrl.AbsoluteUri;
         }
+
         /// <summary>
         /// 添加 SharePoint Site-ID 到数据库
         /// </summary>
@@ -39,6 +42,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         public async Task AddSiteId(string siteName, string nickName)
         {
             Site site = new();
+
             //使用 Onedrive
             if (siteName == "onedrive")
             {
@@ -80,8 +84,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
 
         public List<Site> GetSites()
         {
-            List<Site> result = SiteContext.Sites.ToList();
-            return result;
+            return SiteContext.Sites.ToList();
         }
 
         /// <summary>
@@ -94,6 +97,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
             foreach (var item in SiteContext.Sites.ToArray())
             {
                 Microsoft.Graph.Drive drive;
+
                 //Onedrive
                 if (string.IsNullOrEmpty(item.SiteId))
                 {
@@ -128,11 +132,15 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive
         {
             return _app.AcquireTokenSilent(OneDriveConfiguration.Scopes, OneDriveConfiguration.AccountName).ExecuteAsync().Result.AccessToken;
         }
+
         public class DriveInfo
         {
             public Microsoft.Graph.Quota Quota { get; set; }
+
             public string NickName { get; set; }
+
             public string Name { get; set; }
+
             public string[] HiddenFolders { get; set; }
         }
     }

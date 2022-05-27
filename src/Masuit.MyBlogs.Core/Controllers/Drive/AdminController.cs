@@ -98,7 +98,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
         {
             try
             {
-                List<DriveAccountService.DriveInfo> driveInfo = new List<DriveAccountService.DriveInfo>();
+                var driveInfo = new List<DriveAccountService.DriveInfo>();
                 if (_setting.Get("AccountStatus") == "已认证")
                 {
                     driveInfo = await _driveAccount.GetDriveInfo();

@@ -3,6 +3,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using Collections.Pooled;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository
 {
@@ -34,9 +35,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <returns>还未执行的SQL语句</returns>
-        public override List<Post> GetQueryFromCache(Expression<Func<Post, bool>> @where)
+        public override PooledList<Post> GetQueryFromCache(Expression<Func<Post, bool>> where)
         {
-            return DataContext.Post.Include(p => p.Category).Where(where).Cacheable().ToList();
+            return DataContext.Post.Include(p => p.Category).Where(where).Cacheable().ToPooledList();
         }
 
         /// <summary>

@@ -3,6 +3,8 @@
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 @using Masuit.MyBlogs.Core.Models.Enum
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Collections.Pooled
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @inject IPostService PostService
 
@@ -24,7 +26,7 @@
         }
         else
         {
-            var list = Model.PostsQueryable.OrderByRandom().Take(5).ToList();
+            using var list = Model.PostsQueryable.OrderByRandom().Take(5).ToPooledList();
             if (list.Any())
             {
                 <div class="page-header">

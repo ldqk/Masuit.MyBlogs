@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Collections.Pooled;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
@@ -75,7 +76,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
             }
             if (ModelState.IsValid) return;
-            var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).ToList();
+            using var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).ToPooledList();
             if (errmsgs.Any())
             {
                 for (var i = 0; i < errmsgs.Count; i++)

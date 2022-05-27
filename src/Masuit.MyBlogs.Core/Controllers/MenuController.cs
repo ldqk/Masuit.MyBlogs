@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Office.Word;
+﻿using Collections.Pooled;
+using DocumentFormat.OpenXml.Office.Word;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Command;
@@ -29,7 +30,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         public ActionResult GetMenus()
         {
-            var menus = MenuService.GetAllNoTracking(m => m.Sort).ToList().ToTree(m => m.Id, m => m.ParentId);
+            using var list = MenuService.GetAllNoTracking(m => m.Sort).ToPooledList();
+            var menus = list.ToTree(m => m.Id, m => m.ParentId);
             return ResultData(Mapper.Map<List<MenuDto>>(menus));
         }
 

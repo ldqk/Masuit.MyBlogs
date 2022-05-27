@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Collections.Pooled;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Configs;
@@ -153,7 +154,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             if (ModelState.IsValid) return next();
-            var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).Select((s, i) => $"{i + 1}. {s}").ToList();
+            using var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).Select((s, i) => $"{i + 1}. {s}").ToPooledList();
             filterContext.Result = true switch
             {
                 _ when Request.HasJsonContentType() || Request.Method == HttpMethods.Post => ResultData(errmsgs, false, "数据校验失败，错误信息：" + errmsgs.Join(" | "), user != null, HttpStatusCode.BadRequest),
