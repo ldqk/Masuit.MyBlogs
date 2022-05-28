@@ -84,7 +84,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return RedirectToAction("Details", cid > 0 ? new { id, kw, cid, t = SnowFlake.NewId } : new { id, kw, t = SnowFlake.NewId });
             }
 
-            var post = await PostService.GetQuery(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)).Include(p => p.Seminar).FirstOrDefaultAsync() ?? throw new NotFoundException("文章未找到");
+            var post = await PostService.GetQuery(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)).Include(p => p.Seminar).AsNoTracking().FirstOrDefaultAsync() ?? throw new NotFoundException("文章未找到");
             CheckPermission(post);
             if (!string.IsNullOrEmpty(post.Redirect))
             {

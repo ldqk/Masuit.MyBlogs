@@ -377,7 +377,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetUnreadMsgs()
         {
-            using var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).NotCacheable().ToPooledList();
+            var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).NotCacheable().ToList();
             return ResultData(msgs);
         }
 
