@@ -5,7 +5,9 @@
 @using Masuit.Tools
 @using System.IO
 @using Collections.Pooled
+@using Masuit.MyBlogs.Core.Infrastructure
 @using Masuit.Tools.Logging
+@using Microsoft.EntityFrameworkCore
 @using PerformanceCounter = Masuit.MyBlogs.Core.Common.PerformanceCounter
 @inject IPerfCounter PerfCounter;
 @inject IJSRuntime JS;
@@ -161,7 +163,7 @@
 
     public Dictionary<string, dynamic> GetCounterPercent()
     {
-        var counters = PerfCounter.CreateDataSource();
+        var counters = PerfCounter.CreateDataSource().OrderBy(c => Guid.NewGuid()).Take(5000).ToList();
         var count = counters.Count();
         return new()
         {
@@ -173,7 +175,7 @@
                 p99 = counters.OrderByDescending(c => c.CpuLoad).Take(count / 100).MinOrDefault(c => c.CpuLoad).ToString("N2"),
                 p999 = counters.OrderByDescending(c => c.CpuLoad).Take(count / 1000).MinOrDefault(c => c.CpuLoad).ToString("N2"),
                 average = counters.Average(c => c.CpuLoad).ToString("N2"),
-                stdev = counters.StandardDeviation(c => c.CpuLoad).ToString("N2"),
+                stdev = counters.Select(c => c.CpuLoad).StandardDeviation().ToString("N2"),
             },
             ["内存使用率(%)"] = new
             {
@@ -183,7 +185,7 @@
                 p99 = counters.OrderByDescending(c => c.MemoryUsage).Take(count / 100).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
                 p999 = counters.OrderByDescending(c => c.MemoryUsage).Take(count / 1000).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
                 average = counters.Average(c => c.MemoryUsage).ToString("N2"),
-                stdev = counters.StandardDeviation(c => c.MemoryUsage).ToString("N2"),
+                stdev = counters.Select(c => c.MemoryUsage).StandardDeviation().ToString("N2"),
             },
             ["磁盘读(KBps)"] = new
             {
@@ -193,7 +195,7 @@
                 p99 = counters.OrderByDescending(c => c.DiskRead).Take(count / 100).MinOrDefault(c => c.DiskRead).ToString("N2"),
                 p999 = counters.OrderByDescending(c => c.DiskRead).Take(count / 1000).MinOrDefault(c => c.DiskRead).ToString("N2"),
                 average = counters.Average(c => c.DiskRead).ToString("N2"),
-                stdev = counters.StandardDeviation(c => c.DiskRead).ToString("N2"),
+                stdev = counters.Select(c => c.DiskRead).StandardDeviation().ToString("N2"),
             },
             ["磁盘写(KBps)"] = new
             {
@@ -203,7 +205,7 @@
                 p99 = counters.OrderByDescending(c => c.DiskWrite).Take(count / 100).MinOrDefault(c => c.DiskWrite).ToString("N2"),
                 p999 = counters.OrderByDescending(c => c.DiskWrite).Take(count / 1000).MinOrDefault(c => c.DiskWrite).ToString("N2"),
                 average = counters.Average(c => c.DiskWrite).ToString("N2"),
-                stdev = counters.StandardDeviation(c => c.DiskWrite).ToString("N2")
+                stdev = counters.Select(c => c.DiskWrite).StandardDeviation().ToString("N2")
             },
             ["网络下载(KBps)"] = new
             {
@@ -213,7 +215,7 @@
                 p99 = counters.OrderByDescending(c => c.Download).Take(count / 100).MinOrDefault(c => c.Download).ToString("N2"),
                 p999 = counters.OrderByDescending(c => c.Download).Take(count / 1000).MinOrDefault(c => c.Download).ToString("N2"),
                 average = counters.Average(c => c.Download).ToString("N2"),
-                stdev = counters.StandardDeviation(c => c.Download).ToString("N2")
+                stdev = counters.Select(c => c.Download).StandardDeviation().ToString("N2")
             },
             ["网络上行(KBps)"] = new
             {
@@ -223,7 +225,7 @@
                 p99 = counters.OrderByDescending(c => c.Upload).Take(count / 100).MinOrDefault(c => c.Upload).ToString("N2"),
                 p999 = counters.OrderByDescending(c => c.Upload).Take(count / 1000).MinOrDefault(c => c.Upload).ToString("N2"),
                 average = counters.Average(c => c.Upload).ToString("N2"),
-                stdev = counters.StandardDeviation(c => c.Upload).ToString("N2")
+                stdev = counters.Select(c => c.Upload).StandardDeviation().ToString("N2")
             }
         };
     }

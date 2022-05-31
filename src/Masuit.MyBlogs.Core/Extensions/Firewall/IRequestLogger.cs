@@ -1,14 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
-using Hangfire;
 using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.Tools.Systems;
-using MaxMind.Db;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Graph.CallRecords;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 
@@ -88,28 +84,31 @@ public class RequestDatabaseLogger : IRequestLogger
             result.Network = network;
             _dataContext.Add(result);
         }
-        _dataContext.SaveChanges();
-        var start = DateTime.Now.AddMonths(-6);
-        _dataContext.Set<RequestLogDetail>().Where(e => e.Time < start).DeleteFromQuery();
+
+        if (_dataContext.SaveChanges() > 0)
+        {
+            var start = DateTime.Now.AddMonths(-6);
+            var tableName = _dataContext.Model.FindEntityType(typeof(RequestLogDetail)).GetTableName();
+            _dataContext.Database.ExecuteSqlRaw($"DELETE FROM \"{tableName}\" WHERE \"{nameof(RequestLogDetail.Time)}\" <'{start:yyyy-MM-dd HH:mm:ss}'");
+        }
     }
 }
 
-public class RequestLoggerBackService : BackgroundService
+public class RequestLoggerBackService : ScheduledService
 {
-    private readonly IRequestLogger _logger;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public RequestLoggerBackService(IRequestLogger logger)
+    public RequestLoggerBackService(IServiceScopeFactory scopeFactory) : base(TimeSpan.FromMinutes(5))
     {
-        _logger = logger;
+        _scopeFactory = scopeFactory;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync()
     {
-        while (true)
-        {
-            _logger.Process();
-            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
-        }
+        using var scope = _scopeFactory.CreateAsyncScope();
+        var logger = scope.ServiceProvider.GetRequiredService<IRequestLogger>();
+        logger.Process();
+        return Task.CompletedTask;
     }
 }
 
