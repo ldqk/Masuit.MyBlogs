@@ -31,23 +31,36 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         public ISystemSettingService SystemSettingService { get; set; }
 
+        public IPerfCounter PerfCounter { get; set; }
+
         /// <summary>
         /// 获取历史性能计数器
         /// </summary>
         /// <returns></returns>
         public IActionResult GetCounterHistory()
         {
-            var counters = PerfCounter.List.OrderBy(c => c.Time);
-            var list = counters.Count() < 5000 ? counters : counters.GroupBy(c => c.Time / 60000).Select(g => new PerformanceCounter
+            var counters = PerfCounter.CreateDataSource();
+            var count = counters.Count();
+            var ticks = count switch
             {
-                Time = g.Key * 60000,
-                CpuLoad = g.OrderBy(c => c.CpuLoad).Skip(1).Take(g.Count() - 2).Select(c => c.CpuLoad).DefaultIfEmpty().Average(),
-                DiskRead = g.OrderBy(c => c.DiskRead).Skip(1).Take(g.Count() - 2).Select(c => c.DiskRead).DefaultIfEmpty().Average(),
-                DiskWrite = g.OrderBy(c => c.DiskWrite).Skip(1).Take(g.Count() - 2).Select(c => c.DiskWrite).DefaultIfEmpty().Average(),
-                Download = g.OrderBy(c => c.Download).Skip(1).Take(g.Count() - 2).Select(c => c.Download).DefaultIfEmpty().Average(),
-                Upload = g.OrderBy(c => c.Upload).Skip(1).Take(g.Count() - 2).Select(c => c.Upload).DefaultIfEmpty().Average(),
-                MemoryUsage = g.OrderBy(c => c.MemoryUsage).Skip(1).Take(g.Count() - 2).Select(c => c.MemoryUsage).DefaultIfEmpty().Average()
-            });
+                > 5000 and <= 10000 => 3,
+                > 10000 and <= 20000 => 6,
+                > 20000 and <= 50000 => 12,
+                > 50000 and <= 100000 => 24,
+                > 100000 and <= 200000 => 48,
+                > 200000 and <= 300000 => 72,
+                _ => count
+            } * 10000;
+            var list = count < 5000 ? counters.ToList() : counters.GroupBy(c => c.Time / ticks).Select(g => new PerformanceCounter
+            {
+                Time = g.Key * ticks,
+                CpuLoad = g.Average(c => c.CpuLoad),
+                DiskRead = g.Average(c => c.DiskRead),
+                DiskWrite = g.Average(c => c.DiskWrite),
+                Download = g.Average(c => c.Download),
+                Upload = g.Average(c => c.Upload),
+                MemoryUsage = g.Average(c => c.MemoryUsage)
+            }).ToList();
             return Ok(new
             {
                 cpu = list.Select(c => new[]

@@ -24,7 +24,6 @@ if (!"223.5.5.5".GetIPLocation().Contains("阿里"))
 }
 
 InitOneDrive(); // 初始化Onedrive程序
-PerfCounter.Init(); // 初始化性能计数器
 Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureWebHostDefaults(hostBuilder => hostBuilder.UseKestrel(opt =>
 {
     var config = opt.ApplicationServices.GetService<IConfiguration>();

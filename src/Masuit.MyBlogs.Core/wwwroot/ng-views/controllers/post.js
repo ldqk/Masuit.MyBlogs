@@ -234,9 +234,7 @@
     }
     
     $scope.toggleDisableComment= function(row) {
-        $scope.request("/post/DisableComment", {
-            id: row.Id
-        }, function(data) {
+        $scope.request(`/post/${row.Id}/DisableComment`, null, function(data) {
             window.notie.alert({
                 type: 1,
                 text: data.Message,
@@ -246,9 +244,7 @@
     }
 
     $scope.toggleDisableCopy= function(row) {
-        $scope.request("/post/DisableCopy", {
-            id: row.Id
-        }, function(data) {
+        $scope.request(`/post/${row.Id}/DisableCopy`, null, function(data) {
             window.notie.alert({
                 type: 1,
                 text: data.Message,

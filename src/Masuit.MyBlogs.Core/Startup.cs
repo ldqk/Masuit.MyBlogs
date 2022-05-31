@@ -100,6 +100,27 @@ namespace Masuit.MyBlogs.Core
 
                 opt.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>()).EnableSensitiveDataLogging();
             }); //配置数据库
+            services.AddDbContext<LoggerDbContext>(opt =>
+            {
+                switch (Configuration["Database:Provider"])
+                {
+                    case "pgsql":
+                        opt.UseNpgsql(AppConfig.ConnString);
+                        break;
+
+                    case "mysql":
+                        opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(10));
+                        break;
+
+                    case "mssql":
+                        opt.UseSqlServer(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10));
+                        break;
+
+                    case "sqlite":
+                        opt.UseSqlite(AppConfig.ConnString);
+                        break;
+                }
+            }); //配置数据库
             services.ConfigureOptions();
             services.AddHttpsRedirection(options =>
             {
@@ -132,7 +153,7 @@ namespace Masuit.MyBlogs.Core
                 return new HttpClientHandler();
             }); //注入HttpClient
             services.AddHttpClient<ImagebedClient>().AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(3)); //注入HttpClient
-            services.AddMailSender(Configuration).AddFirewallReporter(Configuration);
+            services.AddMailSender(Configuration).AddFirewallReporter(Configuration).AddRequestLogger(Configuration).AddPerfCounterManager(Configuration);
             services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
             services.SetupMiniProfile();
             services.AddSingleton<IMimeMapper, MimeMapper>(p => new MimeMapper());
@@ -152,13 +173,19 @@ namespace Masuit.MyBlogs.Core
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
-        /// <param name="db"></param>
         /// <param name="hangfire"></param>
         /// <param name="luceneIndexerOptions"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext db, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
         {
-            db.Database.EnsureCreated();
             ServiceProvider = app.ApplicationServices;
+            var maindb = ServiceProvider.GetRequiredService<DataContext>();
+            var loggerdb = ServiceProvider.GetRequiredService<LoggerDbContext>();
+            maindb.Database.EnsureCreated();
+            if (loggerdb.Database.EnsureCreated())
+            {
+                loggerdb.ApplyHypertables();
+            }
+
             app.InitSettings();
             app.UseLuceneSearch(env, hangfire, luceneIndexerOptions);
             app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For

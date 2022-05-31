@@ -7,6 +7,7 @@
 @using Collections.Pooled
 @using Masuit.Tools.Logging
 @using PerformanceCounter = Masuit.MyBlogs.Core.Common.PerformanceCounter
+@inject IPerfCounter PerfCounter;
 @inject IJSRuntime JS;
 
 <h3 class="text-center">
@@ -130,7 +131,7 @@
     protected override void OnInitialized()
     {
         var boot = DateTime.Now - SystemInfo.BootTime();
-        var span = DateTime.Now - PerfCounter.StartTime;
+        var span = DateTime.Now - IPerfCounter.StartTime;
         runningTime = $"{span.Days}天{span.Hours}小时{span.Minutes}分钟";
         bootTime = $"{boot.Days}天{boot.Hours}小时{boot.Minutes}分钟";
     }
@@ -144,7 +145,7 @@
     public static PerformanceCounter GetCurrentPerformanceCounter()
     {
         try {
-            return PerfCounter.GetCurrentPerformanceCounter();
+            return IPerfCounter.GetCurrentPerformanceCounter();
         }
         catch (Exception e) {
             LogManager.Error(e.Demystify());
@@ -160,8 +161,8 @@
 
     public Dictionary<string, dynamic> GetCounterPercent()
     {
-        var counters = PerfCounter.List;
-        var count = counters.Count;
+        var counters = PerfCounter.CreateDataSource();
+        var count = counters.Count();
         return new()
         {
             ["CPU使用率(%)"] = new

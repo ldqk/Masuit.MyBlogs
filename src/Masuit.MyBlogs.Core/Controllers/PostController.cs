@@ -335,8 +335,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> All()
         {
             ViewBag.tags = new Dictionary<string, int>(PostService.GetTags().Where(x => x.Value > 1).OrderBy(x => x.Key));
-            ViewBag.cats = await CategoryService.GetQuery(c => c.Post.Count > 0, c => c.Post.Count, false).Include(c => c.Parent).ToDictionaryAsync(c => c.Id, c => c.Path()); //category
-            ViewBag.seminars = await SeminarService.GetAll(c => c.Post.Count, false).ToDictionaryAsync(c => c.Id, c => c.Title); //seminars
+            ViewBag.cats = await CategoryService.GetQuery(c => c.Post.Count > 0, c => c.Post.Count, false).Include(c => c.Parent).ThenInclude(c => c.Parent).AsNoTracking().ToDictionaryAsync(c => c.Id, c => c.Path()); //category
+            ViewBag.seminars = await SeminarService.GetAll(c => c.Post.Count, false).AsNoTracking().ToDictionaryAsync(c => c.Id, c => c.Title); //seminars
             return View();
         }
 
@@ -922,6 +922,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id">文章id</param>
         /// <returns></returns>
         [MyAuthorize]
+        [HttpPost("post/{id}/DisableComment")]
         public async Task<ActionResult> DisableComment(int id)
         {
             var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
@@ -935,6 +936,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="id">文章id</param>
         /// <returns></returns>
         [MyAuthorize]
+        [HttpPost("post/{id}/DisableCopy")]
         public async Task<ActionResult> DisableCopy(int id)
         {
             var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
