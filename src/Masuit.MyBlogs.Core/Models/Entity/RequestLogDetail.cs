@@ -34,4 +34,7 @@ public class RequestLogDetail
 
     [StringLength(256)]
     public string Network { get; set; }
+
+    [StringLength(128)]
+    public string TraceId { get; set; }
 }

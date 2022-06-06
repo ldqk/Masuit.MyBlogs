@@ -71,7 +71,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(kw) || p.Description.Contains(kw) || p.Url.Contains(kw));
             }
 
-            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ProjectTo<AdvertisementViewModel>(MapperConfig).NotCacheable().ToPagedList(page, size);
+            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ThenByDescending(a => a.Id).ProjectTo<AdvertisementViewModel>(MapperConfig).NotCacheable().ToPagedList(page, size);
             return Ok(list);
         }
 

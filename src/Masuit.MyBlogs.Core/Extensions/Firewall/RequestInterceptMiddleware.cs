@@ -98,7 +98,8 @@ public class RequestInterceptMiddleware
                 var q = request.QueryString.Value.Trim('?');
                 requestUrl = requestUrl.Replace(q, q.Split('&').Where(s => !s.StartsWith("cid") && !s.StartsWith("uid")).Join("&"));
             }
-            _requestLogger.Log(ip, requestUrl, context.Request.Headers[HeaderNames.UserAgent]);
+
+            _requestLogger.Log(ip, requestUrl, context.Request.Headers[HeaderNames.UserAgent], context.Session.Id);
         }
 
         if (string.IsNullOrEmpty(context.Session.Get<string>(SessionKey.TimeZone)))

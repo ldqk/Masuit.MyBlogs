@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
+using System.Net.Sockets;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.Tools;
 using Masuit.Tools.DateTimeExt;
@@ -62,7 +64,8 @@ public interface IPerfCounter
             DiskRead = read,
             DiskWrite = write,
             Download = down,
-            Upload = up
+            Upload = up,
+            ServerIP = SystemInfo.GetLocalUsedIP(AddressFamily.InterNetwork).ToString()
         };
     }
 
@@ -171,6 +174,9 @@ public static class PerfCounterServiceExtension
 [Table(nameof(PerformanceCounter))]
 public class PerformanceCounter
 {
+    [StringLength(128)]
+    public string ServerIP { get; set; }
+
     /// <summary>
     /// 当前时间戳
     /// </summary>

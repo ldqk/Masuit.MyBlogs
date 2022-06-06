@@ -10,14 +10,14 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 
 public interface IRequestLogger
 {
-    void Log(string ip, string url, string userAgent);
+    void Log(string ip, string url, string userAgent, string traceid);
 
     void Process();
 }
 
 public class RequestNoneLogger : IRequestLogger
 {
-    public void Log(string ip, string url, string userAgent)
+    public void Log(string ip, string url, string userAgent, string traceid)
     {
     }
 
@@ -28,7 +28,7 @@ public class RequestNoneLogger : IRequestLogger
 
 public class RequestFileLogger : IRequestLogger
 {
-    public void Log(string ip, string url, string userAgent)
+    public void Log(string ip, string url, string userAgent, string traceid)
     {
         TrackData.RequestLogs.AddOrUpdate(ip, new RequestLog()
         {
@@ -59,14 +59,15 @@ public class RequestDatabaseLogger : IRequestLogger
         _dataContext = dataContext;
     }
 
-    public void Log(string ip, string url, string userAgent)
+    public void Log(string ip, string url, string userAgent, string traceid)
     {
         Queue.Enqueue(new RequestLogDetail
         {
             Time = DateTime.Now,
             UserAgent = userAgent,
             RequestUrl = url,
-            IP = ip
+            IP = ip,
+            TraceId = traceid
         });
     }
 

@@ -28,8 +28,9 @@
                 {{row.Email}}
                 <button class="badge btn btn-primary" ng-click="addToBlock(row)">标记为恶意提交</button>
             </td>
-            <td title="'标签'">
-                {{row.Label}}
+            <td title="'提交IP'">
+                {{row.IP}}
+                <button class="badge btn btn-primary pull-right" ng-click="addToBlackList(row.IP)">黑名单</button>
             </td>
             <td title="'操作'" style="width: 155px;">
                 <div class="btn-group">

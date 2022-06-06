@@ -5,9 +5,7 @@
 @using Masuit.Tools
 @using System.IO
 @using Collections.Pooled
-@using Masuit.MyBlogs.Core.Infrastructure
 @using Masuit.Tools.Logging
-@using Microsoft.EntityFrameworkCore
 @using PerformanceCounter = Masuit.MyBlogs.Core.Common.PerformanceCounter
 @inject IPerfCounter PerfCounter;
 @inject IJSRuntime JS;
@@ -115,6 +113,9 @@
         <h3 class="text-center">性能实时监控</h3>
     </div>
     <div class="row">
+        <div id="servers" style="width: 200px"></div>
+    </div>
+    <div class="row">
         <div id="container" class="col-md-3" style="height: 400px;"></div>
         <div id="container-cpu" class="col-md-5" style="height: 400px;"></div>
         <div id="container-io" class="col-md-4" style="height: 400px;"></div>
@@ -123,11 +124,12 @@
 
 @code {
     private string bootTime;
+    private string ip=SystemInfo.GetLocalUsedIP(AddressFamily.InterNetwork).ToString();
     private string runningTime;
     private readonly CpuInfo cpu = SystemInfo.GetCpuInfo()[0];
     private readonly RamInfo memory = SystemInfo.GetRamInfo();
     private readonly IList<string> macs = SystemInfo.GetMacAddress();
-    private readonly IList<string> ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToPooledList();
+    private readonly IList<string> ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToList();
     private readonly DriveInfo[] _driveInfos = DriveInfo.GetDrives().Where(d => d.IsReady).ToArray();
 
     protected override void OnInitialized()
@@ -140,7 +142,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await JS.InvokeVoidAsync("showLine");
+        await JS.InvokeVoidAsync("getServers");
+        await JS.InvokeVoidAsync("showLine",ip);
     }
 
     [JSInvokable]
@@ -160,10 +163,10 @@
         Windows.ClearMemorySilent();
         JS.InvokeVoidAsync("showSuccess");
     }
-
+    
     public Dictionary<string, dynamic> GetCounterPercent()
     {
-        var counters = PerfCounter.CreateDataSource().OrderBy(c => Guid.NewGuid()).Take(5000).ToList();
+        using var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==ip).OrderBy(c => Guid.NewGuid()).Take(5000).ToPooledList();
         var count = counters.Count();
         return new()
         {

@@ -162,7 +162,7 @@
     }
     $scope.add = function() {
         $scope.partner = {
-            ExpireTime:"2049-12-31"
+            ExpireTime:"2049-12-31 23:59:59"
         };
         $scope.isAdd = true;
         $scope.allowUpload=false;
@@ -194,7 +194,7 @@
 
     $scope.edit = function (item) {
         $scope.partner = angular.copy(item);
-        $scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2049-12-31":new Date($scope.partner.ExpireTime).Format("yyyy-MM-dd hh:mm:ss");
+        $scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2049-12-31 23:59:59":new Date($scope.partner.ExpireTime).Format("yyyy-MM-dd hh:mm:ss");
         $scope.isAdd = false;
         $scope.allowUpload=false;
         layer.closeAll();
@@ -230,7 +230,7 @@
     $scope.copy = function (item) {
         $scope.partner = angular.copy(item);
         delete $scope.partner.Id;
-        $scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2049-12-31":new Date($scope.partner.ExpireTime).Format("yyyy-MM-dd hh:mm:ss");
+        $scope.partner.ExpireTime=$scope.partner.ExpireTime == null?"2049-12-31 23:59:59":new Date($scope.partner.ExpireTime).Format("yyyy-MM-dd hh:mm:ss");
         $scope.isAdd = true;
         $scope.allowUpload=false;
         layer.closeAll();

@@ -145,8 +145,42 @@ function showIO(data) {
     return myChart;
 }
 
-function showLine() {
-    window.fetch("/system/GetCounterHistory", {
+function getServers() {
+    window.fetch("/system/GetServers", {
+        credentials: 'include',
+        method: 'GET',
+        mode: 'cors'
+    }).then(function(response) {
+        return response.json();
+    }).then(function(data) {
+        var arr=[];
+        for (var i = 0; i < data.length; i++) {
+            arr.push({name:data[i],value:data[i]});
+        }
+
+        xmSelect.render({
+            el: '#servers',
+            tips: '请选择服务器',
+            model: {
+                 icon: 'hidden',
+                 label: { type: 'text' }
+            },
+            radio: true,
+            clickClose: true,
+            autoRow: true, //选项过多,自动换行
+            data:arr,
+            on: function (data) {
+                if (data.arr.length>0) {
+                    showLine(data.arr[0].value);
+                }
+            }
+        });
+    });
+}
+
+function showLine(ip) {
+    clearInterval(window.counterInterval);
+    window.fetch("/system/GetCounterHistory?ip="+ip, {
         credentials: 'include',
         method: 'GET',
         mode: 'cors'
@@ -238,38 +272,38 @@ function showLine() {
         });
         var rateChart = showSpeed();
         var ioChart = showIO(data);
-        setInterval(function() {
-                DotNet.invokeMethodAsync('Masuit.MyBlogs.Core', 'GetCurrentPerformanceCounter').then(item => {
-                    data.cpu.push([item.time, item.cpuLoad.toFixed(2)]);
-                    data.mem.push([item.time, item.memoryUsage.toFixed(2)]);
-                    data.read.push([item.time, item.diskRead.toFixed(2)]);
-                    data.write.push([item.time, item.diskWrite.toFixed(2)]);
-                    data.up.push([item.time, item.upload.toFixed(2)]);
-                    data.down.push([item.time, item.download.toFixed(2)]);
-                    myChart.setOption({
-                        series: [{
-                                data: data.cpu
-                            }, {
-                                data: data.mem
-                            }]
-                    });
-                    ioChart.setOption({
-                        series: [{
-                                data: data.read
-                            }, {
-                                data: data.write
-                            }, {
-                                data: data.up
-                            }, {
-                                data: data.down
-                            }]
-                    });
-                    let option = rateChart.getOption();
-                    option.series[0].data[0].value = item.cpuLoad.toFixed(2);
-                    option.series[0].data[1].value = item.memoryUsage.toFixed(2);
-                    rateChart.setOption(option, true);
+        window.counterInterval = setInterval(function() {
+            DotNet.invokeMethodAsync('Masuit.MyBlogs.Core', 'GetCurrentPerformanceCounter').then(item => {
+                data.cpu.push([item.time, item.cpuLoad.toFixed(2)]);
+                data.mem.push([item.time, item.memoryUsage.toFixed(2)]);
+                data.read.push([item.time, item.diskRead.toFixed(2)]);
+                data.write.push([item.time, item.diskWrite.toFixed(2)]);
+                data.up.push([item.time, item.upload.toFixed(2)]);
+                data.down.push([item.time, item.download.toFixed(2)]);
+                myChart.setOption({
+                    series: [{
+                        data: data.cpu
+                    }, {
+                        data: data.mem
+                    }]
                 });
-            }, 2000);
+                ioChart.setOption({
+                    series: [{
+                        data: data.read
+                    }, {
+                        data: data.write
+                    }, {
+                        data: data.up
+                    }, {
+                        data: data.down
+                    }]
+                });
+                let option = rateChart.getOption();
+                option.series[0].data[0].value = item.cpuLoad.toFixed(2);
+                option.series[0].data[1].value = item.memoryUsage.toFixed(2);
+                rateChart.setOption(option, true);
+            });
+        }, 2000);
     }).catch(function(e) {
         console.error(e);
     });

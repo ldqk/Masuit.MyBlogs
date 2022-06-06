@@ -5,7 +5,7 @@
         $scope.get("/notice/get/" + $scope.notice.Id, function (res) {
             $scope.notice = res.Data;
             if ($scope.notice.StartTime+$scope.notice.EndTime) {
-                $scope.notice.Range=new Date($scope.notice.StartTime).Format("yyyy-MM-dd")+" - "+new Date($scope.notice.EndTime).Format("yyyy-MM-dd");
+                $scope.notice.Range=new Date($scope.notice.StartTime).Format("yyyy-MM-dd hh:mm:ss")+" - "+new Date($scope.notice.EndTime).Format("yyyy-MM-dd hh:mm:ss");
             } else {
                 delete $scope.notice.StartTime;
                 delete $scope.notice.EndTime;

@@ -16,7 +16,9 @@ using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using Masuit.Tools.Hardware;
 using PerformanceCounter = Masuit.MyBlogs.Core.Common.PerformanceCounter;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -33,13 +35,20 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public IPerfCounter PerfCounter { get; set; }
 
+        public ActionResult GetServers()
+        {
+            var servers = PerfCounter.CreateDataSource().Select(c => c.ServerIP).Distinct().ToArray();
+            return Ok(servers);
+        }
+
         /// <summary>
         /// 获取历史性能计数器
         /// </summary>
         /// <returns></returns>
-        public IActionResult GetCounterHistory()
+        public IActionResult GetCounterHistory(string ip = null)
         {
-            var counters = PerfCounter.CreateDataSource();
+            ip = ip.IfNullOrEmpty(() => SystemInfo.GetLocalUsedIP(AddressFamily.InterNetwork).ToString());
+            var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP == ip);
             var count = counters.Count();
             var ticks = count switch
             {
@@ -51,7 +60,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 > 200000 and <= 300000 => 72,
                 _ => count
             } * 10000;
-            var list = count < 5000 ? counters.ToList() : counters.GroupBy(c => c.Time / ticks).Select(g => new PerformanceCounter
+
+            var list = count < 5000 ? counters.OrderBy(c => c.Time).ToList() : counters.GroupBy(c => c.Time / ticks).Select(g => new PerformanceCounter
             {
                 Time = g.Key * ticks,
                 CpuLoad = g.Average(c => c.CpuLoad),
@@ -60,7 +70,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Download = g.Average(c => c.Download),
                 Upload = g.Average(c => c.Upload),
                 MemoryUsage = g.Average(c => c.MemoryUsage)
-            }).ToList();
+            }).OrderBy(c => c.Time).ToList();
             return Ok(new
             {
                 cpu = list.Select(c => new[]

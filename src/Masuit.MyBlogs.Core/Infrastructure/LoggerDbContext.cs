@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Masuit.MyBlogs.Core.Common;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Lucene.Net.Sandbox.Queries;
+using OpenXmlPowerTools;
 
 namespace Masuit.MyBlogs.Core.Infrastructure;
 
@@ -61,7 +63,12 @@ public static class TimeScaleExtensions
                         }
                         else
                         {
-                            context.Database.ExecuteSqlRaw($"SELECT create_hypertable('\"{tableName}\"', '{columnName}', chunk_time_interval => 100000);");
+                            context.Database.ExecuteSqlRaw($"SELECT create_hypertable('\"{tableName}\"', '{columnName}', chunk_time_interval => 604800000000);");
+                            context.Database.ExecuteSqlRaw($@"CREATE FUNCTION current_microfortnight() RETURNS BIGINT
+                            LANGUAGE SQL STABLE AS $$
+                               SELECT CAST(1209600 * EXTRACT(EPOCH FROM CURRENT_TIME) / 1000000 AS BIGINT)
+                             $$;
+                            SELECT set_integer_now_func('""{columnName}""', 'current_microfortnight');");
                         }
                     }
                 }

@@ -84,5 +84,9 @@
         /// </summary>
         public string LimitDesc { get; set; }
 
+        /// <summary>
+        /// 提交人IP地址
+        /// </summary>
+        public string IP { get; set; }
     }
 }
