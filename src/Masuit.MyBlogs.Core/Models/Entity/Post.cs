@@ -243,7 +243,10 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         AllowRegionExceptForbidRegion,
 
         [Description("不可见地区：{0}，排除地区：{1}")]
-        ForbidRegionExceptAllowRegion
+        ForbidRegionExceptAllowRegion,
+
+        [Description("仅搜索引擎可见")]
+        OnlyForSearchEngine,
     }
 
     /// <summary>
@@ -271,6 +274,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// <summary>
         /// 密码可见
         /// </summary>
-        Password
+        Password,
+
+        /// <summary>
+        /// 仅搜索引擎可见
+        /// </summary>
+        OnlyForSearchEngine,
     }
 }

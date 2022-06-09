@@ -272,12 +272,18 @@ namespace Masuit.MyBlogs.Core.Controllers
         protected Expression<Func<Post, bool>> PostBaseWhere()
         {
             Expression<Func<Post, bool>> where = _ => true;
+            if (CurrentUser.IsAdmin || Request.IsRobot())
+            {
+                return where;
+            }
+
+            where = where.And(p => p.LimitMode != RegionLimitMode.OnlyForSearchEngine);
             if (HideCategories.Length > 0)
             {
                 where = where.And(p => !HideCategories.Contains(p.CategoryId));
             }
 
-            if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot())
+            if (VisitorTokenValid)
             {
                 return where;
             }
@@ -317,6 +323,10 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             switch (post.LimitMode)
             {
+                case RegionLimitMode.OnlyForSearchEngine:
+                    Disallow(post);
+                    break;
+
                 case RegionLimitMode.AllowRegion:
                     if (!Regex.IsMatch(location, post.Regions))
                     {

@@ -23,6 +23,7 @@
                         <option ng-value="2">地区可见：</option>
                         <option ng-value="3">授权可见</option>
                         <option ng-value="4">密码可见</option>
+                        <option ng-value="5">仅搜索引擎可见</option>
                     </select>
                 </div>
                 <div class="input-group" ng-if="post.ProtectContentMode==2">
@@ -126,20 +127,21 @@
                     <optgroup label="可见性">
                         <option ng-value="1">指定地区可见</option>
                         <option ng-value="3">指定地区可见但排除在内的这些地区</option>
+                        <option ng-value="5">仅搜索引擎可见</option>
                     </optgroup>
                     <optgroup label="不可见性">
                         <option ng-value="2">指定地区不可见</option>
                         <option ng-value="4">指定地区不可见但排除在内的这些地区</option>
                     </optgroup>
                 </select>
-                <span class="input-group-btn" ng-if="(post.LimitMode||0)==0">
+                <span class="input-group-btn" ng-if="(post.LimitMode||0)==0||post.LimitMode==5">
                     <button type="button" class="btn btn-info waves-effect" ng-click="submit(post)">确认修改</button>
                 </span>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6" ng-if="post.LimitMode>0">
+        <div class="col-md-6" ng-if="post.LimitMode>0 && post.LimitMode<5">
             <div class="input-group">
                 <span class="input-group-addon" ng-if="post.LimitMode%2==1">可见地区：</span>
                 <span class="input-group-addon" ng-if="post.LimitMode%2==0"><strong class="text-red">不可见地区：</strong></span>
