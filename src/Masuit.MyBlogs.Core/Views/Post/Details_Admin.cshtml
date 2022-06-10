@@ -411,7 +411,7 @@
 									<header class="panel-heading ${rows[i].IsMaster ? "text-red" : ""} ${rows[i].IsAuthor ? "text-bold" : ""}">${startfloor--}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""} | ${rows[i].CommentDate}
 										<span class="pull-right" style="font-size: 10px;">${rows[i].Status == 4 ? `<a class="label label-success" onclick="pass(${rows[i].Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${rows[i].Id})">删除</a> | ${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span>
 									</header>
-									<div class="panel-body">
+									<div class="panel-body line-height24">
 										${rows[i].Content}
 										<span class="cmvote label label-info" data-id="${rows[i].Id}"><i class="icon-thumbsup"></i>(<span class="count">${rows[i].VoteCount}</span>)</span>
 										<a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a><div class="margin-top10"></div>
@@ -450,7 +450,7 @@
 								${depth}-${floor++}# ${item.IsMaster ? `<i class="icon icon-user"></i>` : ""}${item.NickName}${item.IsMaster ? `(管理员)` : ""} | ${item.CommentDate}
 								<span class="pull-right" style="font-size: 10px;">${item.Status == 4 ? `<a class="label label-success" onclick="pass(${item.Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${item.Id})">删除</a> | ${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span>
 							</div>
-							<div class="panel-body">
+							<div class="panel-body line-height24">
 								${item.Content}
 								<span class="cmvote label label-${color}" data-id="${item.Id}"><i class="icon-thumbsup"></i>(<span class="count">${item.VoteCount}</span>)</span>
 								<a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>

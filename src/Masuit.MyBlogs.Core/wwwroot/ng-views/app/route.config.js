@@ -26,6 +26,7 @@ myApp.config([
                             {
                                 files: [
                                     "https://maplemei.gitee.io/xm-select/xm-select.js",
+                                    "https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js",
                                 ],
                                 cache: true
                             }, cpath + "/post.js"

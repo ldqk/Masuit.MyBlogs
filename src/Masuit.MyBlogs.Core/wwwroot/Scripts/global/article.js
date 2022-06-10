@@ -437,7 +437,7 @@ function loadParentComments(data) {
 								<header class="panel-heading ${rows[i].IsMaster ? "text-red" : ""} ${rows[i].IsAuthor ? "text-bold" : ""}">${startfloor--}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""} | ${rows[i].CommentDate}
 									<span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span>
 								</header>
-								<div class="panel-body">
+								<div class="panel-body line-height24">
 									${rows[i].Content} 
 									<span class="cmvote label label-info" data-id="${rows[i].Id}"><i class="icon-thumbsup"></i>(<span>${rows[i].VoteCount}</span>)</span>
 									<a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
@@ -469,7 +469,7 @@ function loadComments(comments, depth = 0) {
 							${depth}-${floor++}# ${item.IsMaster ?`<i class="icon icon-user"></i>`:""}${item.NickName}${item.IsMaster ?`(管理员)`:""} | ${item.CommentDate}
 							<span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span>
 						</div>
-						<div class="panel-body">
+						<div class="panel-body line-height24">
 							${item.Content} 
 							<span class="cmvote label label-${color}" data-id="${item.Id}"><i class="icon-thumbsup"></i>(<span>${item.VoteCount}</span>)</span>
 							<a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>

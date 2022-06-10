@@ -1117,6 +1117,25 @@ namespace Masuit.MyBlogs.Core.Controllers
         }
 
         /// <summary>
+        /// 文章访问记录图表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet("/post/records-chart"), MyAuthorize]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        public async Task<IActionResult> PostVisitRecordChart(CancellationToken cancellationToken)
+        {
+            var list = await PostVisitRecordService.GetAll().Select(e => new { e.Time.Date, e.IP }).GroupBy(t => t.Date).Select(g => new
+            {
+                Date = g.Key,
+                Count = g.Count(),
+                UV = g.Select(e => e.IP).Distinct().Count()
+            }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
+            return Ok(list);
+        }
+
+        /// <summary>
         /// 文章访问记录分析
         /// </summary>
         /// <param name="id"></param>

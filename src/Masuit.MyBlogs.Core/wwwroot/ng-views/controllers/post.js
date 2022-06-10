@@ -272,6 +272,7 @@
             });
         });
     }
+    
     self.insight= function(row) {
         layer.full(layer.open({
           type: 2,
@@ -281,6 +282,88 @@
           content: '/'+row.Id+'/insight'
         }));
     }
+
+    window.fetch("/post/records-chart", {
+		credentials: 'include',
+		method: 'GET',
+		mode: 'cors'
+	}).then(function(response) {
+		return response.json();
+	}).then(function(res) {
+		var pv = [];
+		var uv = [];
+		for (let item of res) {
+			pv.push([Date.parse(item.Date), item.Count]);
+			uv.push([Date.parse(item.Date),item.UV]);
+		}
+		var chartDom = document.getElementById('chart');
+		var myChart = echarts.init(chartDom);
+		var option = {
+			tooltip: {
+				trigger: 'axis',
+				position: function(pt) {
+					return [pt[0], '10%'];
+				}
+			},
+			title: {
+				left: 'center',
+				text: '最近90天阅读量趋势，日均：' + (res.reduce((acr, cur) => acr + cur.Count, 0) / (new Date() - new Date(res[0].Date)) * (1000 * 60 * 60 * 24)).toFixed(2)
+			},
+			xAxis: {
+				type: 'time',
+				axisLabel: {
+					formatter:function (value){
+						var dt=new Date(value);
+						return dt.toLocaleDateString();
+					}
+				}
+			},
+			yAxis: {
+				type: 'value'
+			},
+			series: [
+				{
+					name: 'PV',
+					type: 'line',
+					smooth: true,
+					symbol: 'none',
+					areaStyle: {},
+					data: pv,
+					markPoint: {
+						data: [
+							{ type: 'max', name: '最大值' },
+							{ type: 'min', name: '最小值' }
+						]
+					},
+					markLine: {
+						data: [
+							{ type: 'average', name: '平均值' }
+						]
+					}
+				},
+				{
+					name: 'UV',
+					type: 'line',
+					smooth: true,
+					symbol: 'none',
+					areaStyle: {},
+					data: uv,
+					markPoint: {
+						data: [
+							{ type: 'max', name: '最大值' },
+							{ type: 'min', name: '最小值' }
+						]
+					},
+					markLine: {
+						data: [
+							{ type: 'average', name: '平均值' }
+						]
+					}
+				}
+			]
+		};
+		myChart.setOption(option);
+	});
 }]);
 myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
     UEDITOR_CONFIG.initialFrameHeight=null;

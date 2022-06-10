@@ -272,7 +272,7 @@ function loadParentMsgs(data) {
 									<header class="panel-heading">${startfloor--}# ${rows[i].IsMaster? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows  [i].IsMaster ? `(管理员)` : ""} | ${rows[i].PostDate}
 										<span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span>
 									</header>
-									<div class="panel-body">
+									<div class="panel-body line-height24">
 										${rows[i].Content}
 										<a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
 										${loadMsgs(rows[i].Children)}
@@ -303,7 +303,7 @@ function loadMsgs(msg, depth = 0) {
 							${depth}-${floor++}# ${item.IsMaster ? `<i class="icon icon-user"></i>` : ""}${item.NickName}${item.IsMaster ? `(管理员)` : ""} | ${item.PostDate}<span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}
 							</span>
 						</div>
-						<div class="panel-body">
+						<div class="panel-body line-height24">
 							${item.Content}
 							<a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
 							${loadMsgs(item.Children, depth)}

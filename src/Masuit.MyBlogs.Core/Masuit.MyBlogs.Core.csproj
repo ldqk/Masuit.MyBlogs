@@ -49,7 +49,7 @@
         <PackageReference Include="Collections.Pooled" Version="1.0.82" />
         <PackageReference Include="CSRedisCore" Version="3.8.2" />
         <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="3.5.1" />
-        <PackageReference Include="Hangfire" Version="1.7.29" />
+        <PackageReference Include="Hangfire" Version="1.7.30" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
         <PackageReference Include="htmldiff.net-core" Version="1.3.6" />
         <PackageReference Include="IP2Region" Version="1.2.0" />
