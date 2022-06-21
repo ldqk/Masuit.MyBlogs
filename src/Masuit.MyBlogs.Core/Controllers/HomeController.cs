@@ -58,7 +58,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner, Request.Location()).OrderByRandom().ToList();
             var fastShares = await fastShareService.GetAllFromCacheAsync(s => s.Sort);
-            var postsQuery = PostService.GetQuery(PostBaseWhere().And(p => p.Status == Status.Published)); //准备文章的查询
+            var postsQuery = PostService.GetQuery(PostBaseWhere()); //准备文章的查询
             var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ToCachedPagedListAsync<Post, PostDto>(1, 15, MapperConfig);
             posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ProjectTo<PostDto>(MapperConfig).Cacheable().ToList());
             var viewModel = await GetIndexPageViewModel();
@@ -89,7 +89,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             page = Math.Max(1, page);
             var viewModel = await GetIndexPageViewModel();
-            var postsQuery = PostService.GetQuery(PostBaseWhere().And(p => p.Status == Status.Published)); //准备文章的查询
+            var postsQuery = PostService.GetQuery(PostBaseWhere()); //准备文章的查询
             var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
             {
@@ -131,7 +131,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 throw new NotFoundException("");
             }
 
-            var where = PostBaseWhere().And(p => p.Status == Status.Published);
+            var where = PostBaseWhere();
             var queryable = PostService.GetQuery(tag.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(s => Regex.Escape(s.Trim())).Aggregate(where, (current, s) => current.And(p => Regex.IsMatch(p.Label, s))));
             var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
@@ -173,11 +173,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 date = DateTime.Today;
             }
 
-            var where = PostBaseWhere().And(p => p.Status == Status.Published);
-            where = mode switch
+            var where = mode switch
             {
-                nameof(Models.Entity.Post.PostDate) => where.And(p => p.PostDate.Date == date),
-                _ => where.And(p => p.ModifyDate.Date == date),
+                nameof(Models.Entity.Post.PostDate) => PostBaseWhere().And(p => p.PostDate.Date == date),
+                _ => PostBaseWhere().And(p => p.ModifyDate.Date == date),
             };
             var queryable = PostService.GetQuery(where);
             var h24 = DateTime.Today.AddDays(-1);
@@ -212,8 +211,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Author(string author, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             page = Math.Max(1, page);
-            Expression<Func<Post, bool>> where = p => p.Author.Equals(author) || p.Modifier.Equals(author) || p.Email.Equals(author) || p.PostHistoryVersion.Any(v => v.Modifier.Equals(author) || v.ModifierEmail.Equals(author));
-            where = where.And(p => p.Status == Status.Published).And(PostBaseWhere());
+            Expression<Func<Post, bool>> where = PostBaseWhere().And(p => p.Author.Equals(author) || p.Modifier.Equals(author) || p.Email.Equals(author) || p.PostHistoryVersion.Any(v => v.Modifier.Equals(author) || v.ModifierEmail.Equals(author)));
             var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
             {
@@ -252,8 +250,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
             {
-                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId) && p.Status == Status.Published)).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-                _ => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId) && p.Status == Status.Published)).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId))).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                _ => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId))).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
             };
             var viewModel = await GetIndexPageViewModel();
             viewModel.Posts = posts;
@@ -326,7 +324,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <returns></returns>
         private async Task<HomePageViewModel> GetIndexPageViewModel()
         {
-            var postsQuery = PostService.GetQuery<PostDto>(PostBaseWhere().And(p => p.Status == Status.Published)); //准备文章的查询
+            var postsQuery = PostService.GetQuery<PostDto>(PostBaseWhere()); //准备文章的查询
             var notices = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(1, 5, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false); //加载前5条公告
             using var cats = CategoryService.GetQuery(c => c.Status == Status.Available && c.Post.Count > 0).Include(c => c.Parent).OrderBy(c => c.Name).ThenBy(c => c.Path).AsNoTracking().Cacheable().ToPooledList(); //加载分类目录
             var hotSearches = RedisHelper.Get<PooledList<KeywordsRank>>("SearchRank:Week").Take(10).ToPooledList(); //热词统计

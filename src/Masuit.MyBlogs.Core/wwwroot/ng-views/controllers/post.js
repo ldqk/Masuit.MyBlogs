@@ -384,9 +384,7 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
     $scope.post.Email = $scope.user.Email;
     var refer = $location.search()['refer'];
     if (refer) {
-        $scope.request("/post/get", {
-            id: refer
-        }, function (data) {
+        $scope.get("/post/get/"+refer, function (data) {
             $scope.post = data.Data;
             delete $scope.post.Id;
             $scope.keywordsDropdown.update({data: ($scope.post.Keyword||"").split(',')});

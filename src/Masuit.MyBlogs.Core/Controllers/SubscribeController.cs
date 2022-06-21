@@ -46,7 +46,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var time = DateTime.Today.AddDays(-1);
             string scheme = Request.Scheme;
             var host = Request.Host;
-            using var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().Cacheable().ToPooledList();
+            using var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().Cacheable().ToPooledList();
             var data = await raw.SelectAsync(async p =>
             {
                 var summary = await p.Content.GetSummary(300, 50);
@@ -129,7 +129,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var host = Request.Host;
             var category = await categoryService.GetByIdAsync(id) ?? throw new NotFoundException("分类未找到");
             var cids = category.Flatten().Select(c => c.Id).ToArray();
-            using var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && cids.Contains(p.CategoryId) && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().Cacheable().ToPooledList();
+            using var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && cids.Contains(p.CategoryId) && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().Cacheable().ToPooledList();
             var data = await raw.SelectAsync(async p =>
             {
                 var summary = await p.Content.GetSummary(300, 50);
@@ -186,7 +186,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             string scheme = Request.Scheme;
             var host = Request.Host;
             var seminar = await seminarService.GetByIdAsync(id) ?? throw new NotFoundException("专题未找到");
-            using var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && p.Seminar.Any(s => s.Id == id) && p.Status == Status.Published && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().Cacheable().ToPooledList();
+            using var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && p.Seminar.Any(s => s.Id == id) && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().Cacheable().ToPooledList();
             var data = await raw.SelectAsync(async p =>
             {
                 var summary = await p.Content.GetSummary(300, 50);
@@ -281,7 +281,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         protected Expression<Func<Post, bool>> PostBaseWhere()
         {
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
-            return p => p.LimitMode != RegionLimitMode.OnlyForSearchEngine && (p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true : p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions) : p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions) : p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions) && !Regex.IsMatch(location, p.ExceptRegions) : !Regex.IsMatch(location, p.Regions) || Regex.IsMatch(location, p.ExceptRegions));
+            return p => p.Status == Status.Published && p.LimitMode != RegionLimitMode.OnlyForSearchEngine && (p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true : p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions) : p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions) : p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions) && !Regex.IsMatch(location, p.ExceptRegions) : !Regex.IsMatch(location, p.Regions) || Regex.IsMatch(location, p.ExceptRegions));
         }
 
         private void CheckPermission(Post post)

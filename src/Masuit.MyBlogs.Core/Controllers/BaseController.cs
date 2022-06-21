@@ -20,6 +20,7 @@ using Microsoft.Net.Http.Headers;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text.RegularExpressions;
+using Masuit.MyBlogs.Core.Models.Enum;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -223,8 +224,14 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         protected void CheckPermission(List<PostDto> posts)
         {
-            if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot())
+            if (CurrentUser.IsAdmin || Request.IsRobot())
             {
+                return;
+            }
+
+            if (VisitorTokenValid)
+            {
+                posts.RemoveAll(p => p.LimitMode == RegionLimitMode.OnlyForSearchEngine);
                 return;
             }
 
@@ -242,6 +249,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 switch (p.LimitMode)
                 {
+                    case RegionLimitMode.OnlyForSearchEngine:
+                        return true;
+
                     case RegionLimitMode.AllowRegion:
                         return !Regex.IsMatch(location, p.Regions);
 
@@ -271,13 +281,12 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         protected Expression<Func<Post, bool>> PostBaseWhere()
         {
-            Expression<Func<Post, bool>> where = _ => true;
             if (CurrentUser.IsAdmin || Request.IsRobot())
             {
-                return where;
+                return _ => true;
             }
 
-            where = where.And(p => p.LimitMode != RegionLimitMode.OnlyForSearchEngine);
+            Expression<Func<Post, bool>> where = p => p.Status == Status.Published && p.LimitMode != RegionLimitMode.OnlyForSearchEngine;
             if (HideCategories.Length > 0)
             {
                 where = where.And(p => !HideCategories.Contains(p.CategoryId));
