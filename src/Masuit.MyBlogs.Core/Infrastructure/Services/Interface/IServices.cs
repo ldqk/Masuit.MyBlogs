@@ -49,4 +49,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 
     public partial interface IAdvertisementClickRecordService : IBaseService<AdvertisementClickRecord>
     { }
+
+    public partial interface IPostTagService : IBaseService<PostTag>
+    { }
 }

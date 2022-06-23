@@ -339,7 +339,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Remark = "无权限查看该文章",
                 Address = Request.Location(),
                 HttpVersion = Request.Protocol,
-                Headers = Request.Headers.ToJsonString()
+                Headers = new
+                {
+                    Request.Protocol,
+                    Request.Headers
+                }.ToJsonString()
             });
             throw new NotFoundException("文章未找到");
         }

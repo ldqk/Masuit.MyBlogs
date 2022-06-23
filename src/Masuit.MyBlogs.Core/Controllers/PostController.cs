@@ -71,6 +71,8 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         public ICommentService CommentService { get; set; }
 
+        public IPostTagService PostTagService { get; set; }
+
         /// <summary>
         /// 文章详情页
         /// </summary>
@@ -302,6 +304,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             p.ModifierEmail = p.Email;
             p.DisableCopy = true;
             p.Rss = true;
+            PostTagService.AddOrUpdate(t => t.Name, p.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
+            {
+                Name = s,
+                Count = PostService.Count(t => t.Label.Contains(s))
+            }));
             p = PostService.AddEntitySaved(p);
             if (p == null)
             {
@@ -722,6 +729,11 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var js = new JiebaSegmenter();
             (p.Keyword + "," + p.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(s => js.AddWord(s));
+            PostTagService.AddOrUpdate(t => t.Name, p.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
+            {
+                Name = s,
+                Count = PostService.Count(t => t.Label.Contains(s))
+            }));
             bool b = await SearchEngine.SaveChangesAsync() > 0;
             if (!b)
             {
@@ -782,6 +794,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             PostService.AddEntity(p);
             var js = new JiebaSegmenter();
             (p.Keyword + "," + p.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(s => js.AddWord(s));
+            PostTagService.AddOrUpdate(t => t.Name, p.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
+            {
+                Name = s,
+                Count = PostService.Count(t => t.Label.Contains(s))
+            }));
             bool b = await SearchEngine.SaveChangesAsync() > 0;
             if (!b)
             {

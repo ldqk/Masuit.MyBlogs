@@ -110,7 +110,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Remark = "检测到异常爬虫行为",
                 Address = Request.Location(),
                 HttpVersion = Request.Protocol,
-                Headers = Request.Headers.ToJsonString()
+                Headers = new
+                {
+                    Request.Protocol,
+                    Request.Headers
+                }.ToJsonString()
             });
             cacheManager.AddOrUpdate("AntiCrawler:" + ip, 1, i => i + 1, 5);
             cacheManager.Expire("AntiCrawler:" + ip, ExpirationMode.Sliding, TimeSpan.FromMinutes(10));

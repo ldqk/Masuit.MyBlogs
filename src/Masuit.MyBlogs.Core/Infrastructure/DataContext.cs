@@ -176,6 +176,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure
 
         public virtual DbSet<LinkLoopback> LinkLoopbacks { get; set; }
 
+        public virtual DbSet<PostTag> PostTags { get; set; }
+
         [DbFunction]
         public static double Random() => throw new NotSupportedException();
     }

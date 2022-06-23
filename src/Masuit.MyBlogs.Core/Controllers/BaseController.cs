@@ -22,6 +22,8 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Masuit.MyBlogs.Core.Models.Enum;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using Newtonsoft.Json.Linq;
+using static Lucene.Net.Util.Fst.Util;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -229,7 +231,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return;
             }
 
-            if (VisitorTokenValid)
+            if (VisitorTokenValid || CommonHelper.IPWhiteList.Contains(ClientIP))
             {
                 posts.RemoveAll(p => p.LimitMode == RegionLimitMode.OnlyForSearchEngine);
                 return;
@@ -249,9 +251,6 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 switch (p.LimitMode)
                 {
-                    case RegionLimitMode.OnlyForSearchEngine:
-                        return true;
-
                     case RegionLimitMode.AllowRegion:
                         return !Regex.IsMatch(location, p.Regions);
 
@@ -292,7 +291,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => !HideCategories.Contains(p.CategoryId));
             }
 
-            if (VisitorTokenValid)
+            if (VisitorTokenValid || CommonHelper.IPWhiteList.Contains(ClientIP))
             {
                 return where;
             }
@@ -315,7 +314,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         protected void CheckPermission(Post post)
         {
-            if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot())
+            if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot() || CommonHelper.IPWhiteList.Contains(ClientIP))
             {
                 return;
             }
@@ -393,7 +392,11 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Remark = remark,
                 Address = Request.Location(),
                 HttpVersion = Request.Protocol,
-                Headers = Request.Headers.ToJsonString()
+                Headers = new
+                {
+                    Request.Protocol,
+                    Request.Headers
+                }.ToJsonString()
             });
             throw new NotFoundException("文章未找到");
         }

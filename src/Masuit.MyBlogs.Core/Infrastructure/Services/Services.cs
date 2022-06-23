@@ -116,4 +116,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         {
         }
     }
+
+    public partial class PostTagService : BaseService<PostTag>, IPostTagService
+    {
+        public PostTagService(IBaseRepository<PostTag> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
+        {
+        }
+    }
 }

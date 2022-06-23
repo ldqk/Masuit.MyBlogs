@@ -716,4 +716,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository.Interface
 
     public partial interface IPostVisitRecordStatsRepository : IBaseRepository<PostVisitRecordStats>
     { }
+
+    public partial interface IPostTagsRepository : IBaseRepository<PostTag>
+    { }
 }

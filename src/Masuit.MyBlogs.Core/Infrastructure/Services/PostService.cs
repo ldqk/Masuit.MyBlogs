@@ -27,16 +27,16 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
     public class PostService : BaseService<Post>, IPostService
     {
         private readonly ICacheManager<SearchResult<PostDto>> _cacheManager;
-        private readonly ICacheManager<Dictionary<string, int>> _tagCacheManager;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
+        private readonly IPostTagsRepository _postTagsRepository;
 
-        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, ICacheManager<SearchResult<PostDto>> cacheManager, ICacheManager<Dictionary<string, int>> tagCacheManager, ICategoryRepository categoryRepository, IMapper mapper) : base(repository, searchEngine, searcher)
+        public PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, ICacheManager<SearchResult<PostDto>> cacheManager, ICategoryRepository categoryRepository, IMapper mapper, IPostTagsRepository postTagsRepository) : base(repository, searchEngine, searcher)
         {
             _cacheManager = cacheManager;
-            _tagCacheManager = tagCacheManager;
             _categoryRepository = categoryRepository;
             _mapper = mapper;
+            _postTagsRepository = postTagsRepository;
         }
 
         /// <summary>
@@ -196,10 +196,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public Dictionary<string, int> GetTags()
         {
-            const string key = "postTags";
-            var dic = _tagCacheManager.GetOrAdd(key, GetQuery(p => !string.IsNullOrEmpty(p.Label)).Select(p => p.Label).Distinct().ToList().SelectMany(s => s.Split(',', '，')).GroupBy(s => s).OrderByDescending(g => g.Count()).ToDictionary(g => g.Key, g => g.Count()));
-            _tagCacheManager.Expire(key, DateTimeOffset.Now.AddDays(1));
-            return dic;
+            return _postTagsRepository.GetAll(t => t.Count, false).Cacheable().ToDictionary(g => g.Name, g => g.Count);
         }
 
         /// <summary>

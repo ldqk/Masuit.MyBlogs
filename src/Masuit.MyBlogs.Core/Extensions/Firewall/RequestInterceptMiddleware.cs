@@ -61,7 +61,11 @@ public class RequestInterceptMiddleware
                 Remark = $"检测到敏感词拦截：{match.Value}",
                 Address = request.Location(),
                 HttpVersion = request.Protocol,
-                Headers = request.Headers.ToJsonString()
+                Headers = new
+                {
+                    request.Protocol,
+                    request.Headers
+                }.ToJsonString()
             });
             context.Response.StatusCode = 404;
             context.Response.ContentType = "text/html; charset=utf-8";
