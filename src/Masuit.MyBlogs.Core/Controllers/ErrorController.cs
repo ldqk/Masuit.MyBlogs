@@ -119,6 +119,11 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private static async Task<string> GetRequestBody(HttpRequest req)
         {
+            if (req.ContentLength > 5120)
+            {
+                return "请求体超长";
+            }
+
             req.Body.Seek(0, SeekOrigin.Begin);
             using var sr = new StreamReader(req.Body, Encoding.UTF8, false);
             var body = await sr.ReadToEndAsync();

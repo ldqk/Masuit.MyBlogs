@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Polly;
 using System.Diagnostics;
 using System.Text;
+using Masuit.Tools.AspNetCore.ModelBinder;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -33,13 +34,13 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public ActionResult GetFiles(string path)
+        public ActionResult GetFiles([FromBodyOrDefault] string path)
         {
-            using var files = Directory.GetFiles(HostEnvironment.WebRootPath + path).OrderByDescending(s => s).Select(s => new
+            var files = Directory.GetFiles(HostEnvironment.WebRootPath + path).OrderByDescending(s => s).Select(s => new
             {
                 filename = Path.GetFileName(s),
                 path = s
-            }).ToPooledList();
+            });
             return ResultData(files);
         }
 
@@ -48,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
-        public ActionResult Read(string filename)
+        public ActionResult Read([FromBodyOrDefault] string filename)
         {
             if (System.IO.File.Exists(filename))
             {
@@ -64,7 +65,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="filename"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-        public ActionResult Save(string filename, string content)
+        public ActionResult Save([FromBodyOrDefault] string filename, [FromBodyOrDefault] string content)
         {
             try
             {
@@ -83,7 +84,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> Upload(string destination)
+        public async Task<ActionResult> Upload([FromBodyOrDefault] string destination)
         {
             var form = await Request.ReadFormAsync();
             foreach (var t in form.Files)

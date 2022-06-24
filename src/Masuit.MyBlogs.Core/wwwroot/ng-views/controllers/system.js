@@ -243,7 +243,7 @@ myApp.controller("log", ["$scope", function ($scope) {
 }]);
 myApp.controller("email", ["$scope", "$http", function ($scope) {
 	$scope.getfiles = function () {
-		$scope.request("/file/Getfiles", {path:"/template"}, function (data) {
+		$scope.get("/file/Getfiles?path=\\template", function (data) {
 			$scope.files = data.Data;
 		});
 	}
