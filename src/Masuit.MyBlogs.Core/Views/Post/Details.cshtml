@@ -3,7 +3,6 @@
 @using System.Web
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.Entity
-@using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.MyBlogs.Core.Views.Post
 @model Masuit.MyBlogs.Core.Models.Entity.Post
@@ -235,6 +234,9 @@
 								<input type="hidden" name="PostId" value="@Model.Id" />
 								<input type="hidden" id="OperatingSystem" name="OperatingSystem" />
 								<input type="hidden" name="Browser" id="Browser" />
+                                @if(hidden==nameof(hidden)) {
+                                    <p>@Context.Request.Cookies["NickName"] 您好！</p>
+                                }
 								<div class="row @hidden">
 									<div class="col-md-4">
 										<div class="input-group">
@@ -302,6 +304,9 @@
 			<input type="hidden" name="PostId" id="postId" value="@Model.Id" />
 			<input type="hidden" name="OperatingSystem" id="OperatingSystem2" />
 			<input type="hidden" name="Browser" id="Browser2" />
+            @if(hidden==nameof(hidden)) {
+                <p>@Context.Request.Cookies["NickName"] 您好！</p>
+            }
 			<div class="@hidden">
 				<div class="input-group">
 					<span class="input-group-addon">

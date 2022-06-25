@@ -23,6 +23,9 @@
         @Html.AntiForgeryToken()
         <input type="hidden" name="OperatingSystem" id="OperatingSystem" />
         <input type="hidden" name="Browser" id="Browser" />
+        @if(hidden==nameof(hidden)) {
+            <p>@Context.Request.Cookies["NickName"] 您好！</p>
+        }
         <div class="row @hidden">
             <div class="col-md-4">
                 <div class="input-group">
@@ -78,6 +81,9 @@
             @Html.AntiForgeryToken()
             <input type="hidden" name="OperatingSystem" id="OperatingSystem2" />
             <input type="hidden" name="Browser" id="Browser2" />
+            @if(hidden==nameof(hidden)) {
+                <p>@Context.Request.Cookies["NickName"] 您好！</p>
+            }
             <div class="@hidden">
                 <div class="input-group">
                     <span class="input-group-addon">
