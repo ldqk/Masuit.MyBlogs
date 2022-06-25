@@ -47,7 +47,10 @@
         /// </summary>
         public int VoteDownCount { get; set; }
 
-        public string CategoryName { get; set; }
+        /// <summary>
+        /// 分类id
+        /// </summary>
+        public int CategoryId { get; set; }
 
         /// <summary>
         /// 修改次数
@@ -88,5 +91,10 @@
         /// 提交人IP地址
         /// </summary>
         public string IP { get; set; }
+
+        /// <summary>
+        /// 所属专题名
+        /// </summary>
+        public int[] Seminars { get; set; }
     }
 }

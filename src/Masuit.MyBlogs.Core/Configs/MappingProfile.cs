@@ -49,7 +49,13 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<PostCommand, PostDto>().ReverseMap();
             CreateMap<PostHistoryVersion, PostDto>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ReverseMap();
             CreateMap<Post, PostViewModel>().ForMember(p => p.CategoryName, e => e.MapFrom(p => p.Category.Name)).ForMember(p => p.PostDate, e => e.MapFrom(p => p.PostDate.ToString("yyyy-MM-dd HH:mm:ss"))).ForMember(p => p.ModifyDate, e => e.MapFrom(p => p.ModifyDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
-            CreateMap<Post, PostDataModel>().ForMember(p => p.ModifyDate, e => e.MapFrom(p => p.ModifyDate)).ForMember(p => p.PostDate, e => e.MapFrom(p => p.PostDate)).ForMember(p => p.Status, e => e.MapFrom(p => p.Status.GetDisplay())).ForMember(p => p.ModifyCount, e => e.MapFrom(p => p.PostHistoryVersion.Count)).ForMember(p => p.ViewCount, e => e.MapFrom(p => p.TotalViewCount)).ForMember(p => p.LimitDesc, e => e.MapFrom(p => p.LimitMode > RegionLimitMode.All ? string.Format(p.LimitMode.GetDescription(), p.Regions, p.ExceptRegions) : "无限制"));
+            CreateMap<Post, PostDataModel>().ForMember(p => p.ModifyDate, e => e.MapFrom(p => p.ModifyDate))
+                .ForMember(p => p.PostDate, e => e.MapFrom(p => p.PostDate))
+                .ForMember(p => p.Status, e => e.MapFrom(p => p.Status.GetDisplay()))
+                .ForMember(p => p.ModifyCount, e => e.MapFrom(p => p.PostHistoryVersion.Count))
+                .ForMember(p => p.ViewCount, e => e.MapFrom(p => p.TotalViewCount))
+                .ForMember(p => p.Seminars, e => e.MapFrom(p => p.Seminar.Select(s => s.Id).ToArray()))
+                .ForMember(p => p.LimitDesc, e => e.MapFrom(p => p.LimitMode > RegionLimitMode.All ? string.Format(p.LimitMode.GetDescription(), p.Regions, p.ExceptRegions) : "无限制"));
 
             CreateMap<SearchDetails, SearchDetailsCommand>().ReverseMap();
             CreateMap<SearchDetails, SearchDetailsDto>().ReverseMap();

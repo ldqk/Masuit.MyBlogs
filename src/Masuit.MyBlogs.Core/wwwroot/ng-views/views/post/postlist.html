@@ -1,4 +1,9 @@
-﻿<div class="row">
+﻿<style>
+    td .xm-body {
+        position: unset
+    }
+</style>
+<div class="row">
     <div class="form-inline pull-left">
         <div class="input-group">
             <span class="input-group-addon">常规视图</span>
@@ -54,8 +59,11 @@
             <td title="'修改次数'" ng-if="!aclMode">
                 {{row.ModifyCount}}
             </td>
-            <td data-title="'分类'">
-                {{row.CategoryName}}
+            <td data-title="'分类'" style="width: 180px">
+                <div id="category-{{row.Id}}"></div>
+            </td>
+            <td data-title="'专题'" style="max-width: 270px">
+                <div id="seminar-{{row.Id}}"></div>
             </td>
             <td data-title="'标签'" style="max-width: 160px;" ng-if="!aclMode">
                 {{row.Label}}

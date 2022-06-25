@@ -112,6 +112,9 @@
             });
         }
     });
+    $scope.request("/seminar/getall", null, function(res) {
+        $scope.Seminars = res.Data;
+    });
 
     this.GetPageData = function (page, size) {
         var params = { page, size, kw: $scope.kw, orderby: $scope.orderby, cid: $scope.CategoryId };
@@ -131,6 +134,62 @@
             });
             self.stats = Enumerable.From(self.stats).Distinct().ToArray();
             localStorage.setItem("postlist-params",JSON.stringify(params));
+            $timeout(function () {
+                self.data.forEach(item => {
+                    let categories = angular.copy($scope.cat);
+                    categories.sort((a,b)=> (b.Id==item.CategoryId||b.Children.some(c=>c.Id==item.CategoryId||c.Children.some(cc=>cc.Id==item.CategoryId)))- (a.Id==item.CategoryId||a.Children.some(c=>c.Id==item.CategoryId||c.Children.some(cc=>cc.Id==item.CategoryId))));
+                    xmSelect.render({
+                        el: '#category-' + item.Id,
+                        tips: '未选择分类',
+                        radio: true,
+                        prop: {
+                            name: 'Name',
+                            value: 'Id',
+                            children: 'Children',
+                        },
+                        tree: {
+                            show: true,
+                            strict: false,
+                            expandedKeys: true,
+                        },
+                        filterable: true, //搜索功能
+                        data: categories,
+                        initValue: [item.CategoryId],
+                        on: function (data) {
+                            for (var i = 0; i < data.arr.length; i++) {
+                                $http.post(`/post/${item.Id}/ChangeCategory/${data.arr[i].Id}`).then(function (res) {
+                                    if (data.status >= 400) {
+                                        layer.msg("操作失败");
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    xmSelect.render({
+                        el: '#seminar-' + item.Id,
+                        tips: '未选择专题',
+                        prop: {
+                            name: 'Title',
+                            value: 'Id'
+                        },
+                        filterable: true, //搜索功能
+                        autoRow: true, //选项过多,自动换行
+                        data: $scope.Seminars,
+                        initValue: item.Seminars,
+                        on: function (data) {
+                            var arr=[];
+                            for (var i = 0; i < data.arr.length; i++) {
+                                arr.push(data.arr[i].Id);
+                            }
+                            $http.post(`/post/${item.Id}/ChangeSeminar/${arr.join(",")}`).then(function (res) {
+                                if (data.status >= 400) {
+                                    layer.msg("操作失败");
+                                }
+                            });
+                        }
+                    });
+                });
+            }, 1);
         });
     }
 

@@ -768,13 +768,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             p.Rss = p.LimitMode is null or RegionLimitMode.All;
             if (!string.IsNullOrEmpty(post.Seminars))
             {
-                var tmp = post.Seminars.Split(',').Distinct();
-                foreach (var s in tmp)
-                {
-                    var id = s.ToInt32();
-                    Seminar seminar = await SeminarService.GetByIdAsync(id);
-                    p.Seminar.Add(seminar);
-                }
+                var tmp = post.Seminars.Split(',').Distinct().Select(int.Parse).ToArray();
+                p.Seminar.AddRange(SeminarService[s => tmp.Contains(s.Id)]);
             }
 
             if (schedule)
@@ -959,6 +954,39 @@ namespace Masuit.MyBlogs.Core.Controllers
             var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
             post.DisableCopy = !post.DisableCopy;
             return ResultData(null, await PostService.SaveChangesAsync() > 0, post.DisableCopy ? $"已开启【{post.Title}】这篇文章的防复制功能！" : $"已关闭【{post.Title}】这篇文章的防复制功能！");
+        }
+
+        /// <summary>
+        /// 修改分类
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cid"></param>
+        /// <returns></returns>
+        [HttpPost("post/{id}/ChangeCategory/{cid}")]
+        public async Task<ActionResult> ChangeCategory(int id, int cid)
+        {
+            await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
+            {
+                CategoryId = cid
+            });
+            return Ok();
+        }
+
+        /// <summary>
+        /// 修改专题
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="sids"></param>
+        /// <returns></returns>
+        [HttpPost("post/{id}/ChangeSeminar/{sids}")]
+        public async Task<ActionResult> ChangeSeminar(int id, string sids)
+        {
+            var post = PostService[id] ?? throw new NotFoundException("文章不存在");
+            var ids = sids.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            post.Seminar.Clear();
+            post.Seminar.AddRange(SeminarService[s => ids.Contains(s.Id)]);
+            await PostService.SaveChangesAsync();
+            return Ok();
         }
 
         /// <summary>
