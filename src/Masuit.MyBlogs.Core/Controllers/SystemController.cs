@@ -48,17 +48,18 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IActionResult GetCounterHistory(string ip = null)
         {
             ip = ip.IfNullOrEmpty(() => SystemInfo.GetLocalUsedIP(AddressFamily.InterNetwork).ToString());
-            var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP == ip);
+            var time = DateTime.Now.AddDays(-15).GetTotalMilliseconds();
+            var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP == ip && c.Time >= time);
             var count = counters.Count();
             var ticks = count switch
             {
+                <= 5000 => count,
                 > 5000 and <= 10000 => 3,
                 > 10000 and <= 20000 => 6,
                 > 20000 and <= 50000 => 12,
                 > 50000 and <= 100000 => 24,
                 > 100000 and <= 200000 => 48,
-                > 200000 and <= 300000 => 72,
-                _ => count
+                _ => 72
             } * 10000;
 
             var list = count < 5000 ? counters.OrderBy(c => c.Time).ToList() : counters.GroupBy(c => c.Time / ticks).Select(g => new PerformanceCounter

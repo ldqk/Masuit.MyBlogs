@@ -120,7 +120,7 @@ public class PerfCounterInDatabase : IPerfCounter
 
         if (_dbContext.SaveChanges() > 0)
         {
-            var start = DateTime.Now.AddMonths(-6).GetTotalMilliseconds();
+            var start = DateTime.Now.AddMonths(-1).GetTotalMilliseconds();
             var tableName = _dbContext.Model.FindEntityType(typeof(PerformanceCounter)).GetTableName();
             _dbContext.Database.ExecuteSqlRaw($"DELETE FROM \"{tableName}\" WHERE \"{nameof(PerformanceCounter.Time)}\" <{start}");
         }
