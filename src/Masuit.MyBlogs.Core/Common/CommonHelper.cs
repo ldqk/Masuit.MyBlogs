@@ -14,13 +14,14 @@ using MaxMind.GeoIP2.Exceptions;
 using MaxMind.GeoIP2.Model;
 using MaxMind.GeoIP2.Responses;
 using Polly;
-using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Collections.Pooled;
+using SixLabors.ImageSharp;
 using TimeZoneConverter;
 using ArgumentException = System.ArgumentException;
+using Configuration = AngleSharp.Configuration;
 
 namespace Masuit.MyBlogs.Core.Common
 {
@@ -368,7 +369,7 @@ namespace Masuit.MyBlogs.Core.Common
                         SkipWatermarkForSmallImages = true,
                         SmallImagePixelsThreshold = 90000
                     };
-                    return watermarker.AddWatermark(SystemSettings["Watermark"], Color.LightGray, WatermarkPosition.BottomRight, 30);
+                    return watermarker.AddWatermark(SystemSettings["Watermark"], AppContext.BaseDirectory + "App_Data/华康勘亭流.ttf", 20, Color.LightGray, WatermarkPosition.BottomRight, 30);
                 }
                 catch
                 {

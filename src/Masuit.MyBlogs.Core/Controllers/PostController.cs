@@ -1,5 +1,4 @@
-﻿using AngleSharp;
-using CacheManager.Core;
+﻿using CacheManager.Core;
 using Collections.Pooled;
 using EFCoreSecondLevelCacheInterceptor;
 using Hangfire;
@@ -18,7 +17,6 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.MyBlogs.Core.Views.Post;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ModelBinder;
@@ -44,6 +42,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using Masuit.MyBlogs.Core.Views.Post;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -457,9 +456,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var post = await PostService.GetAsync(p => p.Id == dto.PostId && p.Status == Status.Published && !p.Locked) ?? throw new NotFoundException("文章未找到");
-            var htmlDiff = new HtmlDiff.HtmlDiff(post.Content.RemoveHtmlTag(), dto.Content.RemoveHtmlTag());
-            var diff = htmlDiff.Build();
-            if (post.Title.Equals(dto.Title) && !diff.Contains(new[] { "diffmod", "diffdel", "diffins" }))
+            if (post.Title.Equals(dto.Title) && post.Content.HammingDistance(dto.Content) == 0)
             {
                 return ResultData(null, false, "内容未被修改！");
             }
@@ -518,6 +515,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Content = dto.Title,
                 Link = "#/merge/compare?id=" + merge.Id
             });
+
+            var htmlDiff = new HtmlDiff.HtmlDiff(post.Content.RemoveHtmlTag(), dto.Content.RemoveHtmlTag());
+            var diff = htmlDiff.Build();
             var content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/merge-request.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8))
                 .Set("title", post.Title)
                 .Set("link", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id)
@@ -702,10 +702,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Post p = await PostService.GetByIdAsync(post.Id);
             if (post.Reserve && p.Status == Status.Published)
             {
-                var context = BrowsingContext.New(Configuration.Default);
-                var doc1 = await context.OpenAsync(req => req.Content(p.Content), cancellationToken);
-                var doc2 = await context.OpenAsync(req => req.Content(post.Content), cancellationToken);
-                if (doc1.Body.TextContent != doc2.Body.TextContent)
+                if (p.Content.HammingDistance(post.Content) > 0)
                 {
                     var history = p.Mapper<PostHistoryVersion>();
                     p.PostHistoryVersion.Add(history);
