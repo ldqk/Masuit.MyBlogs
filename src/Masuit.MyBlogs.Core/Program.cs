@@ -10,12 +10,15 @@ using System.Diagnostics;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-// 设置相关进程优先级为高于正常，防止其他进程影响应用程序的运行性能
-Process.GetProcessesByName("mysqld").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
-Process.GetProcessesByName("pg_ctl").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
-Process.GetProcessesByName("postgres").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
-Process.GetProcessesByName("redis-server").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
-Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.AboveNormal;
+if (Environment.OSVersion.Platform is not (PlatformID.MacOSX or PlatformID.Unix))
+{
+    // 设置相关进程优先级为高于正常，防止其他进程影响应用程序的运行性能
+    Process.GetProcessesByName("mysqld").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+    Process.GetProcessesByName("pg_ctl").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+    Process.GetProcessesByName("postgres").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+    Process.GetProcessesByName("redis-server").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+    Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.AboveNormal;
+}
 
 // 确保IP数据库正常
 if (!"223.5.5.5".GetIPLocation().Contains("阿里"))
@@ -52,7 +55,7 @@ static void InitOneDrive()
     //初始化
     if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "OneDrive.db")))
     {
-        File.Copy("App_Data\\OneDrive.template.db", "App_Data\\OneDrive.db");
+        File.Copy(Path.Combine("App_Data","OneDrive.template.db"), Path.Combine("App_Data","OneDrive.db"));
         Console.WriteLine("数据库创建成功");
     }
 
