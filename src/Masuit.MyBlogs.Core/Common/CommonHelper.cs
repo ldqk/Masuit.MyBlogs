@@ -369,7 +369,9 @@ namespace Masuit.MyBlogs.Core.Common
                         SkipWatermarkForSmallImages = true,
                         SmallImagePixelsThreshold = 90000
                     };
-                    return watermarker.AddWatermark(SystemSettings["Watermark"], AppContext.BaseDirectory + "App_Data/华康勘亭流.ttf", 20, Color.LightGray, WatermarkPosition.BottomRight, 30);
+                    var watermarkText = SystemSettings["Watermark"];
+                    var position = Enum.Parse<WatermarkPosition>(SystemSettings["WatermarkPosition"] ?? "3");
+                    return watermarker.AddWatermark(watermarkText, AppContext.BaseDirectory + "App_Data/华康勘亭流.ttf", 20, Color.LightGray, position, 30);
                 }
                 catch
                 {
