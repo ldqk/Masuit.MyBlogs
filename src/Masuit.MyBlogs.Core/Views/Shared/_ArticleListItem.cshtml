@@ -30,8 +30,9 @@
 				string imgSrc = Model.Content.MatchFirstImgSrc();
 				if (!string.IsNullOrEmpty(imgSrc))
 				{
+					imgSrc += "?width=140&format=webp&quality=50";
 					<div class="col-md-2 paddingright-clear hidden-xs">
-						<img class="img-thumbnail img-responsive thumb lazyload" decoding="async" loading="lazy" data-src="@imgSrc" alt="@CommonHelper.SystemSettings["Title"]" title="@CommonHelper.SystemSettings["Title"] ">
+						<img class="img-thumbnail img-responsive thumb lazyload" decoding="async" loading="lazy" data-src="@imgSrc?width=140&format=webp&quality=50" alt="@CommonHelper.SystemSettings["Title"]" title="@CommonHelper.SystemSettings["Title"] ">
 					</div>
 				}
 			}

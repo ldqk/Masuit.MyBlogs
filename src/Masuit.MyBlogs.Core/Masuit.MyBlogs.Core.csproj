@@ -70,6 +70,7 @@
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.22" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
+        <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.2" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.19" />
         <PackageReference Include="TimeZoneConverter" Version="5.0.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.0" />

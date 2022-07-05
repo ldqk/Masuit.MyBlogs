@@ -23,7 +23,13 @@ using Masuit.Tools.Core.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using Polly;
+using SixLabors.ImageSharp.Web.Caching;
+using SixLabors.ImageSharp.Web.Commands;
+using SixLabors.ImageSharp.Web.DependencyInjection;
+using SixLabors.ImageSharp.Web.Processors;
+using SixLabors.ImageSharp.Web.Providers;
 using System.Net;
+using Microsoft.IO;
 
 namespace Masuit.MyBlogs.Core
 {
@@ -161,6 +167,31 @@ namespace Masuit.MyBlogs.Core
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMapper().AddMyMvc();
+            services.AddImageSharp(options =>
+                {
+                    options.MemoryStreamManager = new RecyclableMemoryStreamManager();
+                    options.BrowserMaxAge = TimeSpan.FromDays(7);
+                    options.CacheMaxAge = TimeSpan.FromDays(365);
+                    options.Configuration = SixLabors.ImageSharp.Configuration.Default;
+                }).SetRequestParser<QueryCollectionRequestParser>()
+                .Configure<PhysicalFileSystemCacheOptions>(options =>
+                {
+                    options.CacheRootPath = null;
+                    options.CacheFolder = "static/image_cache";
+                })
+                .SetCache<PhysicalFileSystemCache>()
+                .SetCacheKey<UriRelativeLowerInvariantCacheKey>()
+                .SetCacheHash<SHA256CacheHash>()
+                .Configure<PhysicalFileSystemProviderOptions>(options =>
+                {
+                    options.ProviderRootPath = null;
+                })
+                .AddProvider<PhysicalFileSystemProvider>()
+                .AddProcessor<ResizeWebProcessor>()
+                .AddProcessor<FormatWebProcessor>()
+                .AddProcessor<BackgroundColorWebProcessor>()
+                .AddProcessor<QualityWebProcessor>()
+                .AddProcessor<AutoOrientWebProcessor>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
@@ -200,7 +231,7 @@ namespace Masuit.MyBlogs.Core
 
             app.UseBundles();
             app.SetupHttpsRedirection(Configuration);
-            app.UseDefaultFiles().UseStaticFiles();
+            app.UseDefaultFiles().UseImageSharp().UseStaticFiles();
             app.UseSession().UseCookiePolicy(); //注入Session
             app.UseWhen(c => c.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true, builder =>
             {

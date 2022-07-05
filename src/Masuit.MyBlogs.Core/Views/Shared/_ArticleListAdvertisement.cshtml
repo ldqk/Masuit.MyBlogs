@@ -10,7 +10,7 @@
         <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
             <div class="row padding-bot10">
                 <div class="col-sm-2 hidden-xs paddingright-clear">
-                    <img class="img-thumbnail img-responsive thumb" src="@Model.ThumbImgUrl" alt="@Model.Title" title="@Model.Title" decoding="async">
+                    <img class="img-thumbnail img-responsive thumb" src="@(Model.ThumbImgUrl+"?width=180&format=webp&quality=50")" alt="@Model.Title" title="@Model.Title" decoding="async">
                 </div>
                 <div class="col-sm-10 col-xs-12">
                     <p>

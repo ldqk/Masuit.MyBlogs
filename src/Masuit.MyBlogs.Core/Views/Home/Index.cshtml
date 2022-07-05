@@ -37,7 +37,7 @@
                 Random r = new Random();
                 <div class="item @(i == 0 ? "active" : "")" class="img-responsive" id="@Stopwatch.GetTimestamp()">
                     <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@p.Id" target="_blank" data-animation="animated @ani[r.Next(ani.Length)]">
-                        <img src="@p.ImageUrl" title="@p.Title" alt="@p.Description" decoding="async"/>
+                        <img src="@(p.ImageUrl+"?width=1800&format=webp")" title="@p.Title" alt="@p.Description" decoding="async"/>
                     </a>
                 </div>
             }

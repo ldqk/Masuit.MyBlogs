@@ -76,7 +76,7 @@
                 </div>
                 <div class="panel-body" id="@Stopwatch.GetTimestamp()">
                     <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
-                        <img class="img img-responsive" src="@ad.ThumbImgUrl" alt="@ad.Title" title="@ad.Title" decoding="async"/>
+                        <img class="img img-responsive" src="@(ad.ThumbImgUrl+"?width=300&format=webp&quality=50")" alt="@ad.Title" title="@ad.Title" decoding="async"/>
                     </a>
                 </div>
             </article>
