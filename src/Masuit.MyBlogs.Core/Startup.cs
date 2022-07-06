@@ -29,6 +29,7 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using System.Net;
+using System.Text.RegularExpressions;
 using Microsoft.IO;
 
 namespace Masuit.MyBlogs.Core
@@ -231,7 +232,7 @@ namespace Masuit.MyBlogs.Core
 
             app.UseBundles();
             app.SetupHttpsRedirection(Configuration);
-            app.UseDefaultFiles().UseImageSharp().UseStaticFiles();
+            app.UseDefaultFiles().UseWhen(c => Regex.IsMatch(c.Request.Path.Value + "", @"(\.jpg|\.jpeg|\.png|\.bmp|\.webp|\.tiff|\.pbm)$", RegexOptions.IgnoreCase), builder => builder.UseImageSharp()).UseStaticFiles();
             app.UseSession().UseCookiePolicy(); //注入Session
             app.UseWhen(c => c.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true, builder =>
             {
