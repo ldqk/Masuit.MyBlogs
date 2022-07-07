@@ -23,15 +23,6 @@ public class LoggerDbContext : DbContext
     {
         modelBuilder.Entity<RequestLogDetail>().HasKey(e => new { e.Id, e.Time });
         modelBuilder.Entity<PerformanceCounter>().HasKey(e => e.Time);
-
-        if (Database.IsNpgsql() || Database.IsSqlite())
-        {
-            modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("random");
-        }
-        else
-        {
-            modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("RAND");
-        }
     }
 }
 

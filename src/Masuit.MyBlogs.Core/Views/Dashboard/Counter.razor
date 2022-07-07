@@ -166,7 +166,7 @@
     
     public Dictionary<string, dynamic> GetCounterPercent()
     {
-        using var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==ip).OrderBy(c => Guid.NewGuid()).Take(5000).ToPooledList();
+        using var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==ip).OrderByRandom().Take(5000).ToPooledList();
         var count = counters.Count();
         return new()
         {

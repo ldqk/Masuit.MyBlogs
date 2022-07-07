@@ -73,17 +73,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure
             modelBuilder.Entity<PostVisitRecordStats>().HasIndex(a => a.Date).HasSortOrder(SortOrder.Descending);
             modelBuilder.Entity<PostVisitRecordStats>().HasIndex(a => a.PostId).HasSortOrder(SortOrder.Ascending);
             modelBuilder.Entity<SearchDetails>().HasIndex(a => a.SearchTime).HasSortOrder(SortOrder.Descending);
-
-            if (Database.IsNpgsql() || Database.IsSqlite())
-            {
-                modelBuilder.HasDbFunction(typeof(DataContext).GetMethod(nameof(Random))).HasName("random");
-                modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("random");
-            }
-            else
-            {
-                modelBuilder.HasDbFunction(typeof(DataContext).GetMethod(nameof(Random))).HasName("RAND");
-                modelBuilder.HasDbFunction(typeof(Guid).GetMethod(nameof(Guid.NewGuid))).HasName("RAND");
-            }
         }
 
         public override int SaveChanges()
@@ -162,8 +151,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure
 
         public virtual DbSet<Seminar> Seminar { get; set; }
 
-        //public virtual DbSet<SeminarPost> SeminarPosts { get; set; }
-        //public virtual DbSet<SeminarPostHistoryVersion> SeminarPostHistoryVersions { get; set; }
         public virtual DbSet<InternalMessage> InternalMessage { get; set; }
 
         public virtual DbSet<FastShare> FastShare { get; set; }
@@ -177,8 +164,5 @@ namespace Masuit.MyBlogs.Core.Infrastructure
         public virtual DbSet<LinkLoopback> LinkLoopbacks { get; set; }
 
         public virtual DbSet<PostTag> PostTags { get; set; }
-
-        [DbFunction]
-        public static double Random() => throw new NotSupportedException();
     }
 }

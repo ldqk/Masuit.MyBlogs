@@ -403,17 +403,6 @@ namespace Masuit.MyBlogs.Core.Common
         {
             return ToTimeZone(time, zone).ToString(format);
         }
-
-        /// <summary>
-        /// 随机排序
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static IOrderedQueryable<T> OrderByRandom<T>(this IQueryable<T> source)
-        {
-            return source.OrderBy(_ => DataContext.Random());
-        }
     }
 
     public class IPLocation

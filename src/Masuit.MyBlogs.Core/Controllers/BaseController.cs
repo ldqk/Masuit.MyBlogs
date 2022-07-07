@@ -22,8 +22,6 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Masuit.MyBlogs.Core.Models.Enum;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
-using Newtonsoft.Json.Linq;
-using static Lucene.Net.Util.Fst.Util;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {

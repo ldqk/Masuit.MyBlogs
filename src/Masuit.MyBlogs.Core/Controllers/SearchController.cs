@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.International.Converters.TraditionalChineseToSimplifiedConverter;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
+using Masuit.Tools;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -40,7 +41,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             ViewBag.PageSize = size;
             ViewBag.Keyword = wd;
-            if (!string.IsNullOrWhiteSpace(wd))
+            if (!wd.IsNullOrEmpty())
             {
                 var posts = postService.SearchPage(page, size, wd);
                 CheckPermission(posts.Results);

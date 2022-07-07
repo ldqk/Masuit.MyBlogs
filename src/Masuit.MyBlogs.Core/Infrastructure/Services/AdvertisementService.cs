@@ -10,6 +10,7 @@ using Masuit.Tools;
 using Masuit.Tools.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -73,7 +74,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                     where = where.And(a => Regex.IsMatch(a.Title + a.Description, regex));
                 }
 
-                var list = GetQuery(where).OrderBy(a => -Math.Log(DataContext.Random()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1)))).Take(count).ToList();
+                var list = GetQuery(where).OrderBy(a => -Math.Log(EF.Functions.Random()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1)))).Take(count).ToList();
                 if (list.Count == 0 && keywords is { Length: > 0 })
                 {
                     return GetsByWeightedPrice(count, type, ipinfo, cid);
