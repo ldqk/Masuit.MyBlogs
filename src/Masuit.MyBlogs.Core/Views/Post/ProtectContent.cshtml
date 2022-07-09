@@ -83,11 +83,11 @@
     return;
 }
 @if(Model.ProtectContentMode==ProtectContentMode.Regions) {
-    if (Model.ProtectContentLimitMode==RegionLimitMode.AllowRegion&&Regex.IsMatch(Context.Request.Location(),Model.ProtectContentRegions)) {
+    if (Model.ProtectContentLimitMode==RegionLimitMode.AllowRegion&&Regex.IsMatch(Context.Request.Location(),Model.ProtectContentRegions, RegexOptions.IgnoreCase)) {
         @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
         return;
     }
-    if (Model.ProtectContentLimitMode==RegionLimitMode.ForbidRegion&&!Regex.IsMatch(Context.Request.Location(),Model.ProtectContentRegions)) {
+    if (Model.ProtectContentLimitMode==RegionLimitMode.ForbidRegion&&!Regex.IsMatch(Context.Request.Location(),Model.ProtectContentRegions, RegexOptions.IgnoreCase)) {
         @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
         return;
     }

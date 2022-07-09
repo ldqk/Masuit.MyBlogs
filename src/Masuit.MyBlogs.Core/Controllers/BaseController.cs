@@ -250,20 +250,20 @@ namespace Masuit.MyBlogs.Core.Controllers
                 switch (p.LimitMode)
                 {
                     case RegionLimitMode.AllowRegion:
-                        return !Regex.IsMatch(location, p.Regions);
+                        return !Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase);
 
                     case RegionLimitMode.ForbidRegion:
-                        return Regex.IsMatch(location, p.Regions);
+                        return Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase);
 
                     case RegionLimitMode.AllowRegionExceptForbidRegion:
-                        if (Regex.IsMatch(location, p.ExceptRegions))
+                        if (Regex.IsMatch(location, p.ExceptRegions, RegexOptions.IgnoreCase))
                         {
                             return true;
                         }
 
                         goto case RegionLimitMode.AllowRegion;
                     case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                        if (Regex.IsMatch(location, p.ExceptRegions))
+                        if (Regex.IsMatch(location, p.ExceptRegions, RegexOptions.IgnoreCase))
                         {
                             return false;
                         }
@@ -305,9 +305,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             return where.And(p => p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true :
-                   p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions) :
-                   p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions) :
-                   p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions) && !Regex.IsMatch(location, p.ExceptRegions) : !Regex.IsMatch(location, p.Regions) || Regex.IsMatch(location, p.ExceptRegions));
+                   p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase) :
+                   p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase) :
+                   p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase) && !Regex.IsMatch(location, p.ExceptRegions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase) || Regex.IsMatch(location, p.ExceptRegions, RegexOptions.IgnoreCase));
         }
 
         protected void CheckPermission(Post post)
@@ -334,7 +334,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     break;
 
                 case RegionLimitMode.AllowRegion:
-                    if (!Regex.IsMatch(location, post.Regions))
+                    if (!Regex.IsMatch(location, post.Regions, RegexOptions.IgnoreCase))
                     {
                         Disallow(post);
                     }
@@ -342,7 +342,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     break;
 
                 case RegionLimitMode.ForbidRegion:
-                    if (Regex.IsMatch(location, post.Regions))
+                    if (Regex.IsMatch(location, post.Regions, RegexOptions.IgnoreCase))
                     {
                         Disallow(post);
                     }
@@ -350,14 +350,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                     break;
 
                 case RegionLimitMode.AllowRegionExceptForbidRegion:
-                    if (Regex.IsMatch(location, post.ExceptRegions))
+                    if (Regex.IsMatch(location, post.ExceptRegions, RegexOptions.IgnoreCase))
                     {
                         Disallow(post);
                     }
 
                     goto case RegionLimitMode.AllowRegion;
                 case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                    if (Regex.IsMatch(location, post.ExceptRegions))
+                    if (Regex.IsMatch(location, post.ExceptRegions, RegexOptions.IgnoreCase))
                     {
                         break;
                     }

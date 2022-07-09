@@ -113,7 +113,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var regex = SearchEngine.LuceneIndexSearcher.CutKeywords(string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label).Select(Regex.Escape).Join("|");
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId, regex);
-            var related = await PostService.GetQuery(PostBaseWhere().And(p => p.Id != id && Regex.IsMatch(p.Title + (p.Keyword ?? "") + (p.Label ?? ""), regex)), p => p.AverageViewCount, false).Take(10).Select(p => new { p.Id, p.Title }).Cacheable().ToDictionaryAsync(p => p.Id, p => p.Title);
+            var related = await PostService.GetQuery(PostBaseWhere().And(p => p.Id != id && Regex.IsMatch(p.Title + (p.Keyword ?? "") + (p.Label ?? ""), regex, RegexOptions.IgnoreCase)), p => p.AverageViewCount, false).Take(10).Select(p => new { p.Id, p.Title }).Cacheable().ToDictionaryAsync(p => p.Id, p => p.Title);
             ViewBag.Related = related;
             post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -641,8 +641,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (!string.IsNullOrEmpty(kw))
             {
                 kw = Regex.Escape(kw);
-                where = where.And(p => Regex.IsMatch(p.Title + p.Author + p.Email + p.Content, kw));
+                where = where.And(p => Regex.IsMatch(p.Title + p.Author + p.Email + p.Content, kw, RegexOptions.IgnoreCase));
             }
+
             var list = orderby switch
             {
                 OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.Status).ThenByDescending(p => p.IsFixedTop).ThenByDescending(p => p.PostVisitRecordStats.Sum(t => t.Count) / p.PostVisitRecordStats.Count).ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig),
@@ -1118,7 +1119,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (!string.IsNullOrEmpty(kw))
             {
                 kw = Regex.Escape(kw);
-                where = where.And(e => Regex.IsMatch(e.IP + e.Location + e.Referer + e.RequestUrl, kw));
+                where = where.And(e => Regex.IsMatch(e.IP + e.Location + e.Referer + e.RequestUrl, kw, RegexOptions.IgnoreCase));
             }
 
             var pages = await PostVisitRecordService.GetPagesAsync<DateTime, PostVisitRecordViewModel>(page, size, where, e => e.Time, false);

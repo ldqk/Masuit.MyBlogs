@@ -281,7 +281,12 @@ namespace Masuit.MyBlogs.Core.Controllers
         protected Expression<Func<Post, bool>> PostBaseWhere()
         {
             var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
-            return p => p.Status == Status.Published && p.LimitMode != RegionLimitMode.OnlyForSearchEngine && (p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true : p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions) : p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions) : p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions) && !Regex.IsMatch(location, p.ExceptRegions) : !Regex.IsMatch(location, p.Regions) || Regex.IsMatch(location, p.ExceptRegions));
+            return p => p.Status == Status.Published && p.LimitMode != RegionLimitMode.OnlyForSearchEngine
+                && (p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true :
+                    p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase) :
+                    p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase) :
+                    p.LimitMode == RegionLimitMode.AllowRegionExceptForbidRegion ? Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase) && !Regex.IsMatch(location, p.ExceptRegions, RegexOptions.IgnoreCase) :
+                    !Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase) || Regex.IsMatch(location, p.ExceptRegions, RegexOptions.IgnoreCase));
         }
 
         private void CheckPermission(Post post)
@@ -294,7 +299,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     break;
 
                 case RegionLimitMode.AllowRegion:
-                    if (!Regex.IsMatch(location, post.Regions) && !Request.IsRobot())
+                    if (!Regex.IsMatch(location, post.Regions, RegexOptions.IgnoreCase) && !Request.IsRobot())
                     {
                         Disallow(post);
                     }
@@ -302,7 +307,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     break;
 
                 case RegionLimitMode.ForbidRegion:
-                    if (Regex.IsMatch(location, post.Regions) && !Request.IsRobot())
+                    if (Regex.IsMatch(location, post.Regions, RegexOptions.IgnoreCase) && !Request.IsRobot())
                     {
                         Disallow(post);
                     }
@@ -310,14 +315,14 @@ namespace Masuit.MyBlogs.Core.Controllers
                     break;
 
                 case RegionLimitMode.AllowRegionExceptForbidRegion:
-                    if (Regex.IsMatch(location, post.ExceptRegions))
+                    if (Regex.IsMatch(location, post.ExceptRegions, RegexOptions.IgnoreCase))
                     {
                         Disallow(post);
                     }
 
                     goto case RegionLimitMode.AllowRegion;
                 case RegionLimitMode.ForbidRegionExceptAllowRegion:
-                    if (Regex.IsMatch(location, post.ExceptRegions))
+                    if (Regex.IsMatch(location, post.ExceptRegions, RegexOptions.IgnoreCase))
                     {
                         break;
                     }

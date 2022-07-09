@@ -57,7 +57,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 var atype = type.ToString("D");
                 Expression<Func<Advertisement, bool>> where = a => a.Types.Contains(atype) && a.Status == Status.Available;
                 var catCount = CategoryRepository.Count(_ => true);
-                where = where.And(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions) : !Regex.IsMatch(location, a.Regions)));
+                where = where.And(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase)));
                 if (cid.HasValue)
                 {
                     var pids = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => c.ParentId + "|" + c.Parent.ParentId).Cacheable().ToArray();
