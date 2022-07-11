@@ -102,10 +102,14 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.CommentsCount = CommentService.Count(c => c.PostId == id && c.ParentId == null && c.Status == Status.Published);
             ViewBag.HistoryCount = PostHistoryVersionService.Count(c => c.PostId == id);
             ViewBag.Keyword = post.Keyword + "," + post.Label;
-            ViewBag.Desc = await post.Content.GetSummary(200);
+            ViewBag.Desc = "若页面无法访问，可通过搜索引擎网页快照进行浏览。" + await post.Content.GetSummary(200);
             var modifyDate = post.ModifyDate;
             ViewBag.Next = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.LimitMode ?? 0) == RegionLimitMode.All && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate);
             ViewBag.Prev = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.LimitMode ?? 0) == RegionLimitMode.All && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate, false);
+            ViewData[nameof(post.Author)] = post.Author;
+            ViewData[nameof(post.PostDate)] = post.PostDate;
+            ViewData[nameof(post.ModifyDate)] = post.ModifyDate;
+            ViewData["cover"] = post.Content.MatchFirstImgSrc();
             if (!string.IsNullOrEmpty(kw))
             {
                 await PostService.Highlight(post, kw);
@@ -119,6 +123,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             post.Content = ReplaceVariables(post.Content);
             post.ProtectContent = ReplaceVariables(post.ProtectContent);
+
             if (CurrentUser.IsAdmin)
             {
                 return View("Details_Admin", post);
@@ -165,17 +170,21 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "hid" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> HistoryVersion(int id, int hid)
         {
-            var post = await PostHistoryVersionService.GetAsync(v => v.Id == hid && (v.Post.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
-            CheckPermission(post.Post);
-            post.Content = ReplaceVariables(post.Content);
-            post.ProtectContent = ReplaceVariables(post.ProtectContent);
-            post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-            var next = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate > post.ModifyDate, p => p.ModifyDate);
-            var prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < post.ModifyDate, p => p.ModifyDate, false);
+            var history = await PostHistoryVersionService.GetAsync(v => v.Id == hid && (v.Post.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
+            CheckPermission(history.Post);
+            history.Content = ReplaceVariables(history.Content);
+            history.ProtectContent = ReplaceVariables(history.ProtectContent);
+            history.ModifyDate = history.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+            var next = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate > history.ModifyDate, p => p.ModifyDate);
+            var prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < history.ModifyDate, p => p.ModifyDate, false);
             ViewBag.Next = next;
             ViewBag.Prev = prev;
-            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId, post.Label);
-            return CurrentUser.IsAdmin ? View("HistoryVersion_Admin", post) : View(post);
+            ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), history.CategoryId, history.Label);
+            ViewData[nameof(history.Post.Author)] = history.Post.Author;
+            ViewData[nameof(history.Post.PostDate)] = history.Post.PostDate;
+            ViewData[nameof(history.ModifyDate)] = history.ModifyDate;
+            ViewData["cover"] = history.Content.MatchFirstImgSrc();
+            return CurrentUser.IsAdmin ? View("HistoryVersion_Admin", history) : View(history);
         }
 
         /// <summary>

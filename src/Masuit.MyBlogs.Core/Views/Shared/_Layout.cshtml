@@ -15,6 +15,8 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using StackExchange.Profiling
 @using Collections.Pooled
+@using Masuit.Tools.AspNetCore.Extensions
+
 @{
     string[] colors = { "success", "info", "warning", "danger", "default" };
     List<Menu> menus = _menuService.GetQueryFromCache(m => m.Status == Status.Available,m => m.Sort).ToPooledList().ToTree(m => m.Id,m => m.ParentId);
@@ -32,13 +34,21 @@
     <title>@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])</title>
     <meta name="keywords" content="@(CommonHelper.SystemSettings["Keyword"]+","+ViewBag.Keyword)" />
     <meta name="description" content="@ViewBag.Desc" />
-    <meta content="telephone=no" name="format-detection">
-    <meta content="#ffffff" name="theme-color">
-    <meta content="website" property="og:type">
-    <meta content="@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])" property="og:title">
-    <meta content="@Context.Request.GetEncodedUrl()" property="og:url">
-    <meta content="zh_CN" property="og:locale">
-    <meta content="summary" name="twitter:card">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="twitter:card" content="summary">
+    <meta property="og:title" content="@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])">
+    <meta property="og:description" content="@ViewBag.Desc">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="@Context.Request.GetEncodedUrl()">
+    <meta property="og:image" content="@ViewData.GetValueOrDefault("cover",() => "/favicon.png")" />
+    <meta property="og:image:alt" content="@ViewBag.Desc" />
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:author" content="@ViewData.GetValueOrDefault(nameof(Post.Author),() => CommonHelper.SystemSettings["Title"])" />
+    <meta property="og:release_date" content="@ViewData.GetValueOrDefault(nameof(Post.PostDate),() => DateTime.Now)" />
+    <meta property="article:author" content="@ViewData.GetValueOrDefault(nameof(Post.Author),() => CommonHelper.SystemSettings["Title"])" />
+    <meta property="article:published_time" content="@ViewData.GetValueOrDefault(nameof(Post.PostDate),() => DateTime.Now)">
+    <meta property="article:modified_time" content="@ViewData.GetValueOrDefault(nameof(Post.ModifyDate),() => DateTime.Now)">
     <link href="@Context.Request.GetEncodedUrl()" rel="canonical">
     <link href="//cdn.staticfile.org" rel="preconnect">
     @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Styles", ""))
