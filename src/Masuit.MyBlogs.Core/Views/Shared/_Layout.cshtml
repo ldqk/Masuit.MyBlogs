@@ -45,10 +45,10 @@
     <meta property="og:image:alt" content="@ViewBag.Desc" />
     <meta property="og:locale" content="zh_CN">
     <meta property="og:author" content="@ViewData.GetValueOrDefault(nameof(Post.Author),() => CommonHelper.SystemSettings["Title"])" />
-    <meta property="og:release_date" content="@ViewData.GetValueOrDefault(nameof(Post.PostDate),() => DateTime.Now)" />
+    <meta property="og:release_date" content="@ViewData.GetValueOrDefault(nameof(Post.PostDate),() => DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss")" />
     <meta property="article:author" content="@ViewData.GetValueOrDefault(nameof(Post.Author),() => CommonHelper.SystemSettings["Title"])" />
-    <meta property="article:published_time" content="@ViewData.GetValueOrDefault(nameof(Post.PostDate),() => DateTime.Now)">
-    <meta property="article:modified_time" content="@ViewData.GetValueOrDefault(nameof(Post.ModifyDate),() => DateTime.Now)">
+    <meta property="article:published_time" content="@ViewData.GetValueOrDefault(nameof(Post.PostDate),() => DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss")">
+    <meta property="article:modified_time" content="@ViewData.GetValueOrDefault(nameof(Post.ModifyDate),() => DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss")">
     <link href="@Context.Request.GetEncodedUrl()" rel="canonical">
     <link href="//cdn.staticfile.org" rel="preconnect">
     @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Styles", ""))
