@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Masuit.MyBlogs.Core.Common;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Lucene.Net.Sandbox.Queries;
-using OpenXmlPowerTools;
 
 namespace Masuit.MyBlogs.Core.Infrastructure;
 

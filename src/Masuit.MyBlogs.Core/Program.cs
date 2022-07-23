@@ -55,7 +55,7 @@ static void InitOneDrive()
     //初始化
     if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "OneDrive.db")))
     {
-        File.Copy(Path.Combine("App_Data","OneDrive.template.db"), Path.Combine("App_Data","OneDrive.db"));
+        File.Copy(Path.Combine("App_Data", "OneDrive.template.db"), Path.Combine("App_Data", "OneDrive.db"));
         Console.WriteLine("数据库创建成功");
     }
 

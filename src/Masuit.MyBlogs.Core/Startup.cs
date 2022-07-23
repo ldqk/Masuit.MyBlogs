@@ -30,6 +30,7 @@ using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using System.Net;
 using System.Text.RegularExpressions;
+using Masuit.Tools.AspNetCore.Extensions;
 using Microsoft.IO;
 
 namespace Masuit.MyBlogs.Core
@@ -165,6 +166,7 @@ namespace Masuit.MyBlogs.Core
             services.SetupMiniProfile();
             services.AddSingleton<IMimeMapper, MimeMapper>(p => new MimeMapper());
             services.AddOneDrive();
+            services.AutoRegisterServices();
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddMapper().AddMyMvc();
