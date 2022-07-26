@@ -28,7 +28,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Index([FromServices] IWebHostEnvironment hostEnvironment)
         {
             var list = await LinksService.GetQueryFromCacheAsync<bool, LinksDto>(l => l.Status == Status.Available, l => l.Recommend, false);
-            ViewBag.Html = await new FileInfo(Path.Combine(hostEnvironment.WebRootPath, "template", "links.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8);
+            var html = await new FileInfo(Path.Combine(hostEnvironment.WebRootPath, "template", "links.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8);
+            ViewBag.Html = ReplaceVariables(html);
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location());
             return CurrentUser.IsAdmin ? View("Index_Admin", list) : View(list);
         }
