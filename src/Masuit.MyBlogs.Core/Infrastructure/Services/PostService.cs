@@ -100,7 +100,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 var searchResult = SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
                 using var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).DistinctBy(s => s.Entity.Id).ToPooledList();
                 var ids = entities.Select(s => s.Entity.Id).ToArray();
-                var dic = GetQuery<PostDto>(p => ids.Contains(p.Id)).ToDictionary(p => p.Id);
+                var dic = GetQuery<PostDto>(p => ids.Contains(p.Id) && p.LimitMode != RegionLimitMode.OnlyForSearchEngine).ToDictionary(p => p.Id);
                 var posts = entities.Where(s => dic.ContainsKey(s.Entity.Id)).Select(s => dic[s.Entity.Id]).ToList();
                 var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
                 var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };

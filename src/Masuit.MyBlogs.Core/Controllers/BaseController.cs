@@ -229,9 +229,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return;
             }
 
+            posts.RemoveAll(p => p.LimitMode == RegionLimitMode.OnlyForSearchEngine);
             if (VisitorTokenValid || CommonHelper.IPWhiteList.Contains(ClientIP))
             {
-                posts.RemoveAll(p => p.LimitMode == RegionLimitMode.OnlyForSearchEngine);
                 return;
             }
 
