@@ -246,7 +246,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             {
                 nameof(DataContext.Post),
             });
-            var list = postService.GetQuery(i => i.Status != Status.Published).ToList();
+            var list = postService.GetQuery(p => p.Status != Status.Published || p.LimitMode == RegionLimitMode.OnlyForSearchEngine).ToList();
             searchEngine.LuceneIndexer.Delete(list);
         }
 

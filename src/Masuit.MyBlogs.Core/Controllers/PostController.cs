@@ -747,6 +747,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "文章修改失败！");
             }
 
+            if (p.LimitMode == RegionLimitMode.OnlyForSearchEngine)
+            {
+                SearchEngine.LuceneIndexer.Delete(p);
+            }
             return ResultData(p.Mapper<PostDto>(), message: "文章修改成功！");
         }
 
@@ -805,6 +809,11 @@ namespace Masuit.MyBlogs.Core.Controllers
             if (!b)
             {
                 return ResultData(null, false, "文章发表失败！");
+            }
+
+            if (p.LimitMode == RegionLimitMode.OnlyForSearchEngine)
+            {
+                SearchEngine.LuceneIndexer.Delete(p);
             }
 
             return ResultData(null, true, "文章发表成功！");
