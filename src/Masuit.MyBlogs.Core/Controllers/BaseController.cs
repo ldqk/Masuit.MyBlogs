@@ -53,7 +53,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <summary>
         /// 普通访客是否token合法
         /// </summary>
-        public bool VisitorTokenValid => Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Request.Cookies["FullAccessToken"]);
+        public bool VisitorTokenValid => Request.Cookies.ContainsKey("FullAccessToken") && Request.Cookies["Email"].MDString(AppConfig.BaiduAK).Equals(Request.Cookies["FullAccessToken"]);
 
         public int[] HideCategories => Request.GetHideCategories();
 

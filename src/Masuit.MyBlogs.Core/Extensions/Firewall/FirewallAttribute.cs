@@ -29,7 +29,7 @@ public class FirewallAttribute : IAsyncActionFilter
     {
         var request = context.HttpContext.Request;
         var ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
-        var tokenValid = request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]);
+        var tokenValid = request.Cookies.ContainsKey("FullAccessToken") && request.Cookies["Email"].MDString(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]);
 
         //黑名单
         if (ip.IsDenyIpAddress() && !tokenValid)

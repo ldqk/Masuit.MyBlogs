@@ -23,6 +23,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Collections.Pooled;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Masuit.MyBlogs.Core
 {
@@ -135,6 +136,10 @@ namespace Masuit.MyBlogs.Core
 
         public static void ConfigureOptions(this IServiceCollection services)
         {
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressInferBindingSourcesForParameters = true;
+            }); //将多个来源绑定到同一个类或参数
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.MinimumSameSitePolicy = SameSiteMode.Lax;

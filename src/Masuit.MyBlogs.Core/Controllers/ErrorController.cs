@@ -167,7 +167,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Expires = DateTime.Now.AddYears(1),
                 SameSite = SameSiteMode.Lax
             });
-            Response.Cookies.Append("FullAccessToken", email.MDString3(AppConfig.BaiduAK), new CookieOptions
+            Response.Cookies.Append("FullAccessToken", email.MDString(AppConfig.BaiduAK), new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(1),
                 SameSite = SameSiteMode.Lax
