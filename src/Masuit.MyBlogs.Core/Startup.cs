@@ -208,11 +208,9 @@ namespace Masuit.MyBlogs.Core
         /// <param name="env"></param>
         /// <param name="hangfire"></param>
         /// <param name="luceneIndexerOptions"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions, DataContext maindb, LoggerDbContext loggerdb)
         {
             ServiceProvider = app.ApplicationServices;
-            var maindb = ServiceProvider.GetRequiredService<DataContext>();
-            var loggerdb = ServiceProvider.GetRequiredService<LoggerDbContext>();
             maindb.Database.EnsureCreated();
             if (loggerdb.Database.EnsureCreated())
             {

@@ -91,6 +91,7 @@ public class FirewallController : Controller
     /// <param name="env"></param>
     /// <returns></returns>
     [HttpGet("/craw/{id}")]
+    [ServiceFilter(typeof(FirewallAttribute))]
     public async Task<IActionResult> AntiCrawler(string id, [FromServices] ICacheManager<int> cacheManager, [FromServices] IWebHostEnvironment env)
     {
         if (Request.IsRobot())
