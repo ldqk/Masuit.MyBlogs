@@ -136,10 +136,6 @@ namespace Masuit.MyBlogs.Core
 
         public static void ConfigureOptions(this IServiceCollection services)
         {
-            services.Configure<ApiBehaviorOptions>(options =>
-            {
-                options.SuppressInferBindingSourcesForParameters = true;
-            }); //将多个来源绑定到同一个类或参数
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.MinimumSameSitePolicy = SameSiteMode.Lax;
