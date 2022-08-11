@@ -1109,7 +1109,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 Id = p.Id,
                 Title = p.Title,
-                ViewCount = p.PostVisitRecordStats.Where(t => t.Date >= yesterday).Sum(e => e.Count)
+                ViewCount = p.PostVisitRecords.Count(t => t.Time >= yesterday)
             }).OrderByDescending(p => p.ViewCount).Take(10).Cacheable().ToListAsync(cancellationToken);
             var readCount = PostVisitRecordService.Count(e => e.Time >= yesterday);
             return ResultData(new

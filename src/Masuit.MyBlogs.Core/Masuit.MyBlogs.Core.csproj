@@ -54,14 +54,14 @@
         <PackageReference Include="htmldiff.net-core" Version="1.3.6" />
         <PackageReference Include="IP2Region" Version="1.2.0" />
         <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.5.1" />
-        <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="12.0.0" />
+        <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="12.0.1" />
         <PackageReference Include="Masuit.Tools.Excel" Version="1.2.2" />
         <PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.7" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.7" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.7" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.7" />
-        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.8" />
         <PackageReference Include="Microsoft.Graph" Version="4.35.0" />
         <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.7" />
         <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />
