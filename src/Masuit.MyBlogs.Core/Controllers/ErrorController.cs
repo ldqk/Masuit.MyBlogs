@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using FreeRedis;
+using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
@@ -26,6 +27,8 @@ namespace Masuit.MyBlogs.Core.Controllers
     [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorController : Controller
     {
+        public IRedisClient RedisClient { get; set; }
+
         /// <summary>
         /// 404
         /// </summary>
@@ -156,7 +159,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "请输入访问密码！");
             }
 
-            var s = RedisHelper.Get("token:" + email);
+            var s = RedisClient.Get("token:" + email);
             if (!token.Equals(s))
             {
                 return ResultData(null, false, "访问密码不正确！");
@@ -190,9 +193,9 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, validator.ErrorMessage);
             }
 
-            if (RedisHelper.Exists("get:" + email))
+            if (RedisClient.Exists("get:" + email))
             {
-                RedisHelper.Expire("get:" + email, 120);
+                RedisClient.Expire("get:" + email, 120);
                 return ResultData(null, false, "发送频率限制，请在2分钟后重新尝试发送邮件！请检查你的邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！");
             }
 
@@ -202,9 +205,9 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var token = SnowFlake.GetInstance().GetUniqueShortId(6);
-            RedisHelper.Set("token:" + email, token, 86400);
+            RedisClient.Set("token:" + email, token, 86400);
             BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, HttpContext.Connection.RemoteIpAddress.ToString()));
-            RedisHelper.Set("get:" + email, token, 120);
+            RedisClient.Set("get:" + email, token, 120);
             return ResultData(null);
         }
 

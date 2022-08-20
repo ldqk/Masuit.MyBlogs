@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using CLRStats;
-using CSRedis;
 using EFCoreSecondLevelCacheInterceptor;
+using FreeRedis;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Masuit.LuceneEFCore.SearchEngine;
@@ -22,6 +22,8 @@ using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Core.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IO;
+using Newtonsoft.Json;
 using Polly;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.Commands;
@@ -30,7 +32,6 @@ using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using System.Net;
 using System.Text.RegularExpressions;
-using Microsoft.IO;
 
 namespace Masuit.MyBlogs.Core
 {
@@ -82,7 +83,6 @@ namespace Masuit.MyBlogs.Core
         /// <returns></returns>
         public void ConfigureServices(IServiceCollection services)
         {
-            RedisHelper.Initialization(new CSRedisClient(AppConfig.Redis));
             services.AddEFSecondLevelCache(options => options.UseCustomCacheProvider<MyEFCacheManagerCoreProvider>(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true));
             services.AddDbContext<DataContext>((serviceProvider, opt) =>
             {
@@ -162,6 +162,11 @@ namespace Masuit.MyBlogs.Core
             services.AddHttpClient<ImagebedClient>().AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(3)); //注入HttpClient
             services.AddMailSender(Configuration).AddFirewallReporter(Configuration).AddRequestLogger(Configuration).AddPerfCounterManager(Configuration);
             services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
+            services.AddSingleton<IRedisClient>(new RedisClient(AppConfig.Redis)
+            {
+                Serialize = JsonConvert.SerializeObject,
+                Deserialize = JsonConvert.DeserializeObject
+            });
             services.SetupMiniProfile();
             services.AddSingleton<IMimeMapper, MimeMapper>(p => new MimeMapper());
             services.AddOneDrive();

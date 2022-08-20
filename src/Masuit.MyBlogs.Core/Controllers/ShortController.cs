@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Extensions;
+﻿using FreeRedis;
+using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +7,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 {
     public class ShortController : Controller
     {
+        public IRedisClient RedisHelper { get; set; }
         [HttpGet("short"), MyAuthorize]
         public IActionResult Short(string key, string url, int? expire)
         {

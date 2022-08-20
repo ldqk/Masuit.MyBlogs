@@ -1,4 +1,5 @@
-﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+﻿using FreeRedis;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -19,14 +20,15 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly IServiceScope _serviceScope;
-
+        private readonly IRedisClient _redisClient;
         /// <summary>
         /// hangfire后台任务
         /// </summary>
-        public HangfireBackJob(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IWebHostEnvironment hostEnvironment)
+        public HangfireBackJob(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IWebHostEnvironment hostEnvironment, IRedisClient redisClient)
         {
             _httpClientFactory = httpClientFactory;
             _hostEnvironment = hostEnvironment;
+            _redisClient = redisClient;
             _serviceScope = serviceProvider.CreateScope();
         }
 
@@ -256,9 +258,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void StatisticsSearchKeywords()
         {
             var searchDetailsService = _serviceScope.ServiceProvider.GetRequiredService<ISearchDetailsService>();
-            RedisHelper.Set("SearchRank:Month", searchDetailsService.GetRanks(DateTime.Today.AddMonths(-1)));
-            RedisHelper.Set("SearchRank:Week", searchDetailsService.GetRanks(DateTime.Today.AddDays(-7)));
-            RedisHelper.Set("SearchRank:Today", searchDetailsService.GetRanks(DateTime.Today));
+            _redisClient.Set("SearchRank:Month", searchDetailsService.GetRanks(DateTime.Today.AddMonths(-1)));
+            _redisClient.Set("SearchRank:Week", searchDetailsService.GetRanks(DateTime.Today.AddDays(-7)));
+            _redisClient.Set("SearchRank:Today", searchDetailsService.GetRanks(DateTime.Today));
         }
 
         /// <summary>

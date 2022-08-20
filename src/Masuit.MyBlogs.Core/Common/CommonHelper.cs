@@ -2,10 +2,11 @@
 using AngleSharp.Css.Dom;
 using AngleSharp.Dom;
 using AutoMapper;
+using Collections.Pooled;
+using FreeRedis;
 using Hangfire;
 using IP2Region;
 using Masuit.MyBlogs.Core.Common.Mails;
-using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.Tools;
 using Masuit.Tools.Media;
 using Masuit.Tools.Systems;
@@ -14,11 +15,10 @@ using MaxMind.GeoIP2.Exceptions;
 using MaxMind.GeoIP2.Model;
 using MaxMind.GeoIP2.Responses;
 using Polly;
+using SixLabors.ImageSharp;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Collections.Pooled;
-using SixLabors.ImageSharp;
 using TimeZoneConverter;
 using ArgumentException = System.ArgumentException;
 using Configuration = AngleSharp.Configuration;
@@ -252,8 +252,9 @@ namespace Masuit.MyBlogs.Core.Common
         public static void SendMail(string title, string content, string tos, string clientip)
         {
             Startup.ServiceProvider.GetRequiredService<IMailSender>().Send(title, content, tos);
-            RedisHelper.SAdd($"Email:{DateTime.Now:yyyyMMdd}", new { title, content, tos, time = DateTime.Now, clientip });
-            RedisHelper.Expire($"Email:{DateTime.Now:yyyyMMdd}", 86400);
+            var redisClient = Startup.ServiceProvider.GetRequiredService<IRedisClient>();
+            redisClient.SAdd($"Email:{DateTime.Now:yyyyMMdd}", new { title, content, tos, time = DateTime.Now, clientip });
+            redisClient.Expire($"Email:{DateTime.Now:yyyyMMdd}", 86400);
         }
 
         /// <summary>

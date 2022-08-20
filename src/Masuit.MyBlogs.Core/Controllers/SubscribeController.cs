@@ -1,4 +1,7 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using Collections.Pooled;
+using EFCoreSecondLevelCacheInterceptor;
+using FreeRedis;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -11,14 +14,12 @@ using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
-using EFCoreSecondLevelCacheInterceptor;
-using Microsoft.EntityFrameworkCore;
 using WilderMinds.RssSyndication;
-using Collections.Pooled;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -30,6 +31,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IPostService PostService { get; set; }
 
         public IAdvertisementService AdvertisementService { get; set; }
+        public IRedisClient RedisClient { get; set; }
 
         /// <summary>
         /// RSS订阅
@@ -333,8 +335,8 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private void Disallow(Post post)
         {
-            RedisHelper.IncrBy("interceptCount");
-            RedisHelper.LPush("intercept", new IpIntercepter()
+            RedisClient.IncrBy("interceptCount", 1);
+            RedisClient.LPush("intercept", new IpIntercepter()
             {
                 IP = HttpContext.Connection.RemoteIpAddress.ToString(),
                 RequestUrl = $"//{Request.Host}/{post.Id}",

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Collections.Pooled;
+using FreeRedis;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Configs;
@@ -8,6 +9,7 @@ using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
 using Masuit.Tools.Core.Net;
@@ -20,7 +22,6 @@ using Microsoft.Net.Http.Headers;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text.RegularExpressions;
-using Masuit.MyBlogs.Core.Models.Enum;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -42,7 +43,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IMapper Mapper { get; set; }
 
         public MapperConfiguration MapperConfig { get; set; }
-
+        public IRedisClient RedisHelper { get; set; }
         public UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
 
         /// <summary>
@@ -184,7 +185,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 {
                     return "请输入验证码！";
                 }
-                if (await RedisHelper.GetAsync("code:" + email) != code)
+                if (RedisHelper.Get("code:" + email) != code)
                 {
                     return "验证码错误！";
                 }
@@ -379,7 +380,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 remark += "，发生了IP切换，原始IP：" + rawip.Base64Decrypt();
             }
 
-            RedisHelper.IncrBy("interceptCount");
+            RedisHelper.IncrBy("interceptCount", 1);
             RedisHelper.LPush("intercept", new IpIntercepter()
             {
                 IP = ClientIP,

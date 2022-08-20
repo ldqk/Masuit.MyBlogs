@@ -17,6 +17,7 @@ using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.MyBlogs.Core.Views.Post;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ModelBinder;
@@ -42,7 +43,6 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using Masuit.MyBlogs.Core.Views.Post;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -281,7 +281,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Publish(PostCommand post, [Required(ErrorMessage = "验证码不能为空")] string code, CancellationToken cancellationToken)
         {
-            if (await RedisHelper.GetAsync("code:" + post.Email) != code)
+            if (RedisHelper.Get("code:" + post.Email) != code)
             {
                 return ResultData(null, false, "验证码错误！");
             }
@@ -323,7 +323,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "文章发表失败！");
             }
 
-            await RedisHelper.ExpireAsync("code:" + p.Email, 1);
+            RedisHelper.Expire("code:" + p.Email, 1);
             var content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/publish.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8))
                 .Set("link", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
                 .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
@@ -459,15 +459,15 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost("{id}/pushmerge")]
         public async Task<ActionResult> PushMerge([FromServices] IInternalMessageService messageService, [FromServices] IPostMergeRequestService postMergeRequestService, PostMergeRequestCommand dto)
         {
-            if (await RedisHelper.GetAsync("code:" + dto.ModifierEmail) != dto.Code)
+            if (RedisHelper.Get("code:" + dto.ModifierEmail) != dto.Code)
             {
                 return ResultData(null, false, "验证码错误！");
             }
 
             var post = await PostService.GetAsync(p => p.Id == dto.PostId && p.Status == Status.Published && !p.Locked) ?? throw new NotFoundException("文章未找到");
-            if (post.Title.Equals(dto.Title) && post.Content.HammingDistance(dto.Content) == 0)
+            if (post.Title.Equals(dto.Title) && post.Content.HammingDistance(dto.Content) <= 1)
             {
-                return ResultData(null, false, "内容未被修改！");
+                return ResultData(null, false, "内容未被修改或修改的内容过少(无意义修改)！");
             }
 
             #region 合并验证
@@ -517,7 +517,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "操作失败！");
             }
 
-            await RedisHelper.ExpireAsync("code:" + dto.ModifierEmail, 1);
+            RedisHelper.Expire("code:" + dto.ModifierEmail, 1);
             await messageService.AddEntitySavedAsync(new InternalMessage()
             {
                 Title = $"来自【{dto.Modifier}】对文章《{post.Title}》的修改请求",
@@ -1079,8 +1079,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<IActionResult> Statistic(CancellationToken cancellationToken = default)
         {
-            var keys = await RedisHelper.KeysAsync(nameof(PostOnline) + ":*");
-            var sets = await keys.SelectAsync(async s => (Id: s.Split(':')[1].ToInt32(), Clients: await RedisHelper.HGetAsync<HashSet<string>>(s, "value")));
+            var keys = RedisHelper.Keys(nameof(PostOnline) + ":*");
+            var sets = keys.Select(s => (Id: s.Split(':')[1].ToInt32(), Clients: RedisHelper.HGet<HashSet<string>>(s, "value")));
             var ids = sets.Where(t => t.Clients?.Count > 0).OrderByDescending(t => t.Clients.Count).Take(10).Select(t => t.Id).ToArray();
             var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).ToListAsync().ContinueWith(t =>
             {

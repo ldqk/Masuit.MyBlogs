@@ -1,8 +1,9 @@
-﻿using Collections.Pooled;
+﻿using FreeRedis;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Files;
 using Masuit.Tools.Logging;
@@ -12,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Polly;
 using System.Diagnostics;
 using System.Text;
-using Masuit.Tools.AspNetCore.ModelBinder;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -28,6 +28,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         ///
         /// </summary>
         public ISevenZipCompressor SevenZipCompressor { get; set; }
+
+        public IRedisClient RedisClient { get; set; }
 
         /// <summary>
         /// 获取文件列表
@@ -265,8 +267,8 @@ namespace Masuit.MyBlogs.Core.Controllers
         {
             path = path?.TrimStart('\\', '/') ?? "";
             var token = Guid.NewGuid().ToString().MDString(Guid.NewGuid().ToString()).FromBinaryBig(16).ToBinary(62);
-            RedisHelper.Set("FileManager:Token:" + token, "1");
-            RedisHelper.Expire("FileManager:Token:" + token, TimeSpan.FromDays(1));
+            RedisClient.Set("FileManager:Token:" + token, "1");
+            RedisClient.Expire("FileManager:Token:" + token, TimeSpan.FromDays(1));
             return RedirectToAction("Download", "File", new { path, items, toFilename, token });
         }
 
@@ -281,7 +283,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet("{**path}"), AllowAnonymous]
         public ActionResult Download(string path, string[] items, string toFilename, string token)
         {
-            if (RedisHelper.Exists("FileManager:Token:" + token))
+            if (RedisClient.Exists("FileManager:Token:" + token))
             {
                 var root = CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/');
                 if (items.Length > 0)

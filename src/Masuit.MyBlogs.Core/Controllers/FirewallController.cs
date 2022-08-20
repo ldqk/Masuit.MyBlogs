@@ -1,5 +1,5 @@
-﻿using System.Web;
-using CacheManager.Core;
+﻿using CacheManager.Core;
+using FreeRedis;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
@@ -12,12 +12,15 @@ using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
 public class FirewallController : Controller
 {
+    public IRedisClient RedisClient { get; set; }
+
     /// <summary>
     /// JS挑战，5秒盾
     /// </summary>
@@ -100,7 +103,7 @@ public class FirewallController : Controller
         }
 
         var ip = HttpContext.Connection.RemoteIpAddress.ToString();
-        await RedisHelper.LPushAsync("intercept", new IpIntercepter()
+        RedisClient.LPush("intercept", new IpIntercepter()
         {
             IP = ip,
             RequestUrl = HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + "/craw/" + id),

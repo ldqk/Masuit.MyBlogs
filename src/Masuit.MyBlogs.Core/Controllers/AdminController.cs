@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Collections.Pooled;
-using Masuit.MyBlogs.Core.Common;
+using FreeRedis;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -23,6 +23,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// UserInfoService
         /// </summary>
         public IUserInfoService UserInfoService { get; set; }
+        public IRedisClient RedisHelper { get; set; }
 
         public IMapper Mapper { get; set; }
 

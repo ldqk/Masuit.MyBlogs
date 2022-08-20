@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using FreeRedis;
+using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
@@ -20,15 +21,16 @@ public class RequestInterceptMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly IRequestLogger _requestLogger;
-
+    private readonly IRedisClient _redisClient;
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="next"></param>
-    public RequestInterceptMiddleware(RequestDelegate next, IRequestLogger requestLogger)
+    public RequestInterceptMiddleware(RequestDelegate next, IRequestLogger requestLogger, IRedisClient redisClient)
     {
         _next = next;
         _requestLogger = requestLogger;
+        _redisClient = redisClient;
     }
 
     public Task Invoke(HttpContext context)
@@ -50,8 +52,8 @@ public class RequestInterceptMiddleware
         var match = Regex.Match(path ?? "", CommonHelper.BanRegex);
         if (match.Length > 0)
         {
-            RedisHelper.IncrBy("interceptCount");
-            RedisHelper.LPush("intercept", new IpIntercepter()
+            _redisClient.IncrBy("interceptCount", 1);
+            _redisClient.LPush("intercept", new IpIntercepter()
             {
                 IP = ip,
                 RequestUrl = requestUrl,
