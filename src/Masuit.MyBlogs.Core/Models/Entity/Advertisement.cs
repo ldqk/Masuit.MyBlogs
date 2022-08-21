@@ -88,6 +88,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         /// </summary>
         public string Regions { get; set; }
 
+        /// <summary>
+        /// 广告商
+        /// </summary>
+        public string Merchant { get; set; }
+
         public virtual ICollection<AdvertisementClickRecord> ClickRecords { get; set; }
     }
 }

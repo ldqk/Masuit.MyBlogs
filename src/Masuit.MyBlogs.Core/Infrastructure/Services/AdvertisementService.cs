@@ -8,9 +8,9 @@ using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.Linq;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -74,7 +74,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                     where = where.And(a => Regex.IsMatch(a.Title + a.Description, regex));
                 }
 
-                var list = GetQuery(where).OrderBy(a => -Math.Log(EF.Functions.Random()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1)))).Take(count).ToList();
+                var array = GetQuery(a => a.Status == Status.Available).GroupBy(a => a.Merchant).Select(g => g.OrderBy(_ => EF.Functions.Random()).FirstOrDefault().Id).Take(50).ToArray();
+                var list = GetQuery(where).Where(a => array.Contains(a.Id)).OrderBy(a => -Math.Log(EF.Functions.Random()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1)))).Take(count).ToList();
                 if (list.Count == 0 && keywords is { Length: > 0 })
                 {
                     return GetsByWeightedPrice(count, type, ipinfo, cid);

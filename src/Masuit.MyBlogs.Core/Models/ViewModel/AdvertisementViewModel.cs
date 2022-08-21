@@ -84,6 +84,12 @@ namespace Masuit.MyBlogs.Core.Models.ViewModel
         /// 地区，逗号或竖线分隔
         /// </summary>
         public string Regions { get; set; }
+
+        /// <summary>
+        /// 广告商
+        /// </summary>
+        public string Merchant { get; set; }
+
     }
 
     public class AdvertisementClickRecordViewModel
