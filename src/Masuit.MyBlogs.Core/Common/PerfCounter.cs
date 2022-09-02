@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics;
-using System.Net.Sockets;
-using Masuit.MyBlogs.Core.Infrastructure;
+﻿using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.Tools;
 using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Hardware;
+using Masuit.Tools.Logging;
 using Masuit.Tools.Systems;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
+using System.Net.Sockets;
 
 namespace Masuit.MyBlogs.Core.Common;
 
@@ -33,8 +34,10 @@ public interface IPerfCounter
                 {
                     if (errorCount > 20)
                     {
+                        LogManager.Error(e);
                         break;
                     }
+
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine(e.Message);
                     Console.ForegroundColor = ConsoleColor.White;
@@ -180,7 +183,6 @@ public class PerformanceCounter
     /// <summary>
     /// 当前时间戳
     /// </summary>
-    [HypertableColumn]
     public long Time { get; set; }
 
     /// <summary>

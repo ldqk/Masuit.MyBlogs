@@ -1,8 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Masuit.MyBlogs.Core.Infrastructure;
-using Masuit.Tools.Systems;
+﻿using Masuit.Tools.Systems;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
@@ -17,7 +16,7 @@ public class RequestLogDetail
     [StringLength(32)]
     public string Id { get; set; }
 
-    [Column(TypeName = "timestamp"), HypertableColumn]
+    [Column(TypeName = "timestamp")]
     public DateTime Time { get; set; }
 
     [StringLength(1024), Unicode]

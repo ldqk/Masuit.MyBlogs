@@ -84,50 +84,8 @@ namespace Masuit.MyBlogs.Core
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEFSecondLevelCache(options => options.UseCustomCacheProvider<MyEFCacheManagerCoreProvider>(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true));
-            services.AddDbContext<DataContext>((serviceProvider, opt) =>
-            {
-                switch (Configuration["Database:Provider"])
-                {
-                    case "pgsql":
-                        opt.UseNpgsql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10));
-                        break;
-
-                    case "mysql":
-                        opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(10));
-                        break;
-
-                    case "mssql":
-                        opt.UseSqlServer(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10));
-                        break;
-
-                    case "sqlite":
-                        opt.UseSqlite(AppConfig.ConnString);
-                        break;
-                }
-
-                opt.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>()).EnableSensitiveDataLogging();
-            }); //配置数据库
-            services.AddDbContext<LoggerDbContext>(opt =>
-            {
-                switch (Configuration["Database:Provider"])
-                {
-                    case "pgsql":
-                        opt.UseNpgsql(AppConfig.ConnString);
-                        break;
-
-                    case "mysql":
-                        opt.UseMySql(AppConfig.ConnString, ServerVersion.AutoDetect(AppConfig.ConnString), builder => builder.EnableRetryOnFailure(10));
-                        break;
-
-                    case "mssql":
-                        opt.UseSqlServer(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10));
-                        break;
-
-                    case "sqlite":
-                        opt.UseSqlite(AppConfig.ConnString);
-                        break;
-                }
-            }); //配置数据库
+            services.AddDbContext<DataContext>((serviceProvider, opt) => opt.UseNpgsql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10)).AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>()).EnableSensitiveDataLogging()); //配置数据库
+            services.AddDbContext<LoggerDbContext>(opt => opt.UseNpgsql(AppConfig.ConnString)); //配置数据库
             services.ConfigureOptions();
             services.AddHttpsRedirection(options =>
             {
@@ -173,7 +131,7 @@ namespace Masuit.MyBlogs.Core
             services.AutoRegisterServices();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddMapper().AddMyMvc();
+            services.AddMapper().AddMyMvc().AddHealthChecks();
             services.AddImageSharp(options =>
                 {
                     options.MemoryStreamManager = new RecyclableMemoryStreamManager();
@@ -217,11 +175,7 @@ namespace Masuit.MyBlogs.Core
         {
             ServiceProvider = app.ApplicationServices;
             maindb.Database.EnsureCreated();
-            if (loggerdb.Database.EnsureCreated())
-            {
-                loggerdb.ApplyHypertables();
-            }
-
+            loggerdb.Database.EnsureCreated();
             app.InitSettings();
             app.UseLuceneSearch(env, hangfire, luceneIndexerOptions);
             app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For
@@ -255,6 +209,7 @@ namespace Masuit.MyBlogs.Core
                     options.LongPolling.PollTimeout = TimeSpan.FromSeconds(10);
                     options.TransportMaxBufferSize = 8388608;
                 });
+                endpoints.MapHealthChecks("/health");
                 endpoints.MapControllers(); // 属性路由
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}"); // 默认路由
                 endpoints.MapFallbackToController("Index", "Error");

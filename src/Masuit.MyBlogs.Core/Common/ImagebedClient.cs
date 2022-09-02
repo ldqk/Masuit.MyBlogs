@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using Collections.Pooled;
+using Hangfire;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools;
 using Masuit.Tools.Html;
@@ -7,8 +8,6 @@ using Masuit.Tools.Systems;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Web;
-using Collections.Pooled;
-using ImageMagick;
 
 namespace Masuit.MyBlogs.Core.Common
 {
@@ -44,16 +43,6 @@ namespace Masuit.MyBlogs.Core.Common
             if (stream.Length < 51200)
             {
                 return Task.FromResult<(string, bool)>((null, false));
-            }
-
-            var optimizer = new ImageOptimizer
-            {
-                IgnoreUnsupportedFormats = true,
-                OptimalCompression = true
-            };
-            if (optimizer.IsSupported(stream))
-            {
-                optimizer.LosslessCompress(stream);
             }
 
             file = Regex.Replace(Path.GetFileName(file), @"\p{P}|\p{S}", "");
