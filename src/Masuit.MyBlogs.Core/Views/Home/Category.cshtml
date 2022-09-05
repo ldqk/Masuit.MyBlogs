@@ -72,7 +72,7 @@
 </div>
 <div class="bg-title">
     <div class="header-content text-center">
-        <h1 class="size48">
+        <h2 class="size48">
             @cat.Path()
             @if(CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") == "true"){
                 <a class="btn btn-lg btn-success" asp-controller="Subscribe" asp-action="CategoryRss" asp-route-id="@cat.Id" target="_blank">
@@ -88,7 +88,7 @@
                     <i class="icon-blocked"></i>
                 </a>
             }
-        </h1>
+        </h2>
         <div class="divider"></div>
         <p class="size24">
             @cat.Description
