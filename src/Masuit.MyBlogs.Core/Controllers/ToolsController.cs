@@ -103,8 +103,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                         FormattedAddress = IPAddress.Parse(ip).GetIPLocation().Address,
                         Location = new Location()
                         {
-                            Lng = location.Location.Longitude ?? 0,
-                            Lat = location.Location.Latitude ?? 0
+                            Lng = (decimal)location.Location.Longitude.GetValueOrDefault(),
+                            Lat = (decimal)location.Location.Latitude.GetValueOrDefault()
                         }
                     }
                 };
@@ -148,8 +148,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                         FormattedAddress = IPAddress.Parse(ip).GetIPLocation().Address,
                         Location = new Location()
                         {
-                            Lng = location.Location.Longitude ?? 0,
-                            Lat = location.Location.Latitude ?? 0
+                            Lng = (decimal)location.Location.Longitude.GetValueOrDefault(),
+                            Lat = (decimal)location.Location.Latitude.GetValueOrDefault()
                         }
                     }
                 };

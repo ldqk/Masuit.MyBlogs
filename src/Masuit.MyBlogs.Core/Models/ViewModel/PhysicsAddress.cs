@@ -104,12 +104,12 @@ namespace Masuit.Tools.Models
         /// 经度
         /// </summary>
         [JsonProperty("lng")]
-        public double Lng { get; set; }
+        public decimal Lng { get; set; }
 
         /// <summary>
         /// 纬度
         /// </summary>
         [JsonProperty("lat")]
-        public double Lat { get; set; }
+        public decimal Lat { get; set; }
     }
 }
