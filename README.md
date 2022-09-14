@@ -26,7 +26,7 @@ Redis：redis-server-windows 5.x
 运行时：必须是.NET 6 
 ### 当前运行环境
 操作系统：Windows Server 2019  
-数据库：MySQL 8.0  
+数据库：PostgreSQL 14.x  
 Redis：redis-server-windows 5.x  
 运行时：.NET 6  
 服务器配置：2核+6GB+1000M  
