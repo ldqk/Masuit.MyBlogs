@@ -1,6 +1,6 @@
 ### Masuit.MyBlogs
 <a href="https://gitee.com/masuit/Masuit.MyBlogs"><img src="https://gitee.com/static/images/logo-black.svg" height="32"></a> <a href="https://github.com/ldqk/Masuit.MyBlogs"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Font_Awesome_5_brands_github.svg/54px-Font_Awesome_5_brands_github.svg.png" height="32"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/GitHub_logo_2013.svg/128px-GitHub_logo_2013.svg.png" height="32"></a>  
-个人博客站项目源码，高性能低占用的博客系统，这也许是我写过的性能最高的web项目了。**仅3MB的代码量！** 目前日均处理请求数80-300w次，同时在线活跃用户数30-200人，**数据量累计已达到数百万条**，数据库+Redis+网站主程序同时运行在一台2核4GB的机器上，浏览器页面请求秒级响应，CPU平均使用率控制在10%左右，内存控制在1GB左右占用。**数据库支持SQL Server、mysql、PostgreSQL、sqlite的无缝切换。**  
+个人博客站项目源码，高性能低占用的博客系统，这也许是我写过的性能最高的web项目了。**仅3MB的代码量！** 目前日均处理请求数80-300w次，同时在线活跃用户数30-200人，**数据量累计已达到数百万条**，数据库+Redis+网站主程序同时运行在一台2核4GB的机器上，浏览器页面请求秒级响应，CPU平均使用率控制在10%左右，内存控制在1GB左右占用。
 ![任务管理器](https://img11.360buyimg.com/ddimg/jfs/t1/170269/23/18655/93697/6076eb8fE82d545e7/78f0815f7311cd49.png)
 ![任务管理器](https://user-images.githubusercontent.com/20254980/129124177-37e0f98b-57ba-454f-955d-141201f50cc6.png)
 ![image](https://user-images.githubusercontent.com/20254980/129124476-88a324ac-cfd2-4e9b-8fb9-e84e12d04051.png)
@@ -21,7 +21,7 @@
 ### 开发环境
 操作系统：Windows 10 2104  
 IDE：Visual Studio 2022 v17.0  
-数据库：SQL Server 2017+/MySQL 8.x/PostgreSQL 14.x  
+数据库：PostgreSQL 14.x  
 Redis：redis-server-windows 5.x  
 运行时：必须是.NET 6 
 ### 当前运行环境
@@ -39,7 +39,7 @@ Redis：redis-server-windows 5.x
 |CPU|1核|2核|2核|4核|
 |内存|1GB|2GB|4GB|8GB|
 |带宽|1Mbps|1Mbps|5Mbps|1000Mbps|
-|数据库|MySQL 5/SQL Server 2008/pgsql 9|MySQL 8/SQL Server 2012/pgsql 14|MySQL 8/SQL Server 2016/pgsql 14|MySQL 8/SQL Server 2016/pgsql 14|
+|数据库|pgsql 9|pgsql 14|pgsql 14|pgsql 14|
 |缓存组件|Redis 3.2+|Redis 5.0+|Redis 5.0+|Redis 5.0+|
 |备注|玩玩而已|几个人同时访问|几百个人同时访问，单日请求量600w以下|单日请求量600w以上|
 ### 主要功能
