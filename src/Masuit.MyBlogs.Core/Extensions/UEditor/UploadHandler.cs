@@ -49,21 +49,21 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                 var stream = file.OpenReadStream();
                 try
                 {
-                    stream = stream.AddWatermark();
-                    var format = await Image.DetectFormatAsync(stream).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
-                    stream.Position = 0;
+                    var stream2 = stream.AddWatermark();
+                    var format = await Image.DetectFormatAsync(stream2).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
+                    stream2.Position = 0;
                     if (format != null && !Regex.IsMatch(format.Name, "JPEG|PNG|Webp|GIF", RegexOptions.IgnoreCase))
                     {
-                        using var image = await Image.LoadAsync(stream);
+                        using var image = await Image.LoadAsync(stream2);
                         var memoryStream = new MemoryStream();
                         await image.SaveAsJpegAsync(memoryStream);
-                        await stream.DisposeAsync();
-                        stream = memoryStream;
+                        await stream2.DisposeAsync();
+                        stream2 = memoryStream;
                         savePath = savePath.Replace(Path.GetExtension(savePath), ".jpg");
                     }
 
                     var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
-                    var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream, localPath, cts.Token);
+                    var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream2, localPath, cts.Token);
                     if (success)
                     {
                         Result.Url = url;
@@ -71,7 +71,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     else
                     {
                         Directory.CreateDirectory(Path.GetDirectoryName(localPath));
-                        await File.WriteAllBytesAsync(localPath, await stream.ToArrayAsync());
+                        await File.WriteAllBytesAsync(localPath, await stream2.ToArrayAsync());
                         Result.Url = savePath;
                     }
 

@@ -10,7 +10,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
     {
         public static string Format(string originFileName, string pathFormat)
         {
-            if (String.IsNullOrWhiteSpace(pathFormat))
+            if (string.IsNullOrWhiteSpace(pathFormat))
             {
                 pathFormat = "{filename}_{rand:6}";
             }
