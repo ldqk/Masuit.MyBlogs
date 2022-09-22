@@ -21,7 +21,7 @@ public static class QueryableExt
     {
         page = Math.Max(1, page);
         var totalCount = query.Count();
-        if (page * size > totalCount)
+        if (1L * page * size > totalCount)
         {
             page = (int)Math.Ceiling(totalCount / (size * 1.0));
         }
@@ -47,7 +47,7 @@ public static class QueryableExt
     {
         page = Math.Max(1, page);
         var totalCount = query.Count();
-        if (page * size > totalCount)
+        if (1L * page * size > totalCount)
         {
             page = (int)Math.Ceiling(totalCount / (size * 1.0));
         }
@@ -75,7 +75,7 @@ public static class QueryableExt
     {
         page = Math.Max(1, page);
         var totalCount = query.Count();
-        if (page * size > totalCount)
+        if (1L * page * size > totalCount)
         {
             page = (int)Math.Ceiling(totalCount / (size * 1.0));
         }
@@ -103,7 +103,7 @@ public static class QueryableExt
     {
         page = Math.Max(1, page);
         var totalCount = await query.CountAsync();
-        if (page * size > totalCount)
+        if (1L * page * size > totalCount)
         {
             page = (int)Math.Ceiling(totalCount / (size * 1.0));
         }
@@ -131,7 +131,7 @@ public static class QueryableExt
     {
         page = Math.Max(1, page);
         var totalCount = query.Count();
-        if (page * size > totalCount)
+        if (1L * page * size > totalCount)
         {
             page = (int)Math.Ceiling(totalCount / (size * 1.0));
         }
@@ -159,7 +159,7 @@ public static class QueryableExt
     {
         page = Math.Max(1, page);
         var totalCount = query.Count();
-        if (page * size > totalCount)
+        if (1L * page * size > totalCount)
         {
             page = (int)Math.Ceiling(totalCount / (size * 1.0));
         }
