@@ -55,7 +55,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             UserInfo exist = Get(u => u.Username.Equals(userInfo.Username) || u.Email.Equals(userInfo.Email));
             if (exist is null)
             {
-                var salt = $"{new Random().StrictNext()}{DateTime.Now.GetTotalMilliseconds()}".MDString2(Guid.NewGuid().ToString()).AESEncrypt();
+                var salt = $"{new Random().StrictNext()}{DateTime.Now.GetTotalMilliseconds()}".MDString2(Guid.NewGuid().ToString()).SHA256();
                 userInfo.Password = userInfo.Password.MDString3(salt);
                 userInfo.SaltKey = salt;
                 UserInfo added = AddEntity(userInfo);
@@ -100,7 +100,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 oldPwd = oldPwd.MDString3(key);
                 if (pwd.Equals(oldPwd))
                 {
-                    var salt = $"{new Random().StrictNext()}{DateTime.Now.GetTotalMilliseconds()}".MDString2(Guid.NewGuid().ToString()).AESEncrypt();
+                    var salt = $"{new Random().StrictNext()}{DateTime.Now.GetTotalMilliseconds()}".MDString2(Guid.NewGuid().ToString()).SHA256();
                     userInfo.Password = newPwd.MDString3(salt);
                     userInfo.SaltKey = salt;
                     return SaveChanges() > 0;
@@ -119,7 +119,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 oldPwd = oldPwd.MDString3(key);
                 if (pwd.Equals(oldPwd))
                 {
-                    var salt = $"{new Random().StrictNext()}{DateTime.Now.GetTotalMilliseconds()}".MDString2(Guid.NewGuid().ToString()).AESEncrypt();
+                    var salt = $"{new Random().StrictNext()}{DateTime.Now.GetTotalMilliseconds()}".MDString2(Guid.NewGuid().ToString()).SHA256();
                     userInfo.Password = newPwd.MDString3(salt);
                     userInfo.SaltKey = salt;
                     return SaveChanges() > 0;
@@ -137,7 +137,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
             UserInfo userInfo = GetByUsername(name);
             if (userInfo != null)
             {
-                var salt = $"{new Random().StrictNext()}{DateTime.Now.GetTotalMilliseconds()}".MDString2(Guid.NewGuid().ToString()).AESEncrypt();
+                var salt = $"{new Random().StrictNext()}{DateTime.Now.GetTotalMilliseconds()}".MDString2(Guid.NewGuid().ToString()).SHA256();
                 userInfo.Password = newPwd.MDString3(salt);
                 userInfo.SaltKey = salt;
                 return SaveChanges() > 0;
