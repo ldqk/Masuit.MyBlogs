@@ -21,14 +21,17 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly IServiceScope _serviceScope;
         private readonly IRedisClient _redisClient;
+        private readonly IConfiguration _configuration;
+
         /// <summary>
         /// hangfire后台任务
         /// </summary>
-        public HangfireBackJob(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IWebHostEnvironment hostEnvironment, IRedisClient redisClient)
+        public HangfireBackJob(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IWebHostEnvironment hostEnvironment, IRedisClient redisClient, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _hostEnvironment = hostEnvironment;
             _redisClient = redisClient;
+            _configuration = configuration;
             _serviceScope = serviceProvider.CreateScope();
         }
 
@@ -192,7 +195,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             linksService.GetQuery(l => !l.Except).AsParallel().ForAll(link =>
             {
                 var prev = link.Status;
-                client.GetStringAsync(link.Url, new CancellationTokenSource(client.Timeout).Token).ContinueWith(t =>
+                client.GetStringAsync(_configuration["HttpClientProxy:UriPrefix"] + link.Url, new CancellationTokenSource(client.Timeout).Token).ContinueWith(t =>
                 {
                     if (t.IsCanceled || t.IsFaulted)
                     {

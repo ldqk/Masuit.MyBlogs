@@ -14,8 +14,13 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
     /// </summary>
     public class CrawlerHandler : Handler
     {
+        private readonly HttpClient _httpClient;
+        private readonly IConfiguration _configuration;
+
         public CrawlerHandler(HttpContext context) : base(context)
         {
+            _httpClient = context.RequestServices.GetRequiredService<IHttpClientFactory>().CreateClient();
+            _configuration = context.RequestServices.GetRequiredService<IConfiguration>();
         }
 
         public override async Task<string> Process()
@@ -30,7 +35,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     state = "SUCCESS",
                     list = (await sources.SelectAsync(s =>
                     {
-                        return new Crawler(s).Fetch(cts.Token).ContinueWith(t => new
+                        return new Crawler(s, _httpClient, _configuration).Fetch(cts.Token).ContinueWith(t => new
                         {
                             state = t.Result.State,
                             source = t.Result.SourceUrl,
@@ -55,14 +60,14 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
 
         public string State { get; set; }
 
-        private static readonly HttpClient HttpClient = new(new HttpClientHandler()
-        {
-            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-        });
+        private readonly HttpClient _httpClient;
+        private readonly IConfiguration _configuration;
 
-        public Crawler(string sourceUrl)
+        public Crawler(string sourceUrl, HttpClient httpClient, IConfiguration configuration)
         {
             SourceUrl = sourceUrl;
+            _httpClient = httpClient;
+            _configuration = configuration;
         }
 
         public async Task<Crawler> Fetch(CancellationToken token)
@@ -74,8 +79,8 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
             }
             try
             {
-                HttpClient.DefaultRequestHeaders.Referrer = new Uri(SourceUrl);
-                using var response = await HttpClient.GetAsync(SourceUrl);
+                _httpClient.DefaultRequestHeaders.Referrer = new Uri(SourceUrl);
+                using var response = await _httpClient.GetAsync(_configuration["HttpClientProxy:UriPrefix"] + SourceUrl);
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
                     State = "远程地址返回了错误的状态吗：" + response.StatusCode;

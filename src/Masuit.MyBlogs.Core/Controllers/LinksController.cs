@@ -17,6 +17,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class LinksController : BaseController
     {
         public IHttpClientFactory HttpClientFactory { get; set; }
+        public IConfiguration Configuration { get; set; }
 
         private HttpClient HttpClient => HttpClientFactory.CreateClient();
 
@@ -69,7 +70,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             HttpClient.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
             HttpClient.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
             HttpClient.DefaultRequestVersion = new Version(2, 0);
-            return await HttpClient.GetAsync(link.Url, cancellationToken).ContinueWith(t =>
+            return await HttpClient.GetAsync(Configuration["HttpClientProxy:UriPrefix"] + link.Url, cancellationToken).ContinueWith(t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {
@@ -120,7 +121,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             HttpClient.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
             HttpClient.DefaultRequestVersion = new Version(2, 0);
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            return HttpClient.GetAsync(link, cts.Token).ContinueWith(t =>
+            return HttpClient.GetAsync(Configuration["HttpClientProxy:UriPrefix"] + link, cts.Token).ContinueWith(t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {
