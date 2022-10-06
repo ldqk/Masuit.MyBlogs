@@ -89,6 +89,14 @@
                 </div>
                 <div class="col-md-12">
                     <div class="input-group">
+                        <span class="input-group-addon">屏蔽固定的请求头值：</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.BlockHeaderValues" placeholder="禁止的HeaderValues，竖线分隔" type="text" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="input-group">
                         <span class="input-group-addon">UA标识限制：</span>
                         <div class="fg-line">
                             <input class="form-control" ng-model="Settings.UserAgentBlocked" placeholder="禁止的UserAgent，逗号分隔(MicroMessenger,QQ)" type="text" />

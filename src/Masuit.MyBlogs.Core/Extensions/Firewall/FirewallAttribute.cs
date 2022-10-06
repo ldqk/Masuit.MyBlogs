@@ -33,6 +33,17 @@ public class FirewallAttribute : IAsyncActionFilter
     public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var request = context.HttpContext.Request;
+        if (CommonHelper.SystemSettings.TryGetValue("BlockHeaderValues", out var v) && v.Length > 0)
+        {
+            var strs = v.Split("|", StringSplitOptions.RemoveEmptyEntries);
+            if (request.Headers.Values.Any(values => strs.Any(s => values.Contains(s))))
+            {
+                context.Result = new NotFoundResult();
+                return Task.CompletedTask;
+            }
+        }
+
+        request.Headers.Values.Contains("");
         var ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
         var tokenValid = request.Cookies.ContainsKey("FullAccessToken") && request.Cookies["Email"].MDString(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]);
 
