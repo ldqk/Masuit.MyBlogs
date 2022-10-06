@@ -204,7 +204,7 @@ namespace Masuit.MyBlogs.Core.Common
                         parts[3] = parts[3] != "0" ? parts[3] : cityName;
                         return new IPLocation(parts[0], parts[2], parts[3], network?.Trim('/'), asn.AutonomousSystemNumber)
                         {
-                            Address2 = countryName + cityName,
+                            Address2 = new IPLocation.CountryCity(countryName, cityName),
                             Coodinate = city.Location
                         };
                     }
@@ -429,7 +429,7 @@ namespace Masuit.MyBlogs.Core.Common
 
         public string Address => new[] { Country, Province, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
 
-        public string Address2 { get; set; }
+        public CountryCity Address2 { get; set; } = new("", "");
 
         public string Network => ASN.HasValue ? ISP + "(AS" + ASN + ")" : ISP;
 
@@ -449,7 +449,7 @@ namespace Masuit.MyBlogs.Core.Common
                 network = "未知网络";
             }
 
-            return new[] { address, Address2, network }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("|");
+            return new[] { address, Address2?.ToString(), network }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("|");
         }
 
         public static implicit operator string(IPLocation entry)
@@ -472,6 +472,25 @@ namespace Masuit.MyBlogs.Core.Common
         public bool Contains(params string[] s)
         {
             return ToString().Contains(s);
+        }
+
+        public record CountryCity(string Country, string City)
+        {
+            public void Deconstruct(out string country, out string city)
+            {
+                country = Country;
+                city = City;
+            }
+
+            public static implicit operator string(CountryCity entry)
+            {
+                return entry.ToString();
+            }
+
+            public override string ToString()
+            {
+                return Country + City;
+            }
         }
     }
 }

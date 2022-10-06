@@ -1,10 +1,11 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.Tools;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 
@@ -80,9 +81,11 @@ public class RequestDatabaseLogger : IRequestLogger
 
         while (Queue.TryDequeue(out var result))
         {
-            var (location, network, info) = result.IP.GetIPLocation();
+            var location = result.IP.GetIPLocation();
             result.Location = location;
-            result.Network = network;
+            result.Country = new[] { location.Country, location.Address2.Country }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("|");
+            result.City = new[] { location.City, location.Address2.City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("|");
+            result.Network = location.Network;
             _dataContext.Add(result);
         }
 

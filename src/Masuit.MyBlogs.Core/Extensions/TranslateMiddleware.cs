@@ -56,17 +56,19 @@ namespace Masuit.MyBlogs.Core.Extensions
             {
                 //设置stream存放ResponseBody
                 var responseOriginalBody = context.Response.Body;
-                var memStream = new MemoryStream();
+                using var memStream = new MemoryStream();
                 context.Response.Body = memStream;
 
                 // 执行其他中间件
                 await _next(context);
 
                 //处理执行其他中间件后的ResponseBody
-                memStream.Position = 0;
-                var responseReader = new StreamReader(memStream, Encoding.UTF8);
+                memStream.Seek(0, SeekOrigin.Begin);
+                using var responseReader = new StreamReader(memStream, Encoding.UTF8);
                 var responseBody = await responseReader.ReadToEndAsync();
-                memStream = new MemoryStream(Encoding.UTF8.GetBytes(ChineseConverter.Convert(responseBody, ChineseConversionDirection.SimplifiedToTraditional)));
+                memStream.Seek(0, SeekOrigin.Begin);
+                await memStream.WriteAsync(Encoding.UTF8.GetBytes(ChineseConverter.Convert(responseBody, ChineseConversionDirection.SimplifiedToTraditional)).AsMemory());
+                memStream.Seek(0, SeekOrigin.Begin);
                 await memStream.CopyToAsync(responseOriginalBody);
                 context.Response.Body = responseOriginalBody;
             }
