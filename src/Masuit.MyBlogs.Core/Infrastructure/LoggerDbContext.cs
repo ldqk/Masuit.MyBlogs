@@ -18,7 +18,7 @@ public class LoggerDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<RequestLogDetail>().HasKey(e => new { e.Id, e.Time });
-        modelBuilder.Entity<PerformanceCounter>().HasKey(e => e.Time);
+        modelBuilder.Entity<PerformanceCounter>().HasKey(e => new { e.ServerIP, e.Time });
     }
 }
 

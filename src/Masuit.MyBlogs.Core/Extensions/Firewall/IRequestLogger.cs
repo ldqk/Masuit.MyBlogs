@@ -2,7 +2,6 @@
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -92,8 +91,7 @@ public class RequestDatabaseLogger : IRequestLogger
         if (_dataContext.SaveChanges() > 0)
         {
             var start = DateTime.Now.AddMonths(-6);
-            var tableName = _dataContext.Model.FindEntityType(typeof(RequestLogDetail)).GetTableName();
-            _dataContext.Database.ExecuteSqlRaw($"DELETE FROM \"{tableName}\" WHERE \"{nameof(RequestLogDetail.Time)}\" <'{start:yyyy-MM-dd HH:mm:ss}'");
+            _dataContext.Set<RequestLogDetail>().Where(e => e.Time < start).DeleteFromQuery();
         }
     }
 }

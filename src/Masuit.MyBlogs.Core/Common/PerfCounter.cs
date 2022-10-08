@@ -4,7 +4,6 @@ using Masuit.Tools.DateTimeExt;
 using Masuit.Tools.Hardware;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Systems;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -124,8 +123,7 @@ public class PerfCounterInDatabase : IPerfCounter
         if (_dbContext.SaveChanges() > 0)
         {
             var start = DateTime.Now.AddMonths(-1).GetTotalMilliseconds();
-            var tableName = _dbContext.Model.FindEntityType(typeof(PerformanceCounter)).GetTableName();
-            _dbContext.Database.ExecuteSqlRaw($"DELETE FROM \"{tableName}\" WHERE \"{nameof(PerformanceCounter.Time)}\" <{start}");
+            _dbContext.Set<PerformanceCounter>().Where(e => e.Time < start).DeleteFromQuery();
         }
     }
 }
