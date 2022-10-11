@@ -9,19 +9,19 @@
 @using Masuit.MyBlogs.Core.Views.Shared
 @using Masuit.Tools
 @using Masuit.Tools.Core.Net
-@using EFCoreSecondLevelCacheInterceptor
 @using Masuit.Tools.Models
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using StackExchange.Profiling
 @using Collections.Pooled
 @using Masuit.Tools.AspNetCore.Extensions
+@using Z.EntityFramework.Plus
 
 @{
     string[] colors = { "success", "info", "warning", "danger", "default" };
     List<Menu> menus = _menuService.GetQueryFromCache(m => m.Status == Status.Available,m => m.Sort).ToPooledList().ToTree(m => m.Id,m => m.ParentId);
     var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-    using var links = _linksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.GroupBy(x => x.IP).Count()).Take(30).Select(e => new{e.Url,e.Name}).Cacheable().ToPooledList();
+    using var links = _linksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.GroupBy(x => x.IP).Count()).Take(30).Select(e => new{e.Url,e.Name}).FromCache().ToPooledList();
 }
 
 <!DOCTYPE html>

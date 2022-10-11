@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Collections.Pooled;
-using EFCoreSecondLevelCacheInterceptor;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools.Core.AspNetCore;
@@ -42,24 +41,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
 
         /// <summary>
-        /// 从二级缓存获取所有实体
-        /// </summary>
-        /// <returns></returns>
-        public virtual IEnumerable<T> GetAllFromCache()
-        {
-            return DataContext.Set<T>().AsNoTracking().Cacheable().AsEnumerable();
-        }
-
-        /// <summary>
-        /// 从二级缓存获取所有实体
-        /// </summary>
-        /// <returns></returns>
-        public Task<List<T>> GetAllFromCacheAsync()
-        {
-            return DataContext.Set<T>().AsNoTracking().Cacheable().ToListAsync();
-        }
-
-        /// <summary>
         /// 获取所有实体（不跟踪）
         /// </summary>
         /// <typeparam name="TDto">映射实体</typeparam>
@@ -67,26 +48,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public virtual IQueryable<TDto> GetAll<TDto>() where TDto : class
         {
             return DataContext.Set<T>().AsNoTracking().ProjectTo<TDto>(MapperConfig);
-        }
-
-        /// <summary>
-        /// 从二级缓存获取所有实体（不跟踪）
-        /// </summary>
-        /// <typeparam name="TDto">映射实体</typeparam>
-        /// <returns></returns>
-        public virtual PooledList<TDto> GetAllFromCache<TDto>() where TDto : class
-        {
-            return DataContext.Set<T>().ProjectTo<TDto>(MapperConfig).Cacheable().ToPooledList();
-        }
-
-        /// <summary>
-        /// 从二级缓存获取所有实体（不跟踪）
-        /// </summary>
-        /// <typeparam name="TDto">映射实体</typeparam>
-        /// <returns></returns>
-        public Task<List<TDto>> GetAllFromCacheAsync<TDto>() where TDto : class
-        {
-            return DataContext.Set<T>().ProjectTo<TDto>(MapperConfig).Cacheable().ToListAsync();
         }
 
         /// <summary>
@@ -122,19 +83,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual PooledList<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return GetAllNoTracking(orderby, isAsc).Cacheable().ToPooledList();
-        }
-
-        /// <summary>
-        /// 从二级缓存获取所有实体
-        /// </summary>
-        /// <typeparam name="TS">排序</typeparam>
-        /// <param name="orderby">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns></returns>
-        public Task<List<T>> GetAllFromCacheAsync<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
-        {
-            return GetAllNoTracking(orderby, isAsc).Cacheable().ToListAsync();
+            return GetAllNoTracking(orderby, isAsc).FromCache().ToPooledList();
         }
 
         /// <summary>
@@ -148,32 +97,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public virtual IQueryable<TDto> GetAll<TS, TDto>(Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
         {
             return GetAllNoTracking(orderby, isAsc).ProjectTo<TDto>(MapperConfig);
-        }
-
-        /// <summary>
-        /// 从二级缓存获取所有实体
-        /// </summary>
-        /// <typeparam name="TS">排序</typeparam>
-        /// <typeparam name="TDto">映射实体</typeparam>
-        /// <param name="orderby">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns>还未执行的SQL语句</returns>
-        public virtual PooledList<TDto> GetAllFromCache<TS, TDto>(Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
-        {
-            return GetAll(orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToPooledList();
-        }
-
-        /// <summary>
-        /// 从二级缓存获取所有实体
-        /// </summary>
-        /// <typeparam name="TS">排序</typeparam>
-        /// <typeparam name="TDto">映射实体</typeparam>
-        /// <param name="orderby">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns></returns>
-        public Task<List<TDto>> GetAllFromCacheAsync<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
-        {
-            return GetAll(orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToListAsync();
         }
 
         /// <summary>
@@ -206,17 +129,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual PooledList<T> GetQueryFromCache(Expression<Func<T, bool>> where)
         {
-            return DataContext.Set<T>().Where(where).AsNoTracking().Cacheable().ToPooledList();
-        }
-
-        /// <summary>
-        /// 基本查询方法，获取一个集合，优先从二级缓存读取
-        /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns></returns>
-        public Task<List<T>> GetQueryFromCacheAsync(Expression<Func<T, bool>> @where)
-        {
-            return DataContext.Set<T>().Where(where).AsNoTracking().Cacheable().ToListAsync();
+            return DataContext.Set<T>().Where(where).AsNoTracking().FromCache().ToPooledList();
         }
 
         /// <summary>
@@ -229,34 +142,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual PooledList<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return GetQueryNoTracking(where, orderby, isAsc).Cacheable().ToPooledList();
-        }
-
-        /// <summary>
-        /// 基本查询方法，获取一个集合，优先从二级缓存读取
-        /// </summary>
-        /// <typeparam name="TS">排序字段</typeparam>
-        /// <param name="where">查询条件</param>
-        /// <param name="orderby">排序方式</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns></returns>
-        public Task<List<T>> GetQueryFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
-        {
-            return GetQueryNoTracking(where, orderby, isAsc).Cacheable().ToListAsync();
-        }
-
-        /// <summary>
-        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取
-        /// </summary>
-        /// <typeparam name="TS">排序字段</typeparam>
-        /// <typeparam name="TDto">输出类型</typeparam>
-        /// <param name="where">查询条件</param>
-        /// <param name="orderby">排序方式</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns></returns>
-        public Task<List<TDto>> GetQueryFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
-        {
-            return GetQueryNoTracking(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToListAsync();
+            return GetQueryNoTracking(where, orderby, isAsc).FromCache().ToPooledList();
         }
 
         /// <summary>
@@ -309,26 +195,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <summary>
         /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(不跟踪实体)
         /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns>实体集合</returns>
-        public virtual PooledList<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class
-        {
-            return DataContext.Set<T>().Where(where).ProjectTo<TDto>(MapperConfig).Cacheable().ToPooledList();
-        }
-
-        /// <summary>
-        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取
-        /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns></returns>
-        public Task<List<TDto>> GetQueryFromCacheAsync<TDto>(Expression<Func<T, bool>> @where) where TDto : class
-        {
-            return DataContext.Set<T>().Where(where).ProjectTo<TDto>(MapperConfig).Cacheable().ToListAsync();
-        }
-
-        /// <summary>
-        /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取(不跟踪实体)
-        /// </summary>
         /// <typeparam name="TS">排序字段</typeparam>
         /// <typeparam name="TDto">输出类型</typeparam>
         /// <param name="where">查询条件</param>
@@ -337,7 +203,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual PooledList<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
         {
-            return GetQuery(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToPooledList();
+            return GetQuery(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache().ToPooledList();
         }
 
         /// <summary>
@@ -348,16 +214,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public virtual T Get(Expression<Func<T, bool>> where)
         {
             return EF.CompileQuery((DataContext ctx) => ctx.Set<T>().FirstOrDefault(where))(DataContext);
-        }
-
-        /// <summary>
-        /// 获取第一条数据
-        /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns>实体</returns>
-        public virtual T GetFromCache(Expression<Func<T, bool>> where)
-        {
-            return DataContext.Set<T>().Where(where).AsNoTracking().DeferredFirstOrDefault().Execute();
         }
 
         /// <summary>
@@ -384,32 +240,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
 
         /// <summary>
-        /// 获取第一条数据
-        /// </summary>
-        /// <typeparam name="TS">排序</typeparam>
-        /// <param name="where">查询条件</param>
-        /// <param name="orderby">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns>实体</returns>
-        public virtual T GetFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
-        {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).Where(where).AsNoTracking().DeferredFirstOrDefault().Execute() : DataContext.Set<T>().OrderByDescending(orderby).Where(where).AsNoTracking().DeferredFirstOrDefault().Execute();
-        }
-
-        /// <summary>
-        /// 获取第一条数据
-        /// </summary>
-        /// <typeparam name="TS">排序</typeparam>
-        /// <param name="where">查询条件</param>
-        /// <param name="orderby">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns>实体</returns>
-        public Task<T> GetFromCacheAsync<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true)
-        {
-            return isAsc ? DataContext.Set<T>().OrderBy(orderby).Where(where).AsNoTracking().DeferredFirstOrDefault().ExecuteAsync() : DataContext.Set<T>().OrderByDescending(orderby).Where(where).AsNoTracking().DeferredFirstOrDefault().ExecuteAsync();
-        }
-
-        /// <summary>
         /// 获取第一条被AutoMapper映射后的数据（不跟踪）
         /// </summary>
         /// <typeparam name="TS">排序</typeparam>
@@ -421,20 +251,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public Task<TDto> GetAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
         {
             return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefaultAsync() : DataContext.Set<T>().Where(where).OrderByDescending(orderby).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefaultAsync();
-        }
-
-        /// <summary>
-        /// 获取第一条被AutoMapper映射后的数据（不跟踪）
-        /// </summary>
-        /// <typeparam name="TS">排序</typeparam>
-        /// <typeparam name="TDto">映射实体</typeparam>
-        /// <param name="where">查询条件</param>
-        /// <param name="orderby">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns>映射实体</returns>
-        public virtual TDto GetFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
-        {
-            return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ProjectTo<TDto>(MapperConfig).DeferredFirstOrDefault().Execute() : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ProjectTo<TDto>(MapperConfig).DeferredFirstOrDefault().Execute();
         }
 
         /// <summary>
@@ -485,19 +301,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
 
         /// <summary>
-        /// 获取第一条数据（不跟踪实体）
-        /// </summary>
-        /// <typeparam name="TS">排序</typeparam>
-        /// <param name="where">查询条件</param>
-        /// <param name="orderby">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns>实体</returns>
-        public virtual T GetNoTracking<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
-        {
-            return isAsc ? EF.CompileQuery((DataContext ctx) => ctx.Set<T>().AsNoTracking().OrderBy(orderby).FirstOrDefault(where))(DataContext) : EF.CompileQuery((DataContext ctx) => ctx.Set<T>().AsNoTracking().OrderByDescending(orderby).FirstOrDefault(where))(DataContext);
-        }
-
-        /// <summary>
         /// 获取第一条被AutoMapper映射后的数据（不跟踪实体）
         /// </summary>
         /// <param name="where">查询条件</param>
@@ -505,26 +308,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public virtual TDto Get<TDto>(Expression<Func<T, bool>> where) where TDto : class
         {
             return DataContext.Set<T>().Where(where).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 获取第一条被AutoMapper映射后的数据
-        /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns>实体</returns>
-        public virtual TDto GetFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class
-        {
-            return DataContext.Set<T>().Where(where).ProjectTo<TDto>(MapperConfig).DeferredFirstOrDefault().Execute();
-        }
-
-        /// <summary>
-        /// 获取第一条被AutoMapper映射后的数据
-        /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns>实体</returns>
-        public Task<TDto> GetFromCacheAsync<TDto>(Expression<Func<T, bool>> @where) where TDto : class
-        {
-            return DataContext.Set<T>().Where(where).ProjectTo<TDto>(MapperConfig).DeferredFirstOrDefault().ExecuteAsync();
         }
 
         /// <summary>
@@ -539,29 +322,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         public virtual TDto Get<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
         {
             return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefault() : DataContext.Set<T>().Where(where).OrderByDescending(orderby).AsNoTracking().ProjectTo<TDto>(MapperConfig).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 获取第一条数据（异步，不跟踪实体）
-        /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns>实体</returns>
-        public virtual Task<T> GetNoTrackingAsync(Expression<Func<T, bool>> where)
-        {
-            return EF.CompileAsyncQuery((DataContext ctx) => ctx.Set<T>().AsNoTracking().FirstOrDefault(@where))(DataContext);
-        }
-
-        /// <summary>
-        /// 获取第一条数据（异步，不跟踪实体）
-        /// </summary>
-        /// <typeparam name="TS">排序</typeparam>
-        /// <param name="where">查询条件</param>
-        /// <param name="orderby">排序字段</param>
-        /// <param name="isAsc">是否升序</param>
-        /// <returns>实体</returns>
-        public virtual Task<T> GetNoTrackingAsync<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
-        {
-            return isAsc ? EF.CompileAsyncQuery((DataContext ctx) => ctx.Set<T>().OrderBy(orderby).AsNoTracking().FirstOrDefault(where))(DataContext) : EF.CompileAsyncQuery((DataContext ctx) => ctx.Set<T>().OrderByDescending(orderby).AsNoTracking().FirstOrDefault(where))(DataContext);
         }
 
         /// <summary>
@@ -585,7 +345,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
 
         /// <summary>
-        /// 高效分页查询方法
+        /// 标准分页查询方法
         /// </summary>
         /// <typeparam name="TS"></typeparam>
         /// <param name="pageIndex">第几页</param>
@@ -596,11 +356,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual PagedList<T> GetPages<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc)
         {
-            return isAsc ? DataContext.Set<T>().Where(where).NotCacheable().OrderBy(orderby).ToPagedList(pageIndex, pageSize) : DataContext.Set<T>().Where(where).NotCacheable().OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
+            return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ToPagedList(pageIndex, pageSize) : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
         }
 
         /// <summary>
-        /// 高效分页查询方法
+        /// 标准分页查询方法
         /// </summary>
         /// <typeparam name="TS"></typeparam>
         /// <param name="pageIndex">第几页</param>
@@ -611,60 +371,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual Task<PagedList<T>> GetPagesAsync<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> orderby, bool isAsc)
         {
-            return isAsc ? DataContext.Set<T>().Where(where).NotCacheable().OrderBy(orderby).ToPagedListAsync(pageIndex, pageSize) : DataContext.Set<T>().Where(where).NotCacheable().OrderByDescending(orderby).ToPagedListAsync(pageIndex, pageSize);
+            return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ToPagedListAsync(pageIndex, pageSize) : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ToPagedListAsync(pageIndex, pageSize);
         }
 
         /// <summary>
-        /// 高效分页查询方法，优先从二级缓存读取
-        /// </summary>
-        /// <typeparam name="TS"></typeparam>
-        /// <param name="pageIndex">第几页</param>
-        /// <param name="pageSize">每页大小</param>
-        /// <param name="where">where Lambda条件表达式</param>
-        /// <param name="orderby">orderby Lambda条件表达式</param>
-        /// <param name="isAsc">升序降序</param>
-        /// <returns></returns>
-        public virtual PagedList<T> GetPagesFromCache<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc)
-        {
-            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            return isAsc ? temp.OrderBy(orderby).ToCachedPagedList(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToCachedPagedList(pageIndex, pageSize);
-        }
-
-        /// <summary>
-        /// 高效分页查询方法，优先从二级缓存读取
-        /// </summary>
-        /// <typeparam name="TS"></typeparam>
-        /// <param name="pageIndex">第几页</param>
-        /// <param name="pageSize">每页大小</param>
-        /// <param name="where">where Lambda条件表达式</param>
-        /// <param name="orderby">orderby Lambda条件表达式</param>
-        /// <param name="isAsc">升序降序</param>
-        /// <returns></returns>
-        public virtual Task<PagedList<T>> GetPagesFromCacheAsync<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc)
-        {
-            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            return isAsc ? temp.OrderBy(orderby).ToCachedPagedListAsync(pageIndex, pageSize) : temp.OrderByDescending(orderby).ToCachedPagedListAsync(pageIndex, pageSize);
-        }
-
-        /// <summary>
-        /// 高效分页查询方法，优先从二级缓存读取，取出被AutoMapper映射后的数据集合
-        /// </summary>
-        /// <typeparam name="TS"></typeparam>
-        /// <typeparam name="TDto"></typeparam>
-        /// <param name="pageIndex">第几页</param>
-        /// <param name="pageSize">每页大小</param>
-        /// <param name="where">where Lambda条件表达式</param>
-        /// <param name="orderby">orderby Lambda条件表达式</param>
-        /// <param name="isAsc">升序降序</param>
-        /// <returns></returns>
-        public Task<PagedList<TDto>> GetPagesFromCacheAsync<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc) where TDto : class
-        {
-            var temp = DataContext.Set<T>().Where(where).AsNoTracking();
-            return isAsc ? temp.OrderBy(orderby).ToCachedPagedListAsync<T, TDto>(pageIndex, pageSize, MapperConfig) : temp.OrderByDescending(orderby).ToCachedPagedListAsync<T, TDto>(pageIndex, pageSize, MapperConfig);
-        }
-
-        /// <summary>
-        /// 高效分页查询方法（不跟踪实体）
+        /// 标准分页查询方法（不跟踪实体）
         /// </summary>
         /// <typeparam name="TS"></typeparam>
         /// <param name="pageIndex">第几页</param>
@@ -675,11 +386,11 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns></returns>
         public virtual PagedList<T> GetPagesNoTracking<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
         {
-            return isAsc ? DataContext.Set<T>().Where(where).AsNoTracking().NotCacheable().OrderBy(orderby).ToPagedList(pageIndex, pageSize) : DataContext.Set<T>().Where(where).AsNoTracking().NotCacheable().OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
+            return isAsc ? DataContext.Set<T>().Where(where).AsNoTracking().OrderBy(orderby).ToPagedList(pageIndex, pageSize) : DataContext.Set<T>().Where(where).AsNoTracking().OrderByDescending(orderby).ToPagedList(pageIndex, pageSize);
         }
 
         /// <summary>
-        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合（不跟踪实体）
+        /// 标准分页查询方法，取出被AutoMapper映射后的数据集合（不跟踪实体）
         /// </summary>
         /// <typeparam name="TS"></typeparam>
         /// <typeparam name="TDto"></typeparam>
@@ -695,7 +406,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
 
         /// <summary>
-        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合
+        /// 标准分页查询方法，取出被AutoMapper映射后的数据集合
         /// </summary>
         /// <typeparam name="TS"></typeparam>
         /// <typeparam name="TDto"></typeparam>
@@ -711,7 +422,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
 
         /// <summary>
-        /// 高效分页查询方法，取出被AutoMapper映射后的数据集合，优先从缓存读取（不跟踪实体）
+        /// 标准分页查询方法，取出被AutoMapper映射后的数据集合，优先从缓存读取（不跟踪实体）
         /// </summary>
         /// <typeparam name="TS"></typeparam>
         /// <typeparam name="TDto"></typeparam>
@@ -771,21 +482,15 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         }
 
         /// <summary>
-        /// 根据条件删除实体（异步）
-        /// </summary>
-        /// <param name="where">查询条件</param>
-        /// <returns>删除成功</returns>
-        public virtual Task<int> DeleteEntityAsync(Expression<Func<T, bool>> where)
-        {
-            return DataContext.Set<T>().Where(where).DeleteAsync();
-        }
-
-        /// <summary>
         /// 添加实体
         /// </summary>
         /// <param name="t">需要添加的实体</param>
         /// <returns>添加成功</returns>
-        public abstract T AddEntity(T t);
+        public T AddEntity(T t)
+        {
+            DataContext.Add(t);
+            return t;
+        }
 
         /// <summary>
         /// 添加或更新实体
@@ -797,17 +502,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         {
             DataContext.Set<T>().AddOrUpdate(key, t);
             return t;
-        }
-
-        /// <summary>
-        /// 添加或更新实体
-        /// </summary>
-        /// <param name="key">更新键规则</param>
-        /// <param name="entities">需要保存的实体</param>
-        /// <returns>保存成功</returns>
-        public void AddOrUpdate<TKey>(Expression<Func<T, TKey>> key, params T[] entities)
-        {
-            DataContext.Set<T>().AddOrUpdate(key, entities);
         }
 
         /// <summary>
@@ -870,21 +564,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
             return true;
         }
 
-        /// <summary>
-        /// 添加多个实体
-        /// </summary>
-        /// <param name="list">实体集合</param>
-        /// <returns>添加成功</returns>
-        public virtual IEnumerable<T> AddEntities(IList<T> list)
-        {
-            DataContext.AddRange(list);
-            return list;
-        }
-
         public override void Dispose(bool disposing)
         {
-            //DataContext?.Dispose();
-            //DataContext = null;
         }
 
         public T this[int id] => GetById(id);

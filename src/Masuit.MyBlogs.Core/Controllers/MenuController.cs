@@ -1,5 +1,4 @@
 ﻿using Collections.Pooled;
-using DocumentFormat.OpenXml.Office.Word;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Command;
@@ -10,7 +9,7 @@ using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Graph;
+using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -89,6 +88,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             Mapper.Map(model, m);
             m.Path = model.ParentId > 0 ? (MenuService[model.ParentId.Value].Path + "," + model.ParentId).Trim(',') : SnowFlake.NewId;
             bool b = await MenuService.SaveChangesAsync() > 0;
+            QueryCacheManager.ExpireType<Menu>();
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }
     }

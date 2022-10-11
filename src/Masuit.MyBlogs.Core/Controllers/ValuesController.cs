@@ -1,9 +1,9 @@
-﻿using EFCoreSecondLevelCacheInterceptor;
-using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+﻿using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -15,13 +15,14 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpGet("list")]
         public async Task<ActionResult> GetAll()
         {
-            return ResultData(await VariablesService.GetAll().NotCacheable().ToListAsync());
+            return ResultData(await VariablesService.GetAllNoTracking().ToListAsync());
         }
 
         [HttpPost]
         public async Task<ActionResult> Save([FromBodyOrDefault] Variables model)
         {
             var b = await VariablesService.AddOrUpdateSavedAsync(v => v.Key, model) > 0;
+            QueryCacheManager.ExpireType<Variables>();
             return ResultData(null, b, b ? "保存成功" : "保存失败");
         }
 
@@ -29,6 +30,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Delete(int id)
         {
             var b = VariablesService - id;
+            QueryCacheManager.ExpireType<Variables>();
             return ResultData(null, b, b ? "删除成功" : "保存失败");
         }
     }

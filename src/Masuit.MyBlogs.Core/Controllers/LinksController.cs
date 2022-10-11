@@ -1,5 +1,4 @@
-﻿using EFCoreSecondLevelCacheInterceptor;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
@@ -8,6 +7,7 @@ using Masuit.Tools;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -28,7 +28,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("links"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Index([FromServices] IWebHostEnvironment hostEnvironment)
         {
-            var list = await LinksService.GetQueryFromCacheAsync<bool, LinksDto>(l => l.Status == Status.Available, l => l.Recommend, false);
+            var list = LinksService.GetQueryFromCache<bool, LinksDto>(l => l.Status == Status.Available, l => l.Recommend, false);
             var html = await new FileInfo(Path.Combine(hostEnvironment.WebRootPath, "template", "links.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8);
             ViewBag.Html = ReplaceVariables(html);
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location());
@@ -91,6 +91,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 }
 
                 var b = LinksService.AddEntitySaved(link) != null;
+                QueryCacheManager.ExpireType<Links>();
                 return ResultData(null, b, b ? "添加成功！这可能有一定的延迟，如果没有看到您的链接，请稍等几分钟后刷新页面即可，如有疑问，请联系站长。" : "添加失败！这可能是由于网站服务器内部发生了错误，如有疑问，请联系站长。");
             });
         }
@@ -104,6 +105,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Save([FromBodyOrDefault] Links links)
         {
             bool b = await LinksService.AddOrUpdateSavedAsync(l => l.Id, links) > 0;
+            QueryCacheManager.ExpireType<Links>();
             return b ? ResultData(null, message: "添加成功！") : ResultData(null, false, "添加失败！");
         }
 
@@ -149,6 +151,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             bool b = await LinksService.DeleteByIdAsync(id) > 0;
+            QueryCacheManager.ExpireType<Links>();
             return ResultData(null, b, b ? "删除成功！" : "删除失败！");
         }
 
@@ -159,7 +162,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult Get()
         {
-            var list = LinksService.GetAll<LinksDto>().OrderBy(p => p.Status).ThenByDescending(p => p.Recommend).ThenByDescending(p => p.Id).NotCacheable().ToList();
+            var list = LinksService.GetAll<LinksDto>().OrderBy(p => p.Status).ThenByDescending(p => p.Recommend).ThenByDescending(p => p.Id).ToList();
             return ResultData(list);
         }
 
@@ -208,6 +211,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 Status = m.Status == Status.Unavailable ? Status.Available : Status.Unavailable
             }) > 0;
+            QueryCacheManager.ExpireType<Links>();
             return ResultData(null, b, b ? "切换成功！" : "切换失败！");
         }
     }

@@ -6,8 +6,14 @@ using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Infrastructure.Drive;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics;
+using Z.EntityFramework.Plus;
 
+QueryCacheManager.DefaultMemoryCacheEntryOptions = new MemoryCacheEntryOptions()
+{
+    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+};
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 if (Environment.OSVersion.Platform is not (PlatformID.MacOSX or PlatformID.Unix))

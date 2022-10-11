@@ -47,7 +47,6 @@
         <PackageReference Include="CHTCHSConv" Version="1.0.0" />
         <PackageReference Include="CLRStats" Version="1.0.0" />
         <PackageReference Include="Collections.Pooled" Version="1.0.82" />
-        <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="3.7.0" />
         <PackageReference Include="FreeRedis" Version="1.0.2" />
         <PackageReference Include="Hangfire" Version="1.7.31" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />

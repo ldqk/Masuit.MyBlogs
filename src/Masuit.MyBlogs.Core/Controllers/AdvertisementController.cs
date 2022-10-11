@@ -1,6 +1,5 @@
 ﻿using AutoMapper.QueryableExtensions;
 using Collections.Pooled;
-using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -72,7 +71,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => Regex.IsMatch(p.Title + p.Description + p.Url, kw, RegexOptions.IgnoreCase));
             }
 
-            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ThenByDescending(a => a.Id).ProjectTo<AdvertisementViewModel>(MapperConfig).NotCacheable().ToPagedList(page, size);
+            var list = AdsService.GetQuery(where).OrderByDescending(p => p.Status == Status.Available).ThenByDescending(a => a.Price).ThenByDescending(a => a.Id).ProjectTo<AdvertisementViewModel>(MapperConfig).ToPagedList(page, size);
             return Ok(list);
         }
 

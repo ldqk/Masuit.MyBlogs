@@ -1,17 +1,18 @@
-﻿using EFCoreSecondLevelCacheInterceptor;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
+using Masuit.Tools;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.International.Converters.TraditionalChineseToSimplifiedConverter;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
-using Masuit.Tools;
+using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -53,7 +54,10 @@ namespace Masuit.MyBlogs.Core.Controllers
                 ViewBag.hotSearches = new List<KeywordsRank>();
                 if (posts.Total > size)
                 {
-                    ViewBag.RelateKeywords = SearchDetailsService.GetQuery(s => s.Keywords.Contains(wd) && s.Keywords != wd).Select(s => s.Keywords).GroupBy(s => s).OrderByDescending(g => g.Count()).Select(g => g.Key).Take(10).Cacheable().ToList();
+                    ViewBag.RelateKeywords = SearchDetailsService.GetQuery(s => s.Keywords.Contains(wd) && s.Keywords != wd).Select(s => s.Keywords).GroupBy(s => s).OrderByDescending(g => g.Count()).Select(g => g.Key).Take(10).FromCache(new MemoryCacheEntryOptions()
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+                    }).ToList();
                 }
 
                 if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !Request.IsRobot())
@@ -84,7 +88,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="search"></param>
         /// <returns></returns>
         [MyAuthorize, HttpPost("search/SearchList"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "search" })]
-        public ActionResult SearchList([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string search = "")
+        public ActionResult SearchList([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 200, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string search = "")
         {
             var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.Keywords.Contains(search);
             var pages = SearchDetailsService.GetPages<DateTime, SearchDetailsDto>(page, size, where, s => s.SearchTime, false);

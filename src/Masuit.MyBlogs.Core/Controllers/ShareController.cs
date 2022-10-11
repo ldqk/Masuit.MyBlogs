@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
+using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -34,6 +35,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public ActionResult Add([FromBodyOrDefault] FastShare share)
         {
             bool b = FastShareService.AddEntitySaved(share) != null;
+            QueryCacheManager.ExpireType<FastShare>();
             return ResultData(null, b, b ? "添加成功" : "添加失败");
         }
 
@@ -46,6 +48,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Remove(int id)
         {
             bool b = await FastShareService.DeleteByIdAsync(id) > 0;
+            QueryCacheManager.ExpireType<FastShare>();
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
 
@@ -63,6 +66,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Link = model.Link,
                 Sort = model.Sort
             }) > 0;
+            QueryCacheManager.ExpireType<FastShare>();
             return ResultData(null, b, b ? "更新成功" : "更新失败");
         }
     }

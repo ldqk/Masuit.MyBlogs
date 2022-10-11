@@ -4,7 +4,6 @@ using AngleSharp.Html.Parser;
 using AutoMapper;
 using CacheManager.Core;
 using Collections.Pooled;
-using EFCoreSecondLevelCacheInterceptor;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
@@ -21,6 +20,7 @@ using PanGu.HighLight;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -120,7 +120,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public void SolvePostsCategory(IList<PostDto> posts)
         {
             var cids = posts.Select(p => p.CategoryId).Distinct().ToArray();
-            var categories = _categoryRepository.GetQuery(c => cids.Contains(c.Id)).Include(c => c.Parent).Cacheable().ToDictionary(c => c.Id);
+            var categories = _categoryRepository.GetQuery(c => cids.Contains(c.Id)).Include(c => c.Parent).ToDictionary(c => c.Id);
             posts.ForEach(p => p.Category = _mapper.Map<CategoryDto_P>(categories[p.CategoryId]));
         }
 
@@ -196,7 +196,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         /// <returns></returns>
         public Dictionary<string, int> GetTags()
         {
-            return _postTagsRepository.GetAll(t => t.Count, false).Cacheable().ToDictionary(g => g.Name, g => g.Count);
+            return _postTagsRepository.GetAll(t => t.Count, false).FromCache().ToDictionary(g => g.Name, g => g.Count);
         }
 
         /// <summary>
@@ -230,17 +230,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override bool DeleteById(int id)
         {
             DeleteEntity(GetById(id));
-            return SearchEngine.SaveChanges() > 0;
-        }
-
-        /// <summary>
-        /// 删除多个实体并保存
-        /// </summary>
-        /// <param name="list">实体集合</param>
-        /// <returns>删除成功</returns>
-        public override bool DeleteEntitiesSaved(IEnumerable<Post> list)
-        {
-            base.DeleteEntities(list);
             return SearchEngine.SaveChanges() > 0;
         }
 
@@ -296,17 +285,6 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
         public override Task<int> DeleteEntitySavedAsync(Expression<Func<Post, bool>> where)
         {
             base.DeleteEntity(where);
-            return SearchEngine.SaveChangesAsync();
-        }
-
-        /// <summary>
-        /// 删除实体并保存（异步）
-        /// </summary>
-        /// <param name="t">需要删除的实体</param>
-        /// <returns>删除成功</returns>
-        public override Task<int> DeleteEntitySavedAsync(Post t)
-        {
-            base.DeleteEntity(t);
             return SearchEngine.SaveChangesAsync();
         }
 

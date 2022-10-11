@@ -1,5 +1,4 @@
 ﻿using CacheManager.Core;
-using EFCoreSecondLevelCacheInterceptor;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
@@ -9,8 +8,10 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services
 {
@@ -60,7 +61,10 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
                 where = where.And(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase)));
                 if (cid.HasValue)
                 {
-                    var pids = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => c.ParentId + "|" + c.Parent.ParentId).Cacheable().ToArray();
+                    var pids = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => c.ParentId + "|" + c.Parent.ParentId).FromCache(new MemoryCacheEntryOptions()
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(5)
+                    }).ToArray();
                     var scid = pids.Select(s => s.Trim('|')).Where(s => !string.IsNullOrEmpty(s)).Append(cid + "").Join("|");
                     if (Any(a => Regex.IsMatch(a.CategoryIds, scid)))
                     {

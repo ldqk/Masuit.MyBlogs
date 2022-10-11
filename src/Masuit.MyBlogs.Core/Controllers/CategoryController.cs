@@ -10,6 +10,7 @@ using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Models;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
+using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -67,6 +68,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             cat.ParentId = cmd.ParentId;
             cat.Path = cmd.ParentId > 0 ? (CategoryService[cmd.ParentId.Value].Path + "," + cmd.ParentId).Trim(',') : SnowFlake.NewId;
             bool b = await CategoryService.SaveChangesAsync() > 0;
+            QueryCacheManager.ExpireType<Category>();
             return ResultData(null, b, b ? "分类修改成功！" : "分类修改失败！");
         }
 
@@ -80,6 +82,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Delete(int id, int cid = 1)
         {
             bool b = await CategoryService.Delete(id, cid);
+            QueryCacheManager.ExpireType<Category>();
             return ResultData(null, b, b ? "分类删除成功" : "分类删除失败");
         }
     }

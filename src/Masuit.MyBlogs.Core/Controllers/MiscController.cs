@@ -68,11 +68,11 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("donatelist")]
-        public async Task<ActionResult> DonateList([FromServices] IDonateService donateService, int page = 1, int size = 10)
+        public ActionResult DonateList([FromServices] IDonateService donateService, int page = 1, int size = 10)
         {
             if (bool.Parse(CommonHelper.SystemSettings.GetOrAdd("EnableDonate", "true")))
             {
-                var list = await donateService.GetPagesFromCacheAsync<DateTime, DonateDto>(page, size, d => true, d => d.DonateTime, false);
+                var list = donateService.GetPagesFromCache<DateTime, DonateDto>(page, size, d => true, d => d.DonateTime, false);
                 if (!CurrentUser.IsAdmin)
                 {
                     foreach (var item in list.Data.Where(item => !(item.QQorWechat + item.Email).Contains("匿名")))

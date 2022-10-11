@@ -1,5 +1,5 @@
 ﻿using CacheManager.Core;
-using EFCoreSecondLevelCacheInterceptor;
+using Collections.Pooled;
 using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
@@ -16,14 +16,13 @@ using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Models;
 using Masuit.Tools.Strings;
+using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.RegularExpressions;
-using Masuit.Tools.Systems;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
-using Collections.Pooled;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -377,7 +376,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public ActionResult GetUnreadMsgs()
         {
-            var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).NotCacheable().ToList();
+            var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).ToList();
             return ResultData(msgs);
         }
 

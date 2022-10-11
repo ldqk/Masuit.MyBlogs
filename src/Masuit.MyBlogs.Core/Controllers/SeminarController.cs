@@ -48,8 +48,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             var h24 = DateTime.Today.AddDays(-1);
             var posts = orderBy switch
             {
-                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id))).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-                _ => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id))).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToCachedPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+                OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id))).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
+                _ => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id))).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
             };
             ViewBag.Id = s.Id;
             ViewBag.Title = s.Title;

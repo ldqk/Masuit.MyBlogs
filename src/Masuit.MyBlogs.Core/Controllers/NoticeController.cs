@@ -10,6 +10,7 @@ using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Core.Net;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
@@ -32,9 +33,9 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [Route("notice"), Route("n", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
-        public async Task<ActionResult> Index([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+        public ActionResult Index([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
-            var list = await NoticeService.GetPagesFromCacheAsync<DateTime, NoticeDto>(page, size, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false);
+            var list = NoticeService.GetPagesFromCache<DateTime, NoticeDto>(page, size, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false);
             ViewData["page"] = new Pagination(page, size, list.TotalCount);
             foreach (var n in list.Data)
             {
@@ -91,6 +92,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             var e = NoticeService.AddEntitySaved(notice);
+            QueryCacheManager.ExpireType<Notice>();
             return e != null ? ResultData(null, message: "发布成功") : ResultData(null, false, "发布失败");
         }
 
@@ -103,6 +105,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             bool b = await NoticeService.DeleteByIdAsync(id) > 0;
+            QueryCacheManager.ExpireType<Notice>();
             return ResultData(null, b, b ? "删除成功" : "删除失败");
         }
 
@@ -117,6 +120,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("公告未找到");
             notice.NoticeStatus = notice.NoticeStatus == NoticeStatus.Normal ? NoticeStatus.Expired : NoticeStatus.Normal;
             var b = await NoticeService.SaveChangesAsync() > 0;
+            QueryCacheManager.ExpireType<Notice>();
             return ResultData(null, b, notice.NoticeStatus == NoticeStatus.Normal ? $"【{notice.Title}】已上架！" : $"【{notice.Title}】已下架！");
         }
 
@@ -145,6 +149,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             entity.Title = notice.Title;
             entity.Content = await ImagebedClient.ReplaceImgSrc(await notice.Content.ClearImgAttributes(), cancellationToken);
             bool b = await NoticeService.SaveChangesAsync() > 0;
+            QueryCacheManager.ExpireType<Notice>();
             return ResultData(null, b, b ? "修改成功" : "修改失败");
         }
 

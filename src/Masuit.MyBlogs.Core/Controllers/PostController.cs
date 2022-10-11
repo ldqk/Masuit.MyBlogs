@@ -1,6 +1,5 @@
 ﻿using CacheManager.Core;
 using Collections.Pooled;
-using EFCoreSecondLevelCacheInterceptor;
 using Hangfire;
 using JiebaNet.Segmenter;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
@@ -43,6 +42,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using Z.EntityFramework.Plus;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -117,7 +117,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             var regex = SearchEngine.LuceneIndexSearcher.CutKeywords(string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label).Select(Regex.Escape).Join("|");
             ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId, regex);
-            var related = await PostService.GetQuery(PostBaseWhere().And(p => p.Id != id && Regex.IsMatch(p.Title + (p.Keyword ?? "") + (p.Label ?? ""), regex, RegexOptions.IgnoreCase)), p => p.AverageViewCount, false).Take(10).Select(p => new { p.Id, p.Title }).Cacheable().ToDictionaryAsync(p => p.Id, p => p.Title);
+            var related = PostService.GetQuery(PostBaseWhere().And(p => p.Id != id && Regex.IsMatch(p.Title + (p.Keyword ?? "") + (p.Label ?? ""), regex, RegexOptions.IgnoreCase)), p => p.AverageViewCount, false).Take(10).Select(p => new { p.Id, p.Title }).FromCache().ToDictionary(p => p.Id, p => p.Title);
             ViewBag.Related = related;
             post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -639,7 +639,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <returns></returns>
         [MyAuthorize]
-        public async Task<ActionResult> GetPageData([FromServices] ICacheManager<HashSet<string>> cacheManager, int page = 1, [Range(1, int.MaxValue, ErrorMessage = "页大小必须大于0")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
+        public async Task<ActionResult> GetPageData([FromServices] ICacheManager<HashSet<string>> cacheManager, int page = 1, [Range(1, 200, ErrorMessage = "页大小必须介于{1}-{2}")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
         {
             Expression<Func<Post, bool>> where = p => true;
             if (cid.HasValue)
@@ -684,7 +684,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 where = where.And(p => p.Title.Contains(search) || p.Author.Contains(search) || p.Email.Contains(search) || p.Label.Contains(search));
             }
 
-            var pages = await PostService.GetQuery(where).OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).ToCachedPagedListAsync<Post, PostDataModel>(page, size, MapperConfig);
+            var pages = await PostService.GetQuery(where).OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig);
             foreach (var item in pages.Data)
             {
                 item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -1097,20 +1097,20 @@ namespace Masuit.MyBlogs.Core.Controllers
                 Id = p.Id,
                 Title = p.Title,
                 ViewCount = p.TotalViewCount
-            }).Cacheable().ToListAsync(cancellationToken);
+            }).ToListAsync(cancellationToken);
             var mostAverage = await postsQuery.OrderByDescending(p => p.AverageViewCount).Take(10).Select(p => new PostModelBase()
             {
                 Id = p.Id,
                 Title = p.Title,
                 ViewCount = (int)p.AverageViewCount
-            }).Cacheable().ToListAsync(cancellationToken);
+            }).ToListAsync(cancellationToken);
             var yesterday = DateTime.Now.AddDays(-1);
             var trending = await postsQuery.Select(p => new PostModelBase()
             {
                 Id = p.Id,
                 Title = p.Title,
                 ViewCount = p.PostVisitRecords.Count(t => t.Time >= yesterday)
-            }).OrderByDescending(p => p.ViewCount).Take(10).Cacheable().ToListAsync(cancellationToken);
+            }).OrderByDescending(p => p.ViewCount).Take(10).ToListAsync(cancellationToken);
             var readCount = PostVisitRecordService.Count(e => e.Time >= yesterday);
             return ResultData(new
             {
