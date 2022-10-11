@@ -101,24 +101,27 @@ public class FirewallController : Controller
     public async Task<ActionResult> CloudflareTurnstileHandler()
     {
         var form = await Request.ReadFormAsync();
-        var token = form["cf-turnstile-response"][0];
-        const string url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
-        using var encodedContent = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
+        if (form.ContainsKey("cf-turnstile-response"))
         {
-            new("secret",CommonHelper.SystemSettings["TurnstileSecretKey"]),
-            new("response",token),
-            new("remoteip",HttpContext.Connection.RemoteIpAddress.ToString()),
-        });
-        var resp = await _httpClient.PostAsync(url, encodedContent);
-        var result = await resp.Content.ReadFromJsonAsync<TurnstileResult>();
-        if (result.Success)
-        {
-            HttpContext.Session.Set("js-challenge", 1);
-            Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.BaiduAK), new CookieOptions()
+            var token = form["cf-turnstile-response"][0];
+            const string url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+            using var encodedContent = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
             {
-                SameSite = SameSiteMode.Lax,
-                Expires = DateTime.Now.AddDays(1)
+                new("secret",CommonHelper.SystemSettings["TurnstileSecretKey"]),
+                new("response",token),
+                new("remoteip",HttpContext.Connection.RemoteIpAddress.ToString()),
             });
+            var resp = await _httpClient.PostAsync(url, encodedContent);
+            var result = await resp.Content.ReadFromJsonAsync<TurnstileResult>();
+            if (result.Success)
+            {
+                HttpContext.Session.Set("js-challenge", 1);
+                Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.BaiduAK), new CookieOptions()
+                {
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTime.Now.AddDays(1)
+                });
+            }
         }
 
         return Redirect(Request.Headers[HeaderNames.Referer]);

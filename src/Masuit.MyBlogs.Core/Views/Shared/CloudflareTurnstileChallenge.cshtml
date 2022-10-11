@@ -33,7 +33,7 @@
     <form asp-controller="Firewall" asp-action="CloudflareTurnstileHandler" method="post">
         @Html.AntiForgeryToken()
         <div class="cf-turnstile" data-sitekey="@CommonHelper.SystemSettings["TurnstileClientKey"]" data-theme="light"></div>
-        <button class="btn btn-lg btn-primary" type="submit">点击进入网站</button>
+        <button id="btn" class="btn btn-lg btn-primary" type="submit" style="display: none">点击进入网站</button>
     </form>
 @Html.Raw(CommonHelper.SystemSettings["Scripts"])
 </body>
@@ -43,6 +43,7 @@
         const interval = setInterval(function() {
             if ($("input[name=cf-turnstile-response]").val().length) {
                 clearInterval(interval);
+                $("#btn").show();
                 $("form").submit();
             }
         },2000);
