@@ -177,6 +177,16 @@ public class FirewallAttribute : IAsyncActionFilter
             return true;
         }
 
+        if (mode == SessionKey.CloudflareTurnstileChallenge)
+        {
+            context.Result = new ViewResult()
+            {
+                ViewName = "/Views/Shared/CloudflareTurnstileChallenge.cshtml"
+            };
+            completedTask = Task.CompletedTask;
+            return true;
+        }
+
         completedTask = Task.CompletedTask;
         return false;
     }

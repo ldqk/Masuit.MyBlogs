@@ -60,7 +60,21 @@
                             <option value=" ">无</option>
                             <option value="JSChallenge">JS挑战</option>
                             <option value="CaptchaChallenge">验证码挑战</option>
+                            <option value="CloudflareTurnstileChallenge">CloudflareTurnstile</option>
                         </select>
+                    </div>
+                    <div class="input-group" ng-if="Settings.ChallengeMode=='CloudflareTurnstileChallenge'">
+                        <span class="input-group-addon">客户端公钥：</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.TurnstileClientKey" placeholder="0x4AAAAAAAAu4dr4wC-ZVpPT" type="text" style="min-width: 220px"/>
+                        </div>
+                    </div>
+                    <div class="input-group" ng-if="Settings.ChallengeMode=='CloudflareTurnstileChallenge'">
+                        <span class="input-group-addon">服务端密钥：</span>
+                        <div class="fg-line">
+                            <input class="form-control" ng-model="Settings.TurnstileSecretKey" placeholder="0x4AAAAAAAAu4eDk4a2NvM91-OoOptBYl5Y" type="text" style="min-width: 320px" />
+                        </div>
+                        <span class="input-group-addon text-red" ng-if="(Settings.TurnstileSecretKey+Settings.TurnstileClientKey).length==0">温馨提示：请先到<a href="https://dash.cloudflare.com/" target="_blank">Cloudflare Turnstile</a>生成站点密钥。</span>
                     </div>
                 </div>
                 <div class="col-md-12">

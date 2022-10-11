@@ -12,6 +12,7 @@ using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
 using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -20,6 +21,12 @@ namespace Masuit.MyBlogs.Core.Controllers;
 public class FirewallController : Controller
 {
     public IRedisClient RedisClient { get; set; }
+    private readonly HttpClient _httpClient;
+
+    public FirewallController(IHttpClientFactory httpClientFactory)
+    {
+        _httpClient = httpClientFactory.CreateClient();
+    }
 
     /// <summary>
     /// JS挑战，5秒盾
@@ -43,6 +50,20 @@ public class FirewallController : Controller
         {
             return BadRequest();
         }
+    }
+
+    /// <summary>
+    /// 验证码
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("/challenge-captcha.jpg")]
+    [ResponseCache(NoStore = true, Duration = 0)]
+    public ActionResult CaptchaChallenge()
+    {
+        string code = ValidateCode.CreateValidateCode(6);
+        HttpContext.Session.Set("challenge-captcha", code);
+        var buffer = HttpContext.CreateValidateGraphic(code);
+        return this.ResumeFile(buffer, ContentType.Jpeg, "验证码.jpg");
     }
 
     /// <summary>
@@ -73,17 +94,34 @@ public class FirewallController : Controller
     }
 
     /// <summary>
-    /// 验证码
+    /// CloudflareTurnstile验证
     /// </summary>
     /// <returns></returns>
-    [HttpGet("/challenge-captcha.jpg")]
-    [ResponseCache(NoStore = true, Duration = 0)]
-    public ActionResult CaptchaChallenge()
+    [HttpPost("/turnstile-handler"), AutoValidateAntiforgeryToken]
+    public async Task<ActionResult> CloudflareTurnstileHandler()
     {
-        string code = ValidateCode.CreateValidateCode(6);
-        HttpContext.Session.Set("challenge-captcha", code);
-        var buffer = HttpContext.CreateValidateGraphic(code);
-        return this.ResumeFile(buffer, ContentType.Jpeg, "验证码.jpg");
+        var form = await Request.ReadFormAsync();
+        var token = form["cf-turnstile-response"][0];
+        const string url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+        using var encodedContent = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
+        {
+            new("secret",CommonHelper.SystemSettings["TurnstileSecretKey"]),
+            new("response",token),
+            new("remoteip",HttpContext.Connection.RemoteIpAddress.ToString()),
+        });
+        var resp = await _httpClient.PostAsync(url, encodedContent);
+        var result = await resp.Content.ReadFromJsonAsync<TurnstileResult>();
+        if (result.Success)
+        {
+            HttpContext.Session.Set("js-challenge", 1);
+            Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.BaiduAK), new CookieOptions()
+            {
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.Now.AddDays(1)
+            });
+        }
+
+        return Redirect(Request.Headers[HeaderNames.Referer]);
     }
 
     /// <summary>
@@ -130,4 +168,16 @@ public class FirewallController : Controller
         var sitemap = Path.Combine(env.WebRootPath, "sitemap.txt");
         return System.IO.File.Exists(sitemap) ? Redirect(System.IO.File.ReadLines(sitemap).OrderByRandom().FirstOrDefault() ?? "/") : Redirect("/");
     }
+}
+
+public class TurnstileResult
+{
+    public bool Success { get; set; }
+    [JsonProperty("error-codes")]
+    public string[] ErrorCodes { get; set; }
+    [JsonProperty("challenge_ts")]
+    public DateTime ChallengeTime { get; set; }
+    public string Hostname { get; set; }
+    public string Action { get; set; }
+    public string Cdata { get; set; }
 }
