@@ -21,6 +21,10 @@ namespace Masuit.MyBlogs.Core.Controllers
         [Route("dashboard"), ResponseCache(Duration = 60, VaryByHeader = "Cookie")]
         public ActionResult Index()
         {
+            Response.Cookies.Append("lang", "zh-cn", new CookieOptions()
+            {
+                Expires = DateTime.Now.AddYears(1),
+            });
             return View();
         }
 
