@@ -3,6 +3,7 @@
         max-height: 800px;
         overflow-y: auto;
     }
+
     td .xm-body {
         position: unset
     }
@@ -159,41 +160,41 @@
                 <div class="form-group">
                     <div class="input-group">
                         <label for="desc" class="input-group-addon control-label">当前竞价：</label>
-                            <input type="number" class="form-control" id="price" placeholder="竞价" ng-model="partner.Price">
+                        <input type="number" class="form-control" id="price" placeholder="竞价" ng-model="partner.Price">
                     </div>
                 </div>
                 <div class="input-group">
                     <label for="desc" class="input-group-addon control-label">过期时间：</label>
                     <div class="fg-line">
-                        <input type="text" class="form-control" id="timespan" ng-model="partner.ExpireTime"/>
+                        <input type="text" class="form-control" id="timespan" ng-model="partner.ExpireTime" />
                     </div>
                 </div>
             </div>
-                <div class="form-group form-inline">
-                    <div class="input-group">
-                        <label for="region" class="input-group-addon control-label">投放地区：</label>
-                        <div class="fg-line">
-                            <input type="text" class="form-control" id="region" placeholder="竖线分隔，支持国家、地区、城市、运营商、ASN" ng-model="partner.Regions" style="width: 420px">
-                            <div class="form-control" id="regionMode" style="width: 100px"></div>
-                        </div>
+            <div class="form-group form-inline">
+                <div class="input-group">
+                    <label for="region" class="input-group-addon control-label">投放地区：</label>
+                    <div class="fg-line">
+                        <input type="text" class="form-control" id="region" placeholder="竖线分隔，支持国家、地区、城市、运营商、ASN" ng-model="partner.Regions" style="width: 420px">
+                        <div class="form-control" id="regionMode" style="width: 100px"></div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-xs-12">
-                        <div class="fg-line">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-info" ng-click="submit(partner)">
-                                    保存
-                                </button>
-                                <button type="button" class="btn btn-danger" ng-click="closeAll()">
-                                    取消
-                                </button>
-                            </div>
+            </div>
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <div class="fg-line">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info" ng-click="submit(partner)">
+                                保存
+                            </button>
+                            <button type="button" class="btn btn-danger" ng-click="closeAll()">
+                                取消
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </div>
 <div id="detail" class="modal">
     <div class="container-fluid" style="margin: 15px 0;">
@@ -281,7 +282,7 @@
                 <span class="input-group-btn hidden">
                     <a href="javascript:void(0);" class="btn btn-info ">浏览</a>
                 </span>
-                <input type="file" class="uploadFile" name="file" onchange="getFile(this, 'file0')" style="width: 200px"/>
+                <input type="file" class="uploadFile" name="file" onchange="getFile(this, 'file0')" style="width: 200px" />
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-primary" ng-click="uploadImage(imgField)">开始上传</button>
                 </span>
@@ -300,5 +301,11 @@
                 <button type="button" class="btn btn-primary" ng-click="submit(partner)">确定</button>
             </span>
         </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div id="chart" style="height: 500px"></div>
     </div>
 </div>

@@ -416,4 +416,65 @@
             content: '/partner/' + row.Id + '/insight'
         }));
     }
+    
+    window.fetch("/partner/records-chart", {
+        credentials: 'include',
+        method: 'GET',
+        mode: 'cors'
+    }).then(function(response) {
+        return response.json();
+    }).then(function(res) {
+        var data = [];
+        for (let item of res) {
+            data.push([Date.parse(item.Date), item.Count]);
+        }
+        var chartDom = document.getElementById('chart');
+        var myChart = echarts.init(chartDom);
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                position: function(pt) {
+                    return [pt[0], '10%'];
+                }
+            },
+            title: {
+                left: 'center',
+                text: '最近30天每日总点击趋势，日均：' + (res.reduce((acr, cur) => acr + cur.Count, 0) / (new Date() - new Date(res[0].Date)) * (1000 * 60 * 60 * 24)).toFixed(2)
+            },
+            xAxis: {
+                type: 'time',
+                axisLabel: {
+                    formatter:function (value){
+                        var dt=new Date(value);
+                        return dt.toLocaleDateString();
+                    }
+                }
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    name: '点击量',
+                    type: 'line',
+                    smooth: true,
+                    symbol: 'none',
+                    areaStyle: {},
+                    data: data,
+                    markPoint: {
+                        data: [
+                            { type: 'max', name: '最大值' },
+                            { type: 'min', name: '最小值' }
+                        ]
+                    },
+                    markLine: {
+                        data: [
+                            { type: 'average', name: '平均值' }
+                        ]
+                    }
+                }
+            ]
+        };
+        myChart.setOption(option);
+    });
 }]);
