@@ -10,10 +10,10 @@ using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
-using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -147,7 +147,7 @@ public class FirewallController : Controller
         RedisClient.LPush("intercept", new IpIntercepter()
         {
             IP = ip,
-            RequestUrl = HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + "/craw/" + id),
+            RequestUrl = Request.GetDisplayUrl(),
             Time = DateTime.Now,
             Referer = Request.Headers[HeaderNames.Referer],
             UserAgent = Request.Headers[HeaderNames.UserAgent],

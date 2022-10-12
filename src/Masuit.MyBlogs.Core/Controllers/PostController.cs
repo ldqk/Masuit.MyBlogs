@@ -32,6 +32,7 @@ using Masuit.Tools.Models;
 using Masuit.Tools.Security;
 using Masuit.Tools.Strings;
 using Masuit.Tools.Systems;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
@@ -41,7 +42,6 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 using Z.EntityFramework.Plus;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -91,7 +91,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             {
                 if (notRobot && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
                 {
-                    BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString)));
+                    BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), Request.GetDisplayUrl()));
                     HttpContext.Session.Set("post" + id, id.ToString());
                 }
 
@@ -131,8 +131,13 @@ namespace Masuit.MyBlogs.Core.Controllers
 
             if (notRobot && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
             {
-                BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), HttpUtility.UrlDecode(Request.Scheme + "://" + Request.Host + Request.Path + Request.QueryString)));
+                BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), Request.GetDisplayUrl()));
                 HttpContext.Session.Set("post" + id, id.ToString());
+            }
+
+            if (post.LimitMode == RegionLimitMode.OnlyForSearchEngine)
+            {
+                BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), Request.GetDisplayUrl()));
             }
 
             return View(post);
