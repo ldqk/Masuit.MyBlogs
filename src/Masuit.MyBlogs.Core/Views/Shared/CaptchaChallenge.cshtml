@@ -15,11 +15,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>继续访问请输入验证码</title>
     <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+    <script src="~/Scripts/layer/layer.js"></script>
     <script src="/Scripts/global/functions.js"></script>
 </head>
 <body>
     <h3>继续访问请输入验证码：</h3>
-    <img src="/challenge-captcha.jpg?@Stopwatch.GetTimestamp()" onclick="this.src='/challenge-captcha.jpg?'+new Date" />
+    <img class="captcha" src="/challenge-captcha.jpg?@Stopwatch.GetTimestamp()" onclick="this.src='/challenge-captcha.jpg?'+new Date" />
     <form asp-action="CaptchaChallenge" asp-controller="Firewall" method="post">
         @Html.AntiForgeryToken()
         <input type="text" name="code" placeholder="验证码" required="" />

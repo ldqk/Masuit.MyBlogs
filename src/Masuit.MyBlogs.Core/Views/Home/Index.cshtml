@@ -4,6 +4,7 @@
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
+@using Masuit.Tools
 @using Masuit.Tools.Core.Net
 @using Microsoft.AspNetCore.Http
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
@@ -12,25 +13,26 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     PooledList<FastShare> shares = ViewBag.FastShare;
     Context.Request.Path = new PathString("/posts");
+    var sliderid = Stopwatch.GetTimestamp().ToBinary(62);
 }
 <link href="~/Assets/banner/bootstrap-touch-slider.css" rel="stylesheet" />
 @if (Model.Banner.Any())
 {
-    <div id="bootstrap-touch-slider" class="carousel bs-slider fade  control-round indicators-line" data-ride="carousel" data-pause="hover" data-interval="5000" id="@Stopwatch.GetTimestamp()">
+    <div id="@sliderid" class="carousel bs-slider fade  control-round indicators-line" data-ride="carousel" data-pause="hover" data-interval="5000" id="@Stopwatch.GetTimestamp()">
         <ol class="carousel-indicators">
             @for (int i = 0; i < Model.Banner.Count; i++)
             {
                 if (i == 0)
                 {
-                    <li data-target="#bootstrap-touch-slider" data-slide-to="@i" class="active"></li>
+                    <li data-target="#@sliderid" data-slide-to="@i" class="active"></li>
                 }
                 else
                 {
-                    <li data-target="#bootstrap-touch-slider" data-slide-to="@i"></li>
+                    <li data-target="#@sliderid" data-slide-to="@i"></li>
                 }
             }
         </ol>
-        <div class="carousel-inner" role="listbox" id="@Stopwatch.GetTimestamp()">
+        <div class="carousel-inner" id="@Stopwatch.GetTimestamp()">
             @for (int i = 0; i < Model.Banner.Count; i++)
             {
                 var p = Model.Banner[i];
@@ -43,11 +45,11 @@
                 </div>
             }
         </div>
-        <a class="left carousel-control" href="#bootstrap-touch-slider" role="button" data-slide="prev">
+        <a class="left carousel-control" href="#@sliderid" role="button" data-slide="prev">
             <span class="fa fa-angle-left" aria-hidden="true"></span>
             <span class="sr-only">上一个</span>
         </a>
-        <a class="right carousel-control" href="#bootstrap-touch-slider" role="button" data-slide="next">
+        <a class="right carousel-control" href="#@sliderid" role="button" data-slide="next">
             <span class="fa fa-angle-right" aria-hidden="true"></span>
             <span class="sr-only">下一个</span>
         </a>
@@ -121,5 +123,5 @@
     await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
 }
 <script type="text/javascript">
-    $('#bootstrap-touch-slider').bsTouchSlider();
+    $('#@sliderid').bsTouchSlider();
 </script>

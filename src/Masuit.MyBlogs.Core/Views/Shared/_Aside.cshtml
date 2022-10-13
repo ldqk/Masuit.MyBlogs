@@ -69,12 +69,12 @@
     </section>
     @foreach (var ad in Model.SidebarAds)
     {
-        <section class="wow animated fadeIn" id="@SnowFlake.NewId">
+        <section class="wow animated fadeIn">
             <article class="panel panel-info">
                 <div class="panel-heading">
                     @ad.Title
                 </div>
-                <div class="panel-body" id="@Stopwatch.GetTimestamp()">
+                <div class="panel-body">
                     <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@ad.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
                         <img class="img img-responsive" src="@(ad.ThumbImgUrl+"?width=300&format=webp&quality=50")" alt="@ad.Title" title="@ad.Title" decoding="async"/>
                     </a>
