@@ -56,7 +56,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 LogManager.Info($"提交内容：{cmd.NickName}/{cmd.Content}，敏感词：{match.Value}");
                 return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
             }
-            var error = await ValidateEmailCode(mailSender, cmd.Email, cmd.Code);
+            var error = ValidateEmailCode(mailSender, cmd.Email, cmd.Code);
             if (!string.IsNullOrEmpty(error))
             {
                 return ResultData(null, false, error);

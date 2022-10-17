@@ -14,7 +14,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="email"></param>
         /// <returns></returns>
         [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" })]
-        public async Task<ActionResult> SendCode(string email)
+        public ActionResult SendCode(string email)
         {
             var validator = new IsEmailAttribute();
             if (!validator.IsValid(email))

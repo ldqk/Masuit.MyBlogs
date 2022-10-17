@@ -212,7 +212,7 @@ myApp.config([
                 deps: ["$ocLazyLoad", function($ocLazyLoad) {
                         return $ocLazyLoad.load([
                             {
-                                files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
+                                files: ["/vs/editor/editor.main.css","/vs/loader.js","/vs/editor/editor.main.nls.js","/vs/editor/editor.main.js","https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
                                 cache: true
                             }, cpath + "/system.js"
                         ]);

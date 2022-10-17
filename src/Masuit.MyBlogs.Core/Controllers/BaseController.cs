@@ -172,7 +172,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="email">邮箱地址</param>
         /// <param name="code">验证码</param>
         /// <returns></returns>
-        internal async Task<string> ValidateEmailCode(IMailSender mailSender, string email, string code)
+        internal string ValidateEmailCode(IMailSender mailSender, string email, string code)
         {
             if (CurrentUser.IsAdmin)
             {

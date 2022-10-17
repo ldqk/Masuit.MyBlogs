@@ -18,14 +18,31 @@ myApp.controller("system", ["$scope", "$http", function($scope, $http) {
 			settings[item.name] = item.value;
 		});
 		$scope.Settings = settings;
-	});
+        let styleEditor = monaco.editor.create(document.getElementById('styles'), {
+            value: $scope.Settings.Styles,
+            language: 'html'
+        });
+		styleEditor.onDidChangeModelContent(function(e) {
+            $scope.$apply(function () {
+			   $scope.Settings.Styles = styleEditor.getValue();
+			});
+        });
+        let scriptEditor = monaco.editor.create(document.getElementById('scripts'), {
+            value: $scope.Settings.Scripts,
+            language: 'html'
+        });
+		scriptEditor.onDidChangeModelContent(function(e) {
+            $scope.$apply(function () {
+			   $scope.Settings.Styles = scriptEditor.getValue();
+			});
+        });
+    });
 	$scope.uploadImage = function() {
 		$("#setImageForm").ajaxSubmit({
 			url: "/Upload",
 			type: "post",
 			success: function(data) {
-				
-				document.getElementById("setImageForm").reset();
+                document.getElementById("setImageForm").reset();
 				$scope.$apply(function () {
 				  $scope.Settings[$scope.property] = data.Data;
 				});
@@ -479,9 +496,7 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 		  type: 1,
 		  area: ['600px', '80%'], //宽高
 		  content: text
-		});
-		$('.layui-layer-content').jsonViewer(eval("("+text+")"), {withQuotes: true, withLinks: true});
-		$('.layui-layer-content').css("word-wrap"," break-word");
+        });
 	}
 
 	$scope.distinct=false;
