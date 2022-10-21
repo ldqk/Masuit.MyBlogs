@@ -1,7 +1,7 @@
 ﻿using CacheManager.Core;
 using Collections.Pooled;
 using Hangfire;
-using JiebaNet.Segmenter;
+using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
@@ -23,7 +23,6 @@ using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Core.Validator;
-using Masuit.Tools.Database;
 using Masuit.Tools.Excel;
 using Masuit.Tools.Html;
 using Masuit.Tools.Linq;
@@ -585,8 +584,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return ResultData(null, false, "审核失败！");
             }
 
-            var js = new JiebaSegmenter();
-            (post.Keyword + "," + post.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(s => js.AddWord(s));
+            (post.Keyword + "," + post.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(KeywordsManager.AddWords);
             SearchEngine.LuceneIndexer.Add(post);
             return ResultData(null, true, "审核通过！");
         }
@@ -731,6 +729,25 @@ namespace Masuit.MyBlogs.Core.Controllers
                     p.PostHistoryVersion.Add(history);
                 }
 
+                if (p.Title.HammingDistance(post.Title) > 10 && CommentService.Any(c => c.PostId == p.Id && c.ParentId == null))
+                {
+                    p.Comment.Add(new Comment
+                    {
+                        Status = Status.Published,
+                        NickName = "系统自动评论",
+                        Email = p.Email,
+                        Content = $"<p style=\"color:red\">温馨提示：由于文章发生了重大更新，本条评论之前的所有评论仅作为原文《{p.Title}》的历史评论保留，不作为本文的最新评论参考，请知悉！了解更多信息，请查阅本文的历史修改记录。</p>",
+                        PostId = p.Id,
+                        CommentDate = DateTime.Now,
+                        IsMaster = true,
+                        IsAuthor = true,
+                        IP = "127.0.0.1",
+                        Location = "内网",
+                        GroupTag = SnowFlake.NewId,
+                        Path = SnowFlake.NewId,
+                    });
+                }
+
                 p.ModifyDate = DateTime.Now;
                 var user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
                 post.Modifier = string.IsNullOrEmpty(post.Modifier) ? user.NickName : post.Modifier;
@@ -742,13 +759,12 @@ namespace Masuit.MyBlogs.Core.Controllers
             p.Seminar.Clear();
             if (!string.IsNullOrEmpty(post.Seminars))
             {
-                var tmp = post.Seminars.Split(',').Distinct().Select(int.Parse).ToArray();
+                var tmp = post.Seminars.Split(',', StringSplitOptions.RemoveEmptyEntries).Distinct().Select(int.Parse).ToArray();
                 var seminars = SeminarService.GetQuery(s => tmp.Contains(s.Id)).ToList();
                 p.Seminar.AddRange(seminars);
             }
 
-            var js = new JiebaSegmenter();
-            (p.Keyword + "," + p.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(s => js.AddWord(s));
+            (p.Keyword + "," + p.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(KeywordsManager.AddWords);
             PostTagService.AddOrUpdate(t => t.Name, p.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
             {
                 Name = s,
@@ -811,8 +827,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             PostService.AddEntity(p);
-            var js = new JiebaSegmenter();
-            (p.Keyword + "," + p.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(s => js.AddWord(s));
+            (p.Keyword + "," + p.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(KeywordsManager.AddWords);
             PostTagService.AddOrUpdate(t => t.Name, p.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
             {
                 Name = s,
