@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.MyBlogs.Core", "Masu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.Tools.AspNetCore", "..\..\Masuit.Tools\Masuit.Tools.AspNetCore\Masuit.Tools.AspNetCore.csproj", "{F67A19C8-5ACE-4111-8DB5-51A0159AF5A3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.Tools.Abstractions", "..\..\Masuit.Tools\Masuit.Tools.Abstractions\Masuit.Tools.Abstractions.csproj", "{0661EDB7-12E8-4F8B-AD0B-1CDEF7D03FAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{F67A19C8-5ACE-4111-8DB5-51A0159AF5A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F67A19C8-5ACE-4111-8DB5-51A0159AF5A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F67A19C8-5ACE-4111-8DB5-51A0159AF5A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0661EDB7-12E8-4F8B-AD0B-1CDEF7D03FAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0661EDB7-12E8-4F8B-AD0B-1CDEF7D03FAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0661EDB7-12E8-4F8B-AD0B-1CDEF7D03FAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0661EDB7-12E8-4F8B-AD0B-1CDEF7D03FAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

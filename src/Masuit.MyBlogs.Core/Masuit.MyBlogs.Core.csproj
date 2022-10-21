@@ -53,7 +53,7 @@
         <PackageReference Include="htmldiff.net" Version="1.4.0" />
         <PackageReference Include="IP2Region" Version="1.2.0" />
         <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.5.1" />
-        <PackageReference Include="Masuit.Tools.Excel" Version="1.2.2" />
+        <PackageReference Include="Masuit.Tools.Excel" Version="1.2.3-beta5" />
         <PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.10" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.10" />

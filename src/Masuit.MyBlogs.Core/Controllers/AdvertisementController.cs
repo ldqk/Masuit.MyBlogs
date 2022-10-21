@@ -11,7 +11,6 @@ using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Core.Net;
-using Masuit.Tools.Database;
 using Masuit.Tools.Excel;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Models;
@@ -189,7 +188,7 @@ public class AdvertisementController : BaseController
     public IActionResult ExportClickRecords(int id)
     {
         using var list = ClickRecordService.GetQuery<DateTime, AdvertisementClickRecordViewModel>(e => e.AdvertisementId == id, e => e.Time, false).ToPooledList();
-        using var ms = list.ToDataTable().ToExcel();
+        using var ms = list.ToExcel();
         var advertisement = AdsService[id];
         return this.ResumeFile(ms.ToArray(), ContentType.Xlsx, advertisement.Title + "访问记录.xlsx");
     }

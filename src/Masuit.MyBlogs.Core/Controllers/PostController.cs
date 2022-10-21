@@ -102,7 +102,15 @@ namespace Masuit.MyBlogs.Core.Controllers
             ViewBag.CommentsCount = CommentService.Count(c => c.PostId == id && c.ParentId == null && c.Status == Status.Published);
             ViewBag.HistoryCount = PostHistoryVersionService.Count(c => c.PostId == id);
             ViewBag.Keyword = post.Keyword + "," + post.Label;
-            ViewBag.Desc = "若页面无法访问，可通过搜索引擎网页快照进行浏览。" + await post.Content.GetSummary(200);
+            if (Request.Query.ContainsKey("share"))
+            {
+                ViewBag.Desc = await post.Content.GetSummary(200);
+            }
+            else
+            {
+                ViewBag.Desc = "若页面无法访问，可通过搜索引擎网页快照进行浏览。" + await post.Content.GetSummary(200);
+            }
+
             var modifyDate = post.ModifyDate;
             ViewBag.Next = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.LimitMode ?? 0) == RegionLimitMode.All && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate);
             ViewBag.Prev = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.LimitMode ?? 0) == RegionLimitMode.All && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate, false);
@@ -1159,7 +1167,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         public IActionResult ExportPostVisitRecords(int id)
         {
             using var list = PostVisitRecordService.GetQuery<DateTime, PostVisitRecordViewModel>(e => e.PostId == id, e => e.Time, false).ToPooledList();
-            using var ms = list.ToDataTable().ToExcel();
+            using var ms = list.ToExcel();
             var post = PostService[id];
             return this.ResumeFile(ms.ToArray(), ContentType.Xlsx, post.Title + "访问记录.xlsx");
         }

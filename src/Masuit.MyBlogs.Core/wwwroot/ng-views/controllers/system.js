@@ -496,7 +496,9 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 		  type: 1,
 		  area: ['600px', '80%'], //宽高
 		  content: text
-        });
+		});
+		$('.layui-layer-content').jsonViewer(eval("("+text+")"), {withQuotes: true, withLinks: true});
+		$('.layui-layer-content').css("word-wrap"," break-word");
 	}
 
 	$scope.distinct=false;
