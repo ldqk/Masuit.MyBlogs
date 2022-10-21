@@ -33,7 +33,7 @@ myApp.controller("system", ["$scope", "$http", function($scope, $http) {
         });
 		scriptEditor.onDidChangeModelContent(function(e) {
             $scope.$apply(function () {
-			   $scope.Settings.Styles = scriptEditor.getValue();
+			   $scope.Settings.Scripts = scriptEditor.getValue();
 			});
         });
     });

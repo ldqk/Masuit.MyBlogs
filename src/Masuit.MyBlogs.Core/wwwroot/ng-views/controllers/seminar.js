@@ -66,7 +66,7 @@
 			html:
 				'<div class="input-group"><span class="input-group-addon">专题名称： </span><div class="fg-line"><input id="title" type="text" class="form-control input-lg" autofocus placeholder="请输入专题名称" value="'+row.Title+'"></div></div>' +
 			'<div class="input-group"><span class="input-group-addon">子标题： </span><div class="fg-line"><input id="subtitle" type="text" class="form-control input-lg" placeholder="请输入专题子标题" value="' + row.SubTitle +'"></div></div>' +
-			'<div class="input-group"><span class="input-group-addon">专题描述：</span><div class="fg-line"><textarea id="desc" rows="5" class="form-control" placeholder="请输入专题描述" value="' + row.Description + '">' + row.Description +'</textarea></div></div>',
+			'<div class="input-group"><span class="input-group-addon">专题描述：</span><div class="fg-line"><textarea id="desc" rows="10" class="form-control" placeholder="请输入专题描述">' + row.Description +'</textarea></div></div>',
 			showCloseButton: true,
 			confirmButtonColor: "#DD6B55",
 			confirmButtonText: "确定",

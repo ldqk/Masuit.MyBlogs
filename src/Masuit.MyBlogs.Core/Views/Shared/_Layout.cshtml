@@ -1,5 +1,5 @@
-﻿@inject IMenuService _menuService;
-@inject ILinksService _linksService;
+﻿@inject IMenuService MenuService;
+@inject ILinksService LinksService;
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 @using Masuit.MyBlogs.Core.Models.DTO
@@ -19,9 +19,9 @@
 
 @{
     string[] colors = { "success", "info", "warning", "danger", "default" };
-    List<Menu> menus = _menuService.GetQueryFromCache(m => m.Status == Status.Available,m => m.Sort).ToPooledList().ToTree(m => m.Id,m => m.ParentId);
+    var menus = MenuService.GetQueryFromCache(m => m.Status == Status.Available,m => m.Sort).ToTree(m => m.Id,m => m.ParentId);
     var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-    using var links = _linksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.GroupBy(x => x.IP).Count()).Take(30).Select(e => new{e.Url,e.Name}).FromCache().ToPooledList();
+    using var links = LinksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.GroupBy(x => x.IP).Count()).Take(30).Select(e => new{e.Url,e.Name}).FromCache().ToPooledList();
 }
 
 <!DOCTYPE html>
