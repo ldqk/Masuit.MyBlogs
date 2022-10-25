@@ -181,8 +181,6 @@ public class AdvertisementController : BaseController
     /// 导出广告访问记录
     /// </summary>
     /// <param name="id"></param>
-    /// <param name="page"></param>
-    /// <param name="size"></param>
     /// <returns></returns>
     [HttpGet("/partner/{id}/records-export"), MyAuthorize]
     public IActionResult ExportClickRecords(int id)
