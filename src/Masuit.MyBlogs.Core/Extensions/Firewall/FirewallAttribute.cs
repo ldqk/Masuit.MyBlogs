@@ -1,5 +1,6 @@
 ﻿using CacheManager.Core;
 using FreeRedis;
+using Markdig;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Controllers;
@@ -71,7 +72,7 @@ public class FirewallAttribute : IAsyncActionFilter
             var msg = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlockedMsg", "当前浏览器不支持访问本站");
             context.Result = new ContentResult()
             {
-                Content = Template.Create(msg).Set("browser", agent.Browser + " " + agent.BrowserVersion).Set("os", agent.Platform).Render(),
+                Content = Markdown.ToHtml(Template.Create(msg).Set("browser", agent.Browser + " " + agent.BrowserVersion).Set("os", agent.Platform).Render()),
                 ContentType = ContentType.Html + "; charset=utf-8",
                 StatusCode = 403
             };

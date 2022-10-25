@@ -12,6 +12,7 @@ using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Models;
+using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -109,7 +110,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                         Body = ad.Description,
                         Title = ad.Title,
                         FullHtmlContent = ad.Description,
-                        Guid = ad.IndexId,
+                        Guid = SnowFlake.NewId,
                         PublishDate = DateTime.UtcNow,
                         Link = new Uri(Url.ActionLink("Redirect", "Advertisement", new { id = ad.Id })),
                         Permalink = Url.ActionLink("Redirect", "Advertisement", new { id = ad.Id })

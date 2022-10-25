@@ -1,4 +1,6 @@
-﻿@model string
+﻿@using Markdig
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model string
 
 @{
     Layout = null;
@@ -52,7 +54,7 @@
                     <span class="STYLE1">Sorry!访问被拒绝&nbsp;</span>
                 </em>
             </h3>
-            @Html.Raw(Model)
+            @Html.Raw(Markdown.ToHtml(Model))
             <form action="/" method="post" class="form-inline" id="code-token">
                 @Html.AntiForgeryToken()
                 <div class="input-group">

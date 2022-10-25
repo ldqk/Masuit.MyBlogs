@@ -6,6 +6,8 @@
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.Tools.Systems
 @using Masuit.MyBlogs.Core.Common
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Markdig
 @model Masuit.Tools.Models.PagedList<Masuit.MyBlogs.Core.Models.DTO.PostDto>
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -68,7 +70,7 @@
                 </h3>
             </div>
             <p>
-                @Html.Raw(ViewBag.Desc)
+                @Html.Raw(Markdown.ToHtml(ViewBag.Desc))
             </p>
         </div>
     </div>

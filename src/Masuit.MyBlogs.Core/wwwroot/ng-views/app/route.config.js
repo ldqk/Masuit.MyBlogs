@@ -238,6 +238,7 @@ myApp.config([
                         return $ocLazyLoad.load([
                             {
                                 files: [
+                                    "/vs/editor/editor.main.css","/vs/loader.js","/vs/editor/editor.main.nls.js","/vs/editor/editor.main.js",
                                     "https://cdn.jsdelivr.net/gh/abodelot/jquery.json-viewer@master/json-viewer/jquery.json-viewer.css",
                                     "https://cdn.jsdelivr.net/gh/abodelot/jquery.json-viewer@master/json-viewer/jquery.json-viewer.js"
                                 ],

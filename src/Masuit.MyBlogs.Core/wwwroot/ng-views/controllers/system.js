@@ -317,6 +317,24 @@ myApp.controller("firewall", ["$scope", "$http","NgTableParams","$timeout", func
 			settings[item.name] = item.value;
 		});
 		$scope.Settings = settings;
+		let userAgentBlockedMsgEditor = monaco.editor.create(document.getElementById('UserAgentBlockedMsg'), {
+            value: $scope.Settings.UserAgentBlockedMsg,
+            language: 'html'
+        });
+		userAgentBlockedMsgEditor.onDidChangeModelContent(function(e) {
+            $scope.$apply(function () {
+			   $scope.Settings.UserAgentBlockedMsg = userAgentBlockedMsgEditor.getValue();
+			});
+        });
+        let accessDenyTipsEditor = monaco.editor.create(document.getElementById('AccessDenyTips'), {
+            value: $scope.Settings.AccessDenyTips,
+            language: 'html'
+        });
+		accessDenyTipsEditor.onDidChangeModelContent(function(e) {
+            $scope.$apply(function () {
+			   $scope.Settings.AccessDenyTips = accessDenyTipsEditor.getValue();
+			});
+        });
 	});
 	this.load = function() {
 		$scope.get("/system/InterceptLog", function(res) {
