@@ -236,7 +236,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return;
             }
 
-            var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+            var ipLocation = Request.Location();
+            var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
             if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip))
             {
                 var s = rawip.Base64Decrypt();
@@ -295,7 +296,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return where;
             }
 
-            var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+            var ipLocation = Request.Location();
+            var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
             if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
             {
                 var s = rawip.Base64Decrypt();
@@ -318,7 +320,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return;
             }
 
-            var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+            var ipLocation = Request.Location();
+            var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
             if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
             {
                 var s = rawip.Base64Decrypt();

@@ -109,7 +109,9 @@ public class FirewallAttribute : IAsyncActionFilter
         }
 
         //白名单地区
-        var (location, network, pos) = ip.GetIPLocation();
+        var ipLocation = ip.GetIPLocation();
+        var (location, network, pos) = ipLocation;
+        pos += ipLocation.Coodinate;
         var allowedAreas = CommonHelper.SystemSettings.GetOrAdd("AllowedArea", "").Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries);
         if (allowedAreas.Any() && pos.Contains(allowedAreas))
         {

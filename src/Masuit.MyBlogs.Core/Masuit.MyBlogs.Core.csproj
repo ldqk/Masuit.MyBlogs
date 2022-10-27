@@ -34,7 +34,6 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine\Masuit.LuceneEFCore.SearchEngine.csproj" />
         <ProjectReference Include="..\..\..\Masuit.Tools\Masuit.Tools.AspNetCore\Masuit.Tools.AspNetCore.csproj" />
-        <ProjectReference Include="..\..\..\Masuit.Tools\Masuit.Tools.Core\Masuit.Tools.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -71,7 +70,7 @@
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.20" />
         <PackageReference Include="TimeZoneConverter" Version="6.0.1" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.0" />
-        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="6.15.2" />
+        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="6.16.0" />
     </ItemGroup>
     <ItemGroup>
         <Content Update="appsettings.json">

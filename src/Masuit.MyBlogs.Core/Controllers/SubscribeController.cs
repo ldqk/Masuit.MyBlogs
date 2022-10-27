@@ -293,7 +293,8 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         protected Expression<Func<Post, bool>> PostBaseWhere()
         {
-            var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+            var ipLocation = Request.Location();
+            var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
             return p => p.Status == Status.Published && p.LimitMode != RegionLimitMode.OnlyForSearchEngine
                 && (p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true :
                     p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase) :
@@ -304,7 +305,8 @@ namespace Masuit.MyBlogs.Core.Controllers
 
         private void CheckPermission(Post post)
         {
-            var location = Request.Location() + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+            var ipLocation = Request.Location();
+            var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
             switch (post.LimitMode)
             {
                 case RegionLimitMode.OnlyForSearchEngine:

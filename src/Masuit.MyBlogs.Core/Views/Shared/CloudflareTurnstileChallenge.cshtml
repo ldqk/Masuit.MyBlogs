@@ -30,7 +30,7 @@
             <h2>检测到您的浏览器不支持javascript或已禁用javascript功能，当前页面无法正常显示！</h2>
         </div>
     </noscript>
-    <h2>请先解决下方的验证码：</h2>
+    <h2>访问前请先解决下方的验证码：</h2>
     <form asp-controller="Firewall" asp-action="CloudflareTurnstileHandler" method="post">
         @Html.AntiForgeryToken()
         <div class="cf-turnstile" data-sitekey="@CommonHelper.SystemSettings["TurnstileClientKey"]" data-theme="light"></div>
@@ -45,7 +45,9 @@
         const interval = setInterval(function() {
             if ($("input[name=cf-turnstile-response]").val().length) {
                 clearInterval(interval);
-                $("#btn").show();
+                setTimeout(function() {
+                    $("#btn").show();
+                }, 2000);
                 $("form").submit();
             }
         },1500);
