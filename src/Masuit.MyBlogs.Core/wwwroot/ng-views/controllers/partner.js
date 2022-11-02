@@ -417,64 +417,103 @@
         }));
     }
     
-    window.fetch("/partner/records-chart", {
-        credentials: 'include',
-        method: 'GET',
-        mode: 'cors'
-    }).then(function(response) {
-        return response.json();
-    }).then(function(res) {
-        var data = [];
-        for (let item of res) {
-            data.push([Date.parse(item.Date), item.Count]);
-        }
+	showCharts=function() {
         var chartDom = document.getElementById('chart');
-        var myChart = echarts.init(chartDom);
-        var option = {
-            tooltip: {
-                trigger: 'axis',
-                position: function(pt) {
-                    return [pt[0], '10%'];
-                }
-            },
-            title: {
-                left: 'center',
-                text: '最近30天每日总点击趋势，日均：' + (res.reduce((acr, cur) => acr + cur.Count, 0) / (new Date() - new Date(res[0].Date)) * (1000 * 60 * 60 * 24)).toFixed(2)
-            },
-            xAxis: {
-                type: 'time',
-                axisLabel: {
-                    formatter:function (value){
-                        var dt=new Date(value);
-                        return dt.toLocaleDateString();
-                    }
-                }
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: [
-                {
-                    name: '点击量',
-                    type: 'line',
-                    smooth: true,
-                    symbol: 'none',
-                    areaStyle: {},
-                    data: data,
-                    markPoint: {
-                        data: [
-                            { type: 'max', name: '最大值' },
-                            { type: 'min', name: '最小值' }
-                        ]
-                    },
-                    markLine: {
-                        data: [
-                            { type: 'average', name: '平均值' }
-                        ]
-                    }
-                }
-            ]
-        };
-        myChart.setOption(option);
-    });
+        echarts.init(chartDom).dispose();
+		var period = document.getElementById("period").value;
+		window.fetch(`/partner/records-chart?compare=${period > 0}&period=${period}`, {
+			credentials: 'include',
+			method: 'GET',
+			mode: 'cors'
+		}).then(function (response) {
+			return response.json();
+		}).then(function (res) {
+			var xSeries = [];
+			var ySeries = [];
+			for (let series of res) {
+				var x = [];
+				var y = [];
+				for (let item of series) {
+					x.push(new Date(Date.parse(item.Date)).toLocaleDateString());
+					y.push(item.Count);
+				}
+				xSeries.push(x);
+				ySeries.push(y);
+			}
+			var chartDom = document.getElementById('chart');
+			var myChart = echarts.init(chartDom);
+			const colors = ['#5470C6', '#EE6666'];
+			var option = {
+				color: colors,
+				tooltip: {
+					trigger: 'none',
+					axisPointer: {
+						type: 'cross'
+					}
+				},
+				legend: {},
+				grid: {
+					top: 70,
+					bottom: 50
+				},
+				title: {
+					left: 'center',
+					text: '最近访问趋势'
+				},
+				xAxis: xSeries.map(function (item, index) {
+					return {
+						type: 'category',
+						axisTick: {
+							alignWithLabel: true
+						},
+						axisLine: {
+							onZero: false,
+							lineStyle: {
+								color: colors[index]
+							}
+						},
+						axisPointer: {
+							label: {
+								formatter: function (params) {
+									return params.value + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+								}
+							}
+						},
+						data: item
+					}
+				}),
+				yAxis: [
+					{
+						type: 'value'
+					}
+				],
+				series: ySeries.map(function (item, index) {
+					return {
+						type: 'line',
+						smooth: true,
+						symbol: 'none',
+						xAxisIndex: index,
+						areaStyle: {},
+						data: item,
+                          lineStyle: {
+                            type: index===1?'dashed':""
+                          },
+						markPoint: {
+							data: [
+								{ type: 'max', name: '最大值' },
+								{ type: 'min', name: '最小值' }
+							]
+						},
+						markLine: {
+							data: [
+								{ type: 'average', name: '平均值' }
+							]
+						}
+					}
+				})
+			};
+			myChart.setOption(option);
+		});
+	}
+	showCharts();
 }]);

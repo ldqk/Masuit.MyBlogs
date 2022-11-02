@@ -342,87 +342,130 @@
         }));
     }
 
-    window.fetch("/post/records-chart", {
-		credentials: 'include',
-		method: 'GET',
-		mode: 'cors'
-	}).then(function(response) {
-		return response.json();
-	}).then(function(res) {
-		var pv = [];
-		var uv = [];
-		for (let item of res) {
-			pv.push([Date.parse(item.Date), item.Count]);
-			uv.push([Date.parse(item.Date),item.UV]);
-		}
-		var chartDom = document.getElementById('chart');
-		var myChart = echarts.init(chartDom);
-		var option = {
-			tooltip: {
-				trigger: 'axis',
-				position: function(pt) {
-					return [pt[0], '10%'];
+    showCharts=function() {
+        echarts.init(document.getElementById('chart')).dispose();
+		var period=document.getElementById("period").value;
+		window.fetch(`/post/records-chart?compare=${period>0}&period=${period}`, {
+			credentials: 'include',
+			method: 'GET',
+			mode: 'cors'
+		}).then(function (response) {
+			return response.json();
+		}).then(function (res) {
+			var xSeries = [];
+			var yCountSeries = [];
+			var yUvSeries = [];
+			for (let series of res) {
+				var x = [];
+				var yCount = [];
+				var yUV = [];
+				for (let item of series) {
+					x.push(new Date(Date.parse(item.Date)).toLocaleDateString());
+					yCount.push(item.Count);
+					yUV.push(item.UV);
 				}
-			},
-			title: {
-				left: 'center',
-				text: '最近90天阅读量趋势，日均：' + (res.reduce((acr, cur) => acr + cur.Count, 0) / (new Date() - new Date(res[0].Date)) * (1000 * 60 * 60 * 24)).toFixed(2)
-			},
-			xAxis: {
-				type: 'time',
-				axisLabel: {
-					formatter:function (value){
-						var dt=new Date(value);
-						return dt.toLocaleDateString();
-					}
-				}
-			},
-			yAxis: {
-				type: 'value'
-			},
-			series: [
-				{
-					name: 'PV',
-					type: 'line',
-					smooth: true,
-					symbol: 'none',
-					areaStyle: {},
-					data: pv,
-					markPoint: {
-						data: [
-							{ type: 'max', name: '最大值' },
-							{ type: 'min', name: '最小值' }
-						]
-					},
-					markLine: {
-						data: [
-							{ type: 'average', name: '平均值' }
-						]
+				xSeries.push(x);
+				yCountSeries.push(yCount);
+                yUvSeries.push(yUV);
+			}
+			var chartDom = document.getElementById('chart');
+			var myChart = echarts.init(chartDom);
+			const colors = ['#5470C6', '#EE6666'];
+			var option = {
+				color: colors,
+				tooltip: {
+					trigger: 'none',
+					axisPointer: {
+						type: 'cross'
 					}
 				},
-				{
-					name: 'UV',
-					type: 'line',
-					smooth: true,
-					symbol: 'none',
-					areaStyle: {},
-					data: uv,
-					markPoint: {
-						data: [
-							{ type: 'max', name: '最大值' },
-							{ type: 'min', name: '最小值' }
-						]
-					},
-					markLine: {
-						data: [
-							{ type: 'average', name: '平均值' }
-						]
+				legend: {},
+				grid: {
+					top: 70,
+					bottom: 50
+				},
+				title: {
+					left: 'center',
+					text: '最近访问趋势'
+				},
+				xAxis: xSeries.map(function (item, index) {
+					return {
+						type: 'category',
+						axisTick: {
+							alignWithLabel: true
+						},
+						axisLine: {
+							onZero: false,
+							lineStyle: {
+								color: colors[index]
+							}
+						},
+						axisPointer: {
+							label: {
+								formatter: function (params) {
+									return params.value + (params.seriesData.length ? ' 访问量：' + params.seriesData[0].data+"，UV："+ params.seriesData[1].data : '');
+								}
+							}
+						},
+						data: item
 					}
-				}
-			]
-		};
-		myChart.setOption(option);
-	});
+				}),
+				yAxis: [
+					{
+						type: 'value'
+					}
+				],
+				series: yCountSeries.map(function (item, index) {
+					return {
+						type: 'line',
+						smooth: true,
+						symbol: 'none',
+						xAxisIndex: index,
+						data: item,
+                          lineStyle: {
+                            type: index===1?'dashed':""
+                          },
+						markPoint: {
+							data: [
+								{ type: 'max', name: '最大值' },
+								{ type: 'min', name: '最小值' }
+							]
+						},
+						markLine: {
+							data: [
+								{ type: 'average', name: '平均值' }
+							]
+						}
+					}
+				}).concat(yUvSeries.map(function (item, index) {
+					return {
+						type: 'line',
+						smooth: true,
+						symbol: 'none',
+						xAxisIndex: index,
+						areaStyle: {},
+						data: item,
+                          lineStyle: {
+                            type: index===1?'dashed':""
+                          },
+						markPoint: {
+							data: [
+								{ type: 'max', name: '最大值' },
+								{ type: 'min', name: '最小值' }
+							]
+						},
+						markLine: {
+							data: [
+								{ type: 'average', name: '平均值' }
+							]
+						}
+					}
+				}))
+			};
+			myChart.setOption(option);
+		});
+    }
+    showCharts();
 }]);
 myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", function ($scope, $http, $timeout,$location) {
     UEDITOR_CONFIG.initialFrameHeight=null;

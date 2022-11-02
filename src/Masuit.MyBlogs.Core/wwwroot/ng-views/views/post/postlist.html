@@ -220,5 +220,13 @@
     </div>
 </div>
 <div class="row">
+    <label>对比最近</label>
+    <select id="period" onchange="showCharts()">
+        <option value="0">不对比</option>
+        <option value="15">15天</option>
+        <option value="30" selected="selected">一个月</option>
+        <option value="60">两个月</option>
+        <option value="90">三个月</option>
+    </select>
     <div id="chart" style="height: 500px"></div>
 </div>

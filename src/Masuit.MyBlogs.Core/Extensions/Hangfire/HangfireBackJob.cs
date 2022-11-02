@@ -97,12 +97,12 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void RecordPostVisit(int pid, string ip, string refer, string url)
         {
             var lastQuarter = DateTime.Now.AddMonths(-6);
-            var lastYear = DateTime.Now.AddYears(-1);
+            var last3Year = DateTime.Now.AddYears(-3);
             var recordService = _serviceScope.ServiceProvider.GetRequiredService<IPostVisitRecordService>();
             var recordStatsService = _serviceScope.ServiceProvider.GetRequiredService<IPostVisitRecordStatsService>();
             var postService = _serviceScope.ServiceProvider.GetRequiredService<IPostService>();
             recordService.GetQuery(b => b.Time < lastQuarter).DeleteFromQuery();
-            recordStatsService.GetQuery(b => b.Date < lastYear).DeleteFromQuery();
+            recordStatsService.GetQuery(b => b.Date < last3Year).DeleteFromQuery();
             var post = postService.GetById(pid);
             if (post == null)
             {

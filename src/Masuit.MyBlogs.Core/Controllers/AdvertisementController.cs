@@ -1,5 +1,6 @@
 ﻿using AutoMapper.QueryableExtensions;
 using Collections.Pooled;
+using Lucene.Net.Support;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -41,15 +42,16 @@ public class AdvertisementController : BaseController
         if (!Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("ads" + id)))
         {
             HttpContext.Session.Set("ads" + id, id.ToString());
-            ad.ClickRecords.Add(new AdvertisementClickRecord()
+            ClickRecordService.AddEntity(new AdvertisementClickRecord()
             {
                 IP = ClientIP,
                 Location = ClientIP.GetIPLocation(),
                 Referer = Request.Headers[HeaderNames.Referer].ToString(),
-                Time = DateTime.Now
+                Time = DateTime.Now,
+                AdvertisementId = id
             });
-            await AdsService.SaveChangesAsync();
-            var start = DateTime.Today.AddMonths(-6);
+            await ClickRecordService.SaveChangesAsync();
+            var start = DateTime.Today.AddYears(-1);
             await ClickRecordService.GetQuery(a => a.Time < start).DeleteFromQueryAsync();
         }
 
@@ -194,37 +196,110 @@ public class AdvertisementController : BaseController
     /// <summary>
     /// 广告访问记录图表
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("/partner/{id}/records-chart"), MyAuthorize]
     [ProducesResponseType((int)HttpStatusCode.OK)]
-    public async Task<IActionResult> ClickRecordsChart(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> ClickRecordsChart(int id, bool compare, uint period, CancellationToken cancellationToken)
     {
+        if (compare)
+        {
+            var start1 = DateTime.Today.AddDays(-period);
+            var list1 = await ClickRecordService.GetQuery(e => e.AdvertisementId == id && e.Time >= start1).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
+            {
+                Date = g.Key,
+                Count = g.Count()
+            }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
+            if (list1.Count == 0)
+            {
+                return Ok(Array.Empty<int>());
+            }
+
+            var start2 = start1.AddDays(-period - 1);
+            var list2 = await ClickRecordService.GetQuery(e => e.AdvertisementId == id && e.Time >= start2 && e.Time < start1).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
+            {
+                Date = g.Key,
+                Count = g.Count()
+            }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
+
+            // 将数据填充成连续的数据
+            for (var i = start1; i <= DateTime.Today; i = i.AddDays(1))
+            {
+                if (list1.All(a => a.Date != i))
+                {
+                    list1.Add(new { Date = i, Count = 0 });
+                }
+            }
+            for (var i = start2; i < start1; i = i.AddDays(1))
+            {
+                if (list2.All(a => a.Date != i))
+                {
+                    list2.Add(new { Date = i, Count = 0 });
+                }
+            }
+            return Ok(new[] { list1.OrderBy(a => a.Date), list2.OrderBy(a => a.Date) });
+        }
+
         var list = await ClickRecordService.GetQuery(e => e.AdvertisementId == id).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
         {
             Date = g.Key,
             Count = g.Count()
         }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
-        return Ok(list);
+        return Ok(new[] { list });
     }
 
     /// <summary>
     /// 广告访问记录图表
     /// </summary>
-    /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("/partner/records-chart"), MyAuthorize]
     [ProducesResponseType((int)HttpStatusCode.OK)]
-    public async Task<IActionResult> ClickRecordsChart(CancellationToken cancellationToken)
+    public async Task<IActionResult> ClickRecordsChart(bool compare, uint period, CancellationToken cancellationToken)
     {
+        if (compare)
+        {
+            var start1 = DateTime.Today.AddDays(-period);
+            var list1 = await ClickRecordService.GetQuery(e => e.Time >= start1).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
+            {
+                Date = g.Key,
+                Count = g.Count()
+            }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
+            if (list1.Count == 0)
+            {
+                return Ok(Array.Empty<int>());
+            }
+
+            var start2 = start1.AddDays(-period - 1);
+            var list2 = await ClickRecordService.GetQuery(e => e.Time >= start2 && e.Time < start1).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
+            {
+                Date = g.Key,
+                Count = g.Count()
+            }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
+
+            // 将数据填充成连续的数据
+            for (var i = start1; i <= DateTime.Today; i = i.AddDays(1))
+            {
+                if (list1.All(a => a.Date != i))
+                {
+                    list1.Add(new { Date = i, Count = 0 });
+                }
+            }
+            for (var i = start2; i < start1; i = i.AddDays(1))
+            {
+                if (list2.All(a => a.Date != i))
+                {
+                    list2.Add(new { Date = i, Count = 0 });
+                }
+            }
+            return Ok(new[] { list1.OrderBy(a => a.Date), list2.OrderBy(a => a.Date) });
+        }
+
         var start = DateTime.Now.AddMonths(-1);
         var list = await ClickRecordService.GetQuery(e => e.Time >= start).Select(e => e.Time).GroupBy(t => t.Date).Select(g => new
         {
             Date = g.Key,
             Count = g.Count()
         }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
-        return Ok(list);
+        return Ok(new[] { list });
     }
 
     /// <summary>
