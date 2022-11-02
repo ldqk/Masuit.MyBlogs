@@ -111,9 +111,9 @@
 		});
     });
 	showCharts();
-    function showCharts() {
-		var period=document.getElementById("period").value;
-		window.fetch(`/@Model.Id/records-chart?compare=${period>0}&period=${period}`, {
+	function showCharts() {
+		var period = document.getElementById("period").value;
+		window.fetch(`/@Model.Id/records-chart?compare=${period > 0}&period=${period}`, {
 			credentials: 'include',
 			method: 'GET',
 			mode: 'cors'
@@ -121,16 +121,20 @@
 			return response.json();
 		}).then(function (res) {
 			var xSeries = [];
-			var ySeries = [];
+			var yCountSeries = [];
+			var yUvSeries = [];
 			for (let series of res) {
 				var x = [];
-				var y = [];
+				var yCount = [];
+				var yUV = [];
 				for (let item of series) {
 					x.push(new Date(Date.parse(item.Date)).toLocaleDateString());
-					y.push(item.Count);
+					yCount.push(item.Count);
+					yUV.push(item.UV);
 				}
 				xSeries.push(x);
-				ySeries.push(y);
+				yCountSeries.push(yCount);
+				yUvSeries.push(yUV);
 			}
 			var chartDom = document.getElementById('chart');
 			var myChart = echarts.init(chartDom);
@@ -150,7 +154,7 @@
 				},
 				title: {
 					left: 'center',
-					text: '最近访问趋势' //+ (res.reduce((acr, cur) => acr + cur.Count, 0) / (new Date() - new Date(res[0].Date)) * (1000 * 60 * 60 * 24)).toFixed(2)
+					text: '最近访问趋势'
 				},
 				xAxis: xSeries.map(function (item, index) {
 					return {
@@ -167,7 +171,7 @@
 						axisPointer: {
 							label: {
 								formatter: function (params) {
-									return params.value + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+									return params.value + (params.seriesData.length ? ' 访问量：' + params.seriesData[0].data + "，UV：" + params.seriesData[1].data : '');
 								}
 							}
 						},
@@ -179,13 +183,12 @@
 						type: 'value'
 					}
 				],
-				series: ySeries.map(function (item, index) {
+				series: yCountSeries.map(function (item, index) {
 					return {
 						type: 'line',
 						smooth: true,
 						symbol: 'none',
 						xAxisIndex: index,
-						areaStyle: {},
 						data: item,
 						lineStyle: {
 							type: index === 1 ? 'dashed' : ""
@@ -202,9 +205,21 @@
 							]
 						}
 					}
-				})
+				}).concat(yUvSeries.map(function (item, index) {
+					return {
+						type: 'line',
+						smooth: true,
+						symbol: 'none',
+						xAxisIndex: index,
+						areaStyle: {},
+						data: item,
+						lineStyle: {
+							type: index === 1 ? 'dashed' : ""
+						}
+					}
+				}))
 			};
 			myChart.setOption(option);
 		});
-    }
+	}
 </script>

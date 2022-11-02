@@ -1201,7 +1201,8 @@ public class PostController : BaseController
             var list1 = await statsService.GetQuery(e => e.PostId == id && e.Date >= start1).GroupBy(t => t.Date).Select(g => new
             {
                 Date = g.Key,
-                Count = g.Sum(t => t.Count)
+                Count = g.Sum(t => t.Count),
+                UV = g.Sum(t => t.UV)
             }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
             if (list1.Count == 0)
             {
@@ -1212,7 +1213,8 @@ public class PostController : BaseController
             var list2 = await statsService.GetQuery(e => e.PostId == id && e.Date >= start2 && e.Date < start1).GroupBy(t => t.Date).Select(g => new
             {
                 Date = g.Key,
-                Count = g.Sum(t => t.Count)
+                Count = g.Sum(t => t.Count),
+                UV = g.Sum(t => t.UV)
             }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
 
             // 将数据填充成连续的数据
@@ -1220,22 +1222,24 @@ public class PostController : BaseController
             {
                 if (list1.All(a => a.Date != i))
                 {
-                    list1.Add(new { Date = i, Count = 0 });
+                    list1.Add(new { Date = i, Count = 0, UV = 0 });
                 }
             }
             for (var i = start2; i < start1; i = i.AddDays(1))
             {
                 if (list2.All(a => a.Date != i))
                 {
-                    list2.Add(new { Date = i, Count = 0 });
+                    list2.Add(new { Date = i, Count = 0, UV = 0 });
                 }
             }
             return Ok(new[] { list1.OrderBy(a => a.Date), list2.OrderBy(a => a.Date) });
         }
+
         var list = await statsService.GetQuery(e => e.PostId == id).GroupBy(t => t.Date).Select(g => new
         {
             Date = g.Key,
-            Count = g.Sum(t => t.Count)
+            Count = g.Sum(t => t.Count),
+            UV = g.Sum(t => t.UV)
         }).OrderBy(a => a.Date).ToListAsync(cancellationToken);
         return Ok(new[] { list });
     }

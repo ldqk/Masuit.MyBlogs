@@ -13,4 +13,7 @@ public class PostVisitRecordStats : BaseEntity
 
     [ConcurrencyCheck]
     public int Count { get; set; }
+
+    [ConcurrencyCheck]
+    public int UV { get; set; }
 }

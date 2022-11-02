@@ -124,12 +124,14 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             if (stats != null)
             {
                 stats.Count = recordService.Count(e => e.PostId == pid & e.Time >= DateTime.Today) + 1;
+                stats.UV = recordService.GetQuery(e => e.PostId == pid & e.Time >= DateTime.Today).Select(e => e.IP).Distinct().Count() + 1;
             }
             else
             {
                 recordStatsService.AddEntity(new PostVisitRecordStats()
                 {
                     Count = 1,
+                    UV = 1,
                     Date = DateTime.Today,
                     PostId = pid
                 });
