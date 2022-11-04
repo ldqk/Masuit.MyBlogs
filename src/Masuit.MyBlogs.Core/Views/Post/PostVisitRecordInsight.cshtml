@@ -35,6 +35,7 @@
 		<div class="layui-input-inline">
 			<select id="period" name="period" lay-filter="period">
 				<option value="0">不对比</option>
+				<option value="7">一周</option>
 				<option value="15">15天</option>
 			    <option value="30" selected="selected">一个月</option>
 				<option value="60">两个月</option>
@@ -138,7 +139,7 @@
 			}
 			var chartDom = document.getElementById('chart');
 			var myChart = echarts.init(chartDom);
-			const colors = ['#5470C6', '#EE6666'];
+			const colors = ['#0091ee', '#ccc'];
 			var option = {
 				color: colors,
 				tooltip: {
@@ -186,7 +187,6 @@
 				series: yCountSeries.map(function (item, index) {
 					return {
 						type: 'line',
-						smooth: true,
 						symbol: 'none',
 						xAxisIndex: index,
 						data: item,
@@ -208,7 +208,6 @@
 				}).concat(yUvSeries.map(function (item, index) {
 					return {
 						type: 'line',
-						smooth: true,
 						symbol: 'none',
 						xAxisIndex: index,
 						areaStyle: {},

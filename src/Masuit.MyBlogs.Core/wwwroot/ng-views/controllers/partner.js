@@ -418,8 +418,7 @@
     }
     
 	showCharts=function() {
-        var chartDom = document.getElementById('chart');
-        echarts.init(chartDom).dispose();
+        echarts.init(document.getElementById('chart')).dispose();
 		var period = document.getElementById("period").value;
 		window.fetch(`/partner/records-chart?compare=${period > 0}&period=${period}`, {
 			credentials: 'include',
@@ -442,7 +441,7 @@
 			}
 			var chartDom = document.getElementById('chart');
 			var myChart = echarts.init(chartDom);
-			const colors = ['#5470C6', '#EE6666'];
+			const colors = ['#0091ee','#ccc'];
 			var option = {
 				color: colors,
 				tooltip: {
@@ -490,7 +489,6 @@
 				series: ySeries.map(function (item, index) {
 					return {
 						type: 'line',
-						smooth: true,
 						symbol: 'none',
 						xAxisIndex: index,
 						areaStyle: {},

@@ -46,14 +46,14 @@
         <PackageReference Include="CHTCHSConv" Version="1.0.0" />
         <PackageReference Include="CLRStats" Version="1.0.0" />
         <PackageReference Include="Collections.Pooled" Version="1.0.82" />
-        <PackageReference Include="FreeRedis" Version="1.0.2" />
+        <PackageReference Include="FreeRedis" Version="1.0.3" />
         <PackageReference Include="Hangfire" Version="1.7.31" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
         <PackageReference Include="htmldiff.net" Version="1.4.0" />
         <PackageReference Include="IP2Region" Version="1.2.0" />
         <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.5.1" />
         <PackageReference Include="Markdig" Version="0.30.4" />
-        <PackageReference Include="Masuit.Tools.Excel" Version="1.2.3.1" />
+        <PackageReference Include="Masuit.Tools.Excel" Version="1.2.3.3" />
         <PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.10" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.10" />

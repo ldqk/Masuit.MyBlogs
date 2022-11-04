@@ -1,4 +1,6 @@
 ﻿@using Masuit.MyBlogs.Core.Common
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     Layout = null;
@@ -9,10 +11,28 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta http-equiv='content-language' content='zh-CN'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>正在检测您的浏览器环境，请稍候......</title>
+    <meta name="keywords" content="@CommonHelper.SystemSettings["Keyword"]" />
+    <meta name="description" content="@CommonHelper.SystemSettings["Description"]" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="twitter:card" content="summary">
+    <meta property="og:title" content="@CommonHelper.SystemSettings["Title"]">
+    <meta property="og:description" content="@CommonHelper.SystemSettings["Description"]">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="@Context.Request.GetEncodedUrl()">
+    <meta property="og:image" content="/favicon.png" />
+    <meta property="og:image:alt" content="@CommonHelper.SystemSettings["Description"]" />
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:author" content="@CommonHelper.SystemSettings["Title"]" />
+    <meta property="og:release_date" content="@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")" />
+    <meta property="article:author" content="@CommonHelper.SystemSettings["Title"]" />
+    <meta property="article:published_time" content="@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")">
+    <meta property="article:modified_time" content="@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")">
     <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
     <script src="/Scripts/global/functions.js"></script>
 </head>

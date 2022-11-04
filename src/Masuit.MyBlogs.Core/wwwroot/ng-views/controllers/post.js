@@ -370,7 +370,7 @@
 			}
 			var chartDom = document.getElementById('chart');
 			var myChart = echarts.init(chartDom);
-			const colors = ['#5470C6', '#EE6666'];
+			const colors = ['#0091ee','#ccc'];
 			var option = {
 				color: colors,
 				tooltip: {
@@ -418,7 +418,7 @@
 				series: yCountSeries.map(function (item, index) {
 					return {
 						type: 'line',
-						smooth: true,
+						//smooth: true,
 						symbol: 'none',
 						xAxisIndex: index,
 						data: item,
@@ -440,25 +440,14 @@
 				}).concat(yUvSeries.map(function (item, index) {
 					return {
 						type: 'line',
-						smooth: true,
+						//smooth: true,
 						symbol: 'none',
 						xAxisIndex: index,
 						areaStyle: {},
 						data: item,
                           lineStyle: {
                             type: index===1?'dashed':""
-                          },
-						markPoint: {
-							data: [
-								{ type: 'max', name: '最大值' },
-								{ type: 'min', name: '最小值' }
-							]
-						},
-						markLine: {
-							data: [
-								{ type: 'average', name: '平均值' }
-							]
-						}
+                          }
 					}
 				}))
 			};
