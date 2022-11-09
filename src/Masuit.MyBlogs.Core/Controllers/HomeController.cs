@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -58,7 +59,7 @@ public class HomeController : BaseController
         var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner, Request.Location()).OrderByRandom().ToList();
         var fastShares = fastShareService.GetAllFromCache(s => s.Sort);
         var postsQuery = PostService.GetQuery(PostBaseWhere()); //准备文章的查询
-        var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderByDescending(p => EF.Property<object>(p, OrderBy.ModifyDate.GetDisplay())).ToPagedListAsync<Post, PostDto>(1, 15, MapperConfig);
+        var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ToPagedListAsync<Post, PostDto>(1, 15, MapperConfig);
         posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ProjectTo<PostDto>(MapperConfig).FromCache().ToList());
         var viewModel = GetIndexPageViewModel();
         viewModel.Banner = banners;
@@ -93,7 +94,7 @@ public class HomeController : BaseController
         var posts = orderBy switch
         {
             OrderBy.Trending => await postsQuery.Where(p => !p.IsFixedTop).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(t => t.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-            _ => await postsQuery.Where(p => !p.IsFixedTop).OrderByDescending(p => EF.Property<object>(p, (orderBy ?? OrderBy.ModifyDate).GetDisplay())).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            _ => await postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
         };
         if (page == 1)
         {
@@ -136,7 +137,7 @@ public class HomeController : BaseController
         var posts = orderBy switch
         {
             OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-            _ => await queryable.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => EF.Property<object>(p, (orderBy ?? OrderBy.ModifyDate).GetDisplay())).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            _ => await queryable.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
         };
         var viewModel = GetIndexPageViewModel();
         ViewBag.Tag = tag;
@@ -182,7 +183,7 @@ public class HomeController : BaseController
         var posts = orderBy switch
         {
             OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-            _ => await queryable.OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => EF.Property<object>(p, (orderBy ?? OrderBy.ModifyDate).GetDisplay())).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            _ => await queryable.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
         };
         var viewModel = GetIndexPageViewModel();
         viewModel.Posts = posts;
@@ -215,7 +216,7 @@ public class HomeController : BaseController
         var posts = orderBy switch
         {
             OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-            _ => await PostService.GetQuery(where).OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => EF.Property<object>(p, (orderBy ?? OrderBy.ModifyDate).GetDisplay())).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            _ => await PostService.GetQuery(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
         };
         var viewModel = GetIndexPageViewModel();
         ViewBag.Author = author;
@@ -250,7 +251,7 @@ public class HomeController : BaseController
         var posts = orderBy switch
         {
             OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId))).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-            _ => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId))).OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => EF.Property<object>(p, (orderBy ?? OrderBy.ModifyDate).GetDisplay())).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            _ => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId))).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
         };
         var viewModel = GetIndexPageViewModel();
         viewModel.Posts = posts;
@@ -327,13 +328,12 @@ public class HomeController : BaseController
         var notices = NoticeService.GetPagesFromCache<DateTime, NoticeDto>(1, 5, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false); //加载前5条公告
         using var cats = CategoryService.GetQuery(c => c.Status == Status.Available && c.Post.Count > 0).Include(c => c.Parent).OrderBy(c => c.Name).ThenBy(c => c.Path).AsNoTracking().FromCache().ToPooledList(); //加载分类目录
         var hotSearches = RedisHelper.Get<PooledList<KeywordsRank>>("SearchRank:Week").AsNotNull().Take(10).ToPooledList(); //热词统计
-        var orderby = (new Random().Next() % 3) switch
+        var hot5Post = postsQuery.OrderBy((new Random().Next() % 3) switch
         {
             1 => nameof(OrderBy.VoteUpCount),
             2 => nameof(OrderBy.AverageViewCount),
             _ => nameof(OrderBy.TotalViewCount)
-        };
-        var hot5Post = postsQuery.OrderByDescending(p => EF.Property<object>(p, orderby)).Skip(0).Take(5).FromCache().ToPooledList(); //热门文章
+        } + " desc").Skip(0).Take(5).FromCache().ToPooledList(); //热门文章
         var tagdic = PostService.GetTags().OrderByRandom().Take(20).ToDictionary(x => x.Key, x => Math.Min(x.Value + 12, 32)); //统计标签
         return new HomePageViewModel
         {

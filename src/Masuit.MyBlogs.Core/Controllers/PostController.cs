@@ -36,6 +36,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text;
@@ -660,7 +661,7 @@ public class PostController : BaseController
         var list = orderby switch
         {
             OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.Status).ThenByDescending(p => p.IsFixedTop).ThenByDescending(p => p.PostVisitRecordStats.Sum(t => t.Count) / p.PostVisitRecordStats.Count).ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig),
-            _ => await PostService.GetQuery(where).OrderByDescending(p => p.Status).ThenByDescending(p => p.IsFixedTop).ThenByDescending(p => EF.Property<object>(p, orderby.GetDisplay())).ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig)
+            _ => await PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig)
         };
         foreach (var item in list.Data)
         {
