@@ -86,11 +86,7 @@ public partial class AdvertisementService : BaseService<Advertisement>, IAdverti
             }
 
             var ids = list.Select(a => a.Id).ToArray();
-            GetQuery(a => ids.Contains(a.Id)).UpdateFromQuery(a => new Advertisement
-            {
-                DisplayCount = a.DisplayCount + 1
-            });
-
+            GetQuery(a => ids.Contains(a.Id)).ExecuteUpdate(a => a.SetProperty(a => a.DisplayCount, a => a.DisplayCount + 1));
             return list;
         });
     }

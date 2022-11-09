@@ -9,6 +9,7 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.Strings;
 using Masuit.Tools.Systems;
+using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire
 {
@@ -152,21 +153,9 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
             var noticeService = _serviceScope.ServiceProvider.GetRequiredService<INoticeService>();
             searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
             TrackData.DumpLog();
-            advertisementService.GetQuery(a => DateTime.Now >= a.ExpireTime).UpdateFromQuery(a => new Advertisement()
-            {
-                Status = Status.Unavailable
-            });
-            noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.UnStart && n.StartTime < DateTime.Now).UpdateFromQuery(n => new Notice()
-            {
-                NoticeStatus = NoticeStatus.Normal,
-                PostDate = DateTime.Now,
-                ModifyDate = DateTime.Now
-            });
-            noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal && n.EndTime < DateTime.Now).UpdateFromQuery(n => new Notice()
-            {
-                NoticeStatus = NoticeStatus.Expired,
-                ModifyDate = DateTime.Now
-            });
+            advertisementService.GetQuery(a => DateTime.Now >= a.ExpireTime).ExecuteUpdate(s => s.SetProperty(a => a.Status, Status.Unavailable));
+            noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.UnStart && n.StartTime < DateTime.Now).ExecuteUpdate(s => s.SetProperty(e => e.NoticeStatus, NoticeStatus.Normal).SetProperty(e => e.PostDate, DateTime.Now).SetProperty(e => e.ModifyDate, DateTime.Now));
+            noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal && n.EndTime < DateTime.Now).ExecuteUpdate(s => s.SetProperty(e => e.NoticeStatus, NoticeStatus.Expired).SetProperty(e => e.ModifyDate, DateTime.Now));
         }
 
         /// <summary>
@@ -175,10 +164,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         public void EverymonthJob()
         {
             var advertisementService = _serviceScope.ServiceProvider.GetRequiredService<IAdvertisementService>();
-            advertisementService.GetAll().UpdateFromQuery(a => new Advertisement()
-            {
-                DisplayCount = 0
-            });
+            advertisementService.GetAll().ExecuteUpdate(s => s.SetProperty(a => a.DisplayCount, 0));
         }
 
         /// <summary>

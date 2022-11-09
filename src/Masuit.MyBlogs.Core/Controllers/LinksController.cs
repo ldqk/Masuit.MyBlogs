@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.Tools;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Z.EntityFramework.Plus;
 
@@ -175,10 +176,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> ToggleWhitelist(int id)
         {
-            var b = await LinksService.GetQuery(m => m.Id == id).UpdateFromQueryAsync(m => new Links()
-            {
-                Except = !m.Except
-            }) > 0;
+            var b = await LinksService.GetQuery(m => m.Id == id).ExecuteUpdateAsync(e => e.SetProperty(c => c.Except, c => !c.Except)) > 0;
             return ResultData(null, b, b ? "切换成功！" : "切换失败！");
         }
 
@@ -191,10 +189,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> ToggleRecommend(int id)
         {
-            var b = await LinksService.GetQuery(m => m.Id == id).UpdateFromQueryAsync(m => new Links()
-            {
-                Recommend = !m.Recommend
-            }) > 0;
+            var b = await LinksService.GetQuery(m => m.Id == id).ExecuteUpdateAsync(e => e.SetProperty(c => c.Recommend, c => !c.Recommend)) > 0;
             return ResultData(null, b, b ? "切换成功！" : "切换失败！");
         }
 
@@ -207,10 +202,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Toggle(int id)
         {
-            var b = await LinksService.GetQuery(m => m.Id == id).UpdateFromQueryAsync(m => new Links()
-            {
-                Status = m.Status == Status.Unavailable ? Status.Available : Status.Unavailable
-            }) > 0;
+            var b = await LinksService.GetQuery(m => m.Id == id).ExecuteUpdateAsync(s => s.SetProperty(e => e.Status, m => m.Status == Status.Unavailable ? Status.Available : Status.Unavailable)) > 0;
             QueryCacheManager.ExpireType<Links>();
             return ResultData(null, b, b ? "切换成功！" : "切换失败！");
         }

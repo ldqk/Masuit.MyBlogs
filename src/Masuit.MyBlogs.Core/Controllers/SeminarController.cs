@@ -12,8 +12,8 @@ using Masuit.Tools.Core.Net;
 using Masuit.Tools.Linq;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.Linq.Dynamic.Core;
 using System.Runtime.InteropServices;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -49,7 +49,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var posts = orderBy switch
             {
                 OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id))).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-                _ => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id))).OrderBy($"{nameof(Post.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+                _ => await PostService.GetQuery(PostBaseWhere().And(p => p.Seminar.Any(x => x.Id == id))).OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => EF.Property<object>(p, (orderBy ?? OrderBy.ModifyDate).GetDisplay())).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
             };
             ViewBag.Id = s.Id;
             ViewBag.Title = s.Title;

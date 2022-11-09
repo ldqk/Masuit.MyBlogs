@@ -36,7 +36,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
-using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text;
@@ -238,10 +237,7 @@ public class PostController : BaseController
             return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
         }
 
-        var b = await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
-        {
-            VoteDownCount = p.VoteDownCount + 1
-        }) > 0;
+        var b = await PostService.GetQuery(p => p.Id == id).ExecuteUpdateAsync(s => s.SetProperty(m => m.VoteDownCount, m => m.VoteDownCount + 1)) > 0;
         if (b)
         {
             HttpContext.Session.Set("post-vote" + id, id.GetBytes());
@@ -262,10 +258,7 @@ public class PostController : BaseController
             return ResultData(null, false, "您刚才已经投过票了，感谢您的参与！");
         }
 
-        var b = await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
-        {
-            VoteUpCount = p.VoteUpCount + 1
-        }) > 0;
+        var b = await PostService.GetQuery(p => p.Id == id).ExecuteUpdateAsync(s => s.SetProperty(m => m.VoteUpCount, m => m.VoteUpCount + 1)) > 0;
         if (b)
         {
             HttpContext.Session.Set("post-vote" + id, id.GetBytes());
@@ -667,7 +660,7 @@ public class PostController : BaseController
         var list = orderby switch
         {
             OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.Status).ThenByDescending(p => p.IsFixedTop).ThenByDescending(p => p.PostVisitRecordStats.Sum(t => t.Count) / p.PostVisitRecordStats.Count).ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig),
-            _ => await PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig)
+            _ => await PostService.GetQuery(where).OrderByDescending(p => p.Status).ThenByDescending(p => p.IsFixedTop).ThenByDescending(p => EF.Property<object>(p, orderby.GetDisplay())).ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig)
         };
         foreach (var item in list.Data)
         {
@@ -1009,10 +1002,7 @@ public class PostController : BaseController
     [HttpPost("post/{id}/ChangeCategory/{cid}")]
     public async Task<ActionResult> ChangeCategory(int id, int cid)
     {
-        await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
-        {
-            CategoryId = cid
-        });
+        await PostService.GetQuery(p => p.Id == id).ExecuteUpdateAsync(s => s.SetProperty(p => p.CategoryId, cid));
         return Ok();
     }
 
@@ -1042,10 +1032,7 @@ public class PostController : BaseController
     [MyAuthorize]
     public async Task<ActionResult> Refresh(int id, CancellationToken cancellationToken = default)
     {
-        await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
-        {
-            ModifyDate = DateTime.Now
-        }, cancellationToken);
+        await PostService.GetQuery(p => p.Id == id).ExecuteUpdateAsync(s => s.SetProperty(m => m.ModifyDate, DateTime.Now), cancellationToken: cancellationToken);
         return RedirectToAction("Details", new { id });
     }
 
@@ -1059,10 +1046,7 @@ public class PostController : BaseController
     [HttpPost("post/block/{id}")]
     public async Task<ActionResult> Block(int id, CancellationToken cancellationToken = default)
     {
-        var b = await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
-        {
-            Status = Status.Forbidden
-        }, cancellationToken) > 0;
+        var b = await PostService.GetQuery(p => p.Id == id).ExecuteUpdateAsync(s => s.SetProperty(m => m.Status, Status.Forbidden), cancellationToken: cancellationToken) > 0;
         return b ? ResultData(null, true, "操作成功！") : ResultData(null, false, "操作失败！");
     }
 
@@ -1076,10 +1060,7 @@ public class PostController : BaseController
     [HttpPost("post/{id}/rss-switch")]
     public async Task<ActionResult> RssSwitch(int id, CancellationToken cancellationToken = default)
     {
-        await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
-        {
-            Rss = !p.Rss
-        }, cancellationToken);
+        await PostService.GetQuery(p => p.Id == id).ExecuteUpdateAsync(s => s.SetProperty(m => m.Rss, p => !p.Rss), cancellationToken: cancellationToken);
         return ResultData(null, message: "操作成功");
     }
 
@@ -1093,10 +1074,7 @@ public class PostController : BaseController
     [HttpPost("post/{id}/locked-switch")]
     public async Task<ActionResult> LockedSwitch(int id, CancellationToken cancellationToken = default)
     {
-        await PostService.GetQuery(p => p.Id == id).UpdateFromQueryAsync(p => new Post()
-        {
-            Locked = !p.Locked
-        }, cancellationToken);
+        await PostService.GetQuery(p => p.Id == id).ExecuteUpdateAsync(s => s.SetProperty(m => m.Locked, p => !p.Locked), cancellationToken: cancellationToken);
         return ResultData(null, message: "操作成功");
     }
 
@@ -1322,7 +1300,7 @@ public class PostController : BaseController
     [ProducesResponseType(typeof(List<string>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> GetRegions(string name)
     {
-        return ResultData(await PostService.GetAll().Select(name).Distinct().ToDynamicListAsync());
+        return ResultData(await PostService.GetAll().Select(p => EF.Property<string>(p, name)).Distinct().ToListAsync());
     }
 
     #endregion 后端管理

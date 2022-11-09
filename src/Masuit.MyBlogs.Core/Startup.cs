@@ -14,6 +14,8 @@ using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.MyBlogs.Core.Infrastructure;
 using Masuit.MyBlogs.Core.Models.DTO;
+using Masuit.MyBlogs.Core.Models.Entity;
+using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Config;
@@ -171,9 +173,17 @@ namespace Masuit.MyBlogs.Core
         /// <param name="luceneIndexerOptions"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions, DataContext maindb, LoggerDbContext loggerdb)
         {
+            maindb.FastShare.AddOrUpdate(s => new[] { s.Title, s.Link }, new[]{new FastShare
+            {
+                Status = Status.Default,
+                Title = "title",
+                Link = "link",
+                Sort = 0
+            }});
             ServiceProvider = app.ApplicationServices;
             maindb.Database.EnsureCreated();
             loggerdb.Database.EnsureCreated();
+            maindb.Advertisements.Where(a => a.Id == 159).ExecuteUpdate(e => e.SetProperty(a => a.DisplayCount, a => a.DisplayCount + 1));
             app.InitSettings();
             app.UseLuceneSearch(env, hangfire, luceneIndexerOptions);
             app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For

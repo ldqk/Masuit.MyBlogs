@@ -18,6 +18,7 @@ using Masuit.Tools.Models;
 using Masuit.Tools.Strings;
 using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -307,10 +308,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Read(int id)
         {
-            await MessageService.GetQuery(m => m.Id == id).UpdateFromQueryAsync(m => new InternalMessage()
-            {
-                Read = true
-            });
+            await MessageService.GetQuery(m => m.Id == id).ExecuteUpdateAsync(s => s.SetProperty(m => m.Read, true));
             return Content("ok");
         }
 
@@ -322,10 +320,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> Unread(int id)
         {
-            await MessageService.GetQuery(m => m.Id == id).UpdateFromQueryAsync(m => new InternalMessage()
-            {
-                Read = false
-            });
+            await MessageService.GetQuery(m => m.Id == id).ExecuteUpdateAsync(s => s.SetProperty(m => m.Read, false));
             return Content("ok");
         }
 
@@ -337,10 +332,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [MyAuthorize]
         public async Task<ActionResult> MarkRead(int id)
         {
-            await MessageService.GetQuery(m => m.Id <= id).UpdateFromQueryAsync(m => new InternalMessage()
-            {
-                Read = true
-            });
+            await MessageService.GetQuery(m => m.Id <= id).ExecuteUpdateAsync(s => s.SetProperty(m => m.Read, true));
             return ResultData(null);
         }
 

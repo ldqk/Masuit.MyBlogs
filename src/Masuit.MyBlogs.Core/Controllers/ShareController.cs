@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers
@@ -60,12 +61,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         [HttpPost]
         public async Task<ActionResult> Update([FromBodyOrDefault] FastShare model)
         {
-            var b = await FastShareService.GetQuery(s => s.Id == model.Id).UpdateFromQueryAsync(s => new FastShare()
-            {
-                Title = model.Title,
-                Link = model.Link,
-                Sort = model.Sort
-            }) > 0;
+            var b = await FastShareService.GetQuery(s => s.Id == model.Id).ExecuteUpdateAsync(s => s.SetProperty(e => e.Title, model.Title).SetProperty(e => e.Link, model.Link).SetProperty(e => e.Sort, model.Sort)) > 0;
             QueryCacheManager.ExpireType<FastShare>();
             return ResultData(null, b, b ? "更新成功" : "更新失败");
         }

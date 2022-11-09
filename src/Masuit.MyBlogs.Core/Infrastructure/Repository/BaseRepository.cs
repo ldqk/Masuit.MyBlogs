@@ -445,7 +445,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>删除成功</returns>
         public virtual bool DeleteById(int id)
         {
-            return DataContext.Set<T>().Where(t => t.Id == id).Delete() > 0;
+            return DataContext.Set<T>().Where(t => t.Id == id).ExecuteDelete() > 0;
         }
 
         /// <summary>
@@ -455,7 +455,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>删除成功</returns>
         public virtual Task<int> DeleteByIdAsync(int id)
         {
-            return DataContext.Set<T>().Where(t => t.Id == id).DeleteAsync();
+            return DataContext.Set<T>().Where(t => t.Id == id).ExecuteDeleteAsync();
         }
 
         /// <summary>
@@ -478,7 +478,7 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Repository
         /// <returns>删除成功</returns>
         public virtual int DeleteEntity(Expression<Func<T, bool>> where)
         {
-            return DataContext.Set<T>().Where(where).Delete();
+            return DataContext.Set<T>().Where(where).ExecuteDelete();
         }
 
         /// <summary>
