@@ -45,7 +45,6 @@
         <PackageReference Include="CacheManager.StackExchange.Redis" Version="1.2.0" />
         <PackageReference Include="CHTCHSConv" Version="1.0.0" />
         <PackageReference Include="CLRStats" Version="1.0.0" />
-        <PackageReference Include="Collections.Pooled" Version="1.0.82" />
         <PackageReference Include="FreeRedis" Version="1.0.3" />
         <PackageReference Include="Hangfire" Version="1.7.31" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />

@@ -169,12 +169,13 @@ namespace Masuit.MyBlogs.Core
         /// <param name="env"></param>
         /// <param name="hangfire"></param>
         /// <param name="luceneIndexerOptions"></param>
+        /// <param name="maindb"></param>
+        /// <param name="loggerdb"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions, DataContext maindb, LoggerDbContext loggerdb)
         {
             ServiceProvider = app.ApplicationServices;
             maindb.Database.EnsureCreated();
             loggerdb.Database.EnsureCreated();
-            maindb.Advertisements.Where(a => a.Id == 159).ExecuteUpdate(e => e.SetProperty(a => a.DisplayCount, a => a.DisplayCount + 1));
             app.InitSettings();
             app.UseLuceneSearch(env, hangfire, luceneIndexerOptions);
             app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For

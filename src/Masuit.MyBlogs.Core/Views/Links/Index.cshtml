@@ -1,6 +1,6 @@
 ﻿@using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
-@model Collections.Pooled.PooledList<Masuit.MyBlogs.Core.Models.DTO.LinksDto>
+@model List<Masuit.MyBlogs.Core.Models.DTO.LinksDto>
 
 @{
     ViewBag.Title = "友情链接大全";
@@ -29,7 +29,7 @@
     </section>
     <hr class="margin-top10 marginbot10" />
     @{
-        await Html.RenderPartialAsync("_ArticleListAdvertisement", (Advertisement)ViewBag.Ads);
+        await Html.RenderPartialAsync("_ArticleListAdvertisement", (AdvertisementDto)ViewBag.Ads);
     }
 </div>
 <script>

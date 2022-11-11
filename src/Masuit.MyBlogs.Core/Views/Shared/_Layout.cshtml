@@ -13,7 +13,6 @@
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using StackExchange.Profiling
-@using Collections.Pooled
 @using Masuit.Tools.AspNetCore.Extensions
 @using Z.EntityFramework.Plus
 
@@ -21,7 +20,7 @@
     string[] colors = { "success", "info", "warning", "danger", "default" };
     var menus = MenuService.GetQueryFromCache(m => m.Status == Status.Available,m => m.Sort).ToTree(m => m.Id,m => m.ParentId);
     var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-    using var links = LinksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.GroupBy(x => x.IP).Count()).Take(30).Select(e => new{e.Url,e.Name}).FromCache().ToPooledList();
+    var links = LinksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.GroupBy(x => x.IP).Count()).Take(30).Select(e => new{e.Url,e.Name}).FromCache().ToList();
 }
 
 <!DOCTYPE html>

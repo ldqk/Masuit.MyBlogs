@@ -2,7 +2,6 @@
 using AngleSharp.Css.Dom;
 using AngleSharp.Dom;
 using AutoMapper;
-using Collections.Pooled;
 using FreeRedis;
 using Hangfire;
 using IP2Region;
@@ -311,7 +310,7 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             var elements = doc.DocumentElement.QuerySelectorAll("p,br");
-            using var els = elements.OrderByRandom().Take(Math.Max(elements.Length / 5, 3)).ToPooledList();
+            var els = elements.OrderByRandom().Take(Math.Max(elements.Length / 5, 3)).ToList();
             var href = "https://" + SystemSettings["Domain"].Split('|').OrderByRandom().FirstOrDefault();
             foreach (var el in els)
             {

@@ -1,11 +1,12 @@
 ﻿@using Masuit.MyBlogs.Core.Models
+@using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
 @model Masuit.Tools.Models.PagedList<Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion>
 @{
 	var post = (Post)ViewBag.Primary;
 	ViewBag.Title = post.Title + "的历史版本";
 	Layout = "~/Views/Shared/_Layout.cshtml";
-	Advertisement ad = ViewBag.Ads;
+	AdvertisementDto ad = ViewBag.Ads;
 }
 <div class="container" style="min-height: 70vh">
 	<ol class="cd-breadcrumb triangle">

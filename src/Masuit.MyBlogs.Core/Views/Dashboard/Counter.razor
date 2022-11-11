@@ -4,7 +4,6 @@
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools
 @using System.IO
-@using Collections.Pooled
 @using Masuit.Tools.Logging
 @using PerformanceCounter = Masuit.MyBlogs.Core.Common.PerformanceCounter
 @inject IPerfCounter PerfCounter;
@@ -166,7 +165,7 @@
     
     public Dictionary<string, dynamic> GetCounterPercent()
     {
-        using var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==ip).OrderByRandom().Take(5000).ToPooledList();
+        var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==ip).OrderByRandom().Take(5000).ToList();
         var count = counters.Count();
         return new()
         {

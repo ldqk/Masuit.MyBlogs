@@ -1,11 +1,11 @@
 ﻿@model string
-@using Masuit.MyBlogs.Core.Models.Entity
+@using Masuit.MyBlogs.Core.Models.DTO
 
 @{
     ViewBag.Title = "网站打赏";
     Layout = "~/Views/Shared/_Layout.cshtml";
     Random r = new Random();
-    List<Advertisement> ads = ViewBag.Ads;
+    List<AdvertisementDto> ads = ViewBag.Ads;
 }
 <style>
     .bg-title {

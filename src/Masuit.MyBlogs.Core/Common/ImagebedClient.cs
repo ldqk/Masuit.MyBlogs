@@ -1,5 +1,4 @@
-﻿using Collections.Pooled;
-using Hangfire;
+﻿using Hangfire;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools;
 using Masuit.Tools.Html;
@@ -46,7 +45,7 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             file = Regex.Replace(Path.GetFileName(file), @"\p{P}|\p{S}", "");
-            using var gitlabs = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length && !_failedList.Contains(c.ApiUrl)).OrderByRandom().ToPooledList();
+            var gitlabs = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length && !_failedList.Contains(c.ApiUrl)).OrderByRandom().ToList();
             if (gitlabs.Count > 0)
             {
                 var gitlab = gitlabs[0];

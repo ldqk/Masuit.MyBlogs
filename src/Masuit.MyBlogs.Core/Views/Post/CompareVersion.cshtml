@@ -1,6 +1,7 @@
 ﻿@using System.Text.Encodings.Web
 @using System.Text.RegularExpressions
 @using Masuit.MyBlogs.Core.Common
+@using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
@@ -9,7 +10,7 @@
 	ViewBag.Title = Model[0].Title + "版本对比";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 	string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
-	IList<Advertisement> ads = ViewBag.Ads;
+	IList<AdvertisementDto> ads = ViewBag.Ads;
 }
 <style>
 	ins {

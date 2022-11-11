@@ -1,7 +1,6 @@
 ﻿@using System.Web
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
-@using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.MyBlogs.Core.Views.Post
@@ -14,7 +13,7 @@
 	string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
 	UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 	var cid = Context.Request.RouteValues["cid"] ?? Context.Request.Query["cid"];
-	Advertisement ad = ViewBag.Ads;
+	AdvertisementDto ad = ViewBag.Ads;
 }
 <script src="https://cdn.staticfile.org/jqueryui/1.12.1/jquery-ui.min.js" async defer></script>
 <environment names="Development">

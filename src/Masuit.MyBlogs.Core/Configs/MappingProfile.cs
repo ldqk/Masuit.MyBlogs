@@ -77,7 +77,7 @@ namespace Masuit.MyBlogs.Core.Configs
             CreateMap<Advertisement, AdvertisementViewModel>()
                 .ForMember(m => m.AverageViewCount, e => e.MapFrom(a => a.ClickRecords.Where(o => o.Time >= DateTime.Today.AddMonths(-1)).GroupBy(r => r.Time.Date).Select(g => g.Count()).DefaultIfEmpty().Average()))
                 .ForMember(m => m.ViewCount, e => e.MapFrom(a => a.ClickRecords.Count(o => o.Time >= DateTime.Today.AddMonths(-1))));
-            CreateMap<AdvertisementDto, Advertisement>().ForMember(a => a.ClickRecords, e => e.Ignore()).ForMember(a => a.Status, e => e.Ignore()).ForMember(a => a.UpdateTime, e => e.MapFrom(a => DateTime.Now));
+            CreateMap<AdvertisementDto, Advertisement>().ForMember(a => a.ClickRecords, e => e.Ignore()).ForMember(a => a.Status, e => e.Ignore()).ForMember(a => a.UpdateTime, e => e.MapFrom(a => DateTime.Now)).ReverseMap();
 
             CreateMap<Donate, DonateDto>();
 
