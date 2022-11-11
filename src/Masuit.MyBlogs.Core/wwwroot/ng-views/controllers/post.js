@@ -92,7 +92,6 @@
                 tree: {
                     show: true,
                     strict: false,
-                    expandedKeys: true,
                 },
                 filterable: true, //搜索功能
                 autoRow: true, //选项过多,自动换行
