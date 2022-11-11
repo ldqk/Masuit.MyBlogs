@@ -45,7 +45,7 @@ Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new AutofacServiceProv
         {
             if (Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.Major >= 10)
             {
-                s.Protocols = HttpProtocols.Http1AndHttp2;
+                s.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
             }
 
             s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]);
