@@ -47,6 +47,8 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
         /// </summary>
         void CheckLinks();
 
+        void CheckAdvertisements();
+
         /// <summary>
         /// 更新友链权重
         /// </summary>

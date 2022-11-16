@@ -48,6 +48,11 @@
         public int VoteDownCount { get; set; }
 
         /// <summary>
+        /// 每日平均访问量
+        /// </summary>
+        public double AverageViewCount { get; set; }
+
+        /// <summary>
         /// 分类id
         /// </summary>
         public int CategoryId { get; set; }

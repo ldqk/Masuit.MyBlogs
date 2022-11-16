@@ -111,7 +111,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                 return View(address);
             }
 
-            var s = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={AppConfig.BaiduAK}", new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token).ContinueWith(t =>
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var s = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={AppConfig.BaiduAK}", cts.Token).ContinueWith(t =>
              {
                  if (t.IsCompletedSuccessfully)
                  {
@@ -163,7 +164,8 @@ namespace Masuit.MyBlogs.Core.Controllers
             }
 
             ViewBag.Address = addr;
-            var physicsAddress = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?output=json&address={addr}&ak={AppConfig.BaiduAK}", new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token).ContinueWith(t =>
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var physicsAddress = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?output=json&address={addr}&ak={AppConfig.BaiduAK}", cts.Token).ContinueWith(t =>
              {
                  if (t.IsCompletedSuccessfully)
                  {

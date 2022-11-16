@@ -147,7 +147,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                 var privateKey = HttpContext.Session.Get<string>(nameof(RsaKey.PrivateKey));
                 password = password.RSADecrypt(privateKey);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 LogManager.Info("登录失败，私钥：" + HttpContext.Session.Get<string>(nameof(RsaKey.PrivateKey)));
                 throw;

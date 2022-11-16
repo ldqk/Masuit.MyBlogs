@@ -340,7 +340,15 @@
           content: '/'+row.Id+'/insight'
         }));
     }
+    
+    $scope.diffDateFromNow = function(date){
+          var dateOut = new Date(date);
 
+          var timeDiff = Math.abs(new Date().getTime() - dateOut.getTime());
+          var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
+          return diffDays;
+    };
+    
     showCharts=function() {
         echarts.init(document.getElementById('chart')).dispose();
 		var period=document.getElementById("period").value;

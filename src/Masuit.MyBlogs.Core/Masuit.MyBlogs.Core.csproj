@@ -66,10 +66,10 @@
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.22" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
         <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.2" />
-        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.22" />
+        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.23" />
         <PackageReference Include="TimeZoneConverter" Version="6.0.1" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.0" />
-        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="7.0.0-rc.2.22472.11-04" />
+        <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="7.17.0" />
     </ItemGroup>
     <ItemGroup>
         <Content Update="appsettings.json">

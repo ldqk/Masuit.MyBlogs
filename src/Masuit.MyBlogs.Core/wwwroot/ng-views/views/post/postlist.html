@@ -34,8 +34,8 @@
             </div>
         </div>
     <table ng-table="list.tableParams" class="table table-striped table-vmiddle table-bordered table-hover table-condensed">
-        <tr ng-repeat="row in $data">
-            <td data-title="'标题'">
+        <tr ng-repeat="row in $data" ng-class="{'warning':(diffDateFromNow(row.ModifyDate)>365)}">
+            <td data-title="'标题'" ng-class="{'danger':(row.AverageViewCount<1)}">
                 <a ng-href="/{{row.Id}}" target="_blank">{{row.Title}}</a>
             </td>
             <td data-title="'作者'">
@@ -44,7 +44,7 @@
             <td data-title="'作者邮箱'">
                 {{row.Email}}
             </td>
-            <td data-title="'阅读'" ng-if="!aclMode">
+            <td data-title="'阅读'" ng-if="!aclMode" ng-class="{'danger':(row.AverageViewCount<1)}">
                 {{row.ViewCount}}
             </td>
             <td data-title="'在看'" ng-if="!aclMode">
@@ -101,7 +101,7 @@
                     <span class="el-switch-style" ng-click="lockedSwitch(row.Id)"></span>
                 </label>
             </td>
-            <td data-title="'操作'" style="width: 195px;">
+            <td data-title="'操作'" style="width: 195px;" ng-class="{'danger':(row.AverageViewCount<1)}">
                 <div class="btn-group">
                     <button class="btn btn-default btn-sm waves-effect" ng-click="list.pass(row)" ng-if="row.Status=='审核中'">
                         <i class="icon-checkmark"></i>
