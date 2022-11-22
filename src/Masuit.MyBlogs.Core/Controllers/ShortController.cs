@@ -1,5 +1,6 @@
 ﻿using FreeRedis;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.Tools;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     public class ShortController : Controller
     {
         public IRedisClient RedisHelper { get; set; }
-        [HttpGet("short"), MyAuthorize]
+        [HttpGet("short"), MyAuthorize, AllowAccessFirewall]
         public IActionResult Short(string key, string url, int? expire)
         {
             expire ??= -1;
@@ -17,7 +18,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             return Ok(id);
         }
 
-        [HttpGet("{key}", Order = 100)]
+        [HttpGet("{key}", Order = 100), AllowAccessFirewall]
         public ActionResult RedirectTo(string key)
         {
             var url = RedisHelper.Get("shorturl:" + key) ?? throw new NotFoundException("链接未找到");

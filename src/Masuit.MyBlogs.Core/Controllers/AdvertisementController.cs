@@ -243,7 +243,17 @@ public class AdvertisementController : BaseController
 			Date = g.Key,
 			Count = g.Count()
 		}).OrderBy(a => a.Date).ToListAsync(cancellationToken);
-		return Ok(new[] { list });
+		var min = list.Min(a => a.Date);
+		var max = list.Max(a => a.Date);
+		for (var i = min; i < max; i = i.AddDays(1))
+		{
+			if (list.All(a => a.Date != i))
+			{
+				list.Add(new { Date = i, Count = 0 });
+			}
+		}
+
+		return Ok(new[] { list.OrderBy(a => a.Date) });
 	}
 
 	/// <summary>
@@ -298,7 +308,17 @@ public class AdvertisementController : BaseController
 			Date = g.Key,
 			Count = g.Count()
 		}).OrderBy(a => a.Date).ToListAsync(cancellationToken);
-		return Ok(new[] { list });
+		var min = list.Min(a => a.Date);
+		var max = list.Max(a => a.Date);
+		for (var i = min; i < max; i = i.AddDays(1))
+		{
+			if (list.All(a => a.Date != i))
+			{
+				list.Add(new { Date = i, Count = 0 });
+			}
+		}
+
+		return Ok(new[] { list.OrderBy(a => a.Date) });
 	}
 
 	/// <summary>

@@ -632,8 +632,8 @@ public class PostController : BaseController
 	[MyAuthorize]
 	public ActionResult Get(int id)
 	{
-		Post post = PostService[id] ?? throw new NotFoundException("文章未找到");
-		PostDto model = post.Mapper<PostDto>();
+		var post = PostService.GetQuery(e => e.Id == id).Include(e => e.Seminar).FirstOrDefault() ?? throw new NotFoundException("文章未找到");
+		var model = post.Mapper<PostDto>();
 		model.Seminars = post.Seminar.Select(s => s.Id).Join(",");
 		return ResultData(model);
 	}
@@ -1012,13 +1012,17 @@ public class PostController : BaseController
 	/// <param name="id"></param>
 	/// <param name="sids"></param>
 	/// <returns></returns>
-	[HttpPost("post/{id}/ChangeSeminar/{sids}")]
+	[HttpPost("post/{id}/ChangeSeminar")]
 	public async Task<ActionResult> ChangeSeminar(int id, string sids)
 	{
-		var post = PostService[id] ?? throw new NotFoundException("文章不存在");
-		var ids = sids.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+		var post = PostService.GetQuery(e => e.Id == id).Include(e => e.Seminar).FirstOrDefault() ?? throw new NotFoundException("文章不存在");
 		post.Seminar.Clear();
-		post.Seminar.AddRange(SeminarService[s => ids.Contains(s.Id)]);
+		if (!string.IsNullOrEmpty(sids))
+		{
+			var ids = sids.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+			post.Seminar.AddRange(SeminarService[s => ids.Contains(s.Id)]);
+		}
+
 		await PostService.SaveChangesAsync();
 		return Ok();
 	}
@@ -1219,7 +1223,17 @@ public class PostController : BaseController
 			Count = g.Sum(t => t.Count),
 			UV = g.Sum(t => t.UV)
 		}).OrderBy(a => a.Date).ToListAsync(cancellationToken);
-		return Ok(new[] { list });
+		var min = list.Min(a => a.Date);
+		var max = list.Max(a => a.Date);
+		for (var i = min; i < max; i = i.AddDays(1))
+		{
+			if (list.All(a => a.Date != i))
+			{
+				list.Add(new { Date = i, Count = 0, UV = 0 });
+			}
+		}
+
+		return Ok(new[] { list.OrderBy(a => a.Date) });
 	}
 
 	/// <summary>
@@ -1276,7 +1290,17 @@ public class PostController : BaseController
 			Count = g.Count(),
 			UV = g.Select(e => e.IP).Distinct().Count()
 		}).OrderBy(a => a.Date).ToListAsync(cancellationToken);
-		return Ok(new[] { list });
+		var min = list.Min(a => a.Date);
+		var max = list.Max(a => a.Date);
+		for (var i = min; i < max; i = i.AddDays(1))
+		{
+			if (list.All(a => a.Date != i))
+			{
+				list.Add(new { Date = i, Count = 0, UV = 0 });
+			}
+		}
+
+		return Ok(new[] { list.OrderBy(a => a.Date) });
 	}
 
 	/// <summary>

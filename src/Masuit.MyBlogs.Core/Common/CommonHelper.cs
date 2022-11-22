@@ -136,7 +136,8 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public static async Task<bool> IsProxy(this IPAddress ip, CancellationToken cancellationToken = default)
         {
-            var httpClient = Startup.ServiceProvider.GetRequiredService<IHttpClientFactory>().CreateClient();
+            using var serviceScope = Startup.ServiceProvider.CreateScope();
+            var httpClient = serviceScope.ServiceProvider.GetRequiredService<IHttpClientFactory>().CreateClient();
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36 Edg/92.0.902.62");
             return await httpClient.GetStringAsync("https://ipinfo.io/" + ip, cancellationToken).ContinueWith(t =>
             {
@@ -250,8 +251,9 @@ namespace Masuit.MyBlogs.Core.Common
         [AutomaticRetry(Attempts = 1, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         public static void SendMail(string title, string content, string tos, string clientip)
         {
-            Startup.ServiceProvider.GetRequiredService<IMailSender>().Send(title, content, tos);
-            var redisClient = Startup.ServiceProvider.GetRequiredService<IRedisClient>();
+            using var serviceScope = Startup.ServiceProvider.CreateScope();
+            serviceScope.ServiceProvider.GetRequiredService<IMailSender>().Send(title, content, tos);
+            var redisClient = serviceScope.ServiceProvider.GetRequiredService<IRedisClient>();
             redisClient.SAdd($"Email:{DateTime.Now:yyyyMMdd}", new { title, content, tos, time = DateTime.Now, clientip });
             redisClient.Expire($"Email:{DateTime.Now:yyyyMMdd}", 86400);
         }

@@ -180,7 +180,7 @@
                             for (var i = 0; i < data.arr.length; i++) {
                                 arr.push(data.arr[i].Id);
                             }
-                            $http.post(`/post/${item.Id}/ChangeSeminar/${arr.join(",")}`).then(function (res) {
+                            $http.post(`/post/${item.Id}/ChangeSeminar?sids=${arr.join(",")}`).then(function (res) {
                                 if (data.status >= 400) {
                                     layer.msg("操作失败");
                                 }

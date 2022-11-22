@@ -1,4 +1,5 @@
-﻿using Masuit.Tools.AspNetCore.ModelBinder;
+﻿using Masuit.MyBlogs.Core.Extensions.Firewall;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -10,7 +11,7 @@ public class DefaultController : Controller
     /// </summary>
     /// <param name="pair"></param>
     /// <returns></returns>
-    [HttpPost("/SetCookie"), HttpGet("/SetCookie")]
+    [HttpPost("/SetCookie"), HttpGet("/SetCookie"), AllowAccessFirewall]
     public ActionResult SetCookie([FromBodyOrDefault] NameValuePair pair)
     {
         Response.Cookies.Append(pair.Name, pair.Value, new CookieOptions

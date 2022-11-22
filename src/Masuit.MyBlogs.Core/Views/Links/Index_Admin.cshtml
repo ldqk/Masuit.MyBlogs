@@ -47,7 +47,7 @@
             allowOutsideClick: false,
             preConfirm: function () {
                 return new Promise(function (resolve) {
-                    $.post("/links/add", {
+                    $.post("/links/save", {
                         Name: $('#title').val(),
                         Url: $('#url').val(),
                         UrlBase: $('#urlbase').val()

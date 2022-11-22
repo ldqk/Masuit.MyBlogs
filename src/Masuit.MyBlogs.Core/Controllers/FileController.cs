@@ -191,12 +191,12 @@ namespace Masuit.MyBlogs.Core.Controllers
                 case "copy":
                     if (!string.IsNullOrEmpty(req.Item))
                     {
-                        System.IO.File.Copy(Path.Combine(root, req.Item.TrimStart('\\', '/')), Path.Combine(root, req.NewItemPath.TrimStart('\\', '/')));
+                        System.IO.File.Copy(Path.Combine(root, req.Item.TrimStart('\\', '/')), Path.Combine(root, req.NewItemPath.TrimStart('\\', '/')), true);
                     }
                     else
                     {
                         newpath = Path.Combine(root, req.NewPath.TrimStart('\\', '/'));
-                        req.Items.ForEach(s => System.IO.File.Copy(Path.Combine(root, s.TrimStart('\\', '/')), !string.IsNullOrEmpty(req.SingleFilename) ? Path.Combine(newpath, req.SingleFilename) : Path.Combine(newpath, Path.GetFileName(s))));
+                        req.Items.ForEach(s => System.IO.File.Copy(Path.Combine(root, s.TrimStart('\\', '/')), !string.IsNullOrEmpty(req.SingleFilename) ? Path.Combine(newpath, req.SingleFilename) : Path.Combine(newpath, Path.GetFileName(s)), true));
                     }
                     list.Add(new
                     {

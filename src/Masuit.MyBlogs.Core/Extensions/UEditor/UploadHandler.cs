@@ -63,7 +63,7 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor
                     }
 
                     var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
-                    var (url, success) = await Startup.ServiceProvider.GetRequiredService<ImagebedClient>().UploadImage(stream2, localPath, cts.Token);
+                    var (url, success) = await Context.RequestServices.GetRequiredService<ImagebedClient>().UploadImage(stream2, localPath, cts.Token);
                     if (success)
                     {
                         Result.Url = url;

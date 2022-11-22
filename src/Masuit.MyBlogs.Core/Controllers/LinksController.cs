@@ -1,5 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Models.DTO;
 using Masuit.MyBlogs.Core.Models.Entity;
 using Masuit.MyBlogs.Core.Models.Enum;
@@ -19,14 +20,13 @@ namespace Masuit.MyBlogs.Core.Controllers
     {
         public IHttpClientFactory HttpClientFactory { get; set; }
         public IConfiguration Configuration { get; set; }
-
         private HttpClient HttpClient => HttpClientFactory.CreateClient();
 
         /// <summary>
         /// 友情链接页
         /// </summary>
         /// <returns></returns>
-        [Route("links"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
+        [Route("links"), ResponseCache(Duration = 600, VaryByHeader = "Cookie"), AllowAccessFirewall]
         public async Task<ActionResult> Index([FromServices] IWebHostEnvironment hostEnvironment)
         {
             var list = LinksService.GetQueryFromCache<bool, LinksDto>(l => l.Status == Status.Available, l => l.Recommend, false);

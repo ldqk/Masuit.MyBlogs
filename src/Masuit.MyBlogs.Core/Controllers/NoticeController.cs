@@ -1,5 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models;
 using Masuit.MyBlogs.Core.Models.DTO;
@@ -32,7 +33,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [Route("notice"), Route("n", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
+        [Route("notice"), AllowAccessFirewall, Route("n", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
         public ActionResult Index([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
         {
             var list = NoticeService.GetPagesFromCache<DateTime, NoticeDto>(page, size, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false);
@@ -53,7 +54,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Route("notice/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
+        [Route("notice/{id:int}"), AllowAccessFirewall, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
         public async Task<ActionResult> Details(int id)
         {
             var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("页面未找到");
@@ -194,7 +195,7 @@ namespace Masuit.MyBlogs.Core.Controllers
         /// 最近一条公告
         /// </summary>
         /// <returns></returns>
-        [ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
+        [ResponseCache(Duration = 600, VaryByHeader = "Cookie"), AllowAccessFirewall]
         public async Task<ActionResult> Last()
         {
             var notice = await NoticeService.GetAsync(n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false);
