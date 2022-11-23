@@ -85,9 +85,9 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services
 				}
 				p.Content = document.Body.InnerHtml;
 			}
-			catch (Exception e)
+			catch
 			{
-				Console.WriteLine(e);
+				// ignored
 			}
 		}
 

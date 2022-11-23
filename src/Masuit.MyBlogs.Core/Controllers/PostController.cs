@@ -127,8 +127,8 @@ public class PostController : BaseController
 		ViewBag.Related = related;
 		post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
 		post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-		post.Content = ReplaceVariables(post.Content);
-		post.ProtectContent = ReplaceVariables(post.ProtectContent);
+		post.Content = await ReplaceVariables(post.Content).Next(s => notRobot ? s.InjectFingerprint() : Task.FromResult(s));
+		post.ProtectContent = await ReplaceVariables(post.ProtectContent).Next(s => notRobot ? s.InjectFingerprint() : Task.FromResult(s));
 
 		if (CurrentUser.IsAdmin)
 		{
@@ -183,8 +183,8 @@ public class PostController : BaseController
 	{
 		var history = await PostHistoryVersionService.GetAsync(v => v.Id == hid && (v.Post.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
 		CheckPermission(history.Post);
-		history.Content = ReplaceVariables(history.Content);
-		history.ProtectContent = ReplaceVariables(history.ProtectContent);
+		history.Content = await ReplaceVariables(history.Content).Next(s => Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
+		history.ProtectContent = await ReplaceVariables(history.ProtectContent).Next(s => Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
 		history.ModifyDate = history.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
 		var next = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate > history.ModifyDate, p => p.ModifyDate);
 		var prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < history.ModifyDate, p => p.ModifyDate, false);
@@ -216,9 +216,9 @@ public class PostController : BaseController
 		main.Id = id;
 		var diff = new HtmlDiff.HtmlDiff(right.Content, left.Content);
 		var diffOutput = diff.Build();
-		right.Content = ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty));
+		right.Content = await ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty)).Next(s => Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
 		right.ModifyDate = right.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-		left.Content = ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty));
+		left.Content = await ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty)).Next(s => Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
 		left.ModifyDate = left.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
 		ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location(), main.CategoryId, main.Label);
 		ViewBag.DisableCopy = post.DisableCopy;

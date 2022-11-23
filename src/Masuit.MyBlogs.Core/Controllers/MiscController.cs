@@ -38,7 +38,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             var misc = await MiscService.GetFromCacheAsync(m => m.Id == id) ?? throw new NotFoundException("页面未找到");
             misc.ModifyDate = misc.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             misc.PostDate = misc.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-            misc.Content = ReplaceVariables(misc.Content);
+            misc.Content = await ReplaceVariables(misc.Content).Next(s => Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
             return View(misc);
         }
 
