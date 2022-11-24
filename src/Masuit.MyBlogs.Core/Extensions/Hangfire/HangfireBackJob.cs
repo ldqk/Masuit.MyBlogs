@@ -149,15 +149,17 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
 		public void EverydayJob()
 		{
 			CommonHelper.IPErrorTimes.RemoveWhere(kv => kv.Value < 100); //将访客访问出错次数少于100的移开
-			DateTime time = DateTime.Now.AddMonths(-1);
+			var time = DateTime.Now.AddMonths(-1);
 			var searchDetailsService = _serviceScope.ServiceProvider.GetRequiredService<ISearchDetailsService>();
 			var advertisementService = _serviceScope.ServiceProvider.GetRequiredService<IAdvertisementService>();
 			var noticeService = _serviceScope.ServiceProvider.GetRequiredService<INoticeService>();
+			var postService = _serviceScope.ServiceProvider.GetRequiredService<IPostService>();
 			searchDetailsService.DeleteEntitySaved(s => s.SearchTime < time);
 			TrackData.DumpLog();
 			advertisementService.GetQuery(a => DateTime.Now >= a.ExpireTime).ExecuteUpdate(s => s.SetProperty(a => a.Status, Status.Unavailable));
 			noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.UnStart && n.StartTime < DateTime.Now).ExecuteUpdate(s => s.SetProperty(e => e.NoticeStatus, NoticeStatus.Normal).SetProperty(e => e.PostDate, DateTime.Now).SetProperty(e => e.ModifyDate, DateTime.Now));
 			noticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal && n.EndTime < DateTime.Now).ExecuteUpdate(s => s.SetProperty(e => e.NoticeStatus, NoticeStatus.Expired).SetProperty(e => e.ModifyDate, DateTime.Now));
+			postService.GetQuery(p => p.ExpireAt < DateTime.Now && p.Status == Status.Published).ExecuteUpdate(s => s.SetProperty(p => p.Status, Status.Takedown));
 		}
 
 		/// <summary>

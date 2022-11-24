@@ -121,7 +121,7 @@
 										}
 										<a asp-controller="Dashboard" asp-action="Index" asp-fragment="/post/edit?id=@Model.Id" class="btn btn-primary" target="_blank">修改</a>
 										<a asp-controller="Dashboard" asp-action="Index" asp-fragment="/writeblog?refer=@Model.Id" class="btn btn-info" target="_blank">复制</a>
-										<button class="btn btn-danger" id="del">删除</button>
+										<button class="btn btn-danger" id="takedown">下架</button>
 										<a asp-controller="Post" asp-action="PostVisitRecordInsight" asp-route-id="@Model.Id" class="btn btn-primary" target="_blank">洞察</a>
 									</div>
 								</div>
@@ -321,9 +321,9 @@
 				});
 			}
 		});
-		$("#del").on("click", function (e) {
+		$("#takedown").on("click", function (e) {
 			swal({
-				title: "确认删除这篇文章吗？",
+				title: "确认下架这篇文章吗？",
 				text: '@Model.Title',
 				showCancelButton: true,
 				confirmButtonColor: "#DD6B55",
@@ -333,7 +333,7 @@
 				animation: true,
 				allowOutsideClick: false
 			}).then(function () {
-				window.fetch("/post/delete/"+@Model.Id, {
+				window.fetch("/post/takedown/"+@Model.Id, {
 		            credentials: 'include',
 		            method: 'POST',
 		            mode: 'cors'

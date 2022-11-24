@@ -583,18 +583,18 @@ public class PostController : BaseController
 	}
 
 	/// <summary>
-	/// 删除
+	/// 下架文章
 	/// </summary>
 	/// <param name="id"></param>
 	/// <returns></returns>
 	[MyAuthorize]
-	public async Task<ActionResult> Delete(int id)
+	public async Task<ActionResult> Takedown(int id)
 	{
 		var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
-		post.Status = Status.Deleted;
+		post.Status = Status.Takedown;
 		bool b = await PostService.SaveChangesAsync(true) > 0;
 		SearchEngine.LuceneIndexer.Delete(post);
-		return ResultData(null, b, b ? "删除成功！" : "删除失败！");
+		return ResultData(null, b, b ? $"文章《{post.Title}》已下架！" : "下架失败！");
 	}
 
 	/// <summary>
@@ -603,13 +603,13 @@ public class PostController : BaseController
 	/// <param name="id"></param>
 	/// <returns></returns>
 	[MyAuthorize]
-	public async Task<ActionResult> Restore(int id)
+	public async Task<ActionResult> Takeup(int id)
 	{
 		var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
 		post.Status = Status.Published;
 		bool b = await PostService.SaveChangesAsync() > 0;
 		SearchEngine.LuceneIndexer.Add(post);
-		return ResultData(null, b, b ? "恢复成功！" : "恢复失败！");
+		return ResultData(null, b, b ? "上架成功！" : "上架失败！");
 	}
 
 	/// <summary>

@@ -14,7 +14,7 @@
     <div class="form-group overlay animated">
         <div style="height: 56vh;" class="ueditor" ng-model="post.Content" type="text/plain"></div>
         <h3 class="size16">
-            文章加密内容：
+            文章加密：
             <small class="form-group form-inline">
                 <div class="input-group">
                     <select ng-model="post.ProtectContentMode" class="form-control">
@@ -172,12 +172,18 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-9">
             <div class="input-group">
                 <span class="input-group-addon">跳转到第三方链接：</span>
                 <div class="fg-line">
                     <input type="text" class="form-control" placeholder="https://baidu.com 留空不跳转" ng-model="post.Redirect" name="Regions" list="Regions">
                 </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-addon">过期时间：</span>
+                <input id="expireAt" class="form-control" ng-model="post.ExpireAt" readonly="readonly" type="datetime" placeholder="请选择时间(留空不过期)" />
             </div>
         </div>
     </div>

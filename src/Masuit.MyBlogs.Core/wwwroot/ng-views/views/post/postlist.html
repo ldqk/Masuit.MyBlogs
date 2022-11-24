@@ -112,16 +112,16 @@
                     <a class="btn btn-info btn-sm waves-effect" ng-href="#/writeblog?refer={{row.Id}}">
                         <i class="zmdi zmdi-copy zmdi-hc-fw"></i>
                     </a>
-                    <button class="btn btn-danger btn-sm waves-effect" ng-click="list.del(row)" ng-if="row.Status!='已删除'">
-                        <i class="icon-bin"></i>
+                    <button class="btn btn-danger btn-sm waves-effect" ng-click="list.takedown(row)" ng-if="row.Status!='已下架'">
+                        <i class="icon-box-add"></i>
                     </button>
-                    <a class="btn btn-danger btn-sm waves-effect" ng-click="list.truncate(row)" ng-if="row.Status=='已删除'">
+                    <a class="btn btn-success btn-sm waves-effect" ng-click="list.takeup(row)" ng-if="row.Status=='已下架'">
+                        <i class="icon-box-remove"></i>
+                    </a>
+                    <a class="btn btn-danger btn-sm waves-effect" ng-click="list.truncate(row)" ng-if="row.Status=='已下架'">
                         <i class="icon-cross"></i>
                     </a>
-                    <a class="btn btn-info btn-sm waves-effect" ng-click="list.restore(row)" ng-if="row.Status=='已删除'">
-                        <i class="icon-undo2"></i>
-                    </a>
-                    <a class="btn  btn-sm waves-effect" ng-class="{true:'btn-success',false:'btn-primary'}[row.IsFixedTop]" ng-click="list.fixtop(row.Id)" ng-if="row.Status!='已删除'">
+                    <a class="btn  btn-sm waves-effect" ng-class="{true:'btn-success',false:'btn-primary'}[row.IsFixedTop]" ng-click="list.fixtop(row.Id)" ng-if="row.Status!='已下架'">
                         <i class="icon-pushpin" ng-class="{true:'text-danger'}[row.IsFixedTop]"></i>
                     </a>
                     <a class="btn btn-info btn-sm waves-effect" ng-click="list.insight(row)">

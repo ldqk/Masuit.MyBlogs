@@ -190,6 +190,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string Redirect { get; set; }
 
         /// <summary>
+        /// 过期时间
+        /// </summary>
+		public DateTime? ExpireAt { get; set; }
+
+        /// <summary>
         /// 分类
         /// </summary>
         public virtual Category Category { get; set; }

@@ -58,6 +58,11 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         public DateTime ModifyDate { get; set; }
 
         /// <summary>
+        /// 过期时间
+        /// </summary>
+        public DateTime? ExpireAt { get; set; }
+
+        /// <summary>
         /// 是否置顶
         /// </summary>
         public bool IsFixedTop { get; set; }

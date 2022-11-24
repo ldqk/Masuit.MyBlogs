@@ -192,9 +192,9 @@
         });
     }
 
-    self.del = function(row) {
+    self.takedown = function(row) {
         swal({
-            title: "确认删除这篇文章吗？",
+            title: "确认下架这篇文章吗？",
             text: row.Title,
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
@@ -204,7 +204,7 @@
             animation: true,
             allowOutsideClick: false
         }).then(function() {
-            $scope.request("/post/delete/"+row.Id, null, function(data) {
+            $scope.request("/post/takedown/"+row.Id, null, function(data) {
                 window.notie.alert({
                     type: 1,
                     text: data.Message,
@@ -257,8 +257,8 @@
             self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
         });
     }
-    self.restore = function(row) {
-        $scope.request("/post/restore/"+row.Id,null, function(data) {
+    self.takeup = function(row) {
+        $scope.request("/post/Takeup/"+row.Id,null, function(data) {
             window.notie.alert({
                 type: 1,
                 text: data.Message,
@@ -774,6 +774,24 @@ myApp.controller("writeblog", ["$scope", "$http", "$timeout","$location", functi
     $scope.get("/post/GetRegions?name=ExceptRegions", function(data) {
         $scope.ExceptRegions=data.Data;
     });
+    
+    // 绑定过期时间表单元素
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        laydate.render({
+        elem: '#expireAt',
+        type: 'datetime',
+        calendar: true,
+        min: new Date(new Date().setMinutes(new Date().getMinutes()+10)).Format("yyyy-MM-dd hh:mm:ss"),
+        done: function(value, date, endDate) {
+            if (value) {
+                $scope.post.expireAt=value;
+            } else {
+                delete $scope.post.expireAt;
+            }
+        }
+        });
+    });
 }]);
 
 myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", function ($scope, $http, $location, $timeout) {
@@ -784,6 +802,9 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
     $scope.reserve = true;
     $scope.get("/post/get/" + $scope.id, function (data) {
         $scope.post = data.Data;
+        if ($scope.post.ExpireAt) {
+            $scope.post.ExpireAt=new Date($scope.post.ExpireAt).Format("yyyy-MM-dd hh:mm:ss");
+        }
         $scope.get("/post/gettag", function (res) {
             $scope.Tags = res.Data;
             var tags=[];
@@ -1083,6 +1104,24 @@ myApp.controller("postedit", ["$scope", "$http", "$location", "$timeout", functi
     });
     $scope.get("/post/GetRegions?name=ExceptRegions", function(data) {
         $scope.ExceptRegions=data.Data;
+    });
+    
+    // 绑定过期时间表单元素
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        laydate.render({
+        elem: '#expireAt',
+        type: 'datetime',
+        calendar: true,
+        min: new Date(new Date().setMinutes(new Date().getMinutes()+10)).Format("yyyy-MM-dd hh:mm:ss"),
+        done: function(value, date, endDate) {
+            if (value) {
+                $scope.post.expireAt=value;
+            } else {
+                delete $scope.post.expireAt;
+            }
+        }
+        });
     });
 }]);
 myApp.controller("category", ["$scope", "$http", "$timeout", function($scope, $http, $timeout) {

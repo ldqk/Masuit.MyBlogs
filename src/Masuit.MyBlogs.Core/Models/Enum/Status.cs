@@ -23,9 +23,9 @@ namespace Masuit.MyBlogs.Core.Models.Enum
         [Display(Name = "禁用")] Forbidden,
 
         /// <summary>
-        /// 已删除
+        /// 已下架
         /// </summary>
-        [Display(Name = "已删除")] Deleted,
+        [Display(Name = "已下架")] Takedown,
 
         /// <summary>
         /// 审核中
