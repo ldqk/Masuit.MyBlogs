@@ -1,4 +1,6 @@
 ﻿@using System.Diagnostics
+@using Markdig
+
 @model Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto
 <div class="ibox wow fadeIn" id="@Stopwatch.GetTimestamp()">
     <div class="ibox-content" id="@Stopwatch.GetTimestamp()">
@@ -14,7 +16,7 @@
                 </div>
                 <div class="col-sm-10 col-xs-12">
                     <p>
-                        @Model.Description
+                        @Html.Raw(Markdown.ToHtml(Model.Description))
                     </p>
                 </div>
             </div>

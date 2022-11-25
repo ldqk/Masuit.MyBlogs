@@ -1,5 +1,4 @@
-﻿using AngleSharp.Text;
-using Autofac.Extensions.DependencyInjection;
+﻿using Autofac.Extensions.DependencyInjection;
 using Masuit.MyBlogs.Core;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
@@ -11,9 +10,6 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics;
 using Z.EntityFramework.Plus;
 
-var stringBuilder = StringBuilderPool.Obtain();
-var builder = stringBuilder.Append("a");
-Console.WriteLine(stringBuilder);
 QueryCacheManager.DefaultMemoryCacheEntryOptions = new MemoryCacheEntryOptions()
 {
 	AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
