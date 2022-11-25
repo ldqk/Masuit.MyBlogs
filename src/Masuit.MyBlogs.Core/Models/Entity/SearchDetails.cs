@@ -22,6 +22,11 @@ namespace Masuit.MyBlogs.Core.Models.Entity
         public string Keywords { get; set; }
 
         /// <summary>
+        /// 结果集数量
+        /// </summary>
+		public int ResultCount { get; set; }
+
+        /// <summary>
         /// 搜索时间
         /// </summary>
         public DateTime SearchTime { get; set; }

@@ -67,7 +67,8 @@ namespace Masuit.MyBlogs.Core.Controllers
                         Keywords = wd,
                         SearchTime = DateTime.Now,
                         IP = ClientIP,
-                        Elapsed = posts.Elapsed
+                        Elapsed = posts.Elapsed,
+                        ResultCount = posts.Total
                     });
                     await SearchDetailsService.SaveChangesAsync();
                     HttpContext.Session.Set("search:" + wd, wd);
