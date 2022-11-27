@@ -101,9 +101,10 @@ $(function() {
 		if (!data.Success) {
 			return ;
 		}
+
 		data = data.Data;
 		var nid = [].concat(JSON.parse(window.localStorage.getItem("notice") || '[]'));
-		if (nid.indexOf(data.Id)==-1) {
+		if (data.StrongAlert && nid.indexOf(data.Id)==-1) {
 			//公告层
 			layer.open({
 				title: '网站公告：' + data.Title,

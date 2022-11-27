@@ -74,7 +74,7 @@ namespace Masuit.MyBlogs.Core.Controllers
                     HttpContext.Session.Set("search:" + wd, wd);
                 }
 
-                if (posts.Total == 1)
+                if (page == 1 && posts.Results.Count == 1)
                 {
                     return RedirectToAction("Details", "Post", new { id = posts.Results[0].Id, kw = wd });
                 }

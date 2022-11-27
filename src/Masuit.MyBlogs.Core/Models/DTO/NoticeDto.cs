@@ -46,5 +46,10 @@ namespace Masuit.MyBlogs.Core.Models.DTO
         /// 公告状态
         /// </summary>
         public NoticeStatus NoticeStatus { get; set; }
+
+        /// <summary>
+        /// 是否弹窗提示
+        /// </summary>
+		public bool StrongAlert { get; set; }
     }
 }

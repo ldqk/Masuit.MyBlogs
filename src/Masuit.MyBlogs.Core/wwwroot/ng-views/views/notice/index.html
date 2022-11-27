@@ -20,7 +20,14 @@
         <div class="col-md-6">
             <div class="input-group">
                 <span class="input-group-addon">生效时间段：</span>
-                <input type="text" class="form-control" id="timespan" ng-model="notice.Range" readonly="readonly"/>
+                <input type="text" class="form-control" id="timespan" ng-model="notice.Range" readonly="readonly" />
+                <span class="input-group-addon">
+                    <label class="checkbox checkbox-inline m-r-20">
+                        <input id="StrongAlert" ng-model="notice.StrongAlert" type="checkbox">
+                        <i class="input-helper"></i>
+                        是否弹窗
+                    </label>
+                </span>
             </div>
         </div>
         <div class="col-md-6">

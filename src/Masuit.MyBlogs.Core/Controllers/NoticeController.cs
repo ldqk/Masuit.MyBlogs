@@ -148,6 +148,7 @@ namespace Masuit.MyBlogs.Core.Controllers
             entity.StartTime = notice.StartTime;
             entity.EndTime = notice.EndTime;
             entity.Title = notice.Title;
+            entity.StrongAlert = notice.StrongAlert;
             entity.Content = await ImagebedClient.ReplaceImgSrc(await notice.Content.ClearImgAttributes(), cancellationToken);
             bool b = await NoticeService.SaveChangesAsync() > 0;
             QueryCacheManager.ExpireType<Notice>();
