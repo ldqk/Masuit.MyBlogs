@@ -12,7 +12,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 控制面板
     /// </summary>
-    public class DashboardController : AdminController
+    public sealed class DashboardController : AdminController
     {
         /// <summary>
         /// 控制面板

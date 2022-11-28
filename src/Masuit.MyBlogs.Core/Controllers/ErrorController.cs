@@ -25,7 +25,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// 错误页
     /// </summary>
     [ApiExplorerSettings(IgnoreApi = true)]
-    public class ErrorController : Controller
+    public sealed class ErrorController : Controller
     {
         public IRedisClient RedisClient { get; set; }
 

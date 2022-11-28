@@ -16,7 +16,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 友情链接管理
     /// </summary>
-    public class LinksController : BaseController
+    public sealed class LinksController : BaseController
     {
         public IHttpClientFactory HttpClientFactory { get; set; }
         public IConfiguration Configuration { get; set; }

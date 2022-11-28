@@ -12,7 +12,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
     [MyAuthorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class AdminController : Controller
+    public sealed class AdminController : Controller
     {
         private readonly IDriveAccountService _driveAccount;
         private readonly SettingService _setting;

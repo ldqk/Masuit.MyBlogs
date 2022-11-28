@@ -27,7 +27,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 	/// <summary>
 	/// 订阅服务
 	/// </summary>
-	public class SubscribeController : Controller
+	public sealed class SubscribeController : Controller
 	{
 		public IPostService PostService { get; set; }
 

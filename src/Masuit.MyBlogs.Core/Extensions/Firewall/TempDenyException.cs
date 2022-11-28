@@ -1,9 +1,8 @@
-﻿namespace Masuit.MyBlogs.Core.Extensions.Firewall
+﻿namespace Masuit.MyBlogs.Core.Extensions.Firewall;
+
+public class TempDenyException : Exception
 {
-    public class TempDenyException : Exception
-    {
-        public TempDenyException(string msg) : base(msg)
-        {
-        }
-    }
+	public TempDenyException(string msg) : base(msg)
+	{
+	}
 }

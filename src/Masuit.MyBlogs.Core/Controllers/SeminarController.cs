@@ -21,7 +21,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 专题页
     /// </summary>
-    public class SeminarController : BaseController
+    public sealed class SeminarController : BaseController
     {
         /// <summary>
         /// 专题

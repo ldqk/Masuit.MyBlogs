@@ -18,7 +18,7 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
-public class FirewallController : Controller
+public sealed class FirewallController : Controller
 {
     public IRedisClient RedisClient { get; set; }
     private readonly HttpClient _httpClient;

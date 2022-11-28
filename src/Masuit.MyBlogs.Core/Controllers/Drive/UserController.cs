@@ -15,7 +15,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : Controller
+    public sealed class UserController : Controller
     {
         public IUserInfoService UserInfoService { get; set; }
 

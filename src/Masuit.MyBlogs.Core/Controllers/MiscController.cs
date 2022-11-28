@@ -16,7 +16,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 杂项页
     /// </summary>
-    public class MiscController : BaseController
+    public sealed class MiscController : BaseController
     {
         /// <summary>
         /// MiscService

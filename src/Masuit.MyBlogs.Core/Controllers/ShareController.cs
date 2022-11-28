@@ -10,7 +10,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 快速分享
     /// </summary>
-    public class ShareController : AdminController
+    public sealed class ShareController : AdminController
     {
         /// <summary>
         /// 快速分享

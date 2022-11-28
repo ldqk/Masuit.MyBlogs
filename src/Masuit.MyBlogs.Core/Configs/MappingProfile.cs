@@ -11,7 +11,7 @@ namespace Masuit.MyBlogs.Core.Configs
     /// <summary>
     /// 注册automapper
     /// </summary>
-    public class MappingProfile : Profile
+    public sealed class MappingProfile : Profile
     {
         public MappingProfile()
         {

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Masuit.MyBlogs.Core.Controllers;
 
 [Route("login")]
-public class LoginController : AdminController
+public sealed class LoginController : AdminController
 {
     public ILoginRecordService LoginRecordService { get; set; }
 

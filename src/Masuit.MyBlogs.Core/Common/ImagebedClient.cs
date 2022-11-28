@@ -13,7 +13,7 @@ namespace Masuit.MyBlogs.Core.Common
     /// <summary>
     /// 图床客户端
     /// </summary>
-    public class ImagebedClient
+    public sealed class ImagebedClient
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _config;

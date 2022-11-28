@@ -2,7 +2,7 @@
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire;
 
-public class HangfireActivator : JobActivator
+public sealed class HangfireActivator : JobActivator
 {
     private readonly IServiceProvider _serviceProvider;
 

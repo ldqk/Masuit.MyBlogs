@@ -16,7 +16,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 	/// <summary>
 	/// 文章分类
 	/// </summary>
-	public class CategoryController : BaseController
+	public sealed class CategoryController : BaseController
 	{
 		/// <summary>
 		/// CategoryService

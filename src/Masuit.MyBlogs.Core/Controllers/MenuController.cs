@@ -15,7 +15,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 	/// <summary>
 	/// 菜单管理
 	/// </summary>
-	public class MenuController : AdminController
+	public sealed class MenuController : AdminController
 	{
 		/// <summary>
 		/// 菜单数据服务

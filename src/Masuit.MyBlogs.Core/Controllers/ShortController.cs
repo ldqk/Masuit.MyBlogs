@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Masuit.MyBlogs.Core.Controllers
 {
-    public class ShortController : Controller
+    public sealed class ShortController : Controller
     {
         public IRedisClient RedisHelper { get; set; }
         [HttpGet("short"), MyAuthorize, AllowAccessFirewall]

@@ -20,7 +20,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// 资源管理器
     /// </summary>
     [Route("[controller]/[action]")]
-    public class FileController : AdminController
+    public sealed class FileController : AdminController
     {
         public IWebHostEnvironment HostEnvironment { get; set; }
 

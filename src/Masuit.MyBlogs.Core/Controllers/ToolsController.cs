@@ -21,7 +21,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// 黑科技
     /// </summary>
     [Route("tools")]
-    public class ToolsController : BaseController
+    public sealed class ToolsController : BaseController
     {
         private readonly HttpClient _httpClient;
 

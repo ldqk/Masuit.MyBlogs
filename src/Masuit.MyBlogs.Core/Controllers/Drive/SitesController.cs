@@ -16,7 +16,7 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive
     [ApiController]
     [ServiceFilter(typeof(FirewallAttribute))]
     [Route("api/")]
-    public class SitesController : Controller
+    public sealed class SitesController : Controller
     {
         private readonly IDriveAccountService _siteService;
         private readonly IDriveService _driveService;

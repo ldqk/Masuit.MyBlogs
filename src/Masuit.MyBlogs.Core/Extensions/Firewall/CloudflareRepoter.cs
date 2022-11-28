@@ -6,7 +6,7 @@ using System.Net.Sockets;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
-    public class CloudflareRepoter : IFirewallRepoter
+    public sealed class CloudflareRepoter : IFirewallRepoter
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;

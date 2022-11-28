@@ -19,7 +19,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 站内搜索
     /// </summary>
-    public class SearchController : BaseController
+    public sealed class SearchController : BaseController
     {
         public ISearchDetailsService SearchDetailsService { get; set; }
 

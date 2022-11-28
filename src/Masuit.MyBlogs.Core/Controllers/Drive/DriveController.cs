@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace Masuit.MyBlogs.Core.Controllers.Drive
 {
     [ServiceFilter(typeof(FirewallAttribute))]
-    public class DriveController : Controller
+    public sealed class DriveController : Controller
     {
         [HttpGet("/drive")]
         public IActionResult Index()

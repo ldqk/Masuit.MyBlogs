@@ -10,7 +10,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 打赏管理
     /// </summary>
-    public class DonateController : AdminController
+    public sealed class DonateController : AdminController
     {
         /// <summary>
         /// DonateService

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
-public class DefaultController : Controller
+public sealed class DefaultController : Controller
 {
     /// <summary>
     /// 设置cookie

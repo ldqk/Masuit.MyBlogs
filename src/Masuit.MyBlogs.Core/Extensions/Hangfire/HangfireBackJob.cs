@@ -18,7 +18,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Hangfire
 	/// <summary>
 	/// hangfire后台任务
 	/// </summary>
-	public class HangfireBackJob : Disposable, IHangfireBackJob
+	public sealed class HangfireBackJob : Disposable, IHangfireBackJob
 	{
 		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly IWebHostEnvironment _hostEnvironment;

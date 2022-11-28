@@ -31,7 +31,7 @@ namespace Masuit.MyBlogs.Core.Controllers;
 /// <summary>
 /// 首页
 /// </summary>
-public class HomeController : BaseController
+public sealed class HomeController : BaseController
 {
 	/// <summary>
 	/// 文章

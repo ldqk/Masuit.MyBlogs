@@ -3,6 +3,6 @@ using Masuit.MyBlogs.Core.Models.Entity;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository;
 
-public partial class LeaveMessageRepository : BaseRepository<LeaveMessage>, ILeaveMessageRepository
+public sealed partial class LeaveMessageRepository : BaseRepository<LeaveMessage>, ILeaveMessageRepository
 {
 }

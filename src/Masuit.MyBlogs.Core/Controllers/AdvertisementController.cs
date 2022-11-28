@@ -25,7 +25,7 @@ using System.Text.RegularExpressions;
 namespace Masuit.MyBlogs.Core.Controllers;
 
 [Route("partner/[action]")]
-public class AdvertisementController : BaseController
+public sealed class AdvertisementController : BaseController
 {
 	public IAdvertisementClickRecordService ClickRecordService { get; set; }
 

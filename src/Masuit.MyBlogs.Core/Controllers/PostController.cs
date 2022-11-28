@@ -48,7 +48,7 @@ namespace Masuit.MyBlogs.Core.Controllers;
 /// <summary>
 /// 文章管理
 /// </summary>
-public class PostController : BaseController
+public sealed class PostController : BaseController
 {
 	public IPostService PostService { get; set; }
 

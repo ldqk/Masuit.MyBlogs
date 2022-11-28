@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core.Common
 {
-    public class UserAgent
+    public sealed class UserAgent
     {
         private static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
 

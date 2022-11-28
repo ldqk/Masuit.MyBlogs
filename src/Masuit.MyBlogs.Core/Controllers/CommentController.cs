@@ -29,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 	/// <summary>
 	/// 评论管理
 	/// </summary>
-	public class CommentController : BaseController
+	public sealed class CommentController : BaseController
 	{
 		public ICommentService CommentService { get; set; }
 

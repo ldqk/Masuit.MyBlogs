@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Masuit.MyBlogs.Core.Configs
 {
-    public class AutofacModule : Autofac.Module
+    public sealed class AutofacModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {

@@ -16,7 +16,7 @@ using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services;
 
-public partial class AdvertisementService : BaseService<Advertisement>, IAdvertisementService
+public sealed partial class AdvertisementService : BaseService<Advertisement>, IAdvertisementService
 {
 	public ICacheManager<List<AdvertisementDto>> CacheManager { get; set; }
 

@@ -3,7 +3,7 @@ using Masuit.MyBlogs.Core.Models.Entity;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository;
 
-public partial class SearchDetailsRepository : BaseRepository<SearchDetails>, ISearchDetailsRepository
+public sealed partial class SearchDetailsRepository : BaseRepository<SearchDetails>, ISearchDetailsRepository
 {
     /// <summary>
     /// 热词统计

@@ -22,7 +22,7 @@ using HeaderNames = Microsoft.Net.Http.Headers.HeaderNames;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 
-public class FirewallAttribute : IAsyncActionFilter
+public sealed class FirewallAttribute : IAsyncActionFilter
 {
     public ICacheManager<int> CacheManager { get; set; }
 

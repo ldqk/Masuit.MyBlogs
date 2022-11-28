@@ -1,6 +1,6 @@
 ﻿namespace Masuit.MyBlogs.Core.Configs
 {
-    public class GitlabConfig
+    public sealed class GitlabConfig
     {
         public bool Enabled { get; set; }
 

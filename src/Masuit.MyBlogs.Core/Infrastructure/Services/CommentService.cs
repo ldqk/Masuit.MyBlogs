@@ -3,12 +3,11 @@ using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 using Masuit.MyBlogs.Core.Models.Entity;
 
-namespace Masuit.MyBlogs.Core.Infrastructure.Services
+namespace Masuit.MyBlogs.Core.Infrastructure.Services;
+
+public sealed partial class CommentService : BaseService<Comment>, ICommentService
 {
-    public partial class CommentService : BaseService<Comment>, ICommentService
-    {
-        public CommentService(IBaseRepository<Comment> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
-        {
-        }
-    }
+	public CommentService(IBaseRepository<Comment> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
+	{
+	}
 }

@@ -6,7 +6,7 @@ using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository;
 
-public partial class PostRepository : BaseRepository<Post>, IPostRepository
+public sealed partial class PostRepository : BaseRepository<Post>, IPostRepository
 {
 	/// <summary>
 	/// 获取第一条数据，优先从缓存读取

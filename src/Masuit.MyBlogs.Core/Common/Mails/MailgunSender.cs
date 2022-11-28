@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Masuit.MyBlogs.Core.Common.Mails
 {
-    public class MailgunSender : IMailSender
+    public sealed class MailgunSender : IMailSender
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;

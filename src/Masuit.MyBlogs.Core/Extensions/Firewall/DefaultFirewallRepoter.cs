@@ -2,7 +2,7 @@
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall
 {
-    public class DefaultFirewallRepoter : IFirewallRepoter
+    public sealed class DefaultFirewallRepoter : IFirewallRepoter
     {
         public string ReporterName { get; set; }
 

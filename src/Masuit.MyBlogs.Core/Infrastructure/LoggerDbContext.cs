@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Infrastructure;
 
-public class LoggerDbContext : DbContext
+public sealed class LoggerDbContext : DbContext
 {
     public LoggerDbContext(DbContextOptions<LoggerDbContext> options) : base(options)
     {

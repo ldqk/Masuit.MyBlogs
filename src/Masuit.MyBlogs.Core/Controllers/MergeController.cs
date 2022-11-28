@@ -23,7 +23,7 @@ using System.Text.RegularExpressions;
 namespace Masuit.MyBlogs.Core.Controllers
 {
     [Route("merge/")]
-    public class MergeController : AdminController
+    public sealed class MergeController : AdminController
     {
         public IPostMergeRequestService PostMergeRequestService { get; set; }
 

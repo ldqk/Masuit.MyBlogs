@@ -76,7 +76,7 @@ public interface IPerfCounter
     void Process();
 }
 
-public class DefaultPerfCounter : IPerfCounter
+public sealed class DefaultPerfCounter : IPerfCounter
 {
     static DefaultPerfCounter()
     {
@@ -92,7 +92,7 @@ public class DefaultPerfCounter : IPerfCounter
     }
 }
 
-public class PerfCounterInDatabase : IPerfCounter
+public sealed class PerfCounterInDatabase : IPerfCounter
 {
     public static ConcurrentLimitedQueue<PerformanceCounter> List { get; } = new(50000);
 
@@ -128,7 +128,7 @@ public class PerfCounterInDatabase : IPerfCounter
     }
 }
 
-public class PerfCounterBackService : ScheduledService
+public sealed class PerfCounterBackService : ScheduledService
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
@@ -173,7 +173,7 @@ public static class PerfCounterServiceExtension
 /// 性能计数器
 /// </summary>
 [Table(nameof(PerformanceCounter))]
-public class PerformanceCounter
+public sealed class PerformanceCounter
 {
     [StringLength(128)]
     public string ServerIP { get; set; }

@@ -29,7 +29,7 @@ namespace Masuit.MyBlogs.Core.Controllers
 	/// <summary>
 	/// 留言板和站内信
 	/// </summary>
-	public class MsgController : BaseController
+	public sealed class MsgController : BaseController
 	{
 		/// <summary>
 		/// 留言

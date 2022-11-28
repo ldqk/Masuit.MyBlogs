@@ -18,7 +18,7 @@ namespace Masuit.MyBlogs.Core.Controllers
     /// <summary>
     /// 网站公告
     /// </summary>
-    public class NoticeController : BaseController
+    public sealed class NoticeController : BaseController
     {
         /// <summary>
         /// 公告
