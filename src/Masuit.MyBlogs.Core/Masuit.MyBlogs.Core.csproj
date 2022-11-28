@@ -49,7 +49,6 @@
         <PackageReference Include="Hangfire" Version="1.7.32" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
         <PackageReference Include="htmldiff.net" Version="1.4.0" />
-        <PackageReference Include="IP2Region" Version="1.2.0" />
         <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.6.0" />
         <PackageReference Include="Markdig" Version="0.30.4" />
         <PackageReference Include="Masuit.Tools.Excel" Version="1.2.3.6" />

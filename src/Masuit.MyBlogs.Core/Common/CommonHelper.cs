@@ -4,7 +4,6 @@ using AngleSharp.Dom;
 using AutoMapper;
 using FreeRedis;
 using Hangfire;
-using IP2Region;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.Tools;
 using Masuit.Tools.Media;
@@ -126,9 +125,10 @@ namespace Masuit.MyBlogs.Core.Common
 			return DenyIP.Contains(ip) || DenyIPRange.AsParallel().Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
 		}
 
-		private static readonly DbSearcher IPSearcher = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "ip2region.db"));
+		private static readonly QQWrySearcher IPSearcher = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "qqwry.dat"));
 		public static readonly DatabaseReader MaxmindReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-City.mmdb"));
 		private static readonly DatabaseReader MaxmindAsnReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-ASN.mmdb"));
+		private static readonly DatabaseReader MaxmindCountryReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-Country.mmdb"));
 
 		/// <summary>
 		/// 是否是代理ip
@@ -170,6 +170,11 @@ namespace Masuit.MyBlogs.Core.Common
 			return Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(new CityResponse()).Execute(() => MaxmindReader.City(ip));
 		}
 
+		private static CountryResponse GetCountryResp(IPAddress ip)
+		{
+			return Policy<CountryResponse>.Handle<AddressNotFoundException>().Fallback(new CountryResponse()).Execute(() => MaxmindCountryReader.Country(ip));
+		}
+
 		public static IPLocation GetIPLocation(this string ip)
 		{
 			var b = IPAddress.TryParse(ip, out var ipAddress);
@@ -185,37 +190,38 @@ namespace Masuit.MyBlogs.Core.Common
 		{
 			if (ip.IsPrivateIP())
 			{
-				return new IPLocation("内网", null, null, "内网IP", null);
+				return new IPLocation("内网", null, "内网IP", null);
 			}
 
-			var city = GetCityResp(ip);
-			var asn = GetIPAsn(ip);
-			var countryName = city.Country.Names.GetValueOrDefault("zh-CN") ?? city.Country.Name;
+			var cityTask = Task.Run(() => GetCityResp(ip));
+			var asnTask = Task.Run(() => GetIPAsn(ip));
+			var countryTask = Task.Run(() => GetCountryResp(ip));
+			Task.WaitAll(cityTask, countryTask, asnTask);
+			var city = cityTask.Result;
+			var country = countryTask.Result;
+			var asn = asnTask.Result;
+			var countryName = country.Country.Names.GetValueOrDefault("zh-CN") ?? country.Country.Name;
 			var cityName = city.City.Names.GetValueOrDefault("zh-CN") ?? city.City.Name;
+			var continent = country.Continent.Names.GetValueOrDefault("zh-CN") ?? country.Continent.Name;
 			switch (ip.AddressFamily)
 			{
 				case AddressFamily.InterNetworkV6 when ip.IsIPv4MappedToIPv6:
 					ip = ip.MapToIPv4();
 					goto case AddressFamily.InterNetwork;
 				case AddressFamily.InterNetwork:
-					var parts = IPSearcher.MemorySearch(ip.ToString())?.Region.Split('|');
-					if (parts != null)
+					var location = IPSearcher.GetIpLocation(ip);
+					var network = location.Network + "/" + asn.AutonomousSystemOrganization;
+					return new IPLocation(countryName, location.City, network.Trim('/'), asn.AutonomousSystemNumber)
 					{
-						var network = parts[^1] == "0" ? asn.AutonomousSystemOrganization : parts[^1] + "/" + asn.AutonomousSystemOrganization;
-						parts[0] = parts[0] != "0" ? parts[0] : countryName;
-						parts[3] = parts[3] != "0" ? parts[3] : cityName;
-						return new IPLocation(parts[0], parts[2], parts[3], network?.Trim('/'), asn.AutonomousSystemNumber)
-						{
-							Address2 = new IPLocation.CountryCity(countryName, cityName),
-							Coodinate = city.Location
-						};
-					}
-
-					goto default;
+						Address2 = new IPLocation.CountryCity(continent, countryName, cityName),
+						Coodinate = city.Location,
+						Continent = continent
+					};
 				default:
-					return new IPLocation(countryName, null, cityName, asn.AutonomousSystemOrganization, asn.AutonomousSystemNumber)
+					return new IPLocation(countryName, cityName, asn.AutonomousSystemOrganization, asn.AutonomousSystemNumber)
 					{
-						Coodinate = city.Location
+						Coodinate = city.Location,
+						Continent = continent
 					};
 			}
 		}
@@ -438,18 +444,17 @@ namespace Masuit.MyBlogs.Core.Common
 
 	public class IPLocation
 	{
-		public IPLocation(string country, string province, string city, string isp, long? asn)
+		public IPLocation(string country, string city, string isp, long? asn)
 		{
 			Country = country?.Trim('0');
-			Province = province?.Trim('0');
 			City = city?.Trim('0');
 			ISP = isp;
 			ASN = asn;
 		}
 
-		public string Country { get; set; }
+		public string Continent { get; set; }
 
-		public string Province { get; set; }
+		public string Country { get; set; }
 
 		public string City { get; set; }
 
@@ -457,9 +462,9 @@ namespace Masuit.MyBlogs.Core.Common
 
 		public long? ASN { get; set; }
 
-		public string Address => new[] { Country, Province, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
+		public string Address => new[] { Continent, Country, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
 
-		public CountryCity Address2 { get; set; } = new("", "");
+		public CountryCity Address2 { get; set; } = new("", "", "");
 
 		public string Network => ASN.HasValue ? ISP + "(AS" + ASN + ")" : ISP;
 
@@ -504,12 +509,13 @@ namespace Masuit.MyBlogs.Core.Common
 			return ToString().Contains(s);
 		}
 
-		public record CountryCity(string Country, string City)
+		public record CountryCity(string Continent, string Country, string City)
 		{
-			public void Deconstruct(out string country, out string city)
+			public void Deconstruct(out string continent, out string country, out string city)
 			{
 				country = Country;
 				city = City;
+				continent = Continent;
 			}
 
 			public static implicit operator string(CountryCity entry)
@@ -519,7 +525,7 @@ namespace Masuit.MyBlogs.Core.Common
 
 			public override string ToString()
 			{
-				return Country + City;
+				return Continent + Country + City;
 			}
 		}
 	}
