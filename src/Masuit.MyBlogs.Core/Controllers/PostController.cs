@@ -719,12 +719,13 @@ public sealed class PostController : BaseController
 			if (p.Content.HammingDistance(post.Content) > 0)
 			{
 				var history = p.Mapper<PostHistoryVersion>();
-				p.PostHistoryVersion.Add(history);
+				history.PostId = p.Id;
+				PostHistoryVersionService.AddEntity(history);
 			}
 
 			if (p.Title.HammingDistance(post.Title) > 10 && CommentService.Any(c => c.PostId == p.Id && c.ParentId == null))
 			{
-				p.Comment.Add(new Comment
+				CommentService.AddEntity(new Comment
 				{
 					Status = Status.Published,
 					NickName = "系统自动评论",

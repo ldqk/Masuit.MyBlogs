@@ -11,7 +11,6 @@ using Masuit.Tools.Models;
 using Masuit.Tools.Security;
 using Masuit.Tools.Systems;
 using MaxMind.GeoIP2;
-using MaxMind.GeoIP2.Exceptions;
 using MaxMind.GeoIP2.Responses;
 using Polly;
 using SixLabors.ImageSharp;
@@ -162,17 +161,17 @@ namespace Masuit.MyBlogs.Core.Common
 				return new AsnResponse();
 			}
 
-			return Policy<AsnResponse>.Handle<AddressNotFoundException>().Fallback(new AsnResponse()).Execute(() => MaxmindAsnReader.Asn(ip));
+			return MaxmindAsnReader.TryAsn(ip, out var result) ? result : new AsnResponse();
 		}
 
 		private static CityResponse GetCityResp(IPAddress ip)
 		{
-			return Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(new CityResponse()).Execute(() => MaxmindReader.City(ip));
+			return MaxmindReader.TryCity(ip, out var result) ? result : new CityResponse();
 		}
 
 		private static CountryResponse GetCountryResp(IPAddress ip)
 		{
-			return Policy<CountryResponse>.Handle<AddressNotFoundException>().Fallback(new CountryResponse()).Execute(() => MaxmindCountryReader.Country(ip));
+			return MaxmindCountryReader.TryCountry(ip, out var result) ? result : new CountryResponse();
 		}
 
 		public static IPLocation GetIPLocation(this string ip)

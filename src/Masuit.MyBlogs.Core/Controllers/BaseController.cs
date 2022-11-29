@@ -86,7 +86,12 @@ namespace Masuit.MyBlogs.Core.Controllers
 			}
 
 			var location = Request.Location();
-			var template = Template.Create(text).Set("clientip", ClientIP).Set("location", location.Address).Set("network", location.Network).Set("domain", Request.Host.Host).Set("path", Request.Path.ToUriComponent());
+			var template = Template.Create(text)
+				.Set("clientip", ClientIP)
+				.Set("location", location.Address)
+				.Set("network", location.Network)
+				.Set("domain", Request.Host.Host)
+				.Set("path", Request.Path.ToUriComponent());
 			if (text.Contains("{{browser}}") || text.Contains("{{os}}"))
 			{
 				var agent = UserAgent.Parse(Request.Headers[HeaderNames.UserAgent] + "");

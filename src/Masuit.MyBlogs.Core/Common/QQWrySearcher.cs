@@ -78,11 +78,7 @@ public sealed class QQWrySearcher : IDisposable
 
     static QQWrySearcher()
     {
-#if NET45
-
-#else
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-#endif
         Gb2312Encoding = Encoding.GetEncoding("gb2312");
     }
 
@@ -110,10 +106,8 @@ public sealed class QQWrySearcher : IDisposable
                 return _init.Value;
             }
 
-            _qqwryDbBytes = FileToBytes(_dbPath);
-
+            _qqwryDbBytes = File.ReadAllBytes(_dbPath);
             _ipIndexCache = BlockToArray(ReadIpBlock(_qqwryDbBytes, out _startPosition));
-
             _ipCount = null;
             _version = null;
             _init = true;
@@ -206,7 +200,6 @@ public sealed class QQWrySearcher : IDisposable
     /// <returns></returns>
     private static int SearchIp(long ip, long[] ipArray, int start, int end)
     {
-        //二分法 https://baike.baidu.com/item/%E4%BA%8C%E5%88%86%E6%B3%95%E6%9F%A5%E6%89%BE
         while (true)
         {
             //计算中间索引
@@ -215,7 +208,8 @@ public sealed class QQWrySearcher : IDisposable
             {
                 return middle;
             }
-            else if (ip < ipArray[middle])
+
+            if (ip < ipArray[middle])
             {
                 end = middle;
             }
@@ -238,12 +232,12 @@ public sealed class QQWrySearcher : IDisposable
         var endPosition = ReadLongX(bytes, offset, 4);
         offset = startPosition;
         var count = (endPosition - startPosition) / 7 + 1;//总记录数
-
         var ipBlock = new byte[count * 7];
         for (var i = 0; i < ipBlock.Length; i++)
         {
             ipBlock[i] = bytes[offset + i];
         }
+
         return ipBlock;
     }
 
@@ -251,6 +245,7 @@ public sealed class QQWrySearcher : IDisposable
     ///  从IP文件中读取指定字节并转换位long
     /// </summary>
     /// <param name="bytes"></param>
+    /// <param name="offset"></param>
     /// <param name="bytesCount">需要转换的字节数，主意不要超过8字节</param>
     /// <returns></returns>
     private static long ReadLongX(byte[] bytes, long offset, int bytesCount)
@@ -260,6 +255,7 @@ public sealed class QQWrySearcher : IDisposable
         {
             cBytes[i] = bytes[offset + i];
         }
+
         return BitConverter.ToInt64(cBytes, 0);
     }
 
@@ -280,6 +276,7 @@ public sealed class QQWrySearcher : IDisposable
         {
             offset -= 1;
         }
+
         var list = new List<byte>();
         var b = bytes[offset];
         offset += 1;
@@ -289,21 +286,8 @@ public sealed class QQWrySearcher : IDisposable
             b = bytes[offset];
             offset += 1;
         }
+
         return Gb2312Encoding.GetString(list.ToArray());
-    }
-
-    private static byte[] FileToBytes(string fileName)
-    {
-        using (FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-        {
-            byte[] bytes = new byte[fileStream.Length];
-
-            fileStream.Read(bytes, 0, bytes.Length);
-
-            fileStream.Close();
-
-            return bytes;
-        }
     }
 
     private static (string City, string Network) ReadLocation(long ip, long startPosition, long[] ipIndex, byte[] qqwryDbBytes)
@@ -336,7 +320,6 @@ public sealed class QQWrySearcher : IDisposable
         flag = qqwryDbBytes[arrayOffset];
         arrayOffset += 1;
         var network = ReadString(qqwryDbBytes, flag, ref arrayOffset);
-
         return (city, network);
     }
 }
