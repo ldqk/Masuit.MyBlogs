@@ -2,21 +2,15 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using CacheManager.Core;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
-using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
-using Masuit.MyBlogs.Core.Models.DTO;
-using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools;
 using Masuit.Tools.Html;
 using Microsoft.EntityFrameworkCore;
 using PanGu;
 using PanGu.HighLight;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Z.EntityFramework.Plus;
@@ -91,7 +85,7 @@ public sealed class PostService : BaseService<Post>, IPostService
 		}
 	}
 
-	public SearchResult<PostDto> SearchPage(int page, int size, string keyword)
+	public SearchResult<PostDto> SearchPage(Expression<Func<Post, bool>> whereBase, int page, int size, string keyword)
 	{
 		var cacheKey = $"search:{keyword}:{page}:{size}";
 		var result = _cacheManager.GetOrAdd(cacheKey, _ =>
@@ -99,7 +93,7 @@ public sealed class PostService : BaseService<Post>, IPostService
 			var searchResult = SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
 			var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).DistinctBy(s => s.Entity.Id).ToList();
 			var ids = entities.Select(s => s.Entity.Id).ToArray();
-			var dic = GetQuery<PostDto>(p => ids.Contains(p.Id) && p.LimitMode != RegionLimitMode.OnlyForSearchEngine).ToDictionary(p => p.Id);
+			var dic = GetQuery(whereBase.And(p => ids.Contains(p.Id) && p.LimitMode != RegionLimitMode.OnlyForSearchEngine)).ProjectTo<PostDto>(_mapper.ConfigurationProvider).ToDictionary(p => p.Id);
 			var posts = entities.Where(s => dic.ContainsKey(s.Entity.Id)).Select(s => dic[s.Entity.Id]).ToList();
 			var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
 			var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };

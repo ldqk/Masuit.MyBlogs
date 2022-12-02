@@ -1,24 +1,15 @@
 ﻿using AutoMapper.QueryableExtensions;
-using Lucene.Net.Support;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
-using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
-using Masuit.MyBlogs.Core.Models.DTO;
-using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Excel;
-using Masuit.Tools.Linq;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
 using System.Net;
 using System.Text.RegularExpressions;
 

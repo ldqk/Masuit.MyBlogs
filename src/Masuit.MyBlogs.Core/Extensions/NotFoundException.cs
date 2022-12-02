@@ -1,9 +1,8 @@
-﻿namespace Masuit.MyBlogs.Core.Extensions
+﻿namespace Masuit.MyBlogs.Core.Extensions;
+
+public class NotFoundException : Exception
 {
-    public class NotFoundException : Exception
-    {
-        public NotFoundException(string msg) : base(msg)
-        {
-        }
-    }
+	public NotFoundException(string msg) : base(msg)
+	{
+	}
 }

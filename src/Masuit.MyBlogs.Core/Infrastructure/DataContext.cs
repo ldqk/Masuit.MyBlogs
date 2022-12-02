@@ -1,5 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Models.Entity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Masuit.MyBlogs.Core.Infrastructure;

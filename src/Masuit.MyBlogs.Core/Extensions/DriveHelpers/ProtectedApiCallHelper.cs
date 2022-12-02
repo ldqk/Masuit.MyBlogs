@@ -18,8 +18,7 @@ public sealed class ProtectedApiCallHelper
 		HttpClient = httpClient;
 	}
 
-	protected HttpClient HttpClient { get; }
-
+	private HttpClient HttpClient { get; }
 
 	/// <summary>
 	/// Calls the protected Web API and processes the result

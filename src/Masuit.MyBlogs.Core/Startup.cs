@@ -12,24 +12,13 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using Masuit.MyBlogs.Core.Infrastructure;
-using Masuit.MyBlogs.Core.Models.DTO;
-using Masuit.MyBlogs.Core.Models.ViewModel;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Config;
 using Masuit.Tools.Core.AspNetCore;
-using Masuit.Tools.Core.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
-using Microsoft.IO;
 using Newtonsoft.Json;
-using Polly;
-using SixLabors.ImageSharp.Web.Caching;
-using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-using SixLabors.ImageSharp.Web.Processors;
-using SixLabors.ImageSharp.Web.Providers;
-using System.Net;
 using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core
@@ -103,22 +92,7 @@ namespace Masuit.MyBlogs.Core
 				Path = "lucene"
 			}); // 配置7z和断点续传和Redis和Lucene搜索引擎
 
-			services.AddHttpClient("").AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(5)).ConfigurePrimaryHttpMessageHandler(() =>
-			{
-				var handler = new HttpClientHandler
-				{
-					AutomaticDecompression = DecompressionMethods.All,
-					ClientCertificateOptions = ClientCertificateOption.Manual,
-					ServerCertificateCustomValidationCallback = (_, _, _, _) => true
-				};
-				if (bool.TryParse(Configuration["HttpClientProxy:Enabled"], out var b) && b)
-				{
-					handler.Proxy = new WebProxy(Configuration["HttpClientProxy:Uri"], true);
-				}
-
-				return handler;
-			}); //注入HttpClient
-			services.AddHttpClient<ImagebedClient>().AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(3)); //注入HttpClient
+			services.SetupHttpClients(Configuration);
 			services.AddMailSender(Configuration).AddFirewallReporter(Configuration).AddRequestLogger(Configuration).AddPerfCounterManager(Configuration);
 			services.AddBundling().UseDefaults(_env).UseNUglify().EnableMinification().EnableChangeDetection().EnableCacheHeader(TimeSpan.FromHours(1));
 			services.AddSingleton<IRedisClient>(new RedisClient(AppConfig.Redis)
@@ -133,31 +107,8 @@ namespace Masuit.MyBlogs.Core
 			services.AddRazorPages();
 			services.AddServerSideBlazor();
 			services.AddMapper().AddMyMvc().AddHealthChecks();
-			services.AddImageSharp(options =>
-				{
-					options.MemoryStreamManager = new RecyclableMemoryStreamManager();
-					options.BrowserMaxAge = TimeSpan.FromDays(7);
-					options.CacheMaxAge = TimeSpan.FromDays(365);
-					options.Configuration = SixLabors.ImageSharp.Configuration.Default;
-				}).SetRequestParser<QueryCollectionRequestParser>()
-				.Configure<PhysicalFileSystemCacheOptions>(options =>
-				{
-					options.CacheRootPath = null;
-					options.CacheFolder = "static/image_cache";
-				})
-				.SetCache<PhysicalFileSystemCache>()
-				.SetCacheKey<UriRelativeLowerInvariantCacheKey>()
-				.SetCacheHash<SHA256CacheHash>()
-				.Configure<PhysicalFileSystemProviderOptions>(options =>
-				{
-					options.ProviderRootPath = null;
-				})
-				.AddProvider<PhysicalFileSystemProvider>()
-				.AddProcessor<ResizeWebProcessor>()
-				.AddProcessor<FormatWebProcessor>()
-				.AddProcessor<BackgroundColorWebProcessor>()
-				.AddProcessor<QualityWebProcessor>()
-				.AddProcessor<AutoOrientWebProcessor>();
+			services.SetupImageSharp();
+			services.AddHttpContextAccessor();
 		}
 
 		public void ConfigureContainer(ContainerBuilder builder)

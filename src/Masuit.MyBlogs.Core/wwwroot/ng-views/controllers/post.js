@@ -338,6 +338,16 @@
         });
     }
     
+    $scope.nsfwSwitch= function(id) {
+        $scope.request("/post/"+id+"/nsfw",null, function(data) {
+            window.notie.alert({
+                type: 1,
+                text: data.Message,
+                time: 4
+            });
+        });
+    }
+    
     self.insight= function(row) {
         layer.full(layer.open({
           type: 2,

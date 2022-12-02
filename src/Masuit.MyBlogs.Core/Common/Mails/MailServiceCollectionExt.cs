@@ -1,21 +1,20 @@
-﻿namespace Masuit.MyBlogs.Core.Common.Mails
+﻿namespace Masuit.MyBlogs.Core.Common.Mails;
+
+public static class MailServiceCollectionExt
 {
-    public static class MailServiceCollectionExt
-    {
-        public static IServiceCollection AddMailSender(this IServiceCollection services, IConfiguration configuration)
-        {
-            switch (configuration["MailSender"])
-            {
-                case "Mailgun":
-                    services.AddHttpClient<IMailSender, MailgunSender>();
-                    break;
+	public static IServiceCollection AddMailSender(this IServiceCollection services, IConfiguration configuration)
+	{
+		switch (configuration["MailSender"])
+		{
+			case "Mailgun":
+				services.AddHttpClient<IMailSender, MailgunSender>();
+				break;
 
-                default:
-                    services.AddSingleton<IMailSender, SmtpSender>();
-                    break;
-            }
+			default:
+				services.AddSingleton<IMailSender, SmtpSender>();
+				break;
+		}
 
-            return services;
-        }
-    }
+		return services;
+	}
 }

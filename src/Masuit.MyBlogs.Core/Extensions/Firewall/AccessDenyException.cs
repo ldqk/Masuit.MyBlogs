@@ -1,9 +1,8 @@
-﻿namespace Masuit.MyBlogs.Core.Extensions.Firewall
+﻿namespace Masuit.MyBlogs.Core.Extensions.Firewall;
+
+public class AccessDenyException : Exception
 {
-    public class AccessDenyException : Exception
-    {
-        public AccessDenyException(string msg) : base(msg)
-        {
-        }
-    }
+	public AccessDenyException(string msg) : base(msg)
+	{
+	}
 }

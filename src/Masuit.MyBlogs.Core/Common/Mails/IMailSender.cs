@@ -1,13 +1,12 @@
-﻿namespace Masuit.MyBlogs.Core.Common.Mails
+﻿namespace Masuit.MyBlogs.Core.Common.Mails;
+
+public interface IMailSender
 {
-    public interface IMailSender
-    {
-        void Send(string title, string content, string tos);
+	void Send(string title, string content, string tos);
 
-        List<string> GetBounces();
+	List<string> GetBounces();
 
-        string AddRecipient(string email);
+	string AddRecipient(string email);
 
-        public bool HasBounced(string address);
-    }
+	public bool HasBounced(string address);
 }

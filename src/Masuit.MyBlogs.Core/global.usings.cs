@@ -1,0 +1,16 @@
+﻿global using Masuit.MyBlogs.Core.Infrastructure;
+global using Masuit.MyBlogs.Core.Infrastructure.Repository;
+global using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
+global using Masuit.MyBlogs.Core.Models.Command;
+global using Masuit.MyBlogs.Core.Models.DTO;
+global using Masuit.MyBlogs.Core.Models.Entity;
+global using Masuit.MyBlogs.Core.Models.Enum;
+global using Masuit.MyBlogs.Core.Models.ViewModel;
+global using Masuit.MyBlogs.Core.Views.Post;
+global using Masuit.Tools;
+global using Masuit.Tools.Core.Net;
+global using Masuit.Tools.Linq;
+global using Masuit.Tools.Security;
+global using Masuit.Tools.Strings;
+global using Masuit.Tools.Systems;
+global using System.Linq.Expressions;

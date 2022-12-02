@@ -1,9 +1,8 @@
-﻿namespace Masuit.MyBlogs.Core.Models.ViewModel
+﻿namespace Masuit.MyBlogs.Core.Models.ViewModel;
+
+public class SearchResult<T>
 {
-    public class SearchResult<T>
-    {
-        public int Total { get; set; }
-        public double Elapsed { get; set; }
-        public List<T> Results { get; set; } = new List<T>();
-    }
+	public int Total { get; set; }
+	public double Elapsed { get; set; }
+	public List<T> Results { get; set; } = new List<T>();
 }

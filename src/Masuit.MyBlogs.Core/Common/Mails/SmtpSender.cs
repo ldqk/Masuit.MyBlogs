@@ -1,5 +1,4 @@
-﻿using Masuit.Tools;
-using Masuit.Tools.Models;
+﻿using Masuit.Tools.Models;
 using System.Text;
 
 namespace Masuit.MyBlogs.Core.Common.Mails;

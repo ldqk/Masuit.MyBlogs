@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
-        <ServerGarbageCollection>true</ServerGarbageCollection>
+        <ServerGarbageCollection>false</ServerGarbageCollection>
         <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
         <Authors>懒得勤快</Authors>
         <Product>懒得勤快的博客</Product>
@@ -51,7 +51,7 @@
         <PackageReference Include="htmldiff.net" Version="1.4.0" />
         <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.6.0" />
         <PackageReference Include="Markdig" Version="0.30.4" />
-        <PackageReference Include="Masuit.Tools.Excel" Version="1.2.4.1" />
+        <PackageReference Include="Masuit.Tools.Excel" Version="1.2.4.2" />
         <PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.0" />

@@ -7,36 +7,20 @@ using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using Masuit.MyBlogs.Core.Infrastructure;
-using Masuit.MyBlogs.Core.Infrastructure.Repository;
-using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
-using Masuit.MyBlogs.Core.Models.Command;
-using Masuit.MyBlogs.Core.Models.DTO;
-using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.MyBlogs.Core.Models.Enum;
-using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.MyBlogs.Core.Views.Post;
-using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
-using Masuit.Tools.Core.Net;
 using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Excel;
 using Masuit.Tools.Html;
-using Masuit.Tools.Linq;
 using Masuit.Tools.Logging;
 using Masuit.Tools.Models;
-using Masuit.Tools.Security;
-using Masuit.Tools.Strings;
-using Masuit.Tools.Systems;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -127,8 +111,8 @@ public sealed class PostController : BaseController
 		ViewBag.Related = related;
 		post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
 		post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-		post.Content = await ReplaceVariables(post.Content).Next(s => notRobot ? s.InjectFingerprint() : Task.FromResult(s));
-		post.ProtectContent = await ReplaceVariables(post.ProtectContent).Next(s => notRobot ? s.InjectFingerprint() : Task.FromResult(s));
+		post.Content = await ReplaceVariables(post.Content).Next(s => notRobot && post.DisableCopy ? s.InjectFingerprint() : Task.FromResult(s));
+		post.ProtectContent = await ReplaceVariables(post.ProtectContent).Next(s => notRobot && post.DisableCopy ? s.InjectFingerprint() : Task.FromResult(s));
 
 		if (CurrentUser.IsAdmin)
 		{
@@ -183,8 +167,8 @@ public sealed class PostController : BaseController
 	{
 		var history = await PostHistoryVersionService.GetAsync(v => v.Id == hid && (v.Post.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
 		CheckPermission(history.Post);
-		history.Content = await ReplaceVariables(history.Content).Next(s => Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
-		history.ProtectContent = await ReplaceVariables(history.ProtectContent).Next(s => Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
+		history.Content = await ReplaceVariables(history.Content).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
+		history.ProtectContent = await ReplaceVariables(history.ProtectContent).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
 		history.ModifyDate = history.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
 		var next = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate > history.ModifyDate, p => p.ModifyDate);
 		var prev = await PostHistoryVersionService.GetAsync(p => p.PostId == id && p.ModifyDate < history.ModifyDate, p => p.ModifyDate, false);
@@ -216,9 +200,9 @@ public sealed class PostController : BaseController
 		main.Id = id;
 		var diff = new HtmlDiff.HtmlDiff(right.Content, left.Content);
 		var diffOutput = diff.Build();
-		right.Content = await ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty)).Next(s => Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
+		right.Content = await ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty)).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
 		right.ModifyDate = right.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-		left.Content = await ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty)).Next(s => Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
+		left.Content = await ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty)).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint());
 		left.ModifyDate = left.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
 		ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location(), main.CategoryId, main.Label);
 		ViewBag.DisableCopy = post.DisableCopy;
@@ -992,6 +976,20 @@ public sealed class PostController : BaseController
 		var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
 		post.DisableCopy = !post.DisableCopy;
 		return ResultData(null, await PostService.SaveChangesAsync() > 0, post.DisableCopy ? $"已开启【{post.Title}】这篇文章的防复制功能！" : $"已关闭【{post.Title}】这篇文章的防复制功能！");
+	}
+
+	/// <summary>
+	/// 禁用或开启NSFW
+	/// </summary>
+	/// <param name="id">文章id</param>
+	/// <returns></returns>
+	[MyAuthorize]
+	[HttpPost("post/{id}/nsfw")]
+	public async Task<ActionResult> Nsfw(int id)
+	{
+		var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
+		post.IsNsfw = !post.IsNsfw;
+		return ResultData(null, await PostService.SaveChangesAsync() > 0, post.IsNsfw ? $"已将文章【{post.Title}】标记为不安全内容！" : $"已将文章【{post.Title}】取消标记为不安全内容！");
 	}
 
 	/// <summary>

@@ -4,20 +4,22 @@ using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using Masuit.MyBlogs.Core.Infrastructure;
-using Masuit.MyBlogs.Core.Models.DTO;
-using Masuit.MyBlogs.Core.Models.ViewModel;
-using Masuit.Tools;
 using Masuit.Tools.AspNetCore.Mime;
-using Masuit.Tools.Core.Net;
-using Masuit.Tools.Systems;
 using Masuit.Tools.Win32;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.IO;
 using Microsoft.Net.Http.Headers;
+using Polly;
+using SixLabors.ImageSharp.Web.Caching;
+using SixLabors.ImageSharp.Web.Commands;
+using SixLabors.ImageSharp.Web.DependencyInjection;
+using SixLabors.ImageSharp.Web.Processors;
+using SixLabors.ImageSharp.Web.Providers;
 using StackExchange.Profiling;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
@@ -160,6 +162,47 @@ namespace Masuit.MyBlogs.Core
 				options.HttpsCompression = HttpsCompressionMode.Compress;
 			}); // 配置静态资源文件类型和缓存
 		}
+
+		public static IServiceCollection SetupHttpClients(this IServiceCollection services, IConfiguration config)
+		{
+			services.AddHttpClient("").AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(5)).ConfigurePrimaryHttpMessageHandler(() =>
+			{
+				var handler = new HttpClientHandler
+				{
+					AutomaticDecompression = DecompressionMethods.All,
+					ClientCertificateOptions = ClientCertificateOption.Manual,
+					ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+				};
+				if (bool.TryParse(config["HttpClientProxy:Enabled"], out var b) && b)
+				{
+					handler.Proxy = new WebProxy(config["HttpClientProxy:Uri"], true);
+				}
+
+				return handler;
+			}); //注入HttpClient
+			services.AddHttpClient<ImagebedClient>().AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(3)); //注入HttpClient
+			return services;
+		}
+
+		public static IServiceCollection SetupImageSharp(this IServiceCollection services)
+		{
+			services.AddImageSharp(options =>
+			{
+				options.MemoryStreamManager = new RecyclableMemoryStreamManager();
+				options.BrowserMaxAge = TimeSpan.FromDays(7);
+				options.CacheMaxAge = TimeSpan.FromDays(365);
+				options.Configuration = SixLabors.ImageSharp.Configuration.Default;
+			}).SetRequestParser<QueryCollectionRequestParser>().Configure<PhysicalFileSystemCacheOptions>(options =>
+			{
+				options.CacheRootPath = null;
+				options.CacheFolder = "static/image_cache";
+			}).SetCache<PhysicalFileSystemCache>().SetCacheKey<UriRelativeLowerInvariantCacheKey>().SetCacheHash<SHA256CacheHash>().Configure<PhysicalFileSystemProviderOptions>(options =>
+			{
+				options.ProviderRootPath = null;
+			}).AddProvider<PhysicalFileSystemProvider>().AddProcessor<ResizeWebProcessor>().AddProcessor<FormatWebProcessor>().AddProcessor<BackgroundColorWebProcessor>().AddProcessor<QualityWebProcessor>().AddProcessor<AutoOrientWebProcessor>();
+			return services;
+		}
+
 	}
 
 	/// <summary>

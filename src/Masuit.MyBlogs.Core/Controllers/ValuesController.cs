@@ -1,6 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
-using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.Tools.AspNetCore.ModelBinder;
+﻿using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;

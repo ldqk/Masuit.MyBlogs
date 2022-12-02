@@ -101,6 +101,12 @@
                     <span class="el-switch-style" ng-click="lockedSwitch(row.Id)"></span>
                 </label>
             </td>
+            <td data-title="'标记为不安全内容'" ng-if="aclMode">
+                <label class="el-switch">
+                    <input type="checkbox" name="switch" ng-checked="row.IsNsfw">
+                    <span class="el-switch-style" ng-click="nsfwSwitch(row.Id)"></span>
+                </label>
+            </td>
             <td data-title="'操作'" style="width: 195px;" ng-class="{'danger':(row.AverageViewCount<1)}">
                 <div class="btn-group">
                     <button class="btn btn-default btn-sm waves-effect" ng-click="list.pass(row)" ng-if="row.Status=='审核中'">

@@ -1,12 +1,9 @@
 ﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Models.DTO;
-using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.MyBlogs.Core.Models.Enum;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 {
-    public partial interface IAdvertisementService : IBaseService<Advertisement>
-    {
+	public partial interface IAdvertisementService : IBaseService<Advertisement>
+	{
 		/// <summary>
 		/// 按价格随机筛选一个元素
 		/// </summary>
@@ -27,5 +24,5 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 		/// <param name="keywords"></param>
 		/// <returns></returns>
 		List<AdvertisementDto> GetsByWeightedPrice(int count, AdvertiseType type, IPLocation location, int? cid = null, string keywords = "");
-    }
+	}
 }

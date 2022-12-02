@@ -1,6 +1,4 @@
-﻿var defaultBlockCategoryIds=[49,14];
-
-//全局加载动画
+﻿//全局加载动画
 function loading() {
 	$(".loading1").show();
 }
@@ -295,7 +293,7 @@ async function blockCategory(id,name) {
     }
 }
 
-async function clearBlockedCategory() {
+async function disableSafemode() {
 	await swal({
 		title: "确认关闭安全模式吗？",
 		text: "关闭安全模式后可能会出现一些引起不适的内容，请谨慎操作，确认关闭吗？",
@@ -308,9 +306,9 @@ async function clearBlockedCategory() {
 		allowOutsideClick: false
 	}).then(async function() {
 		cookieStore.set({
-		  name: "HideCategories",
-		  value: null,
-		  expires: Date.now() + 24*60*60*365
+		  name: "Nsfw",
+		  value: 0,
+		  expires: Date.now() + 24*60*60*3650
 		}).then(
 		  function() {
 			location.reload();
@@ -323,15 +321,15 @@ async function clearBlockedCategory() {
 	}).catch(swal.noop);
 }
 
-async function enableDefaultSafeMode() {
+async function enableSafemode() {
 	if (localStorage.getItem("DefaultSafeMode")==1) {
 		return ;
 	}
-
+	
 	cookieStore.set({
-	  name: "HideCategories",
-	  value: defaultBlockCategoryIds.join("%2C")+"%2C"+(await cookieStore.get("HideCategories")||{value:"0"}).value,
-	  expires: Date.now() + 24*60*60*365
+	  name: "Nsfw",
+	  value: 1,
+	  expires: Date.now() + 24*60*60*3650
 	}).then(
 	  function() {
 		localStorage.setItem("DefaultSafeMode",1);
@@ -341,3 +339,10 @@ async function enableDefaultSafeMode() {
 	  }
 	);
 }
+
+/*默认安全模式*/
+cookieStore.get("Nsfw").then(res=>{
+    var value=(res||{value:"1"}).value;
+    if(value=="1"){
+    $("body").append("<a style='position:fixed;left:0;bottom:0;color:black;z-index:10;text-shadow: 0px 0px 1px #000;'>安全模式</a>");
+}});

@@ -1,25 +1,24 @@
 ﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Infrastructure;
 
 public sealed class LoggerDbContext : DbContext
 {
-    public LoggerDbContext(DbContextOptions<LoggerDbContext> options) : base(options)
-    {
-    }
+	public LoggerDbContext(DbContextOptions<LoggerDbContext> options) : base(options)
+	{
+	}
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.EnableDetailedErrors().UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-    }
+	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+	{
+		optionsBuilder.EnableDetailedErrors().UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+	}
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<RequestLogDetail>().HasKey(e => new { e.Id, e.Time });
-        modelBuilder.Entity<PerformanceCounter>().HasKey(e => new { e.ServerIP, e.Time });
-    }
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
+	{
+		modelBuilder.Entity<RequestLogDetail>().HasKey(e => new { e.Id, e.Time });
+		modelBuilder.Entity<PerformanceCounter>().HasKey(e => new { e.ServerIP, e.Time });
+	}
 }
 
 //[AttributeUsage(AttributeTargets.Property)]

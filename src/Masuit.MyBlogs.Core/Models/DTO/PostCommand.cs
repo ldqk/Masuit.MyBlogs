@@ -1,5 +1,3 @@
-using Masuit.MyBlogs.Core.Models.Entity;
-using Masuit.MyBlogs.Core.Models.Enum;
 using Masuit.MyBlogs.Core.Models.Validation;
 using Masuit.Tools.Core.Validator;
 using System.ComponentModel.DataAnnotations;
@@ -130,4 +128,9 @@ public class PostCommand : BaseEntity
 	/// 过期时间
 	/// </summary>
 	public DateTime? ExpireAt { get; set; }
+
+	/// <summary>
+	/// 是否是不安全内容
+	/// </summary>
+	public bool IsNsfw { get; set; }
 }

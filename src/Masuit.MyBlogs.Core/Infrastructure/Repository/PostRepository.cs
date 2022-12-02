@@ -1,7 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
-using Masuit.MyBlogs.Core.Models.Entity;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository;
