@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "工具库", "工具库", "{
 		工具库可用同名nuget包替代 = 工具库可用同名nuget包替代
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Masuit.Tools.Excel", "..\..\Masuit.Tools\Masuit.Tools.Excel\Masuit.Tools.Excel.csproj", "{99933B01-597A-40F7-81D7-8BDA3CD4D840}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{0661EDB7-12E8-4F8B-AD0B-1CDEF7D03FAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0661EDB7-12E8-4F8B-AD0B-1CDEF7D03FAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0661EDB7-12E8-4F8B-AD0B-1CDEF7D03FAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99933B01-597A-40F7-81D7-8BDA3CD4D840}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99933B01-597A-40F7-81D7-8BDA3CD4D840}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99933B01-597A-40F7-81D7-8BDA3CD4D840}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99933B01-597A-40F7-81D7-8BDA3CD4D840}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{D0D32A1B-13C8-49E6-AC5A-112AD981FD1A} = {51B677E0-194F-4A0F-9E86-4B147F22728E}
 		{F67A19C8-5ACE-4111-8DB5-51A0159AF5A3} = {51B677E0-194F-4A0F-9E86-4B147F22728E}
 		{0661EDB7-12E8-4F8B-AD0B-1CDEF7D03FAD} = {51B677E0-194F-4A0F-9E86-4B147F22728E}
+		{99933B01-597A-40F7-81D7-8BDA3CD4D840} = {51B677E0-194F-4A0F-9E86-4B147F22728E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2D2DF884-78F6-45E0-80C5-25FAE9F0B5C9}

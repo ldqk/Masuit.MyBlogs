@@ -1,4 +1,5 @@
-﻿using CacheManager.Core;
+﻿using AutoMapper;
+using CacheManager.Core;
 using Hangfire;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
@@ -24,6 +25,7 @@ public sealed class PassportController : Controller
 	public IUserInfoService UserInfoService { get; set; }
 
 	public IFirewallRepoter FirewallRepoter { get; set; }
+	public IMapper Mapper { get; set; }
 
 	/// <summary>
 	/// 客户端的真实IP
@@ -221,7 +223,7 @@ public sealed class PassportController : Controller
 	{
 		var user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-			user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoDto>();
+		user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
 #endif
 
 		return ResultData(user);

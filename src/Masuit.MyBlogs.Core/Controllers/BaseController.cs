@@ -114,8 +114,8 @@ public class BaseController : Controller
 		ViewBag.Desc = CommonHelper.SystemSettings["Description"];
 		var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-			user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoDto>();
-			filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
+		user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
+		filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
 #endif
 		if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true" && user?.IsAdmin != true)
 		{

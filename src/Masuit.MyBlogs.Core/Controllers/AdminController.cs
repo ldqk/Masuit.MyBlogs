@@ -48,8 +48,8 @@ public class AdminController : Controller
 		base.OnActionExecuting(filterContext);
 		var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-			user = UserInfoService.GetByUsername("masuit").Mapper<UserInfoDto>();
-			filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
+		user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
+		filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
 #endif
 		if (user == null && Request.Cookies.Any(x => x.Key == "username" || x.Key == "password")) //执行自动登录
 		{
