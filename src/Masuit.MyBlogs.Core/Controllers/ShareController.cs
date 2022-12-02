@@ -1,4 +1,5 @@
-﻿using Masuit.Tools.AspNetCore.ModelBinder;
+﻿using Dispose.Scope;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;
@@ -21,7 +22,7 @@ public sealed class ShareController : AdminController
 	/// <returns></returns>
 	public ActionResult Index()
 	{
-		var shares = FastShareService.GetAll(s => s.Sort).ToList();
+		var shares = FastShareService.GetAll(s => s.Sort).ToPooledListScope();
 		return ResultData(shares);
 	}
 

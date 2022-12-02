@@ -43,8 +43,8 @@ namespace Masuit.MyBlogs.Core.Common
 			}
 
 			file = Regex.Replace(Path.GetFileName(file), @"\p{P}|\p{S}", "");
-			var gitlabs = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length && !_failedList.Contains(c.ApiUrl)).OrderByRandom().ToList();
-			if (gitlabs.Count > 0)
+			var gitlabs = AppConfig.GitlabConfigs.Where(c => c.FileLimitSize >= stream.Length && !_failedList.Contains(c.ApiUrl)).OrderByRandom().ToArray();
+			if (gitlabs.Length > 0)
 			{
 				var gitlab = gitlabs[0];
 				if (gitlab.ApiUrl.Contains("api.github.com"))

@@ -3,6 +3,7 @@ using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Polly;
 using System.Text;
+using Dispose.Scope;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -43,20 +44,20 @@ public sealed class DashboardController : AdminController
 			p.Title,
 			p.PostDate,
 			p.Author
-		}).ToList();
+		}).ToPooledListScope();
 		var msgs = leaveMessageService.GetQuery(m => m.Status == Status.Pending).Select(p => new
 		{
 			p.Id,
 			p.PostDate,
 			p.NickName
-		}).ToList();
+		}).ToPooledListScope();
 		var comments = commentService.GetQuery(c => c.Status == Status.Pending).Select(p => new
 		{
 			p.Id,
 			p.CommentDate,
 			p.PostId,
 			p.NickName
-		}).ToList();
+		}).ToPooledListScope();
 		return ResultData(new
 		{
 			post,
@@ -71,7 +72,7 @@ public sealed class DashboardController : AdminController
 	/// <returns></returns>
 	public ActionResult GetLogfiles()
 	{
-		List<string> files = Directory.GetFiles(LogManager.LogDirectory).OrderByDescending(s => s).Select(Path.GetFileName).ToList();
+		var files = Directory.GetFiles(LogManager.LogDirectory).OrderByDescending(s => s).Select(Path.GetFileName).ToPooledListScope();
 		return ResultData(files);
 	}
 

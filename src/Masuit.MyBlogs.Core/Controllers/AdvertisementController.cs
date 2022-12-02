@@ -1,4 +1,5 @@
 ﻿using AutoMapper.QueryableExtensions;
+using Dispose.Scope;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.AspNetCore.Mime;
@@ -177,7 +178,7 @@ public sealed class AdvertisementController : BaseController
 	[HttpGet("/partner/{id}/records-export"), MyAuthorize]
 	public IActionResult ExportClickRecords(int id)
 	{
-		var list = ClickRecordService.GetQuery<DateTime, AdvertisementClickRecordViewModel>(e => e.AdvertisementId == id, e => e.Time, false).ToList();
+		var list = ClickRecordService.GetQuery<DateTime, AdvertisementClickRecordViewModel>(e => e.AdvertisementId == id, e => e.Time, false).ToPooledListScope();
 		using var ms = list.ToExcel();
 		var advertisement = AdsService[id];
 		return this.ResumeFile(ms.ToArray(), ContentType.Xlsx, advertisement.Title + "访问记录.xlsx");

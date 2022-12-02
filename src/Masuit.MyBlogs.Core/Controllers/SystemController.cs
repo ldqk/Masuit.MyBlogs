@@ -1,4 +1,6 @@
-﻿using Hangfire;
+﻿using Collections.Pooled;
+using Dispose.Scope;
+using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
@@ -57,7 +59,7 @@ public sealed class SystemController : AdminController
 			_ => 72
 		} * 10000;
 
-		var list = count < 5000 ? counters.OrderBy(c => c.Time).ToList() : counters.GroupBy(c => c.Time / ticks).Select(g => new PerformanceCounter
+		var list = count < 5000 ? counters.OrderBy(c => c.Time).ToPooledListScope() : counters.GroupBy(c => c.Time / ticks).Select(g => new PerformanceCounter
 		{
 			Time = g.Key * ticks,
 			CpuLoad = g.Average(c => c.CpuLoad),
@@ -66,7 +68,7 @@ public sealed class SystemController : AdminController
 			Download = g.Average(c => c.Download),
 			Upload = g.Average(c => c.Upload),
 			MemoryUsage = g.Average(c => c.MemoryUsage)
-		}).OrderBy(c => c.Time).ToList();
+		}).OrderBy(c => c.Time).ToPooledListScope();
 		return Ok(new
 		{
 			cpu = list.Select(c => new[]
@@ -112,7 +114,7 @@ public sealed class SystemController : AdminController
 		{
 			s.Name,
 			s.Value
-		}).ToList();
+		}).ToPooledListScope();
 		return ResultData(list);
 	}
 
@@ -231,9 +233,9 @@ public sealed class SystemController : AdminController
 	/// 发件箱记录
 	/// </summary>
 	/// <returns></returns>
-	public ActionResult<List<JObject>> SendBox()
+	public ActionResult<PooledList<JObject>> SendBox()
 	{
-		return RedisHelper.SUnion(RedisHelper.Keys("Email:*")).Select(JObject.Parse).OrderByDescending(o => o["time"]).ToList();
+		return RedisHelper.SUnion(RedisHelper.Keys("Email:*")).Select(JObject.Parse).OrderByDescending(o => o["time"]).ToPooledListScope();
 	}
 
 	public ActionResult BounceEmail([FromServices] IMailSender mailSender, [FromBodyOrDefault] string email)

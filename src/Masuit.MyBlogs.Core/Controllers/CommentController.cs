@@ -12,6 +12,7 @@ using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.RegularExpressions;
+using Dispose.Scope;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -213,7 +214,7 @@ public sealed class CommentController : BaseController
 		if (cid > 0)
 		{
 			var comment = await CommentService.GetByIdAsync(cid.Value) ?? throw new NotFoundException("评论未找到");
-			var layer = CommentService.GetQueryNoTracking(c => c.GroupTag == comment.GroupTag).ToList();
+			var layer = CommentService.GetQueryNoTracking(c => c.GroupTag == comment.GroupTag).ToPooledListScope();
 			foreach (var c in layer)
 			{
 				c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -243,7 +244,7 @@ public sealed class CommentController : BaseController
 		}
 		int total = parent.TotalCount; //总条数，用于前台分页
 		var tags = parent.Data.Select(c => c.GroupTag).ToArray();
-		var comments = CommentService.GetQuery(c => tags.Contains(c.GroupTag)).Include(c => c.Post).AsNoTracking().ToList();
+		var comments = CommentService.GetQuery(c => tags.Contains(c.GroupTag)).Include(c => c.Post).AsNoTracking().ToPooledListScope();
 		comments.ForEach(c =>
 		{
 			c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -289,7 +290,7 @@ public sealed class CommentController : BaseController
 				.Set("time", DateTime.Now.ToTimeZoneF(HttpContext.Session.Get<string>(SessionKey.TimeZone)))
 				.Set("nickname", comment.NickName)
 				.Set("content", comment.Content);
-			var emails = CommentService.GetQuery(c => c.GroupTag == comment.GroupTag).Select(c => c.Email).Distinct().ToList().Append(post.ModifierEmail).Except(new List<string> { comment.Email, CurrentUser.Email }).ToHashSet();
+			var emails = CommentService.GetQuery(c => c.GroupTag == comment.GroupTag).Select(c => c.Email).Distinct().AsEnumerable().Append(post.ModifierEmail).Except(new List<string> { comment.Email, CurrentUser.Email }).ToPooledSetScope();
 			var link = Url.Action("Details", "Post", new
 			{
 				id = comment.PostId,

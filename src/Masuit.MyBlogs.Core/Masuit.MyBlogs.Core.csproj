@@ -45,6 +45,7 @@
         <PackageReference Include="CacheManager.StackExchange.Redis" Version="1.2.0" />
         <PackageReference Include="CHTCHSConv" Version="1.0.0" />
         <PackageReference Include="CLRStats" Version="1.0.0" />
+        <PackageReference Include="Dispose.Scope.AspNetCore" Version="0.0.3" />
         <PackageReference Include="FreeRedis" Version="1.0.3" />
         <PackageReference Include="Hangfire" Version="1.7.32" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />

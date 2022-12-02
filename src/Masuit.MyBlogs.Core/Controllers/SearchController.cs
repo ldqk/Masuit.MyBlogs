@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using Dispose.Scope;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -48,7 +49,7 @@ public sealed class SearchController : BaseController
 				ViewBag.RelateKeywords = SearchDetailsService.GetQuery(s => s.Keywords.Contains(wd) && s.Keywords != wd).Select(s => s.Keywords).GroupBy(s => s).OrderByDescending(g => g.Count()).Select(g => g.Key).Take(10).FromCache(new MemoryCacheEntryOptions()
 				{
 					AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
-				}).ToList();
+				}).ToPooledListScope();
 			}
 
 			if (!HttpContext.Session.TryGetValue("search:" + wd, out _) && !Request.IsRobot())

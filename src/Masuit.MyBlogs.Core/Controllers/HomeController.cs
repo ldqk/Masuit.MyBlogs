@@ -1,5 +1,6 @@
 ﻿using AngleSharp;
 using AutoMapper.QueryableExtensions;
+using Dispose.Scope;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models;
@@ -44,11 +45,11 @@ public sealed class HomeController : BaseController
 	[ResponseCache(Duration = 600, VaryByHeader = nameof(HeaderNames.Cookie))]
 	public async Task<ActionResult> Index([FromServices] IFastShareService fastShareService)
 	{
-		var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner, Request.Location()).OrderByRandom().ToList();
+		var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner, Request.Location()).OrderByRandom().ToPooledListScope();
 		var fastShares = fastShareService.GetAllFromCache(s => s.Sort);
 		var postsQuery = PostService.GetQuery(PostBaseWhere()); //准备文章的查询
 		var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ToPagedListAsync<Post, PostDto>(1, 15, MapperConfig);
-		posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ProjectTo<PostDto>(MapperConfig).FromCache().ToList());
+		posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ProjectTo<PostDto>(MapperConfig).FromCache().ToPooledListScope());
 		var viewModel = GetIndexPageViewModel();
 		viewModel.Banner = banners;
 		viewModel.Posts = posts;
@@ -86,7 +87,7 @@ public sealed class HomeController : BaseController
 		};
 		if (page == 1)
 		{
-			posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ProjectTo<PostDto>(MapperConfig).ToList());
+			posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).OrderByDescending(p => p.ModifyDate).ProjectTo<PostDto>(MapperConfig));
 		}
 
 		viewModel.Posts = posts;
@@ -314,18 +315,18 @@ public sealed class HomeController : BaseController
 	{
 		var postsQuery = PostService.GetQuery<PostDto>(PostBaseWhere()); //准备文章的查询
 		var notices = NoticeService.GetPagesFromCache<DateTime, NoticeDto>(1, 5, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false); //加载前5条公告
-		var cats = CategoryService.GetQuery(c => c.Status == Status.Available && c.Post.Count > 0).Include(c => c.Parent).OrderBy(c => c.Name).ThenBy(c => c.Path).AsNoTracking().FromCache().ToList(); //加载分类目录
-		var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").AsNotNull().Take(10).ToList(); //热词统计
+		var cats = CategoryService.GetQuery(c => c.Status == Status.Available && c.Post.Count > 0).Include(c => c.Parent).OrderBy(c => c.Name).ThenBy(c => c.Path).AsNoTracking().FromCache().ToPooledListScope(); //加载分类目录
+		var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").AsNotNull().Take(10).ToPooledListScope(); //热词统计
 		var hot5Post = postsQuery.OrderBy((new Random().Next() % 3) switch
 		{
 			1 => nameof(OrderBy.VoteUpCount),
 			2 => nameof(OrderBy.AverageViewCount),
 			_ => nameof(OrderBy.TotalViewCount)
-		} + " desc").Skip(0).Take(5).FromCache().ToList(); //热门文章
+		} + " desc").Skip(0).Take(5).FromCache().ToPooledListScope(); //热门文章
 		var tagdic = PostService.GetTags().OrderByRandom().Take(20).ToDictionary(x => x.Key, x => Math.Min(x.Value + 12, 32)); //统计标签
 		return new HomePageViewModel
 		{
-			Categories = Mapper.Map<List<CategoryDto_P>>(cats.ToTree(c => c.Id, c => c.ParentId).Flatten().ToList()),
+			Categories = Mapper.Map<List<CategoryDto_P>>(cats.ToTree(c => c.Id, c => c.ParentId).Flatten()),
 			HotSearch = hotSearches,
 			Notices = notices.Data,
 			Tags = tagdic,

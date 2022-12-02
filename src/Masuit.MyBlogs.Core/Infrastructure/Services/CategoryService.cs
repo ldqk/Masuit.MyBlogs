@@ -1,4 +1,5 @@
-﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+﻿using Dispose.Scope;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services;
@@ -18,7 +19,7 @@ public sealed partial class CategoryService : BaseService<Category>, ICategorySe
 	public async Task<bool> Delete(int id, int mid)
 	{
 		var category = await GetByIdAsync(id);
-		var categories = GetQuery(c => c.Path.StartsWith(category.Path)).ToList();
+		var categories = GetQuery(c => c.Path.StartsWith(category.Path)).ToPooledListScope();
 		var moveCat = await GetByIdAsync(mid);
 		foreach (var c in categories)
 		{

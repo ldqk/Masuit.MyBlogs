@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Dispose.Scope;
 using FreeRedis;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
@@ -71,14 +72,12 @@ public class AdminController : Controller
 			}
 		}
 		if (ModelState.IsValid) return;
-		var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).ToList();
-		if (errmsgs.Any())
+		var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).ToPooledListScope();
+		for (var i = 0; i < errmsgs.Count; i++)
 		{
-			for (var i = 0; i < errmsgs.Count; i++)
-			{
-				errmsgs[i] = i + 1 + ". " + errmsgs[i];
-			}
+			errmsgs[i] = i + 1 + ". " + errmsgs[i];
 		}
+
 		filterContext.Result = ResultData(null, false, "数据校验失败，错误信息：" + string.Join(" | ", errmsgs));
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using CLRStats;
+using Dispose.Scope.AspNetCore;
 using FreeRedis;
 using Hangfire;
 using Hangfire.MemoryStorage;
@@ -131,6 +132,7 @@ namespace Masuit.MyBlogs.Core
 			maindb.Database.EnsureCreated();
 			loggerdb.Database.EnsureCreated();
 			app.InitSettings();
+			app.UseDisposeScope();
 			app.UseLuceneSearch(env, hangfire, luceneIndexerOptions);
 			app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For
 			if (env.IsDevelopment())

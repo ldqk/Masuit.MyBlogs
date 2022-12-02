@@ -1,4 +1,5 @@
-﻿using Masuit.Tools.Models;
+﻿using Collections.Pooled;
+using Masuit.Tools.Models;
 
 namespace Masuit.MyBlogs.Core.Models.ViewModel;
 
@@ -30,12 +31,12 @@ public class HomePageViewModel
 	/// <summary>
 	/// 近期热搜
 	/// </summary>
-	public List<KeywordsRank> HotSearch { get; set; }
+	public PooledList<KeywordsRank> HotSearch { get; set; }
 
 	/// <summary>
 	/// 热门文章
 	/// </summary>
-	public List<PostDto> Top5Post { get; set; }
+	public PooledList<PostDto> Top5Post { get; set; }
 
 	/// <summary>
 	/// 文章列表查询
@@ -45,7 +46,7 @@ public class HomePageViewModel
 	/// <summary>
 	/// banner文章
 	/// </summary>
-	public List<AdvertisementDto> Banner { get; set; }
+	public PooledList<AdvertisementDto> Banner { get; set; }
 
 	/// <summary>
 	/// 边栏广告

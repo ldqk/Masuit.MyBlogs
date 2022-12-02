@@ -15,6 +15,7 @@ using SixLabors.ImageSharp;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Dispose.Scope;
 using TimeZoneConverter;
 using ArgumentException = System.ArgumentException;
 using Configuration = AngleSharp.Configuration;
@@ -317,7 +318,7 @@ namespace Masuit.MyBlogs.Core.Common
 			}
 
 			var elements = doc.DocumentElement.QuerySelectorAll("p,br");
-			var els = elements.OrderByRandom().Take(Math.Max(elements.Length / 5, 3)).ToList();
+			var els = elements.OrderByRandom().Take(Math.Max(elements.Length / 5, 3)).ToPooledListScope();
 			var href = "https://" + SystemSettings["Domain"].Split('|').OrderByRandom().FirstOrDefault();
 			foreach (var el in els)
 			{

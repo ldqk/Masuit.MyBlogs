@@ -12,6 +12,7 @@ using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.RegularExpressions;
+using Dispose.Scope;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -59,7 +60,7 @@ public sealed class MsgController : BaseController
 		if (cid > 0)
 		{
 			var message = await LeaveMessageService.GetByIdAsync(cid.Value) ?? throw new NotFoundException("留言未找到");
-			var layer = LeaveMessageService.GetQueryNoTracking(e => e.GroupTag == message.GroupTag).ToList();
+			var layer = LeaveMessageService.GetQueryNoTracking(e => e.GroupTag == message.GroupTag).ToPooledListScope();
 			foreach (var m in layer)
 			{
 				m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -88,7 +89,7 @@ public sealed class MsgController : BaseController
 		}
 		var total = parent.TotalCount;
 		var tags = parent.Data.Select(c => c.GroupTag).ToArray();
-		var messages = LeaveMessageService.GetQueryNoTracking(c => tags.Contains(c.GroupTag)).ToList();
+		var messages = LeaveMessageService.GetQueryNoTracking(c => tags.Contains(c.GroupTag)).ToPooledListScope();
 		messages.ForEach(m =>
 		{
 			m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -248,7 +249,7 @@ public sealed class MsgController : BaseController
 		if (b)
 		{
 			var content = new Template(await new FileInfo(Path.Combine(HostEnvironment.WebRootPath, "template", "notify.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8)).Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
-			var emails = LeaveMessageService.GetQuery(m => m.GroupTag == msg.GroupTag).Select(m => m.Email).Distinct().ToList().Except(new List<string> { msg.Email, CurrentUser.Email }).ToHashSet();
+			var emails = LeaveMessageService.GetQuery(m => m.GroupTag == msg.GroupTag).Select(m => m.Email).Distinct().AsEnumerable().Except(new List<string> { msg.Email, CurrentUser.Email }).ToPooledSetScope();
 			var link = Url.Action("Index", "Msg", new { cid = id }, Request.Scheme);
 			foreach (var s in emails)
 			{
@@ -357,7 +358,7 @@ public sealed class MsgController : BaseController
 	[MyAuthorize]
 	public ActionResult GetUnreadMsgs()
 	{
-		var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).ToList();
+		var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).ToPooledListScope();
 		return ResultData(msgs);
 	}
 

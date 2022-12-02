@@ -1,4 +1,5 @@
-﻿using FreeRedis;
+﻿using Dispose.Scope;
+using FreeRedis;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
@@ -43,7 +44,7 @@ public sealed class SubscribeController : Controller
 		var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().FromCache(new MemoryCacheEntryOptions()
 		{
 			AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
-		}).ToList();
+		});
 		var data = await raw.SelectAsync(async p =>
 		{
 			var summary = await p.Content.GetSummary(300, 50);
@@ -66,7 +67,7 @@ public sealed class SubscribeController : Controller
 				FullHtmlContent = summary
 			};
 		});
-		var posts = data.ToList();
+		var posts = data.ToPooledListScope();
 		InsertAdvertisement(posts);
 		var feed = new Feed()
 		{
@@ -129,7 +130,7 @@ public sealed class SubscribeController : Controller
 		var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && cids.Contains(p.CategoryId) && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().FromCache(new MemoryCacheEntryOptions()
 		{
 			AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
-		}).ToList();
+		});
 		var data = await raw.SelectAsync(async p =>
 		{
 			var summary = await p.Content.GetSummary(300, 50);
@@ -152,7 +153,7 @@ public sealed class SubscribeController : Controller
 				FullHtmlContent = summary
 			};
 		});
-		var posts = data.ToList();
+		var posts = data.ToPooledListScope();
 		InsertAdvertisement(posts, id, category.Name);
 		var feed = new Feed()
 		{
@@ -189,7 +190,7 @@ public sealed class SubscribeController : Controller
 		var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && p.Seminar.Any(s => s.Id == id) && p.ModifyDate >= time), p => p.ModifyDate, false).Include(p => p.Category).AsNoTracking().FromCache(new MemoryCacheEntryOptions()
 		{
 			AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
-		}).ToList();
+		});
 		var data = await raw.SelectAsync(async p =>
 		{
 			var summary = await p.Content.GetSummary(300, 50);
@@ -212,7 +213,7 @@ public sealed class SubscribeController : Controller
 				FullHtmlContent = summary
 			};
 		});
-		var posts = data.ToList();
+		var posts = data.ToPooledListScope();
 		InsertAdvertisement(posts, id, seminar.Title);
 		var feed = new Feed()
 		{

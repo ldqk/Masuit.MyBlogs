@@ -7,6 +7,7 @@
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.Tools.Models
 @using Z.EntityFramework.Plus
+@using Dispose.Scope
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @inject ICategoryService CategoryService
 @{
@@ -19,19 +20,19 @@
     var parentId = cat.ParentId;
     switch (level) {
         case 1:
-            children2.AddRange(cat.Children.Where(c => c.Status == Status.Available).OrderBy(c => c.Id).ToList());
+            children2.AddRange(cat.Children.Where(c => c.Status == Status.Available).OrderBy(c => c.Id).ToPooledListScope());
             break;
         case 2:
-            children2.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == parentId, c => c.Name).FromCache().ToList());
-            children3.AddRange(cat.Children.Where(c => c.Status == Status.Available).OrderBy(c => c.Id).ToList());
+            children2.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == parentId, c => c.Name).FromCache().ToPooledListScope());
+            children3.AddRange(cat.Children.Where(c => c.Status == Status.Available).OrderBy(c => c.Id).ToPooledListScope());
             break;
         case 3:
             var topid = cat.Parent.ParentId;
-            children2.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == topid, c => c.Name).FromCache().ToList());
-            children3.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == parentId, c => c.Name).FromCache().ToList());
+            children2.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == topid, c => c.Name).FromCache().ToPooledListScope());
+            children3.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == parentId, c => c.Name).FromCache().ToPooledListScope());
             break;
     }
-    var alllist = CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).Select(c => new{c.Id,c.Name}).FromCache().ToList();
+    var alllist = CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).Select(c => new{c.Id,c.Name}).FromCache().ToPooledListScope();
 }
 <style>
     .bg-title {

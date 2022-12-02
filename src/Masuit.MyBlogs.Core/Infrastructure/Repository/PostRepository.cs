@@ -1,4 +1,6 @@
-﻿using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
+﻿using Collections.Pooled;
+using Dispose.Scope;
+using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;
 
@@ -21,9 +23,9 @@ public sealed partial class PostRepository : BaseRepository<Post>, IPostReposito
 	/// </summary>
 	/// <param name="where">查询条件</param>
 	/// <returns>还未执行的SQL语句</returns>
-	public override List<Post> GetQueryFromCache(Expression<Func<Post, bool>> where)
+	public override PooledList<Post> GetQueryFromCache(Expression<Func<Post, bool>> where)
 	{
-		return DataContext.Post.Include(p => p.Category).Where(where).FromCache().ToList();
+		return DataContext.Post.Include(p => p.Category).Where(where).FromCache().ToPooledListScope();
 	}
 
 	/// <summary>

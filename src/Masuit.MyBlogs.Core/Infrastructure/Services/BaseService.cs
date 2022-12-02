@@ -1,4 +1,5 @@
-﻿using Masuit.LuceneEFCore.SearchEngine;
+﻿using Collections.Pooled;
+using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools.Models;
@@ -81,7 +82,7 @@ public class BaseService<T> : IBaseService<T> where T : LuceneIndexableBaseEntit
 	/// <param name="orderby">排序字段</param>
 	/// <param name="isAsc">是否升序</param>
 	/// <returns>还未执行的SQL语句</returns>
-	public virtual List<T> GetAllFromCache<TS>(Expression<Func<T, TS>> @orderby, bool isAsc = true)
+	public virtual PooledList<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true)
 	{
 		return BaseDal.GetAllFromCache(orderby, isAsc);
 	}
@@ -179,7 +180,7 @@ public class BaseService<T> : IBaseService<T> where T : LuceneIndexableBaseEntit
 	/// <param name="orderby">排序方式</param>
 	/// <param name="isAsc">是否升序</param>
 	/// <returns>还未执行的SQL语句</returns>
-	public virtual List<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
+	public virtual PooledList<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
 	{
 		return BaseDal.GetQueryFromCache<TS, TDto>(where, orderby, isAsc);
 	}

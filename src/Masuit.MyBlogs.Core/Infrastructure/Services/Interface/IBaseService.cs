@@ -1,4 +1,6 @@
-﻿using Masuit.LuceneEFCore.SearchEngine;
+﻿using Collections.Pooled;
+using Dispose.Scope;
+using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.Tools.Models;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
@@ -49,7 +51,7 @@ public interface IBaseService<T> where T : LuceneIndexableBaseEntity
 	/// <param name="orderby">排序字段</param>
 	/// <param name="isAsc">是否升序</param>
 	/// <returns></returns>
-	List<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true);
+	PooledList<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true);
 
 	/// <summary>
 	/// 获取所有实体Dto
@@ -123,7 +125,7 @@ public interface IBaseService<T> where T : LuceneIndexableBaseEntity
 	/// <param name="orderby">排序方式</param>
 	/// <param name="isAsc">是否升序</param>
 	/// <returns></returns>
-	List<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class;
+	PooledList<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class;
 
 	/// <summary>
 	/// 基本查询方法，获取一个集合（不跟踪实体）
@@ -458,7 +460,7 @@ public interface IBaseService<T> where T : LuceneIndexableBaseEntity
 
 	decimal this[int id, Expression<Func<T, decimal>> selector] => GetQuery(t => t.Id == id).Select(selector).FirstOrDefault();
 
-	List<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToList();
+	PooledList<T> this[Expression<Func<T, bool>> where] => GetQuery(where).ToPooledListScope();
 
 	public static T operator +(IBaseService<T> left, T right) => left.AddEntitySaved(right);
 

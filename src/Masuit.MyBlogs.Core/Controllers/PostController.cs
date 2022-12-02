@@ -1,4 +1,5 @@
 ﻿using CacheManager.Core;
+using Dispose.Scope;
 using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
@@ -738,7 +739,7 @@ public sealed class PostController : BaseController
 		if (!string.IsNullOrEmpty(post.Seminars))
 		{
 			var tmp = post.Seminars.Split(',', StringSplitOptions.RemoveEmptyEntries).Distinct().Select(int.Parse).ToArray();
-			var seminars = SeminarService.GetQuery(s => tmp.Contains(s.Id)).ToList();
+			var seminars = SeminarService.GetQuery(s => tmp.Contains(s.Id)).ToPooledListScope();
 			p.Seminar.AddRange(seminars);
 		}
 
@@ -1162,7 +1163,7 @@ public sealed class PostController : BaseController
 	[ProducesResponseType(typeof(PagedList<PostVisitRecordViewModel>), (int)HttpStatusCode.OK)]
 	public IActionResult ExportPostVisitRecords(int id)
 	{
-		var list = PostVisitRecordService.GetQuery<DateTime, PostVisitRecordViewModel>(e => e.PostId == id, e => e.Time, false).ToList();
+		var list = PostVisitRecordService.GetQuery<DateTime, PostVisitRecordViewModel>(e => e.PostId == id, e => e.Time, false).ToPooledListScope();
 		using var ms = list.ToExcel();
 		var post = PostService[id];
 		return this.ResumeFile(ms.ToArray(), ContentType.Xlsx, post.Title + "访问记录.xlsx");

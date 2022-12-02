@@ -1,4 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
+﻿using Dispose.Scope;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models;
 using Masuit.Tools.AspNetCore.ModelBinder;
@@ -134,7 +135,7 @@ public sealed class SeminarController : BaseController
 	[MyAuthorize]
 	public ActionResult GetAll()
 	{
-		var list = SeminarService.GetAll<string, SeminarDto>(s => s.Title).ToList();
+		var list = SeminarService.GetAll<string, SeminarDto>(s => s.Title).ToPooledListScope();
 		return ResultData(list);
 	}
 

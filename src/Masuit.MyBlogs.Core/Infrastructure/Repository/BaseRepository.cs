@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Collections.Pooled;
+using Dispose.Scope;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools.Core.AspNetCore;
@@ -78,9 +80,9 @@ public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T
 	/// <param name="orderby">排序字段</param>
 	/// <param name="isAsc">是否升序</param>
 	/// <returns></returns>
-	public virtual List<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true)
+	public virtual PooledList<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true)
 	{
-		return GetAllNoTracking(orderby, isAsc).FromCache().ToList();
+		return GetAllNoTracking(orderby, isAsc).FromCache().ToPooledListScope();
 	}
 
 	/// <summary>
@@ -124,9 +126,9 @@ public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T
 	/// </summary>
 	/// <param name="where">查询条件</param>
 	/// <returns></returns>
-	public virtual List<T> GetQueryFromCache(Expression<Func<T, bool>> where)
+	public virtual PooledList<T> GetQueryFromCache(Expression<Func<T, bool>> where)
 	{
-		return DataContext.Set<T>().Where(where).AsNoTracking().FromCache().ToList();
+		return DataContext.Set<T>().Where(where).AsNoTracking().FromCache().ToPooledListScope();
 	}
 
 	/// <summary>
@@ -137,9 +139,9 @@ public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T
 	/// <param name="orderby">排序方式</param>
 	/// <param name="isAsc">是否升序</param>
 	/// <returns></returns>
-	public virtual List<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
+	public virtual PooledList<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
 	{
-		return GetQueryNoTracking(where, orderby, isAsc).FromCache().ToList();
+		return GetQueryNoTracking(where, orderby, isAsc).FromCache().ToPooledListScope();
 	}
 
 	/// <summary>
@@ -198,9 +200,9 @@ public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T
 	/// <param name="orderby">排序方式</param>
 	/// <param name="isAsc">是否升序</param>
 	/// <returns></returns>
-	public virtual List<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
+	public virtual PooledList<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
 	{
-		return GetQuery(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache().ToList();
+		return GetQuery(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache().ToPooledListScope();
 	}
 
 	/// <summary>

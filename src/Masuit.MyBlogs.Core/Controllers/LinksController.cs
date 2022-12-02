@@ -5,6 +5,7 @@ using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using Dispose.Scope;
 using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -159,7 +160,7 @@ public sealed class LinksController : BaseController
 	[MyAuthorize]
 	public ActionResult Get()
 	{
-		var list = LinksService.GetAll<LinksDto>().OrderBy(p => p.Status).ThenByDescending(p => p.Recommend).ThenByDescending(p => p.Id).ToList();
+		var list = LinksService.GetAll<LinksDto>().OrderBy(p => p.Status).ThenByDescending(p => p.Recommend).ThenByDescending(p => p.Id).ToPooledListScope();
 		return ResultData(list);
 	}
 
