@@ -1,6 +1,5 @@
 ﻿@using Masuit.MyBlogs.Core.Models.DTO
-@using Masuit.MyBlogs.Core.Models.Entity
-@model List<Masuit.MyBlogs.Core.Models.DTO.LinksDto>
+@model IEnumerable<Masuit.MyBlogs.Core.Models.DTO.LinksDto>
 
 @{
     ViewBag.Title = "友情链接大全";
@@ -20,7 +19,7 @@
     </article>
     <section>
         <div class="button-effect">
-            @foreach (LinksDto link in Model)
+            @foreach (var link in Model)
             {
                 <a class="effect effect-5" href="@link.Url" title="@link.Name" target="_blank" referrerpolicy="unsafe-url">@link.Name</a>
             }

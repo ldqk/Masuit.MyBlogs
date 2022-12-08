@@ -1,7 +1,7 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using Masuit.MyBlogs.Core.Common;
+﻿using Masuit.MyBlogs.Core.Common;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 
@@ -118,9 +118,11 @@ public class RequestLoggerBackService : ScheduledService
 
 	protected override Task ExecuteAsync()
 	{
+#if RELEASE
 		using var scope = _scopeFactory.CreateAsyncScope();
 		var logger = scope.ServiceProvider.GetRequiredService<IRequestLogger>();
 		logger.Process();
+#endif
 		return Task.CompletedTask;
 	}
 }

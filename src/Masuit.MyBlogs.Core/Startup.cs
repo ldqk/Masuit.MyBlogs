@@ -17,6 +17,7 @@ using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Config;
 using Masuit.Tools.Core.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using SixLabors.ImageSharp.Web.DependencyInjection;

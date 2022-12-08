@@ -105,6 +105,7 @@ public interface IBaseService<T> where T : LuceneIndexableBaseEntity
 	/// <param name="where">查询条件</param>
 	/// <returns></returns>
 	IEnumerable<T> GetQueryFromCache(Expression<Func<T, bool>> @where);
+	IEnumerable<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> @where) where TDto : class;
 
 	/// <summary>
 	/// 基本查询方法，获取一个集合，优先从二级缓存读取

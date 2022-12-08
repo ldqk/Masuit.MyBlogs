@@ -158,6 +158,11 @@ public class BaseService<T> : IBaseService<T> where T : LuceneIndexableBaseEntit
 		return BaseDal.GetQueryFromCache(where);
 	}
 
+	public IEnumerable<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class
+	{
+		return BaseDal.GetQueryFromCache<TDto>(where);
+	}
+
 	/// <summary>
 	/// 基本查询方法，获取一个集合，优先从二级缓存读取
 	/// </summary>

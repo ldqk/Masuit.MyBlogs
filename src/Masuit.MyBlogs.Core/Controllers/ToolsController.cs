@@ -36,17 +36,16 @@ public sealed class ToolsController : BaseController
 	[Route("ip"), Route("ip/{ip?}", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "ip" })]
 	public async Task<ActionResult> GetIpInfo([IsIPAddress] string ip)
 	{
-		if (string.IsNullOrEmpty(ip))
+		if (!IPAddress.TryParse(ip, out var ipAddress))
 		{
-			ip = ClientIP;
+			ipAddress = ClientIP;
 		}
 
-		if (ip.IsPrivateIP())
+		if (ipAddress.IsPrivateIP())
 		{
 			return Ok("内网IP");
 		}
 
-		var ipAddress = IPAddress.Parse(ip);
 		ViewBag.IP = ip;
 		var loc = ipAddress.GetIPLocation();
 		var asn = ipAddress.GetIPAsn();
@@ -89,8 +88,8 @@ public sealed class ToolsController : BaseController
 		{
 			var ip = ClientIP;
 #if DEBUG
-                var r = new Random();
-                ip = $"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}";
+			var r = new Random();
+			ip = IPAddress.Parse($"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}");
 #endif
 			var location = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
 			var address = new PhysicsAddress()
@@ -98,7 +97,7 @@ public sealed class ToolsController : BaseController
 				Status = 0,
 				AddressResult = new AddressResult()
 				{
-					FormattedAddress = IPAddress.Parse(ip).GetIPLocation().Address,
+					FormattedAddress = ip.GetIPLocation().Address,
 					Location = new Location()
 					{
 						Lng = (decimal)location.Location.Longitude.GetValueOrDefault(),
@@ -135,17 +134,17 @@ public sealed class ToolsController : BaseController
 		{
 			var ip = ClientIP;
 #if DEBUG
-                Random r = new Random();
-                ip = $"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}";
+			Random r = new Random();
+			ip = IPAddress.Parse($"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}");
 #endif
 			var location = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
 			var address = new PhysicsAddress()
 			{
 				Status = 0,
-				AddressResult = new AddressResult()
+				AddressResult = new AddressResult
 				{
-					FormattedAddress = IPAddress.Parse(ip).GetIPLocation().Address,
-					Location = new Location()
+					FormattedAddress = ip.GetIPLocation().Address,
+					Location = new Location
 					{
 						Lng = (decimal)location.Location.Longitude.GetValueOrDefault(),
 						Lat = (decimal)location.Location.Latitude.GetValueOrDefault()

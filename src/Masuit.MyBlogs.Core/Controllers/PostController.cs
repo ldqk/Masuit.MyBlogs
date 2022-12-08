@@ -60,7 +60,7 @@ public sealed class PostController : BaseController
 	/// </summary>
 	/// <returns></returns>
 	[Route("{id:int}"), Route("{id:int}/comments/{cid:int}"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
-	public async Task<ActionResult> Details(int id, string kw, int cid, string t)
+	public async Task<ActionResult> Details([FromServices] ISearchDetailsService searchService, int id, string kw, int cid, string t)
 	{
 		var notRobot = !Request.IsRobot();
 		if (string.IsNullOrEmpty(t) && notRobot)
@@ -70,11 +70,12 @@ public sealed class PostController : BaseController
 
 		var post = await PostService.GetQuery(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)).Include(p => p.Seminar).AsNoTracking().FirstOrDefaultAsync() ?? throw new NotFoundException("文章未找到");
 		CheckPermission(post);
+		var ip = ClientIP.ToString();
 		if (!string.IsNullOrEmpty(post.Redirect))
 		{
 			if (notRobot && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
 			{
-				BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), Request.GetDisplayUrl()));
+				BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ip, Request.Headers[HeaderNames.Referer].ToString(), Request.GetDisplayUrl()));
 				HttpContext.Session.Set("post" + id, id.ToString());
 			}
 
@@ -106,10 +107,11 @@ public sealed class PostController : BaseController
 			await PostService.Highlight(post, kw);
 		}
 
-		var regex = SearchEngine.LuceneIndexSearcher.CutKeywords(string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label).Select(Regex.Escape).Join("|");
+		var keys = searchService.GetQuery(e => e.IP == ip).OrderByDescending(e => e.SearchTime).Select(e => e.Keywords).Distinct().Take(5).FromCache();
+		var regex = SearchEngine.LuceneIndexSearcher.CutKeywords(string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label).Union(keys).Select(Regex.Escape).Join("|");
 		ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId, regex);
-		var related = PostService.GetQuery(PostBaseWhere().And(p => p.Id != id && Regex.IsMatch(p.Title + (p.Keyword ?? "") + (p.Label ?? ""), regex, RegexOptions.IgnoreCase)), p => p.AverageViewCount, false).Take(10).Select(p => new { p.Id, p.Title }).FromCache().ToDictionary(p => p.Id, p => p.Title);
-		ViewBag.Related = related;
+		ViewBag.Related = PostService.GetQuery(PostBaseWhere().And(p => p.Id != post.Id && Regex.IsMatch(p.Title + (p.Keyword ?? "") + (p.Label ?? ""), regex, RegexOptions.IgnoreCase)), p => p.AverageViewCount, false).Take(10).Select(p => new { p.Id, p.Title }).FromCache().ToDictionary(p => p.Id, p => p.Title);
+
 		post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
 		post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
 		post.Content = await ReplaceVariables(post.Content).Next(s => notRobot && post.DisableCopy ? s.InjectFingerprint() : Task.FromResult(s));
@@ -122,13 +124,13 @@ public sealed class PostController : BaseController
 
 		if (notRobot && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
 		{
-			BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), Request.GetDisplayUrl()));
+			BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ip, Request.Headers[HeaderNames.Referer].ToString(), Request.GetDisplayUrl()));
 			HttpContext.Session.Set("post" + id, id.ToString());
 		}
 
 		if (post.LimitMode == RegionLimitMode.OnlyForSearchEngine)
 		{
-			BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ClientIP, Request.Headers[HeaderNames.Referer].ToString(), Request.GetDisplayUrl()));
+			BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ip, Request.Headers[HeaderNames.Referer].ToString(), Request.GetDisplayUrl()));
 		}
 
 		return View(post);
@@ -297,7 +299,7 @@ public sealed class PostController : BaseController
 		post.Status = Status.Pending;
 		post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.HtmlSantinizerStandard().ClearImgAttributes(), cancellationToken);
 		Post p = post.Mapper<Post>();
-		p.IP = ClientIP;
+		p.IP = ClientIP.ToString();
 		p.Modifier = p.Author;
 		p.ModifierEmail = p.Email;
 		p.DisableCopy = true;
@@ -318,7 +320,7 @@ public sealed class PostController : BaseController
 			.Set("link", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
 			.Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
 			.Set("title", p.Title).Render();
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, CommonHelper.SystemSettings["ReceiveEmail"], ClientIP));
+		BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, CommonHelper.SystemSettings["ReceiveEmail"], p.IP));
 		return ResultData(p.Mapper<PostDto>(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
 	}
 
@@ -406,7 +408,7 @@ public sealed class PostController : BaseController
 
 		var token = SnowFlake.GetInstance().GetUniqueShortId(6);
 		RedisHelper.Set("token:" + email, token, 86400);
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, ClientIP));
+		BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, ClientIP.ToString()));
 		RedisHelper.Set("get:" + email, token, 120);
 		return ResultData(null);
 	}
@@ -500,7 +502,7 @@ public sealed class PostController : BaseController
 			merge.SubmitTime = DateTime.Now;
 			post.PostMergeRequests.Add(merge);
 		}
-		merge.IP = ClientIP;
+		merge.IP = ClientIP.ToString();
 		var b = await PostService.SaveChangesAsync() > 0;
 		if (!b)
 		{
@@ -524,7 +526,7 @@ public sealed class PostController : BaseController
 			.Set("host", "//" + Request.Host)
 			.Set("id", merge.Id.ToString())
 			.Render();
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"], ClientIP));
+		BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"], merge.IP));
 		return ResultData(null, true, "您的修改请求已提交，已进入审核状态，感谢您的参与！");
 	}
 
@@ -734,7 +736,7 @@ public sealed class PostController : BaseController
 		}
 
 		Mapper.Map(post, p);
-		p.IP = ClientIP;
+		p.IP = ClientIP.ToString();
 		p.Seminar.Clear();
 		if (!string.IsNullOrEmpty(post.Seminars))
 		{
@@ -783,7 +785,7 @@ public sealed class PostController : BaseController
 		Post p = post.Mapper<Post>();
 		p.Modifier = p.Author;
 		p.ModifierEmail = p.Email;
-		p.IP = ClientIP;
+		p.IP = ClientIP.ToString();
 		p.Rss = p.LimitMode is null or RegionLimitMode.All;
 		if (!string.IsNullOrEmpty(post.Seminars))
 		{

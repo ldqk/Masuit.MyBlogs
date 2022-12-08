@@ -1,4 +1,5 @@
 ﻿using CacheManager.Core;
+using Dispose.Scope;
 using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
@@ -12,7 +13,6 @@ using Microsoft.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.RegularExpressions;
-using Dispose.Scope;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -64,9 +64,10 @@ public sealed class CommentController : BaseController
 		}
 
 		cmd.Content = cmd.Content.Trim().Replace("<p><br></p>", string.Empty);
-		if (CommentFeq.GetOrAdd("Comments:" + ClientIP, 1) > 2)
+		var ip = ClientIP.ToString();
+		if (CommentFeq.GetOrAdd("Comments:" + ip, 1) > 2)
 		{
-			CommentFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
+			CommentFeq.Expire("Comments:" + ip, TimeSpan.FromMinutes(1));
 			return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
 		}
 
@@ -101,7 +102,7 @@ public sealed class CommentController : BaseController
 		}
 		comment.Content = await cmd.Content.HtmlSantinizerStandard().ClearImgAttributes();
 		comment.Browser = cmd.Browser ?? Request.Headers[HeaderNames.UserAgent];
-		comment.IP = ClientIP;
+		comment.IP = ip;
 		comment.Location = Request.Location();
 		comment = CommentService.AddEntitySaved(comment);
 		if (comment == null)
@@ -115,8 +116,8 @@ public sealed class CommentController : BaseController
 			SameSite = SameSiteMode.Lax
 		});
 		WriteEmailKeyCookie(cmd.Email);
-		CommentFeq.AddOrUpdate("Comments:" + ClientIP, 1, i => i + 1, 5);
-		CommentFeq.Expire("Comments:" + ClientIP, TimeSpan.FromMinutes(1));
+		CommentFeq.AddOrUpdate("Comments:" + comment.IP, 1, i => i + 1, 5);
+		CommentFeq.Expire("Comments:" + comment.IP, TimeSpan.FromMinutes(1));
 		var emails = new HashSet<string>();
 		var email = CommonHelper.SystemSettings["ReceiveEmail"]; //站长邮箱
 		emails.Add(email);
@@ -151,7 +152,7 @@ public sealed class CommentController : BaseController
 				//新评论，只通知博主和楼主
 				foreach (var s in emails)
 				{
-					BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false), s, ClientIP));
+					BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false), s, comment.IP));
 				}
 			}
 			else
@@ -163,7 +164,7 @@ public sealed class CommentController : BaseController
 				string link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment";
 				foreach (var s in emails)
 				{
-					BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), s, ClientIP));
+					BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), s, comment.IP));
 				}
 			}
 			return ResultData(null, true, "评论发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将显示到评论列表中");
@@ -171,7 +172,7 @@ public sealed class CommentController : BaseController
 
 		foreach (var s in emails)
 		{
-			BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论(待审核)：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false) + "<p style='color:red;'>(待审核)</p>", s, ClientIP));
+			BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论(待审核)：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false) + "<p style='color:red;'>(待审核)</p>", s, comment.IP));
 		}
 
 		return ResultData(null, true, "评论成功，待站长审核通过以后将显示");
@@ -298,7 +299,7 @@ public sealed class CommentController : BaseController
 			}, Request.Scheme) + "#comment";
 			foreach (var email in emails)
 			{
-				BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), email, ClientIP));
+				BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), email, ClientIP.ToString()));
 			}
 
 			return ResultData(null, true, "审核通过！");

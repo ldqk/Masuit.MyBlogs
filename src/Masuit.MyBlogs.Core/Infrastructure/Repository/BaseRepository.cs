@@ -144,6 +144,11 @@ public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T
 		return GetQueryNoTracking(where, orderby, isAsc).FromCache().ToPooledListScope();
 	}
 
+	public PooledList<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class
+	{
+		return GetQuery<TDto>(where).FromCache().ToPooledListScope();
+	}
+
 	/// <summary>
 	/// 基本查询方法，获取一个集合（不跟踪实体）
 	/// </summary>

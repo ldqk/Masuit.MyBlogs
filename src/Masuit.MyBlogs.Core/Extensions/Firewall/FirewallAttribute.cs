@@ -1,8 +1,4 @@
-﻿using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Web;
-using CacheManager.Core;
+﻿using CacheManager.Core;
 using FreeRedis;
 using Markdig;
 using Masuit.MyBlogs.Core.Common;
@@ -14,6 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
+using System.Net;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall;
@@ -109,7 +109,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 		}
 
 		//白名单地区
-		var ipLocation = ip.GetIPLocation();
+		var ipLocation = context.HttpContext.Connection.RemoteIpAddress.GetIPLocation();
 		var (location, network, pos) = ipLocation;
 		pos += ipLocation.Coodinate;
 		var allowedAreas = CommonHelper.SystemSettings.GetOrAdd("AllowedArea", "").Split(new[]
@@ -123,11 +123,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 		}
 
 		//黑名单地区
-		var denyAreas = CommonHelper.SystemSettings.GetOrAdd("DenyArea", "").Split(new[]
-		{
-			',',
-			'，'
-		}, StringSplitOptions.RemoveEmptyEntries);
+		var denyAreas = CommonHelper.SystemSettings.GetOrAdd("DenyArea", "").Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries);
 		if (denyAreas.Any())
 		{
 			if (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(network) || pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any()) // 未知地区的，未知网络的，禁区的
@@ -167,6 +163,10 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
 	private static bool Challenge(ActionExecutingContext context, out Task completedTask)
 	{
+#if DEBUG
+		completedTask = Task.CompletedTask;
+		return false;
+#endif
 		var mode = CommonHelper.SystemSettings.GetOrAdd(SessionKey.ChallengeMode, "");
 		if (mode == SessionKey.JSChallenge)
 		{

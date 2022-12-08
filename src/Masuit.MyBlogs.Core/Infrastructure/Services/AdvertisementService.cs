@@ -46,6 +46,24 @@ public sealed partial class AdvertisementService : BaseService<Advertisement>, I
 	/// <returns></returns>
 	public List<AdvertisementDto> GetsByWeightedPrice(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null, string keywords = "")
 	{
+		if (Count(a => a.Status == Status.Available) >= 200)
+		{
+			return GetsByWeightedPriceExternal(count, type, ipinfo, cid, keywords);
+		}
+		return GetsByWeightedPriceMemory(count, type, ipinfo, cid, keywords);
+	}
+
+	/// <summary>
+	/// 按价格随机筛选一个元素
+	/// </summary>
+	/// <param name="count">数量</param>
+	/// <param name="type">广告类型</param>
+	/// <param name="ipinfo"></param>
+	/// <param name="cid">分类id</param>
+	/// <param name="keywords"></param>
+	/// <returns></returns>
+	public List<AdvertisementDto> GetsByWeightedPriceExternal(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null, string keywords = "")
+	{
 		var (location, _, _) = ipinfo;
 		return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}-{keywords}", _ =>
 		{
@@ -55,11 +73,11 @@ public sealed partial class AdvertisementService : BaseService<Advertisement>, I
 			where = where.And(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase)));
 			if (cid.HasValue)
 			{
-				var pids = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => c.ParentId + "|" + c.Parent.ParentId).FromCache(new MemoryCacheEntryOptions()
+				var pids = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => string.Concat(c.ParentId, "|", c.Parent.ParentId).Trim('|')).Distinct().FromCache(new MemoryCacheEntryOptions()
 				{
 					AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(5)
-				}).ToArray();
-				var scid = pids.Select(s => s.Trim('|')).Where(s => !string.IsNullOrEmpty(s)).Append(cid + "").Join("|");
+				});
+				var scid = pids.Append(cid + "").Join("|");
 				if (Any(a => Regex.IsMatch(a.CategoryIds, scid)))
 				{
 					where = where.And(a => Regex.IsMatch(a.CategoryIds, scid) || string.IsNullOrEmpty(a.CategoryIds));
@@ -76,11 +94,57 @@ public sealed partial class AdvertisementService : BaseService<Advertisement>, I
 			var list = GetQuery<AdvertisementDto>(where).Where(a => array.Contains(a.Id)).OrderBy(a => -Math.Log(EF.Functions.Random()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1)))).Take(count).ToList();
 			if (list.Count == 0 && keywords is { Length: > 0 })
 			{
-				return GetsByWeightedPrice(count, type, ipinfo, cid);
+				return GetsByWeightedPriceExternal(count, type, ipinfo, cid);
 			}
 
 			var ids = list.Select(a => a.Id).ToArray();
-			GetQuery(a => ids.Contains(a.Id)).ExecuteUpdate(a => a.SetProperty(a => a.DisplayCount, a => a.DisplayCount + 1));
+			GetQuery(a => ids.Contains(a.Id)).ExecuteUpdate(p => p.SetProperty(a => a.DisplayCount, a => a.DisplayCount + 1));
+			return list;
+		});
+	}
+
+	/// <summary>
+	/// 按价格随机筛选一个元素
+	/// </summary>
+	/// <param name="count">数量</param>
+	/// <param name="type">广告类型</param>
+	/// <param name="ipinfo"></param>
+	/// <param name="cid">分类id</param>
+	/// <param name="keywords"></param>
+	/// <returns></returns>
+	public List<AdvertisementDto> GetsByWeightedPriceMemory(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null, string keywords = "")
+	{
+		var (location, _, _) = ipinfo;
+		var all = CacheManager.GetOrAdd("Advertisement:all", _ => GetQueryFromCache<AdvertisementDto>(a => a.Status == Status.Available).ToList());
+		return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}-{keywords}", _ =>
+		{
+			var atype = type.ToString("D");
+			var catCount = CategoryRepository.Count(_ => true);
+			string scid = "";
+			if (cid.HasValue)
+			{
+				scid = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => string.Concat(c.ParentId, "|", c.Parent.ParentId).Trim('|')).Distinct().FromCache(new MemoryCacheEntryOptions()
+				{
+					AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(5)
+				}).Append(cid + "").Join("|");
+			}
+
+			var array = all.GroupBy(a => a.Merchant).Select(g => g.OrderByRandom().FirstOrDefault().Id).Take(50).ToArray();
+			var list = all.Where(a => a.Types.Contains(atype))
+				.Where(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase)))
+				.WhereIf(cid.HasValue, a => Regex.IsMatch(a.CategoryIds + "", scid) || string.IsNullOrEmpty(a.CategoryIds))
+				.WhereIf(!keywords.IsNullOrEmpty(), a => (a.Title + a.Description).Contains(_luceneIndexSearcher.CutKeywords(keywords)))
+				.Where(a => array.Contains(a.Id)).OrderBy(a => -Math.Log(Random.Shared.NextDouble()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1)))).Take(count).ToList();
+			if (list.Count == 0 && keywords is { Length: > 0 })
+			{
+				list.AddRange(all.Where(a => a.Types.Contains(atype))
+				.Where(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase)))
+				.WhereIf(cid.HasValue, a => Regex.IsMatch(a.CategoryIds + "", scid) || string.IsNullOrEmpty(a.CategoryIds))
+				.Where(a => array.Contains(a.Id)).OrderBy(a => -Math.Log(Random.Shared.NextDouble()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1)))).Take(count));
+			}
+
+			var ids = list.Select(a => a.Id).ToArray();
+			GetQuery(a => ids.Contains(a.Id)).ExecuteUpdate(p => p.SetProperty(a => a.DisplayCount, a => a.DisplayCount + 1));
 			return list;
 		});
 	}

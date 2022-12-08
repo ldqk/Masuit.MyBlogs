@@ -115,6 +115,7 @@ public interface IBaseRepository<T> : IDisposable where T : LuceneIndexableBaseE
 	/// <param name="isAsc">是否升序</param>
 	/// <returns></returns>
 	PooledList<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true);
+	PooledList<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class;
 
 	/// <summary>
 	/// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取

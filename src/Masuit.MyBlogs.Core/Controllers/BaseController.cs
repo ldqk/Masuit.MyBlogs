@@ -37,7 +37,7 @@ public class BaseController : Controller
 	/// <summary>
 	/// 客户端的真实IP
 	/// </summary>
-	public string ClientIP => HttpContext.Connection.RemoteIpAddress.ToString();
+	public IPAddress ClientIP => HttpContext.Connection.RemoteIpAddress;
 
 	/// <summary>
 	/// 普通访客是否token合法
@@ -78,7 +78,7 @@ public class BaseController : Controller
 
 		var location = Request.Location();
 		var template = Template.Create(text)
-			.Set("clientip", ClientIP)
+			.Set("clientip", ClientIP.ToString())
 			.Set("location", location.Address)
 			.Set("network", location.Network)
 			.Set("domain", Request.Host.Host)
@@ -114,8 +114,11 @@ public class BaseController : Controller
 		ViewBag.Desc = CommonHelper.SystemSettings["Description"];
 		var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-		user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
-		filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
+		if (HttpContext.Connection.RemoteIpAddress.IsPrivateIP())
+		{
+			user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
+			filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
+		}
 #endif
 		if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true" && user?.IsAdmin != true)
 		{
@@ -225,19 +228,20 @@ public class BaseController : Controller
 			return _ => true;
 		}
 
+		var ip = ClientIP.ToString();
 		Expression<Func<Post, bool>> where = p => p.Status == Status.Published && p.LimitMode != RegionLimitMode.OnlyForSearchEngine;
 		where = where.AndIf(HideCategories.Length > 0, p => !HideCategories.Contains(p.CategoryId)).AndIf(SafeMode, p => !p.IsNsfw);
-		if (VisitorTokenValid || CommonHelper.IPWhiteList.Contains(ClientIP))
+		if (VisitorTokenValid || CommonHelper.IPWhiteList.Contains(ip))
 		{
 			return where;
 		}
 
 		var ipLocation = Request.Location();
 		var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
-		if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
+		if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ip != rawip)
 		{
 			var s = rawip.Base64Decrypt();
-			if (ClientIP != s)
+			if (ip != s)
 			{
 				location += "|" + s.GetIPLocation();
 			}
@@ -251,17 +255,18 @@ public class BaseController : Controller
 
 	protected void CheckPermission(Post post)
 	{
-		if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot() || CommonHelper.IPWhiteList.Contains(ClientIP))
+		var ip = ClientIP.ToString();
+		if (CurrentUser.IsAdmin || VisitorTokenValid || Request.IsRobot() || CommonHelper.IPWhiteList.Contains(ip))
 		{
 			return;
 		}
 
 		var ipLocation = Request.Location();
 		var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
-		if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip)
+		if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ip != rawip)
 		{
 			var s = rawip.Base64Decrypt();
-			if (ClientIP != s)
+			if (ip != s)
 			{
 				location += "|" + s.GetIPLocation();
 			}
@@ -314,7 +319,8 @@ public class BaseController : Controller
 	private void Disallow(Post post)
 	{
 		var remark = "无权限查看该文章";
-		if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ClientIP != rawip.Base64Decrypt())
+		var ip = ClientIP.ToString();
+		if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ip != rawip.Base64Decrypt())
 		{
 			remark += "，发生了IP切换，原始IP：" + rawip.Base64Decrypt();
 		}
@@ -322,7 +328,7 @@ public class BaseController : Controller
 		RedisHelper.IncrBy("interceptCount", 1);
 		RedisHelper.LPush("intercept", new IpIntercepter()
 		{
-			IP = ClientIP,
+			IP = ip,
 			RequestUrl = $"//{Request.Host}/{post.Id}",
 			Referer = Request.Headers[HeaderNames.Referer],
 			Time = DateTime.Now,

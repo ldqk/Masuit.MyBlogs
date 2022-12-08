@@ -35,8 +35,8 @@ public sealed class AdvertisementController : BaseController
 			HttpContext.Session.Set("ads" + id, id.ToString());
 			ClickRecordService.AddEntity(new AdvertisementClickRecord()
 			{
-				IP = ClientIP,
-				Location = ClientIP.GetIPLocation(),
+				IP = ClientIP.ToString(),
+				Location = Request.Location(),
 				Referer = Request.Headers[HeaderNames.Referer].ToString(),
 				Time = DateTime.Now,
 				AdvertisementId = id
@@ -136,8 +136,8 @@ public sealed class AdvertisementController : BaseController
 			HttpContext.Session.Set("ads" + ad.Id, ad.Id.ToString());
 			ClickRecordService.AddEntity(new AdvertisementClickRecord()
 			{
-				IP = ClientIP,
-				Location = ClientIP.GetIPLocation(),
+				IP = ClientIP.ToString(),
+				Location = Request.Location(),
 				Referer = Request.Headers[HeaderNames.Referer].ToString(),
 				Time = DateTime.Now
 			});

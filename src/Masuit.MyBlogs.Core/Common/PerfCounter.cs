@@ -136,9 +136,11 @@ public sealed class PerfCounterBackService : ScheduledService
 
 	protected override Task ExecuteAsync()
 	{
+#if RELEASE
 		using var scope = _serviceScopeFactory.CreateAsyncScope();
 		var counter = scope.ServiceProvider.GetRequiredService<IPerfCounter>();
-		counter.Process();
+		counter.Process(); 
+#endif
 		return Task.CompletedTask;
 	}
 }

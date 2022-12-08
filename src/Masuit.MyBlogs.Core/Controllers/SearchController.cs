@@ -58,7 +58,7 @@ public sealed class SearchController : BaseController
 				{
 					Keywords = wd,
 					SearchTime = DateTime.Now,
-					IP = ClientIP,
+					IP = ClientIP.ToString(),
 					Elapsed = posts.Elapsed,
 					ResultCount = posts.Total
 				});
