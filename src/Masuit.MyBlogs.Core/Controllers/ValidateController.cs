@@ -1,5 +1,5 @@
 ﻿using Hangfire;
-using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.Tools.Core.Validator;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,7 +29,7 @@ public sealed class ValidateController : BaseController
 
 		string code = SnowFlake.GetInstance().GetUniqueShortId(6);
 		RedisHelper.Set("code:" + email, code, 86400);
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{code}</span>，有效期为24h，请按时使用！", email, ClientIP.ToString()));
+		BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(Request.Host + "博客验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{code}</span>，有效期为24h，请按时使用！", email, ClientIP.ToString()));
 		RedisHelper.Set("get:" + email, code, 120);
 #if !DEBUG
 		return ResultData(null, true, "验证码发送成功！");

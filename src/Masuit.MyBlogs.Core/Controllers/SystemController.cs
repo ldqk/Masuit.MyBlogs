@@ -196,7 +196,7 @@ public sealed class SystemController : AdminController
 	/// <returns></returns>
 	public ActionResult SendMail([Required(ErrorMessage = "收件人不能为空"), FromBodyOrDefault] string tos, [Required(ErrorMessage = "邮件标题不能为空"), FromBodyOrDefault] string title, [Required(ErrorMessage = "邮件内容不能为空"), FromBodyOrDefault] string content)
 	{
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail(title, content + "<p style=\"color: red\">本邮件由系统自动发出，请勿回复本邮件！</p>", tos, "127.0.0.1"));
+		BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(title, content + "<p style=\"color: red\">本邮件由系统自动发出，请勿回复本邮件！</p>", tos, "127.0.0.1"));
 		return Ok();
 	}
 

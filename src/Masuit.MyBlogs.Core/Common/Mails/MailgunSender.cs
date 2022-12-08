@@ -1,4 +1,6 @@
 ﻿using CacheManager.Core;
+using FreeRedis;
+using Hangfire;
 using Masuit.Tools.Models;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
@@ -12,17 +14,20 @@ public sealed class MailgunSender : IMailSender
 	private readonly IConfiguration _configuration;
 	private readonly ICacheManager<List<string>> _cacheManager;
 	private readonly ICacheManager<bool> _bouncedCacheManager;
+	private readonly IRedisClient _redisClient;
 
-	public MailgunSender(HttpClient httpClient, IConfiguration configuration, ICacheManager<List<string>> cacheManager, ICacheManager<bool> bouncedCacheManager)
+	public MailgunSender(HttpClient httpClient, IConfiguration configuration, ICacheManager<List<string>> cacheManager, ICacheManager<bool> bouncedCacheManager, IRedisClient redisClient)
 	{
 		_configuration = configuration;
 		_cacheManager = cacheManager;
 		_bouncedCacheManager = bouncedCacheManager;
+		_redisClient = redisClient;
 		_httpClient = httpClient;
 		_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"api:{_configuration["MailgunConfig:apikey"]}")));
 	}
 
-	public void Send(string title, string content, string tos)
+	[AutomaticRetry(Attempts = 1, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
+	public async Task Send(string title, string content, string tos, string clientip)
 	{
 		EmailAddress email = _configuration["MailgunConfig:from"];
 		using var form = new MultipartFormDataContent
@@ -32,7 +37,9 @@ public sealed class MailgunSender : IMailSender
 			{ new StringContent(title,Encoding.UTF8), "subject" },
 			{ new StringContent(content,Encoding.UTF8), "html" }
 		};
-		_httpClient.PostAsync($"https://api.mailgun.net/v3/{email.Domain}/messages", form).Wait();
+		await _httpClient.PostAsync($"https://api.mailgun.net/v3/{email.Domain}/messages", form);
+		_redisClient.SAdd($"Email:{DateTime.Now:yyyyMMdd}", new { title, content, tos, time = DateTime.Now, clientip });
+		_redisClient.Expire($"Email:{DateTime.Now:yyyyMMdd}", 86400);
 	}
 
 	public List<string> GetBounces()
@@ -50,7 +57,7 @@ public sealed class MailgunSender : IMailSender
 		return _bouncedCacheManager.GetOrAdd("email-bounced", _ => _httpClient.GetStringAsync($"https://api.mailgun.net/v3/{email.Domain}/bounces/{address}").ContinueWith(t => t.IsCompletedSuccessfully && JObject.Parse(t.Result).ContainsKey("error")).Result);
 	}
 
-	public string AddRecipient(string email)
+	public Task<string> AddRecipient(string email)
 	{
 		EmailAddress mail = _configuration["MailgunConfig:from"];
 		return _httpClient.PostAsync($"https://api.mailgun.net/v3/{mail.Domain}/bounces", new MultipartFormDataContent
@@ -65,6 +72,6 @@ public sealed class MailgunSender : IMailSender
 				return (string)JObject.Parse(resp.Content.ReadAsStringAsync().Result)["message"];
 			}
 			return "添加失败";
-		}).Result;
+		});
 	}
 }

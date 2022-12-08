@@ -1,12 +1,14 @@
-﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
-using Masuit.MyBlogs.Core.Common;
+﻿using AutoMapper;
+using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools.DateTimeExt;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services;
 
-public sealed partial class UserInfoService : BaseService<UserInfo>, IUserInfoService
+public sealed class UserInfoService : BaseService<UserInfo>, IUserInfoService
 {
+	public IMapper Mapper { get; set; }
+
 	/// <summary>
 	/// 根据用户名获取
 	/// </summary>
@@ -28,7 +30,7 @@ public sealed partial class UserInfoService : BaseService<UserInfo>, IUserInfoSe
 		UserInfo userInfo = GetByUsername(username);
 		if (userInfo != null)
 		{
-			UserInfoDto user = userInfo.Mapper<UserInfoDto>();
+			UserInfoDto user = Mapper.Map<UserInfoDto>(userInfo);
 			string key = userInfo.SaltKey;
 			string pwd = userInfo.Password;
 			password = password.MDString3(key);
@@ -37,6 +39,7 @@ public sealed partial class UserInfoService : BaseService<UserInfo>, IUserInfoSe
 				return user;
 			}
 		}
+
 		return null;
 	}
 

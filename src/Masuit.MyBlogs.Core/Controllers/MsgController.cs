@@ -78,7 +78,7 @@ public sealed class MsgController : BaseController
 				parentTotal = 1,
 				page,
 				size,
-				rows = layer.ToTree(e => e.Id, e => e.ParentId).Mapper<IList<LeaveMessageViewModel>>()
+				rows = Mapper.Map<IList<LeaveMessageViewModel>>(layer.ToTree(e => e.Id, e => e.ParentId))
 			});
 		}
 
@@ -108,7 +108,7 @@ public sealed class MsgController : BaseController
 				parentTotal = total,
 				page,
 				size,
-				rows = messages.OrderByDescending(c => c.PostDate).ToTree(c => c.Id, c => c.ParentId).Mapper<IList<LeaveMessageViewModel>>()
+				rows = Mapper.Map<IList<LeaveMessageViewModel>>(messages.OrderByDescending(c => c.PostDate).ToTree(c => c.Id, c => c.ParentId))
 			});
 		}
 
@@ -150,7 +150,7 @@ public sealed class MsgController : BaseController
 			return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
 		}
 
-		var msg = cmd.Mapper<LeaveMessage>();
+		var msg = Mapper.Map<LeaveMessage>(cmd);
 		if (cmd.ParentId > 0)
 		{
 			msg.GroupTag = LeaveMessageService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.GroupTag).FirstOrDefault();
@@ -214,7 +214,7 @@ public sealed class MsgController : BaseController
 			if (msg.ParentId == null)
 			{
 				//新评论，只通知博主
-				BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言：", content.Set("link", Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)).Render(false), email, ip));
+				BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(Request.Host + "|博客新留言：", content.Set("link", Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme)).Render(false), email, ip));
 			}
 			else
 			{
@@ -223,13 +223,13 @@ public sealed class MsgController : BaseController
 				string link = Url.Action("Index", "Msg", new { cid = msg.Id }, Request.Scheme);
 				foreach (var s in emails)
 				{
-					BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(false), s, ip));
+					BackgroundJob.Enqueue<IMailSender>(sender => sender.Send($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(false), s, ip));
 				}
 			}
 			return ResultData(null, true, "留言发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将会显示到列表中！");
 		}
 
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客新留言(待审核)：", content.Set("link", Url.Action("Index", "Msg", new
+		BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(Request.Host + "|博客新留言(待审核)：", content.Set("link", Url.Action("Index", "Msg", new
 		{
 			cid = msg.Id
 		}, Request.Scheme)).Render(false) + "<p style='color:red;'>(待审核)</p>", email, ip));
@@ -254,7 +254,7 @@ public sealed class MsgController : BaseController
 			var link = Url.Action("Index", "Msg", new { cid = id }, Request.Scheme);
 			foreach (var s in emails)
 			{
-				BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(false), s, ClientIP.ToString()));
+				BackgroundJob.Enqueue<IMailSender>(sender => sender.Send($"{Request.Host}{CommonHelper.SystemSettings["Title"]} 留言回复：", content.Set("link", link).Render(false), s, ClientIP.ToString()));
 			}
 		}
 

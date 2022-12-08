@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Hangfire;
 using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
@@ -75,7 +76,7 @@ public sealed class MergeController : AdminController
 		string diffOutput = diffHelper.Build();
 		old.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);
 		newer.Content = Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty);
-		return ResultData(new { old = old.Mapper<PostMergeRequestDto>(), newer = newer.Mapper<PostMergeRequestDto>() });
+		return ResultData(new { old = Mapper.Map<PostMergeRequestDto>(old), newer = Mapper.Map<PostMergeRequestDto>(newer) });
 	}
 
 	/// <summary>
@@ -87,7 +88,7 @@ public sealed class MergeController : AdminController
 	public async Task<IActionResult> Merge(int id)
 	{
 		var merge = await PostMergeRequestService.GetByIdAsync(id) ?? throw new NotFoundException("待合并文章未找到");
-		var history = merge.Post.Mapper<PostHistoryVersion>();
+		var history = Mapper.Map<PostHistoryVersion>(merge.Post);
 		history.Id = 0;
 		merge.Post = Mapper.Map(merge, merge.Post);
 		merge.Post.PostHistoryVersion.Add(history);
@@ -101,7 +102,7 @@ public sealed class MergeController : AdminController
 
 		string link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id;
 		string content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/merge-pass.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8)).Set("link", link).Set("title", merge.Post.Title).Render();
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已通过", content, merge.ModifierEmail, "127.0.0.1"));
+		BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已通过", content, merge.ModifierEmail, "127.0.0.1"));
 		return ResultData(null, true, "文章合并完成！");
 	}
 
@@ -138,7 +139,7 @@ public sealed class MergeController : AdminController
 
 		var link = Request.Scheme + "://" + Request.Host + "/" + merge.Post.Id + "/merge/" + id;
 		var content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/merge-reject.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8)).Set("link", link).Set("title", merge.Post.Title).Set("reason", reason).Render();
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已被拒绝", content, merge.ModifierEmail, "127.0.0.1"));
+		BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(CommonHelper.SystemSettings["Title"] + "博客你提交的修改已被拒绝", content, merge.ModifierEmail, "127.0.0.1"));
 		return ResultData(null, true, "合并已拒绝！");
 	}
 

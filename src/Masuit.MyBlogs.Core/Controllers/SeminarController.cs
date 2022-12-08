@@ -112,7 +112,7 @@ public sealed class SeminarController : BaseController
 	public async Task<ActionResult> Get(int id)
 	{
 		Seminar seminar = await SeminarService.GetByIdAsync(id);
-		return ResultData(seminar.Mapper<SeminarDto>());
+		return ResultData(Mapper.Map<SeminarDto>(seminar));
 	}
 
 	/// <summary>

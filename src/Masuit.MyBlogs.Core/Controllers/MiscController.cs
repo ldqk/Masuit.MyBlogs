@@ -189,6 +189,6 @@ public sealed class MiscController : BaseController
 			misc.PostDate = misc.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
 		}
 
-		return ResultData(misc.Mapper<MiscDto>());
+		return ResultData(Mapper.Map<MiscDto>(misc));
 	}
 }

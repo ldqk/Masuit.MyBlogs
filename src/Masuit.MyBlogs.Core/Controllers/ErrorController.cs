@@ -13,6 +13,7 @@ using Microsoft.Net.Http.Headers;
 using System.Diagnostics;
 using System.Text;
 using System.Web;
+using Masuit.MyBlogs.Core.Common.Mails;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -202,7 +203,7 @@ public sealed class ErrorController : Controller
 
 		var token = SnowFlake.GetInstance().GetUniqueShortId(6);
 		RedisClient.Set("token:" + email, token, 86400);
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, HttpContext.Connection.RemoteIpAddress.ToString()));
+		BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, HttpContext.Connection.RemoteIpAddress.ToString()));
 		RedisClient.Set("get:" + email, token, 120);
 		return ResultData(null);
 	}

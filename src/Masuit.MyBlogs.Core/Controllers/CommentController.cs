@@ -71,7 +71,7 @@ public sealed class CommentController : BaseController
 			return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
 		}
 
-		var comment = cmd.Mapper<Comment>();
+		var comment = Mapper.Map<Comment>(cmd);
 		if (cmd.ParentId > 0)
 		{
 			comment.GroupTag = CommentService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.GroupTag).FirstOrDefault();
@@ -152,7 +152,7 @@ public sealed class CommentController : BaseController
 				//新评论，只通知博主和楼主
 				foreach (var s in emails)
 				{
-					BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false), s, comment.IP));
+					BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(Request.Host + "|博客文章新评论：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false), s, comment.IP));
 				}
 			}
 			else
@@ -164,7 +164,7 @@ public sealed class CommentController : BaseController
 				string link = Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment";
 				foreach (var s in emails)
 				{
-					BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), s, comment.IP));
+					BackgroundJob.Enqueue<IMailSender>(sender => sender.Send($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), s, comment.IP));
 				}
 			}
 			return ResultData(null, true, "评论发表成功，服务器正在后台处理中，这会有一定的延迟，稍后将显示到评论列表中");
@@ -172,7 +172,7 @@ public sealed class CommentController : BaseController
 
 		foreach (var s in emails)
 		{
-			BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "|博客文章新评论(待审核)：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false) + "<p style='color:red;'>(待审核)</p>", s, comment.IP));
+			BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(Request.Host + "|博客文章新评论(待审核)：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false) + "<p style='color:red;'>(待审核)</p>", s, comment.IP));
 		}
 
 		return ResultData(null, true, "评论成功，待站长审核通过以后将显示");
@@ -234,7 +234,7 @@ public sealed class CommentController : BaseController
 				parentTotal = 1,
 				page,
 				size,
-				rows = layer.ToTree(c => c.Id, c => c.ParentId).Mapper<IList<CommentViewModel>>()
+				rows = Mapper.Map<IList<CommentViewModel>>(layer.ToTree(c => c.Id, c => c.ParentId))
 			});
 		}
 
@@ -265,7 +265,7 @@ public sealed class CommentController : BaseController
 				parentTotal = total,
 				page,
 				size,
-				rows = comments.OrderByDescending(c => c.CommentDate).ToTree(c => c.Id, c => c.ParentId).Mapper<IList<CommentViewModel>>()
+				rows = Mapper.Map<IList<CommentViewModel>>(comments.OrderByDescending(c => c.CommentDate).ToTree(c => c.Id, c => c.ParentId))
 			});
 		}
 
@@ -299,7 +299,7 @@ public sealed class CommentController : BaseController
 			}, Request.Scheme) + "#comment";
 			foreach (var email in emails)
 			{
-				BackgroundJob.Enqueue(() => CommonHelper.SendMail($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), email, ClientIP.ToString()));
+				BackgroundJob.Enqueue<IMailSender>(sender => sender.Send($"{Request.Host}{CommonHelper.SystemSettings["Title"]}文章评论回复：", content.Set("link", link).Render(false), email, ClientIP.ToString()));
 			}
 
 			return ResultData(null, true, "审核通过！");

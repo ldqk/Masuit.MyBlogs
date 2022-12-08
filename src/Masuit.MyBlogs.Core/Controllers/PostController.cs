@@ -25,6 +25,7 @@ using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using Masuit.MyBlogs.Core.Common.Mails;
 using Z.EntityFramework.Plus;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -196,7 +197,7 @@ public sealed class PostController : BaseController
 	public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
 	{
 		var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
-		var main = post.Mapper<PostHistoryVersion>() ?? throw new NotFoundException("文章未找到");
+		var main = Mapper.Map<PostHistoryVersion>(post) ?? throw new NotFoundException("文章未找到");
 		CheckPermission(post);
 		var left = v1 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
 		var right = v2 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
@@ -298,7 +299,7 @@ public sealed class PostController : BaseController
 		post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
 		post.Status = Status.Pending;
 		post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.HtmlSantinizerStandard().ClearImgAttributes(), cancellationToken);
-		Post p = post.Mapper<Post>();
+		Post p = Mapper.Map<Post>(post);
 		p.IP = ClientIP.ToString();
 		p.Modifier = p.Author;
 		p.ModifierEmail = p.Email;
@@ -320,8 +321,8 @@ public sealed class PostController : BaseController
 			.Set("link", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
 			.Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
 			.Set("title", p.Title).Render();
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, CommonHelper.SystemSettings["ReceiveEmail"], p.IP));
-		return ResultData(p.Mapper<PostDto>(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
+		BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, CommonHelper.SystemSettings["ReceiveEmail"], p.IP));
+		return ResultData(Mapper.Map<PostDto>(p), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
 	}
 
 	/// <summary>
@@ -408,7 +409,7 @@ public sealed class PostController : BaseController
 
 		var token = SnowFlake.GetInstance().GetUniqueShortId(6);
 		RedisHelper.Set("token:" + email, token, 86400);
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, ClientIP.ToString()));
+		BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, ClientIP.ToString()));
 		RedisHelper.Set("get:" + email, token, 120);
 		return ResultData(null);
 	}
@@ -480,7 +481,7 @@ public sealed class PostController : BaseController
 
 		if (post.Email.Equals(dto.ModifierEmail))
 		{
-			var history = post.Mapper<PostHistoryVersion>();
+			var history = Mapper.Map<PostHistoryVersion>(post);
 			Mapper.Map(dto, post);
 			post.PostHistoryVersion.Add(history);
 			post.ModifyDate = DateTime.Now;
@@ -526,7 +527,7 @@ public sealed class PostController : BaseController
 			.Set("host", "//" + Request.Host)
 			.Set("id", merge.Id.ToString())
 			.Render();
-		BackgroundJob.Enqueue(() => CommonHelper.SendMail("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"], merge.IP));
+		BackgroundJob.Enqueue<IMailSender>(sender => sender.Send("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"], merge.IP));
 		return ResultData(null, true, "您的修改请求已提交，已进入审核状态，感谢您的参与！");
 	}
 
@@ -620,7 +621,7 @@ public sealed class PostController : BaseController
 	public ActionResult Get(int id)
 	{
 		var post = PostService.GetQuery(e => e.Id == id).Include(e => e.Seminar).FirstOrDefault() ?? throw new NotFoundException("文章未找到");
-		var model = post.Mapper<PostDto>();
+		var model = Mapper.Map<PostDto>(post);
 		model.Seminars = post.Seminar.Select(s => s.Id).Join(",");
 		return ResultData(model);
 	}
@@ -705,7 +706,7 @@ public sealed class PostController : BaseController
 		{
 			if (p.Content.HammingDistance(post.Content) > 0)
 			{
-				var history = p.Mapper<PostHistoryVersion>();
+				var history = Mapper.Map<PostHistoryVersion>(p);
 				history.PostId = p.Id;
 				PostHistoryVersionService.AddEntity(history);
 			}
@@ -761,7 +762,7 @@ public sealed class PostController : BaseController
 		{
 			SearchEngine.LuceneIndexer.Delete(p);
 		}
-		return ResultData(p.Mapper<PostDto>(), message: "文章修改成功！");
+		return ResultData(Mapper.Map<PostDto>(p), message: "文章修改成功！");
 	}
 
 	/// <summary>
@@ -782,7 +783,7 @@ public sealed class PostController : BaseController
 		}
 
 		post.Status = Status.Published;
-		Post p = post.Mapper<Post>();
+		Post p = Mapper.Map<Post>(post);
 		p.Modifier = p.Author;
 		p.ModifierEmail = p.Email;
 		p.IP = ClientIP.ToString();
@@ -804,7 +805,7 @@ public sealed class PostController : BaseController
 			p.PostDate = timespan.Value.ToUniversalTime();
 			p.ModifyDate = timespan.Value.ToUniversalTime();
 			BackgroundJob.Enqueue<IHangfireBackJob>(job => job.PublishPost(p));
-			return ResultData(p.Mapper<PostDto>(), message: $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！");
+			return ResultData(Mapper.Map<PostDto>(p), message: $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！");
 		}
 
 		PostService.AddEntity(p);

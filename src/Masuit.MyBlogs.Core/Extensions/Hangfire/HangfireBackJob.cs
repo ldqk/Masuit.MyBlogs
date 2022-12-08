@@ -4,6 +4,7 @@ using Masuit.MyBlogs.Core.Common;
 using Masuit.Tools.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using Masuit.MyBlogs.Core.Common.Mails;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire;
 
@@ -17,16 +18,18 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
 	private readonly IServiceScope _serviceScope;
 	private readonly IRedisClient _redisClient;
 	private readonly IConfiguration _configuration;
+	private readonly IMailSender _mailSender;
 
 	/// <summary>
 	/// hangfire后台任务
 	/// </summary>
-	public HangfireBackJob(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IWebHostEnvironment hostEnvironment, IRedisClient redisClient, IConfiguration configuration)
+	public HangfireBackJob(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IWebHostEnvironment hostEnvironment, IRedisClient redisClient, IConfiguration configuration, IMailSender mailSender)
 	{
 		_httpClientFactory = httpClientFactory;
 		_hostEnvironment = hostEnvironment;
 		_redisClient = redisClient;
 		_configuration = configuration;
+		_mailSender = mailSender;
 		_serviceScope = serviceProvider.CreateScope();
 	}
 
@@ -55,7 +58,7 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
 			.Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
 			.Set("ip", record.IP)
 			.Set("address", record.PhysicAddress).Render();
-		CommonHelper.SendMail(settingService.Get(s => s.Name.Equals("Title")).Value + "账号登录通知", content, settingService.Get(s => s.Name.Equals("ReceiveEmail")).Value, "127.0.0.1");
+		_mailSender.Send(settingService.Get(s => s.Name.Equals("Title")).Value + "账号登录通知", content, settingService.Get(s => s.Name.Equals("ReceiveEmail")).Value, "127.0.0.1");
 	}
 
 	/// <summary>

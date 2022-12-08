@@ -1,11 +1,7 @@
 ﻿using AngleSharp;
 using AngleSharp.Css.Dom;
 using AngleSharp.Dom;
-using AutoMapper;
 using Dispose.Scope;
-using FreeRedis;
-using Hangfire;
-using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.Tools.Media;
 using Masuit.Tools.Models;
 using MaxMind.GeoIP2;
@@ -127,31 +123,6 @@ namespace Masuit.MyBlogs.Core.Common
 		private static readonly DatabaseReader MaxmindAsnReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-ASN.mmdb"));
 		private static readonly DatabaseReader MaxmindCountryReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-Country.mmdb"));
 
-		/// <summary>
-		/// 是否是代理ip
-		/// </summary>
-		/// <param name="ip"></param>
-		/// <param name="cancellationToken"></param>
-		/// <returns></returns>
-		public static async Task<bool> IsProxy(this IPAddress ip, CancellationToken cancellationToken = default)
-		{
-			using var serviceScope = Startup.ServiceProvider.CreateScope();
-			var httpClient = serviceScope.ServiceProvider.GetRequiredService<IHttpClientFactory>().CreateClient();
-			httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36 Edg/92.0.902.62");
-			return await httpClient.GetStringAsync("https://ipinfo.io/" + ip, cancellationToken).ContinueWith(t =>
-			{
-				if (t.IsCompletedSuccessfully)
-				{
-					var ctx = BrowsingContext.New(Configuration.Default);
-					var doc = ctx.OpenAsync(res => res.Content(t.Result)).Result;
-					var isAnycast = doc.DocumentElement.QuerySelectorAll(".title").Where(e => e.TextContent.Contains("Anycast")).Select(e => e.Parent).Any(n => n.TextContent.Contains("True"));
-					var isproxy = doc.DocumentElement.QuerySelectorAll("#block-privacy img").Any(e => e.OuterHtml.Contains("right"));
-					return isAnycast || isproxy;
-				}
-				return false;
-			});
-		}
-
 		public static AsnResponse GetIPAsn(this IPAddress ip)
 		{
 			if (ip.IsPrivateIP())
@@ -236,31 +207,6 @@ namespace Masuit.MyBlogs.Core.Common
 			}
 
 			return GetCityResp(ip).Location.TimeZone ?? "Asia/Shanghai";
-		}
-
-		/// <summary>
-		/// 类型映射
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="source"></param>
-		/// <returns></returns>
-		public static T Mapper<T>(this object source) where T : class => Startup.ServiceProvider.GetRequiredService<IMapper>().Map<T>(source);
-
-		/// <summary>
-		/// 发送邮件
-		/// </summary>
-		/// <param name="title">标题</param>
-		/// <param name="content">内容</param>
-		/// <param name="tos">收件人</param>
-		/// <param name="clientip"></param>
-		[AutomaticRetry(Attempts = 1, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-		public static void SendMail(string title, string content, string tos, string clientip)
-		{
-			using var serviceScope = Startup.ServiceProvider.CreateScope();
-			serviceScope.ServiceProvider.GetRequiredService<IMailSender>().Send(title, content, tos);
-			var redisClient = serviceScope.ServiceProvider.GetRequiredService<IRedisClient>();
-			redisClient.SAdd($"Email:{DateTime.Now:yyyyMMdd}", new { title, content, tos, time = DateTime.Now, clientip });
-			redisClient.Expire($"Email:{DateTime.Now:yyyyMMdd}", 86400);
 		}
 
 		/// <summary>

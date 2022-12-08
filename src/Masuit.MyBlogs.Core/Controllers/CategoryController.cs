@@ -1,5 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Extensions;
+﻿using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +24,7 @@ public sealed class CategoryController : BaseController
 	{
 		var categories = CategoryService.GetQueryNoTracking(c => c.Status == Status.Available, c => c.Name).ToList();
 		var list = categories.ToTree(c => c.Id, c => c.ParentId);
-		return ResultData(list.Mapper<List<CategoryDto>>());
+		return ResultData(Mapper.Map<List<CategoryDto>>(list));
 	}
 
 	/// <summary>
@@ -36,7 +35,7 @@ public sealed class CategoryController : BaseController
 	public async Task<ActionResult> Get(int id)
 	{
 		var model = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("分类不存在！");
-		return ResultData(model.Mapper<CategoryDto>());
+		return ResultData(Mapper.Map<CategoryDto>(model));
 	}
 
 	/// <summary>

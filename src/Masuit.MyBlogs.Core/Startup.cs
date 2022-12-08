@@ -17,7 +17,6 @@ using Masuit.Tools.AspNetCore.Mime;
 using Masuit.Tools.Config;
 using Masuit.Tools.Core.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using SixLabors.ImageSharp.Web.DependencyInjection;
@@ -30,11 +29,6 @@ namespace Masuit.MyBlogs.Core
 	/// </summary>
 	public class Startup
 	{
-		/// <summary>
-		/// 依赖注入容器
-		/// </summary>
-		public static IServiceProvider ServiceProvider { get; private set; }
-
 		/// <summary>
 		/// 配置中心
 		/// </summary>
@@ -129,7 +123,6 @@ namespace Masuit.MyBlogs.Core
 		/// <param name="loggerdb"></param>
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHangfireBackJob hangfire, LuceneIndexerOptions luceneIndexerOptions, DataContext maindb, LoggerDbContext loggerdb)
 		{
-			ServiceProvider = app.ApplicationServices;
 			maindb.Database.EnsureCreated();
 			loggerdb.Database.EnsureCreated();
 			app.InitSettings();

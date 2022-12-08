@@ -1,4 +1,5 @@
-﻿using DnsClient;
+﻿using AngleSharp;
+using DnsClient;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools.AspNetCore.Mime;
@@ -64,7 +65,7 @@ public sealed class ToolsController : BaseController
 				Organization = loc.ISP
 			},
 			TimeZone = loc.Coodinate.TimeZone + $"  UTC{TZConvert.GetTimeZoneInfo(loc.Coodinate.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}",
-			IsProxy = loc.Network.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business", "ASN" }) || domain.Length > 1 || await ipAddress.IsProxy(cts.Token),
+			IsProxy = loc.Network.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business", "ASN" }) || domain.Length > 1 || await IsProxy(ipAddress, cts.Token),
 			Domain = domain
 		};
 		if (Request.Method.Equals(HttpMethods.Get) || (Request.Headers[HeaderNames.Accept] + "").StartsWith(ContentType.Json))
@@ -73,6 +74,29 @@ public sealed class ToolsController : BaseController
 		}
 
 		return Json(address);
+	}
+
+	/// <summary>
+	/// 是否是代理ip
+	/// </summary>
+	/// <param name="ip"></param>
+	/// <param name="cancellationToken"></param>
+	/// <returns></returns>
+	public async Task<bool> IsProxy(IPAddress ip, CancellationToken cancellationToken = default)
+	{
+		_httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36 Edg/92.0.902.62");
+		return await _httpClient.GetStringAsync("https://ipinfo.io/" + ip, cancellationToken).ContinueWith(t =>
+		{
+			if (t.IsCompletedSuccessfully)
+			{
+				var ctx = BrowsingContext.New(Configuration.Default);
+				var doc = ctx.OpenAsync(res => res.Content(t.Result)).Result;
+				var isAnycast = doc.DocumentElement.QuerySelectorAll(".title").Where(e => e.TextContent.Contains("Anycast")).Select(e => e.Parent).Any(n => n.TextContent.Contains("True"));
+				var isproxy = doc.DocumentElement.QuerySelectorAll("#block-privacy img").Any(e => e.OuterHtml.Contains("right"));
+				return isAnycast || isproxy;
+			}
+			return false;
+		});
 	}
 
 	/// <summary>

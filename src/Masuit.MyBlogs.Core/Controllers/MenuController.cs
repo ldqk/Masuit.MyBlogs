@@ -1,5 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.Tools.AspNetCore.ModelBinder;
+﻿using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Models;
 using Microsoft.AspNetCore.Mvc;
 using Z.EntityFramework.Plus;
@@ -73,7 +72,7 @@ public sealed class MenuController : AdminController
 		var m = await MenuService.GetByIdAsync(model.Id);
 		if (m == null)
 		{
-			var menu = model.Mapper<Menu>();
+			var menu = Mapper.Map<Menu>(model);
 			menu.Path = model.ParentId > 0 ? (MenuService[model.ParentId.Value].Path + "," + model.ParentId).Trim(',') : SnowFlake.NewId;
 			return await MenuService.AddEntitySavedAsync(menu) > 0 ? ResultData(model, true, "添加成功") : ResultData(null, false, "添加失败");
 		}

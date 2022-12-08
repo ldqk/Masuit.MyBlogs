@@ -206,7 +206,7 @@ public sealed class NoticeController : BaseController
 
 		notice.ViewCount += 1;
 		await NoticeService.SaveChangesAsync();
-		var dto = notice.Mapper<NoticeDto>();
+		var dto = Mapper.Map<NoticeDto>(notice);
 		Response.Cookies.Append("last-notice", dto.Id.ToString(), new CookieOptions()
 		{
 			Expires = DateTime.Now.AddYears(1),
