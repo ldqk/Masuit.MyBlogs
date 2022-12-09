@@ -229,7 +229,7 @@ function get(url, callback, error) {
 
 async function blockCategory(id,name) {
     let value = Cookies.get("HideCategories")||"0";
-    if (value.split("%2C").indexOf(id+"")>-1) {
+    if (value.split(",").indexOf(id+"")>-1) {
         await swal({
 		    title: "确认移除屏蔽【"+name+"】吗？",
 		    text: "移除屏蔽之后可能会出现一些引起不适的内容，请谨慎操作，确认关闭吗？",
@@ -241,7 +241,7 @@ async function blockCategory(id,name) {
 		    animation: true,
 		    allowOutsideClick: false
 	    }).then(async function() {
-		    Cookies.set("HideCategories",value.split("%2C").filter(function(item){return item!=id}).join("%2C"),{ expires: 365 });
+		    Cookies.set("HideCategories",value.split(",").filter(function(item){return item!=id}).join(","),{ expires: 365 });
 			swal({
 				text: "取消屏蔽成功",type:"success",
 				showConfirmButton: false,
@@ -261,7 +261,7 @@ async function blockCategory(id,name) {
 		    animation: true,
 		    allowOutsideClick: false
 	    }).then(async function() {
-		    Cookies.set("HideCategories",id+"%2C"+value, {expires: 365 });
+		    Cookies.set("HideCategories",id+","+value, {expires: 365 });
             swal({
 				text: "屏蔽成功",type:"success",
 				showConfirmButton: false,
