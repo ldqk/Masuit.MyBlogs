@@ -4,6 +4,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <ServerGarbageCollection>false</ServerGarbageCollection>
         <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+        <TieredPGO>true</TieredPGO>
         <Authors>懒得勤快</Authors>
         <Product>懒得勤快的博客</Product>
         <Description>masuit.com</Description>
@@ -11,7 +12,6 @@
         <NeutralLanguage>zh-CN</NeutralLanguage>
         <ImplicitUsings>enable</ImplicitUsings>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <TieredPGO>true</TieredPGO>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

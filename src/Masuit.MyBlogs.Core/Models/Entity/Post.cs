@@ -21,6 +21,8 @@ public class Post : BaseEntity
 		Status = Status.Pending;
 		Seminar = new HashSet<Seminar>();
 		PostMergeRequests = new HashSet<PostMergeRequest>();
+		PostVisitRecordStats = new List<PostVisitRecordStats>();
+		PostVisitRecords = new List<PostVisitRecord>();
 	}
 
 	/// <summary>

@@ -45,7 +45,6 @@ public sealed class MappingProfile : Profile
 			.ForMember(p => p.Status, e => e.MapFrom(p => p.Status.GetDisplay()))
 			.ForMember(p => p.ModifyCount, e => e.MapFrom(p => p.PostHistoryVersion.Count))
 			.ForMember(p => p.ViewCount, e => e.MapFrom(p => p.TotalViewCount))
-			.ForMember(p => p.AverageViewCount, e => e.MapFrom(p => p.PostVisitRecordStats.Sum(t => t.Count) / (p.PostVisitRecordStats.Max(s => s.Date) - p.PostVisitRecordStats.Min(s => s.Date)).TotalDays))
 			.ForMember(p => p.Seminars, e => e.MapFrom(p => p.Seminar.Select(s => s.Id).ToArray()))
 			.ForMember(p => p.LimitDesc, e => e.MapFrom(p => p.LimitMode > RegionLimitMode.All ? string.Format(p.LimitMode.GetDescription(), p.Regions, p.ExceptRegions) : "无限制"));
 

@@ -1,10 +1,10 @@
 ﻿using FreeRedis;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.Tools.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
-using Masuit.MyBlogs.Core.Common.Mails;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire;
 
@@ -108,7 +108,16 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
 		}
 
 		post.TotalViewCount += 1;
-		post.AverageViewCount = recordService.GetQuery(e => e.PostId == pid).GroupBy(r => r.Time.Date).Select(g => g.Count()).DefaultIfEmpty().Average();
+		var count = recordService.Count(e => e.PostId == pid);
+		if (count > 0)
+		{
+			post.AverageViewCount = count / (recordService.GetQuery(e => e.PostId == pid).MaxOrDefault(e => e.Time) - recordService.GetQuery(e => e.PostId == pid).MinOrDefault(e => e.Time)).TotalDays;
+		}
+		else
+		{
+			post.AverageViewCount = 1;
+		}
+
 		recordService.AddEntity(new PostVisitRecord()
 		{
 			IP = ip,

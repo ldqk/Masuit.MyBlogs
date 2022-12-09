@@ -4,6 +4,7 @@ using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
+using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
@@ -25,7 +26,6 @@ using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using Masuit.MyBlogs.Core.Common.Mails;
 using Z.EntityFramework.Plus;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
