@@ -228,7 +228,7 @@ function get(url, callback, error) {
 }
 
 async function blockCategory(id,name) {
-    let value = (await cookieStore.get("HideCategories")||{value:"0"}).value;
+    let value = Cookies.get("HideCategories")||"0";
     if (value.split("%2C").indexOf(id+"")>-1) {
         await swal({
 		    title: "确认移除屏蔽【"+name+"】吗？",
@@ -241,24 +241,13 @@ async function blockCategory(id,name) {
 		    animation: true,
 		    allowOutsideClick: false
 	    }).then(async function() {
-		    cookieStore.set({
-		      name: "HideCategories",
-		      value: value.split("%2C").filter(function(item){return item!=id}).join("%2C"),
-		      expires: Date.now() + 24*60*60*365
-		    }).then(
-		      function() {
-			    swal({
-				    text: "取消屏蔽成功",type:"success",
-				    showConfirmButton: false,
-				    timer:1500
-			    }).catch(swal.noop);
-				location.reload();
-		      },
-		      function(reason) {
-			    console.error("It failed: ", reason);
-		      }
-		    );
-	    }, function() {
+		    Cookies.set("HideCategories",value.split("%2C").filter(function(item){return item!=id}).join("%2C"),{ expires: 365 });
+			swal({
+				text: "取消屏蔽成功",type:"success",
+				showConfirmButton: false,
+				timer:1500
+			}).catch(swal.noop);
+        }, function() {
 	    }).catch(swal.noop);
     } else {
 		await swal({
@@ -272,22 +261,12 @@ async function blockCategory(id,name) {
 		    animation: true,
 		    allowOutsideClick: false
 	    }).then(async function() {
-		    cookieStore.set({
-		      name: "HideCategories",
-		      value: id+"%2C"+value,
-		      expires: Date.now() + 24*60*60*365
-		    }).then(
-		      function() {
-			    swal({
-				    text: "屏蔽成功",type:"success",
-				    showConfirmButton: false,
-				    timer:1500
-			    }).catch(swal.noop)
-		      },
-		      function(reason) {
-			    console.error("It failed: ", reason);
-		      }
-		    );
+		    Cookies.set("HideCategories",id+"%2C"+value, {expires: 365 });
+            swal({
+				text: "屏蔽成功",type:"success",
+				showConfirmButton: false,
+				timer:1500
+			}).catch(swal.noop);
 	    }, function() {
 	    }).catch(swal.noop);
     }
@@ -305,18 +284,8 @@ async function disableSafemode() {
 		animation: true,
 		allowOutsideClick: false
 	}).then(async function() {
-		cookieStore.set({
-		  name: "Nsfw",
-		  value: 0,
-		  expires: Date.now() + 24*60*60*3650
-		}).then(
-		  function() {
-			location.reload();
-		  },
-		  function() {
-			location.reload();
-		  }
-		);
+		Cookies.set("Nsfw",0,{ expires: 3650 });
+        location.reload();
 	}, function() {
 	}).catch(swal.noop);
 }
@@ -326,23 +295,11 @@ async function enableSafemode() {
 		return ;
 	}
 	
-	cookieStore.set({
-	  name: "Nsfw",
-	  value: 1,
-	  expires: Date.now() + 24*60*60*3650
-	}).then(
-	  function() {
-		localStorage.setItem("DefaultSafeMode",1);
-	  },
-	  function() {
-		location.reload();
-	  }
-	);
+	Cookies.set("Nsfw",1,{ expires: 3650 });
+    localStorage.setItem("DefaultSafeMode",1);
 }
 
 /*默认安全模式*/
-cookieStore.get("Nsfw").then(res=>{
-    var value=(res||{value:"1"}).value;
-    if(value=="1"){
+if(Cookies.get("Nsfw")=="1"){
     $("body").append("<a style='position:fixed;left:0;bottom:0;color:black;z-index:10;text-shadow: 0px 0px 1px #000;'>安全模式</a>");
-}});
+}

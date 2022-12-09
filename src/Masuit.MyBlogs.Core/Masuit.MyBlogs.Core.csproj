@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <ServerGarbageCollection>false</ServerGarbageCollection>
-        <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+        <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
         <TieredPGO>true</TieredPGO>
         <Authors>懒得勤快</Authors>
         <Product>懒得勤快的博客</Product>

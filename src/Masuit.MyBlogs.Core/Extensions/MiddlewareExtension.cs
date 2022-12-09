@@ -150,7 +150,6 @@ public static class MiddlewareExtension
 				.Include("/Scripts/ripplet.js")
 				.Include("/Scripts/global/functions.js")
 				.Include("/Scripts/global/scripts.js")
-				.Include("/Scripts/platform.js")
 				.Include("/Assets/newsbox/jquery.bootstrap.newsbox.js")
 				.Include("/Assets/tagcloud/js/tagcloud.js")
 				.Include("/Assets/scrolltop/js/scrolltop.js")

@@ -1,4 +1,4 @@
-﻿var DeviceInfo = (function () {
+﻿;var DeviceInfo = (function () {
     var root = typeof self !== 'undefined' ? self : this
     var _window = root || {}
     // 变量库
