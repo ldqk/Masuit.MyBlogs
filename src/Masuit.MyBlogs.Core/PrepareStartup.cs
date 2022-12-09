@@ -175,7 +175,11 @@ namespace Masuit.MyBlogs.Core
 				};
 				if (bool.TryParse(config["HttpClientProxy:Enabled"], out var b) && b)
 				{
-					handler.Proxy = new WebProxy(config["HttpClientProxy:Uri"], true);
+					handler.Proxy = new WebProxy(config["HttpClientProxy:Uri"], true); // 使用自定义代理
+				}
+				else
+				{
+					handler.Proxy = WebRequest.GetSystemWebProxy(); // 使用系统代理
 				}
 
 				return handler;
@@ -218,7 +222,7 @@ namespace Masuit.MyBlogs.Core
 		public bool Authorize(DashboardContext context)
 		{
 #if DEBUG
-            return true;
+			return true;
 #endif
 			var user = context.GetHttpContext().Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
 			return user.IsAdmin;
