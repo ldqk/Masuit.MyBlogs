@@ -19,7 +19,7 @@
 
 @{
     string[] colors = { "success", "info", "warning", "danger", "default" };
-    var menus = MenuService.GetQueryFromCache(m => m.Status == Status.Available,m => m.Sort).ToTree(m => m.Id,m => m.ParentId);
+    var menus = MenuService.GetQueryNoTracking(m => m.Status == Status.Available,m => m.Sort).FromCache().ToTree(m => m.Id,m => m.ParentId);
     var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
     var links = LinksService.GetQuery(l => l.Status == Status.Available).OrderByDescending(l => l.Recommend).ThenByDescending(l => l.Loopbacks.GroupBy(x => x.IP).Count()).Take(30).Select(e => new{e.Url,e.Name}).FromCache().ToPooledListScope();
 }
