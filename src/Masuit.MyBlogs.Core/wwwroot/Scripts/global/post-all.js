@@ -1,4 +1,5 @@
-﻿if (!Detector.webgl) Detector.addGetWebGLMessage();
+﻿// 云朵特效
+if (!Detector.webgl) Detector.addGetWebGLMessage();
     var container;
     var camera, scene, renderer;
     var mesh, geometry, material;
