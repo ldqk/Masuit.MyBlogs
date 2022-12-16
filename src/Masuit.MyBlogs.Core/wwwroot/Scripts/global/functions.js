@@ -284,19 +284,16 @@ async function disableSafemode() {
 		animation: true,
 		allowOutsideClick: false
 	}).then(async function() {
-		Cookies.set("Nsfw",0,{ expires: 3650 });
-        location.reload();
+	    Cookies.set("Nsfw",0,{ expires: 3650 });
+            location.reload();
 	}, function() {
 	}).catch(swal.noop);
 }
 
 async function enableSafemode() {
-	if (localStorage.getItem("DefaultSafeMode")==1) {
-		return ;
-	}
-	
-	Cookies.set("Nsfw",1,{ expires: 3650 });
-    localStorage.setItem("DefaultSafeMode",1);
+    Cookies.set("Nsfw",1,{ expires: 3650 });
+    alert("已开启安全模式");
+    location.reload();
 }
 
 /*默认安全模式*/
