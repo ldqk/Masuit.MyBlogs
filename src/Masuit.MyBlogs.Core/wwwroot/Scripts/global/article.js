@@ -209,8 +209,7 @@ $("#getcode-reply").on("click", function (e) {
 	
 	//表单取消按钮
 	$(".btn-cancel").click(function() {
-		$(':input', '#reply-form').not(':button,:submit,:reset,:hidden').val('').removeAttr('checked')
-			.removeAttr('checked'); //评论成功清空表单
+		$(':input', '#reply-form').not(':button,:submit,:reset,:hidden').val('').removeAttr('checked').removeAttr('checked'); //评论成功清空表单
 		layer.closeAll();
 		setTimeout(function() {
 			$("#reply").css("display", "none");
@@ -455,7 +454,7 @@ function loadParentComments(data) {
 //加载子楼层
 function loadComments(comments, depth = 0) {
 	comments.sort(function(x, y) {
-		return x.Id - y.Id
+		return x.Id - y.Id;
 	});
 
 	var colors = ["info", "success", "primary", "warning", "danger"];

@@ -16,7 +16,7 @@ if (!Detector.webgl) Detector.addGetWebGLMessage();
         container.style.right = 0;
         container.style.bottom = 0;
         container.style.top = 0;
-		
+        
         document.body.appendChild(container);
         // Bg gradient
         var canvas = document.createElement('canvas');
@@ -30,7 +30,7 @@ if (!Detector.webgl) Detector.addGetWebGLMessage();
         context.fillRect(0, 0, canvas.width, canvas.height);
         container.style.background = 'url(' + canvas.toDataURL('image/png') + ')';
         container.style.backgroundSize = '32px 100%';
-		container.style.zIndex = -1;
+        container.style.zIndex = -1;
         camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 3000);
         camera.position.z = 6000;
         scene = new THREE.Scene();
@@ -90,50 +90,50 @@ if (!Detector.webgl) Detector.addGetWebGLMessage();
         renderer.render(scene, camera);
     }
 $('.choose').click(function () {
-	$('.choose').addClass('active');
-	$('.choose > .icon').addClass('active');
-	$('.pay').removeClass('active');
-	$('.wrap').removeClass('active');
-	$('.pay > .icon').removeClass('active');
-	$('.wrap > .icon').removeClass('active');
-	$('#line').addClass('one');
-	$('#line').removeClass('two');
-	$('#line').removeClass('three');
+    $('.choose').addClass('active');
+    $('.choose > .icon').addClass('active');
+    $('.pay').removeClass('active');
+    $('.wrap').removeClass('active');
+    $('.pay > .icon').removeClass('active');
+    $('.wrap > .icon').removeClass('active');
+    $('#line').addClass('one');
+    $('#line').removeClass('two');
+    $('#line').removeClass('three');
 });
 $('.pay').click(function () {
-	$('.pay').addClass('active');
-	$('.pay > .icon').addClass('active');
-	$('.choose').removeClass('active');
-	$('.wrap').removeClass('active');
-	$('.choose > .icon').removeClass('active');
-	$('.wrap > .icon').removeClass('active');
-	$('#line').addClass('two');
-	$('#line').removeClass('one');
-	$('#line').removeClass('three');
+    $('.pay').addClass('active');
+    $('.pay > .icon').addClass('active');
+    $('.choose').removeClass('active');
+    $('.wrap').removeClass('active');
+    $('.choose > .icon').removeClass('active');
+    $('.wrap > .icon').removeClass('active');
+    $('#line').addClass('two');
+    $('#line').removeClass('one');
+    $('#line').removeClass('three');
 });
 $('.wrap').click(function () {
-	$('.wrap').addClass('active');
-	$('.wrap > .icon').addClass('active');
-	$('.pay').removeClass('active');
-	$('.choose').removeClass('active');
-	$('.pay > .icon').removeClass('active');
-	$('.choose > .icon').removeClass('active');
-	$('#line').addClass('three');
-	$('#line').removeClass('two');
-	$('#line').removeClass('one');
+    $('.wrap').addClass('active');
+    $('.wrap > .icon').addClass('active');
+    $('.pay').removeClass('active');
+    $('.choose').removeClass('active');
+    $('.pay > .icon').removeClass('active');
+    $('.choose > .icon').removeClass('active');
+    $('#line').addClass('three');
+    $('#line').removeClass('two');
+    $('#line').removeClass('one');
 });
 $('.choose').click(function () {
-	$('#first').addClass('active');
-	$('#second').removeClass('active');
-	$('#third').removeClass('active');
+    $('#first').addClass('active');
+    $('#second').removeClass('active');
+    $('#third').removeClass('active');
 });
 $('.pay').click(function () {
-	$('#first').removeClass('active');
-	$('#second').addClass('active');
-	$('#third').removeClass('active');
+    $('#first').removeClass('active');
+    $('#second').addClass('active');
+    $('#third').removeClass('active');
 });
 $('.wrap').click(function () {
-	$('#first').removeClass('active');
-	$('#second').removeClass('active');
-	$('#third').addClass('active');
+    $('#first').removeClass('active');
+    $('#second').removeClass('active');
+    $('#third').addClass('active');
 });

@@ -2,64 +2,64 @@
     var myChart = echarts.init(document.getElementById("container"));
     myChart.setOption({
         series: [{
-                type: 'gauge',
-                anchor: {
-                    show: true,
-                    showAbove: true,
-                    size: 18,
-                    itemStyle: {
-                        color: '#FAC858'
-                    }
-                },
-                pointer: {
-                    icon: 'path://M2.9,0.7L2.9,0.7c1.4,0,2.6,1.2,2.6,2.6v115c0,1.4-1.2,2.6-2.6,2.6l0,0c-1.4,0-2.6-1.2-2.6-2.6V3.3C0.3,1.9,1.4,0.7,2.9,0.7z',
-                    width: 8,
-                    length: '80%',
-                    offsetCenter: [0, '8%']
-                },
-
-                progress: {
-                    show: true,
-                    overlap: true,
-                    roundCap: true
-                },
-                axisLine: {
-                    roundCap: true
-                },
-                data: [{
-                        value: 0,
-                        name: 'CPU',
-                        title: {
-                            offsetCenter: ['-20%', '80%']
-                        },
-                        detail: {
-                            offsetCenter: ['-20%', '95%']
-                        }
-                    },
-                    {
-                        value: 0,
-                        name: '内存',
-                        title: {
-                            offsetCenter: ['20%', '80%']
-                        },
-                        detail: {
-                            offsetCenter: ['20%', '95%']
-                        }
-                    }
-                ],
-                title: {
-                    fontSize: 14
-                },
-                detail: {
-                    width: 40,
-                    height: 14,
-                    fontSize: 14,
-                    color: '#fff',
-                    backgroundColor: 'auto',
-                    borderRadius: 3,
-                    formatter: '{value}%'
+            type: 'gauge',
+            anchor: {
+                show: true,
+                showAbove: true,
+                size: 18,
+                itemStyle: {
+                    color: '#FAC858'
                 }
-            }]
+            },
+            pointer: {
+                icon: 'path://M2.9,0.7L2.9,0.7c1.4,0,2.6,1.2,2.6,2.6v115c0,1.4-1.2,2.6-2.6,2.6l0,0c-1.4,0-2.6-1.2-2.6-2.6V3.3C0.3,1.9,1.4,0.7,2.9,0.7z',
+                width: 8,
+                length: '80%',
+                offsetCenter: [0, '8%']
+            },
+
+            progress: {
+                show: true,
+                overlap: true,
+                roundCap: true
+            },
+            axisLine: {
+                roundCap: true
+            },
+            data: [{
+                    value: 0,
+                    name: 'CPU',
+                    title: {
+                        offsetCenter: ['-20%', '80%']
+                    },
+                    detail: {
+                        offsetCenter: ['-20%', '95%']
+                    }
+                },
+                {
+                    value: 0,
+                    name: '内存',
+                    title: {
+                        offsetCenter: ['20%', '80%']
+                    },
+                    detail: {
+                        offsetCenter: ['20%', '95%']
+                    }
+                }
+            ],
+            title: {
+                fontSize: 14
+            },
+            detail: {
+                width: 40,
+                height: 14,
+                fontSize: 14,
+                color: '#fff',
+                backgroundColor: 'auto',
+                borderRadius: 3,
+                formatter: '{value}%'
+            }
+        }]
     });
     return myChart;
 }
@@ -190,10 +190,10 @@ function showLine(ip) {
         var myChart = echarts.init(document.getElementById("container-cpu"));
         myChart.setOption({
             visualMap: [{
-                    show: false,
-                    type: 'continuous',
-                    seriesIndex: 0
-                }],
+                show: false,
+                type: 'continuous',
+                seriesIndex: 0
+            }],
             tooltip: {
                 trigger: 'axis',
                 axisPointer: {
@@ -201,15 +201,15 @@ function showLine(ip) {
                 }
             },
             dataZoom: [{
-                    type: 'inside',
-                    start: 70,
-                    end: 100,
-                    minValueSpan: 100
-                }, {
-                    start: 70,
-                    end: 100,
-                    minValueSpan: 100
-                }],
+                type: 'inside',
+                start: 70,
+                end: 100,
+                minValueSpan: 100
+            }, {
+                start: 70,
+                end: 100,
+                minValueSpan: 100
+            }],
             xAxis: {
                 type: 'time',
                 interval: 20000,
@@ -235,40 +235,40 @@ function showLine(ip) {
                 data: ['CPU使用率', '内存使用率']
             },
             series: [{
-                    name: 'CPU使用率',
-                    type: 'line',
-                    showSymbol: false,
-                    hoverAnimation: false,
-                    data: data.cpu,
-                    markPoint: {
-                        data: [
-                            { type: 'max', name: '最大值' },
-                            { type: 'min', name: '最小值' }
-                        ]
-                    },
-                    markLine: {
-                        data: [
-                            { type: 'average', name: '平均值' }
-                        ]
-                    }
-                }, {
-                    name: '内存使用率',
-                    type: 'line',
-                    showSymbol: false,
-                    hoverAnimation: false,
-                    data: data.mem,
-                    markPoint: {
-                        data: [
-                            { type: 'max', name: '最大值' },
-                            { type: 'min', name: '最小值' }
-                        ]
-                    },
-                    markLine: {
-                        data: [
-                            { type: 'average', name: '平均值' }
-                        ]
-                    }
-                }]
+                name: 'CPU使用率',
+                type: 'line',
+                showSymbol: false,
+                hoverAnimation: false,
+                data: data.cpu,
+                markPoint: {
+                    data: [
+                        { type: 'max', name: '最大值' },
+                        { type: 'min', name: '最小值' }
+                    ]
+                },
+                markLine: {
+                    data: [
+                        { type: 'average', name: '平均值' }
+                    ]
+                }
+            }, {
+                name: '内存使用率',
+                type: 'line',
+                showSymbol: false,
+                hoverAnimation: false,
+                data: data.mem,
+                markPoint: {
+                    data: [
+                        { type: 'max', name: '最大值' },
+                        { type: 'min', name: '最小值' }
+                    ]
+                },
+                markLine: {
+                    data: [
+                        { type: 'average', name: '平均值' }
+                    ]
+                }
+            }]
         });
         var rateChart = showSpeed();
         var ioChart = showIO(data);

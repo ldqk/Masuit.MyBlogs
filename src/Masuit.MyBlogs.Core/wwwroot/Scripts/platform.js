@@ -1,6 +1,6 @@
 ﻿;var DeviceInfo = (function () {
-    var root = typeof self !== 'undefined' ? self : this
-    var _window = root || {}
+    var root = typeof self !== 'undefined' ? self : this;
+    var _window = root || {};
     // 变量库
     var VariableLibrary = {
         navigator: typeof root.navigator != 'undefined' ? root.navigator : {},

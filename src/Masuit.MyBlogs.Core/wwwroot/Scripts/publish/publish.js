@@ -17,6 +17,7 @@
 		if (!data.Success) {
 			return ;
 		}
+
 		data = data.Data.sort((a,b)=>(b.Id==1)-(a.Id==1));
 		window.categoryDropdown = xmSelect.render({
 			el: '#category',

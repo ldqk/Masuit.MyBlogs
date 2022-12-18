@@ -26,7 +26,7 @@ public sealed class UploadController : Controller
 {
     public IWebHostEnvironment HostEnvironment { get; set; }
 
-    public ActionResult ResultData(object data, bool isTrue = true, string message = "")
+    private ActionResult ResultData(object data, bool isTrue = true, string message = "")
     {
         return Json(new
         {
