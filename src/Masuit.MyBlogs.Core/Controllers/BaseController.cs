@@ -114,11 +114,11 @@ public class BaseController : Controller
         ViewBag.Desc = CommonHelper.SystemSettings["Description"];
         var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-		if (HttpContext.Connection.RemoteIpAddress.IsPrivateIP())
-		{
-			user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
-			filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
-		}
+        if (HttpContext.Connection.RemoteIpAddress.IsPrivateIP())
+        {
+            user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
+            filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
+        }
 #endif
         if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true" && user?.IsAdmin != true)
         {

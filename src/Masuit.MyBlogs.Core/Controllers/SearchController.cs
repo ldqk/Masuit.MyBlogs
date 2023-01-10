@@ -66,7 +66,7 @@ public sealed class SearchController : BaseController
 				HttpContext.Session.Set("search:" + wd, wd);
 			}
 
-			if (page == 1 && posts.Results.Count == 1)
+			if (page == 1 && posts.Results.Count == 1 && (posts.Results[0].Title.Contains(wd) || posts.Results[0].Content.Contains(wd)))
 			{
 				return RedirectToAction("Details", "Post", new { id = posts.Results[0].Id, kw = wd });
 			}

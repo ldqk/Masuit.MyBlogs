@@ -13,7 +13,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     PooledList<FastShare> shares = ViewBag.FastShare;
     Context.Request.Path = new PathString("/posts");
-    var sliderid = Stopwatch.GetTimestamp().ToBinary(62);
+    var sliderid = Stopwatch.GetTimestamp().ToBase(62);
 }
 <link href="~/Assets/banner/bootstrap-touch-slider.css" rel="stylesheet" />
 @if (Model.Banner.Any())

@@ -263,7 +263,7 @@ public sealed class FileController : AdminController
 	public ActionResult Handle(string path, string[] items, string toFilename)
 	{
 		path = path?.TrimStart('\\', '/') ?? "";
-		var token = Guid.NewGuid().ToString().MDString(Guid.NewGuid().ToString()).FromBinaryBig(16).ToBinary(62);
+		var token = Guid.NewGuid().ToString().MDString(Guid.NewGuid().ToString()).FromBaseBig(16).ToBase(62);
 		RedisClient.Set("FileManager:Token:" + token, "1");
 		RedisClient.Expire("FileManager:Token:" + token, TimeSpan.FromDays(1));
 		return RedirectToAction("Download", "File", new { path, items, toFilename, token });
