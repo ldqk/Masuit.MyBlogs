@@ -304,6 +304,6 @@ async function enableSafemode() {
 /*默认安全模式*/
 ;$(function() {
     if (Cookies.get("Nsfw") != "0") {
-        $("body").append("<a style='position:fixed;left:0;bottom:0;color:black;z-index:10;text-shadow: 0px 0px 1px #000;'>安全模式</a>");
+        $("body").append("<a style='position:fixed;left:0;bottom:0;color:black;z-index:10;text-shadow: 0px 0px 1px #000;' onclick='disableSafemode()'>安全模式</a>");
     }
 });
