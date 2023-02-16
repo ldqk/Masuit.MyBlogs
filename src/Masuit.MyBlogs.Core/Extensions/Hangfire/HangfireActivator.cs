@@ -13,6 +13,7 @@ public sealed class HangfireActivator : JobActivator
 
 	public override object ActivateJob(Type type)
 	{
-		return _serviceProvider.GetService(type);
+		using var serviceScope = _serviceProvider.CreateScope();
+		return serviceScope.ServiceProvider.GetService(type);
 	}
 }
