@@ -57,7 +57,8 @@ public sealed class CommentController : BaseController
 			return ResultData(null, false, "当前评论过于久远，不再允许回复！");
 		}
 
-		Post post = await PostService.GetByIdAsync(cmd.PostId) ?? throw new NotFoundException("评论失败，文章未找到");
+		var post = await PostService.GetByIdAsync(cmd.PostId) ?? throw new NotFoundException("评论失败，文章未找到");
+		CheckPermission(post);
 		if (post.DisableComment)
 		{
 			return ResultData(null, false, "本文已禁用评论功能，不允许任何人回复！");
