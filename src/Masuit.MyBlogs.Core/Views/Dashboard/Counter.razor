@@ -4,7 +4,9 @@
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools
 @using System.IO
+@using Masuit.Tools.Core.AspNetCore
 @using Masuit.Tools.Logging
+@using Masuit.Tools.Maths
 @using PerformanceCounter = Masuit.MyBlogs.Core.Common.PerformanceCounter
 @inject IPerfCounter PerfCounter;
 @inject IJSRuntime JS;
@@ -162,72 +164,77 @@
         Windows.ClearMemorySilent();
         JS.InvokeVoidAsync("showSuccess");
     }
-    
+
     public Dictionary<string, dynamic> GetCounterPercent()
     {
         var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==ip).OrderByRandom().Take(5000).ToList();
-        var count = counters.Count();
+        var cpuLoads = counters.Select(c => c.CpuLoad).ToList();
+        var memUse = counters.Select(c => c.MemoryUsage).ToList();
+        var reads = counters.Select(c => c.DiskRead).ToList();
+        var writes = counters.Select(c => c.DiskWrite).ToList();
+        var downloads = counters.Select(c => c.Download).ToList();
+        var uploads = counters.Select(c => c.Upload).ToList();
         return new()
         {
             ["CPU使用率(%)"] = new
             {
-                p50 = counters.OrderByDescending(c => c.CpuLoad).Take(count / 2).MinOrDefault(c => c.CpuLoad).ToString("N2"),
-                p75 = counters.OrderByDescending(c => c.CpuLoad).Take(count / 4).MinOrDefault(c => c.CpuLoad).ToString("N2"),
-                p90 = counters.OrderByDescending(c => c.CpuLoad).Take(count / 10).MinOrDefault(c => c.CpuLoad).ToString("N2"),
-                p99 = counters.OrderByDescending(c => c.CpuLoad).Take(count / 100).MinOrDefault(c => c.CpuLoad).ToString("N2"),
-                p999 = counters.OrderByDescending(c => c.CpuLoad).Take(count / 1000).MinOrDefault(c => c.CpuLoad).ToString("N2"),
+                p50 = cpuLoads.Percentile(50).ToString("N2"),
+                p75 = cpuLoads.Percentile(75).ToString("N2"),
+                p90 = cpuLoads.Percentile(90).ToString("N2"),
+                p99 = cpuLoads.Percentile(99).ToString("N2"),
+                p999 = cpuLoads.Percentile(99.9).ToString("N2"),
                 average = counters.Average(c => c.CpuLoad).ToString("N2"),
-                stdev = counters.Select(c => c.CpuLoad).StandardDeviation().ToString("N2"),
+                stdev = cpuLoads.StandardDeviation().ToString("N2"),
             },
             ["内存使用率(%)"] = new
             {
-                p50 = counters.OrderByDescending(c => c.MemoryUsage).Take(count / 2).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
-                p75 = counters.OrderByDescending(c => c.MemoryUsage).Take(count / 4).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
-                p90 = counters.OrderByDescending(c => c.MemoryUsage).Take(count / 10).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
-                p99 = counters.OrderByDescending(c => c.MemoryUsage).Take(count / 100).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
-                p999 = counters.OrderByDescending(c => c.MemoryUsage).Take(count / 1000).MinOrDefault(c => c.MemoryUsage).ToString("N2"),
+                p50 = memUse.Percentile(50).ToString("N2"),
+                p75 = memUse.Percentile(75).ToString("N2"),
+                p90 = memUse.Percentile(90).ToString("N2"),
+                p99 = memUse.Percentile(99).ToString("N2"),
+                p999 = memUse.Percentile(99.9).ToString("N2"),
                 average = counters.Average(c => c.MemoryUsage).ToString("N2"),
-                stdev = counters.Select(c => c.MemoryUsage).StandardDeviation().ToString("N2"),
+                stdev = memUse.StandardDeviation().ToString("N2"),
             },
             ["磁盘读(KBps)"] = new
             {
-                p50 = counters.OrderByDescending(c => c.DiskRead).Take(count / 2).MinOrDefault(c => c.DiskRead).ToString("N2"),
-                p75 = counters.OrderByDescending(c => c.DiskRead).Take(count / 4).MinOrDefault(c => c.DiskRead).ToString("N2"),
-                p90 = counters.OrderByDescending(c => c.DiskRead).Take(count / 10).MinOrDefault(c => c.DiskRead).ToString("N2"),
-                p99 = counters.OrderByDescending(c => c.DiskRead).Take(count / 100).MinOrDefault(c => c.DiskRead).ToString("N2"),
-                p999 = counters.OrderByDescending(c => c.DiskRead).Take(count / 1000).MinOrDefault(c => c.DiskRead).ToString("N2"),
+                p50 = reads.Percentile(50).ToString("N2"),
+                p75 = reads.Percentile(75).ToString("N2"),
+                p90 = reads.Percentile(90).ToString("N2"),
+                p99 = reads.Percentile(99).ToString("N2"),
+                p999 = reads.Percentile(99.9).ToString("N2"),
                 average = counters.Average(c => c.DiskRead).ToString("N2"),
-                stdev = counters.Select(c => c.DiskRead).StandardDeviation().ToString("N2"),
+                stdev = reads.StandardDeviation().ToString("N2"),
             },
             ["磁盘写(KBps)"] = new
             {
-                p50 = counters.OrderByDescending(c => c.DiskWrite).Take(count / 2).MinOrDefault(c => c.DiskWrite).ToString("N2"),
-                p75 = counters.OrderByDescending(c => c.DiskWrite).Take(count / 4).MinOrDefault(c => c.DiskWrite).ToString("N2"),
-                p90 = counters.OrderByDescending(c => c.DiskWrite).Take(count / 10).MinOrDefault(c => c.DiskWrite).ToString("N2"),
-                p99 = counters.OrderByDescending(c => c.DiskWrite).Take(count / 100).MinOrDefault(c => c.DiskWrite).ToString("N2"),
-                p999 = counters.OrderByDescending(c => c.DiskWrite).Take(count / 1000).MinOrDefault(c => c.DiskWrite).ToString("N2"),
+                p50 = writes.Percentile(50).ToString("N2"),
+                p75 = writes.Percentile(75).ToString("N2"),
+                p90 = writes.Percentile(90).ToString("N2"),
+                p99 = writes.Percentile(99).ToString("N2"),
+                p999 = writes.Percentile(99.9).ToString("N2"),
                 average = counters.Average(c => c.DiskWrite).ToString("N2"),
-                stdev = counters.Select(c => c.DiskWrite).StandardDeviation().ToString("N2")
+                stdev = writes.StandardDeviation().ToString("N2")
             },
             ["网络下载(KBps)"] = new
             {
-                p50 = counters.OrderByDescending(c => c.Download).Take(count / 2).MinOrDefault(c => c.Download).ToString("N2"),
-                p75 = counters.OrderByDescending(c => c.Download).Take(count / 4).MinOrDefault(c => c.Download).ToString("N2"),
-                p90 = counters.OrderByDescending(c => c.Download).Take(count / 10).MinOrDefault(c => c.Download).ToString("N2"),
-                p99 = counters.OrderByDescending(c => c.Download).Take(count / 100).MinOrDefault(c => c.Download).ToString("N2"),
-                p999 = counters.OrderByDescending(c => c.Download).Take(count / 1000).MinOrDefault(c => c.Download).ToString("N2"),
+                p50 = downloads.Percentile(50).ToString("N2"),
+                p75 = downloads.Percentile(75).ToString("N2"),
+                p90 = downloads.Percentile(90).ToString("N2"),
+                p99 = downloads.Percentile(99).ToString("N2"),
+                p999 = downloads.Percentile(99.9).ToString("N2"),
                 average = counters.Average(c => c.Download).ToString("N2"),
-                stdev = counters.Select(c => c.Download).StandardDeviation().ToString("N2")
+                stdev = downloads.StandardDeviation().ToString("N2")
             },
             ["网络上行(KBps)"] = new
             {
-                p50 = counters.OrderByDescending(c => c.Upload).Take(count / 2).MinOrDefault(c => c.Upload).ToString("N2"),
-                p75 = counters.OrderByDescending(c => c.Upload).Take(count / 4).MinOrDefault(c => c.Upload).ToString("N2"),
-                p90 = counters.OrderByDescending(c => c.Upload).Take(count / 10).MinOrDefault(c => c.Upload).ToString("N2"),
-                p99 = counters.OrderByDescending(c => c.Upload).Take(count / 100).MinOrDefault(c => c.Upload).ToString("N2"),
-                p999 = counters.OrderByDescending(c => c.Upload).Take(count / 1000).MinOrDefault(c => c.Upload).ToString("N2"),
+                p50 = uploads.Percentile(50).ToString("N2"),
+                p75 = uploads.Percentile(75).ToString("N2"),
+                p90 = uploads.Percentile(90).ToString("N2"),
+                p99 = uploads.Percentile(99).ToString("N2"),
+                p999 = uploads.Percentile(99.9).ToString("N2"),
                 average = counters.Average(c => c.Upload).ToString("N2"),
-                stdev = counters.Select(c => c.Upload).StandardDeviation().ToString("N2")
+                stdev = uploads.StandardDeviation().ToString("N2")
             }
         };
     }
