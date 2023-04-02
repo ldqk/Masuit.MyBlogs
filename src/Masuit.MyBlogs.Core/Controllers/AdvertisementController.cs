@@ -85,6 +85,10 @@ public sealed class AdvertisementController : BaseController
             case AdvertiseOrderBy.ClickRate:
                 queryable = queryable.ThenByDescending(a => a.ViewCount * 1m / (a.DisplayCount + 1));
                 break;
+
+            default:
+                queryable = queryable.ThenByDescending(a => a.UpdateTime);
+                break;
         }
 
         var list = queryable.ToPagedList(page, size);

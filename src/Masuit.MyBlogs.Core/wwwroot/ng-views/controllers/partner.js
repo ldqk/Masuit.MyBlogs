@@ -4,6 +4,7 @@
 	$scope.allowUpload = false;
 	$scope.partner = {};
 	$scope.kw = "";
+	$scope.orderby = 1;
 	$scope.paginationConf = {
 		currentPage: 1,
 		itemsPerPage: 10,
