@@ -7,8 +7,7 @@ public class PerfCounterFilterAttribute : ActionFilterAttribute
 {
     public Stopwatch Stopwatch { get; set; }
 
-    /// <inheritdoc />
-    public override void OnActionExecuting(ActionExecutingContext context)
+    public PerfCounterFilterAttribute()
     {
         Stopwatch = Stopwatch.StartNew();
     }
