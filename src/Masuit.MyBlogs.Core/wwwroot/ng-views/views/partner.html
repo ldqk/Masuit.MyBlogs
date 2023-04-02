@@ -22,6 +22,10 @@
                 <input type="text" class="form-control" ng-change="search(kw)" ng-model="kw" placeholder="全局搜索" />
             </div>
         </div>
+        <div class="input-group">
+            <span class="input-group-addon">排序方式：</span>
+            <div class="form-control" id="orderby" style="width: 220px"></div>
+        </div>
     </div>
     <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed listTable" ng-form="list.tableForm" tracked-table="list.tableTracker">
         <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
@@ -46,14 +50,17 @@
             <td title="'日均点击'">
                 {{row.AverageViewCount|number:2}}
             </td>
+            <td title="'点击率'">
+                {{row.ClickRate|number:2}}
+            </td>
             <td title="'分类'" style="max-width: 270px">
                 <div id="category-{{row.Id}}"></div>
             </td>
             <td title="'创建时间'">
-                {{row.CreateTime|date:'yyyy-MM-dd HH:mm'}}
+                {{row.CreateTime|date:'yyyy-MM-dd'}}
             </td>
             <td title="'修改时间'">
-                {{row.UpdateTime|date:'yyyy-MM-dd HH:mm'}}
+                {{row.UpdateTime|date:'yyyy-MM-dd'}}
             </td>
             <td title="'状态'">
                 <label class="el-switch">
