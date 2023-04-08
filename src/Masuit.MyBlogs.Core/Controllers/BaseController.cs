@@ -31,7 +31,9 @@ public class BaseController : Controller
     public IMapper Mapper { get; set; }
 
     public MapperConfiguration MapperConfig { get; set; }
+
     public IRedisClient RedisHelper { get; set; }
+
     public UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
 
     /// <summary>
@@ -237,7 +239,7 @@ public class BaseController : Controller
         }
 
         var ipLocation = Request.Location();
-        var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+        var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent] + "|" + Request.Headers.Where(x => x.Key.StartsWith("cf-")).Select(x => x.Value).Join("|");
         if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ip != rawip)
         {
             var s = rawip.Base64Decrypt();
@@ -262,7 +264,7 @@ public class BaseController : Controller
         }
 
         var ipLocation = Request.Location();
-        var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent];
+        var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent] + "|" + Request.Headers.Where(x => x.Key.StartsWith("cf-")).Select(x => x.Value).Join("|");
         if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ip != rawip)
         {
             var s = rawip.Base64Decrypt();

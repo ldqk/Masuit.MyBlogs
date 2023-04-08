@@ -11,6 +11,7 @@ using SixLabors.ImageSharp;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Newtonsoft.Json;
 using SixLabors.ImageSharp.Formats.Webp;
 using TimeZoneConverter;
 using ArgumentException = System.ArgumentException;
@@ -67,6 +68,7 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             IPWhiteList = ReadFile(Path.Combine(AppContext.BaseDirectory + "App_Data", "whitelist.txt")).Split(',', '，').ToList();
+            Areas = JsonConvert.DeserializeObject<List<Area>>(ReadFile(Path.Combine(AppContext.BaseDirectory + "App_Data", "areas.json")));
         }
 
         /// <summary>
@@ -103,6 +105,8 @@ namespace Masuit.MyBlogs.Core.Common
         /// IP黑名单地址段
         /// </summary>
         public static Dictionary<string, string> DenyIPRange { get; set; }
+
+        public static List<Area> Areas { get; set; }
 
         /// <summary>
         /// 判断IP地址是否被黑名单
@@ -178,21 +182,28 @@ namespace Masuit.MyBlogs.Core.Common
                     ip = ip.MapToIPv4();
                     goto case AddressFamily.InterNetwork;
                 case AddressFamily.InterNetwork:
-                    var location = IPSearcher.GetIpLocation(ip);
-                    var network = location.Network + "/" + asn.AutonomousSystemOrganization;
-                    return new IPLocation(countryName, location.City, network.Trim('/'), asn.AutonomousSystemNumber)
                     {
-                        Address2 = new IPLocation.CountryCity(continent, countryName, cityName),
-                        Coodinate = city.Location,
-                        Continent = continent
-                    };
-
+                        var location = IPSearcher.GetIpLocation(ip);
+                        var network = location.Network + "/" + asn.AutonomousSystemOrganization;
+                        var state = Areas.FirstOrDefault(a => a.CountryCode == country.Country.IsoCode && (a.City == location.City || a.City_EN == location.City))?.State;
+                        return new IPLocation(countryName, location.City, network.Trim('/'), asn.AutonomousSystemNumber)
+                        {
+                            Address2 = new IPLocation.CountryCity(continent, countryName, state, location.City),
+                            Coodinate = city.Location,
+                            Continent = continent,
+                            State = state
+                        };
+                    }
                 default:
-                    return new IPLocation(countryName, cityName, asn.AutonomousSystemOrganization, asn.AutonomousSystemNumber)
                     {
-                        Coodinate = city.Location,
-                        Continent = continent
-                    };
+                        var state = Areas.FirstOrDefault(a => a.CountryCode == country.Country.IsoCode && (a.City == cityName || a.City_EN == city.City.Name))?.State;
+                        return new IPLocation(countryName, cityName, asn.AutonomousSystemOrganization, asn.AutonomousSystemNumber)
+                        {
+                            Coodinate = city.Location,
+                            Continent = continent,
+                            State = state
+                        };
+                    }
             }
         }
 
@@ -401,15 +412,17 @@ namespace Masuit.MyBlogs.Core.Common
 
         public string Country { get; set; }
 
+        public string State { get; set; }
+
         public string City { get; set; }
 
         public string ISP { get; set; }
 
         public long? ASN { get; set; }
 
-        public string Address => new[] { Continent, Country, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
+        public string Address => new[] { Continent, Country, State, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
 
-        public CountryCity Address2 { get; set; } = new("", "", "");
+        public CountryCity Address2 { get; set; } = new("", "", "", "");
 
         public string Network => ASN.HasValue ? ISP + "(AS" + ASN + ")" : ISP;
 
@@ -454,13 +467,14 @@ namespace Masuit.MyBlogs.Core.Common
             return ToString().Contains(s);
         }
 
-        public record CountryCity(string Continent, string Country, string City)
+        public record CountryCity(string Continent, string Country, string State, string City)
         {
-            public void Deconstruct(out string continent, out string country, out string city)
+            public void Deconstruct(out string continent, out string country, out string state, out string city)
             {
                 country = Country;
                 city = City;
                 continent = Continent;
+                state = State;
             }
 
             public static implicit operator string(CountryCity entry)
@@ -470,7 +484,7 @@ namespace Masuit.MyBlogs.Core.Common
 
             public override string ToString()
             {
-                return Continent + Country + City;
+                return Continent + Country + State + City;
             }
         }
     }
