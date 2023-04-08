@@ -68,7 +68,7 @@ namespace Masuit.MyBlogs.Core.Common
             }
 
             IPWhiteList = ReadFile(Path.Combine(AppContext.BaseDirectory + "App_Data", "whitelist.txt")).Split(',', '，').ToList();
-            Areas = JsonConvert.DeserializeObject<List<Area>>(ReadFile(Path.Combine(AppContext.BaseDirectory + "App_Data", "areas.json")));
+            Areas = JsonConvert.DeserializeObject<HashSet<Area>>(ReadFile(Path.Combine(AppContext.BaseDirectory + "App_Data", "areas.json")));
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// </summary>
         public static Dictionary<string, string> DenyIPRange { get; set; }
 
-        public static List<Area> Areas { get; set; }
+        public static HashSet<Area> Areas { get; set; }
 
         /// <summary>
         /// 判断IP地址是否被黑名单
