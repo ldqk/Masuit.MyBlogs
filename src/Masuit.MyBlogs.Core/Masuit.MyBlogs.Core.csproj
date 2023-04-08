@@ -68,7 +68,7 @@
         <PackageReference Include="OpenXmlPowerTools-NetStandard" Version="4.6.23-alpha4" />
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.22" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
-        <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.2" />
+        <PackageReference Include="SixLabors.ImageSharp.Web" Version="3.0.1" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.2" />
         <PackageReference Include="TimeZoneConverter" Version="6.1.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.0" />

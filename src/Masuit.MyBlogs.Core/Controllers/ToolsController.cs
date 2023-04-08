@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Polly;
 using System.Net;
 using TimeZoneConverter;
+using Configuration = AngleSharp.Configuration;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
