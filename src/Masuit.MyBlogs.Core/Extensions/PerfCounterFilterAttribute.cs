@@ -15,7 +15,7 @@ public class PerfCounterFilterAttribute : ActionFilterAttribute
     /// <inheritdoc />
     public override void OnActionExecuted(ActionExecutedContext context)
     {
-        context.HttpContext.Response.Headers.Add("X-Action-Time", Stopwatch.ElapsedMilliseconds + "ms");
+        context.HttpContext.Response.Headers.AddOrUpdate("X-Action-Time", Stopwatch.ElapsedMilliseconds + "ms", Stopwatch.ElapsedMilliseconds + "ms");
     }
 
     /// <inheritdoc />
@@ -24,7 +24,7 @@ public class PerfCounterFilterAttribute : ActionFilterAttribute
         Stopwatch.Restart();
         context.HttpContext.Response.OnStarting(() =>
         {
-            context.HttpContext.Response.Headers.Add("X-Result-Time", Stopwatch.ElapsedMilliseconds + "ms");
+            context.HttpContext.Response.Headers.AddOrUpdate("X-Result-Time", Stopwatch.ElapsedMilliseconds + "ms", Stopwatch.ElapsedMilliseconds + "ms");
             return Task.CompletedTask;
         });
     }

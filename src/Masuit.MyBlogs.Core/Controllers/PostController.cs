@@ -66,7 +66,7 @@ public sealed class PostController : BaseController
         var notRobot = !Request.IsRobot();
         if (string.IsNullOrEmpty(t) && notRobot)
         {
-            return RedirectToAction("Details", cid > 0 ? new { id, kw, cid, t = SnowFlake.NewId } : new { id, kw, t = SnowFlake.NewId });
+            return RedirectToAction("Details", cid > 0 ? new { id, kw, cid, t = HttpContext.Connection.Id } : new { id, kw, t = HttpContext.Connection.Id });
         }
 
         var post = await PostService.GetQuery(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)).Include(p => p.Seminar).AsNoTracking().FirstOrDefaultAsync() ?? throw new NotFoundException("文章未找到");
@@ -298,7 +298,7 @@ public sealed class PostController : BaseController
 
         post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
         post.Status = Status.Pending;
-        post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.HtmlSantinizerStandard().ClearImgAttributes(), cancellationToken);
+        post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.HtmlSanitizerStandard().ClearImgAttributes(), cancellationToken);
         Post p = Mapper.Map<Post>(post);
         p.IP = ClientIP.ToString();
         p.Modifier = p.Author;
