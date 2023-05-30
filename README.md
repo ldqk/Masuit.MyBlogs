@@ -19,6 +19,14 @@
 
 ### 前端请求支援
 目前网站前端页面的代码比较零乱，到处都是，大家想吐槽的尽管吐槽吧，也想找个人帮忙设计下整体的前端页面，有兴趣愿意贡献代码的的小伙伴，欢迎Pull Request吧！😂😂
+### 项目主要技术栈
+.NET7  
+ASP.NET Core MVC  
+Blazor  
+Entity Framework Core
+Masuit.Tools
+Masuit.LuceneEFCore.SearchEngine  
+Hangfire  
 ### 开发环境
 操作系统：Windows 10 2104  
 IDE：Visual Studio 2022 v17.0  
