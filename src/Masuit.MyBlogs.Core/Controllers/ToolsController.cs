@@ -2,7 +2,7 @@
 using DnsClient;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
-using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.Mime;
 using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Models;
 using MaxMind.GeoIP2.Exceptions;

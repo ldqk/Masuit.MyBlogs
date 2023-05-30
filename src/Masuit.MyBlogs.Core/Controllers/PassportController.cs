@@ -4,7 +4,7 @@ using Hangfire;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +25,7 @@ public sealed class PassportController : Controller
     public IUserInfoService UserInfoService { get; set; }
 
     public IFirewallRepoter FirewallRepoter { get; set; }
+
     public IMapper Mapper { get; set; }
 
     /// <summary>
@@ -194,7 +195,7 @@ public sealed class PassportController : Controller
     {
         string code = Tools.Strings.ValidateCode.CreateValidateCode(6);
         HttpContext.Session.Set("valid", code); //将验证码生成到Session中
-        var buffer = HttpContext.CreateValidateGraphic(code);
+        using var buffer = code.CreateValidateGraphic();
         return this.ResumeFile(buffer, ContentType.Jpeg, "验证码.jpg");
     }
 

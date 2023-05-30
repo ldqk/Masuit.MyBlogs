@@ -1,5 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.Mime;
 using Microsoft.International.Converters.TraditionalChineseToSimplifiedConverter;
 using System.Text;
 

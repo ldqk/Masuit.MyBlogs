@@ -4,7 +4,7 @@ using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
-using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.Mime;
 using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Diagnostics;

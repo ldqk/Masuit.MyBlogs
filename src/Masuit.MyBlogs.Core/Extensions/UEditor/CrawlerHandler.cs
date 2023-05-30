@@ -1,7 +1,6 @@
 ﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.Mime;
 using Masuit.Tools.Logging;
-using SixLabors.ImageSharp;
 using System.Diagnostics;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -62,6 +61,7 @@ public class Crawler
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
     private readonly HttpContext _httpContext;
+
     public Crawler(string sourceUrl, HttpClient httpClient, IConfiguration configuration, HttpContext httpContext)
     {
         SourceUrl = sourceUrl;

@@ -13,7 +13,7 @@ using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using Masuit.Tools.AspNetCore.Mime;
+using Masuit.Tools.Mime;
 using Masuit.Tools.Config;
 using Masuit.Tools.Core.AspNetCore;
 using Microsoft.EntityFrameworkCore;
