@@ -1,4 +1,5 @@
 ﻿using CacheManager.Core;
+using Dispose.Scope;
 using FreeRedis;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
@@ -58,8 +59,8 @@ public sealed class FirewallController : Controller
     {
         string code = ValidateCode.CreateValidateCode(6);
         HttpContext.Session.Set("challenge-captcha", code);
-        using var buffer = code.CreateValidateGraphic();
-        return this.ResumeFile(buffer, ContentType.Jpeg, "验证码.jpg");
+        var stream = code.CreateValidateGraphic().RegisterDisposeScope();
+        return this.ResumeFile(stream, ContentType.Jpeg, "验证码.jpg");
     }
 
     /// <summary>

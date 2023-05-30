@@ -10,6 +10,7 @@ using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Web;
+using Dispose.Scope;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -195,8 +196,8 @@ public sealed class PassportController : Controller
     {
         string code = Tools.Strings.ValidateCode.CreateValidateCode(6);
         HttpContext.Session.Set("valid", code); //将验证码生成到Session中
-        using var buffer = code.CreateValidateGraphic();
-        return this.ResumeFile(buffer, ContentType.Jpeg, "验证码.jpg");
+        var stream = code.CreateValidateGraphic().RegisterDisposeScope();
+        return this.ResumeFile(stream, ContentType.Jpeg, "验证码.jpg");
     }
 
     /// <summary>
