@@ -135,14 +135,8 @@ namespace Masuit.MyBlogs.Core
 
         public static void ConfigureOptions(this IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.MinimumSameSitePolicy = SameSiteMode.Lax;
-            }); //配置Cookie策略
-            services.Configure<FormOptions>(options =>
-            {
-                options.MultipartBodyLengthLimit = 104857600; // 100MB
-            }); //配置请求长度
+            services.Configure<CookiePolicyOptions>(options => options.MinimumSameSitePolicy = SameSiteMode.Lax); //配置Cookie策略
+            services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = 104857600); //配置请求长度
             services.Configure<ForwardedHeadersOptions>(options => // X-Forwarded-For
             {
                 options.ForwardLimit = null;
