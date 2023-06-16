@@ -190,7 +190,7 @@ angularjs
 #### 1.安装基础设施：
 1. 安装.net6运行时：[https://dotnet.microsoft.com/zh-cn/download](https://dotnet.microsoft.com/zh-cn/download)
 2. 安装mysql：[mysql 8 绿色版](https://masuit.org/1567),或pgsql：[pgsql 14 绿色版](https://masuit.org/2160)
-3. 安装redis：[redis for windows绿色版](https://ldqk.lanzouy.com/iRKsR0tqw6ti)
+3. 安装redis：[redis for windows绿色版](https://masuit.org/130)
 #### 2.生成网站应用
 #### 方式一：编译源代码：
 编译需要将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目也一起clone下来，和本项目平级目录存放，才能正常编译，否则，将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目移除，通过nuget安装也是可以的。  
