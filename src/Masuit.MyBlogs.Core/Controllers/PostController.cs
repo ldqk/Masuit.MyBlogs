@@ -1095,7 +1095,7 @@ public sealed class PostController : BaseController
         var keys = RedisHelper.Keys(nameof(PostOnline) + ":*");
         var sets = keys.Select(s => (Id: s.Split(':')[1].ToInt32(), Clients: RedisHelper.HGet<HashSet<string>>(s, "value")));
         var ids = sets.Where(t => t.Clients?.Count > 0).OrderByDescending(t => t.Clients.Count).Take(10).Select(t => t.Id).ToArray();
-        var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).ToListAsync().ContinueWith(t =>
+        var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).ToListAsync(cancellationToken).ContinueWith(t =>
         {
             foreach (var item in t.Result)
             {
