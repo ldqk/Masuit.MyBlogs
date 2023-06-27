@@ -15,5 +15,5 @@ public class PostModelBase
     /// <summary>
     /// 浏览次数
     /// </summary>
-    public long ViewCount { get; set; }
+    public int ViewCount { get; set; }
 }
