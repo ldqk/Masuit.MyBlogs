@@ -101,7 +101,7 @@
 								@if (Model.LimitMode > 0)
 								{
 									<div class="col-md-6 col-sm-12 text-red margin-top10">
-										本文 @string.Format(Model.LimitMode.GetDescription(), Model.Regions, Model.ExceptRegions)
+										本文 @Model.LimitMode.GetDescription(Model.Regions, Model.ExceptRegions)
 									</div>
 								}
 								<div class="col-md-6 col-sm-12 pull-right">

@@ -46,18 +46,18 @@
         </div>
         <table class="table table-bordered table-condensed table-responsive">
             <thead>
-            <tr>
-                <th>序号</th>
-                <th>关键词</th>
-                <th>搜索次数</th>
-            </tr>
+                <tr>
+                    <th>序号</th>
+                    <th>关键词</th>
+                    <th>搜索次数</th>
+                </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="item in agg.month">
-                <td>{{$index+1}}</td>
-                <td><a ng-href="/search/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
-                <td>{{item.Count}}</td>
-            </tr>
+                <tr ng-repeat="item in agg.month">
+                    <td>{{$index+1}}</td>
+                    <td><a ng-href="/search/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
+                    <td>{{item.Count}}</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -67,10 +67,10 @@
         </div>
         <table class="table table-bordered table-condensed table-responsive">
             <thead>
-            <tr>
-                <th>关键词</th>
-                <th>搜索次数</th>
-            </tr>
+                <tr>
+                    <th>关键词</th>
+                    <th>搜索次数</th>
+                </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="item in agg.week">
@@ -86,13 +86,72 @@
         </div>
         <table class="table table-bordered table-condensed table-responsive">
             <thead>
-            <tr>
-                <th>关键词</th>
-                <th>搜索次数</th>
-            </tr>
+                <tr>
+                    <th>关键词</th>
+                    <th>搜索次数</th>
+                </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="item in agg.today">
+                    <td><a ng-href="/search/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
+                    <td>{{item.Count}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-4" ng-if="agg.wish_month.length>0">
+        <div class="page-header">
+            <h3 class="text-center">月度搜索排行(搜索结果为0的热词)</h3>
+        </div>
+        <table class="table table-bordered table-condensed table-responsive">
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>关键词</th>
+                    <th>搜索次数</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in agg.wish_month">
+                    <td>{{$index+1}}</td>
+                    <td><a ng-href="/search/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
+                    <td>{{item.Count}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-4" ng-if="agg.wish_week.length>0">
+        <div class="page-header">
+            <h3 class="text-center">本周搜索排行(搜索结果为0的热词)</h3>
+        </div>
+        <table class="table table-bordered table-condensed table-responsive">
+            <thead>
+                <tr>
+                    <th>关键词</th>
+                    <th>搜索次数</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in agg.wish_week">
+                    <td><a ng-href="/search/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
+                    <td>{{item.Count}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-4" ng-if="agg.wish_today.length>0">
+        <div class="page-header">
+            <h3 class="text-center">今日搜索排行(搜索结果为0的热词)</h3>
+        </div>
+        <table class="table table-bordered table-condensed table-responsive">
+            <thead>
+                <tr>
+                    <th>关键词</th>
+                    <th>搜索次数</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in agg.wish_today">
                     <td><a ng-href="/search/{{item.Keywords}}" target="_blank">{{item.Keywords}}</a></td>
                     <td>{{item.Count}}</td>
                 </tr>

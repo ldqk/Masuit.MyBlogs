@@ -303,6 +303,9 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
         _redisClient.Set("SearchRank:Month", searchDetailsService.GetRanks(DateTime.Today.AddMonths(-1)));
         _redisClient.Set("SearchRank:Week", searchDetailsService.GetRanks(DateTime.Today.AddDays(-7)));
         _redisClient.Set("SearchRank:Today", searchDetailsService.GetRanks(DateTime.Today));
+        _redisClient.Set("SearchWishRank:Month", searchDetailsService.WishRanks(DateTime.Today.AddMonths(-1)));
+        _redisClient.Set("SearchWishRank:Week", searchDetailsService.WishRanks(DateTime.Today.AddDays(-7)));
+        _redisClient.Set("SearchWishRank:Today", searchDetailsService.WishRanks(DateTime.Today));
     }
 
     /// <summary>

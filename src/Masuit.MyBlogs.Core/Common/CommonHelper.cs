@@ -7,7 +7,6 @@ using Masuit.Tools.Models;
 using MaxMind.GeoIP2;
 using MaxMind.GeoIP2.Responses;
 using Polly;
-using SixLabors.ImageSharp;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;

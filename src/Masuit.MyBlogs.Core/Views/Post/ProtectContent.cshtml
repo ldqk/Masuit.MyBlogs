@@ -49,7 +49,7 @@
     <div class="row protected-content">
         @if (string.IsNullOrEmpty(Context.Request.Cookies["Comment_" + Model.Id]))
         {
-            <p class="text-red text-center size24 margin-bot10">此处内容回复后刷新页面可见</p>
+            <p class="text-red text-center size24 margin-bot10">此处内容已隐藏，评论回复后刷新页面可见</p>
         }
         else
         {
