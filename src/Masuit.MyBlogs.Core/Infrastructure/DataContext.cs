@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFramework.Exceptions.Common;
+using EntityFramework.Exceptions.PostgreSQL;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.Mapping;
 
 namespace Masuit.MyBlogs.Core.Infrastructure;
 
@@ -11,6 +14,7 @@ public class DataContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        optionsBuilder.UseExceptionProcessor();
         optionsBuilder.EnableDetailedErrors().UseLazyLoadingProxies().UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).ConfigureWarnings(builder => builder.Ignore(CoreEventId.DetachedLazyLoadingWarning));
     }
 
@@ -90,6 +94,25 @@ public class DataContext : DbContext
                 var resolvedValues = databaseValues.Clone();
                 entry.OriginalValues.SetValues(databaseValues);
                 entry.CurrentValues.SetValues(resolvedValues);
+            }
+            catch (MaxLengthExceededException e)
+            {
+                var list = new List<Exception>() { e.InnerException };
+                foreach (var entry in e.Entries)
+                {
+                    foreach (var property in entry.CurrentValues.Properties)
+                    {
+                        if (property.GetTypeMapping() is NpgsqlStringTypeMapping m)
+                        {
+                            var value = entry.CurrentValues.GetValue<string>(property);
+                            if (m.Size < value.Length)
+                            {
+                                list.Add(new MaxLengthExceededException($"{entry.Metadata.Name}.{property.Name}字段值【{value}】超出长度限制：{m.Size}"));
+                            }
+                        }
+                    }
+                }
+                throw new AggregateException(list);
             }
         }
 

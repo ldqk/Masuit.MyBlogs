@@ -2,6 +2,7 @@
 @using Markdig
 
 @model Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto
+@if(Model!=null) {
 <div class="ibox wow fadeIn" id="@Stopwatch.GetTimestamp()">
     <div class="ibox-content" id="@Stopwatch.GetTimestamp()">
         <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
@@ -23,3 +24,4 @@
         </a>
     </div>
 </div>
+}

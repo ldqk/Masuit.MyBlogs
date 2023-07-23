@@ -1,11 +1,15 @@
 ﻿@inject IWebHostEnvironment _hostEnvironment
+@inject IAdvertisementService AdsService
 @using System.IO
+@using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools
 @using Microsoft.AspNetCore.Hosting
+@using Polly
 
 @{
     string[] colors = { "success", "info", "primary", "warning", "danger" };
     Layout = null;
+    var advertisement = Policy<AdvertisementDto>.Handle<Exception>().Fallback(() => new AdvertisementDto()).Execute(() => AdsService.GetByWeightedPrice(AdvertiseType.InPage, Context.Request.Location()));
 }
 <!DOCTYPE html>
 <html>
@@ -64,12 +68,21 @@
                 display: inline-block;
                 vertical-align: middle;
             }
+            #games{
+            width: 100%;
+            margin-top: 32px;
+            }
+            canvas{
+            max-width:100vw !important;
+            height:auto !important;
+            }
     </style>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="https://cdn.staticfile.org/normalize/8.0.1/normalize.min.css" rel="stylesheet">
     <link href="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/content/common/articlestyle.css" rel="stylesheet" />
     <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/jquery.ripples/0.5.3/jquery.ripples.min.js"></script>
     <script src="https://cdn.staticfile.org/phaser/3.24.1/phaser.min.js"></script>
@@ -85,7 +98,7 @@
                 Random r = new Random();
                 string imgPath = $"/Assets/images/404/404{r.StrictNext(Directory.GetFiles(_hostEnvironment.WebRootPath + "/Assets/images/404").Length) + 1}.jpg";
             }
-            <img class="img img-responsive img-thumbnail" width="100%" src="@imgPath" alt="@ViewBag.Keywords" decoding="async"/>
+            <img class="img img-responsive img-thumbnail" width="100%" src="@imgPath" alt="@ViewBag.Keywords"/>
             <h3 class="margintop20">
                 <em>
                         <span class="STYLE1">404 Error&nbsp;</span>
@@ -104,8 +117,12 @@
                         <li>将猫困在一个深色圆点围成的圈子里面就算成功了！</li>
                     </ul>
                 </dd>
-                <div id="games" style="position:static;z-index: 100"></div>
+                <div id="games"></div>
             </dl>
+            <hr class="margin-top10 marginbot10" />
+            @{
+                await Html.RenderPartialAsync("_ArticleListAdvertisement", advertisement);
+            }
         </div>
     </div>
     <div class="layer animated fadeIn">
@@ -122,16 +139,16 @@
 </html>
 <script>
     $(document).ready(function () {
-        window.game = new CatchTheCatGame({
-            w: 11,
-            h: 11,
-            r: 20,
-            backgroundColor: 0xffffff,
-            parent: 'games',
-            statusBarAlign: 'center',
-            credit: 'masuit.com'
-        });
         setTimeout(function () {
+            window.game = new CatchTheCatGame({
+                w: 11,
+                h: 11,
+                r: 20,
+                backgroundColor: 0xffffff,
+                parent: 'games',
+                statusBarAlign: 'center',
+                credit: 'masuit.org'
+            });
             try {
                 $('body').ripples({
                     resolution: 512,
