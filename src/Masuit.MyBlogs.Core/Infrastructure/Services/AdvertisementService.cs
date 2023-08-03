@@ -130,17 +130,19 @@ public sealed partial class AdvertisementService : BaseService<Advertisement>, I
 			}
 
 			var array = all.GroupBy(a => a.Merchant).Select(g => g.OrderByRandom().FirstOrDefault().Id).Take(50).ToArray();
-			var list = all.Where(a => a.Types.Contains(atype))
+			var list = all.Where(a => a.Types.Contains(atype) && array.Contains(a.Id))
 				.Where(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase)))
 				.WhereIf(cid.HasValue, a => Regex.IsMatch(a.CategoryIds + "", scid) || string.IsNullOrEmpty(a.CategoryIds))
 				.WhereIf(!keywords.IsNullOrEmpty(), a => (a.Title + a.Description).Contains(_luceneIndexSearcher.CutKeywords(keywords)))
-				.Where(a => array.Contains(a.Id)).OrderBy(a => -Math.Log(Random.Shared.NextDouble()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1)))).Take(count).ToList();
+				.OrderBy(a => -Math.Log(Random.Shared.NextDouble()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1))))
+				.Take(count).ToList();
 			if (list.Count == 0 && keywords is { Length: > 0 })
 			{
-				list.AddRange(all.Where(a => a.Types.Contains(atype))
+				list.AddRange(all.Where(a => a.Types.Contains(atype) && array.Contains(a.Id))
 				.Where(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase)))
 				.WhereIf(cid.HasValue, a => Regex.IsMatch(a.CategoryIds + "", scid) || string.IsNullOrEmpty(a.CategoryIds))
-				.Where(a => array.Contains(a.Id)).OrderBy(a => -Math.Log(Random.Shared.NextDouble()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1)))).Take(count));
+				.OrderBy(a => -Math.Log(Random.Shared.NextDouble()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1))))
+				.Take(count));
 			}
 
 			var ids = list.Select(a => a.Id).ToArray();

@@ -36,19 +36,19 @@
                     <div class="input-group">
                         <span class="input-group-addon">单IP访问频次：每</span>
                         <div class="fg-line">
-                            <input class="form-control" ng-model="Settings.LimitIPFrequency" type="text" />
+                            <input class="form-control" ng-model="Settings.LimitIPFrequency" type="text" style="width:32px"/>
                         </div>
                         <span class="input-group-addon">秒内，最大请求</span>
                         <div class="fg-line">
-                            <input class="form-control" ng-model="Settings.LimitIPRequestTimes" type="text" />
+                            <input class="form-control" ng-model="Settings.LimitIPRequestTimes" type="text" style="width:32px" />
                         </div>
                         <span class="input-group-addon">次，冻结该IP：</span>
                         <div class="fg-line">
-                            <input class="form-control" ng-model="Settings.BanIPTimespan" type="text" />
+                            <input class="form-control" ng-model="Settings.BanIPTimespan" type="text" style="width:24px" />
                         </div>
                         <span class="input-group-addon">分钟，拦截次数达到</span>
                         <div class="fg-line">
-                            <input class="form-control" ng-model="Settings.LimitIPInterceptTimes" type="text" />
+                            <input class="form-control" ng-model="Settings.LimitIPInterceptTimes" type="text" style="width:32px" />
                         </div>
                         <span class="input-group-addon">次，上报防火墙永久冻结该IP。</span>
                     </div>
@@ -57,7 +57,7 @@
                     <div class="input-group">
                         <span class="input-group-addon">挑战模式：</span>
                         <select ng-model="Settings.ChallengeMode" ng-init="Settings.ChallengeMode = ' '" class="form-control">
-                            <option value=" ">无</option>
+                            <option value="">无</option>
                             <option value="JSChallenge">JS挑战</option>
                             <option value="CaptchaChallenge">验证码挑战</option>
                             <option value="CloudflareTurnstileChallenge">CloudflareTurnstile</option>
@@ -66,7 +66,7 @@
                     <div class="input-group" ng-if="Settings.ChallengeMode=='CloudflareTurnstileChallenge'">
                         <span class="input-group-addon">客户端公钥：</span>
                         <div class="fg-line">
-                            <input class="form-control" ng-model="Settings.TurnstileClientKey" placeholder="0x4AAAAAAAAu4dr4wC-ZVpPT" type="text" style="min-width: 220px"/>
+                            <input class="form-control" ng-model="Settings.TurnstileClientKey" placeholder="0x4AAAAAAAAu4dr4wC-ZVpPT" type="text" style="min-width: 220px" />
                         </div>
                     </div>
                     <div class="input-group" ng-if="Settings.ChallengeMode=='CloudflareTurnstileChallenge'">
@@ -76,6 +76,26 @@
                         </div>
                         <span class="input-group-addon text-red" ng-if="(Settings.TurnstileSecretKey+Settings.TurnstileClientKey).length==0">温馨提示：请先到<a href="https://dash.cloudflare.com/" target="_blank">Cloudflare Turnstile</a>生成站点密钥。</span>
                     </div>
+                    <small class="form-group form-inline" ng-if="Settings.ChallengeMode">
+                        <div class="input-group">
+                            <span class="input-group-addon">启用规则：</span>
+                        </div>
+                        <div class="input-group">
+                            <div class="fg-line">
+                                <select ng-model="Settings.ChallengeRule" class="form-control">
+                                    <option value="All">所有</option>
+                                    <option value="Region">在地区：</option>
+                                </select>
+                                <span ng-if="Settings.ChallengeRule=='Region'">
+                                    <input type="text" class="form-control" id="region" placeholder="竖线分隔，支持国家、地区、城市、运营商、ASN" ng-model="Settings.ChallengeRegions" style="width:300px">
+                                    <select ng-model="Settings.ChallengeRegionLimitMode" ng-init="Settings.ChallengeRegionLimitMode=Settings.ChallengeRegionLimitMode||'2'" class="form-control">
+                                        <option value="1">以内</option>
+                                        <option value="2">以外</option>
+                                    </select>
+                                </span>
+                            </div>
+                        </div>
+                    </small>
                 </div>
                 <div class="col-md-12">
                     <div class="input-group">

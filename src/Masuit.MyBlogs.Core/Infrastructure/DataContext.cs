@@ -15,7 +15,7 @@ public class DataContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseExceptionProcessor();
-        optionsBuilder.EnableDetailedErrors().UseLazyLoadingProxies().UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).ConfigureWarnings(builder => builder.Ignore(CoreEventId.DetachedLazyLoadingWarning));
+        optionsBuilder.EnableDetailedErrors().UseLazyLoadingProxies().UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).ConfigureWarnings(builder => builder.Ignore(CoreEventId.DetachedLazyLoadingWarning, CoreEventId.LazyLoadOnDisposedContextWarning));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

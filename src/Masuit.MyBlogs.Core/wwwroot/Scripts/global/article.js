@@ -6,7 +6,7 @@
 	$(".tocify>.close").on("click", function(e) {
 		$(this).parent().hide();
 	});		
-	$('article img').click(function(){
+	$('article p>img').click(function(){
 		window.open($(this).attr("src"));
 	});
 
