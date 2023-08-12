@@ -223,7 +223,7 @@ function submitComment(_this) {
 
 //评论回复按钮事件
 function bindReplyBtn() {
-	$(".msg-list article .panel-body a").on("click", function (e) {
+	$(".msg-list article .panel-body a.reply").on("click", function (e) {
 		e.preventDefault();
 		loadingDone();
 		var href = $(this).attr("href");
@@ -274,7 +274,7 @@ function loadParentMsgs(data) {
 									</header>
 									<div class="panel-body line-height24">
 										${rows[i].Content}
-										<a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
+										<a class="reply label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
 										${loadMsgs(rows[i].Children)}
 									</div>
 								</article>
@@ -305,7 +305,7 @@ function loadMsgs(msg, depth = 0) {
 						</div>
 						<div class="panel-body line-height24">
 							${item.Content}
-							<a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
+							<a class="reply label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
 							${loadMsgs(item.Children, depth)}
 						</div>
 					</article>`;

@@ -72,19 +72,19 @@
 <script>
     window.onload = function () {
         loading();
-		$('#pageToolbar').Paging({ //异步加载评论
-			pagesize: 10,
-			count: @ViewBag.TotalCount ,
-			toolbar: true,
-			callback: function(page, size, count) {
+        $('#pageToolbar').Paging({ //异步加载评论
+            pagesize: 10,
+            count: @ViewBag.TotalCount ,
+            toolbar: true,
+            callback: function(page, size, count) {
                 $.get("/msg/getmsgs?page=" + page + "&size=" + size, function (data) {
                     data = data.Data;
                     if (data) {
                         document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
                         bindReplyBtn();
-					}
-				});
-			}
+                    }
+                });
+            }
         });
         loadingDone();
     };
@@ -94,7 +94,7 @@
     function loadParentMsgs(data) {
         loading();
         var html = '';
-		if (data) {
+        if (data) {
             var rows = data.rows;
             var page = data.page;
             var size = data.size;
@@ -110,7 +110,7 @@
                                         <span class="pull-right" style="font-size: 10px;">${rows[i].Status == 4 ? `<a class="label label-success" onclick="pass(${rows[i].Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${rows[i].Id})">删除</a><span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span></span>
                                     </header>
                                     <div class="panel-body line-height24">
-                                        ${rows[i].Content} <a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
+                                        ${rows[i].Content} <a class="reply label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
                                         <div class="margin-top10"></div>
                                         <div class="pull-left">
                                             <span class="label label-success">${rows[i].IP}</span>
@@ -125,7 +125,7 @@
                             </div>
                         </li>`;
             }
-		}
+        }
         loadingDone();
         return html;
     }
@@ -149,7 +149,7 @@
                         </div>
                         <div class="panel-body line-height24">
                             ${item.Content}
-                            <a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
+                            <a class="reply label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
                             <div class="margin-top10"></div>
                             <div class="pull-left">
                                 <span class="label label-success">${item.IP}</span>
@@ -165,13 +165,13 @@
         return html;
     }
 
-	function pass(id) {
-		$.post("/msg/pass", {
-			id: id
-		}, function(res) {
-			swal(res.Message, "", res.Success ? "success" : "error");
-			getmsgs();
-		});
+    function pass(id) {
+        $.post("/msg/pass", {
+            id: id
+        }, function(res) {
+            swal(res.Message, "", res.Success ? "success" : "error");
+            getmsgs();
+        });
     }
 
     function bounceEmail(email) {
@@ -194,7 +194,7 @@
     }
 
     function del(id) {
-		swal({
+        swal({
             title: "确认删除这条留言吗？",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
@@ -204,10 +204,10 @@
             animation: true,
             allowOutsideClick: false
         }).then(function () {
-		    $.post("/msg/delete/"+id, function(res) {
-			    swal(res.Message, "", res.Success ? "success" : "error");
-			    getmsgs();
-		    });
+            $.post("/msg/delete/"+id, function(res) {
+                swal(res.Message, "", res.Success ? "success" : "error");
+                getmsgs();
+            });
         }, function () {});
     }
 
@@ -215,10 +215,10 @@
    * 获取留言
    */
     function getmsgs() {
-		$.get("/msg/getmsgs?page=1&size=10&cid=@cid", (data) => {
+        $.get("/msg/getmsgs?page=1&size=10&cid=@cid", (data) => {
             data = data.Data;
-			document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
-			bindReplyBtn();
-		});
-	}
+            document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
+            bindReplyBtn();
+        });
+    }
 </script>

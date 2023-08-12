@@ -309,7 +309,7 @@ function submitComment(_this) {
 
 //评论回复按钮事件
 function bindReplyBtn() {
-	$(".msg-list article .panel-body a").on("click", function(e) {
+	$(".msg-list article .panel-body a.reply").on("click", function(e) {
 		e.preventDefault();
 		loadingDone();
 		var href = $(this).attr("href");
@@ -439,7 +439,7 @@ function loadParentComments(data) {
 								<div class="panel-body line-height24">
 									${rows[i].Content} 
 									<span class="cmvote label label-info" data-id="${rows[i].Id}"><i class="icon-thumbsup"></i>(<span>${rows[i].VoteCount}</span>)</span>
-									<a class="label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
+									<a class="reply label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
 									${loadComments(rows[i].Children)}
 								</div>
 							</article>
@@ -471,7 +471,7 @@ function loadComments(comments, depth = 0) {
 						<div class="panel-body line-height24">
 							${item.Content} 
 							<span class="cmvote label label-${color}" data-id="${item.Id}"><i class="icon-thumbsup"></i>(<span>${item.VoteCount}</span>)</span>
-							<a class="label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
+							<a class="reply label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
 							${loadComments(item.Children, depth)}
 						</div>
 					</article>`;
