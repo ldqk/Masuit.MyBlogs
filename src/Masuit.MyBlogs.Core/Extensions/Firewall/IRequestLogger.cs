@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 
@@ -99,11 +100,9 @@ public class RequestDatabaseLogger : IRequestLogger
 			_dataContext.Add(result);
 		}
 
-		if (_dataContext.SaveChanges() > 0)
-		{
-			var start = DateTime.Now.AddMonths(-6);
-			_dataContext.Set<RequestLogDetail>().Where(e => e.Time < start).DeleteFromQuery();
-		}
+		var start = DateTime.Now.AddMonths(-6);
+		_dataContext.Set<RequestLogDetail>().Where(e => e.Time < start).ExecuteDelete();
+		_dataContext.SaveChanges();
 	}
 }
 

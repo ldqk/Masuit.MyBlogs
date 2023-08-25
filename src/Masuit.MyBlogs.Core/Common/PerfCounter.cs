@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Net.Sockets;
+using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Common;
 
@@ -117,11 +118,9 @@ public sealed class PerfCounterInDatabase : IPerfCounter
 			_dbContext.Add(result);
 		}
 
-		if (_dbContext.SaveChanges() > 0)
-		{
-			var start = DateTime.Now.AddMonths(-1).GetTotalMilliseconds();
-			_dbContext.Set<PerformanceCounter>().Where(e => e.Time < start).DeleteFromQuery();
-		}
+		var start = DateTime.Now.AddMonths(-1).GetTotalMilliseconds();
+		_dbContext.Set<PerformanceCounter>().Where(e => e.Time < start).ExecuteDelete();
+		_dbContext.SaveChanges();
 	}
 }
 
@@ -139,7 +138,7 @@ public sealed class PerfCounterBackService : ScheduledService
 #if RELEASE
 		using var scope = _serviceScopeFactory.CreateAsyncScope();
 		var counter = scope.ServiceProvider.GetRequiredService<IPerfCounter>();
-		counter.Process(); 
+		counter.Process();
 #endif
 		return Task.CompletedTask;
 	}
