@@ -1,8 +1,8 @@
 ﻿using Collections.Pooled;
 using Dispose.Scope;
+using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
-using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository;
 
@@ -25,7 +25,7 @@ public sealed partial class PostRepository : BaseRepository<Post>, IPostReposito
 	/// <returns>还未执行的SQL语句</returns>
 	public override PooledList<Post> GetQueryFromCache(Expression<Func<Post, bool>> where)
 	{
-		return DataContext.Post.Include(p => p.Category).Where(where).FromCache().ToPooledListScope();
+		return DataContext.Post.Include(p => p.Category).Where(where).Cacheable().ToPooledListScope();
 	}
 
 	/// <summary>

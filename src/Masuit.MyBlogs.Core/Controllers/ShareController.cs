@@ -2,7 +2,6 @@
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -35,7 +34,6 @@ public sealed class ShareController : AdminController
 	public ActionResult Add([FromBodyOrDefault] FastShare share)
 	{
 		bool b = FastShareService.AddEntitySaved(share) != null;
-		QueryCacheManager.ExpireType<FastShare>();
 		return ResultData(null, b, b ? "添加成功" : "添加失败");
 	}
 
@@ -48,7 +46,6 @@ public sealed class ShareController : AdminController
 	public async Task<ActionResult> Remove(int id)
 	{
 		bool b = await FastShareService.DeleteByIdAsync(id) > 0;
-		QueryCacheManager.ExpireType<FastShare>();
 		return ResultData(null, b, b ? "删除成功" : "删除失败");
 	}
 
@@ -61,7 +58,6 @@ public sealed class ShareController : AdminController
 	public async Task<ActionResult> Update([FromBodyOrDefault] FastShare model)
 	{
 		var b = await FastShareService.GetQuery(s => s.Id == model.Id).ExecuteUpdateAsync(s => s.SetProperty(e => e.Title, model.Title).SetProperty(e => e.Link, model.Link).SetProperty(e => e.Sort, model.Sort)) > 0;
-		QueryCacheManager.ExpireType<FastShare>();
 		return ResultData(null, b, b ? "更新成功" : "更新失败");
 	}
 }

@@ -22,6 +22,8 @@ using Newtonsoft.Json;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using System.Text.RegularExpressions;
 using Masuit.Tools.AspNetCore.ModelBinder;
+using EFCoreSecondLevelCacheInterceptor;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Masuit.MyBlogs.Core;
 
@@ -68,7 +70,8 @@ public class Startup
 	/// <returns></returns>
 	public void ConfigureServices(IServiceCollection services)
 	{
-		services.AddDbContext<DataContext>(opt => opt.UseNpgsql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10)).EnableSensitiveDataLogging()); //配置数据库
+		services.AddEFSecondLevelCache(options => options.UseCacheManagerCoreProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true).UseCacheKeyPrefix("EFCache:"));
+		services.AddDbContext<DataContext>((serviceProvider, opt) => opt.UseNpgsql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10)).EnableSensitiveDataLogging().AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())); //配置数据库
 		services.AddDbContext<LoggerDbContext>(opt => opt.UseNpgsql(AppConfig.ConnString)); //配置数据库
 		services.ConfigureOptions();
 		services.AddHttpsRedirection(options =>

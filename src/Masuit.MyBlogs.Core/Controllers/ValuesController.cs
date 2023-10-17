@@ -1,7 +1,6 @@
 ﻿using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -20,7 +19,6 @@ public sealed class ValuesController : AdminController
 	public async Task<ActionResult> Save([FromBodyOrDefault] Variables model)
 	{
 		var b = await VariablesService.AddOrUpdateSavedAsync(v => v.Key, model) > 0;
-		QueryCacheManager.ExpireType<Variables>();
 		return ResultData(null, b, b ? "保存成功" : "保存失败");
 	}
 
@@ -28,7 +26,6 @@ public sealed class ValuesController : AdminController
 	public ActionResult Delete(int id)
 	{
 		var b = VariablesService - id;
-		QueryCacheManager.ExpireType<Variables>();
 		return ResultData(null, b, b ? "删除成功" : "保存失败");
 	}
 }

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Dispose.Scope;
-using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -16,7 +15,9 @@ namespace Masuit.MyBlogs.Core.Controllers;
 public sealed class LinksController : BaseController
 {
 	public IHttpClientFactory HttpClientFactory { get; set; }
+
 	public IConfiguration Configuration { get; set; }
+
 	private HttpClient HttpClient => HttpClientFactory.CreateClient();
 
 	/// <summary>
@@ -89,7 +90,6 @@ public sealed class LinksController : BaseController
 			}
 
 			var b = LinksService.AddEntitySaved(link) != null;
-			QueryCacheManager.ExpireType<Links>();
 			return ResultData(null, b, b ? "添加成功！这可能有一定的延迟，如果没有看到您的链接，请稍等几分钟后刷新页面即可，如有疑问，请联系站长。" : "添加失败！这可能是由于网站服务器内部发生了错误，如有疑问，请联系站长。");
 		});
 	}
@@ -103,7 +103,6 @@ public sealed class LinksController : BaseController
 	public async Task<ActionResult> Save([FromBodyOrDefault] Links links)
 	{
 		bool b = await LinksService.AddOrUpdateSavedAsync(l => l.Id, links) > 0;
-		QueryCacheManager.ExpireType<Links>();
 		return b ? ResultData(null, message: "添加成功！") : ResultData(null, false, "添加失败！");
 	}
 
@@ -149,7 +148,6 @@ public sealed class LinksController : BaseController
 	public async Task<ActionResult> Delete(int id)
 	{
 		bool b = await LinksService.DeleteByIdAsync(id) > 0;
-		QueryCacheManager.ExpireType<Links>();
 		return ResultData(null, b, b ? "删除成功！" : "删除失败！");
 	}
 
@@ -200,7 +198,6 @@ public sealed class LinksController : BaseController
 	public async Task<ActionResult> Toggle(int id)
 	{
 		var b = await LinksService.GetQuery(m => m.Id == id).ExecuteUpdateAsync(s => s.SetProperty(e => e.Status, m => m.Status == Status.Unavailable ? Status.Available : Status.Unavailable)) > 0;
-		QueryCacheManager.ExpireType<Links>();
 		return ResultData(null, b, b ? "切换成功！" : "切换失败！");
 	}
 }

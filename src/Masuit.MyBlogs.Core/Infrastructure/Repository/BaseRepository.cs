@@ -2,12 +2,12 @@
 using AutoMapper.QueryableExtensions;
 using Collections.Pooled;
 using Dispose.Scope;
+using EFCoreSecondLevelCacheInterceptor;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools.Core.AspNetCore;
 using Masuit.Tools.Models;
 using Microsoft.EntityFrameworkCore;
-using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository;
 
@@ -82,7 +82,7 @@ public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T
 	/// <returns></returns>
 	public virtual PooledList<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true)
 	{
-		return GetAllNoTracking(orderby, isAsc).FromCache().ToPooledListScope();
+		return GetAllNoTracking(orderby, isAsc).Cacheable().ToPooledListScope();
 	}
 
 	/// <summary>
@@ -128,7 +128,7 @@ public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T
 	/// <returns></returns>
 	public virtual PooledList<T> GetQueryFromCache(Expression<Func<T, bool>> where)
 	{
-		return DataContext.Set<T>().Where(where).AsNoTracking().FromCache().ToPooledListScope();
+		return DataContext.Set<T>().Where(where).AsNoTracking().Cacheable().ToPooledListScope();
 	}
 
 	/// <summary>
@@ -141,12 +141,12 @@ public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T
 	/// <returns></returns>
 	public virtual PooledList<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true)
 	{
-		return GetQueryNoTracking(where, orderby, isAsc).FromCache().ToPooledListScope();
+		return GetQueryNoTracking(where, orderby, isAsc).Cacheable().ToPooledListScope();
 	}
 
 	public PooledList<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class
 	{
-		return GetQuery<TDto>(where).FromCache().ToPooledListScope();
+		return GetQuery<TDto>(where).Cacheable().ToPooledListScope();
 	}
 
 	/// <summary>
@@ -207,7 +207,7 @@ public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T
 	/// <returns></returns>
 	public virtual PooledList<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class
 	{
-		return GetQuery(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).FromCache().ToPooledListScope();
+		return GetQuery(where, orderby, isAsc).ProjectTo<TDto>(MapperConfig).Cacheable().ToPooledListScope();
 	}
 
 	/// <summary>
@@ -227,7 +227,7 @@ public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T
 	/// <returns>实体</returns>
 	public Task<T> GetFromCacheAsync(Expression<Func<T, bool>> @where)
 	{
-		return DataContext.Set<T>().Where(where).AsNoTracking().DeferredFirstOrDefault().ExecuteAsync();
+		return DataContext.Set<T>().Where(where).AsNoTracking().Cacheable().FirstOrDefaultAsync();
 	}
 
 	/// <summary>
@@ -268,7 +268,7 @@ public abstract class BaseRepository<T> : Disposable, IBaseRepository<T> where T
 	/// <returns>映射实体</returns>
 	public Task<TDto> GetFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class
 	{
-		return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ProjectTo<TDto>(MapperConfig).DeferredFirstOrDefault().ExecuteAsync() : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ProjectTo<TDto>(MapperConfig).DeferredFirstOrDefault().ExecuteAsync();
+		return isAsc ? DataContext.Set<T>().Where(where).OrderBy(orderby).ProjectTo<TDto>(MapperConfig).Cacheable().FirstOrDefaultAsync() : DataContext.Set<T>().Where(where).OrderByDescending(orderby).ProjectTo<TDto>(MapperConfig).Cacheable().FirstOrDefaultAsync();
 	}
 
 	/// <summary>

@@ -5,7 +5,6 @@ using Masuit.MyBlogs.Core.Models;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using Z.EntityFramework.Plus;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -87,7 +86,6 @@ public sealed class NoticeController : BaseController
 		}
 
 		var e = NoticeService.AddEntitySaved(notice);
-		QueryCacheManager.ExpireType<Notice>();
 		return e != null ? ResultData(null, message: "发布成功") : ResultData(null, false, "发布失败");
 	}
 
@@ -100,7 +98,6 @@ public sealed class NoticeController : BaseController
 	public async Task<ActionResult> Delete(int id)
 	{
 		bool b = await NoticeService.DeleteByIdAsync(id) > 0;
-		QueryCacheManager.ExpireType<Notice>();
 		return ResultData(null, b, b ? "删除成功" : "删除失败");
 	}
 
@@ -115,7 +112,6 @@ public sealed class NoticeController : BaseController
 		var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("公告未找到");
 		notice.NoticeStatus = notice.NoticeStatus == NoticeStatus.Normal ? NoticeStatus.Expired : NoticeStatus.Normal;
 		var b = await NoticeService.SaveChangesAsync() > 0;
-		QueryCacheManager.ExpireType<Notice>();
 		return ResultData(null, b, notice.NoticeStatus == NoticeStatus.Normal ? $"【{notice.Title}】已上架！" : $"【{notice.Title}】已下架！");
 	}
 
@@ -145,7 +141,6 @@ public sealed class NoticeController : BaseController
 		entity.StrongAlert = notice.StrongAlert;
 		entity.Content = await ImagebedClient.ReplaceImgSrc(await notice.Content.ClearImgAttributes(), cancellationToken);
 		bool b = await NoticeService.SaveChangesAsync() > 0;
-		QueryCacheManager.ExpireType<Notice>();
 		return ResultData(null, b, b ? "修改成功" : "修改失败");
 	}
 

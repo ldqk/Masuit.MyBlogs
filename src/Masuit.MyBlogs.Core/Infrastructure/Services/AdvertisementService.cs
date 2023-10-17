@@ -5,7 +5,7 @@ using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text.RegularExpressions;
-using Z.EntityFramework.Plus;
+using EFCoreSecondLevelCacheInterceptor;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services;
 
@@ -73,10 +73,7 @@ public sealed partial class AdvertisementService : BaseService<Advertisement>, I
 			where = where.And(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase)));
 			if (cid.HasValue)
 			{
-				var pids = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => string.Concat(c.ParentId, "|", c.Parent.ParentId).Trim('|')).Distinct().FromCache(new MemoryCacheEntryOptions()
-				{
-					AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(5)
-				});
+				var pids = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => string.Concat(c.ParentId, "|", c.Parent.ParentId).Trim('|')).Distinct().Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromHours(5)).ToList();
 				var scid = pids.Append(cid + "").Join("|");
 				if (Any(a => Regex.IsMatch(a.CategoryIds, scid)))
 				{
@@ -123,10 +120,7 @@ public sealed partial class AdvertisementService : BaseService<Advertisement>, I
 			string scid = "";
 			if (cid.HasValue)
 			{
-				scid = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => string.Concat(c.ParentId, "|", c.Parent.ParentId).Trim('|')).Distinct().FromCache(new MemoryCacheEntryOptions()
-				{
-					AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(5)
-				}).Append(cid + "").Join("|");
+				scid = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => string.Concat(c.ParentId, "|", c.Parent.ParentId).Trim('|')).Distinct().Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromHours(5)).AsEnumerable().Append(cid + "").Join("|");
 			}
 
 			var array = all.GroupBy(a => a.Merchant).Select(g => g.OrderByRandom().FirstOrDefault().Id).Take(50).ToArray();

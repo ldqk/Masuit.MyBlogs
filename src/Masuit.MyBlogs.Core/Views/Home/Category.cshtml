@@ -6,8 +6,8 @@
 @using Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.Tools.Models
-@using Z.EntityFramework.Plus
 @using Dispose.Scope
+@using EFCoreSecondLevelCacheInterceptor
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @inject ICategoryService CategoryService
 @{
@@ -23,16 +23,16 @@
             children2.AddRange(cat.Children.Where(c => c.Status == Status.Available).OrderBy(c => c.Id).ToPooledListScope());
             break;
         case 2:
-            children2.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == parentId, c => c.Name).FromCache().ToPooledListScope());
+            children2.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == parentId, c => c.Name).Cacheable().ToPooledListScope());
             children3.AddRange(cat.Children.Where(c => c.Status == Status.Available).OrderBy(c => c.Id).ToPooledListScope());
             break;
         case 3:
             var topid = cat.Parent.ParentId;
-            children2.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == topid, c => c.Name).FromCache().ToPooledListScope());
-            children3.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == parentId, c => c.Name).FromCache().ToPooledListScope());
+            children2.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == topid, c => c.Name).Cacheable().ToPooledListScope());
+            children3.AddRange(CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == parentId, c => c.Name).Cacheable().ToPooledListScope());
             break;
     }
-    var alllist = CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).Select(c => new{c.Id,c.Name}).FromCache().ToPooledListScope();
+    var alllist = CategoryService.GetQuery(c => c.Status == Status.Available && c.ParentId == null, c => c.Name).Select(c => new{c.Id,c.Name}).Cacheable().ToPooledListScope();
 }
 <style>
     .bg-title {
