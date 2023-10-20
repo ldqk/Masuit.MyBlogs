@@ -49,10 +49,10 @@
         <PackageReference Include="CHTCHSConv" Version="1.0.0" />
         <PackageReference Include="CLRStats" Version="1.0.0" />
         <PackageReference Include="Dispose.Scope.AspNetCore" Version="0.0.3" />
-        <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="3.9.2" />
+        <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="3.9.4" />
         <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="6.0.3" />
         <PackageReference Include="FreeRedis" Version="1.1.10" />
-        <PackageReference Include="Hangfire" Version="1.8.5" />
+        <PackageReference Include="Hangfire" Version="1.8.6" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.0" />
         <PackageReference Include="htmldiff.net" Version="1.4.1" />
         <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.7.0" />
