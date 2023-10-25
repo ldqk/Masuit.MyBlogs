@@ -1,0 +1,289 @@
+﻿@using Masuit.Tools.Models
+@using System.Globalization
+@using CacheManager.Core
+@implements IAsyncDisposable
+@inject ICacheManager<HashSet<string>> CacheManager
+<div class="container">
+    <p>当前<span class="text-red online">@online</span>人正在使用本功能</p>
+    <p class="text-red">温馨提示：支持多次提前还款和多次调整利率，同时支持提前还款时变更贷款方式和缩短年限，如有利率调整或提前还款计划，因银行计算受实时利率或提前还款违约金影响，本试算模型的计算结果和银行结果大约有1‰的误差，结果仅供参考，请以银行结果为准</p>
+    <div class="panel panel-info">
+        <div class="panel-heading">贷款基本信息</div>
+        <div class="panel-body">
+            <div class="input-group">
+                <label class="input-group-addon" for="loan">贷款金额</label>
+                <input @bind="LoanAmount" class="form-control" id="loan" placeholder="贷款金额" type="number" min="10">
+                <span class="input-group-addon">万元</span>
+            </div>
+            <div class="input-group">
+                <label class="input-group-addon" for="rate">发放利率</label>
+                <input @bind="Rate" class="form-control" id="rate" placeholder="贷款发放利率" type="number" step="0.1" min="1" max="24">
+                <span class="input-group-addon">%</span>
+            </div>
+            <div class="input-group">
+                <label class="input-group-addon" for="year">贷款年限</label>
+                <input @bind="Year" class="form-control" id="year" placeholder="贷款年限" type="number" max="30" min="2">
+                <span class="input-group-addon">年</span>
+            </div>
+            <div class="input-group">
+                <label class="input-group-addon" for="start">贷款时间</label>
+                <input @bind="Start" class="form-control" id="start" placeholder="贷款发放时间" type="date">
+            </div>
+            <div class="input-group">
+                <label class="input-group-addon">贷款方式</label>
+                <select @bind="Type" class="form-control">
+                    <option value="@LoanType.EquivalentInterest">等额本息</option>
+                    <option value="@LoanType.EquivalentPrincipal">等额本金</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-danger">
+        <div class="panel-heading">利率调整计划</div>
+        <div class="panel-body">
+            <table class="table table-bordered table-striped">
+                <thead class="firstRow">
+                <tr>
+                    <td>调整时间</td>
+                    <td>利率</td>
+                    <td>操作</td>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var (key, value) in RateAdjustments) {
+                    <tr>
+                        <td>@key.ToString("yyyy-MM-dd")</td>
+                        <td>@value?.ToString("P")</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => RateAdjustments.Remove(key)">移除</button>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td>
+                        <input @bind="AdjTime" class="form-control" placeholder="利率调整时间" type="date">
+                    </td>
+                        <td>
+                            <div class="input-group">
+                                <input @bind="RateAdj" class="form-control" placeholder="4.2" type="number" step="0.1" min="1" max="24">
+                                <span class="input-group-addon">%</span>
+                            </div>
+                    </td>
+                    <td>
+                        @if (RateAdj is > 0 and < 20) {
+                            <button class="btn btn-info" @onclick="() => RateAdjustments.AddOrUpdate(AdjTime, RateAdj / 100, RateAdj / 100)">添加</button>
+                        }
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="panel panel-success">
+        <div class="font-weight-bold panel-heading">提前还款计划</div>
+        <div class="panel-body">
+            <table class="table table-bordered table-striped">
+                <thead class="firstRow">
+                <tr>
+                    <td>提前还款时间</td>
+                    <td>提前还款额</td>
+                    <td>是否缩短期限</td>
+                    <td>变更贷款方式</td>
+                    <td>操作</td>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in PrepaymentOptions) {
+                    <tr>
+                        <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                        <td>@item.Amount.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                        <td>@(item.ReducePeriod?"是":"否")</td>
+                        <td>@item.ChangeType?.GetDescription()</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => PrepaymentOptions.Remove(item)">移除</button>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td>
+                        <input @bind="PrepaymentDate" class="form-control" placeholder="提前还款时间" type="date">
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <input @bind="PrepaymentAmount" class="form-control" placeholder="100000" type="number" min="5" max="@LoanAmount">
+                            <span class="input-group-addon">万元</span>
+                        </div>
+                    </td>
+                    <td>
+                        <input @bind="PrepaymentReducePeriod" type="checkbox">
+                    </td>
+                    <td>
+                        <select @bind="PrepaymentLoanType" class="form-control">
+                            <option value="@LoanType.EquivalentInterest">等额本息</option>
+                            <option value="@LoanType.EquivalentPrincipal">等额本金</option>
+                        </select>
+                    </td>
+                    <td>
+                        @if (PrepaymentAmount > 0) {
+                            <button class="btn btn-info" @onclick="() => PrepaymentOptions.Add(new PrepaymentOption(PrepaymentDate, PrepaymentAmount * 10000, PrepaymentReducePeriod, PrepaymentLoanType))">添加</button>
+                        }
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="text-red">温馨提示：【缩短期限】选项实际银行政策不允许直接调整，需要重新变更贷款合同，该选项勾选可能会和银行新贷款合同的还款计划相差较大，视银行具体情况而定。【缩短期限】与【变更贷款方式】选项同时发生变化时，仅生效变更贷款方式。</p>
+        </div>
+    </div>
+    <button class="btn btn-info btn-lg" @onclick="Calc">开始计算</button>
+    @if (LoanResult.Plans.Any()) {
+        <div class="panel panel-primary">
+            <div class="panel-heading">汇总摘要</div>
+            <div class="panel-body">
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                    <tr>
+                        <td>总利息</td>
+                        <td>@LoanResult.TotalInterest.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                    </tr>
+                    <tr>
+                        <td>实际支付利息</td>
+                        <td>@LoanResult.ActualInterest.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                    </tr>
+                    <tr>
+                        <td>提前还款节省利息</td>
+                        <td>@LoanResult.SavedInterest.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                    </tr>
+                    <tr>
+                        <td>总提前还款</td>
+                        <td>@LoanResult.TotalRepayment.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                    </tr>
+                    <tr>
+                        <td>实际还款总额</td>
+                        <td>@LoanResult.ActualPayment.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                    </tr>
+                    <tr>
+                        <td>总还款期数</td>
+                        <td>@LoanResult.Plans.Count 期</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">还款计划明细：</div>
+            <div class="panel-body">
+                <table class="table table-bordered table-striped">
+                    <thead class="firstRow">
+                    <tr>
+                        <td>期数</td>
+                        <td>还款日</td>
+                        <td>月供</td>
+                        <td>年利率</td>
+                        <td>月还利息</td>
+                        <td>月还本金</td>
+                        <td>当期提前还款额</td>
+                        <td>每期剩余本金</td>
+                        <td>贷款类型</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in LoanResult.Plans) {
+                        <tr>
+                            <td>@item.Period</td>
+                            <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                            <td>@item.Payment.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                            <td>@item.Rate.ToString("P")</td>
+                            <td>@item.Interest.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                            <td>@item.Amount.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                            <td>@item.Repayment.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                            <td>@item.Balance.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                            <td>@item.LoanType.GetDescription()</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+
+    int online;
+    Timer _timer;
+
+    [Parameter]
+    public string IP { get; set; }
+
+    public decimal LoanAmount { get; set; } = 100;
+    public decimal Rate { get; set; } = 4.3m;
+    public int Year { get; set; } = 20;
+    public int Period => Year * 12;
+    public DateTime Start { get; set; } = DateTime.Today;
+    public LoanType Type { get; set; }
+    public Dictionary<DateTime, decimal?> RateAdjustments = new();
+    public List<PrepaymentOption> PrepaymentOptions = new();
+    public LoanResult LoanResult { get; set; } = new(0, new List<PaymentPlan>());
+
+    public decimal RateAdj { get; set; } = 4;
+    public DateTime AdjTime { get; set; } = DateTime.Today;
+
+    public DateTime PrepaymentDate = DateTime.Today;
+    public decimal PrepaymentAmount=5;
+    public bool PrepaymentReducePeriod { get; set; }
+    public LoanType PrepaymentLoanType { get; set; }
+
+    public void Calc() {
+        LoanResult = new LoanModel(LoanAmount * 10000, Rate / 100, Period, Start, Type) {
+            Prepayments = PrepaymentOptions,
+            RateAdjustments = RateAdjustments
+        }.Payment();
+    }
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            var key = nameof(Loan);
+            online = CacheManager.AddOrUpdate(key, new HashSet<string>(), set =>
+            {
+                set.Add(IP);
+                return set;
+            }, 3).Count;
+            CacheManager.Expire(key, ExpirationMode.Sliding, TimeSpan.FromMinutes(5));
+            _timer = new Timer(_ =>
+            {
+                try
+                {
+                    online = CacheManager.Get(key)?.Count ?? 0;
+                    InvokeAsync(StateHasChanged);
+                }
+                catch
+                {
+                    // ignored
+                }
+            }, null, 0, 1000);
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        try
+        {
+            online = CacheManager.AddOrUpdate(nameof(Loan), new HashSet<string>(), set =>
+            {
+                set.Remove(IP);
+                return set;
+            }).Count;
+        }
+        catch
+        {
+            // ignored
+        }
+        return _timer?.DisposeAsync() ?? ValueTask.CompletedTask;
+    }
+}

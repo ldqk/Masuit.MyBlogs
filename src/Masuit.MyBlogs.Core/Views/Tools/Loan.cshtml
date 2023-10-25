@@ -1,0 +1,16 @@
+﻿@using Masuit.Tools.Models
+@using Masuit.MyBlogs.Core.Views.Tools
+@model Location
+@{
+    ViewBag.Title = "房贷多次提前还款试算模型计算器";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container">
+    <ol class="cd-breadcrumb triangle">
+        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
+        <li class="current">
+            <em>@ViewBag.Title</em>
+        </li>
+    </ol>
+</div>
+@(await Html.RenderComponentAsync<Loan>(RenderMode.ServerPrerendered, new { IP = Context.Connection.RemoteIpAddress.ToString() }))
