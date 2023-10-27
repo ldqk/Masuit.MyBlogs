@@ -339,6 +339,19 @@
         </form>
     </div>
 </div>
+@if (Model.DisableCopy)
+{
+    <style>
+        /* webkit, opera, IE9 （谷歌浏览器）*/
+        ::selection {
+            background: transparent;
+        }
+        /* mozilla firefox（火狐浏览器） */
+        ::-moz-selection {
+            background: transparent;
+        }
+    </style>
+}
 <script>
     @if(Model.DisableCopy) {
         <text>
