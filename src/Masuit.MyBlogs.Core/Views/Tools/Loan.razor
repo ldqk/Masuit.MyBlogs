@@ -149,7 +149,7 @@
                         <td>@LoanResult.ActualInterest.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
                     </tr>
                     <tr>
-                        <td>提前还款节省利息</td>
+                        <td>提前还款/利率调整节省利息</td>
                         <td>@LoanResult.SavedInterest.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
                     </tr>
                     <tr>
@@ -182,7 +182,10 @@
                         <td>月还利息</td>
                         <td>月还本金</td>
                         <td>当期提前还款额</td>
-                        <td>每期剩余本金</td>
+                        <td>当期剩余本金</td>
+                        <td>当期剩余利息</td>
+                        <td>发生变更减少总利息</td>
+                        <td>相当于每月理财收益</td>
                         <td>贷款类型</td>
                     </tr>
                     </thead>
@@ -195,8 +198,11 @@
                             <td>@item.Rate.ToString("P")</td>
                             <td>@item.Interest.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
                             <td>@item.Amount.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
-                            <td>@item.Repayment.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                            <td>@(item.Repayment<=0?"":item.Repayment.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN")))</td>
                             <td>@item.Balance.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                            <td>@item.RemainInterest.ToString("C",CultureInfo.CreateSpecificCulture("zh-CN"))</td>
+                            <td>@(item.OriginRemainInterest - item.RemainInterest<100?"":(item.OriginRemainInterest - item.RemainInterest).ToString("C", CultureInfo.CreateSpecificCulture("zh-CN")))</td>
+                            <td>@(item.OriginRemainInterest - item.RemainInterest<100?"":((item.OriginRemainInterest - item.RemainInterest) / (LoanResult.Plans.Count - LoanResult.Plans.IndexOf(item))).ToString("C", CultureInfo.CreateSpecificCulture("zh-CN")))</td>
                             <td>@item.LoanType.GetDescription()</td>
                         </tr>
                     }
