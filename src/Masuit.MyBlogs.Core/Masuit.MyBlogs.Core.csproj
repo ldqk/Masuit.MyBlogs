@@ -49,7 +49,7 @@
         <PackageReference Include="CHTCHSConv" Version="1.0.0" />
         <PackageReference Include="CLRStats" Version="1.0.0" />
         <PackageReference Include="Dispose.Scope.AspNetCore" Version="0.0.3" />
-        <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="3.9.5" />
+        <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="4.0.0" />
         <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="6.0.3" />
         <PackageReference Include="FreeRedis" Version="1.1.12" />
         <PackageReference Include="Hangfire" Version="1.8.6" />
