@@ -108,7 +108,7 @@ public sealed class MsgController : BaseController
                 parentTotal = total,
                 page,
                 size,
-                rows = Mapper.Map<IList<LeaveMessageViewModel>>(messages.OrderByDescending(c => c.PostDate).ToTree(c => c.Id, c => c.ParentId))
+                rows = Mapper.Map<List<LeaveMessageViewModel>>(messages.OrderByDescending(c => c.PostDate).ToTree(c => c.Id, c => c.ParentId))
             });
         }
 

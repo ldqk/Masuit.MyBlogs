@@ -236,7 +236,7 @@ public sealed class HomeController : BaseController
     {
         page = Math.Max(1, page);
         var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
-        var cids = cat.Flatten().Select(c => c.Id).ToArray();
+        var cids = CategoryService.GetQuery(c => c.Status == Status.Available && c.Path.StartsWith(cat.Path + ",")).Select(c => c.Id).Cacheable().AsEnumerable().Append(id).ToArray();
         var h24 = DateTime.Today.AddDays(-1);
         var posts = orderBy switch
         {
@@ -245,7 +245,6 @@ public sealed class HomeController : BaseController
         };
         var viewModel = GetIndexPageViewModel();
         viewModel.Posts = posts;
-        ViewBag.Category = cat;
         viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
         viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location(), id);
         viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location(), id);
@@ -255,6 +254,7 @@ public sealed class HomeController : BaseController
             item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
         }
 
+        ViewBag.Category = cat;
         return View(viewModel);
     }
 
@@ -316,7 +316,12 @@ public sealed class HomeController : BaseController
     {
         var postsQuery = PostService.GetQuery<PostDto>(PostBaseWhere()); //准备文章的查询
         var notices = NoticeService.GetPagesFromCache<DateTime, NoticeDto>(1, 5, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false); //加载前5条公告
-        var cats = CategoryService.GetQuery(c => c.Status == Status.Available && c.Post.Count > 0).Include(c => c.Parent).OrderBy(c => c.Name).ThenBy(c => c.Path).AsNoTracking().Cacheable().ToPooledListScope(); //加载分类目录
+        var cats = CategoryService.GetQuery(c => c.Status == Status.Available && c.Post.Count > 0).OrderBy(c => c.Name).ThenBy(c => c.Path).AsNoTracking().Select(c => new Category
+        {
+            Id = c.Id,
+            Name = c.Name,
+            ParentId = c.ParentId,
+        }).Cacheable().ToPooledListScope(); //加载分类目录
         var hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").AsNotNull().Take(10).ToPooledListScope(); //热词统计
         var hot5Post = postsQuery.OrderBy((new Random().Next() % 3) switch
         {

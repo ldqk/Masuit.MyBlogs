@@ -129,35 +129,35 @@
 </div>
 <script src="~/Scripts/global/leavemsg.js"></script>
 <script>
-	window.onload = function() {
+    window.onload = function() {
         loading();
-		$('#pageToolbar').Paging({ //异步加载评论
-			pagesize: 10,
-			count: @ViewBag.TotalCount,
-			toolbar: true,
-			callback: function(page, size, count) {
-				$.get("/msg/getmsgs?page="+page+"&size="+size, function (data){
+        $('#pageToolbar').Paging({ //异步加载评论
+            pagesize: 10,
+            count: @ViewBag.TotalCount,
+            toolbar: true,
+            callback: function(page, size, count) {
+                $.get("/msg/getmsgs?page="+page+"&size="+size, function (data){
                     data = data.Data;
                     if (data) {
                         document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
                         bindReplyBtn();
-					}
-				});
-			}
-		});
+                    }
+                });
+            }
+        });
         loadingDone();
-	};
+    };
 
-	/**
+    /**
    * 获取留言
    */
     function getmsgs() {
         $.get("/msg/getmsgs?page=1&size=10&cid=@cid", function(data){
             data = data.Data;
-			if (data) {
+            if (data) {
                 document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
                 bindReplyBtn();
-			}
+            }
         });
     }
 </script>

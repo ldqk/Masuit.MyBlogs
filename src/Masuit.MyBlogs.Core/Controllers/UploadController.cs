@@ -129,9 +129,9 @@ public sealed class UploadController : Controller
         var doc = context.OpenAsync(req => req.Content(html)).Result;
         var body = doc.Body;
         var nodes = body.GetElementsByTagName("img");
-        foreach (var img in nodes)
+        foreach (var img in nodes.Select(x => x.Attributes["src"]))
         {
-            var attr = img.Attributes["src"].Value;
+            var attr = img.Value;
             var strs = attr.Split(",");
             var base64 = strs[1];
             var bytes = Convert.FromBase64String(base64);
@@ -143,7 +143,7 @@ public sealed class UploadController : Controller
             Directory.CreateDirectory(dir);
             await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             await image.CopyToAsync(fs);
-            img.Attributes["src"].Value = path[HostEnvironment.WebRootPath.Length..].Replace("\\", "/");
+            img.Value = path[HostEnvironment.WebRootPath.Length..].Replace("\\", "/");
         }
 
         return body.InnerHtml.HtmlSanitizerCustom(attributes: new[] { "dir", "lang" });

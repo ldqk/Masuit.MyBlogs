@@ -1,4 +1,5 @@
-﻿using EntityFramework.Exceptions.Common;
+﻿using System.Reflection;
+using EntityFramework.Exceptions.Common;
 using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -15,37 +16,21 @@ public class DataContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseExceptionProcessor();
-        optionsBuilder.EnableDetailedErrors().UseLazyLoadingProxies().UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).ConfigureWarnings(builder => builder.Ignore(CoreEventId.DetachedLazyLoadingWarning, CoreEventId.LazyLoadOnDisposedContextWarning));
+        optionsBuilder.EnableDetailedErrors().UseLazyLoadingProxies(builder => builder.IgnoreNonVirtualNavigations()).UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).ConfigureWarnings(builder => builder.Ignore(CoreEventId.DetachedLazyLoadingWarning, CoreEventId.LazyLoadOnDisposedContextWarning));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<Category>().HasMany(e => e.Post).WithOne(e => e.Category).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<Category>().HasMany(e => e.PostHistoryVersion).WithOne(e => e.Category).HasForeignKey(r => r.CategoryId).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<Category>().HasMany(e => e.Children).WithOne(c => c.Parent).IsRequired(false).HasForeignKey(c => c.ParentId).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<Category>().Property(c => c.Path).IsRequired();
-
-        modelBuilder.Entity<Post>().HasMany(e => e.Comment).WithOne(e => e.Post).HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<Post>().HasMany(e => e.PostHistoryVersion).WithOne(e => e.Post).HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<Post>().HasMany(e => e.Seminar).WithMany(s => s.Post).UsingEntity(builder => builder.ToTable("SeminarPost"));
-        modelBuilder.Entity<Post>().HasMany(e => e.PostMergeRequests).WithOne(s => s.Post).HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<Post>().HasMany(e => e.PostVisitRecords).WithOne().HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<Post>().HasMany(e => e.PostVisitRecordStats).WithOne().HasForeignKey(r => r.PostId).OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType()));
         modelBuilder.Entity<PostHistoryVersion>().HasMany(e => e.Seminar).WithMany(s => s.PostHistoryVersion).UsingEntity(builder => builder.ToTable("SeminarPostHistoryVersion"));
 
         modelBuilder.Entity<UserInfo>().HasMany(e => e.LoginRecord).WithOne(e => e.UserInfo).OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Menu>().HasMany(e => e.Children).WithOne(m => m.Parent).IsRequired(false).OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<Menu>().Property(c => c.Path).IsRequired();
-
-        modelBuilder.Entity<Comment>().HasMany(e => e.Children).WithOne(c => c.Parent).HasForeignKey(c => c.ParentId).IsRequired(false).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<Comment>().Property(c => c.Path).IsRequired();
-        modelBuilder.Entity<Comment>().Property(c => c.GroupTag).IsRequired();
-
-        modelBuilder.Entity<LeaveMessage>().HasMany(e => e.Children).WithOne(c => c.Parent).HasForeignKey(c => c.ParentId).IsRequired(false).OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<LeaveMessage>().Property(c => c.Path).IsRequired();
-        modelBuilder.Entity<LeaveMessage>().Property(c => c.GroupTag).IsRequired();
+        modelBuilder.Entity<Menu>().Navigation(p => p.Children).EnableLazyLoading(false);
+        modelBuilder.Entity<Menu>().Navigation(p => p.Parent).EnableLazyLoading(false);
 
         modelBuilder.Entity<Links>().HasMany(e => e.Loopbacks).WithOne(l => l.Links).IsRequired().HasForeignKey(e => e.LinkId).OnDelete(DeleteBehavior.Cascade);
 
@@ -63,10 +48,6 @@ public class DataContext : DbContext
         modelBuilder.Entity<Menu>().HasIndex(a => a.Sort);
         modelBuilder.Entity<Menu>().HasIndex(a => a.ParentId);
         modelBuilder.Entity<Notice>().HasIndex(a => a.ModifyDate).IsDescending();
-        modelBuilder.Entity<Post>().HasIndex(a => a.CategoryId);
-        modelBuilder.Entity<Post>().HasIndex(a => a.ModifyDate).IsDescending();
-        modelBuilder.Entity<Post>().HasIndex(a => a.AverageViewCount).IsDescending();
-        modelBuilder.Entity<Post>().HasIndex(a => a.TotalViewCount).IsDescending();
         modelBuilder.Entity<PostHistoryVersion>().HasIndex(a => a.CategoryId);
         modelBuilder.Entity<PostHistoryVersion>().HasIndex(a => a.PostId);
         modelBuilder.Entity<PostMergeRequest>().HasIndex(a => a.PostId);

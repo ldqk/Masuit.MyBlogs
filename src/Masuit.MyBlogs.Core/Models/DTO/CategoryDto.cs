@@ -5,7 +5,7 @@ namespace Masuit.MyBlogs.Core.Models.DTO;
 /// <summary>
 /// 文章分类输出模型
 /// </summary>
-public class CategoryDto : BaseDto, ITreeChildren<CategoryDto>
+public class CategoryDto : BaseDto, ITreeEntity<CategoryDto, int>
 {
     /// <summary>
     /// 分类名
