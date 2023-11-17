@@ -47,9 +47,9 @@ Redis：redis-server-windows 7.x
 | --------   | -----:   | :----: | :----: | :----: |
 |CPU|1核|2核|2核|4核|
 |内存|1GB|2GB|4GB|8GB|
-|带宽|1Mbps|1Mbps|5Mbps|1000Mbps|
-|数据库|pgsql 9|pgsql 14|pgsql 14|pgsql 14|
-|缓存组件|Redis 3.2+|Redis 5.0+|Redis 5.0+|Redis 5.0+|
+|带宽|1Mbps|1Mbps|5Mbps|1000Mbps+|
+|数据库|pgsql 9|pgsql 14|pgsql 15+|pgsql 16+|
+|缓存组件|Redis 3.2+|Redis 5.0+|Redis 5.0+|Redis 7.0+|
 |备注|玩玩而已|几个人同时访问|几百个人同时访问，单日请求量600w以下|单日请求量600w以上|
 ### 主要功能
 #### 服务器性能监控
