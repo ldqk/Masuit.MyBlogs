@@ -23,8 +23,8 @@
 .NET8  
 ASP.NET Core MVC  
 Blazor  
-Entity Framework Core
-Masuit.Tools
+Entity Framework Core  
+Masuit.Tools  
 Masuit.LuceneEFCore.SearchEngine  
 Hangfire  
 ### 开发环境
