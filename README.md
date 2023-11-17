@@ -1,6 +1,6 @@
 ### Masuit.MyBlogs
 <a href="https://gitee.com/masuit/Masuit.MyBlogs"><img src="https://gitee.com/static/images/logo-black.svg" height="32"></a> <a href="https://github.com/ldqk/Masuit.MyBlogs"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Font_Awesome_5_brands_github.svg/54px-Font_Awesome_5_brands_github.svg.png" height="32"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/GitHub_logo_2013.svg/128px-GitHub_logo_2013.svg.png" height="32"></a>  
-个人博客站项目源码，高性能高安全性低占用的博客系统，这也许是我写过的性能最高的web项目了。**仅3MB的代码量！** 目前日均处理请求数80-300w次，同时在线活跃用户数30-200人，**数据量累计已达到数百万条**，数据库+Redis+网站主程序同时运行在一台4核8GB的机器上，浏览器页面请求秒级响应，CPU平均使用率控制在10%左右，内存占用控制在400MB左右。
+个人博客站项目源码，高性能高安全性低占用的博客系统，这也许是我写过的性能最高的web项目了。**仅3MB的代码量！** 目前日均处理请求数80-600w次，同时在线活跃用户数30-200人，**数据量累计已达到数百万条**，数据库+Redis+网站主程序同时运行在一台4核8GB的机器上，浏览器页面请求秒级响应，CPU平均使用率控制在10%左右，内存占用控制在400MB左右。
 ![任务管理器](https://img11.360buyimg.com/ddimg/jfs/t1/170269/23/18655/93697/6076eb8fE82d545e7/78f0815f7311cd49.png)
 ![image](https://user-images.githubusercontent.com/20254980/206615289-fa975ddc-4534-47f8-9d80-d8ab637b0157.png)
 
@@ -20,7 +20,7 @@
 ### 前端请求支援
 目前网站前端页面的代码比较零乱，到处都是，大家想吐槽的尽管吐槽吧，也想找个人帮忙设计下整体的前端页面，有兴趣愿意贡献代码的的小伙伴，欢迎Pull Request吧！😂😂
 ### 项目主要技术栈
-.NET7  
+.NET8  
 ASP.NET Core MVC  
 Blazor  
 Entity Framework Core
@@ -28,17 +28,17 @@ Masuit.Tools
 Masuit.LuceneEFCore.SearchEngine  
 Hangfire  
 ### 开发环境
-操作系统：Windows 10 2104  
-IDE：Visual Studio 2022 v17.0  
-数据库：PostgreSQL 14.x  
-Redis：redis-server-windows 5.x  
-运行时：必须是.NET 7 
+操作系统：Windows 11 23h2  
+IDE：Visual Studio 2022 v17.8  
+数据库：PostgreSQL 16.x  
+Redis：redis-server-windows 7.x  
+运行时：必须是.NET 8 
 ### 当前运行环境
 操作系统：Windows Server 2019  
-数据库：PostgreSQL 14.x  
-Redis：redis-server-windows 5.x  
-运行时：.NET 7  
-服务器配置：2核+6GB+1000M  
+数据库：PostgreSQL 16.x  
+Redis：redis-server-windows 7.x  
+运行时：.NET 8  
+服务器配置：4核+8GB+6Gbps  
 承载流量：单日请求量平均600w左右，单日带宽1TB左右  
 `请勿使用阿里云、百度云等活动超卖机运行本程序，否则卡出翔！！！`  
 `如何判断服务器商是否有超卖：给你的服务器跑个分，如果跑分接近于网络上该处理器公布的分数，则不是超卖的机器，计算公式：总分/核心数进行比较，由于是虚拟机，如果单独比较单核跑分，没有参考意义`
