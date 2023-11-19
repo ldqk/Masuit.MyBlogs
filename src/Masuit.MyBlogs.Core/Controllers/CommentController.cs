@@ -1,5 +1,4 @@
-﻿using CacheManager.Core;
-using Dispose.Scope;
+﻿using Dispose.Scope;
 using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
@@ -28,8 +27,6 @@ public sealed class CommentController : BaseController
 
     public IWebHostEnvironment HostEnvironment { get; set; }
 
-    public ICacheManager<int> CommentFeq { get; set; }
-
     /// <summary>
     /// 发表评论
     /// </summary>
@@ -46,7 +43,7 @@ public sealed class CommentController : BaseController
             LogManager.Info($"提交内容：{cmd.NickName}/{cmd.Content}，敏感词：{match.Value}");
             return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
         }
-        var error = ValidateEmailCode(mailSender, cmd.Email, cmd.Code);
+        var error = await ValidateEmailCode(mailSender, cmd.Email, cmd.Code);
         if (!string.IsNullOrEmpty(error))
         {
             return ResultData(null, false, error);
@@ -66,9 +63,10 @@ public sealed class CommentController : BaseController
 
         cmd.Content = cmd.Content.Trim().Replace("<p><br></p>", string.Empty);
         var ip = ClientIP.ToString();
-        if (CommentFeq.GetOrAdd("Comments:" + ip, 1) > 2)
+
+        if (await RedisHelper.IncrAsync("Comments:" + ip) > 2)
         {
-            CommentFeq.Expire("Comments:" + ip, TimeSpan.FromMinutes(1));
+            await RedisHelper.ExpireAsync("Comments:" + ip, TimeSpan.FromMinutes(1));
             return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
         }
 
@@ -117,8 +115,7 @@ public sealed class CommentController : BaseController
             SameSite = SameSiteMode.Lax
         });
         WriteEmailKeyCookie(cmd.Email);
-        CommentFeq.AddOrUpdate("Comments:" + comment.IP, 1, i => i + 1, 5);
-        CommentFeq.Expire("Comments:" + comment.IP, TimeSpan.FromMinutes(1));
+        await RedisHelper.ExpireAsync("Comments:" + comment.IP, TimeSpan.FromMinutes(1));
         var emails = new HashSet<string>();
         var email = CommonHelper.SystemSettings["ReceiveEmail"]; //站长邮箱
         emails.Add(email);

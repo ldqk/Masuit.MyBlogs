@@ -23,6 +23,7 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using System.Text.RegularExpressions;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using EFCoreSecondLevelCacheInterceptor;
+using CacheManager.Core;
 
 namespace Masuit.MyBlogs.Core;
 
@@ -70,7 +71,7 @@ public class Startup
     /// <returns></returns>
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddEFSecondLevelCache(options => options.UseCacheManagerCoreProvider(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true).UseCacheKeyPrefix("EFCache:"));
+        services.AddEFSecondLevelCache(options => options.UseCustomCacheProvider<EFCoreCacheProvider>().DisableLogging(true).UseCacheKeyPrefix("EFCache:").UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1)));
         services.AddDbContext<DataContext>((serviceProvider, opt) => opt.UseNpgsql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10)).EnableSensitiveDataLogging().AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())); //配置数据库
         services.AddDbContext<LoggerDbContext>(opt => opt.UseNpgsql(AppConfig.ConnString)); //配置数据库
         services.ConfigureOptions();
@@ -79,7 +80,7 @@ public class Startup
             options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
         });
         services.AddSession().AddAntiforgery(); //注入Session
-        services.AddResponseCache().AddCacheConfig();
+        services.AddResponseCache();
         services.AddHangfireServer().AddHangfire((serviceProvider, configuration) =>
         {
             configuration.UseActivator(new HangfireActivator(serviceProvider));
@@ -171,4 +172,132 @@ public class Startup
 
         Console.WriteLine("网站启动完成");
     }
+}
+
+public class EFCoreCacheProvider : IEFCacheServiceProvider
+{
+    private readonly IRedisClient _redisClient;
+
+    private readonly ILogger<EFCacheManagerCoreProvider> _cacheManagerCoreProviderLogger;
+    private readonly IEFDebugLogger _logger;
+
+    public EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCacheManagerCoreProvider> cacheManagerCoreProviderLogger, IEFDebugLogger logger)
+    {
+        _redisClient = redisClient;
+        _cacheManagerCoreProviderLogger = cacheManagerCoreProviderLogger;
+        _logger = logger;
+    }
+
+    /// <summary>
+    ///     Adds a new item to the cache.
+    /// </summary>
+    /// <param name="cacheKey">key</param>
+    /// <param name="value">value</param>
+    /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
+    public void InsertValue(EFCacheKey cacheKey, EFCachedData value, EFCachePolicy cachePolicy)
+    {
+        if (cacheKey is null)
+        {
+            throw new ArgumentNullException(nameof(cacheKey));
+        }
+
+        if (value == null)
+        {
+            value = new EFCachedData
+            {
+                IsNull = true
+            };
+        }
+
+        var keyHash = cacheKey.KeyHash;
+
+        foreach (var rootCacheKey in cacheKey.CacheDependencies)
+        {
+            _redisClient.SAdd(rootCacheKey, keyHash);
+        }
+
+        if (cachePolicy == null)
+        {
+            _redisClient.Set(keyHash, value);
+        }
+        else
+        {
+            _redisClient.AddOrUpdate(keyHash, value, value, cachePolicy.CacheTimeout, cachePolicy.CacheExpirationMode == CacheExpirationMode.Sliding);
+        }
+    }
+
+    /// <summary>
+    ///     Removes the cached entries added by this library.
+    /// </summary>
+    public void ClearAllCachedEntries()
+    {
+        _redisClient.Del("EFCore:*");
+    }
+
+    /// <summary>
+    ///     Gets a cached entry by key.
+    /// </summary>
+    /// <param name="cacheKey">key to find</param>
+    /// <returns>cached value</returns>
+    /// <param name="cachePolicy">Defines the expiration mode of the cache item.</param>
+    public EFCachedData? GetValue(EFCacheKey cacheKey, EFCachePolicy cachePolicy)
+    {
+        if (cacheKey is null)
+        {
+            throw new ArgumentNullException(nameof(cacheKey));
+        }
+
+        return _redisClient.Get<EFCachedData>(cacheKey.KeyHash);
+    }
+
+    /// <summary>
+    ///     Invalidates all of the cache entries which are dependent on any of the specified root keys.
+    /// </summary>
+    /// <param name="cacheKey">Stores information of the computed key of the input LINQ query.</param>
+    public void InvalidateCacheDependencies(EFCacheKey cacheKey)
+    {
+        if (cacheKey is null)
+        {
+            throw new ArgumentNullException(nameof(cacheKey));
+        }
+
+        foreach (var rootCacheKey in cacheKey.CacheDependencies)
+        {
+            if (string.IsNullOrWhiteSpace(rootCacheKey))
+            {
+                continue;
+            }
+
+            var cachedValue = _redisClient.Get<EFCachedData>(cacheKey.KeyHash);
+            var dependencyKeys = _redisClient.SMembers(rootCacheKey);
+            if (AreRootCacheKeysExpired(cachedValue, dependencyKeys))
+            {
+                if (_logger.IsLoggerEnabled)
+                {
+                    _cacheManagerCoreProviderLogger.LogDebug(CacheableEventId.QueryResultInvalidated, "Invalidated all of the cache entries due to early expiration of a root cache key[{RootCacheKey}].", rootCacheKey);
+                }
+
+                ClearAllCachedEntries();
+                return;
+            }
+
+            ClearDependencyValues(dependencyKeys);
+            _redisClient.Del(rootCacheKey);
+        }
+    }
+
+    private void ClearDependencyValues(string[] dependencyKeys)
+    {
+        if (dependencyKeys is null)
+        {
+            return;
+        }
+
+        foreach (var dependencyKey in dependencyKeys)
+        {
+            _redisClient.SRem(dependencyKey);
+        }
+    }
+
+    private static bool AreRootCacheKeysExpired(EFCachedData? cachedValue, string[] dependencyKeys) => cachedValue is not null && dependencyKeys is null;
 }

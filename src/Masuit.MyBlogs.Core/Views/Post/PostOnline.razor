@@ -1,8 +1,9 @@
-﻿@using CacheManager.Core
-@using System.Threading
+﻿@using System.Threading
+@using FreeRedis
 @using Masuit.MyBlogs.Core.Common
+
 @implements IAsyncDisposable
-@inject ICacheManager<HashSet<string>> CacheManager
+@inject IRedisClient CacheManager
 @inject IJSRuntime _js;
 
 <span class="text-red online" @onclick="ShowViewer">@online</span>人正在浏览本文
@@ -17,23 +18,19 @@
     [Parameter]
     public bool IsAdmin { get; set; }
 
-    int online;
+    long online;
     Timer _timer;
 
     protected override void OnInitialized()
     {
         try {
             var key = nameof(PostOnline) + ":" + Id;
-            online = CacheManager.AddOrUpdate(key, new HashSet<string>(), set =>
-            {
-                set.Add(IP);
-                return set;
-            }, 3).Count;
-            CacheManager.Expire(key, ExpirationMode.Sliding, TimeSpan.FromMinutes(5));
+            online = CacheManager.SAdd(key, IP);
+            CacheManager.Expire(key, TimeSpan.FromMinutes(5));
             _timer = new Timer(_ =>
             {
                 try {
-                    online = CacheManager.Get(key)?.Count ?? 0;
+                    online = CacheManager.SCard(key);
                     InvokeAsync(StateHasChanged);
                 }
                 catch{
@@ -51,7 +48,7 @@
         if (online > 0 && IsAdmin)
         {
             try {
-                _js.InvokeVoidAsync("showViewer", CacheManager.Get(nameof(PostOnline) + ":" + Id).Select(s => KeyValuePair.Create(s, s.GetIPLocation().ToString())));
+                _js.InvokeVoidAsync("showViewer", CacheManager.SMembers(nameof(PostOnline) + ":" + Id).Select(s => KeyValuePair.Create(s, s.GetIPLocation().ToString())));
             }
             catch {
                 // ignored
@@ -62,11 +59,7 @@
     public ValueTask DisposeAsync()
     {
         try {
-            online = CacheManager.AddOrUpdate(nameof(PostOnline) + ":" + Id, new HashSet<string>(), set =>
-            {
-                set.Remove(IP);
-                return set;
-            }).Count;
+            online = CacheManager.SRem(nameof(PostOnline) + ":" + Id, IP);
         }
         catch {
             // ignored

@@ -2,11 +2,11 @@
 
 public interface IMailSender
 {
-	Task Send(string title, string content, string tos, string clientip);
+    Task Send(string title, string content, string tos, string clientip);
 
-	List<string> GetBounces();
+    Task<List<string>> GetBounces();
 
-	Task<string> AddRecipient(string email);
+    Task<string> AddRecipient(string email);
 
-	public bool HasBounced(string address);
+    public Task<bool> HasBounced(string address);
 }

@@ -172,7 +172,7 @@ public class BaseController : Controller
     /// <param name="email">邮箱地址</param>
     /// <param name="code">验证码</param>
     /// <returns></returns>
-    internal string ValidateEmailCode(IMailSender mailSender, string email, string code)
+    internal async Task<string> ValidateEmailCode(IMailSender mailSender, string email, string code)
     {
         if (CurrentUser.IsAdmin)
         {
@@ -198,7 +198,7 @@ public class BaseController : Controller
             return "邮箱验证信息已失效，请刷新页面后重新评论！";
         }
 
-        if (mailSender.HasBounced(email))
+        if (await mailSender.HasBounced(email))
         {
             Response.Cookies.Delete("Email");
             Response.Cookies.Delete("NickName");

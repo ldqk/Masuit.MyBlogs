@@ -1,5 +1,4 @@
-﻿using CacheManager.Core;
-using Dispose.Scope;
+﻿using Dispose.Scope;
 using Hangfire;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
@@ -33,8 +32,6 @@ public sealed class MsgController : BaseController
     public IInternalMessageService MessageService { get; set; }
 
     public IWebHostEnvironment HostEnvironment { get; set; }
-
-    public ICacheManager<int> MsgFeq { get; set; }
 
     /// <summary>
     /// 留言板
@@ -131,7 +128,7 @@ public sealed class MsgController : BaseController
             return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
         }
 
-        var error = ValidateEmailCode(mailSender, cmd.Email, cmd.Code);
+        var error = await ValidateEmailCode(mailSender, cmd.Email, cmd.Code);
         if (!string.IsNullOrEmpty(error))
         {
             return ResultData(null, false, error);
@@ -144,9 +141,9 @@ public sealed class MsgController : BaseController
 
         cmd.Content = cmd.Content.Trim().Replace("<p><br></p>", string.Empty);
         var ip = ClientIP.ToString();
-        if (MsgFeq.GetOrAdd("Comments:" + ip, 1) > 2)
+        if (await RedisHelper.IncrAsync("Comments:" + ip) > 2)
         {
-            MsgFeq.Expire("Comments:" + ip, TimeSpan.FromMinutes(1));
+            await RedisHelper.ExpireAsync("Comments:" + ip, TimeSpan.FromMinutes(1));
             return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
         }
 
@@ -196,8 +193,7 @@ public sealed class MsgController : BaseController
             SameSite = SameSiteMode.Lax
         });
         WriteEmailKeyCookie(cmd.Email);
-        MsgFeq.AddOrUpdate("Comments:" + ip, 1, i => i + 1, 5);
-        MsgFeq.Expire("Comments:" + ip, TimeSpan.FromMinutes(1));
+        await RedisHelper.ExpireAsync("Comments:" + ip, TimeSpan.FromMinutes(1));
         var email = CommonHelper.SystemSettings["ReceiveEmail"];
         var content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/notify.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8)).Set("title", "网站留言板").Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);
         if (msg.Status == Status.Published)

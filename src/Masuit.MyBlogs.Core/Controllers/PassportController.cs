@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CacheManager.Core;
 using Hangfire;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Web;
 using Dispose.Scope;
+using FreeRedis;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -123,7 +123,7 @@ public sealed class PassportController : Controller
     /// <param name="remem"></param>
     /// <returns></returns>
     [HttpPost, ValidateAntiForgeryToken]
-    public ActionResult Login([FromServices] ICacheManager<int> cacheManager, string username, string password, string valid, string remem)
+    public ActionResult Login([FromServices] IRedisClient cacheManager, string username, string password, string valid, string remem)
     {
         string validSession = HttpContext.Session.Get<string>("valid") ?? string.Empty; //将验证码从Session中取出来，用于登录验证比较
         if (string.IsNullOrEmpty(validSession) || !valid.Trim().Equals(validSession, StringComparison.InvariantCultureIgnoreCase))
@@ -150,7 +150,7 @@ public sealed class PassportController : Controller
         var userInfo = UserInfoService.Login(username, password);
         if (userInfo == null)
         {
-            var times = cacheManager.AddOrUpdate("LoginError:" + ClientIP, 1, i => i + 1, 5);
+            var times = cacheManager.Incr("LoginError:" + ClientIP);
             if (times > 30)
             {
                 FirewallRepoter.ReportAsync(IPAddress.Parse(ClientIP)).ContinueWith(_ => LogManager.Info($"多次登录用户名或密码错误，疑似爆破行为，已上报IP{ClientIP}至：" + FirewallRepoter.ReporterName));

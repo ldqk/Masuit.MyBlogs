@@ -1,5 +1,4 @@
-﻿using CacheManager.Core;
-using Dispose.Scope;
+﻿using Dispose.Scope;
 using FreeRedis;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
@@ -133,7 +132,7 @@ public sealed class FirewallController : Controller
     /// <returns></returns>
     [HttpGet("/craw/{id}")]
     [ServiceFilter(typeof(FirewallAttribute))]
-    public IActionResult AntiCrawler(string id, [FromServices] ICacheManager<int> cacheManager, [FromServices] IWebHostEnvironment env)
+    public IActionResult AntiCrawler(string id, [FromServices] RedisClient cacheManager, [FromServices] IWebHostEnvironment env)
     {
         if (Request.IsRobot())
         {
@@ -157,8 +156,8 @@ public sealed class FirewallController : Controller
                 Request.Headers
             }.ToJsonString()
         });
-        cacheManager.AddOrUpdate("AntiCrawler:" + ip, 1, i => i + 1, 5);
-        cacheManager.Expire("AntiCrawler:" + ip, ExpirationMode.Sliding, TimeSpan.FromMinutes(10));
+        cacheManager.Incr("AntiCrawler:" + ip);
+        cacheManager.Expire("AntiCrawler:" + ip, TimeSpan.FromMinutes(10));
         if (cacheManager.Get<int>("AntiCrawler:" + ip) > 3)
         {
             Response.StatusCode = 429;

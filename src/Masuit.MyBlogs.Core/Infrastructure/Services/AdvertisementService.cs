@@ -1,17 +1,16 @@
-﻿using CacheManager.Core;
-using Masuit.LuceneEFCore.SearchEngine.Interfaces;
+﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using System.Text.RegularExpressions;
 using EFCoreSecondLevelCacheInterceptor;
+using FreeRedis;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services;
 
-public sealed partial class AdvertisementService : BaseService<Advertisement>, IAdvertisementService
+public sealed class AdvertisementService : BaseService<Advertisement>, IAdvertisementService
 {
-    public ICacheManager<List<AdvertisementDto>> CacheManager { get; set; }
+    public IRedisClient CacheManager { get; set; }
 
     public ICategoryRepository CategoryRepository { get; set; }
 
@@ -65,7 +64,7 @@ public sealed partial class AdvertisementService : BaseService<Advertisement>, I
     public List<AdvertisementDto> GetsByWeightedPriceExternal(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null, string keywords = "")
     {
         var (location, _, _) = ipinfo;
-        return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}-{keywords}", _ =>
+        return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}-{keywords}", () =>
         {
             var atype = type.ToString("D");
             Expression<Func<Advertisement, bool>> where = a => a.Types.Contains(atype) && a.Status == Status.Available;
@@ -112,8 +111,8 @@ public sealed partial class AdvertisementService : BaseService<Advertisement>, I
     public List<AdvertisementDto> GetsByWeightedPriceMemory(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null, string keywords = "")
     {
         var (location, _, _) = ipinfo;
-        var all = CacheManager.GetOrAdd("Advertisement:all", _ => GetQuery<AdvertisementDto>(a => a.Status == Status.Available).ToList());
-        return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}-{keywords}", _ =>
+        var all = CacheManager.GetOrAdd("Advertisement:all", () => GetQuery<AdvertisementDto>(a => a.Status == Status.Available).ToList(), TimeSpan.FromHours(1));
+        return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}-{keywords}", () =>
         {
             var atype = type.ToString("D");
             var catCount = CategoryRepository.Count(_ => true);
@@ -142,6 +141,6 @@ public sealed partial class AdvertisementService : BaseService<Advertisement>, I
             var ids = list.Select(a => a.Id).ToArray();
             GetQuery(a => ids.Contains(a.Id)).ExecuteUpdate(p => p.SetProperty(a => a.DisplayCount, a => a.DisplayCount + 1));
             return list;
-        });
+        }, TimeSpan.FromHours(1));
     }
 }
