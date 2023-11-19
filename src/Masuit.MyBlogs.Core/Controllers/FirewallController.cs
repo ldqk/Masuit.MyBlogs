@@ -132,7 +132,7 @@ public sealed class FirewallController : Controller
     /// <returns></returns>
     [HttpGet("/craw/{id}")]
     [ServiceFilter(typeof(FirewallAttribute))]
-    public IActionResult AntiCrawler(string id, [FromServices] RedisClient cacheManager, [FromServices] IWebHostEnvironment env)
+    public IActionResult AntiCrawler(string id, [FromServices] IRedisClient cacheManager, [FromServices] IWebHostEnvironment env)
     {
         if (Request.IsRobot())
         {
