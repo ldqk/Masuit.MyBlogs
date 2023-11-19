@@ -431,21 +431,6 @@ public sealed class PostController : BaseController
     /// <summary>
     /// 文章合并
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="mid"></param>
-    /// <returns></returns>
-    [HttpGet("{id}/merge/{mid}")]
-    public async Task<ActionResult> RepushMerge(int id, int mid)
-    {
-        var post = await PostService.GetAsync(p => p.Id == id && p.Status == Status.Published && !p.Locked) ?? throw new NotFoundException("文章未找到");
-        CheckPermission(post);
-        var merge = post.PostMergeRequests.FirstOrDefault(p => p.Id == mid && p.MergeState != MergeStatus.Merged) ?? throw new NotFoundException("待合并文章未找到");
-        return View(merge);
-    }
-
-    /// <summary>
-    /// 文章合并
-    /// </summary>
     /// <param name="messageService"></param>
     /// <param name="postMergeRequestService"></param>
     /// <param name="dto"></param>
@@ -530,6 +515,21 @@ public sealed class PostController : BaseController
             .Render();
         BackgroundJob.Enqueue<IMailSender>(sender => sender.Send("博客文章修改请求：", content, CommonHelper.SystemSettings["ReceiveEmail"], merge.IP));
         return ResultData(null, true, "您的修改请求已提交，已进入审核状态，感谢您的参与！");
+    }
+
+    /// <summary>
+    /// 文章合并
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="mid"></param>
+    /// <returns></returns>
+    [HttpGet("{id}/merge/{mid}")]
+    public async Task<ActionResult> RepushMerge(int id, int mid)
+    {
+        var post = await PostService.GetAsync(p => p.Id == id && p.Status == Status.Published && !p.Locked) ?? throw new NotFoundException("文章未找到");
+        CheckPermission(post);
+        var merge = post.PostMergeRequests.FirstOrDefault(p => p.Id == mid && p.MergeState != MergeStatus.Merged) ?? throw new NotFoundException("待合并文章未找到");
+        return View(merge);
     }
 
     #region 后端管理
@@ -1206,14 +1206,14 @@ public sealed class PostController : BaseController
             // 将数据填充成连续的数据
             for (var i = start1; i <= DateTime.Today; i = i.AddDays(1))
             {
-                if (list1.All(a => a.Date != i))
+                if (list1.TrueForAll(a => a.Date != i))
                 {
                     list1.Add(new { Date = i, Count = 0, UV = 0 });
                 }
             }
             for (var i = start2; i < start1; i = i.AddDays(1))
             {
-                if (list2.All(a => a.Date != i))
+                if (list2.TrueForAll(a => a.Date != i))
                 {
                     list2.Add(new { Date = i, Count = 0, UV = 0 });
                 }
@@ -1231,7 +1231,7 @@ public sealed class PostController : BaseController
         var max = list.Max(a => a.Date);
         for (var i = min; i < max; i = i.AddDays(1))
         {
-            if (list.All(a => a.Date != i))
+            if (list.TrueForAll(a => a.Date != i))
             {
                 list.Add(new { Date = i, Count = 0, UV = 0 });
             }
@@ -1273,14 +1273,14 @@ public sealed class PostController : BaseController
             // 将数据填充成连续的数据
             for (var i = start1; i <= DateTime.Today; i = i.AddDays(1))
             {
-                if (list1.All(a => a.Date != i))
+                if (list1.TrueForAll(a => a.Date != i))
                 {
                     list1.Add(new { Date = i, Count = 0, UV = 0 });
                 }
             }
             for (var i = start2; i < start1; i = i.AddDays(1))
             {
-                if (list2.All(a => a.Date != i))
+                if (list2.TrueForAll(a => a.Date != i))
                 {
                     list2.Add(new { Date = i, Count = 0, UV = 0 });
                 }
@@ -1298,7 +1298,7 @@ public sealed class PostController : BaseController
         var max = list.Max(a => a.Date);
         for (var i = min; i < max; i = i.AddDays(1))
         {
-            if (list.All(a => a.Date != i))
+            if (list.TrueForAll(a => a.Date != i))
             {
                 list.Add(new { Date = i, Count = 0, UV = 0 });
             }

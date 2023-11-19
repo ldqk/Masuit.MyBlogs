@@ -134,8 +134,8 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
         var stats = recordStatsService.Get(e => e.PostId == pid && e.Date >= DateTime.Today);
         if (stats != null)
         {
-            stats.Count = recordService.Count(e => e.PostId == pid & e.Time >= DateTime.Today) + 1;
-            stats.UV = recordService.GetQuery(e => e.PostId == pid & e.Time >= DateTime.Today).Select(e => e.IP).Distinct().Count() + 1;
+            stats.Count = recordService.Count(e => e.PostId == pid && e.Time >= DateTime.Today) + 1;
+            stats.UV = recordService.GetQuery(e => e.PostId == pid && e.Time >= DateTime.Today).Select(e => e.IP).Distinct().Count() + 1;
         }
         else
         {
@@ -193,7 +193,7 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
         advertisementService.GetQuery(a => a.Status == Status.Available).AsParallel().ForAll(e =>
         {
             var url = e.Url;
-            if (e.Url.StartsWith("/"))
+            if (e.Url.StartsWith('/'))
             {
                 url = baseAddr + e.Url;
             }

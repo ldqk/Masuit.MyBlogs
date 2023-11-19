@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using FreeRedis;
+﻿using FreeRedis;
 
 namespace Masuit.MyBlogs.Core.Common;
 
@@ -64,21 +63,6 @@ public static class RedisClientExtension
         return value;
     }
 
-    public static async Task<T> GetOrAddAsync<T>(this IRedisClient client, string key, T addValue, TimeSpan? expire = null)
-    {
-        var value = await client.GetAsync<CacheEntry<T>>(key);
-        if (value is null)
-        {
-            await client.SetAsync(key, new CacheEntry<T>(addValue));
-            if (expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
-            return addValue;
-        }
-        return value;
-    }
-
     public static T GetOrAdd<T>(this IRedisClient client, string key, Func<T> addValue, TimeSpan? expire = null)
     {
         var value = client.Get<CacheEntry<T>>(key);
@@ -90,6 +74,21 @@ public static class RedisClientExtension
             {
                 client.Expire(key, expire.Value);
             }
+        }
+        return value;
+    }
+
+    public static async Task<T> GetOrAddAsync<T>(this IRedisClient client, string key, T addValue, TimeSpan? expire = null)
+    {
+        var value = await client.GetAsync<CacheEntry<T>>(key);
+        if (value is null)
+        {
+            await client.SetAsync(key, new CacheEntry<T>(addValue));
+            if (expire.HasValue)
+            {
+                await client.ExpireAsync(key, expire.Value);
+            }
+            return addValue;
         }
         return value;
     }
@@ -327,6 +326,64 @@ public static class RedisClientExtension
         }
 
         return value;
+    }
+
+    /// <summary>
+    /// 创建并获取分布式锁对象
+    /// </summary>
+    /// <param name="client"></param>
+    /// <param name="key">锁对象</param>
+    /// <param name="expire">锁过期时间</param>
+    /// <returns>T</returns>
+    public static RedisClient.LockController Lock(this IRedisClient client, string key, int expire = 60) => client.Lock(key, expire);
+
+    /// <summary>
+    /// 分布式锁
+    /// </summary>
+    /// <typeparam name="T">T</typeparam>
+    /// <param name="client"></param>
+    /// <param name="key">锁对象</param>
+    /// <param name="func">需要锁的代码</param>
+    /// <param name="expire">锁过期时间</param>
+    /// <returns>T</returns>
+    public static T Lock<T>(this IRedisClient client, string key, Func<T> func, int expire = 60)
+    {
+        using (client.Lock(key, expire))
+        {
+            return func();
+        }
+    }
+
+    /// <summary>
+    /// 分布式锁
+    /// </summary>
+    /// <typeparam name="T">T</typeparam>
+    /// <param name="client"></param>
+    /// <param name="key">锁对象</param>
+    /// <param name="func">需要锁的代码</param>
+    /// <param name="expire">锁过期时间</param>
+    /// <returns>T</returns>
+    public static Task<T> Lock<T>(this IRedisClient client, string key, Func<Task<T>> func, int expire = 60)
+    {
+        using (client.Lock(key, expire))
+        {
+            return func();
+        }
+    }
+
+    /// <summary>
+    /// 分布式锁
+    /// </summary>
+    /// <param name="client"></param>
+    /// <param name="key">锁对象</param>
+    /// <param name="action">需要锁的代码</param>
+    /// <param name="expire">锁过期时间</param>
+    public static void Lock(this IRedisClient client, string key, Action action, int expire = 60)
+    {
+        using (client.Lock(key, expire))
+        {
+            action();
+        }
     }
 }
 

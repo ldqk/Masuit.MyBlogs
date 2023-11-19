@@ -39,17 +39,17 @@ public sealed class AdvertisementService : BaseService<Advertisement>, IAdvertis
     /// </summary>
     /// <param name="count">数量</param>
     /// <param name="type">广告类型</param>
-    /// <param name="ipinfo"></param>
+    /// <param name="location"></param>
     /// <param name="cid">分类id</param>
     /// <param name="keywords"></param>
     /// <returns></returns>
-    public List<AdvertisementDto> GetsByWeightedPrice(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null, string keywords = "")
+    public List<AdvertisementDto> GetsByWeightedPrice(int count, AdvertiseType type, IPLocation location, int? cid = null, string keywords = "")
     {
         if (Count(a => a.Status == Status.Available) >= 200)
         {
-            return GetsByWeightedPriceExternal(count, type, ipinfo, cid, keywords);
+            return GetsByWeightedPriceExternal(count, type, location, cid, keywords);
         }
-        return GetsByWeightedPriceMemory(count, type, ipinfo, cid, keywords);
+        return GetsByWeightedPriceMemory(count, type, location, cid, keywords);
     }
 
     /// <summary>

@@ -59,7 +59,7 @@ public sealed class PostService : BaseService<Post>, IPostService
                     foreach (var s in keywords)
                     {
                         string frag;
-                        if (handled == false && node.TextContent.Contains(s, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(frag = highlighter.GetBestFragment(s, node.TextContent)))
+                        if (!handled && node.TextContent.Contains(s, StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(frag = highlighter.GetBestFragment(s, node.TextContent)))
                         {
                             switch (node)
                             {

@@ -121,13 +121,11 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
         //黑名单地区
         var denyAreas = CommonHelper.SystemSettings.GetOrAdd("DenyArea", "").Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries);
-        if (denyAreas.Any())
+        if (denyAreas.Any() && (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(network) || pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any()))
         {
-            if (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(network) || pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any()) // 未知地区的，未知网络的，禁区的
-            {
-                await AccessDeny(ip, request, "访问地区限制");
-                throw new AccessDenyException("访问地区限制");
-            }
+            // 未知地区的，未知网络的，禁区的
+            await AccessDeny(ip, request, "访问地区限制");
+            throw new AccessDenyException("访问地区限制");
         }
 
         //挑战模式
