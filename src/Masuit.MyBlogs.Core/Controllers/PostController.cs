@@ -1094,13 +1094,13 @@ public sealed class PostController : BaseController
     public async Task<IActionResult> Statistic(CancellationToken cancellationToken = default)
     {
         var keys = await RedisHelper.KeysAsync(nameof(PostOnline) + ":*");
-        var sets = keys.Select(s => (Id: s.Split(':')[1].ToInt32(), Clients: RedisHelper.HGet<HashSet<string>>(s, "value")));
-        var ids = sets.Where(t => t.Clients?.Count > 0).OrderByDescending(t => t.Clients.Count).Take(10).Select(t => t.Id).ToArray();
+        var sets = keys.Select(s => (Id: s.Split(':')[1].ToInt32(), Clients: RedisHelper.SMembers(s)));
+        var ids = sets.Where(t => t.Clients.Length > 0).OrderByDescending(t => t.Clients.Length).Take(10).Select(t => t.Id).ToArray();
         var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).ToListAsync(cancellationToken).ContinueWith(t =>
         {
             foreach (var item in t.Result)
             {
-                item.ViewCount = sets.FirstOrDefault(x => x.Id == item.Id).Clients.Count;
+                item.ViewCount = sets.FirstOrDefault(x => x.Id == item.Id).Clients.Length;
             }
 
             return t.Result.OrderByDescending(p => p.ViewCount);
