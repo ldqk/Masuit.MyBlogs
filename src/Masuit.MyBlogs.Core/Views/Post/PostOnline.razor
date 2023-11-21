@@ -4,7 +4,7 @@
 
 @implements IAsyncDisposable
 @inject IRedisClient CacheManager
-@inject IJSRuntime _js;
+@inject IJSRuntime JavaScript;
 
 <span class="text-red online" @onclick="ShowViewer">@online</span>人正在浏览本文
 
@@ -48,7 +48,7 @@
         if (online > 0 && IsAdmin)
         {
             try {
-                _js.InvokeVoidAsync("showViewer", CacheManager.SMembers(nameof(PostOnline) + ":" + Id).Select(s => KeyValuePair.Create(s, s.GetIPLocation().ToString())));
+                JavaScript.InvokeVoidAsync("showViewer", CacheManager.SMembers(nameof(PostOnline) + ":" + Id).Select(s => KeyValuePair.Create(s, s.GetIPLocation().ToString())));
             }
             catch {
                 // ignored

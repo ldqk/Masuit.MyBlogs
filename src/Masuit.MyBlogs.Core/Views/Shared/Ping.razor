@@ -1,11 +1,45 @@
-﻿<p style="display: table">
+﻿@using FreeRedis
+
+@implements IAsyncDisposable
+@inject IRedisClient CacheManager
+
+<p style="display: table;margin-left:70px">
     Ping:<span id="ping">50</span>ms
 </p>
 
 @code {
+    [Parameter]
+    public string IP { get; set; }
+
     [JSInvokable]
     public static long Latency()
     {
         return 0;
+    }
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            CacheManager.SAdd("GlobalOnline", IP);
+            CacheManager.Expire("GlobalOnline", TimeSpan.FromMinutes(20));
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        try
+        {
+            CacheManager.SRem("GlobalOnline", IP);
+        }
+        catch
+        {
+            // ignored
+        }
+        return ValueTask.CompletedTask;
     }
 }

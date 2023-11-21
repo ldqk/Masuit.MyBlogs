@@ -331,7 +331,7 @@
                         @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Scripts", ""))
                     </section>
                 </div>
-                <component type="typeof(Ping)" render-mode="ServerPrerendered" />
+                @(await Html.RenderComponentAsync<Ping>(RenderMode.ServerPrerendered, new { IP = Context.Connection.RemoteIpAddress.ToString() }))
             </footer>
         </main>
     </div>

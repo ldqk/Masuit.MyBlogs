@@ -8,13 +8,13 @@ public class EFCoreCacheProvider : IEFCacheServiceProvider
 {
     private readonly IRedisClient _redisClient;
 
-    private readonly ILogger<EFCacheManagerCoreProvider> _cacheManagerCoreProviderLogger;
+    private readonly ILogger<EFCoreCacheProvider> _cacheLogger;
     private readonly IEFDebugLogger _logger;
 
-    public EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCacheManagerCoreProvider> cacheManagerCoreProviderLogger, IEFDebugLogger logger)
+    public EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCacheProvider> cacheLogger, IEFDebugLogger logger)
     {
         _redisClient = redisClient;
-        _cacheManagerCoreProviderLogger = cacheManagerCoreProviderLogger;
+        _cacheLogger = cacheLogger;
         _logger = logger;
     }
 
@@ -31,24 +31,26 @@ public class EFCoreCacheProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        if (value == null)
+        value ??= new EFCachedData
         {
-            value = new EFCachedData
-            {
-                IsNull = true
-            };
-        }
+            IsNull = true
+        };
 
         var keyHash = cacheKey.KeyHash;
 
         foreach (var rootCacheKey in cacheKey.CacheDependencies)
         {
+            if (string.IsNullOrWhiteSpace(rootCacheKey))
+            {
+                continue;
+            }
             _redisClient.SAdd(rootCacheKey, keyHash);
+            _redisClient.Expire(rootCacheKey, 3600);
         }
 
         if (cachePolicy == null)
         {
-            _redisClient.Set(keyHash, value);
+            _redisClient.Set(keyHash, value, 300);
         }
         else
         {
@@ -56,9 +58,7 @@ public class EFCoreCacheProvider : IEFCacheServiceProvider
         }
     }
 
-    /// <summary>
-    ///     Removes the cached entries added by this library.
-    /// </summary>
+    /// <summary>Removes the cached entries added by this library.</summary>
     public void ClearAllCachedEntries()
     {
         _redisClient.Del("EFCache:*");
@@ -100,34 +100,17 @@ public class EFCoreCacheProvider : IEFCacheServiceProvider
 
             var cachedValue = _redisClient.Get<EFCachedData>(cacheKey.KeyHash);
             var dependencyKeys = _redisClient.SMembers(rootCacheKey);
-            if (AreRootCacheKeysExpired(cachedValue, dependencyKeys))
+            if (dependencyKeys.IsNullOrEmpty() && cachedValue is not null)
             {
                 if (_logger.IsLoggerEnabled)
                 {
-                    _cacheManagerCoreProviderLogger.LogDebug(CacheableEventId.QueryResultInvalidated, "Invalidated all of the cache entries due to early expiration of a root cache key[{RootCacheKey}].", rootCacheKey);
+                    _cacheLogger.LogDebug(CacheableEventId.QueryResultInvalidated, "Invalidated all of the cache entries due to early expiration of a root cache key[{RootCacheKey}].", rootCacheKey);
                 }
 
-                ClearAllCachedEntries();
+                _redisClient.Del(rootCacheKey);
                 return;
             }
-
-            ClearDependencyValues(dependencyKeys);
             _redisClient.Del(rootCacheKey);
         }
     }
-
-    private void ClearDependencyValues(string[] dependencyKeys)
-    {
-        if (dependencyKeys is null)
-        {
-            return;
-        }
-
-        foreach (var dependencyKey in dependencyKeys)
-        {
-            _redisClient.SRem(dependencyKey);
-        }
-    }
-
-    private static bool AreRootCacheKeysExpired(EFCachedData cachedValue, string[] dependencyKeys) => cachedValue is not null && dependencyKeys is null;
 }

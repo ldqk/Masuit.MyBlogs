@@ -28,10 +28,11 @@
             <span class="input-group-addon">分类：</span>
             <div class="form-control" id="category" style="width: 200px"></div>
         </div>
-        < class="input-group">
+        <div class="input-group">
             <span class="input-group-addon">排序方式：</span>
             <div class="form-control" id="orderby" style="width: 220px"></div>
         </div>
+    </div>
     <table ng-table="list.tableParams" class="table table-striped table-vmiddle table-bordered table-hover table-condensed">
         <tr ng-repeat="row in $data" ng-class="{'warning':(diffDateFromNow(row.ModifyDate)>365)}">
             <td data-title="'标题'" ng-class="{'danger':(row.AverageViewCount<1 && row.IsNsfw==false && row.LimitDesc=='无限制')}">
@@ -181,6 +182,8 @@
             </tbody>
         </table>
     </div>
+</div>
+<div class="row">
     <div class="col-md-6" ng-if="agg.mostAverage.length>0">
         <div class="page-header">
             <h3 class="text-center">日均访问量排行榜</h3>

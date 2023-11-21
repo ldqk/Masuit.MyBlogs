@@ -4,12 +4,15 @@
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools
 @using System.IO
+@using FreeRedis
 @using Masuit.Tools.Core.AspNetCore
 @using Masuit.Tools.Logging
 @using Masuit.Tools.Maths
 @using PerformanceCounter = Masuit.MyBlogs.Core.Common.PerformanceCounter
+
 @inject IPerfCounter PerfCounter;
-@inject IJSRuntime JS;
+@inject IJSRuntime JavaScript;
+@inject IRedisClient CacheManager;
 
 <h3 class="text-center">
     服务器系统信息概览
@@ -18,43 +21,43 @@
     <tbody>
         <tr>
             <td>网站开机时长</td>
-            <th>@runningTime</th>
+            <th>@_runningTime</th>
             <td>服务器开机时长</td>
-            <th>@bootTime</th>
+            <th>@_bootTime</th>
             <td>操作系统</td>
             <th>@Environment.OSVersion.VersionString</th>
         </tr>
         <tr>
             <td>CPU型号</td>
-            <th>@cpu.Type</th>
+            <th>@_cpu.Type</th>
             <td>CPU基础频率</td>
-            <th>@cpu.CurrentClockSpeed MHz</th>
+            <th>@_cpu.CurrentClockSpeed MHz</th>
             <td>CPU睿频</td>
-            <th>@cpu.MaxClockSpeed MHz</th>
+            <th>@_cpu.MaxClockSpeed MHz</th>
         </tr>
         <tr>
             <td>CPU个数</td>
             <th>@SystemInfo.GetCpuInfo().Count 插槽</th>
             <td>CPU核心数</td>
-            <th>@cpu.NumberOfCores 核心</th>
+            <th>@_cpu.NumberOfCores 核心</th>
             <td>CPU线程数</td>
-            <th>@cpu.NumberOfLogicalProcessors 线程</th>
+            <th>@_cpu.NumberOfLogicalProcessors 线程</th>
         </tr>
         <tr>
             <td>物理总内存</td>
-            <th>@((memory.PhysicalMemory / 1048576).ToString("N2")) MB(@((memory.PhysicalMemory / 1073741824).ToString("N2")) GB)</th>
+            <th>@((_memory.PhysicalMemory / 1048576).ToString("N2")) MB(@((_memory.PhysicalMemory / 1073741824).ToString("N2")) GB)</th>
             <td>物理内存已使用</td>
-            <th>@((memory.PhysicalMemory * memory.MemoryUsage / 104857600).ToString("N2")) MB(@((memory.PhysicalMemory * memory.MemoryUsage / 107374182400).ToString("N2")) GB)</th>
+            <th>@((_memory.PhysicalMemory * _memory.MemoryUsage / 104857600).ToString("N2")) MB(@((_memory.PhysicalMemory * _memory.MemoryUsage / 107374182400).ToString("N2")) GB)</th>
             <td>物理内存剩余</td>
-            <th>@((memory.PhysicalMemory * (100 - memory.MemoryUsage) / 104857600).ToString("N2")) MB(@((memory.PhysicalMemory * (100 - memory.MemoryUsage) / 107374182400).ToString("N2")) GB)</th>
+            <th>@((_memory.PhysicalMemory * (100 - _memory.MemoryUsage) / 104857600).ToString("N2")) MB(@((_memory.PhysicalMemory * (100 - _memory.MemoryUsage) / 107374182400).ToString("N2")) GB)</th>
         </tr>
         <tr>
             <td>虚拟内存总数</td>
-            <th>@((memory.TotalPageFile / 1048576).ToString("N2")) MB</th>
+            <th>@((_memory.TotalPageFile / 1048576).ToString("N2")) MB</th>
             <td>虚拟内存已使用</td>
-            <th>@(((memory.TotalPageFile - memory.AvailablePageFile) / 1048576).ToString("N2")) MB</th>
+            <th>@(((_memory.TotalPageFile - _memory.AvailablePageFile) / 1048576).ToString("N2")) MB</th>
             <td>虚拟内存可用</td>
-            <th>@((memory.AvailablePageFile / 1048576).ToString("N2")) MB</th>
+            <th>@((_memory.AvailablePageFile / 1048576).ToString("N2")) MB</th>
         </tr>
         <tr>
             <td>磁盘总空间</td>
@@ -66,11 +69,13 @@
         </tr>
         <tr>
             <td>MAC地址</td>
-            <th colspan="5">@macs.Join(" , ")</th>
+            <th colspan="3">@_macs.Join(" , ")</th>
+            <td>在线人数</td>
+            <th>@CacheManager.SCard("GlobalOnline") 人</th>
         </tr>
         <tr>
             <td>IP地址</td>
-            <th colspan="5">@ips.Join(" , ")</th>
+            <th colspan="5">@_ips.Join(" , ")</th>
         </tr>
     </tbody>
 </table>
@@ -124,27 +129,27 @@
 </div>
 
 @code {
-    private string bootTime;
-    private string ip=SystemInfo.GetLocalUsedIP(AddressFamily.InterNetwork).ToString();
-    private string runningTime;
-    private readonly CpuInfo cpu = SystemInfo.GetCpuInfo()[0];
-    private readonly RamInfo memory = SystemInfo.GetRamInfo();
-    private readonly IList<string> macs = SystemInfo.GetMacAddress();
-    private readonly IList<string> ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToList();
+    private string _bootTime;
+    private readonly string _ip=SystemInfo.GetLocalUsedIP(AddressFamily.InterNetwork).ToString();
+    private string _runningTime;
+    private readonly CpuInfo _cpu = SystemInfo.GetCpuInfo()[0];
+    private readonly RamInfo _memory = SystemInfo.GetRamInfo();
+    private readonly IList<string> _macs = SystemInfo.GetMacAddress();
+    private readonly IList<string> _ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToList();
     private readonly DriveInfo[] _driveInfos = DriveInfo.GetDrives().Where(d => d.IsReady).ToArray();
 
     protected override void OnInitialized()
     {
         var boot = DateTime.Now - SystemInfo.BootTime();
         var span = DateTime.Now - IPerfCounter.StartTime;
-        runningTime = $"{span.Days}天{span.Hours}小时{span.Minutes}分钟";
-        bootTime = $"{boot.Days}天{boot.Hours}小时{boot.Minutes}分钟";
+        _runningTime = $"{span.Days}天{span.Hours}小时{span.Minutes}分钟";
+        _bootTime = $"{boot.Days}天{boot.Hours}小时{boot.Minutes}分钟";
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await JS.InvokeVoidAsync("getServers");
-        await JS.InvokeVoidAsync("showLine",ip);
+        await JavaScript.InvokeVoidAsync("getServers");
+        await JavaScript.InvokeVoidAsync("showLine",_ip);
     }
 
     [JSInvokable]
@@ -162,12 +167,12 @@
     public void ClearMemory()
     {
         Windows.ClearMemorySilent();
-        JS.InvokeVoidAsync("showSuccess");
+        JavaScript.InvokeVoidAsync("showSuccess");
     }
 
     public Dictionary<string, dynamic> GetCounterPercent()
     {
-        var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==ip).OrderByRandom().Take(5000).ToList();
+        var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==_ip).OrderByRandom().Take(5000).ToList();
         var cpuLoads = counters.Select(c => c.CpuLoad).ToList();
         var memUse = counters.Select(c => c.MemoryUsage).ToList();
         var reads = counters.Select(c => c.DiskRead).ToList();
