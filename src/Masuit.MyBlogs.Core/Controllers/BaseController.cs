@@ -185,7 +185,7 @@ public class BaseController : Controller
             {
                 return "请输入验证码！";
             }
-            if (RedisHelper.Get("code:" + email) != code)
+            if (await RedisHelper.GetAsync("code:" + email) != code)
             {
                 return "验证码错误！";
             }
@@ -206,6 +206,7 @@ public class BaseController : Controller
             return "邮箱地址错误，请刷新页面后重新使用有效的邮箱地址！";
         }
 
+        await RedisHelper.DelAsync("code:" + email);
         return string.Empty;
     }
 

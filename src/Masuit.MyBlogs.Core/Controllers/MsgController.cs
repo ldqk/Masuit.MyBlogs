@@ -141,10 +141,20 @@ public sealed class MsgController : BaseController
 
         cmd.Content = cmd.Content.Trim().Replace("<p><br></p>", string.Empty);
         var ip = ClientIP.ToString();
-        if (await RedisHelper.IncrAsync("Comments:" + ip) > 2)
+
+        if (!CurrentUser.IsAdmin)
         {
-            await RedisHelper.ExpireAsync("Comments:" + ip, TimeSpan.FromMinutes(1));
-            return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
+            if (await RedisHelper.SAddAsync("Comments:" + ip, cmd.Content) == 0)
+            {
+                await RedisHelper.ExpireAsync("Comments:" + ip, TimeSpan.FromMinutes(2));
+                return ResultData(null, false, "您已发表了相同的评论内容，请稍后再发表吧！");
+            }
+
+            if (await RedisHelper.SCardAsync("Comments:" + ip) > 2)
+            {
+                await RedisHelper.ExpireAsync("Comments:" + ip, TimeSpan.FromMinutes(2));
+                return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
+            }
         }
 
         var msg = Mapper.Map<LeaveMessage>(cmd);

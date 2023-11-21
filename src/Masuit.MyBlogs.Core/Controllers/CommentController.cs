@@ -43,6 +43,7 @@ public sealed class CommentController : BaseController
             LogManager.Info($"提交内容：{cmd.NickName}/{cmd.Content}，敏感词：{match.Value}");
             return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
         }
+
         var error = await ValidateEmailCode(mailSender, cmd.Email, cmd.Code);
         if (!string.IsNullOrEmpty(error))
         {
@@ -64,10 +65,19 @@ public sealed class CommentController : BaseController
         cmd.Content = cmd.Content.Trim().Replace("<p><br></p>", string.Empty);
         var ip = ClientIP.ToString();
 
-        if (await RedisHelper.IncrAsync("Comments:" + ip) > 2)
+        if (!CurrentUser.IsAdmin)
         {
-            await RedisHelper.ExpireAsync("Comments:" + ip, TimeSpan.FromMinutes(1));
-            return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
+            if (await RedisHelper.SAddAsync("Comments:" + ip, cmd.Content) == 0)
+            {
+                await RedisHelper.ExpireAsync("Comments:" + ip, TimeSpan.FromMinutes(2));
+                return ResultData(null, false, "您已发表了相同的评论内容，请稍后再发表吧！");
+            }
+
+            if (await RedisHelper.SCardAsync("Comments:" + ip) > 2)
+            {
+                await RedisHelper.ExpireAsync("Comments:" + ip, TimeSpan.FromMinutes(2));
+                return ResultData(null, false, "您的发言频率过快，请稍后再发表吧！");
+            }
         }
 
         var comment = Mapper.Map<Comment>(cmd);
@@ -173,7 +183,7 @@ public sealed class CommentController : BaseController
             BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(Request.Host + "|博客文章新评论(待审核)：", content.Set("link", Url.Action("Details", "Post", new { id = comment.PostId, cid = comment.Id }, Request.Scheme) + "#comment").Render(false) + "<p style='color:red;'>(待审核)</p>", s, comment.IP));
         }
 
-        return ResultData(null, true, "评论成功，待站长审核通过以后将显示");
+        return ResultData(null, true, "评论成功，待审核通过以后显示");
     }
 
     /// <summary>

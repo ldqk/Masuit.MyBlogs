@@ -23,7 +23,6 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using System.Text.RegularExpressions;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using EFCoreSecondLevelCacheInterceptor;
-using CacheManager.Core;
 
 namespace Masuit.MyBlogs.Core;
 

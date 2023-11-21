@@ -329,15 +329,6 @@ public static class RedisClientExtension
     }
 
     /// <summary>
-    /// 创建并获取分布式锁对象
-    /// </summary>
-    /// <param name="client"></param>
-    /// <param name="key">锁对象</param>
-    /// <param name="expire">锁过期时间</param>
-    /// <returns>T</returns>
-    public static RedisClient.LockController Lock(this IRedisClient client, string key, int expire = 60) => client.Lock(key, expire);
-
-    /// <summary>
     /// 分布式锁
     /// </summary>
     /// <typeparam name="T">T</typeparam>
