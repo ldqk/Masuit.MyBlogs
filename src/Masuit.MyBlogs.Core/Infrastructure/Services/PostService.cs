@@ -108,7 +108,7 @@ public sealed class PostService : BaseService<Post>, IPostService
                 Elapsed = searchResult.Elapsed,
                 Total = searchResult.TotalHits
             };
-        });
+        }, TimeSpan.FromMinutes(10));
     }
 
     public void SolvePostsCategory(IList<PostDto> posts)

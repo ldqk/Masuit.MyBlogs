@@ -96,7 +96,7 @@ public sealed class AdvertisementService : BaseService<Advertisement>, IAdvertis
             var ids = list.Select(a => a.Id).ToArray();
             GetQuery(a => ids.Contains(a.Id)).ExecuteUpdate(p => p.SetProperty(a => a.DisplayCount, a => a.DisplayCount + 1));
             return list;
-        });
+        }, TimeSpan.FromMinutes(10));
     }
 
     /// <summary>
@@ -111,9 +111,9 @@ public sealed class AdvertisementService : BaseService<Advertisement>, IAdvertis
     public List<AdvertisementDto> GetsByWeightedPriceMemory(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null, string keywords = "")
     {
         var (location, _, _) = ipinfo;
-        var all = CacheManager.GetOrAdd("Advertisement:all", () => GetQuery<AdvertisementDto>(a => a.Status == Status.Available).ToList(), TimeSpan.FromHours(1));
         return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}-{keywords}", () =>
         {
+            var all = GetQuery<AdvertisementDto>(a => a.Status == Status.Available).Cacheable(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(10)).ToList();
             var atype = type.ToString("D");
             var catCount = CategoryRepository.Count(_ => true);
             string scid = "";
@@ -141,6 +141,6 @@ public sealed class AdvertisementService : BaseService<Advertisement>, IAdvertis
             var ids = list.Select(a => a.Id).ToArray();
             GetQuery(a => ids.Contains(a.Id)).ExecuteUpdate(p => p.SetProperty(a => a.DisplayCount, a => a.DisplayCount + 1));
             return list;
-        }, TimeSpan.FromHours(1));
+        }, TimeSpan.FromMinutes(10));
     }
 }
