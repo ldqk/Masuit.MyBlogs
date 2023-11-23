@@ -320,7 +320,8 @@ Custom bottom spacer
     margin-top: 0px;
 }
 .notices {
-    min-height: 100px;
+    min-height: 110px !important;
+    overflow:hidden !important;
 }
 .text-white {
     color: white;

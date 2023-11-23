@@ -25,6 +25,8 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
     public IRedisClient RedisClient { get; set; }
 
+    private static readonly char[] Separator = { ',', '|', '，' };
+
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var request = context.HttpContext.Request;
@@ -59,7 +61,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
         //UserAgent
         var ua = request.Headers[HeaderNames.UserAgent] + "";
-        var blocked = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlocked", "").Split(new[] { ',', '|' }, StringSplitOptions.RemoveEmptyEntries);
+        var blocked = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlocked", "").Split(Separator, StringSplitOptions.RemoveEmptyEntries);
         if (ua.Contains(blocked))
         {
             var agent = UserAgent.Parse(ua);
@@ -108,20 +110,16 @@ public sealed class FirewallAttribute : IAsyncActionFilter
         var ipLocation = context.HttpContext.Connection.RemoteIpAddress.GetIPLocation();
         var (location, network, pos) = ipLocation;
         pos += ipLocation.Coodinate;
-        var allowedAreas = CommonHelper.SystemSettings.GetOrAdd("AllowedArea", "").Split(new[]
-        {
-            ',',
-            '，'
-        }, StringSplitOptions.RemoveEmptyEntries);
-        if (allowedAreas.Any() && pos.Contains(allowedAreas))
+        var allowedAreas = CommonHelper.SystemSettings.GetOrAdd("AllowedArea", "").Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+        if (allowedAreas.Length != 0 && pos.Contains(allowedAreas))
         {
             await next();
             return;
         }
 
         //黑名单地区
-        var denyAreas = CommonHelper.SystemSettings.GetOrAdd("DenyArea", "").Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries);
-        if (denyAreas.Any() && (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(network) || pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any()))
+        var denyAreas = CommonHelper.SystemSettings.GetOrAdd("DenyArea", "").Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+        if (denyAreas.Length != 0 && (string.IsNullOrWhiteSpace(location) || string.IsNullOrWhiteSpace(network) || pos.Contains(denyAreas) || denyAreas.Intersect(pos.Split("|")).Any()))
         {
             // 未知地区的，未知网络的，禁区的
             await AccessDeny(ip, request, "访问地区限制");
@@ -129,7 +127,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
         }
 
         //挑战模式
-        if (context.HttpContext.Session.TryGetValue("js-challenge", out _) || request.Path.ToUriComponent().Contains("."))
+        if (context.HttpContext.Session.TryGetValue("js-challenge", out _) || request.Path.ToUriComponent().Contains('.'))
         {
             await next();
             return;
@@ -226,7 +224,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
     private async Task ThrottleLimit(string ip, HttpRequest request, ActionExecutionDelegate next)
     {
-        var times = RedisClient.Incr("Frequency:" + ip);
+        var times = await RedisClient.IncrAsync("Frequency:" + ip);
         await RedisClient.ExpireAsync("Frequency:" + ip, TimeSpan.FromSeconds(CommonHelper.SystemSettings.GetOrAdd("LimitIPFrequency", "60").ToInt32()));
         var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPRequestTimes", "90").ToInt32();
         if (times <= limit)

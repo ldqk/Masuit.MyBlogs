@@ -50,7 +50,7 @@ namespace Masuit.MyBlogs.Core
                     var set = db.Post.Select(p => $"{p.Title},{p.Label},{p.Keyword}").AsParallel().SelectMany(s => Regex.Split(s, @"\p{P}(?<!\.|#)|\p{Z}|\p{S}")).Where(s => s.Length > 1).ToHashSet();
                     var lines = File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomKeywords.txt")).Union(set);
                     KeywordsManager.AddWords(lines);
-                    KeywordsManager.AddSynonyms(File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomSynonym.txt")).Where(s => s.Contains(" ")).Select(s =>
+                    KeywordsManager.AddSynonyms(File.ReadAllLines(Path.Combine(env.ContentRootPath, "App_Data", "CustomSynonym.txt")).Where(s => s.Contains(' ')).Select(s =>
                     {
                         var arr = Regex.Split(s, "\\s");
                         return (arr[0], arr[1]);
@@ -194,10 +194,7 @@ namespace Masuit.MyBlogs.Core
             {
                 options.CacheRootPath = null;
                 options.CacheFolder = "static/image_cache";
-            }).SetCache<PhysicalFileSystemCache>().SetCacheKey<UriRelativeLowerInvariantCacheKey>().SetCacheHash<SHA256CacheHash>().Configure<PhysicalFileSystemProviderOptions>(options =>
-            {
-                options.ProviderRootPath = null;
-            }).AddProvider<PhysicalFileSystemProvider>().AddProcessor<ResizeWebProcessor>().AddProcessor<FormatWebProcessor>().AddProcessor<BackgroundColorWebProcessor>().AddProcessor<QualityWebProcessor>().AddProcessor<AutoOrientWebProcessor>();
+            }).SetCache<PhysicalFileSystemCache>().SetCacheKey<UriRelativeLowerInvariantCacheKey>().SetCacheHash<SHA256CacheHash>().Configure<PhysicalFileSystemProviderOptions>(options => options.ProviderRootPath = null).AddProvider<PhysicalFileSystemProvider>().AddProcessor<ResizeWebProcessor>().AddProcessor<FormatWebProcessor>().AddProcessor<BackgroundColorWebProcessor>().AddProcessor<QualityWebProcessor>().AddProcessor<AutoOrientWebProcessor>();
             return services;
         }
     }

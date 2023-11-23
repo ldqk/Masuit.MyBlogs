@@ -1,6 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.Tools.Logging;
-using SixLabors.ImageSharp;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
@@ -9,26 +8,19 @@ namespace Masuit.MyBlogs.Core.Extensions.UEditor;
 /// <summary>
 /// UploadHandler 的摘要说明
 /// </summary>
-public class UploadHandler : Handler
+public class UploadHandler(HttpContext context, UploadConfig config) : Handler(context)
 {
-    public UploadConfig UploadConfig { get; }
+    public UploadConfig UploadConfig { get; } = config;
 
-    public UploadResult Result { get; }
-
-    public UploadHandler(HttpContext context, UploadConfig config) : base(context)
+    public UploadResult Result { get; } = new()
     {
-        UploadConfig = config;
-        Result = new UploadResult()
-        {
-            State = UploadState.Unknown
-        };
-    }
+        State = UploadState.Unknown
+    };
 
     public override async Task<string> Process()
     {
         var form = await Request.ReadFormAsync();
-        var files = form.Files;
-        foreach (var file in files)
+        foreach (var file in form.Files)
         {
             var uploadFileName = file.FileName;
             if (!CheckFileType(uploadFileName))

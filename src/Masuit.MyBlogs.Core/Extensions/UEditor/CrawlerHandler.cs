@@ -1,133 +1,118 @@
 ﻿using Masuit.MyBlogs.Core.Common;
 using Masuit.Tools.Mime;
-using Masuit.Tools.Logging;
-using System.Diagnostics;
 using System.Net;
 using System.Text.RegularExpressions;
 using Masuit.Tools.Files;
+using Polly;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor;
 
 /// <summary>
 /// Crawler 的摘要说明
 /// </summary>
-public class CrawlerHandler : Handler
+public class CrawlerHandler(HttpContext context) : Handler(context)
 {
-	private readonly HttpClient _httpClient;
-	private readonly IConfiguration _configuration;
+    private readonly HttpClient _httpClient = context.RequestServices.GetRequiredService<IHttpClientFactory>().CreateClient();
+    private readonly IConfiguration _configuration = context.RequestServices.GetRequiredService<IConfiguration>();
 
-	public CrawlerHandler(HttpContext context) : base(context)
-	{
-		_httpClient = context.RequestServices.GetRequiredService<IHttpClientFactory>().CreateClient();
-		_configuration = context.RequestServices.GetRequiredService<IConfiguration>();
-	}
+    public override async Task<string> Process()
+    {
+        var form = await Request.ReadFormAsync();
+        string[] sources = form["source[]"];
+        if (sources is { Length: > 0 })
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(sources.Length * 2));
+            return WriteJson(new
+            {
+                state = "SUCCESS",
+                list = await sources.SelectAsync(async s =>
+                {
+                    var crawler = new Crawler(s, _httpClient, _configuration, Context);
+                    var fetch = await Policy<Crawler>.Handle<ObjectDisposedException>().RetryAsync(3).WrapAsync(Policy<Crawler>.Handle<ObjectDisposedException>().FallbackAsync(crawler)).ExecuteAsync(() => crawler.Fetch(cts.Token));
+                    return new
+                    {
+                        state = fetch.State,
+                        source = fetch.SourceUrl,
+                        url = fetch.ServerUrl
+                    };
+                })
+            });
+        }
 
-	public override async Task<string> Process()
-	{
-		var form = await Request.ReadFormAsync();
-		string[] sources = form["source[]"];
-		if (sources?.Length > 0 || sources?.Length <= 10)
-		{
-			using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-			return WriteJson(new
-			{
-				state = "SUCCESS",
-				list = (await sources.SelectAsync(s =>
-				{
-					return new Crawler(s, _httpClient, _configuration, Context).Fetch(cts.Token).ContinueWith(t => new
-					{
-						state = t.Result.State,
-						source = t.Result.SourceUrl,
-						url = t.Result.ServerUrl
-					});
-				}))
-			});
-		}
-
-		return WriteJson(new
-		{
-			state = "参数错误：没有指定抓取源"
-		});
-	}
+        return WriteJson(new
+        {
+            state = "参数错误：没有指定抓取源"
+        });
+    }
 }
 
-public class Crawler
+public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration configuration, HttpContext httpContext)
 {
-	public string SourceUrl { get; set; }
+    public string SourceUrl { get; set; } = sourceUrl;
 
-	public string ServerUrl { get; set; }
+    public string ServerUrl { get; set; }
 
-	public string State { get; set; }
+    public string State { get; set; }
 
-	private readonly HttpClient _httpClient;
-	private readonly IConfiguration _configuration;
-	private readonly HttpContext _httpContext;
+    public async Task<Crawler> Fetch(CancellationToken token)
+    {
+        if (!SourceUrl.IsExternalAddress())
+        {
+            State = "INVALID_URL";
+            return this;
+        }
 
-	public Crawler(string sourceUrl, HttpClient httpClient, IConfiguration configuration, HttpContext httpContext)
-	{
-		SourceUrl = sourceUrl;
-		_httpClient = httpClient;
-		_configuration = configuration;
-		_httpContext = httpContext;
-	}
+        httpClient.DefaultRequestHeaders.Referrer = new Uri(SourceUrl);
+        var stream = await httpClient.GetAsync(configuration["HttpClientProxy:UriPrefix"] + SourceUrl, token).ContinueWith(task =>
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                var response = task.Result;
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    State = "远程地址返回了错误的状态吗：" + response.StatusCode;
+                    return new PooledMemoryStream();
+                }
 
-	public async Task<Crawler> Fetch(CancellationToken token)
-	{
-		if (!SourceUrl.IsExternalAddress())
-		{
-			State = "INVALID_URL";
-			return this;
-		}
-		try
-		{
-			_httpClient.DefaultRequestHeaders.Referrer = new Uri(SourceUrl);
-			using var response = await _httpClient.GetAsync(_configuration["HttpClientProxy:UriPrefix"] + SourceUrl, token);
-			if (response.StatusCode != HttpStatusCode.OK)
-			{
-				State = "远程地址返回了错误的状态吗：" + response.StatusCode;
-				return this;
-			}
+                var fileName = Path.GetFileNameWithoutExtension(SourceUrl).Next(s => Regex.Matches(s, @"\w+").LastOrDefault()?.Value);
+                ServerUrl = PathFormatter.Format(fileName, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload") + UeditorConfig.GetString("catcherPathFormat")) + MimeMapper.ExtTypes[response.Content.Headers.ContentType?.MediaType ?? "image/jpeg"];
+                return response.Content.ReadAsStreamAsync().Result;
+            }
 
-			var fileName = Path.GetFileNameWithoutExtension(SourceUrl).Next(s => Regex.Matches(s, @"\w+").LastOrDefault()?.Value);
-			ServerUrl = PathFormatter.Format(fileName, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload") + UeditorConfig.GetString("catcherPathFormat")) + MimeMapper.ExtTypes[response.Content.Headers.ContentType?.MediaType ?? "image/jpeg"];
-			var stream = await response.Content.ReadAsStreamAsync();
-			var format = await Image.DetectFormatAsync(stream).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
-			stream.Position = 0;
-			if (format != null)
-			{
-				ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), "." + format.Name.ToLower());
-				if (!Regex.IsMatch(format.Name, "JPEG|PNG|Webp|GIF", RegexOptions.IgnoreCase))
-				{
-					using var image = await Image.LoadAsync(stream, token);
-					var memoryStream = new PooledMemoryStream();
-					await image.SaveAsJpegAsync(memoryStream, token);
-					await stream.DisposeAsync();
-					stream = memoryStream;
-					ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), ".jpg");
-				}
-			}
+            State = "远程请求失败";
+            return new PooledMemoryStream();
+        });
+        if (stream.Length == 0)
+        {
+            return this;
+        }
 
-			var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
-			var (url, success) = await _httpContext.RequestServices.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath, token);
-			if (success)
-			{
-				ServerUrl = url;
-			}
-			else
-			{
-				Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-				await stream.SaveFileAsync(savePath);
-			}
+        var format = await Image.DetectFormatAsync(stream).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
+        stream.Position = 0;
+        if (format != null)
+        {
+            ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), "." + format.Name.ToLower());
+            if (!Regex.IsMatch(format.Name, "JPEG|PNG|Webp|GIF", RegexOptions.IgnoreCase))
+            {
+                using var image = await Image.LoadAsync(stream, token);
+                await image.SaveAsJpegAsync(stream, token);
+                ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), ".jpg");
+            }
+        }
 
-			await stream.DisposeAsync();
-			State = "SUCCESS";
-		}
-		catch (Exception e)
-		{
-			State = "抓取错误：" + e.Message;
-			LogManager.Error(e.Demystify());
-		}
+        var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
+        var (url, success) = await httpContext.RequestServices.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath, token);
+        if (success)
+        {
+            ServerUrl = url;
+        }
+        else
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+            await stream.SaveFileAsync(savePath);
+        }
 
-		return this;
-	}
+        State = "SUCCESS";
+        return this;
+    }
 }
