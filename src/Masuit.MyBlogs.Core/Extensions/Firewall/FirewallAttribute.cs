@@ -262,10 +262,8 @@ public sealed class FirewallAttribute : IAsyncActionFilter
                 request.Headers
             }.ToJsonString()
         });
-        var limit = CommonHelper.SystemSettings.GetOrAdd("LimitIPInterceptTimes", "30").ToInt32();
-        var list = RedisClient.LRange<IpIntercepter>("intercept", 0, -1);
         var key = "FirewallRepoter:" + FirewallRepoter.ReporterName + ":" + ip;
-        if (list.Count(x => x.IP == ip) >= limit && !MemoryCache.TryGetValue(key, out _))
+        if (!MemoryCache.TryGetValue(key, out _) && (await RedisClient.LRangeAsync<IpIntercepter>("intercept", 0, -1)).Count(x => x.IP == ip) >= CommonHelper.SystemSettings.GetOrAdd("LimitIPInterceptTimes", "30").ToInt32())
         {
             LogManager.Info($"准备上报IP{ip}到{FirewallRepoter.ReporterName}");
             await FirewallRepoter.ReportAsync(IPAddress.Parse(ip)).ContinueWith(_ =>
