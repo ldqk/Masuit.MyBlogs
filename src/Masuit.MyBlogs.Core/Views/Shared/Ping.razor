@@ -1,6 +1,7 @@
 ﻿@using FreeRedis
 
 @implements IAsyncDisposable
+@attribute [StreamRendering]
 @inject IRedisClient CacheManager
 
 <p style="display: table;margin-left:70px">

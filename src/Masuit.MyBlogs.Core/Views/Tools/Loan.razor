@@ -3,6 +3,7 @@
 @using FreeRedis
 
 @implements IAsyncDisposable
+@attribute [StreamRendering]
 @inject IRedisClient CacheManager
 <div class="container">
     <p>当前<span class="text-red online">@online</span>人正在使用本功能</p>

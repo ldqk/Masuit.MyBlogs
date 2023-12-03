@@ -5,6 +5,7 @@
 @implements IAsyncDisposable
 @inject IRedisClient CacheManager
 @inject IJSRuntime JavaScript;
+@attribute [StreamRendering]
 
 <span class="text-red online" @onclick="ShowViewer">@online</span>人正在浏览本文
 
@@ -26,12 +27,11 @@
         try {
             var key = nameof(PostOnline) + ":" + Id;
             CacheManager.SAdd(key, IP);
-            CacheManager.SAdd(key, "127.0.0.1");
             CacheManager.Expire(key, TimeSpan.FromMinutes(10));
             _timer = new Timer(_ =>
             {
                 try {
-                    online = CacheManager.SCard(key)-1;
+                    online = CacheManager.SCard(key);
                     InvokeAsync(StateHasChanged);
                 }
                 catch{
@@ -49,7 +49,7 @@
         if (online > 0 && IsAdmin)
         {
             try {
-                JavaScript.InvokeVoidAsync("showViewer", CacheManager.SMembers(nameof(PostOnline) + ":" + Id).Where(s => s!="127.0.0.1").Select(s => KeyValuePair.Create(s, s.GetIPLocation().ToString())));
+                JavaScript.InvokeVoidAsync("showViewer", CacheManager.SMembers(nameof(PostOnline) + ":" + Id).Select(s => KeyValuePair.Create(s, s.GetIPLocation().ToString())));
             }
             catch {
                 // ignored
