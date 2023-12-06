@@ -5,6 +5,7 @@ using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Infrastructure.Drive;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Diagnostics;
+using AngleSharp.Text;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -31,7 +32,7 @@ Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new AutofacServiceProv
     var port = config["Port"] ?? "5000";
     var sslport = config["Https:Port"] ?? "5001";
     opt.ListenAnyIP(port.ToInt32(), options => options.Protocols = HttpProtocols.Http1AndHttp2AndHttp3);
-    if (bool.Parse(config["Https:Enabled"]))
+    if (config["Https:Enabled"].ToBoolean())
     {
         opt.ListenAnyIP(sslport.ToInt32(), s =>
         {
