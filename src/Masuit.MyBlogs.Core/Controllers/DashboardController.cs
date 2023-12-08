@@ -36,34 +36,48 @@ public sealed class DashboardController : AdminController
 	/// 获取站内消息
 	/// </summary>
 	/// <returns></returns>
-	public ActionResult GetMessages([FromServices] IPostService postService, [FromServices] ILeaveMessageService leaveMessageService, [FromServices] ICommentService commentService)
+	public async Task<ActionResult> GetMessages([FromServices] IPostService postService, [FromServices] ILeaveMessageService leaveMessageService, [FromServices] ICommentService commentService, CancellationToken cancellationToken)
 	{
-		var post = postService.GetQuery(p => p.Status == Status.Pending).Select(p => new
+		Response.ContentType = "text/event-stream";
+		while (true)
 		{
-			p.Id,
-			p.Title,
-			p.PostDate,
-			p.Author
-		}).ToPooledListScope();
-		var msgs = leaveMessageService.GetQuery(m => m.Status == Status.Pending).Select(p => new
-		{
-			p.Id,
-			p.PostDate,
-			p.NickName
-		}).ToPooledListScope();
-		var comments = commentService.GetQuery(c => c.Status == Status.Pending).Select(p => new
-		{
-			p.Id,
-			p.CommentDate,
-			p.PostId,
-			p.NickName
-		}).ToPooledListScope();
-		return ResultData(new
-		{
-			post,
-			msgs,
-			comments
-		});
+			if (cancellationToken.IsCancellationRequested)
+			{
+				break;
+			}
+			await Response.WriteAsync($"event: message\n", cancellationToken);
+			var post = postService.GetQuery(p => p.Status == Status.Pending).Select(p => new
+			{
+				p.Id,
+				p.Title,
+				p.PostDate,
+				p.Author
+			}).ToPooledListScope();
+			var msgs = leaveMessageService.GetQuery(m => m.Status == Status.Pending).Select(p => new
+			{
+				p.Id,
+				p.PostDate,
+				p.NickName
+			}).ToPooledListScope();
+			var comments = commentService.GetQuery(c => c.Status == Status.Pending).Select(p => new
+			{
+				p.Id,
+				p.CommentDate,
+				p.PostId,
+				p.NickName
+			}).ToPooledListScope();
+			await Response.WriteAsync("data:" + new
+			{
+				post,
+				msgs,
+				comments
+			}.ToJsonString() + "\r\r");
+			await Response.Body.FlushAsync(cancellationToken);
+			await Task.Delay(5000, cancellationToken);
+		}
+
+		Response.Body.Close();
+		return ResultData(null);
 	}
 
 	/// <summary>
