@@ -14,6 +14,15 @@ public sealed class DriveAccountService(DriveContext siteContext, TokenService t
     /// <value></value>
     public Microsoft.Graph.GraphServiceClient Graph { get; set; } = tokenService.Graph;
 
+    public DriveContext SiteContext
+    {
+        get => siteContext;
+
+        set
+        {
+        }
+    }
+
     /// <summary>
     /// 返回 Oauth 验证url
     /// </summary>
@@ -42,10 +51,8 @@ public sealed class DriveAccountService(DriveContext siteContext, TokenService t
         }
         else
         {
-            using var httpClient = new HttpClient
-            {
-                Timeout = TimeSpan.FromSeconds(20)
-            };
+            using var httpClient = new HttpClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(20);
             var apiCaller = new ProtectedApiCallHelper(httpClient);
             await apiCaller.CallWebApiAndProcessResultASync($"{OneDriveConfiguration.GraphApi}/v1.0/sites/{OneDriveConfiguration.DominName}:/sites/{siteName}", GetToken(), result =>
             {

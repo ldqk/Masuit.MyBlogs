@@ -4,6 +4,8 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Drive;
 
 public interface IDriveAccountService
 {
+    public DriveContext SiteContext { get; set; }
+
     /// <summary>
     /// 返回 Oauth 验证url
     /// </summary>
