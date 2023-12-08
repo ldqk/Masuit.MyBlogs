@@ -98,20 +98,20 @@
     }
 </div>
 <div class="container-fluid">
-    @if (Model != null && Model.Status == 0)
+    @if (Model is {Status: 0})
     {
         <div id="allmap"></div>
         <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=89772e94509a9b903724e247cbc175c2"></script>
         <script>
-	    var map = new BMap.Map("allmap"); // 创建Map实例,设置地图允许的最小/大级别
+        var map = new BMap.Map("allmap"); // 创建Map实例,设置地图允许的最小/大级别
 
-	    map.centerAndZoom(new BMap.Point(@(Model.AddressResult.Location?.Lng), @(Model.AddressResult.Location?.Lat)), 15);
-	    map.enableScrollWheelZoom(true);
-	    var new_point = new BMap.Point(@(Model.AddressResult.Location?.Lng), @(Model.AddressResult.Location?.Lat));
-	    var marker = new BMap.Marker(new_point); // 创建标注
-	    map.addOverlay(marker); // 将标注添加到地图中
-	    marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
-	    map.panTo(new_point);
+        map.centerAndZoom(new BMap.Point(@(Model.AddressResult.Location?.Lng), @(Model.AddressResult.Location?.Lat)), 15);
+        map.enableScrollWheelZoom(true);
+        var new_point = new BMap.Point(@(Model.AddressResult.Location?.Lng), @(Model.AddressResult.Location?.Lat));
+        var marker = new BMap.Marker(new_point); // 创建标注
+        map.addOverlay(marker); // 将标注添加到地图中
+        marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+        map.panTo(new_point);
         </script>
     }
 </div>

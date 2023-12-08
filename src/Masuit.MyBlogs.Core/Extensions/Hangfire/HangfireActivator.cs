@@ -2,17 +2,10 @@
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire;
 
-public sealed class HangfireActivator : JobActivator
+public sealed class HangfireActivator(IServiceProvider serviceProvider) : JobActivator
 {
-	private readonly IServiceProvider _serviceProvider;
-
-	public HangfireActivator(IServiceProvider serviceProvider)
-	{
-		_serviceProvider = serviceProvider;
-	}
-
-	public override object ActivateJob(Type type)
-	{
-		return _serviceProvider.GetService(type);
-	}
+    public override object ActivateJob(Type type)
+    {
+        return serviceProvider.GetService(type);
+    }
 }

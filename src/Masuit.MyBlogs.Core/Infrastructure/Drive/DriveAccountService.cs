@@ -4,24 +4,15 @@ using Microsoft.Identity.Client;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Drive;
 
-public sealed class DriveAccountService : IDriveAccountService
+public sealed class DriveAccountService(DriveContext siteContext, TokenService tokenService) : IDriveAccountService
 {
-    private readonly IConfidentialClientApplication _app;
-
-    public DriveContext SiteContext { get; set; }
+    private readonly IConfidentialClientApplication _app = tokenService.App;
 
     /// <summary>
     /// Graph实例
     /// </summary>
     /// <value></value>
-    public Microsoft.Graph.GraphServiceClient Graph { get; set; }
-
-    public DriveAccountService(DriveContext siteContext, TokenService tokenService)
-    {
-        SiteContext = siteContext;
-        _app = tokenService.App;
-        Graph = tokenService.Graph;
-    }
+    public Microsoft.Graph.GraphServiceClient Graph { get; set; } = tokenService.Graph;
 
     /// <summary>
     /// 返回 Oauth 验证url
@@ -63,18 +54,18 @@ public sealed class DriveAccountService : IDriveAccountService
                 site.NickName = nickName;
             });
         }
-        if (!SiteContext.Sites.Any(s => s.SiteId == site.SiteId))
+        if (!siteContext.Sites.Any(s => s.SiteId == site.SiteId))
         {
             //若是首次添加则设置为默认的驱动器
             using (var setting = new SettingService(new DriveContext()))
             {
-                if (!SiteContext.Sites.Any())
+                if (!siteContext.Sites.Any())
                 {
                     await setting.Set("DefaultDrive", site.Name);
                 }
             }
-            await SiteContext.Sites.AddAsync(site);
-            await SiteContext.SaveChangesAsync();
+            await siteContext.Sites.AddAsync(site);
+            await siteContext.SaveChangesAsync();
         }
         else
         {
@@ -84,7 +75,7 @@ public sealed class DriveAccountService : IDriveAccountService
 
     public List<Site> GetSites()
     {
-        return SiteContext.Sites.ToList();
+        return siteContext.Sites.ToList();
     }
 
     /// <summary>
@@ -94,7 +85,7 @@ public sealed class DriveAccountService : IDriveAccountService
     public async Task<List<DriveInfo>> GetDriveInfo()
     {
         var drivesInfo = new List<DriveInfo>();
-        foreach (var item in SiteContext.Sites.ToArray())
+        foreach (var item in siteContext.Sites.ToArray())
         {
             Microsoft.Graph.Drive drive;
 
@@ -120,8 +111,8 @@ public sealed class DriveAccountService : IDriveAccountService
 
     public async Task Unbind(string nickName)
     {
-        SiteContext.Sites.Remove(SiteContext.Sites.Single(site => site.NickName == nickName));
-        await SiteContext.SaveChangesAsync();
+        siteContext.Sites.Remove(siteContext.Sites.Single(site => site.NickName == nickName));
+        await siteContext.SaveChangesAsync();
     }
 
     /// <summary>

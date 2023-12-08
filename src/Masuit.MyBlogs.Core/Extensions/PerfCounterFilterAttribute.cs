@@ -5,12 +5,7 @@ namespace Masuit.MyBlogs.Core.Extensions;
 
 public class PerfCounterFilterAttribute : ActionFilterAttribute
 {
-    public Stopwatch Stopwatch { get; set; }
-
-    public PerfCounterFilterAttribute()
-    {
-        Stopwatch = Stopwatch.StartNew();
-    }
+    public Stopwatch Stopwatch { get; set; } = Stopwatch.StartNew();
 
     /// <inheritdoc />
     public override void OnActionExecuted(ActionExecutedContext context)

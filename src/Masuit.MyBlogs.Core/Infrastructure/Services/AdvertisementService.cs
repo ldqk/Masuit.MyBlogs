@@ -8,18 +8,11 @@ using FreeRedis;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services;
 
-public sealed class AdvertisementService : BaseService<Advertisement>, IAdvertisementService
+public sealed class AdvertisementService(IBaseRepository<Advertisement> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : BaseService<Advertisement>(repository, searchEngine, searcher), IAdvertisementService
 {
     public IRedisClient CacheManager { get; set; }
 
     public ICategoryRepository CategoryRepository { get; set; }
-
-    private readonly ILuceneIndexSearcher _luceneIndexSearcher;
-
-    public AdvertisementService(IBaseRepository<Advertisement> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : base(repository, searchEngine, searcher)
-    {
-        _luceneIndexSearcher = searcher;
-    }
 
     /// <summary>
     /// 按价格随机筛选一个元素
@@ -82,7 +75,7 @@ public sealed class AdvertisementService : BaseService<Advertisement>, IAdvertis
 
             if (!keywords.IsNullOrEmpty())
             {
-                var regex = _luceneIndexSearcher.CutKeywords(keywords).Select(Regex.Escape).Join("|");
+                var regex = Searcher.CutKeywords(keywords).Select(Regex.Escape).Join("|");
                 where = where.And(a => Regex.IsMatch(a.Title + a.Description, regex));
             }
 
@@ -126,7 +119,7 @@ public sealed class AdvertisementService : BaseService<Advertisement>, IAdvertis
             var list = all.Where(a => a.Types.Contains(atype) && array.Contains(a.Id))
                 .Where(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase)))
                 .WhereIf(cid.HasValue, a => Regex.IsMatch(a.CategoryIds + "", scid) || string.IsNullOrEmpty(a.CategoryIds))
-                .WhereIf(!keywords.IsNullOrEmpty(), a => (a.Title + a.Description).Contains(_luceneIndexSearcher.CutKeywords(keywords)))
+                .WhereIf(!keywords.IsNullOrEmpty(), a => (a.Title + a.Description).Contains(Searcher.CutKeywords(keywords)))
                 .OrderBy(a => -Math.Log(Random.Shared.NextDouble()) / ((double)a.Price / a.Types.Length * catCount / (string.IsNullOrEmpty(a.CategoryIds) ? catCount : (a.CategoryIds.Length + 1))))
                 .Take(count).ToList();
             if (list.Count == 0 && keywords is { Length: > 0 })

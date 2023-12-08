@@ -4,20 +4,8 @@ using Masuit.MyBlogs.Core.Common;
 
 namespace Masuit.MyBlogs.Core;
 
-public class EFCoreCacheProvider : IEFCacheServiceProvider
+public class EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCacheProvider> cacheLogger, IEFDebugLogger logger) : IEFCacheServiceProvider
 {
-    private readonly IRedisClient _redisClient;
-
-    private readonly ILogger<EFCoreCacheProvider> _cacheLogger;
-    private readonly IEFDebugLogger _logger;
-
-    public EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCacheProvider> cacheLogger, IEFDebugLogger logger)
-    {
-        _redisClient = redisClient;
-        _cacheLogger = cacheLogger;
-        _logger = logger;
-    }
-
     /// <summary>
     ///     Adds a new item to the cache.
     /// </summary>
@@ -44,24 +32,24 @@ public class EFCoreCacheProvider : IEFCacheServiceProvider
             {
                 continue;
             }
-            _redisClient.SAdd(rootCacheKey, keyHash);
-            _redisClient.Expire(rootCacheKey, 3600);
+            redisClient.SAdd(rootCacheKey, keyHash);
+            redisClient.Expire(rootCacheKey, 3600);
         }
 
         if (cachePolicy == null)
         {
-            _redisClient.Set(keyHash, value, 300);
+            redisClient.Set(keyHash, value, 300);
         }
         else
         {
-            _redisClient.AddOrUpdate(keyHash, value, value, cachePolicy.CacheTimeout, cachePolicy.CacheExpirationMode == CacheExpirationMode.Sliding);
+            redisClient.AddOrUpdate(keyHash, value, value, cachePolicy.CacheTimeout, cachePolicy.CacheExpirationMode == CacheExpirationMode.Sliding);
         }
     }
 
     /// <summary>Removes the cached entries added by this library.</summary>
     public void ClearAllCachedEntries()
     {
-        _redisClient.Del("EFCache:*");
+        redisClient.Del("EFCache:*");
     }
 
     /// <summary>
@@ -77,7 +65,7 @@ public class EFCoreCacheProvider : IEFCacheServiceProvider
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        return _redisClient.Get<EFCachedData>(cacheKey.KeyHash);
+        return redisClient.Get<EFCachedData>(cacheKey.KeyHash);
     }
 
     /// <summary>
@@ -98,19 +86,19 @@ public class EFCoreCacheProvider : IEFCacheServiceProvider
                 continue;
             }
 
-            var cachedValue = _redisClient.Get<EFCachedData>(cacheKey.KeyHash);
-            var dependencyKeys = _redisClient.SMembers(rootCacheKey);
+            var cachedValue = redisClient.Get<EFCachedData>(cacheKey.KeyHash);
+            var dependencyKeys = redisClient.SMembers(rootCacheKey);
             if (dependencyKeys.IsNullOrEmpty() && cachedValue is not null)
             {
-                if (_logger.IsLoggerEnabled)
+                if (logger.IsLoggerEnabled)
                 {
-                    _cacheLogger.LogDebug(CacheableEventId.QueryResultInvalidated, "Invalidated all of the cache entries due to early expiration of a root cache key[{RootCacheKey}].", rootCacheKey);
+                    cacheLogger.LogDebug(CacheableEventId.QueryResultInvalidated, "Invalidated all of the cache entries due to early expiration of a root cache key[{RootCacheKey}].", rootCacheKey);
                 }
 
-                _redisClient.Del(rootCacheKey);
+                redisClient.Del(rootCacheKey);
                 return;
             }
-            _redisClient.Del(rootCacheKey);
+            redisClient.Del(rootCacheKey);
         }
     }
 }
