@@ -15,10 +15,10 @@ namespace Masuit.MyBlogs.Core.Controllers.Drive;
 public sealed class AdminController(IDriveAccountService driveAccount, SettingService setting, TokenService tokenService) : Controller
 {
     /// <summary>
-	/// 重定向到 M$ 的 Oauth
-	/// </summary>
-	/// <returns></returns>
-	[AllowAnonymous]
+    /// 重定向到 M$ 的 Oauth
+    /// </summary>
+    /// <returns></returns>
+    [AllowAnonymous]
     [HttpGet("bind/url")]
     public async Task<RedirectResult> RedirectToBinding()
     {
@@ -147,16 +147,16 @@ public sealed class AdminController(IDriveAccountService driveAccount, SettingSe
     /// <param name="settings"></param>
     /// <returns></returns>
     [HttpPost("settings")]
-    public async Task<IActionResult> UpdateSetting(UpdateSettings toSaveSetting)
+    public async Task<IActionResult> UpdateSetting(UpdateSettings settings)
     {
         try
         {
-            await setting.Set("AppName", toSaveSetting.appName);
-            await setting.Set("WebName", toSaveSetting.webName);
-            await setting.Set("DefaultDrive", toSaveSetting.defaultDrive);
-            await setting.Set("Footer", toSaveSetting.footer);
-            await setting.Set("UploadPassword", toSaveSetting.uploadPassword);
-            await setting.Set("AllowAnonymouslyUpload", toSaveSetting.allowAnonymouslyUpload.ToString());
+            await setting.Set("AppName", settings.appName);
+            await setting.Set("WebName", settings.webName);
+            await setting.Set("DefaultDrive", settings.defaultDrive);
+            await setting.Set("Footer", settings.footer);
+            await setting.Set("UploadPassword", settings.uploadPassword);
+            await setting.Set("AllowAnonymouslyUpload", settings.allowAnonymouslyUpload.ToString());
         }
         catch (Exception e)
         {
