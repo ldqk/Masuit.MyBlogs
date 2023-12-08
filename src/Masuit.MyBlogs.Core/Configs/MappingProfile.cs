@@ -17,12 +17,12 @@ public sealed class MappingProfile : Profile
         CreateMap<CommentCommand, Comment>().ForMember(c => c.Status, e => e.MapFrom(c => Status.Pending)).ForMember(c => c.ParentId, e => e.MapFrom(c => c.ParentId > 0 ? c.ParentId : null)).ReverseMap();
         CreateMap<Comment, CommentDto>().ReverseMap();
         CreateMap<CommentCommand, CommentDto>().ReverseMap();
-        CreateMap<Comment, CommentViewModel>().ForMember(c => c.CommentDate, e => e.MapFrom(c => c.CommentDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
+        CreateMap<Comment, CommentViewModel>().ForMember(c => c.CommentDate, e => e.MapFrom(c => c.CommentDate.ToString("yyyy-MM-dd"))).ReverseMap();
 
         CreateMap<LeaveMessageCommand, LeaveMessage>().ForMember(c => c.Status, e => e.MapFrom(c => Status.Pending)).ForMember(c => c.ParentId, e => e.MapFrom(c => c.ParentId > 0 ? c.ParentId : null)).ReverseMap();
         CreateMap<LeaveMessage, LeaveMessageDto>().ReverseMap();
         CreateMap<LeaveMessageCommand, LeaveMessageDto>().ReverseMap();
-        CreateMap<LeaveMessage, LeaveMessageViewModel>().ForMember(l => l.PostDate, e => e.MapFrom(l => l.PostDate.ToString("yyyy-MM-dd HH:mm:ss"))).ReverseMap();
+        CreateMap<LeaveMessage, LeaveMessageViewModel>().ForMember(l => l.PostDate, e => e.MapFrom(l => l.PostDate.ToString("yyyy-MM-dd"))).ReverseMap();
 
         CreateMap<Links, LinksDto>().ForMember(e => e.Loopbacks, e => e.MapFrom(m => m.Loopbacks.GroupBy(e =>
             e.IP).Count())).ReverseMap();
