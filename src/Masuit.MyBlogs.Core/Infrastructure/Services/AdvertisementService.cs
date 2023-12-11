@@ -112,10 +112,10 @@ public sealed class AdvertisementService(IBaseRepository<Advertisement> reposito
             string scid = "";
             if (cid.HasValue)
             {
-                scid = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => string.Concat(c.ParentId, "|", c.Parent.ParentId).Trim('|')).Distinct().Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromHours(5)).AsEnumerable().Append(cid + "").Join("|");
+                scid = CategoryRepository.GetQuery(c => c.Id == cid).Select(static c => string.Concat(c.ParentId, "|", c.Parent.ParentId).Trim('|')).Distinct().Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromHours(5)).AsEnumerable().Append(cid + "").Join("|");
             }
 
-            var array = all.Where(a => a.Types.Contains(atype)).GroupBy(a => a.Merchant).Select(g => g.OrderByRandom().FirstOrDefault().Id).Take(50).ToArray();
+            var array = all.Where(a => a.Types.Contains(atype)).GroupBy(a => a.Merchant).Select(static g => g.OrderByRandom().FirstOrDefault().Id).Take(50).ToArray();
             var list = all.Where(a => a.Types.Contains(atype) && array.Contains(a.Id))
                 .Where(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase)))
                 .WhereIf(cid.HasValue, a => Regex.IsMatch(a.CategoryIds + "", scid) || string.IsNullOrEmpty(a.CategoryIds))

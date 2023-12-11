@@ -29,6 +29,7 @@ using EFCoreSecondLevelCacheInterceptor;
 using FreeRedis;
 using Masuit.Tools.Mime;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using Masuit.MyBlogs.Core.Infrastructure.Services;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -1093,47 +1094,61 @@ public sealed class PostController : BaseController
     [MyAuthorize]
     public async Task<IActionResult> Statistic(CancellationToken cancellationToken = default)
     {
-        var keys = await RedisHelper.KeysAsync(nameof(PostOnline) + ":*");
-        var sets = keys.Select(s => (Id: s.Split(':')[1].ToInt32(), Clients: RedisHelper.SMembers(s))).ToArray();
-        var ids = sets.OrderByDescending(t => t.Clients.Length).Take(10).Select(t => t.Id).ToArray();
-        var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).ToListAsync(cancellationToken).ContinueWith(t =>
+        Response.ContentType = "text/event-stream";
+        while (true)
         {
-            foreach (var item in t.Result)
+            if (cancellationToken.IsCancellationRequested)
             {
-                item.ViewCount = sets.FirstOrDefault(x => x.Id == item.Id).Clients.Length;
+                break;
             }
+            await Response.WriteAsync($"event: message\n", cancellationToken);
+            var keys = await RedisHelper.KeysAsync(nameof(PostOnline) + ":*");
+            var sets = keys.Select(s => (Id: s.Split(':')[1].ToInt32(), Clients: RedisHelper.SMembers(s))).ToArray();
+            var ids = sets.OrderByDescending(t => t.Clients.Length).Take(10).Select(t => t.Id).ToArray();
+            var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).ToListAsync(cancellationToken).ContinueWith(t =>
+            {
+                foreach (var item in t.Result)
+                {
+                    item.ViewCount = sets.FirstOrDefault(x => x.Id == item.Id).Clients.Length;
+                }
 
-            return t.Result.OrderByDescending(p => p.ViewCount);
-        });
-        var postsQuery = PostService.GetQuery(p => p.Status == Status.Published);
-        var mostView = await postsQuery.OrderByDescending(p => p.TotalViewCount).Take(10).Select(p => new PostModelBase()
-        {
-            Id = p.Id,
-            Title = p.Title,
-            ViewCount = p.TotalViewCount
-        }).ToListAsync(cancellationToken);
-        var mostAverage = await postsQuery.OrderByDescending(p => p.AverageViewCount).Take(10).Select(p => new PostModelBase()
-        {
-            Id = p.Id,
-            Title = p.Title,
-            ViewCount = (int)p.AverageViewCount
-        }).ToListAsync(cancellationToken);
-        var yesterday = DateTime.Now.AddDays(-1);
-        var trending = await postsQuery.Select(p => new PostModelBase()
-        {
-            Id = p.Id,
-            Title = p.Title,
-            ViewCount = p.PostVisitRecords.Count(t => t.Time >= yesterday)
-        }).OrderByDescending(p => p.ViewCount).Take(10).ToListAsync(cancellationToken);
-        var readCount = PostVisitRecordService.Count(e => e.Time >= yesterday);
-        return ResultData(new
-        {
-            mostHots,
-            mostView,
-            mostAverage,
-            trending,
-            readCount
-        });
+                return t.Result.OrderByDescending(p => p.ViewCount);
+            });
+            var postsQuery = PostService.GetQuery(p => p.Status == Status.Published);
+            var mostView = await postsQuery.OrderByDescending(p => p.TotalViewCount).Take(10).Select(p => new PostModelBase()
+            {
+                Id = p.Id,
+                Title = p.Title,
+                ViewCount = p.TotalViewCount
+            }).ToListAsync(cancellationToken);
+            var mostAverage = await postsQuery.OrderByDescending(p => p.AverageViewCount).Take(10).Select(p => new PostModelBase()
+            {
+                Id = p.Id,
+                Title = p.Title,
+                ViewCount = (int)p.AverageViewCount
+            }).ToListAsync(cancellationToken);
+            var yesterday = DateTime.Now.AddDays(-1);
+            var trending = await postsQuery.Select(p => new PostModelBase()
+            {
+                Id = p.Id,
+                Title = p.Title,
+                ViewCount = p.PostVisitRecords.Count(t => t.Time >= yesterday)
+            }).OrderByDescending(p => p.ViewCount).Take(10).ToListAsync(cancellationToken);
+            var readCount = PostVisitRecordService.Count(e => e.Time >= yesterday);
+            await Response.WriteAsync("data:" + new
+            {
+                mostHots,
+                mostView,
+                mostAverage,
+                trending,
+                readCount
+            }.ToJsonString() + "\r\r");
+            await Response.Body.FlushAsync(cancellationToken);
+            await Task.Delay(5000, cancellationToken);
+        }
+
+        Response.Body.Close();
+        return Ok();
     }
 
     /// <summary>
