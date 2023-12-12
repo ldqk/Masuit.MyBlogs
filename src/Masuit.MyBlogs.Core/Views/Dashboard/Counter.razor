@@ -14,6 +14,7 @@
 @inject IJSRuntime JavaScript;
 @inject IRedisClient CacheManager;
 @attribute [StreamRendering]
+@implements IDisposable
 
 <h3 class="text-center">
     服务器系统信息概览
@@ -69,10 +70,24 @@
             <th>@_driveInfos.Select(kv => kv.Name + " " + (kv.AvailableFreeSpace * 1m / kv.TotalSize).ToString("P")).Join(" | ")</th>
         </tr>
         <tr>
-            <td>MAC地址</td>
-            <th colspan="3">@_macs.Join(" , ")</th>
             <td>在线人数</td>
             <th>@CacheManager.SCard("GlobalOnline") 人</th>
+            <td>线程数</td>
+            <th>@_process.Threads.Count</th>
+            <td>句柄数</td>
+            <th>@_process.HandleCount</th>
+        </tr>
+        <tr>
+            <td>整机进程数</td>
+            <th>@_processes.Length</th>
+            <td>整机线程数</td>
+            <th>@_processes.Sum(p => p.Threads.Count)</th>
+            <td>整机句柄数</td>
+            <th>@_processes.Sum(p => p.HandleCount)</th>
+        </tr>
+        <tr>
+            <td>MAC地址</td>
+            <th colspan="5">@_macs.Join(" , ")</th>
         </tr>
         <tr>
             <td>IP地址</td>
@@ -111,10 +126,10 @@
                 <td>@value.stdev</td>
             </tr>
         }
-
     </tbody>
 </table>
 <button class="btn btn-success" @onclick="ClearMemory">整理内存</button>
+<button class="btn btn-success" @onclick="RefreshMemory">刷新GC配置</button>
 <div>
     <div class="page-header">
         <h3 class="text-center">性能实时监控</h3>
@@ -130,6 +145,8 @@
 </div>
 
 @code {
+    private readonly Process _process=Process.GetCurrentProcess();
+    private readonly Process[] _processes = Process.GetProcesses();
     private string _bootTime;
     private readonly string _ip=SystemInfo.GetLocalUsedIP(AddressFamily.InterNetwork).ToString();
     private string _runningTime;
@@ -171,6 +188,12 @@
         JavaScript.InvokeVoidAsync("showSuccess");
     }
 
+    public void RefreshMemory()
+    {
+        GC.RefreshMemoryLimit();
+        JavaScript.InvokeVoidAsync("showSuccess");
+    }
+
     public Dictionary<string, dynamic> GetCounterPercent()
     {
         var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==_ip).OrderByRandom().Take(5000).ToList();
@@ -180,8 +203,7 @@
         var writes = counters.Select(c => c.DiskWrite).ToList();
         var downloads = counters.Select(c => c.Download).ToList();
         var uploads = counters.Select(c => c.Upload).ToList();
-        return new()
-        {
+        return new Dictionary<string, dynamic> {
             ["CPU使用率(%)"] = new
             {
                 p50 = cpuLoads.Percentile(50).ToString("N2"),
@@ -243,5 +265,12 @@
                 stdev = uploads.StandardDeviation().ToString("N2")
             }
         };
+    }
+
+    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+    public void Dispose()
+    {
+        _process.Dispose();
+        _processes.ForEach(p => p.Dispose());
     }
 }
