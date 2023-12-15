@@ -75,6 +75,7 @@ public static class RedisClientExtension
                 client.Expire(key, expire.Value);
             }
         }
+
         return value;
     }
 
@@ -120,6 +121,7 @@ public static class RedisClientExtension
                 await client.ExpireAsync(key, expire.Value);
             }
         }
+
         return value;
     }
 
@@ -128,8 +130,8 @@ public static class RedisClientExtension
         T value;
         if (client.Exists(key))
         {
-            value = new CacheEntry<T>(updateValue);
-            client.Set(key, value);
+            value = updateValue;
+            client.Set(key, new CacheEntry<T>(updateValue));
             if (isSliding && expire.HasValue)
             {
                 client.Expire(key, expire.Value);
@@ -137,8 +139,8 @@ public static class RedisClientExtension
         }
         else
         {
-            value = new CacheEntry<T>(addValue);
-            client.Set(key, value);
+            value = addValue;
+            client.Set(key, new CacheEntry<T>(addValue));
             if (expire.HasValue)
             {
                 client.Expire(key, expire.Value);
@@ -179,8 +181,8 @@ public static class RedisClientExtension
         var value = client.Get<CacheEntry<T>>(key);
         if (value is null)
         {
-            client.Set(key, new CacheEntry<T>(addValue));
-            value = addValue;
+            value = new CacheEntry<T>(addValue);
+            client.Set(key, value);
             if (expire.HasValue)
             {
                 client.Expire(key, expire.Value);
@@ -189,7 +191,7 @@ public static class RedisClientExtension
         else
         {
             value = updateValue(value);
-            client.Set(key, new CacheEntry<T>(value));
+            client.Set(key, value);
             if (isSliding && expire.HasValue)
             {
                 client.Expire(key, expire.Value);
@@ -255,8 +257,8 @@ public static class RedisClientExtension
         var value = await client.GetAsync<CacheEntry<T>>(key);
         if (value is null)
         {
-            await client.SetAsync(key, new CacheEntry<T>(addValue));
-            value = addValue;
+            value = new CacheEntry<T>(addValue);
+            await client.SetAsync(key, value);
             if (expire.HasValue)
             {
                 await client.ExpireAsync(key, expire.Value);
@@ -264,9 +266,8 @@ public static class RedisClientExtension
         }
         else
         {
-            var update = updateValue(value);
-            await client.SetAsync(key, new CacheEntry<T>(update));
-            value = update;
+            value = updateValue(value);
+            await client.SetAsync(key, value);
             if (isSliding && expire.HasValue)
             {
                 await client.ExpireAsync(key, expire.Value);
@@ -307,8 +308,8 @@ public static class RedisClientExtension
         var value = await client.GetAsync<CacheEntry<T>>(key);
         if (value is null)
         {
-            await client.SetAsync(key, new CacheEntry<T>(addValue));
-            value = addValue;
+            value = new CacheEntry<T>(addValue);
+            await client.SetAsync(key, value);
             if (expire.HasValue)
             {
                 await client.ExpireAsync(key, expire.Value);
@@ -316,9 +317,8 @@ public static class RedisClientExtension
         }
         else
         {
-            var update = await updateValue(value);
-            await client.SetAsync(key, new CacheEntry<T>(update));
-            value = update;
+            value = await updateValue(value);
+            await client.SetAsync(key, value);
             if (isSliding && expire.HasValue)
             {
                 await client.ExpireAsync(key, expire.Value);
@@ -401,7 +401,7 @@ public record CacheEntry<T>
     /// <param name="entry"></param>
     public static implicit operator T(CacheEntry<T> entry)
     {
-        return entry.Value;
+        return (entry ?? new CacheEntry<T>()).Value;
     }
 
     /// <summary>

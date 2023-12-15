@@ -47,14 +47,14 @@
         <PackageReference Include="CHTCHSConv" Version="1.0.0" />
         <PackageReference Include="CLRStats" Version="1.0.0" />
         <PackageReference Include="Dispose.Scope.AspNetCore" Version="0.0.3" />
-        <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="4.1.0" />
+        <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="4.1.1" />
         <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="8.0.0" />
-        <PackageReference Include="FreeRedis" Version="1.2.9" />
+        <PackageReference Include="FreeRedis" Version="1.2.10" />
         <PackageReference Include="Hangfire" Version="1.8.6" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.0" />
         <PackageReference Include="htmldiff.net" Version="1.4.2" />
         <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.7.0" />
-        <PackageReference Include="Markdig" Version="0.33.0" />
+        <PackageReference Include="Markdig" Version="0.34.0" />
         <PackageReference Include="MaxMind.GeoIP2" Version="5.2.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />

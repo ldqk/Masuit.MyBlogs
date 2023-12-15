@@ -397,27 +397,19 @@ namespace Masuit.MyBlogs.Core.Common
         }
     }
 
-    public class IPLocation
+    public record IPLocation(string country, string city, string isp, long? asn)
     {
-        public IPLocation(string country, string city, string isp, long? asn)
-        {
-            Country = country?.Trim('0');
-            City = city?.Trim('0');
-            ISP = isp;
-            ASN = asn;
-        }
-
         public string Continent { get; set; }
 
-        public string Country { get; set; }
+        public string Country { get; set; } = country?.Trim('0');
 
         public string State { get; set; }
 
-        public string City { get; set; }
+        public string City { get; set; } = city?.Trim('0');
 
-        public string ISP { get; set; }
+        public string ISP { get; set; } = isp;
 
-        public long? ASN { get; set; }
+        public long? ASN { get; set; } = asn;
 
         public string Address => new[] { Continent, Country, State, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
 

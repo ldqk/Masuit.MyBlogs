@@ -182,7 +182,7 @@
                     </section>
                 }
                 @{
-                    var posts = (Dictionary<int,string>)ViewBag.Related;
+                    var posts = (IDictionary<int,string>)ViewBag.Related;
                     if (posts.Count>1)
                     {
                         <section class="wow margintop20 animated fadeIn">

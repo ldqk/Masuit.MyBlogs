@@ -77,6 +77,7 @@ public static class MiddlewareExtension
             options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
             {
                 "text/html; charset=utf-8",
+                "text/event-stream",
                 "application/xhtml+xml",
                 "application/atom+xml",
                 "image/svg+xml"

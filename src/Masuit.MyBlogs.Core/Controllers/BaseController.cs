@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Collections.Frozen;
+using AutoMapper;
 using FreeRedis;
 using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
@@ -95,7 +96,7 @@ public class BaseController : Controller
         var keys = Regex.Matches(template.Render(), pattern).Select(m => m.Value.Trim('{', '}')).ToArray();
         if (keys.Length > 0)
         {
-            var dic = VariablesService.GetQueryFromCache(v => keys.Contains(v.Key)).ToDictionary(v => v.Key, v => v.Value);
+            var dic = VariablesService.GetQueryFromCache(v => keys.Contains(v.Key)).ToFrozenDictionary(v => v.Key, v => v.Value);
             foreach (var (key, value) in dic)
             {
                 string valve = value;

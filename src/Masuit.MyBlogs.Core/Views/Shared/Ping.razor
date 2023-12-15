@@ -23,7 +23,7 @@
         try
         {
             CacheManager.SAdd("GlobalOnline", IP);
-            CacheManager.Expire("GlobalOnline", TimeSpan.FromMinutes(20));
+            CacheManager.Expire("GlobalOnline", TimeSpan.FromMinutes(60));
         }
         catch
         {

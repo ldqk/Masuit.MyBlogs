@@ -8,7 +8,8 @@
 @using Masuit.Tools.Core.AspNetCore
 @using Masuit.Tools.Logging
 @using Masuit.Tools.Maths
-@using PerformanceCounter = Masuit.MyBlogs.Core.Common.PerformanceCounter
+@using System.Collections.Frozen
+@using PerformanceCounter = System.Diagnostics.PerformanceCounter
 
 @inject IPerfCounter PerfCounter;
 @inject IJSRuntime JavaScript;
@@ -70,8 +71,8 @@
             <th>@_driveInfos.Select(kv => kv.Name + " " + (kv.AvailableFreeSpace * 1m / kv.TotalSize).ToString("P")).Join(" | ")</th>
         </tr>
         <tr>
-            <td>在线人数</td>
-            <th>@CacheManager.SCard("GlobalOnline") 人</th>
+            <td>内存占用</td>
+            <th>GC Heap：@(GC.GetTotalMemory(false) / 1048576)MB，工作集：@((SystemInfo.CurrentProcessMemory / 1048576).ToString("N"))MB</th>
             <td>线程数</td>
             <th>@_process.Threads.Count</th>
             <td>句柄数</td>
@@ -86,12 +87,24 @@
             <th>@_processes.Sum(p => p.HandleCount)</th>
         </tr>
         <tr>
+            <td>Redis版本</td>
+            <th>@CacheManager.Info("server").Split("\r\n").Select(s => s.Split(':')).FirstOrDefault(s => s[0] == "redis_version")![1]</th>
+            <td>Redis内存使用</td>
+            <th>@_cacheMemoryUsed.ToString("F")MB</th>
+            <td>Redis缓存命中率</td>
+            <th>@_cacheHits.ToString("P")</th>
+        </tr>
+        <tr>
             <td>MAC地址</td>
-            <th colspan="5">@_macs.Join(" , ")</th>
+            <th colspan="3">@_macs.Join(" , ")</th>
+            <td>Redis执行命令数</td>
+            <th>@_redisStats["total_commands_processed"]</th>
         </tr>
         <tr>
             <td>IP地址</td>
-            <th colspan="5">@_ips.Join(" , ")</th>
+            <th colspan="3">@_ips.Join(" , ")</th>
+            <td>在线人数</td>
+            <th>@CacheManager.SCard("GlobalOnline") 人</th>
         </tr>
     </tbody>
 </table>
@@ -155,9 +168,15 @@
     private readonly IList<string> _macs = SystemInfo.GetMacAddress();
     private readonly IList<string> _ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToList();
     private readonly DriveInfo[] _driveInfos = DriveInfo.GetDrives().Where(d => d.IsReady).ToArray();
+    private decimal _cacheHits;
+    private decimal _cacheMemoryUsed;
+    private IDictionary<string,decimal> _redisStats;
 
     protected override void OnInitialized()
     {
+        _redisStats = CacheManager.Info("stats").Split("\r\n", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Split(':')).Where(s => s.Length == 2).ToFrozenDictionary(s => s[0], s => s[1].ToDecimal());
+        _cacheHits = _redisStats["keyspace_hits"] / (_redisStats["keyspace_hits"] + _redisStats["keyspace_misses"]);
+        _cacheMemoryUsed = CacheManager.Info("memory").Split("\r\n", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Split(':')).FirstOrDefault(s => s[0] == "used_memory")![1].ToDecimal()/1048576;
         var boot = DateTime.Now - SystemInfo.BootTime();
         var span = DateTime.Now - IPerfCounter.StartTime;
         _runningTime = $"{span.Days}天{span.Hours}小时{span.Minutes}分钟";
@@ -171,14 +190,14 @@
     }
 
     [JSInvokable]
-    public static PerformanceCounter GetCurrentPerformanceCounter()
+    public static Masuit.MyBlogs.Core.Common.PerformanceCounter GetCurrentPerformanceCounter()
     {
         try {
             return IPerfCounter.GetCurrentPerformanceCounter();
         }
         catch (Exception e) {
             LogManager.Error(e.Demystify());
-            return new PerformanceCounter();
+            return new Masuit.MyBlogs.Core.Common.PerformanceCounter();
         }
     }
 

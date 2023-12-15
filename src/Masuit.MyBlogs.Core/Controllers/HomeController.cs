@@ -1,4 +1,5 @@
-﻿using AngleSharp;
+﻿using System.Collections.Frozen;
+using AngleSharp;
 using AutoMapper.QueryableExtensions;
 using Dispose.Scope;
 using Masuit.MyBlogs.Core.Common;
@@ -329,7 +330,7 @@ public sealed class HomeController : BaseController
             2 => nameof(OrderBy.AverageViewCount),
             _ => nameof(OrderBy.TotalViewCount)
         } + " desc").Skip(0).Take(5).Cacheable().ToPooledListScope(); //热门文章
-        var tagdic = PostService.GetTags().OrderByRandom().Take(20).ToDictionary(x => x.Key, x => Math.Min(x.Value + 12, 32)); //统计标签
+        var tagdic = PostService.GetTags().OrderByRandom().Take(20).ToFrozenDictionary(x => x.Key, x => Math.Min(x.Value + 12, 32)); //统计标签
         return new HomePageViewModel
         {
             Categories = Mapper.Map<List<CategoryDto_P>>(cats.ToTree(c => c.Id, c => c.ParentId).Flatten()),

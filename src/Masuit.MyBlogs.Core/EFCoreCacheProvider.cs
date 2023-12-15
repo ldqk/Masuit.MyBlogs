@@ -38,7 +38,7 @@ public class EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCachePr
 
         if (cachePolicy == null)
         {
-            redisClient.Set(keyHash, value, 300);
+            redisClient.Set(keyHash, new CacheEntry<EFCachedData>(value), 300);
         }
         else
         {
@@ -65,7 +65,7 @@ public class EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCachePr
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        return redisClient.Get<EFCachedData>(cacheKey.KeyHash);
+        return redisClient.Get<CacheEntry<EFCachedData>>(cacheKey.KeyHash);
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public class EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCachePr
                 continue;
             }
 
-            var cachedValue = redisClient.Get<EFCachedData>(cacheKey.KeyHash);
+            var cachedValue = redisClient.Get<CacheEntry<EFCachedData>>(cacheKey.KeyHash)?.Value;
             var dependencyKeys = redisClient.SMembers(rootCacheKey);
             if (dependencyKeys.IsNullOrEmpty() && cachedValue is not null)
             {

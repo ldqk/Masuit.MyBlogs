@@ -126,10 +126,9 @@ public sealed class SystemController : AdminController
     public async Task<ActionResult> Save([FromBody] List<SystemSetting> settings)
     {
         var b = await SystemSettingService.AddOrUpdateSavedAsync(s => s.Name, settings) > 0;
-        var dic = settings.ToDictionary(s => s.Name, s => s.Value); //同步设置
-        foreach (var (key, value) in dic)
+        foreach (var item in settings)
         {
-            CommonHelper.SystemSettings[key] = value;
+            CommonHelper.SystemSettings[item.Name] = item.Value;
         }
 
         return ResultData(null, b, b ? "设置保存成功！" : "设置保存失败！");

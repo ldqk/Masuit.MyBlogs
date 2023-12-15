@@ -1,4 +1,5 @@
-﻿using CacheManager.Core;
+﻿using System.Collections.Frozen;
+using CacheManager.Core;
 using Dispose.Scope;
 using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine;
@@ -113,7 +114,7 @@ public sealed class PostController : BaseController
         var keys = searchService.GetQuery(e => e.IP == ip).OrderByDescending(e => e.SearchTime).Select(e => e.Keywords).Distinct().Take(5).Cacheable().ToPooledListScope();
         var regex = SearchEngine.LuceneIndexSearcher.CutKeywords(string.IsNullOrWhiteSpace(post.Keyword + post.Label) ? post.Title : post.Keyword + post.Label).Union(keys).Select(Regex.Escape).Join("|");
         ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location(), post.CategoryId, regex);
-        ViewBag.Related = PostService.GetQuery(PostBaseWhere().And(p => p.Id != post.Id && Regex.IsMatch(p.Title + (p.Keyword ?? "") + (p.Label ?? ""), regex, RegexOptions.IgnoreCase)), p => p.AverageViewCount, false).Take(10).Select(p => new { p.Id, p.Title }).Cacheable().ToDictionary(p => p.Id, p => p.Title);
+        ViewBag.Related = PostService.GetQuery(PostBaseWhere().And(p => p.Id != post.Id && Regex.IsMatch(p.Title + (p.Keyword ?? "") + (p.Label ?? ""), regex, RegexOptions.IgnoreCase)), p => p.AverageViewCount, false).Take(10).Select(p => new { p.Id, p.Title }).Cacheable().ToFrozenDictionary(p => p.Id, p => p.Title);
 
         post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
         post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
