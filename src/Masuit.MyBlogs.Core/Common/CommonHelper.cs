@@ -397,7 +397,7 @@ namespace Masuit.MyBlogs.Core.Common
         }
     }
 
-    public record IPLocation(string country, string city, string isp, long? asn)
+    public record IPLocation(string country, string city, string ISP, long? ASN)
     {
         public string Continent { get; set; }
 
@@ -406,10 +406,6 @@ namespace Masuit.MyBlogs.Core.Common
         public string State { get; set; }
 
         public string City { get; set; } = city?.Trim('0');
-
-        public string ISP { get; set; } = isp;
-
-        public long? ASN { get; set; } = asn;
 
         public string Address => new[] { Continent, Country, State, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
 
