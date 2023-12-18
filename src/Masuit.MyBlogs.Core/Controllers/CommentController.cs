@@ -31,11 +31,11 @@ public sealed class CommentController : BaseController
     /// 发表评论
     /// </summary>
     /// <param name="messageService"></param>
-    /// <param name="mailSender"></param>
+    /// <param name="blocklistService"></param>
     /// <param name="cmd"></param>
     /// <returns></returns>
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<ActionResult> Submit([FromServices] IInternalMessageService messageService, [FromServices] IMailSender mailSender, CommentCommand cmd)
+    public async Task<ActionResult> Submit([FromServices] IInternalMessageService messageService, [FromServices] IEmailBlocklistService blocklistService, CommentCommand cmd)
     {
         var match = Regex.Match(cmd.NickName + cmd.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
         if (match.Success)
@@ -44,7 +44,7 @@ public sealed class CommentController : BaseController
             return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
         }
 
-        var error = await ValidateEmailCode(mailSender, cmd.Email, cmd.Code);
+        var error = await ValidateEmailCode(blocklistService, cmd.Email, cmd.Code);
         if (!string.IsNullOrEmpty(error))
         {
             return ResultData(null, false, error);

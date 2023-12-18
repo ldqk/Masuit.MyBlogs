@@ -32,6 +32,8 @@ public sealed class SystemController : AdminController
 
     public IPerfCounter PerfCounter { get; set; }
 
+    public IEmailBlocklistService EmailBlocklistService { get; set; }
+
     public ActionResult GetServers()
     {
         var servers = PerfCounter.CreateDataSource().Select(c => c.ServerIP).Distinct().ToArray();
@@ -237,12 +239,12 @@ public sealed class SystemController : AdminController
         return RedisHelper.SUnion(RedisHelper.Keys("Email:*")).Select(JObject.Parse).OrderByDescending(o => o["time"]).ToPooledListScope();
     }
 
-    public ActionResult BounceEmail([FromServices] IMailSender mailSender, [FromBodyOrDefault] string email)
+    public ActionResult BounceEmail([FromBodyOrDefault] string email)
     {
-        var msg = mailSender.AddRecipient(email);
+        EmailBlocklistService.AddEntitySaved(new EmailBlocklist() { Email = email });
         return Ok(new
         {
-            msg
+            msg = "添加成功！"
         });
     }
 

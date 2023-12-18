@@ -2,7 +2,6 @@
 using AutoMapper;
 using FreeRedis;
 using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
@@ -173,7 +172,7 @@ public class BaseController : Controller
     /// <param name="email">邮箱地址</param>
     /// <param name="code">验证码</param>
     /// <returns></returns>
-    internal async Task<string> ValidateEmailCode(IMailSender mailSender, string email, string code)
+    internal async Task<string> ValidateEmailCode(IEmailBlocklistService mailSender, string email, string code)
     {
         if (CurrentUser.IsAdmin)
         {
@@ -199,7 +198,7 @@ public class BaseController : Controller
             return "邮箱验证信息已失效，请刷新页面后重新评论！";
         }
 
-        if (await mailSender.HasBounced(email))
+        if (mailSender.Any(e => e.Email == email))
         {
             Response.Cookies.Delete("Email");
             Response.Cookies.Delete("NickName");

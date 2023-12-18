@@ -3,7 +3,6 @@ using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
-using EFCoreSecondLevelCacheInterceptor;
 using FreeRedis;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services;
@@ -57,16 +56,16 @@ public sealed class AdvertisementService(IBaseRepository<Advertisement> reposito
     public List<AdvertisementDto> GetsByWeightedPriceExternal(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null, string keywords = "")
     {
         var (location, _, _) = ipinfo;
-        return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}-{keywords}", () =>
+        return CacheManager.GetOrAdd($"Advertisement:{location}:{type}:{count}-{cid}-{keywords}", () =>
         {
             var atype = type.ToString("D");
             Expression<Func<Advertisement, bool>> where = a => a.Types.Contains(atype) && a.Status == Status.Available;
-            var catCount = CategoryRepository.Count(_ => true);
+            var categories = CacheManager.GetOrAdd("Category:all", () => CategoryRepository.GetAll().Select(c => new { c.Id, c.Path }).Distinct().ToArray(), TimeSpan.FromHours(5));
+            var catCount = categories.Length;
             where = where.And(a => a.RegionMode == RegionLimitMode.All || (a.RegionMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase) : !Regex.IsMatch(location, a.Regions, RegexOptions.IgnoreCase)));
             if (cid.HasValue)
             {
-                var pids = CategoryRepository.GetQuery(c => c.Id == cid).Select(c => string.Concat(c.ParentId, "|", c.Parent.ParentId).Trim('|')).Distinct().Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromHours(5)).ToList();
-                var scid = pids.Append(cid + "").Join("|");
+                var scid = categories.FirstOrDefault(c => c.Id == cid.Value)!.Path.Replace(',', '|');
                 if (Any(a => Regex.IsMatch(a.CategoryIds, scid)))
                 {
                     where = where.And(a => Regex.IsMatch(a.CategoryIds, scid) || string.IsNullOrEmpty(a.CategoryIds));
@@ -104,15 +103,16 @@ public sealed class AdvertisementService(IBaseRepository<Advertisement> reposito
     public List<AdvertisementDto> GetsByWeightedPriceMemory(int count, AdvertiseType type, IPLocation ipinfo, int? cid = null, string keywords = "")
     {
         var (location, _, _) = ipinfo;
-        return CacheManager.GetOrAdd($"Advertisement:{location.Crc32()}:{type}:{count}-{cid}-{keywords}", () =>
+        return CacheManager.GetOrAdd($"Advertisement:{location}:{type}:{count}-{cid}-{keywords}", () =>
         {
-            var all = GetQuery<AdvertisementDto>(a => a.Status == Status.Available).Cacheable(CacheExpirationMode.Sliding, TimeSpan.FromMinutes(10)).ToList();
+            var all = CacheManager.GetOrAdd("Advertisement:all", () => GetQuery<AdvertisementDto>(a => a.Status == Status.Available).ToList(), TimeSpan.FromMinutes(10));
             var atype = type.ToString("D");
-            var catCount = CategoryRepository.Count(_ => true);
+            var categories = CacheManager.GetOrAdd("Category:all", () => CategoryRepository.GetAll().Select(c => new { c.Id, c.Path }).Distinct().ToArray(), TimeSpan.FromHours(5));
+            var catCount = categories.Length;
             string scid = "";
             if (cid.HasValue)
             {
-                scid = CategoryRepository.GetQuery(c => c.Id == cid).Select(static c => string.Concat(c.ParentId, "|", c.Parent.ParentId).Trim('|')).Distinct().Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromHours(5)).AsEnumerable().Append(cid + "").Join("|");
+                scid = categories.FirstOrDefault(c => c.Id == cid.Value)!.Path.Replace(',', '|');
             }
 
             var array = all.Where(a => a.Types.Contains(atype)).GroupBy(a => a.Merchant).Select(static g => g.OrderByRandom().FirstOrDefault().Id).Take(50).ToArray();

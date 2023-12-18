@@ -33,3 +33,5 @@ public partial interface IPostVisitRecordStatsService : IBaseService<PostVisitRe
 public partial interface IAdvertisementClickRecordService : IBaseService<AdvertisementClickRecord>;
 
 public partial interface IPostTagService : IBaseService<PostTag>;
+
+public partial interface IEmailBlocklistService : IBaseService<EmailBlocklist>;

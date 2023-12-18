@@ -48,19 +48,19 @@
         </tr>
         <tr>
             <td>物理总内存</td>
-            <th>@((_memory.PhysicalMemory / 1048576).ToString("N2")) MB(@((_memory.PhysicalMemory / 1073741824).ToString("N2")) GB)</th>
+            <th>@((_memory.PhysicalMemory / 1048576).ToDecimal(2)) MB(@((_memory.PhysicalMemory / 1073741824).ToDecimal(2)) GB)</th>
             <td>物理内存已使用</td>
-            <th>@((_memory.PhysicalMemory * _memory.MemoryUsage / 104857600).ToString("N2")) MB(@((_memory.PhysicalMemory * _memory.MemoryUsage / 107374182400).ToString("N2")) GB)</th>
+            <th>@((_memory.PhysicalMemory * _memory.MemoryUsage / 104857600).ToDecimal(2)) MB(@((_memory.PhysicalMemory * _memory.MemoryUsage / 107374182400).ToDecimal(2)) GB)</th>
             <td>物理内存剩余</td>
-            <th>@((_memory.PhysicalMemory * (100 - _memory.MemoryUsage) / 104857600).ToString("N2")) MB(@((_memory.PhysicalMemory * (100 - _memory.MemoryUsage) / 107374182400).ToString("N2")) GB)</th>
+            <th>@((_memory.PhysicalMemory * (100 - _memory.MemoryUsage) / 104857600).ToDecimal(2)) MB(@((_memory.PhysicalMemory * (100 - _memory.MemoryUsage) / 107374182400).ToDecimal(2)) GB)</th>
         </tr>
         <tr>
             <td>虚拟内存总数</td>
-            <th>@((_memory.TotalPageFile / 1048576).ToString("N2")) MB</th>
+            <th>@((_memory.TotalPageFile / 1048576).ToDecimal(2)) MB</th>
             <td>虚拟内存已使用</td>
-            <th>@(((_memory.TotalPageFile - _memory.AvailablePageFile) / 1048576).ToString("N2")) MB</th>
+            <th>@(((_memory.TotalPageFile - _memory.AvailablePageFile) / 1048576).ToDecimal(2)) MB</th>
             <td>虚拟内存可用</td>
-            <th>@((_memory.AvailablePageFile / 1048576).ToString("N2")) MB</th>
+            <th>@((_memory.AvailablePageFile / 1048576).ToDecimal(2)) MB</th>
         </tr>
         <tr>
             <td>磁盘总空间</td>
@@ -225,63 +225,63 @@
         return new Dictionary<string, dynamic> {
             ["CPU使用率(%)"] = new
             {
-                p50 = cpuLoads.Percentile(50).ToString("N2"),
-                p75 = cpuLoads.Percentile(75).ToString("N2"),
-                p90 = cpuLoads.Percentile(90).ToString("N2"),
-                p99 = cpuLoads.Percentile(99).ToString("N2"),
-                p999 = cpuLoads.Percentile(99.9).ToString("N2"),
-                average = counters.Average(c => c.CpuLoad).ToString("N2"),
-                stdev = cpuLoads.StandardDeviation().ToString("N2"),
+                p50 = cpuLoads.Percentile(50).ToDecimal(2),
+                p75 = cpuLoads.Percentile(75).ToDecimal(2),
+                p90 = cpuLoads.Percentile(90).ToDecimal(2),
+                p99 = cpuLoads.Percentile(99).ToDecimal(2),
+                p999 = cpuLoads.Percentile(99.9).ToDecimal(2),
+                average = counters.Average(c => c.CpuLoad).ToDecimal(2),
+                stdev = cpuLoads.StandardDeviation().ToDecimal(2),
             },
             ["内存使用率(%)"] = new
             {
-                p50 = memUse.Percentile(50).ToString("N2"),
-                p75 = memUse.Percentile(75).ToString("N2"),
-                p90 = memUse.Percentile(90).ToString("N2"),
-                p99 = memUse.Percentile(99).ToString("N2"),
-                p999 = memUse.Percentile(99.9).ToString("N2"),
-                average = counters.Average(c => c.MemoryUsage).ToString("N2"),
-                stdev = memUse.StandardDeviation().ToString("N2"),
+                p50 = memUse.Percentile(50).ToDecimal(2),
+                p75 = memUse.Percentile(75).ToDecimal(2),
+                p90 = memUse.Percentile(90).ToDecimal(2),
+                p99 = memUse.Percentile(99).ToDecimal(2),
+                p999 = memUse.Percentile(99.9).ToDecimal(2),
+                average = counters.Average(c => c.MemoryUsage).ToDecimal(2),
+                stdev = memUse.StandardDeviation().ToDecimal(2),
             },
             ["磁盘读(KBps)"] = new
             {
-                p50 = reads.Percentile(50).ToString("N2"),
-                p75 = reads.Percentile(75).ToString("N2"),
-                p90 = reads.Percentile(90).ToString("N2"),
-                p99 = reads.Percentile(99).ToString("N2"),
-                p999 = reads.Percentile(99.9).ToString("N2"),
-                average = counters.Average(c => c.DiskRead).ToString("N2"),
-                stdev = reads.StandardDeviation().ToString("N2"),
+                p50 = reads.Percentile(50).ToDecimal(2),
+                p75 = reads.Percentile(75).ToDecimal(2),
+                p90 = reads.Percentile(90).ToDecimal(2),
+                p99 = reads.Percentile(99).ToDecimal(2),
+                p999 = reads.Percentile(99.9).ToDecimal(2),
+                average = counters.Average(c => c.DiskRead).ToDecimal(2),
+                stdev = reads.StandardDeviation().ToDecimal(2),
             },
             ["磁盘写(KBps)"] = new
             {
-                p50 = writes.Percentile(50).ToString("N2"),
-                p75 = writes.Percentile(75).ToString("N2"),
-                p90 = writes.Percentile(90).ToString("N2"),
-                p99 = writes.Percentile(99).ToString("N2"),
-                p999 = writes.Percentile(99.9).ToString("N2"),
-                average = counters.Average(c => c.DiskWrite).ToString("N2"),
-                stdev = writes.StandardDeviation().ToString("N2")
+                p50 = writes.Percentile(50).ToDecimal(2),
+                p75 = writes.Percentile(75).ToDecimal(2),
+                p90 = writes.Percentile(90).ToDecimal(2),
+                p99 = writes.Percentile(99).ToDecimal(2),
+                p999 = writes.Percentile(99.9).ToDecimal(2),
+                average = counters.Average(c => c.DiskWrite).ToDecimal(2),
+                stdev = writes.StandardDeviation().ToDecimal(2)
             },
             ["网络下载(KBps)"] = new
             {
-                p50 = downloads.Percentile(50).ToString("N2"),
-                p75 = downloads.Percentile(75).ToString("N2"),
-                p90 = downloads.Percentile(90).ToString("N2"),
-                p99 = downloads.Percentile(99).ToString("N2"),
-                p999 = downloads.Percentile(99.9).ToString("N2"),
-                average = counters.Average(c => c.Download).ToString("N2"),
-                stdev = downloads.StandardDeviation().ToString("N2")
+                p50 = downloads.Percentile(50).ToDecimal(2),
+                p75 = downloads.Percentile(75).ToDecimal(2),
+                p90 = downloads.Percentile(90).ToDecimal(2),
+                p99 = downloads.Percentile(99).ToDecimal(2),
+                p999 = downloads.Percentile(99.9).ToDecimal(2),
+                average = counters.Average(c => c.Download).ToDecimal(2),
+                stdev = downloads.StandardDeviation().ToDecimal(2)
             },
             ["网络上行(KBps)"] = new
             {
-                p50 = uploads.Percentile(50).ToString("N2"),
-                p75 = uploads.Percentile(75).ToString("N2"),
-                p90 = uploads.Percentile(90).ToString("N2"),
-                p99 = uploads.Percentile(99).ToString("N2"),
-                p999 = uploads.Percentile(99.9).ToString("N2"),
-                average = counters.Average(c => c.Upload).ToString("N2"),
-                stdev = uploads.StandardDeviation().ToString("N2")
+                p50 = uploads.Percentile(50).ToDecimal(2),
+                p75 = uploads.Percentile(75).ToDecimal(2),
+                p90 = uploads.Percentile(90).ToDecimal(2),
+                p99 = uploads.Percentile(99).ToDecimal(2),
+                p999 = uploads.Percentile(99.9).ToDecimal(2),
+                average = counters.Average(c => c.Upload).ToDecimal(2),
+                stdev = uploads.StandardDeviation().ToDecimal(2)
             }
         };
     }

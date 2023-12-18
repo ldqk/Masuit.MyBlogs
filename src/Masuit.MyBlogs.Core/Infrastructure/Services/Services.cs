@@ -36,3 +36,5 @@ public sealed partial class PostVisitRecordStatsService(IBaseRepository<PostVisi
 public sealed partial class AdvertisementClickRecordService(IBaseRepository<AdvertisementClickRecord> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : BaseService<AdvertisementClickRecord>(repository, searchEngine, searcher), IAdvertisementClickRecordService;
 
 public sealed partial class PostTagService(IBaseRepository<PostTag> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : BaseService<PostTag>(repository, searchEngine, searcher), IPostTagService;
+
+public sealed partial class EmailBlocklistService(IBaseRepository<EmailBlocklist> repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher) : BaseService<EmailBlocklist>(repository, searchEngine, searcher), IEmailBlocklistService;

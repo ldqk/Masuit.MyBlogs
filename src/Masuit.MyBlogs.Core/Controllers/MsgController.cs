@@ -115,11 +115,11 @@ public sealed class MsgController : BaseController
     /// <summary>
     /// 发表留言
     /// </summary>
-    /// <param name="mailSender"></param>
+    /// <param name="blocklistService"></param>
     /// <param name="cmd"></param>
     /// <returns></returns>
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<ActionResult> Submit([FromServices] IMailSender mailSender, LeaveMessageCommand cmd)
+    public async Task<ActionResult> Submit([FromServices] IEmailBlocklistService blocklistService, LeaveMessageCommand cmd)
     {
         var match = Regex.Match(cmd.NickName + cmd.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
         if (match.Success)
@@ -128,7 +128,7 @@ public sealed class MsgController : BaseController
             return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
         }
 
-        var error = await ValidateEmailCode(mailSender, cmd.Email, cmd.Code);
+        var error = await ValidateEmailCode(blocklistService, cmd.Email, cmd.Code);
         if (!string.IsNullOrEmpty(error))
         {
             return ResultData(null, false, error);

@@ -6,145 +6,117 @@ public static class RedisClientExtension
 {
     public static long IncrBy(this IRedisClient client, string key, int inc, TimeSpan? expire = null)
     {
-        var incr = client.IncrBy(key, inc);
+        using var multi = client.Multi();
+        var incr = multi.IncrBy(key, inc);
         if (expire.HasValue)
         {
-            client.Expire(key, expire.Value);
+            multi.Expire(key, expire.Value);
         }
 
+        multi.Exec();
         return incr;
     }
 
     public static long Incr(this IRedisClient client, string key, TimeSpan? expire = null)
     {
-        var incr = client.Incr(key);
+        using var multi = client.Multi();
+        var incr = multi.Incr(key);
         if (expire.HasValue)
         {
-            client.Expire(key, expire.Value);
+            multi.Expire(key, expire.Value);
         }
 
+        multi.Exec();
         return incr;
     }
 
     public static async Task<long> IncrByAsync(this IRedisClient client, string key, int inc, TimeSpan? expire = null)
     {
-        var incr = await client.IncrByAsync(key, inc);
+        using var multi = client.Multi();
+        var incr = await multi.IncrByAsync(key, inc);
         if (expire.HasValue)
         {
-            await client.ExpireAsync(key, expire.Value);
+            await multi.ExpireAsync(key, expire.Value);
         }
 
+        multi.Exec();
         return incr;
     }
 
     public static async Task<long> IncrAsync(this IRedisClient client, string key, TimeSpan? expire = null)
     {
-        var incr = await client.IncrAsync(key);
+        using var multi = client.Multi();
+        var incr = await multi.IncrAsync(key);
         if (expire.HasValue)
         {
-            await client.ExpireAsync(key, expire.Value);
+            await multi.ExpireAsync(key, expire.Value);
         }
 
+        multi.Exec();
         return incr;
     }
 
     public static T GetOrAdd<T>(this IRedisClient client, string key, T addValue, TimeSpan? expire = null)
     {
-        var value = client.Get<CacheEntry<T>>(key);
-        if (value is null)
-        {
-            client.Set(key, new CacheEntry<T>(addValue));
-            if (expire.HasValue)
-            {
-                client.Expire(key, expire.Value);
-            }
-            return addValue;
-        }
-        return value;
+        return client.SetNx(key, addValue, expire ?? TimeSpan.FromSeconds(0)) ? addValue : client.Get<T>(key);
     }
 
     public static T GetOrAdd<T>(this IRedisClient client, string key, Func<T> addValue, TimeSpan? expire = null)
     {
-        var value = client.Get<CacheEntry<T>>(key);
-        if (value is null)
+        if (client.Exists(key))
         {
-            value = new CacheEntry<T>(addValue());
-            client.Set(key, value);
-            if (expire.HasValue)
-            {
-                client.Expire(key, expire.Value);
-            }
+            return client.Get<T>(key);
         }
 
+        var value = addValue();
+        client.SetNx(key, value, expire ?? TimeSpan.FromSeconds(0));
         return value;
     }
 
     public static async Task<T> GetOrAddAsync<T>(this IRedisClient client, string key, T addValue, TimeSpan? expire = null)
     {
-        var value = await client.GetAsync<CacheEntry<T>>(key);
-        if (value is null)
-        {
-            await client.SetAsync(key, new CacheEntry<T>(addValue));
-            if (expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
-            return addValue;
-        }
-        return value;
+        return await client.SetNxAsync(key, addValue, expire ?? TimeSpan.FromSeconds(0)) ? addValue : await client.GetAsync<T>(key);
     }
 
     public static async Task<T> GetOrAddAsync<T>(this IRedisClient client, string key, Func<T> addValue, TimeSpan? expire = null)
     {
-        var value = await client.GetAsync<CacheEntry<T>>(key);
-        if (value is null)
+        if (await client.ExistsAsync(key))
         {
-            value = new CacheEntry<T>(addValue());
-            await client.SetAsync(key, value);
-            if (expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            return await client.GetAsync<T>(key);
         }
+
+        var value = addValue();
+        await client.SetNxAsync(key, value, expire ?? TimeSpan.FromSeconds(0));
         return value;
     }
 
     public static async Task<T> GetOrAddAsync<T>(this IRedisClient client, string key, Func<Task<T>> addValue, TimeSpan? expire = null)
     {
-        var value = await client.GetAsync<CacheEntry<T>>(key);
-        if (value is null)
+        if (await client.ExistsAsync(key))
         {
-            value = new CacheEntry<T>(await addValue());
-            await client.SetAsync(key, value);
-            if (expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            return await client.GetAsync<T>(key);
         }
 
+        var value = await addValue();
+        await client.SetNxAsync(key, value, expire ?? TimeSpan.FromSeconds(0));
         return value;
     }
 
     public static T AddOrUpdate<T>(this IRedisClient client, string key, T addValue, T updateValue, TimeSpan? expire = null, bool isSliding = true)
     {
-        T value;
-        if (client.Exists(key))
+        if (client.SetNx(key, addValue, expire ?? TimeSpan.FromSeconds(0)))
         {
-            value = updateValue;
-            client.Set(key, new CacheEntry<T>(updateValue));
-            if (isSliding && expire.HasValue)
-            {
-                client.Expire(key, expire.Value);
-            }
+            return addValue;
+        }
+
+        var value = updateValue;
+        if (isSliding && expire.HasValue)
+        {
+            client.Set(key, updateValue, expire.Value);
         }
         else
         {
-            value = addValue;
-            client.Set(key, new CacheEntry<T>(addValue));
-            if (expire.HasValue)
-            {
-                client.Expire(key, expire.Value);
-            }
+            client.Set(key, updateValue, true);
         }
 
         return value;
@@ -152,50 +124,39 @@ public static class RedisClientExtension
 
     public static T AddOrUpdate<T>(this IRedisClient client, string key, T addValue, Func<T> updateValue, TimeSpan? expire = null, bool isSliding = true)
     {
-        T value;
-        if (client.Exists(key))
+        if (client.SetNx(key, addValue, expire ?? TimeSpan.FromSeconds(0)))
         {
-            var update = updateValue();
-            client.Set(key, new CacheEntry<T>(update));
-            value = update;
-            if (isSliding && expire.HasValue)
-            {
-                client.Expire(key, expire.Value);
-            }
+            return addValue;
+        }
+
+        var update = updateValue();
+        if (isSliding && expire.HasValue)
+        {
+            client.Set(key, update, expire.Value);
         }
         else
         {
-            client.Set(key, new CacheEntry<T>(addValue));
-            value = addValue;
-            if (expire.HasValue)
-            {
-                client.Expire(key, expire.Value);
-            }
+            client.Set(key, update, true);
         }
 
-        return value;
+        return update;
     }
 
     public static T AddOrUpdate<T>(this IRedisClient client, string key, T addValue, Func<T, T> updateValue, TimeSpan? expire = null, bool isSliding = true)
     {
-        var value = client.Get<CacheEntry<T>>(key);
-        if (value is null)
+        if (client.SetNx(key, addValue, expire ?? TimeSpan.FromSeconds(0)))
         {
-            value = new CacheEntry<T>(addValue);
-            client.Set(key, value);
-            if (expire.HasValue)
-            {
-                client.Expire(key, expire.Value);
-            }
+            return addValue;
+        }
+
+        var value = updateValue(client.Get<T>(key));
+        if (isSliding && expire.HasValue)
+        {
+            client.Set(key, value, expire.Value);
         }
         else
         {
-            value = updateValue(value);
-            client.Set(key, value);
-            if (isSliding && expire.HasValue)
-            {
-                client.Expire(key, expire.Value);
-            }
+            client.Set(key, value, true);
         }
 
         return value;
@@ -203,50 +164,38 @@ public static class RedisClientExtension
 
     public static async Task<T> AddOrUpdateAsync<T>(this IRedisClient client, string key, T addValue, T updateValue, TimeSpan? expire = null, bool isSliding = true)
     {
-        T value;
-        if (await client.ExistsAsync(key))
+        if (await client.SetNxAsync(key, addValue, expire ?? TimeSpan.FromSeconds(0)))
         {
-            await client.SetAsync(key, new CacheEntry<T>(updateValue));
-            value = updateValue;
-            if (isSliding && expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            return addValue;
+        }
+
+        if (isSliding && expire.HasValue)
+        {
+            await client.SetAsync(key, updateValue, expire.Value);
         }
         else
         {
-            await client.SetAsync(key, new CacheEntry<T>(addValue));
-            value = addValue;
-            if (expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            await client.SetAsync(key, updateValue, true);
         }
 
-        return value;
+        return updateValue;
     }
 
     public static async Task<T> AddOrUpdateAsync<T>(this IRedisClient client, string key, T addValue, Func<T> updateValue, TimeSpan? expire = null, bool isSliding = true)
     {
-        T value;
-        if (await client.ExistsAsync(key))
+        if (await client.SetNxAsync(key, addValue, expire ?? TimeSpan.FromSeconds(0)))
         {
-            var update = updateValue();
-            await client.SetAsync(key, new CacheEntry<T>(update));
-            value = update;
-            if (isSliding && expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            return addValue;
+        }
+
+        var value = updateValue();
+        if (isSliding && expire.HasValue)
+        {
+            await client.SetAsync(key, value, expire.Value);
         }
         else
         {
-            await client.SetAsync(key, new CacheEntry<T>(addValue));
-            value = addValue;
-            if (expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            await client.SetAsync(key, value, true);
         }
 
         return value;
@@ -254,24 +203,19 @@ public static class RedisClientExtension
 
     public static async Task<T> AddOrUpdateAsync<T>(this IRedisClient client, string key, T addValue, Func<T, T> updateValue, TimeSpan? expire = null, bool isSliding = true)
     {
-        var value = await client.GetAsync<CacheEntry<T>>(key);
-        if (value is null)
+        if (await client.SetNxAsync(key, addValue, expire ?? TimeSpan.FromSeconds(0)))
         {
-            value = new CacheEntry<T>(addValue);
-            await client.SetAsync(key, value);
-            if (expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            return addValue;
+        }
+
+        var value = updateValue(await client.GetAsync<T>(key));
+        if (isSliding && expire.HasValue)
+        {
+            await client.SetAsync(key, value, expire.Value);
         }
         else
         {
-            value = updateValue(value);
-            await client.SetAsync(key, value);
-            if (isSliding && expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            await client.SetAsync(key, value, true);
         }
 
         return value;
@@ -279,25 +223,19 @@ public static class RedisClientExtension
 
     public static async Task<T> AddOrUpdateAsync<T>(this IRedisClient client, string key, T addValue, Func<Task<T>> updateValue, TimeSpan? expire = null, bool isSliding = true)
     {
-        T value;
-        if (!await client.ExistsAsync(key))
+        if (await client.SetNxAsync(key, addValue, expire ?? TimeSpan.FromSeconds(0)))
         {
-            await client.SetAsync(key, new CacheEntry<T>(addValue));
-            value = addValue;
-            if (expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            return addValue;
+        }
+
+        var value = await updateValue();
+        if (isSliding && expire.HasValue)
+        {
+            await client.SetAsync(key, value, expire.Value);
         }
         else
         {
-            var update = await updateValue();
-            await client.SetAsync(key, new CacheEntry<T>(update));
-            value = update;
-            if (isSliding && expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            await client.SetAsync(key, value, true);
         }
 
         return value;
@@ -305,24 +243,19 @@ public static class RedisClientExtension
 
     public static async Task<T> AddOrUpdateAsync<T>(this IRedisClient client, string key, T addValue, Func<T, Task<T>> updateValue, TimeSpan? expire = null, bool isSliding = true)
     {
-        var value = await client.GetAsync<CacheEntry<T>>(key);
-        if (value is null)
+        if (await client.SetNxAsync(key, addValue, expire ?? TimeSpan.FromSeconds(0)))
         {
-            value = new CacheEntry<T>(addValue);
-            await client.SetAsync(key, value);
-            if (expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            return addValue;
+        }
+
+        var value = await updateValue(await client.GetAsync<T>(key));
+        if (isSliding && expire.HasValue)
+        {
+            await client.SetAsync(key, value, expire.Value);
         }
         else
         {
-            value = await updateValue(value);
-            await client.SetAsync(key, value);
-            if (isSliding && expire.HasValue)
-            {
-                await client.ExpireAsync(key, expire.Value);
-            }
+            await client.SetAsync(key, value, true);
         }
 
         return value;
@@ -375,41 +308,5 @@ public static class RedisClientExtension
         {
             action();
         }
-    }
-}
-
-/// <summary>
-/// 缓存实体
-/// </summary>
-/// <typeparam name="T"></typeparam>
-public record CacheEntry<T>
-{
-    public CacheEntry()
-    {
-    }
-
-    public CacheEntry(T value)
-    {
-        Value = value;
-    }
-
-    public T Value { get; set; }
-
-    /// <summary>
-    /// 隐式转换
-    /// </summary>
-    /// <param name="entry"></param>
-    public static implicit operator T(CacheEntry<T> entry)
-    {
-        return (entry ?? new CacheEntry<T>()).Value;
-    }
-
-    /// <summary>
-    /// 隐式转换
-    /// </summary>
-    /// <param name="item"></param>
-    public static implicit operator CacheEntry<T>(T item)
-    {
-        return new CacheEntry<T>(item);
     }
 }

@@ -1,1 +1,12 @@
-﻿<iframe src="/counter" width="100%" frameborder="0" style="height: 1260px"></iframe>
+﻿<iframe src="/counter" width="100%" frameborder="0" height="0" onload="setIframeHeight(this)"></iframe>
+<script>
+
+function setIframeHeight(iframe) {
+    if (iframe) {
+        var iframeWin = iframe.contentWindow || iframe.contentDocument.parentWindow;
+        if (iframeWin.document.body) {
+            iframe.height = (iframeWin.document.documentElement.scrollHeight || iframeWin.document.body.scrollHeight)+50;
+        }
+    }
+}
+</script>

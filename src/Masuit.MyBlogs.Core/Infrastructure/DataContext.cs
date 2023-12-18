@@ -162,4 +162,6 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public virtual DbSet<LinkLoopback> LinkLoopbacks { get; set; }
 
     public virtual DbSet<PostTag> PostTags { get; set; }
+
+    public virtual DbSet<EmailBlocklist> EmailBlocklist { get; set; }
 }

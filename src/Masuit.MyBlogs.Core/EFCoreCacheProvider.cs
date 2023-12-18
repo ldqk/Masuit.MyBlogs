@@ -4,7 +4,7 @@ using Masuit.MyBlogs.Core.Common;
 
 namespace Masuit.MyBlogs.Core;
 
-public class EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCacheProvider> cacheLogger, IEFDebugLogger logger) : IEFCacheServiceProvider
+public class EFCoreCacheProvider(IRedisClient redisClient) : IEFCacheServiceProvider
 {
     /// <summary>
     ///     Adds a new item to the cache.
@@ -25,7 +25,6 @@ public class EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCachePr
         };
 
         var keyHash = cacheKey.KeyHash;
-
         foreach (var rootCacheKey in cacheKey.CacheDependencies)
         {
             if (string.IsNullOrWhiteSpace(rootCacheKey))
@@ -38,7 +37,7 @@ public class EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCachePr
 
         if (cachePolicy == null)
         {
-            redisClient.Set(keyHash, new CacheEntry<EFCachedData>(value), 300);
+            redisClient.Set(keyHash, value, 300);
         }
         else
         {
@@ -49,7 +48,10 @@ public class EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCachePr
     /// <summary>Removes the cached entries added by this library.</summary>
     public void ClearAllCachedEntries()
     {
-        redisClient.Del("EFCache:*");
+        foreach (var key in redisClient.Keys("EFCache:*"))
+        {
+            redisClient.Del(key);
+        }
     }
 
     /// <summary>
@@ -65,7 +67,7 @@ public class EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCachePr
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        return redisClient.Get<CacheEntry<EFCachedData>>(cacheKey.KeyHash);
+        return redisClient.Get<EFCachedData>(cacheKey.KeyHash);
     }
 
     /// <summary>
@@ -86,18 +88,6 @@ public class EFCoreCacheProvider(IRedisClient redisClient, ILogger<EFCoreCachePr
                 continue;
             }
 
-            var cachedValue = redisClient.Get<CacheEntry<EFCachedData>>(cacheKey.KeyHash)?.Value;
-            var dependencyKeys = redisClient.SMembers(rootCacheKey);
-            if (dependencyKeys.IsNullOrEmpty() && cachedValue is not null)
-            {
-                if (logger.IsLoggerEnabled)
-                {
-                    cacheLogger.LogDebug(CacheableEventId.QueryResultInvalidated, "Invalidated all of the cache entries due to early expiration of a root cache key[{RootCacheKey}].", rootCacheKey);
-                }
-
-                redisClient.Del(rootCacheKey);
-                return;
-            }
             redisClient.Del(rootCacheKey);
         }
     }
