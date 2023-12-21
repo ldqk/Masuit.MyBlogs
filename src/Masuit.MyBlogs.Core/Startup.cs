@@ -70,7 +70,7 @@ public class Startup
     /// <returns></returns>
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddEFSecondLevelCache(options => options.UseCustomCacheProvider<EFCoreCacheProvider>(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).DisableLogging(true).UseCacheKeyPrefix("EFCache:"));
+        services.AddEFSecondLevelCache(options => options.UseCustomCacheProvider<EFCoreCacheProvider>(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(5)).SkipCacheInvalidationCommands(s => Regex.IsMatch(s, @"ViewCount|DisplayCount|LinkLoopback|LoginRecord|ClickRecord|VisitRecord|SearchDetails")).DisableLogging(true).UseCacheKeyPrefix("EFCache:"));
         services.AddDbContext<DataContext>((serviceProvider, opt) => opt.UseNpgsql(AppConfig.ConnString, builder => builder.EnableRetryOnFailure(10)).EnableSensitiveDataLogging().AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>())); //配置数据库
         services.AddDbContext<LoggerDbContext>(opt => opt.UseNpgsql(AppConfig.ConnString)); //配置数据库
         services.ConfigureOptions();
