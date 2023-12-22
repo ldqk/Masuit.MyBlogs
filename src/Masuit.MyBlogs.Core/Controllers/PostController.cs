@@ -1,5 +1,4 @@
 ﻿using System.Collections.Frozen;
-using CacheManager.Core;
 using Dispose.Scope;
 using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine;
@@ -30,7 +29,6 @@ using EFCoreSecondLevelCacheInterceptor;
 using FreeRedis;
 using Masuit.Tools.Mime;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
-using Masuit.MyBlogs.Core.Infrastructure.Services;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
