@@ -81,14 +81,18 @@ public class EFCoreCacheProvider(IRedisClient redisClient) : IEFCacheServiceProv
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        foreach (var rootCacheKey in cacheKey.CacheDependencies)
+        foreach (var rootKey in cacheKey.CacheDependencies)
         {
-            if (string.IsNullOrWhiteSpace(rootCacheKey))
+            if (string.IsNullOrWhiteSpace(rootKey))
             {
                 continue;
             }
 
-            redisClient.Del(rootCacheKey);
+            if (redisClient.SMembers(rootKey) is { Length: > 0 } keys)
+            {
+                redisClient.Del(keys);
+                redisClient.Del(rootKey);
+            }
         }
     }
 }
