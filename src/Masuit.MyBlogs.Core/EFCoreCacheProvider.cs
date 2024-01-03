@@ -37,7 +37,7 @@ public class EFCoreCacheProvider(IRedisClient redisClient) : IEFCacheServiceProv
 
         if (cachePolicy == null)
         {
-            redisClient.Set(keyHash, value, 300);
+            redisClient.Set(keyHash, value, 900);
         }
         else
         {
