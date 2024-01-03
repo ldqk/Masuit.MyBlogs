@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using Masuit.LuceneEFCore.SearchEngine;
+﻿using Masuit.LuceneEFCore.SearchEngine;
 
 namespace Masuit.MyBlogs.Core.Models.Entity;
 

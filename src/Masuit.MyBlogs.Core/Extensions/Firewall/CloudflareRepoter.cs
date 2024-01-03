@@ -1,5 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.Tools.Logging;
+﻿using Masuit.Tools.Logging;
 using Polly;
 using System.Net;
 using System.Net.Sockets;

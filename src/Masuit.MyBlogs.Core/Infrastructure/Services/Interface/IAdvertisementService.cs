@@ -1,6 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Common;
-
-namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
+﻿namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface
 {
 	public partial interface IAdvertisementService : IBaseService<Advertisement>
 	{

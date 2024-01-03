@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Masuit.MyBlogs.Core.Models.Command;
 
 /// <summary>

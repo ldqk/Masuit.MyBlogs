@@ -2,8 +2,6 @@
 using AutoMapper.QueryableExtensions;
 using EFCoreSecondLevelCacheInterceptor;
 using Masuit.LuceneEFCore.SearchEngine;
-using Masuit.Tools.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository;
 

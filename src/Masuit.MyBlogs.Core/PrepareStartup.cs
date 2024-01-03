@@ -1,7 +1,6 @@
 ﻿using Hangfire;
 using Hangfire.Dashboard;
 using Masuit.LuceneEFCore.SearchEngine;
-using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools.Mime;

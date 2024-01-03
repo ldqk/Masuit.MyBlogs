@@ -1,6 +1,4 @@
-﻿using Masuit.Tools.Models;
-
-namespace Masuit.MyBlogs.Core.Models.ViewModel;
+﻿namespace Masuit.MyBlogs.Core.Models.ViewModel;
 
 /// <summary>
 /// 留言板视图模型

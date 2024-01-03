@@ -6,8 +6,6 @@ using EFCoreSecondLevelCacheInterceptor;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools.Core.AspNetCore;
-using Masuit.Tools.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository;
 

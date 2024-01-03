@@ -8,14 +8,12 @@ using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
 using Masuit.Tools.Html;
-using Microsoft.EntityFrameworkCore;
 using PanGu;
 using PanGu.HighLight;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using EFCoreSecondLevelCacheInterceptor;
 using FreeRedis;
-using Masuit.MyBlogs.Core.Common;
 using Configuration = AngleSharp.Configuration;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services;

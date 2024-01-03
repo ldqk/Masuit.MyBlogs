@@ -1,6 +1,4 @@
-﻿using Masuit.Tools.Models;
-
-namespace Masuit.MyBlogs.Core.Models.DTO;
+﻿namespace Masuit.MyBlogs.Core.Models.DTO;
 
 /// <summary>
 /// 导航菜单输出模型

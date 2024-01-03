@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Masuit.MyBlogs.Core.Models.Validation;
+﻿namespace Masuit.MyBlogs.Core.Models.Validation;
 
 /// <summary>
 /// 强制true检查

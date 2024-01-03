@@ -1,4 +1,5 @@
 ﻿using MaxMind.GeoIP2.Model;
+using Location = MaxMind.GeoIP2.Model.Location;
 
 namespace Masuit.MyBlogs.Core.Models.ViewModel;
 

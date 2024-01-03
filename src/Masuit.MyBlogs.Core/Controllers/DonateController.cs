@@ -1,7 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.AspNetCore.ModelBinder;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 

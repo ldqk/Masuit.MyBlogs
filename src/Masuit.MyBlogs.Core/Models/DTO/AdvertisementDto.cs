@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Masuit.MyBlogs.Core.Models.DTO;
+﻿namespace Masuit.MyBlogs.Core.Models.DTO;
 
 public class AdvertisementDto : BaseDto
 {

@@ -6,7 +6,6 @@ using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Logging;
-using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Web;
 using Dispose.Scope;

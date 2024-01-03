@@ -1,8 +1,6 @@
-﻿using Masuit.MyBlogs.Core.Common;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 

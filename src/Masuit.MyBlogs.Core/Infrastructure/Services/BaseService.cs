@@ -2,7 +2,6 @@
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
-using Masuit.Tools.Models;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services;
 

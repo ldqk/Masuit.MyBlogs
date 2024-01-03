@@ -1,9 +1,6 @@
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Models.Validation;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Masuit.MyBlogs.Core.Models.Entity;

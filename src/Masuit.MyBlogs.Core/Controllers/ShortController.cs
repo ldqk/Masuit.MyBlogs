@@ -1,7 +1,6 @@
 ﻿using FreeRedis;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 

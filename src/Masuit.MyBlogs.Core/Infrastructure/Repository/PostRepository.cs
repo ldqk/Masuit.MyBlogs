@@ -2,7 +2,6 @@
 using Dispose.Scope;
 using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
-using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Repository;
 

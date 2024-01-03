@@ -2,7 +2,6 @@
 using AutoMapper.Extensions.ExpressionMapping;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools.Mime;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.WebEncoders;

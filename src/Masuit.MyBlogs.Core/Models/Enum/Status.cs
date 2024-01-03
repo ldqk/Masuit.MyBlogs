@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Masuit.MyBlogs.Core.Models.Enum;
+﻿namespace Masuit.MyBlogs.Core.Models.Enum;
 
 /// <summary>
 /// 数据状态

@@ -1,12 +1,10 @@
 ﻿using FreeRedis;
-using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Files;
 using Masuit.Tools.Logging;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Polly;
 using System.Diagnostics;
 using System.Text;

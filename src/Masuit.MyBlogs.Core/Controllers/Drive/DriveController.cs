@@ -1,6 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Extensions.Firewall;
-using Microsoft.AspNetCore.Mvc;
+﻿using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Masuit.MyBlogs.Core.Controllers.Drive;

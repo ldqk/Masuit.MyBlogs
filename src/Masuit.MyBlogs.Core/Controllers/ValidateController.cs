@@ -1,7 +1,6 @@
 ﻿using Hangfire;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.Tools.Core.Validator;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 

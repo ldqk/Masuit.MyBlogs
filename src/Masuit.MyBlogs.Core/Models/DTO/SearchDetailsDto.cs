@@ -1,6 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Common;
-
-namespace Masuit.MyBlogs.Core.Models.DTO;
+﻿namespace Masuit.MyBlogs.Core.Models.DTO;
 
 /// <summary>
 /// 搜索详情输出模型

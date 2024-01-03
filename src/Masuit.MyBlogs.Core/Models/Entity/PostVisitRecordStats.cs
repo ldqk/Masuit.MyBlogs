@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Masuit.MyBlogs.Core.Models.Entity;
+﻿namespace Masuit.MyBlogs.Core.Models.Entity;
 
 [Table("PostVisitRecordStats")]
 public class PostVisitRecordStats : BaseEntity

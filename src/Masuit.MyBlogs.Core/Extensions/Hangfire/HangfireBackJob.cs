@@ -1,9 +1,7 @@
 ﻿using FreeRedis;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
-using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.Tools.Logging;
-using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire;

@@ -1,6 +1,5 @@
 ﻿using Autofac.Extensions.DependencyInjection;
 using Masuit.MyBlogs.Core;
-using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Infrastructure.Drive;
 using Microsoft.AspNetCore.Server.Kestrel.Core;

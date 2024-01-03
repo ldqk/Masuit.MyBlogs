@@ -1,4 +1,10 @@
-﻿global using Masuit.MyBlogs.Core.Infrastructure;
+global using System.ComponentModel.DataAnnotations;
+global using System.ComponentModel.DataAnnotations.Schema;
+global using Masuit.MyBlogs.Core.Common;
+global using Masuit.Tools.Models;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.EntityFrameworkCore;
+global using Masuit.MyBlogs.Core.Infrastructure;
 global using Masuit.MyBlogs.Core.Infrastructure.Repository;
 global using Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 global using Masuit.MyBlogs.Core.Models.Command;

@@ -3,7 +3,6 @@ using Dispose.Scope;
 using FreeRedis;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Masuit.MyBlogs.Core.Controllers;

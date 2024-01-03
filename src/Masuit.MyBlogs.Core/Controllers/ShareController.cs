@@ -1,7 +1,5 @@
 ﻿using Dispose.Scope;
 using Masuit.Tools.AspNetCore.ModelBinder;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 

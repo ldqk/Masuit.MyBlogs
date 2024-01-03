@@ -1,10 +1,6 @@
 using Masuit.MyBlogs.Core.Models.Validation;
 using Masuit.Tools.Core.Validator;
-using Masuit.Tools.Models;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Reflection.Emit;
 

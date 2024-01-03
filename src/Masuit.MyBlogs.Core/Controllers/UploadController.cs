@@ -1,15 +1,12 @@
 ﻿using AngleSharp;
 using DocumentFormat.OpenXml.Packaging;
-using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.UEditor;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
-using Microsoft.AspNetCore.Mvc;
 using OpenXmlPowerTools;
 using Polly;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;

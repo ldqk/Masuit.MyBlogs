@@ -3,7 +3,6 @@ using AngleSharp.Css.Dom;
 using AngleSharp.Dom;
 using Dispose.Scope;
 using Masuit.Tools.Media;
-using Masuit.Tools.Models;
 using MaxMind.GeoIP2;
 using MaxMind.GeoIP2.Responses;
 using Polly;

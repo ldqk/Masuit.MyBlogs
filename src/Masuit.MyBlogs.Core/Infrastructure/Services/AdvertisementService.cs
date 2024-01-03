@@ -1,7 +1,5 @@
 ﻿using Masuit.LuceneEFCore.SearchEngine.Interfaces;
-using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
-using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using FreeRedis;
 

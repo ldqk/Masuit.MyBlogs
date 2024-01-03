@@ -1,6 +1,5 @@
 ﻿using EFCoreSecondLevelCacheInterceptor;
 using FreeRedis;
-using Masuit.MyBlogs.Core.Common;
 
 namespace Masuit.MyBlogs.Core;
 

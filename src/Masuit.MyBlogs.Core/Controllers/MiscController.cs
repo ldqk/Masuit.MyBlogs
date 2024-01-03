@@ -1,7 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.MyBlogs.Core.Extensions;
+﻿using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.AspNetCore.ModelBinder;
-using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
 namespace Masuit.MyBlogs.Core.Controllers;

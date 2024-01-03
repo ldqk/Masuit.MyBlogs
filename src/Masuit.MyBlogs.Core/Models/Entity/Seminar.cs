@@ -1,10 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// 文章专题
+/// 锟斤拷锟斤拷专锟斤拷
 /// </summary>
 [Table("Seminar")]
 public partial class Seminar : BaseEntity
@@ -15,20 +12,20 @@ public partial class Seminar : BaseEntity
 	}
 
 	/// <summary>
-	/// 专题名
+	/// 专锟斤拷锟斤拷
 	/// </summary>
-	[Required(ErrorMessage = "专题名称不能为空！")]
+	[Required(ErrorMessage = "专锟斤拷锟斤拷锟狡诧拷锟斤拷为锟秸ｏ拷")]
 	public string Title { get; set; }
 
 	/// <summary>
-	/// 专题子标题
+	/// 专锟斤拷锟接憋拷锟斤拷
 	/// </summary>
 	public string SubTitle { get; set; }
 
 	/// <summary>
-	/// 专题描述
+	/// 专锟斤拷锟斤拷锟斤拷
 	/// </summary>
-	[Required(ErrorMessage = "专题描述不能为空！")]
+	[Required(ErrorMessage = "专锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷为锟秸ｏ拷")]
 	public string Description { get; set; }
 
 	public virtual ICollection<Post> Post { get; set; }

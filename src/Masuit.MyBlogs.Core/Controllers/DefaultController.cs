@@ -1,6 +1,5 @@
 ﻿using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.Tools.AspNetCore.ModelBinder;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 

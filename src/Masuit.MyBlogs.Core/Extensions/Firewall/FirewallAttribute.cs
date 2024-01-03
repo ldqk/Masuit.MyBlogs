@@ -1,11 +1,9 @@
 ﻿using FreeRedis;
 using Markdig;
-using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Controllers;
 using Masuit.Tools.Mime;
 using Masuit.Tools.Logging;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;

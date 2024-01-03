@@ -1,6 +1,5 @@
 ﻿using FreeRedis;
 using Hangfire;
-using Masuit.Tools.Models;
 
 namespace Masuit.MyBlogs.Core.Common.Mails;
 

@@ -1,7 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Common;
-using Microsoft.EntityFrameworkCore;
-
-namespace Masuit.MyBlogs.Core.Infrastructure;
+﻿namespace Masuit.MyBlogs.Core.Infrastructure;
 
 public sealed class LoggerDbContext(DbContextOptions<LoggerDbContext> options) : DbContext(options)
 {

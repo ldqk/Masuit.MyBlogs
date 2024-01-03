@@ -1,5 +1,4 @@
 ﻿using Masuit.Tools.AspNetCore.ModelBinder;
-using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace Masuit.MyBlogs.Core.Controllers;

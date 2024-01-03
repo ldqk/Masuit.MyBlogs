@@ -1,7 +1,5 @@
-﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.Tools.Html;
+﻿using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
-using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace Masuit.MyBlogs.Core.Models.Validation;

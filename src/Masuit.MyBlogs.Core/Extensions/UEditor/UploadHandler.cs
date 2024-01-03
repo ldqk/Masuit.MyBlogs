@@ -1,5 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Common;
-using Masuit.Tools.Logging;
+﻿using Masuit.Tools.Logging;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 

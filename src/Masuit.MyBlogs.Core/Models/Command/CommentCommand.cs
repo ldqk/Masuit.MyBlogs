@@ -1,6 +1,5 @@
 using Masuit.MyBlogs.Core.Models.Validation;
 using Masuit.Tools.Core.Validator;
-using System.ComponentModel.DataAnnotations;
 
 namespace Masuit.MyBlogs.Core.Models.Command;
 

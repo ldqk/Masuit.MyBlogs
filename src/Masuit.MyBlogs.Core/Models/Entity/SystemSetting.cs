@@ -1,10 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// 系统设置
+/// 系统锟斤拷锟斤拷
 /// </summary>
 [Table("SystemSetting")]
 public class SystemSetting : BaseEntity
@@ -14,7 +11,7 @@ public class SystemSetting : BaseEntity
 		Status = Status.Available;
 	}
 	/// <summary>
-	/// 参数项名
+	/// 锟斤拷锟斤拷锟斤拷锟斤拷
 	/// </summary>
 	[Required]
 	public string Name { get; set; }

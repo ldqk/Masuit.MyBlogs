@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using EntityFramework.Exceptions.Common;
 using EntityFramework.Exceptions.PostgreSQL;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.Mapping;
 

@@ -1,6 +1,5 @@
 ﻿using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Logging;
-using Microsoft.AspNetCore.Mvc;
 using Polly;
 using System.Text;
 using Dispose.Scope;

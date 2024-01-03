@@ -1,7 +1,6 @@
 ﻿using Collections.Pooled;
 using Dispose.Scope;
 using Masuit.LuceneEFCore.SearchEngine;
-using Masuit.Tools.Models;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services.Interface;
 

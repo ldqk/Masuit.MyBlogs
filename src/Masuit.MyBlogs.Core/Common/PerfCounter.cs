@@ -2,11 +2,8 @@
 using Masuit.Tools.Hardware;
 using Masuit.Tools.Logging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Net.Sockets;
-using Microsoft.EntityFrameworkCore;
 
 namespace Masuit.MyBlogs.Core.Common;
 

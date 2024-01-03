@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Masuit.MyBlogs.Core.Controllers;
+﻿namespace Masuit.MyBlogs.Core.Controllers;
 
 [Route("login")]
 public sealed class LoginController : AdminController
