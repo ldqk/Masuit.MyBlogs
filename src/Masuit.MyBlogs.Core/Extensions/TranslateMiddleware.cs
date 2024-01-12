@@ -1,6 +1,8 @@
 ﻿using Masuit.Tools.Mime;
 using Microsoft.International.Converters.TraditionalChineseToSimplifiedConverter;
 using System.Text;
+using System.Text.RegularExpressions;
+using Yarp.ReverseProxy.Configuration;
 
 namespace Masuit.MyBlogs.Core.Extensions;
 
@@ -20,13 +22,18 @@ public sealed class TranslateMiddleware
         _next = next;
     }
 
-    public Task Invoke(HttpContext context)
+    public Task Invoke(HttpContext context, IProxyConfigProvider proxy)
     {
         var path = context.Request.Path.Value ?? "";
         if (path.StartsWith("/_blazor") || path.StartsWith("/api") || path.StartsWith("/file") || path.StartsWith("/download") || context.Request.IsRobot())
         {
             return _next(context);
         }
+
+        //if (proxy.GetConfig().Routes.Any(c => RouteMatch(c.Match.Path, path)))
+        //{
+        //    return _next(context);
+        //}
 
         string lang = context.Request.Query["lang"];
         lang ??= context.Request.Cookies["lang"];
@@ -45,6 +52,14 @@ public sealed class TranslateMiddleware
         }
 
         return Traditional(context);
+    }
+
+    private static bool RouteMatch(string pattern, string input)
+    {
+        string regexPattern = "^" + pattern.Replace("*", ".*?").Replace("?", ".");
+        regexPattern = Regex.Replace(regexPattern, @"\{\*\*.*?\}", ".*");
+        regexPattern = Regex.Replace(regexPattern, @"\{.*?\}", ".*?");
+        return Regex.IsMatch(input, regexPattern);
     }
 
     private async Task Traditional(HttpContext context)

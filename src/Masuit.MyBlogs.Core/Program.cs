@@ -8,14 +8,21 @@ using AngleSharp.Text;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-if (Environment.OSVersion.Platform is not (PlatformID.MacOSX or PlatformID.Unix))
+try
 {
-    // 设置相关进程优先级为高于正常，防止其他进程影响应用程序的运行性能
-    Process.GetProcessesByName("mysqld").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
-    Process.GetProcessesByName("pg_ctl").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
-    Process.GetProcessesByName("postgres").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
-    Process.GetProcessesByName("redis-server").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
-    Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.AboveNormal;
+    if (Environment.OSVersion.Platform is not (PlatformID.MacOSX or PlatformID.Unix))
+    {
+        // 设置相关进程优先级为高于正常，防止其他进程影响应用程序的运行性能
+        Process.GetProcessesByName("mysqld").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+        Process.GetProcessesByName("pg_ctl").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+        Process.GetProcessesByName("postgres").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+        Process.GetProcessesByName("redis-server").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
+        Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.AboveNormal;
+    }
+}
+catch
+{
+    // ignored
 }
 
 // 确保IP数据库正常

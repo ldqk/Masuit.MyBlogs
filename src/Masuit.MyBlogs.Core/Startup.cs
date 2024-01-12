@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using System.Net;
+using Autofac;
 using CLRStats;
 using Dispose.Scope.AspNetCore;
 using FreeRedis;
@@ -107,6 +108,14 @@ public class Startup
         services.AddMapper().AddMyMvc().AddHealthChecks();
         services.SetupImageSharp();
         services.AddHttpContextAccessor();
+        services.AddReverseProxy().LoadFromConfig(Configuration.GetSection("ReverseProxy")).ConfigureHttpClient((context, handler) =>
+        {
+            handler.AllowAutoRedirect = true;
+            handler.AutomaticDecompression = DecompressionMethods.All;
+            handler.UseCookies = true;
+            handler.UseProxy = true;
+        });
+        services.AddHttpForwarder();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
@@ -165,6 +174,7 @@ public class Startup
             endpoints.MapControllers(); // 属性路由
             endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}"); // 默认路由
             endpoints.MapFallbackToController("Index", "Error");
+            endpoints.MapReverseProxy();
         });
 
         Console.WriteLine("网站启动完成");
