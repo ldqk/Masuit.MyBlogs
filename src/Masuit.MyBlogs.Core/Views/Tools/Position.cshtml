@@ -98,20 +98,50 @@
     }
 </div>
 <div class="container-fluid">
-    @if (Model is {Status: 0})
-    {
-        <div id="allmap"></div>
-        <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=89772e94509a9b903724e247cbc175c2"></script>
-        <script>
+@if (Model is {Status: 0})
+{
+    <div id="allmap"></div>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=89772e94509a9b903724e247cbc175c2"></script>
+    <script>
+        function getPosition() {
+            return new Promise((resolve, reject) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        let latitude = position.coords.latitude
+                        let longitude = position.coords.longitude
+                        let data = {
+                            latitude: latitude,
+                            longitude: longitude
+                        }
+                        resolve(data);
+                    }, function () {
+                        reject(arguments);
+                    });
+                } else {
+                    reject('你的浏览器不支持当前地理位置信息获取');
+                }
+            });
+        }
+        
         var map = new BMap.Map("allmap"); // 创建Map实例,设置地图允许的最小/大级别
-
-        map.centerAndZoom(new BMap.Point(@(Model.AddressResult.Location?.Lng), @(Model.AddressResult.Location?.Lat)), 15);
+        var lng=@(Model.AddressResult.Location?.Lng);
+        var lat=@(Model.AddressResult.Location?.Lat);
+        getPosition().then(res => {
+            if (!location.search) {
+                $("input[name=lng]").val(res.longitude);
+                $("input[name=lat]").val(res.latitude);
+                $("form").submit();
+            }
+        }).catch(err => {
+            console.log(err);
+        });
+        map.centerAndZoom(new BMap.Point(lng, lat), 15);
         map.enableScrollWheelZoom(true);
-        var new_point = new BMap.Point(@(Model.AddressResult.Location?.Lng), @(Model.AddressResult.Location?.Lat));
+        var new_point = new BMap.Point(lng, lat);
         var marker = new BMap.Marker(new_point); // 创建标注
         map.addOverlay(marker); // 将标注添加到地图中
         marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
         map.panTo(new_point);
-        </script>
-    }
+    </script>
+}
 </div>

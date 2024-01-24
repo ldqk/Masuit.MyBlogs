@@ -39,19 +39,9 @@ public sealed class TranslateMiddleware
         lang ??= context.Request.Cookies["lang"];
         if (string.IsNullOrEmpty(lang))
         {
-            if (context.Request.Location().Address.Contains(new[] { "台湾", "香港", "澳门", "Taiwan", "TW", "HongKong", "HK" }))
-            {
-                return Traditional(context);
-            }
-
-            return _next(context);
+            return context.Request.Location().Address.Contains(new[] { "台湾", "香港", "澳门", "Taiwan", "TW", "HongKong", "HK" }) ? Traditional(context) : _next(context);
         }
-        if (lang == "zh-cn")
-        {
-            return _next(context);
-        }
-
-        return Traditional(context);
+        return lang == "zh-cn" ? _next(context) : Traditional(context);
     }
 
     private static bool RouteMatch(string pattern, string input)
