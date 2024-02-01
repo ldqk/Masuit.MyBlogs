@@ -202,7 +202,7 @@ public sealed class SubscribeController : Controller
 			};
 		});
 		var posts = data.ToPooledListScope();
-		InsertAdvertisement(posts, id, seminar.Title);
+		InsertAdvertisement(posts,keywords: seminar.Title);
 		var feed = new Feed()
 		{
 			Title = Request.Host + $":专题{seminar.Title}文章订阅",

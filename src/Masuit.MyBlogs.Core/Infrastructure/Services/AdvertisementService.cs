@@ -105,12 +105,12 @@ public sealed class AdvertisementService(IBaseRepository<Advertisement> reposito
         {
             var all = CacheManager.GetOrAdd("Advertisement:all", () => GetQuery<AdvertisementDto>(a => a.Status == Status.Available).ToList(), TimeSpan.FromMinutes(10));
             var atype = type.ToString("D");
-            var categories = CacheManager.GetOrAdd("Category:all", () => CategoryRepository.GetAll().Select(c => new { c.Id, c.Path }).Distinct().ToArray(), TimeSpan.FromHours(5));
-            var catCount = categories.Length;
+            var categories = CacheManager.GetOrAdd("Category:all", () => CategoryRepository.GetAll().Select(c => new { c.Id, c.Path }).Distinct().ToArray(), TimeSpan.FromHours(5)).ToDictionarySafety(a => a.Id,a => a.Path.Replace(',', '|'));
+            var catCount = categories.Count;
             string scid = "";
             if (cid.HasValue)
             {
-                scid = categories.FirstOrDefault(c => c.Id == cid.Value)!.Path.Replace(',', '|');
+                scid = categories[cid.Value];
             }
 
             var array = all.Where(a => a.Types.Contains(atype)).GroupBy(a => a.Merchant).Select(static g => g.OrderByRandom().FirstOrDefault().Id).Take(50).ToArray();
