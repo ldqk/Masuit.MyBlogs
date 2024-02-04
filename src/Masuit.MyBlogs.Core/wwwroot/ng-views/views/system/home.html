@@ -36,15 +36,26 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-2">
                 <div class="input-group">
                     <span class="input-group-addon">上传图片水印：</span>
-                    <div class="fg-line">
-                        <input type="text" class="form-control" ng-model="Settings.Watermark" placeholder="留空则上传图片时不添加水印" />
-                    </div>
+                    <select ng-model="Settings.WatermarkType" class="form-control">
+                        <option ng-value="'None'">无</option>
+                        <option ng-value="'Text'">文字水印</option>
+                        <option ng-value="'Image'">图片水印</option>
+                    </select>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
+                <div class="fg-line" ng-if="Settings['WatermarkType']=='Text'">
+                    <input type="text" class="form-control" ng-model="Settings.Watermark" placeholder="留空则上传图片时不添加水印" />
+                </div>
+                <div ng-if="Settings['WatermarkType']=='Image'">
+                    <img class="img img-responsive img-thumbnail img-rounded" ng-src="{{Settings.WatermarkImage}}" style="max-height: 100px;" ng-click="setImage('WatermarkImage')" />
+                    <button type="button" class="btn btn-danger waves-effect" ng-click="setImage('WatermarkImage')">修改</button>
+                </div>
+            </div>
+            <div class="col-md-2" ng-if="Settings['WatermarkType']!='None'">
                 <div class="input-group">
                     <span class="input-group-addon">水印位置：</span>
                     <select ng-model="Settings.WatermarkPosition" class="form-control">

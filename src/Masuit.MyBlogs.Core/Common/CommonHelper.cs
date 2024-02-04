@@ -351,7 +351,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <returns></returns>
         public static Stream AddWatermark(this Stream stream)
         {
-            if (!string.IsNullOrEmpty(SystemSettings.GetOrAdd("Watermark", string.Empty)))
+            if (SystemSettings.GetOrAdd("WatermarkType", "None") != "None")
             {
                 try
                 {
@@ -360,9 +360,22 @@ namespace Masuit.MyBlogs.Core.Common
                         SkipWatermarkForSmallImages = true,
                         SmallImagePixelsThreshold = 90000
                     };
-                    var watermarkText = SystemSettings["Watermark"];
                     var position = Enum.Parse<WatermarkPosition>(SystemSettings["WatermarkPosition"] ?? "3");
-                    return watermarker.AddWatermark(watermarkText, AppContext.BaseDirectory + "App_Data/华康勘亭流.ttf", 20, Color.LightGray, position, 30);
+                    switch (SystemSettings["WatermarkType"])
+                    {
+                        case "Text":
+                            var watermarkText = SystemSettings["Watermark"];
+                            return watermarker.AddWatermark(watermarkText, AppContext.BaseDirectory + "App_Data/华康勘亭流.ttf", 20, Color.LightGray, position, 30);
+
+                        case "Image":
+                            {
+                                var path = AppContext.BaseDirectory + "wwwroot" + SystemSettings["WatermarkImage"];
+                                using var fs = File.OpenRead(path);
+                                return watermarker.AddWatermark(fs, 0.6f, position, 30);
+                            }
+                        default:
+                            return stream;
+                    }
                 }
                 catch
                 {

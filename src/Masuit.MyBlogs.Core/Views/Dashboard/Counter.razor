@@ -9,6 +9,7 @@
 @using Masuit.Tools.Logging
 @using Masuit.Tools.Maths
 @using System.Collections.Frozen
+@using System.Net.NetworkInformation
 @using PerformanceCounter = System.Diagnostics.PerformanceCounter
 
 @inject IPerfCounter PerfCounter;
@@ -165,7 +166,7 @@
     private string _runningTime;
     private readonly CpuInfo _cpu = SystemInfo.GetCpuInfo()[0];
     private readonly RamInfo _memory = SystemInfo.GetRamInfo();
-    private readonly IList<string> _macs = SystemInfo.GetMacAddress();
+    private readonly List<PhysicalAddress> _macs = SystemInfo.GetMacAddress().ToList();
     private readonly IList<string> _ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToList();
     private readonly DriveInfo[] _driveInfos = DriveInfo.GetDrives().Where(d => d.IsReady).ToArray();
     private decimal _cacheHits;
