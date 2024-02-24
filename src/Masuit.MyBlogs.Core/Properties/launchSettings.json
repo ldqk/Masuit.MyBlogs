@@ -1,19 +1,19 @@
 {
+  "profiles": {
+    "Masuit.MyBlogs.Core": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:5000"
+    }
+  },
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
       "applicationUrl": "http://localhost:4909",
       "sslPort": 0
-    }
-  },
-  "profiles": {
-    "Masuit.MyBlogs.Core": {
-      "commandName": "Project",
-        "environmentVariables": {
-            "ASPNETCORE_ENVIRONMENT": "Production"
-        },
-      "applicationUrl": "http://localhost:5000"
     }
   }
 }

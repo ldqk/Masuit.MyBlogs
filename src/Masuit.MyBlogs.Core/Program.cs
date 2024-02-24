@@ -32,7 +32,7 @@ if (!"223.5.5.5".GetIPLocation().Contains("阿里"))
 }
 
 InitOneDrive(); // 初始化Onedrive程序
-Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => builder.AddJsonFile("appsettings.json", true, true)).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureWebHostDefaults(hostBuilder => hostBuilder.UseQuic().UseKestrel(opt =>
+Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => builder.AddJsonFile("appsettings.json", true, true)).ConfigureLogging(logger => logger.AddRinLogger()).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureWebHostDefaults(hostBuilder => hostBuilder.UseQuic().UseKestrel(opt =>
 {
     var config = opt.ApplicationServices.GetService<IConfiguration>();
     var port = config["Port"] ?? "5000";

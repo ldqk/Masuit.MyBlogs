@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
-using Masuit.MyBlogs.Core.Configs;
+﻿using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools.Mime;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -12,6 +10,8 @@ using System.IO.Compression;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
 
 namespace Masuit.MyBlogs.Core.Extensions;
 
