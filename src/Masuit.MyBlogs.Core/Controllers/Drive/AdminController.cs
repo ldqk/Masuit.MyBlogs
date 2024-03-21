@@ -136,7 +136,7 @@ public sealed class AdminController(IDriveAccountService driveAccount, SettingSe
             {
                 message = e.Message
             });
-        };
+        }
         return StatusCode(204);
     }
 
@@ -163,7 +163,7 @@ public sealed class AdminController(IDriveAccountService driveAccount, SettingSe
             {
                 message = e.Message
             });
-        };
+        }
         return StatusCode(204);
     }
 
@@ -185,7 +185,7 @@ public sealed class AdminController(IDriveAccountService driveAccount, SettingSe
             {
                 message = e.Message
             });
-        };
+        }
         return StatusCode(204);
     }
 

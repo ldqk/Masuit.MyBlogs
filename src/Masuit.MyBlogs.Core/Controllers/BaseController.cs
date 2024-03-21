@@ -109,26 +109,26 @@ public class BaseController : Controller
         return template.Render();
     }
 
-    public override Task OnActionExecutionAsync(ActionExecutingContext filterContext, ActionExecutionDelegate next)
+    public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         ViewBag.Desc = CommonHelper.SystemSettings["Description"];
-        var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
+        var user = context.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
         if (HttpContext.Connection.RemoteIpAddress.IsPrivateIP())
         {
             user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
-            filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
+            context.HttpContext.Session.Set(SessionKey.UserInfo, user);
         }
 #endif
         if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true" && user?.IsAdmin != true)
         {
-            filterContext.Result = RedirectToAction("ComingSoon", "Error");
+            context.Result = RedirectToAction("ComingSoon", "Error");
             return Task.CompletedTask;
         }
 
-        if (Request.Method == HttpMethods.Post && !Request.Path.Value.Contains("get", StringComparison.InvariantCultureIgnoreCase) && CommonHelper.SystemSettings.GetOrAdd("DataReadonly", "false") == "true" && !filterContext.Filters.Any(m => m.ToString().Contains(nameof(MyAuthorizeAttribute))))
+        if (Request.Method == HttpMethods.Post && !Request.Path.Value.Contains("get", StringComparison.InvariantCultureIgnoreCase) && CommonHelper.SystemSettings.GetOrAdd("DataReadonly", "false") == "true" && !context.Filters.Any(m => m.ToString().Contains(nameof(MyAuthorizeAttribute))))
         {
-            filterContext.Result = ResultData("网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", false, "网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", user != null, HttpStatusCode.BadRequest);
+            context.Result = ResultData("网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", false, "网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", user != null, HttpStatusCode.BadRequest);
             return Task.CompletedTask;
         }
 
@@ -149,13 +149,13 @@ public class BaseController : Controller
                     Expires = DateTime.Now.AddYears(1),
                     SameSite = SameSiteMode.Lax
                 });
-                filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
+                context.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
             }
         }
 
         if (ModelState.IsValid) return next();
         var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).Select((s, i) => $"{i + 1}. {s}");
-        filterContext.Result = true switch
+        context.Result = true switch
         {
             _ when Request.HasJsonContentType() || Request.Method == HttpMethods.Post => ResultData(errmsgs, false, "数据校验失败，错误信息：" + errmsgs.Join(" | "), user != null, HttpStatusCode.BadRequest),
             _ => base.BadRequest("参数错误：" + errmsgs.Join(" | "))
@@ -174,7 +174,7 @@ public class BaseController : Controller
     {
         if (CurrentUser.IsAdmin)
         {
-            return string.Empty; ;
+            return string.Empty;
         }
 
         if (string.IsNullOrEmpty(Request.Cookies["ValidateKey"]))

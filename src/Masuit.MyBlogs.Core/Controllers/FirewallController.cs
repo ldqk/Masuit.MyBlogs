@@ -25,7 +25,6 @@ public sealed class FirewallController : Controller
     /// <summary>
     /// JS挑战，5秒盾
     /// </summary>
-    /// <param name="token"></param>
     /// <returns></returns>
     [HttpPost("/challenge"), AutoValidateAntiforgeryToken]
     public ActionResult JsChallenge()
