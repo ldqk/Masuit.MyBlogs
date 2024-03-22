@@ -17,6 +17,7 @@ public class AdminController : Controller
     /// UserInfoService
     /// </summary>
     public IUserInfoService UserInfoService { get; set; }
+
     public IRedisClient RedisHelper { get; set; }
 
     public IMapper Mapper { get; set; }
@@ -41,14 +42,14 @@ public class AdminController : Controller
     }
 
     /// <summary>在调用操作方法前调用。</summary>
-    /// <param name="filterContext">有关当前请求和操作的信息。</param>
-    public override void OnActionExecuting(ActionExecutingContext filterContext)
+    /// <param name="context">有关当前请求和操作的信息。</param>
+    public override void OnActionExecuting(ActionExecutingContext context)
     {
-        base.OnActionExecuting(filterContext);
-        var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
+        base.OnActionExecuting(context);
+        var user = context.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
         user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
-        filterContext.HttpContext.Session.Set(SessionKey.UserInfo, user);
+        context.HttpContext.Session.Set(SessionKey.UserInfo, user);
 #endif
         if (user == null && Request.Cookies.Any(x => x.Key == "username" || x.Key == "password")) //执行自动登录
         {
@@ -67,7 +68,7 @@ public class AdminController : Controller
                     Expires = DateTime.Now.AddYears(1),
                     SameSite = SameSiteMode.Lax
                 });
-                filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
+                context.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
             }
         }
         if (ModelState.IsValid) return;
@@ -77,6 +78,6 @@ public class AdminController : Controller
             errmsgs[i] = i + 1 + ". " + errmsgs[i];
         }
 
-        filterContext.Result = ResultData(null, false, "数据校验失败，错误信息：" + string.Join(" | ", errmsgs));
+        context.Result = ResultData(null, false, "数据校验失败，错误信息：" + string.Join(" | ", errmsgs));
     }
 }

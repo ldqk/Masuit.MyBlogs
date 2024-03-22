@@ -1,7 +1,5 @@
 ﻿using Autofac.Extensions.DependencyInjection;
 using Masuit.MyBlogs.Core;
-using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
-using Masuit.MyBlogs.Core.Infrastructure.Drive;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Diagnostics;
 using AngleSharp.Text;
@@ -31,7 +29,6 @@ if (!"223.5.5.5".GetIPLocation().Contains("阿里"))
     throw new Exception("IP地址库初始化失败，请重启应用！");
 }
 
-InitOneDrive(); // 初始化Onedrive程序
 Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => builder.AddJsonFile("appsettings.json", true, true)).ConfigureLogging(logger => logger.AddRinLogger()).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureWebHostDefaults(hostBuilder => hostBuilder.UseQuic().UseKestrel(opt =>
 {
     var config = opt.ApplicationServices.GetService<IConfiguration>();
@@ -54,22 +51,3 @@ Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => builder.Add
     opt.Limits.MaxRequestBodySize = null;
     Console.WriteLine($"应用程序监听端口：http：{port}，https：{sslport}");
 }).UseStartup<Startup>()).Build().Run();
-return;
-
-static void InitOneDrive()
-{
-    //初始化
-    if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "OneDrive.db")))
-    {
-        File.Copy(Path.Combine("App_Data", "OneDrive.template.db"), Path.Combine("App_Data", "OneDrive.db"));
-        Console.WriteLine("数据库创建成功");
-    }
-
-    using var settingService = new SettingService(new DriveContext());
-    if (settingService.Get("IsInit") != "true")
-    {
-        settingService.Set("IsInit", "true").Wait();
-        Console.WriteLine("数据初始化成功");
-        Console.WriteLine($"请登录 {OneDriveConfiguration.BaseUri}/#/admin 进行身份及其他配置");
-    }
-}

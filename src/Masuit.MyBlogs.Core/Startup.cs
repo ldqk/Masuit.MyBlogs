@@ -10,7 +10,6 @@ using Masuit.LuceneEFCore.SearchEngine.Extensions;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
-using Masuit.MyBlogs.Core.Extensions.DriveHelpers;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools.Mime;
@@ -101,7 +100,6 @@ public class Startup
         });
         services.SetupMiniProfile();
         services.AddSingleton<IMimeMapper, MimeMapper>(_ => new MimeMapper());
-        services.AddOneDrive();
         services.AutoRegisterServices();
         services.AddRazorPages();
         services.AddServerSideBlazor();
