@@ -45,19 +45,22 @@ public static class HttpContextExtension
     /// <returns></returns>
     public static bool IsRobot(this HttpRequest req)
     {
-        if (UserAgent.Parse(req.Headers[HeaderNames.UserAgent].ToString()).IsRobot || req.Location().Contains("Spider", "蜘蛛", "Google", "Microsoft", "Baidu", "Cloudflare", "Telegram"))
+        return (bool)req.HttpContext.Items.GetOrAdd("ip.robot", () =>
         {
-            var nslookup = new LookupClient();
-            var fallbackPolicy = Policy<bool>.Handle<Exception>().FallbackAsync(false);
-            var retryPolicy = Policy<bool>.Handle<Exception>().RetryAsync(3);
-            return Policy.WrapAsync(fallbackPolicy, retryPolicy).ExecuteAsync(async () =>
+            if (UserAgent.Parse(req.Headers[HeaderNames.UserAgent].ToString()).IsRobot || req.Location().Contains("Spider", "蜘蛛", "Google", "Microsoft", "Baidu", "Cloudflare", "Telegram"))
             {
-                using var cts = new CancellationTokenSource(1000);
-                var query = await nslookup.QueryReverseAsync(req.HttpContext.Connection.RemoteIpAddress, cts.Token);
-                return query.Answers.Any(r => r.ToString().Trim('.').EndsWith(Spiders));
-            }).Result;
-        }
+                var nslookup = new LookupClient();
+                var fallbackPolicy = Policy<bool>.Handle<Exception>().FallbackAsync(false);
+                var retryPolicy = Policy<bool>.Handle<Exception>().RetryAsync(3);
+                return Policy.WrapAsync(fallbackPolicy, retryPolicy).ExecuteAsync(async () =>
+                {
+                    using var cts = new CancellationTokenSource(1000);
+                    var query = await nslookup.QueryReverseAsync(req.HttpContext.Connection.RemoteIpAddress, cts.Token);
+                    return query.Answers.Any(r => r.ToString().Trim('.').EndsWith(Spiders));
+                }).Result;
+            }
 
-        return false;
+            return false;
+        });
     }
 }

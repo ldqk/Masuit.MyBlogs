@@ -39,7 +39,6 @@
     <meta property="og:title" content="@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])">
     <meta property="og:description" content="@ViewBag.Desc">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="@Context.Request.GetEncodedUrl()">
     <meta property="og:image" content="@ViewData.GetValueOrDefault("cover",() => "/favicon.png")" />
     <meta property="og:image:alt" content="@ViewBag.Desc" />
     <meta property="og:locale" content="zh_CN">
@@ -101,6 +100,7 @@
     </environment>
 </head>
 <body>
+@if(!Context.Request.IsRobot()) {
     <noscript>
         <meta http-equiv="Refresh" content="3;url=/ServiceUnavailable" />
         <style>
@@ -116,6 +116,7 @@
             <p class="size48">检测到您的浏览器不支持javascript或已禁用javascript功能，当前页面无法正常显示！</p>
         </div>
     </noscript>
+}
     <div id="toc" style="display: none;">
         <a class="close">
             <i class="icon-cross"></i>
