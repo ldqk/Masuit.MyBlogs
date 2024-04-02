@@ -165,7 +165,7 @@ public class Startup
         app.SetupHangfire();
         app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
         app.UseMiddleware<TranslateMiddleware>();
-        app.UseRouting().UseBodyOrDefaultModelBinder().UseEndpoints(endpoints =>
+        app.UseRouting().UseEndpoints(endpoints =>
         {
             endpoints.MapBlazorHub(options =>
             {

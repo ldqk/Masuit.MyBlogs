@@ -1,0 +1,45 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Masuit.MyBlogs.Core.Models
+@model PagedList<PostDto>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv='content-language' content='zh-CN'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>@CommonHelper.SystemSettings["Title"]</title>
+    <meta name="keywords" content="@CommonHelper.SystemSettings["Keyword"]" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="twitter:card" content="summary">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h2><a asp-controller="Home" asp-action="Index">@CommonHelper.SystemSettings["Title"]</a></h2>
+        </div>
+        <div class="list-group">
+            @foreach (var post in Model.Data)
+            {
+
+                <a asp-controller="Post" asp-action="Details" asp-route-id="@post.Id" class="list-group-item">
+                    @post.Title
+                </a>
+            }
+        </div>
+        <div>
+            @{
+                await Html.RenderPartialAsync("_Pagination",new Pagination(Model.CurrentPage,Model.PageSize,Model.TotalCount));
+            }
+        </div>
+    </div>
+</body>
+</html>

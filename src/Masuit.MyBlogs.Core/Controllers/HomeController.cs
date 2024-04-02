@@ -42,16 +42,20 @@ public sealed class HomeController : BaseController
     [ResponseCache(Duration = 600, VaryByHeader = nameof(HeaderNames.Cookie))]
     public async Task<ActionResult> Index([FromServices] IFastShareService fastShareService)
     {
-        var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner, Request.Location()).OrderByRandom().ToPooledListScope();
-        var fastShares = fastShareService.GetAllFromCache(s => s.Sort);
         var postsQuery = PostService.GetQuery(PostBaseWhere()); //准备文章的查询
         var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ToPagedListAsync<Post, PostDto>(1, 15, MapperConfig);
         posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).ProjectTo<PostDto>(MapperConfig).Cacheable().ToPooledListScope().OrderByRandom());
+        if (Request.IsRobot())
+        {
+            return View("SEO_List", posts);
+        }
         var viewModel = GetIndexPageViewModel();
-        viewModel.Banner = banners;
         viewModel.Posts = posts;
-        ViewBag.FastShare = fastShares;
         viewModel.PageParams = new Pagination(1, 15, posts.TotalCount, OrderBy.ModifyDate);
+        var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner, Request.Location()).OrderByRandom().ToPooledListScope();
+        var fastShares = fastShareService.GetAllFromCache(s => s.Sort);
+        viewModel.Banner = banners;
+        ViewBag.FastShare = fastShares;
         viewModel.SidebarAds = AdsService.GetsByWeightedPrice(2, AdvertiseType.SideBar, Request.Location());
         viewModel.ListAdvertisement = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location());
         PostService.SolvePostsCategory(posts.Data);
@@ -85,6 +89,11 @@ public sealed class HomeController : BaseController
         if (page == 1)
         {
             posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).ProjectTo<PostDto>(MapperConfig).ToPooledListScope().OrderByRandom());
+        }
+
+        if (Request.IsRobot())
+        {
+            return View("SEO_List", posts);
         }
 
         viewModel.Posts = posts;
@@ -125,6 +134,11 @@ public sealed class HomeController : BaseController
             OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
             _ => await queryable.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
         };
+        if (Request.IsRobot())
+        {
+            return View("SEO_List", posts);
+        }
+
         var viewModel = GetIndexPageViewModel();
         ViewBag.Tag = tag;
         viewModel.Posts = posts;
@@ -171,6 +185,11 @@ public sealed class HomeController : BaseController
             OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
             _ => await queryable.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
         };
+        if (Request.IsRobot())
+        {
+            return View("SEO_List", posts);
+        }
+
         var viewModel = GetIndexPageViewModel();
         viewModel.Posts = posts;
         viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);
@@ -204,6 +223,11 @@ public sealed class HomeController : BaseController
             OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
             _ => await PostService.GetQuery(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
         };
+        if (Request.IsRobot())
+        {
+            return View("SEO_List", posts);
+        }
+
         var viewModel = GetIndexPageViewModel();
         ViewBag.Author = author;
         viewModel.Posts = posts;
@@ -239,6 +263,11 @@ public sealed class HomeController : BaseController
             OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId))).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
             _ => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId))).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
         };
+        if (Request.IsRobot())
+        {
+            return View("SEO_List", posts);
+        }
+
         var viewModel = GetIndexPageViewModel();
         viewModel.Posts = posts;
         viewModel.PageParams = new Pagination(page, size, posts.TotalCount, orderBy);

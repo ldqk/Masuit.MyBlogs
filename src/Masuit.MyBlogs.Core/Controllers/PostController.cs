@@ -59,8 +59,12 @@ public sealed class PostController : BaseController
     [Route("{id:int}"), Route("{id:int}/comments/{cid:int}"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
     public async Task<ActionResult> Details([FromServices] ISearchDetailsService searchService, int id, string kw, int cid, string t)
     {
-        var notRobot = !Request.IsRobot();
-        if (string.IsNullOrEmpty(t) && notRobot)
+        if (Request.IsRobot())
+        {
+            return View("Details_SEO", PostService[id] ?? throw new NotFoundException("文章未找到"));
+        }
+
+        if (string.IsNullOrEmpty(t))
         {
             return RedirectToAction("Details", cid > 0 ? new { id, kw, cid, t = HttpContext.Connection.Id } : new { id, kw, t = HttpContext.Connection.Id });
         }
@@ -70,7 +74,7 @@ public sealed class PostController : BaseController
         var ip = ClientIP.ToString();
         if (!string.IsNullOrEmpty(post.Redirect))
         {
-            if (notRobot && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
+            if (string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
             {
                 BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ip, Request.Headers[HeaderNames.Referer].ToString(), Request.GetDisplayUrl()));
                 HttpContext.Session.Set("post" + id, id.ToString());
@@ -83,15 +87,7 @@ public sealed class PostController : BaseController
         ViewBag.CommentsCount = CommentService.Count(c => c.PostId == id && c.ParentId == null && c.Status == Status.Published);
         ViewBag.HistoryCount = PostHistoryVersionService.Count(c => c.PostId == id);
         ViewBag.Keyword = post.Keyword + "," + post.Label;
-        if (Request.Query.ContainsKey("share"))
-        {
-            ViewBag.Desc = await post.Content.GetSummary(200);
-        }
-        else
-        {
-            ViewBag.Desc = "若页面无法访问，可通过搜索引擎网页快照进行浏览。" + await post.Content.GetSummary(200);
-        }
-
+        ViewBag.Desc = await post.Content.GetSummary(200);
         var modifyDate = post.ModifyDate;
         ViewBag.Next = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.LimitMode ?? 0) == RegionLimitMode.All && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate);
         ViewBag.Prev = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.LimitMode ?? 0) == RegionLimitMode.All && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate, false);
@@ -111,15 +107,15 @@ public sealed class PostController : BaseController
 
         post.ModifyDate = post.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
         post.PostDate = post.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-        post.Content = await ReplaceVariables(post.Content).Next(s => notRobot && post.DisableCopy ? s.InjectFingerprint() : Task.FromResult(s));
-        post.ProtectContent = await ReplaceVariables(post.ProtectContent).Next(s => notRobot && post.DisableCopy ? s.InjectFingerprint() : Task.FromResult(s));
+        post.Content = await ReplaceVariables(post.Content).Next(s => post.DisableCopy ? s.InjectFingerprint() : Task.FromResult(s));
+        post.ProtectContent = await ReplaceVariables(post.ProtectContent).Next(s => post.DisableCopy ? s.InjectFingerprint() : Task.FromResult(s));
 
         if (CurrentUser.IsAdmin)
         {
             return View("Details_Admin", post);
         }
 
-        if (notRobot && string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
+        if (string.IsNullOrEmpty(HttpContext.Session.Get<string>("post" + id)))
         {
             BackgroundJob.Enqueue<IHangfireBackJob>(job => job.RecordPostVisit(id, ip, Request.Headers[HeaderNames.Referer].ToString(), Request.GetDisplayUrl()));
             HttpContext.Session.Set("post" + id, id.ToString());
