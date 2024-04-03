@@ -1,6 +1,6 @@
 ### Masuit.MyBlogs
 <a href="https://gitee.com/masuit/Masuit.MyBlogs"><img src="https://gitee.com/static/images/logo-black.svg" height="32"></a> <a href="https://github.com/ldqk/Masuit.MyBlogs"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Font_Awesome_5_brands_github.svg/54px-Font_Awesome_5_brands_github.svg.png" height="32"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/GitHub_logo_2013.svg/128px-GitHub_logo_2013.svg.png" height="32"></a>  
-**重要提醒：OneDrive功能将于2024.12.31进行移除处理，如果你正在使用本项目，请尽快完成OneDrive迁移到alist或其他网盘挂载程序**  
+**重要提醒：OneDrive功能将于2024.6.30进行移除处理，如果你正在使用本项目，请尽快完成OneDrive迁移到alist或其他网盘挂载程序**  
 
 个人博客站项目源码，高性能高安全性低占用的博客系统，这也许是我写过的性能最高的web项目了。**仅3MB的代码量！** 目前日均处理请求数80-600w次，同时在线活跃用户数60-600人，**数据量累计已达到数百万条**，数据库+Redis+网站主程序同时运行在一台4核8GB的机器上，浏览器页面请求秒级响应，CPU平均使用率控制在10%左右，内存占用控制在400MB左右。
 ![任务管理器](https://img11.360buyimg.com/ddimg/jfs/t1/170269/23/18655/93697/6076eb8fE82d545e7/78f0815f7311cd49.png)
