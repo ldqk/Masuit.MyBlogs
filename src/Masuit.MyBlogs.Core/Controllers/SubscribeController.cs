@@ -380,7 +380,7 @@ public sealed class SubscribeController : Controller
     {
         if (!Request.IsRobot())
         {
-            return Ok();
+            return await Rss();
         }
 
         var host = Request.Host;
