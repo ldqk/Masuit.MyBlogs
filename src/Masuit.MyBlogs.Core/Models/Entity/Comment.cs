@@ -1,11 +1,11 @@
-using Masuit.Tools.Core.Validator;
+ï»¿using Masuit.Tools.Core.Validator;
 using System.ComponentModel;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ÆÀÂÛ±í
+/// è¯„è®ºè¡¨
 /// </summary>
 [Table("Comment")]
 public class Comment : BaseEntity, ITreeEntity<Comment, int>, ITreeParent<Comment>, IEntityTypeConfiguration<Comment>
@@ -18,52 +18,52 @@ public class Comment : BaseEntity, ITreeEntity<Comment, int>, ITreeParent<Commen
     }
 
     /// <summary>
-    /// êÇ³Æ
+    /// æ˜µç§°
     /// </summary>
-    [Required(ErrorMessage = "¼ÈÈ»ÒªÆÀÂÛ£¬²»ÁôÃûÔõÃ´ĞĞÄØ£¡"), MaxLength(24, ErrorMessage = "±ğÄÖ£¬ÄãÕâÃû×ÖÌ«³¤ÁË°É£¡"), MinLength(2, ErrorMessage = "êÇ³ÆÖÁÉÙ2¸ö×Ö£¡")]
+    [Required(ErrorMessage = "æ—¢ç„¶è¦è¯„è®ºï¼Œä¸ç•™åæ€ä¹ˆè¡Œå‘¢ï¼"), MaxLength(24, ErrorMessage = "åˆ«é—¹ï¼Œä½ è¿™åå­—å¤ªé•¿äº†å§ï¼"), MinLength(2, ErrorMessage = "æ˜µç§°è‡³å°‘2ä¸ªå­—ï¼")]
     public string NickName { get; set; }
 
     /// <summary>
-    /// ÓÊÏä
+    /// é‚®ç®±
     /// </summary>
     [IsEmail]
     public string Email { get; set; }
 
     /// <summary>
-    /// ÆÀÂÛÄÚÈİ
+    /// è¯„è®ºå†…å®¹
     /// </summary>
-    [Required(ErrorMessage = "ÆÀÂÛÄÚÈİ²»ÄÜÎª¿Õ£¡")]
+    [Required(ErrorMessage = "è¯„è®ºå†…å®¹ä¸èƒ½ä¸ºç©ºï¼")]
     public string Content { get; set; }
 
     /// <summary>
-    /// ¸¸¼¶ID
+    /// çˆ¶çº§ID
     /// </summary>
     public int? ParentId { get; set; }
 
     /// <summary>
-    /// ÎÄÕÂID
+    /// æ–‡ç« ID
     /// </summary>
     public int PostId { get; set; }
 
     /// <summary>
-    /// ·¢±íÊ±¼ä
+    /// å‘è¡¨æ—¶é—´
     /// </summary>
     public DateTime CommentDate { get; set; }
 
     /// <summary>
-    /// ä¯ÀÀÆ÷°æ±¾
+    /// æµè§ˆå™¨ç‰ˆæœ¬
     /// </summary>
     [StringLength(255)]
     public string Browser { get; set; }
 
     /// <summary>
-    /// ²Ù×÷ÏµÍ³°æ±¾
+    /// æ“ä½œç³»ç»Ÿç‰ˆæœ¬
     /// </summary>
     [StringLength(255)]
     public string OperatingSystem { get; set; }
 
     /// <summary>
-    /// ÊÇ·ñÊÇ²©Ö÷
+    /// æ˜¯å¦æ˜¯åšä¸»
     /// </summary>
     [DefaultValue(false)]
     public bool IsMaster { get; set; }
@@ -72,22 +72,22 @@ public class Comment : BaseEntity, ITreeEntity<Comment, int>, ITreeParent<Commen
     public bool IsAuthor { get; set; }
 
     /// <summary>
-    /// Ö§³ÖÊı
+    /// æ”¯æŒæ•°
     /// </summary>
     public int VoteCount { get; set; }
 
     /// <summary>
-    /// ·´¶ÔÊı
+    /// åå¯¹æ•°
     /// </summary>
     public int AgainstCount { get; set; }
 
     /// <summary>
-    /// Ìá½»ÈËIPµØÖ·
+    /// æäº¤äººIPåœ°å€
     /// </summary>
     public string IP { get; set; }
 
     /// <summary>
-    /// µØÀíĞÅÏ¢
+    /// åœ°ç†ä¿¡æ¯
     /// </summary>
     public string Location { get; set; }
 
@@ -99,12 +99,12 @@ public class Comment : BaseEntity, ITreeEntity<Comment, int>, ITreeParent<Commen
     public virtual Post Post { get; set; }
 
     /// <summary>
-    /// ×Ó¼¶
+    /// å­çº§
     /// </summary>
     public ICollection<Comment> Children { get; set; }
 
     /// <summary>
-    /// ¸¸½Úµã
+    /// çˆ¶èŠ‚ç‚¹
     /// </summary>
     public Comment Parent { get; set; }
 

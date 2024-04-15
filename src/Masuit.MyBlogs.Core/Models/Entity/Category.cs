@@ -1,9 +1,9 @@
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+ï»¿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ÎÄÕÂ·ÖÀà
+/// æ–‡ç« åˆ†ç±»
 /// </summary>
 [Table("Category")]
 public class Category : BaseEntity, ITree<Category>, IEntityTypeConfiguration<Category>, ITreeEntity<Category, int>
@@ -15,18 +15,18 @@ public class Category : BaseEntity, ITree<Category>, IEntityTypeConfiguration<Ca
     }
 
     /// <summary>
-    /// ·ÖÀàÃû
+    /// åˆ†ç±»å
     /// </summary>
-    [Required(ErrorMessage = "·ÖÀàÃû²»ÄÜÎª¿Õ"), MaxLength(64, ErrorMessage = "·ÖÀàÃû×î´óÔÊĞí64¸ö×Ö·û"), MinLength(2, ErrorMessage = "·ÖÀàÃûÖÁÉÙ2¸ö×Ö·û")]
+    [Required(ErrorMessage = "åˆ†ç±»åä¸èƒ½ä¸ºç©º"), MaxLength(64, ErrorMessage = "åˆ†ç±»åæœ€å¤§å…è®¸64ä¸ªå­—ç¬¦"), MinLength(2, ErrorMessage = "åˆ†ç±»åè‡³å°‘2ä¸ªå­—ç¬¦")]
     public string Name { get; set; }
 
     /// <summary>
-    /// ·ÖÀàÃèÊö
+    /// åˆ†ç±»æè¿°
     /// </summary>
     public string Description { get; set; }
 
     /// <summary>
-    /// ¸¸¼¶id
+    /// çˆ¶çº§id
     /// </summary>
     public int? ParentId { get; set; }
 
@@ -37,12 +37,12 @@ public class Category : BaseEntity, ITree<Category>, IEntityTypeConfiguration<Ca
     public virtual ICollection<PostHistoryVersion> PostHistoryVersion { get; set; }
 
     /// <summary>
-    /// ¸¸½Úµã
+    /// çˆ¶èŠ‚ç‚¹
     /// </summary>
     public virtual Category Parent { get; set; }
 
     /// <summary>
-    /// ×Ó¼¶
+    /// å­çº§
     /// </summary>
     public virtual ICollection<Category> Children { get; set; }
 

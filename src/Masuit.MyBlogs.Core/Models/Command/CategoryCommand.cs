@@ -1,7 +1,7 @@
-namespace Masuit.MyBlogs.Core.Models.Command;
+ï»¿namespace Masuit.MyBlogs.Core.Models.Command;
 
 /// <summary>
-/// ÎÄÕÂ·ÖÀàÊäÈëÄ£ĞÍ
+/// æ–‡ç« åˆ†ç±»è¾“å…¥æ¨¡å‹
 /// </summary>
 public class CategoryCommand : BaseEntity
 {
@@ -11,18 +11,18 @@ public class CategoryCommand : BaseEntity
 	}
 
 	/// <summary>
-	/// ·ÖÀàÃû
+	/// åˆ†ç±»å
 	/// </summary>
-	[Required(ErrorMessage = "·ÖÀàÃû²»ÄÜÎª¿Õ"), MaxLength(64, ErrorMessage = "·ÖÀàÃû×î´óÔÊĞí64¸ö×Ö·û"), MinLength(2, ErrorMessage = "·ÖÀàÃûÖÁÉÙ2¸ö×Ö·û")]
+	[Required(ErrorMessage = "åˆ†ç±»åä¸èƒ½ä¸ºç©º"), MaxLength(64, ErrorMessage = "åˆ†ç±»åæœ€å¤§å…è®¸64ä¸ªå­—ç¬¦"), MinLength(2, ErrorMessage = "åˆ†ç±»åè‡³å°‘2ä¸ªå­—ç¬¦")]
 	public string Name { get; set; }
 
 	/// <summary>
-	/// ·ÖÀàÃèÊö
+	/// åˆ†ç±»æè¿°
 	/// </summary>
 	public string Description { get; set; }
 
 	/// <summary>
-	/// ¸¸¼¶id
+	/// çˆ¶çº§id
 	/// </summary>
 	public int? ParentId { get; set; }
 }

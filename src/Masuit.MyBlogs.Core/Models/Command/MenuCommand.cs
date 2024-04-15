@@ -1,7 +1,7 @@
-namespace Masuit.MyBlogs.Core.Models.Command;
+ï»¿namespace Masuit.MyBlogs.Core.Models.Command;
 
 /// <summary>
-/// µ¼º½²Ëµ¥ÊäÈëÄ£ĞÍ
+/// å¯¼èˆªèœå•è¾“å…¥æ¨¡å‹
 /// </summary>
 public class MenuCommand : BaseEntity
 {
@@ -12,40 +12,40 @@ public class MenuCommand : BaseEntity
 	}
 
 	/// <summary>
-	/// Ãû×Ö
+	/// åå­—
 	/// </summary>
-	[Required(ErrorMessage = "²Ëµ¥Ãû²»ÄÜÎª¿Õ£¡"), MaxLength(16, ErrorMessage = "²Ëµ¥Ãû×î³¤Ö§³Ö16¸ö×Ö·û£¡"), MinLength(2, ErrorMessage = "²Ëµ¥ÃûÖÁÉÙĞèÒª2¸ö×Ö·û£¡")]
+	[Required(ErrorMessage = "èœå•åä¸èƒ½ä¸ºç©ºï¼"), MaxLength(16, ErrorMessage = "èœå•åæœ€é•¿æ”¯æŒ16ä¸ªå­—ç¬¦ï¼"), MinLength(2, ErrorMessage = "èœå•åè‡³å°‘éœ€è¦2ä¸ªå­—ç¬¦ï¼")]
 	public string Name { get; set; }
 
 	/// <summary>
-	/// Í¼±ê
+	/// å›¾æ ‡
 	/// </summary>
 	public string Icon { get; set; }
 
 	/// <summary>
 	/// URL
 	/// </summary>
-	[Required(ErrorMessage = "²Ëµ¥µÄURL²»ÄÜÎª¿Õ£¡"), StringLength(256, ErrorMessage = "URL×î³¤Ö§³Ö256¸ö×Ö·û£¡")]
+	[Required(ErrorMessage = "èœå•çš„URLä¸èƒ½ä¸ºç©ºï¼"), StringLength(256, ErrorMessage = "URLæœ€é•¿æ”¯æŒ256ä¸ªå­—ç¬¦ï¼")]
 	public string Url { get; set; }
 
 	/// <summary>
-	/// ÅÅĞòºÅ
+	/// æ’åºå·
 	/// </summary>
 	public int Sort { get; set; }
 
 	/// <summary>
-	/// ¸¸¼¶ID
+	/// çˆ¶çº§ID
 	/// </summary>
 	public int? ParentId { get; set; }
 
 	/// <summary>
-	/// ²Ëµ¥ÀàĞÍ
+	/// èœå•ç±»å‹
 	/// </summary>
 	[Required]
 	public MenuType MenuType { get; set; }
 
 	/// <summary>
-	/// ÊÇ·ñÔÚĞÂ±êÇ©Ò³´ò¿ª
+	/// æ˜¯å¦åœ¨æ–°æ ‡ç­¾é¡µæ‰“å¼€
 	/// </summary>
 	public bool NewTab { get; set; }
 }

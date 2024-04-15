@@ -1,10 +1,10 @@
-using Masuit.Tools.Core.Validator;
+ï»¿using Masuit.Tools.Core.Validator;
 using System.ComponentModel;
 
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ÓÃ»§
+/// ç”¨æˆ·
 /// </summary>
 [Table("UserInfo")]
 public class UserInfo : BaseEntity
@@ -15,48 +15,48 @@ public class UserInfo : BaseEntity
 	}
 
 	/// <summary>
-	/// ÓÃ»§Ãû
+	/// ç”¨æˆ·å
 	/// </summary>
-	[Required(ErrorMessage = "ÓÃ»§Ãû²»ÄÜÎª¿Õ£¡")]
+	[Required(ErrorMessage = "ç”¨æˆ·åä¸èƒ½ä¸ºç©ºï¼")]
 	public string Username { get; set; }
 
 	/// <summary>
-	/// ÏÔÊ¾Ãû³Æ
+	/// æ˜¾ç¤ºåç§°
 	/// </summary>
-	[Required(ErrorMessage = "êÇ³Æ²»ÄÜÎª¿Õ£¡")]
+	[Required(ErrorMessage = "æ˜µç§°ä¸èƒ½ä¸ºç©ºï¼")]
 	public string NickName { get; set; }
 
 	/// <summary>
-	/// ÃÜÂë
+	/// å¯†ç 
 	/// </summary>
-	[Required(ErrorMessage = "ÃÜÂë²»ÄÜÎª¿Õ£¡")]
+	[Required(ErrorMessage = "å¯†ç ä¸èƒ½ä¸ºç©ºï¼")]
 	public string Password { get; set; }
 
 	/// <summary>
-	/// ¼ÓÃÜÑÎ
+	/// åŠ å¯†ç›
 	/// </summary>
 	[Required]
 	public string SaltKey { get; set; }
 
 	/// <summary>
-	/// ÊÇ·ñÊÇ¹ÜÀíÔ±
+	/// æ˜¯å¦æ˜¯ç®¡ç†å‘˜
 	/// </summary>
 	[DefaultValue(false)]
 	public bool IsAdmin { get; set; }
 
 	/// <summary>
-	/// ÓÊÏä
+	/// é‚®ç®±
 	/// </summary>
 	[IsEmail]
 	public string Email { get; set; }
 
 	/// <summary>
-	/// QQ»òÎ¢ĞÅ
+	/// QQæˆ–å¾®ä¿¡
 	/// </summary>
 	public string QQorWechat { get; set; }
 
 	/// <summary>
-	/// ÓÃ»§Í·Ïñ
+	/// ç”¨æˆ·å¤´åƒ
 	/// </summary>
 	public string Avatar { get; set; }
 

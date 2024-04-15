@@ -1,31 +1,31 @@
-using Masuit.Tools.Core.Validator;
+ï»¿using Masuit.Tools.Core.Validator;
 
 namespace Masuit.MyBlogs.Core.Models.Command;
 
 /// <summary>
-/// ÎÄÕÂĞŞ¸ÄÇëÇó
+/// æ–‡ç« ä¿®æ”¹è¯·æ±‚
 /// </summary>
 public class PostMergeRequestCommand : PostMergeRequestCommandBase
 {
 	/// <summary>
-	/// ÎÄÕÂid
+	/// æ–‡ç« id
 	/// </summary>
 	public int PostId { get; set; }
 
 	/// <summary>
-	/// ĞŞ¸ÄÈË
+	/// ä¿®æ”¹äºº
 	/// </summary>
-	[Required, MaxLength(36, ErrorMessage = "ĞŞ¸ÄÈËÃû×Ö×î³¤Ö§³Ö36¸ö×Ö·û£¡"), MinLength(2, ErrorMessage = "ĞŞ¸ÄÈËÃû×Ö×îÉÙ2¸ö×Ö·û£¡")]
+	[Required, MaxLength(36, ErrorMessage = "ä¿®æ”¹äººåå­—æœ€é•¿æ”¯æŒ36ä¸ªå­—ç¬¦ï¼"), MinLength(2, ErrorMessage = "ä¿®æ”¹äººåå­—æœ€å°‘2ä¸ªå­—ç¬¦ï¼")]
 	public string Modifier { get; set; }
 
 	/// <summary>
-	/// ĞŞ¸ÄÈËÓÊÏä
+	/// ä¿®æ”¹äººé‚®ç®±
 	/// </summary>
-	[Required(ErrorMessage = "ÓÊÏä²»ÄÜÎª¿Õ£¡"), MinLength(6, ErrorMessage = "ÓÊÏä¸ñÊ½²»ÕıÈ·£¡"), IsEmail]
+	[Required(ErrorMessage = "é‚®ç®±ä¸èƒ½ä¸ºç©ºï¼"), MinLength(6, ErrorMessage = "é‚®ç®±æ ¼å¼ä¸æ­£ç¡®ï¼"), IsEmail]
 	public string ModifierEmail { get; set; }
 	/// <summary>
-	/// ÑéÖ¤Âë
+	/// éªŒè¯ç 
 	/// </summary>
-	[Required(ErrorMessage = "ÑéÖ¤Âë²»ÄÜÎª¿Õ£¡")]
+	[Required(ErrorMessage = "éªŒè¯ç ä¸èƒ½ä¸ºç©ºï¼")]
 	public string Code { get; set; }
 }

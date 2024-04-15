@@ -1,10 +1,10 @@
-using Masuit.Tools.Core.Validator;
+ï»¿using Masuit.Tools.Core.Validator;
 using System.ComponentModel;
 
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ÎÄÕÂÀúÊ·°æ±¾
+/// æ–‡ç« å†å²ç‰ˆæœ¬
 /// </summary>
 [Table("PostHistoryVersion")]
 public class PostHistoryVersion : BaseEntity
@@ -17,79 +17,79 @@ public class PostHistoryVersion : BaseEntity
 	}
 
 	/// <summary>
-	/// ±êÌâ
+	/// æ ‡é¢˜
 	/// </summary>
 	[Required, StringLength(128)]
 	public string Title { get; set; }
 
 	/// <summary>
-	/// ÄÚÈİ
+	/// å†…å®¹
 	/// </summary>
 	[Required]
 	public string Content { get; set; }
 
 	/// <summary>
-	/// ÊÜ±£»¤µÄÄÚÈİ
+	/// å—ä¿æŠ¤çš„å†…å®¹
 	/// </summary>
 	public string ProtectContent { get; set; }
 
 	/// <summary>
-	/// ä¯ÀÀ´ÎÊı
+	/// æµè§ˆæ¬¡æ•°
 	/// </summary>
 	[DefaultValue(0)]
 	public int ViewCount { get; set; }
 
 	/// <summary>
-	/// ĞŞ¸ÄÊ±¼ä
+	/// ä¿®æ”¹æ—¶é—´
 	/// </summary>
 	public DateTime ModifyDate { get; set; }
 
 	/// <summary>
-	/// ·ÖÀàid
+	/// åˆ†ç±»id
 	/// </summary>
 	[ForeignKey("Category")]
 	public int CategoryId { get; set; }
 
 	/// <summary>
-	/// ÎÄÕÂid
+	/// æ–‡ç« id
 	/// </summary>
 	[ForeignKey("Post")]
 	public int PostId { get; set; }
 
 	/// <summary>
-	/// ×÷ÕßÓÊÏä
+	/// ä½œè€…é‚®ç®±
 	/// </summary>
 	[StringLength(255), IsEmail]
 	public string Email { get; set; }
 
 	/// <summary>
-	/// ĞŞ¸ÄÈËÃû×Ö
+	/// ä¿®æ”¹äººåå­—
 	/// </summary>
 	public string Modifier { get; set; }
 
 	/// <summary>
-	/// ĞŞ¸ÄÈËÓÊÏä
+	/// ä¿®æ”¹äººé‚®ç®±
 	/// </summary>
 	public string ModifierEmail { get; set; }
 
 	/// <summary>
-	/// ±êÇ©
+	/// æ ‡ç­¾
 	/// </summary>
 	[StringLength(255)]
 	public string Label { get; set; }
 
 	/// <summary>
-	/// ·ÖÀà
+	/// åˆ†ç±»
 	/// </summary>
 	public virtual Category Category { get; set; }
 
 	/// <summary>
-	/// ĞÂÎÄÕÂ
+	/// æ–°æ–‡ç« 
 	/// </summary>
 	public virtual Post Post { get; set; }
 
 	/// <summary>
-	/// ×¨Ìâ
+	/// ä¸“é¢˜
 	/// </summary>
 	public virtual ICollection<Seminar> Seminar { get; set; }
 }

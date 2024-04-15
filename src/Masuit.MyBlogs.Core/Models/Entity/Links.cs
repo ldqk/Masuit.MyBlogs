@@ -1,9 +1,9 @@
-using Masuit.Tools.Core.AspNetCore;
+ï»¿using Masuit.Tools.Core.AspNetCore;
 
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ÓÑÇéÁ´½Ó
+/// å‹æƒ…é“¾æ¥
 /// </summary>
 [Table("Links")]
 public class Links : BaseEntity
@@ -16,35 +16,35 @@ public class Links : BaseEntity
 	}
 
 	/// <summary>
-	/// Ãû×Ö
+	/// åå­—
 	/// </summary>
-	[Required(ErrorMessage = "Õ¾µãÃû²»ÄÜÎª¿Õ£¡"), MaxLength(32, ErrorMessage = "Õ¾µãÃû³Æ×î³¤ÏŞÖÆ32¸ö×Ö")]
+	[Required(ErrorMessage = "ç«™ç‚¹åä¸èƒ½ä¸ºç©ºï¼"), MaxLength(32, ErrorMessage = "ç«™ç‚¹åç§°æœ€é•¿é™åˆ¶32ä¸ªå­—")]
 	public string Name { get; set; }
 
 	/// <summary>
 	/// URL
 	/// </summary>
-	[Required(ErrorMessage = "Õ¾µãµÄURL²»ÄÜÎª¿Õ£¡"), MaxLength(64, ErrorMessage = "Õ¾µãµÄURLÏŞÖÆ64¸ö×Ö·û")]
+	[Required(ErrorMessage = "ç«™ç‚¹çš„URLä¸èƒ½ä¸ºç©ºï¼"), MaxLength(64, ErrorMessage = "ç«™ç‚¹çš„URLé™åˆ¶64ä¸ªå­—ç¬¦")]
 	public string Url { get; set; }
 
 	/// <summary>
-	/// Ö÷Ò³µØÖ·
+	/// ä¸»é¡µåœ°å€
 	/// </summary>
-	[Required(ErrorMessage = "Õ¾µãµÄÖ÷Ò³URL²»ÄÜÎª¿Õ£¡"), MaxLength(64, ErrorMessage = "Õ¾µãµÄÖ÷Ò³URLÏŞÖÆ64¸ö×Ö·û")]
+	[Required(ErrorMessage = "ç«™ç‚¹çš„ä¸»é¡µURLä¸èƒ½ä¸ºç©ºï¼"), MaxLength(64, ErrorMessage = "ç«™ç‚¹çš„ä¸»é¡µURLé™åˆ¶64ä¸ªå­—ç¬¦")]
 	public string UrlBase { get; set; }
 
 	/// <summary>
-	/// ÊÇ·ñ¼ì²â°×Ãûµ¥
+	/// æ˜¯å¦æ£€æµ‹ç™½åå•
 	/// </summary>
 	public bool Except { get; set; }
 
 	/// <summary>
-	/// ÊÇ·ñÊÇÍÆ¼öÕ¾µã
+	/// æ˜¯å¦æ˜¯æ¨èç«™ç‚¹
 	/// </summary>
 	public bool Recommend { get; set; }
 
 	/// <summary>
-	/// ¸üĞÂÊ±¼ä
+	/// æ›´æ–°æ—¶é—´
 	/// </summary>
 	public DateTime UpdateTime { get; set; }
 

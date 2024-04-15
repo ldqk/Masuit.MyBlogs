@@ -1,9 +1,9 @@
-using Masuit.LuceneEFCore.SearchEngine;
+ï»¿using Masuit.LuceneEFCore.SearchEngine;
 
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ËÑË÷ÏêÏ¸¼ÇÂ¼
+/// æœç´¢è¯¦ç»†è®°å½•
 /// </summary>
 [Table("SearchDetails")]
 public class SearchDetails : LuceneIndexableBaseEntity
@@ -14,28 +14,28 @@ public class SearchDetails : LuceneIndexableBaseEntity
 	}
 
 	/// <summary>
-	/// ¹Ø¼ü´Ê
+	/// å…³é”®è¯
 	/// </summary>
-	[Required(ErrorMessage = "¹Ø¼ü´Ê²»ÄÜÎª¿Õ")]
+	[Required(ErrorMessage = "å…³é”®è¯ä¸èƒ½ä¸ºç©º")]
 	public string Keywords { get; set; }
 
 	/// <summary>
-	/// ½á¹û¼¯ÊıÁ¿
+	/// ç»“æœé›†æ•°é‡
 	/// </summary>
 	public int ResultCount { get; set; }
 
 	/// <summary>
-	/// ËÑË÷Ê±¼ä
+	/// æœç´¢æ—¶é—´
 	/// </summary>
 	public DateTime SearchTime { get; set; }
 
 	/// <summary>
-	/// ·ÃÎÊÕßIP
+	/// è®¿é—®è€…IP
 	/// </summary>
 	public string IP { get; set; }
 
 	/// <summary>
-	/// ËÑË÷ºÄÊ±
+	/// æœç´¢è€—æ—¶
 	/// </summary>
 	public double Elapsed { get; set; }
 }

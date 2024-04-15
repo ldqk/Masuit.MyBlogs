@@ -1,10 +1,10 @@
-using Masuit.MyBlogs.Core.Models.Validation;
+ï»¿using Masuit.MyBlogs.Core.Models.Validation;
 using Masuit.Tools.Core.Validator;
 
 namespace Masuit.MyBlogs.Core.Models.DTO;
 
 /// <summary>
-/// ÎÄÕÂÊäÈëÄ£ĞÍ
+/// æ–‡ç« è¾“å…¥æ¨¡å‹
 /// </summary>
 public class PostCommand : BaseEntity
 {
@@ -14,15 +14,15 @@ public class PostCommand : BaseEntity
 	}
 
 	/// <summary>
-	/// ±êÌâ
+	/// æ ‡é¢˜
 	/// </summary>
-	[Required(ErrorMessage = "ÎÄÕÂ±êÌâ²»ÄÜÎª¿Õ£¡"), MaxLength(128, ErrorMessage = "ÎÄÕÂ±êÌâ×î³¤Ö§³Ö128¸ö×Ö·û£¡"), MinLength(4, ErrorMessage = "ÎÄÕÂ±êÌâ×îÉÙ4¸ö×Ö·û£¡")]
+	[Required(ErrorMessage = "æ–‡ç« æ ‡é¢˜ä¸èƒ½ä¸ºç©ºï¼"), MaxLength(128, ErrorMessage = "æ–‡ç« æ ‡é¢˜æœ€é•¿æ”¯æŒ128ä¸ªå­—ç¬¦ï¼"), MinLength(4, ErrorMessage = "æ–‡ç« æ ‡é¢˜æœ€å°‘4ä¸ªå­—ç¬¦ï¼")]
 	public string Title { get; set; }
 
 	/// <summary>
-	/// ×÷Õß
+	/// ä½œè€…
 	/// </summary>
-	[Required, MaxLength(24, ErrorMessage = "×÷ÕßÃû×î³¤Ö§³Ö24¸ö×Ö·û£¡"), MinLength(2, ErrorMessage = "×÷ÕßÃû×îÉÙ2¸ö×Ö·û£¡")]
+	[Required, MaxLength(24, ErrorMessage = "ä½œè€…åæœ€é•¿æ”¯æŒ24ä¸ªå­—ç¬¦ï¼"), MinLength(2, ErrorMessage = "ä½œè€…åæœ€å°‘2ä¸ªå­—ç¬¦ï¼")]
 	public string Author { get; set; }
 
 	public string Modifier { get; set; }
@@ -30,106 +30,106 @@ public class PostCommand : BaseEntity
 	public string ModifierEmail { get; set; }
 
 	/// <summary>
-	/// ÄÚÈİ
+	/// å†…å®¹
 	/// </summary>
-	[Required(ErrorMessage = "ÎÄÕÂÄÚÈİ²»ÄÜÎª¿Õ£¡"), SubmitCheck(20, 1000000, false)]
+	[Required(ErrorMessage = "æ–‡ç« å†…å®¹ä¸èƒ½ä¸ºç©ºï¼"), SubmitCheck(20, 1000000, false)]
 	public string Content { get; set; }
 
 	/// <summary>
-	/// ÎÄÕÂ¹Ø¼ü´Ê
+	/// æ–‡ç« å…³é”®è¯
 	/// </summary>
-	[StringLength(256, ErrorMessage = "ÎÄÕÂ¹Ø¼ü´Ê×î´óÔÊĞí255¸ö×Ö·û")]
+	[StringLength(256, ErrorMessage = "æ–‡ç« å…³é”®è¯æœ€å¤§å…è®¸255ä¸ªå­—ç¬¦")]
 	public string Keyword { get; set; }
 
 	/// <summary>
-	/// ÊÜ±£»¤µÄÄÚÈİ
+	/// å—ä¿æŠ¤çš„å†…å®¹
 	/// </summary>
 	public string ProtectContent { get; set; }
 
 	/// <summary>
-	/// ÊÜ±£»¤ÄÚÈİÄ£Ê½
+	/// å—ä¿æŠ¤å†…å®¹æ¨¡å¼
 	/// </summary>
 	public ProtectContentMode ProtectContentMode { get; set; }
 
 	/// <summary>
-	/// ·ÖÀàid
+	/// åˆ†ç±»id
 	/// </summary>
 	public int CategoryId { get; set; }
 
 	/// <summary>
-	/// ×÷ÕßÓÊÏä
+	/// ä½œè€…é‚®ç®±
 	/// </summary>
-	[Required(ErrorMessage = "×÷ÕßÓÊÏä²»ÄÜÎª¿Õ£¡"), MinLength(6, ErrorMessage = "ÓÊÏä¸ñÊ½²»ÕıÈ·£¡"), IsEmail]
+	[Required(ErrorMessage = "ä½œè€…é‚®ç®±ä¸èƒ½ä¸ºç©ºï¼"), MinLength(6, ErrorMessage = "é‚®ç®±æ ¼å¼ä¸æ­£ç¡®ï¼"), IsEmail]
 	public string Email { get; set; }
 
 	/// <summary>
-	/// ±êÇ©
+	/// æ ‡ç­¾
 	/// </summary>
-	[StringLength(255, ErrorMessage = "±êÇ©×î´óÔÊĞí255¸ö×Ö·û")]
+	[StringLength(255, ErrorMessage = "æ ‡ç­¾æœ€å¤§å…è®¸255ä¸ªå­—ç¬¦")]
 	public string Label { get; set; }
 
 	/// <summary>
-	/// ×¨Ìâ
+	/// ä¸“é¢˜
 	/// </summary>
 	public string Seminars { get; set; }
 
 	/// <summary>
-	/// ½ûÖ¹ÆÀÂÛ
+	/// ç¦æ­¢è¯„è®º
 	/// </summary>
 	public bool DisableComment { get; set; }
 
 	/// <summary>
-	/// ½ûÖ¹×ªÔØ
+	/// ç¦æ­¢è½¬è½½
 	/// </summary>
 	public bool DisableCopy { get; set; }
 
 	/// <summary>
-	/// ÏŞÖÆÄ£Ê½
+	/// é™åˆ¶æ¨¡å¼
 	/// </summary>
 	public RegionLimitMode? LimitMode { get; set; }
 
 	/// <summary>
-	/// ÏŞÖÆµØÇø£¬ÊúÏß·Ö¸ô
+	/// é™åˆ¶åœ°åŒºï¼Œç«–çº¿åˆ†éš”
 	/// </summary>
 	public string Regions { get; set; }
 
 	/// <summary>
-	/// ÏŞÖÆÅÅ³ıµØÇø£¬ÊúÏß·Ö¸ô
+	/// é™åˆ¶æ’é™¤åœ°åŒºï¼Œç«–çº¿åˆ†éš”
 	/// </summary>
 	public string ExceptRegions { get; set; }
 
 	/// <summary>
-	/// ÏŞÖÆÄ£Ê½
+	/// é™åˆ¶æ¨¡å¼
 	/// </summary>
 	public RegionLimitMode? ProtectContentLimitMode { get; set; }
 
 	/// <summary>
-	/// ÏŞÖÆµØÇø£¬ÊúÏß·Ö¸ô
+	/// é™åˆ¶åœ°åŒºï¼Œç«–çº¿åˆ†éš”
 	/// </summary>
 	public string ProtectContentRegions { get; set; }
 
 	/// <summary>
-	/// ±£»¤ÃÜÂë
+	/// ä¿æŠ¤å¯†ç 
 	/// </summary>
 	public string ProtectPassword { get; set; }
 
 	/// <summary>
-	/// Ìø×ªµ½µÚÈı·½Á´½Ó
+	/// è·³è½¬åˆ°ç¬¬ä¸‰æ–¹é“¾æ¥
 	/// </summary>
 	public string Redirect { get; set; }
 
 	/// <summary>
-	/// ±£ÁôÀúÊ·°æ±¾
+	/// ä¿ç•™å†å²ç‰ˆæœ¬
 	/// </summary>
 	public bool Reserve { get; set; }
 
 	/// <summary>
-	/// ¹ıÆÚÊ±¼ä
+	/// è¿‡æœŸæ—¶é—´
 	/// </summary>
 	public DateTime? ExpireAt { get; set; }
 
 	/// <summary>
-	/// ÊÇ·ñÊÇ²»°²È«ÄÚÈİ
+	/// æ˜¯å¦æ˜¯ä¸å®‰å…¨å†…å®¹
 	/// </summary>
 	public bool IsNsfw { get; set; }
 }

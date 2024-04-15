@@ -90,7 +90,18 @@ public class RequestInterceptMiddleware
                             "sogou",
                             "so.com",
                             "bing.com",
-                            "sm.cn"
+                            "sm.cn",
+                            "sohu.com",
+                            "soso.com",
+                            "sogou.com",
+                            "telegram.org",
+                            "t.me",
+                            "twitter.com",
+                            "facebook.com",
+                            "github.com",
+                            "gitee.com",
+                            "gitlab.com",
+                            "gitee.io",
                         }))
                     {
                         BackgroundJob.Enqueue<IHangfireBackJob>(job => job.UpdateLinkWeight(referer, ip));

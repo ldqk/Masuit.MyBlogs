@@ -1,4 +1,4 @@
-using Masuit.LuceneEFCore.SearchEngine;
+ï»¿using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.MyBlogs.Core.Models.Validation;
 using System.ComponentModel;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ÎÄÕÂ
+/// æ–‡ç« 
 /// </summary>
 [Table("Post")]
 public class Post : BaseEntity, IEntityTypeConfiguration<Post>
@@ -25,212 +25,212 @@ public class Post : BaseEntity, IEntityTypeConfiguration<Post>
     }
 
     /// <summary>
-    /// ±êÌâ
+    /// æ ‡é¢˜
     /// </summary>
-    [Required(ErrorMessage = "ÎÄÕÂ±êÌâ²»ÄÜÎª¿Õ£¡"), LuceneIndex]
+    [Required(ErrorMessage = "æ–‡ç« æ ‡é¢˜ä¸èƒ½ä¸ºç©ºï¼"), LuceneIndex]
     public string Title { get; set; }
 
     /// <summary>
-    /// ×÷Õß
+    /// ä½œè€…
     /// </summary>
-    [Required, MaxLength(24, ErrorMessage = "×÷ÕßÃû×î³¤Ö§³Ö24¸ö×Ö·û£¡"), LuceneIndex]
+    [Required, MaxLength(24, ErrorMessage = "ä½œè€…åæœ€é•¿æ”¯æŒ24ä¸ªå­—ç¬¦ï¼"), LuceneIndex]
     public string Author { get; set; }
 
     /// <summary>
-    /// ÄÚÈİ
+    /// å†…å®¹
     /// </summary>
-    [Required(ErrorMessage = "ÎÄÕÂÄÚÈİ²»ÄÜÎª¿Õ£¡"), SubmitCheck(20, 1000000, false), LuceneIndex(IsHtml = true)]
+    [Required(ErrorMessage = "æ–‡ç« å†…å®¹ä¸èƒ½ä¸ºç©ºï¼"), SubmitCheck(20, 1000000, false), LuceneIndex(IsHtml = true)]
     public string Content { get; set; }
 
     /// <summary>
-    /// ÊÜ±£»¤µÄÄÚÈİ
+    /// å—ä¿æŠ¤çš„å†…å®¹
     /// </summary>
     [LuceneIndex(IsHtml = true)]
     public string ProtectContent { get; set; }
 
     /// <summary>
-    /// ÊÜ±£»¤ÄÚÈİÄ£Ê½
+    /// å—ä¿æŠ¤å†…å®¹æ¨¡å¼
     /// </summary>
     public ProtectContentMode ProtectContentMode { get; set; }
 
     /// <summary>
-    /// ·¢±íÊ±¼ä
+    /// å‘è¡¨æ—¶é—´
     /// </summary>
     public DateTime PostDate { get; set; }
 
     /// <summary>
-    /// ĞŞ¸ÄÊ±¼ä
+    /// ä¿®æ”¹æ—¶é—´
     /// </summary>
     [LuceneIndex]
     public DateTime ModifyDate { get; set; }
 
     /// <summary>
-    /// ÊÇ·ñÖÃ¶¥
+    /// æ˜¯å¦ç½®é¡¶
     /// </summary>
     [DefaultValue(false)]
     public bool IsFixedTop { get; set; }
 
     /// <summary>
-    /// ·ÖÀàid
+    /// åˆ†ç±»id
     /// </summary>
     public int CategoryId { get; set; }
 
     /// <summary>
-    /// ×÷ÕßÓÊÏä
+    /// ä½œè€…é‚®ç®±
     /// </summary>
-    [Required(ErrorMessage = "×÷ÕßÓÊÏä²»ÄÜÎª¿Õ£¡"), EmailAddress, LuceneIndex]
+    [Required(ErrorMessage = "ä½œè€…é‚®ç®±ä¸èƒ½ä¸ºç©ºï¼"), EmailAddress, LuceneIndex]
     public string Email { get; set; }
 
     /// <summary>
-    /// ĞŞ¸ÄÈËÃû×Ö
+    /// ä¿®æ”¹äººåå­—
     /// </summary>
     [LuceneIndex]
     public string Modifier { get; set; }
 
     /// <summary>
-    /// ĞŞ¸ÄÈËÓÊÏä
+    /// ä¿®æ”¹äººé‚®ç®±
     /// </summary>
     [LuceneIndex]
     public string ModifierEmail { get; set; }
 
     /// <summary>
-    /// ±êÇ©
+    /// æ ‡ç­¾
     /// </summary>
-    [StringLength(256, ErrorMessage = "±êÇ©×î´óÔÊĞí255¸ö×Ö·û"), LuceneIndex]
+    [StringLength(256, ErrorMessage = "æ ‡ç­¾æœ€å¤§å…è®¸255ä¸ªå­—ç¬¦"), LuceneIndex]
     public string Label { get; set; }
 
     /// <summary>
-    /// ÎÄÕÂ¹Ø¼ü´Ê
+    /// æ–‡ç« å…³é”®è¯
     /// </summary>
-    [StringLength(256, ErrorMessage = "ÎÄÕÂ¹Ø¼ü´Ê×î´óÔÊĞí255¸ö×Ö·û"), LuceneIndex]
+    [StringLength(256, ErrorMessage = "æ–‡ç« å…³é”®è¯æœ€å¤§å…è®¸255ä¸ªå­—ç¬¦"), LuceneIndex]
     public string Keyword { get; set; }
 
     /// <summary>
-    /// Ö§³ÖÊı
+    /// æ”¯æŒæ•°
     /// </summary>
     [DefaultValue(0), ConcurrencyCheck]
     public int VoteUpCount { get; set; }
 
     /// <summary>
-    /// ·´¶ÔÊı
+    /// åå¯¹æ•°
     /// </summary>
     [DefaultValue(0), ConcurrencyCheck]
     public int VoteDownCount { get; set; }
 
     /// <summary>
-    /// Ã¿ÈÕÆ½¾ù·ÃÎÊÁ¿
+    /// æ¯æ—¥å¹³å‡è®¿é—®é‡
     /// </summary>
     [ConcurrencyCheck]
     public double AverageViewCount { get; set; }
 
     /// <summary>
-    /// ×Ü·ÃÎÊÁ¿
+    /// æ€»è®¿é—®é‡
     /// </summary>
     [ConcurrencyCheck]
     public int TotalViewCount { get; set; }
 
     /// <summary>
-    /// Ìá½»ÈËIPµØÖ·
+    /// æäº¤äººIPåœ°å€
     /// </summary>
     public string IP { get; set; }
 
     /// <summary>
-    /// ½ûÖ¹ÆÀÂÛ
+    /// ç¦æ­¢è¯„è®º
     /// </summary>
     public bool DisableComment { get; set; }
 
     /// <summary>
-    /// ½ûÖ¹×ªÔØ
+    /// ç¦æ­¢è½¬è½½
     /// </summary>
     public bool DisableCopy { get; set; }
 
     /// <summary>
-    /// ÏŞÖÆÄ£Ê½
+    /// é™åˆ¶æ¨¡å¼
     /// </summary>
     public RegionLimitMode? LimitMode { get; set; }
 
     /// <summary>
-    /// ÏŞÖÆµØÇø£¬ÊúÏß·Ö¸ô
+    /// é™åˆ¶åœ°åŒºï¼Œç«–çº¿åˆ†éš”
     /// </summary>
     public string Regions { get; set; }
 
     /// <summary>
-    /// ÏŞÖÆÅÅ³ıµØÇø£¬ÊúÏß·Ö¸ô
+    /// é™åˆ¶æ’é™¤åœ°åŒºï¼Œç«–çº¿åˆ†éš”
     /// </summary>
     public string ExceptRegions { get; set; }
 
     /// <summary>
-    /// ÏŞÖÆÄ£Ê½
+    /// é™åˆ¶æ¨¡å¼
     /// </summary>
     public RegionLimitMode? ProtectContentLimitMode { get; set; }
 
     /// <summary>
-    /// ÏŞÖÆµØÇø£¬ÊúÏß·Ö¸ô
+    /// é™åˆ¶åœ°åŒºï¼Œç«–çº¿åˆ†éš”
     /// </summary>
     public string ProtectContentRegions { get; set; }
 
     /// <summary>
-    /// ±£»¤ÃÜÂë
+    /// ä¿æŠ¤å¯†ç 
     /// </summary>
     public string ProtectPassword { get; set; }
 
     /// <summary>
-    /// ¿ªÆôrss¶©ÔÄ
+    /// å¼€å¯rssè®¢é˜…
     /// </summary>
     public bool Rss { get; set; }
 
     /// <summary>
-    /// Ëø¶¨±à¼­
+    /// é”å®šç¼–è¾‘
     /// </summary>
     public bool Locked { get; set; }
 
     /// <summary>
-    /// ÖØ¶¨Ïòµ½µÚÈı·½Á´½Ó
+    /// é‡å®šå‘åˆ°ç¬¬ä¸‰æ–¹é“¾æ¥
     /// </summary>
     public string Redirect { get; set; }
 
     /// <summary>
-    /// ¹ıÆÚÊ±¼ä
+    /// è¿‡æœŸæ—¶é—´
     /// </summary>
     public DateTime? ExpireAt { get; set; }
 
     /// <summary>
-    /// ÊÇ·ñÊÇ²»°²È«ÄÚÈİ
+    /// æ˜¯å¦æ˜¯ä¸å®‰å…¨å†…å®¹
     /// </summary>
     public bool IsNsfw { get; set; }
 
     /// <summary>
-    /// ·ÖÀà
+    /// åˆ†ç±»
     /// </summary>
     public virtual Category Category { get; set; }
 
     /// <summary>
-    /// ÆÀÂÛ
+    /// è¯„è®º
     /// </summary>
     public virtual ICollection<Comment> Comment { get; set; }
 
     /// <summary>
-    /// ×¨Ìâ
+    /// ä¸“é¢˜
     /// </summary>
     public virtual ICollection<Seminar> Seminar { get; set; }
 
     /// <summary>
-    /// ÎÄÕÂÀúÊ·°æ±¾
+    /// æ–‡ç« å†å²ç‰ˆæœ¬
     /// </summary>
     public virtual ICollection<PostHistoryVersion> PostHistoryVersion { get; set; }
 
     /// <summary>
-    /// ÎÄÕÂĞŞ¸ÄÇëÇó
+    /// æ–‡ç« ä¿®æ”¹è¯·æ±‚
     /// </summary>
     public virtual ICollection<PostMergeRequest> PostMergeRequests { get; set; }
 
     /// <summary>
-    /// ·ÃÎÊ¼ÇÂ¼
+    /// è®¿é—®è®°å½•
     /// </summary>
     public virtual ICollection<PostVisitRecord> PostVisitRecords { get; set; }
 
     /// <summary>
-    /// ·ÃÎÊ¼ÇÂ¼Í³¼Æ
+    /// è®¿é—®è®°å½•ç»Ÿè®¡
     /// </summary>
     public virtual ICollection<PostVisitRecordStats> PostVisitRecordStats { get; set; }
 
@@ -255,58 +255,58 @@ public class Post : BaseEntity, IEntityTypeConfiguration<Post>
 }
 
 /// <summary>
-/// µØÇøÏŞÖÆ
+/// åœ°åŒºé™åˆ¶
 /// </summary>
 public enum RegionLimitMode
 {
-    [Description("²»ÏŞ")]
+    [Description("ä¸é™")]
     All,
 
-    [Description("Ö¸¶¨µØÇø¿É¼û£º{0}")]
+    [Description("æŒ‡å®šåœ°åŒºå¯è§ï¼š{0}")]
     AllowRegion,
 
-    [Description("Ö¸¶¨µØÇø²»¿É¼û£º{0}")]
+    [Description("æŒ‡å®šåœ°åŒºä¸å¯è§ï¼š{0}")]
     ForbidRegion,
 
-    [Description("¿É¼ûµØÇø£º{0}£¬ÅÅ³ıµØÇø£º{1}")]
+    [Description("å¯è§åœ°åŒºï¼š{0}ï¼Œæ’é™¤åœ°åŒºï¼š{1}")]
     AllowRegionExceptForbidRegion,
 
-    [Description("²»¿É¼ûµØÇø£º{0}£¬ÅÅ³ıµØÇø£º{1}")]
+    [Description("ä¸å¯è§åœ°åŒºï¼š{0}ï¼Œæ’é™¤åœ°åŒºï¼š{1}")]
     ForbidRegionExceptAllowRegion,
 
-    [Description("½öËÑË÷ÒıÇæ¿É¼û")]
+    [Description("ä»…æœç´¢å¼•æ“å¯è§")]
     OnlyForSearchEngine,
 }
 
 /// <summary>
-/// ÊÜ±£»¤ÄÚÈİÄ£Ê½
+/// å—ä¿æŠ¤å†…å®¹æ¨¡å¼
 /// </summary>
 public enum ProtectContentMode
 {
     None,
 
     /// <summary>
-    /// ÆÀÂÛ¿É¼û
+    /// è¯„è®ºå¯è§
     /// </summary>
     CommentVisiable,
 
     /// <summary>
-    /// µØÇø¿É¼û
+    /// åœ°åŒºå¯è§
     /// </summary>
     Regions,
 
     /// <summary>
-    /// ÊÚÈ¨¿É¼û
+    /// æˆæƒå¯è§
     /// </summary>
     AuthorizeVisiable,
 
     /// <summary>
-    /// ÃÜÂë¿É¼û
+    /// å¯†ç å¯è§
     /// </summary>
     Password,
 
     /// <summary>
-    /// ½öËÑË÷ÒıÇæ¿É¼û
+    /// ä»…æœç´¢å¼•æ“å¯è§
     /// </summary>
     OnlyForSearchEngine,
 }

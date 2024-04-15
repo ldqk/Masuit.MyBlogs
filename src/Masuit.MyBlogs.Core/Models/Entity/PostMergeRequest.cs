@@ -1,43 +1,43 @@
-namespace Masuit.MyBlogs.Core.Models.Entity;
+ï»¿namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ÎÄÕÂĞŞ¸ÄÇëÇó
+/// æ–‡ç« ä¿®æ”¹è¯·æ±‚
 /// </summary>
 [Table("PostMergeRequest")]
 public class PostMergeRequest : BaseEntity
 {
 	/// <summary>
-	/// ÎÄÕÂid
+	/// æ–‡ç« id
 	/// </summary>
 	public int PostId { get; set; }
 
 	/// <summary>
-	/// ±êÌâ
+	/// æ ‡é¢˜
 	/// </summary>
 	public string Title { get; set; }
 
 	/// <summary>
-	/// ÎÄÕÂÄÚÈİ
+	/// æ–‡ç« å†…å®¹
 	/// </summary>
 	public string Content { get; set; }
 
 	/// <summary>
-	/// ĞŞ¸ÄÈË
+	/// ä¿®æ”¹äºº
 	/// </summary>
 	public string Modifier { get; set; }
 
 	/// <summary>
-	/// ĞŞ¸ÄÈËÓÊÏä
+	/// ä¿®æ”¹äººé‚®ç®±
 	/// </summary>
 	public string ModifierEmail { get; set; }
 
 	/// <summary>
-	/// ºÏ²¢×´Ì¬
+	/// åˆå¹¶çŠ¶æ€
 	/// </summary>
 	public MergeStatus MergeState { get; set; }
 
 	/// <summary>
-	/// Ìá½»Ê±¼ä
+	/// æäº¤æ—¶é—´
 	/// </summary>
 	public DateTime SubmitTime { get; set; }
 
@@ -45,7 +45,7 @@ public class PostMergeRequest : BaseEntity
 	public virtual Post Post { get; set; }
 
 	/// <summary>
-	/// Ìá½»ÈËIP
+	/// æäº¤äººIP
 	/// </summary>
 	public string IP { get; set; }
 }

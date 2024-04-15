@@ -1,37 +1,37 @@
-namespace Masuit.MyBlogs.Core.Models.ViewModel;
+ï»¿namespace Masuit.MyBlogs.Core.Models.ViewModel;
 
 /// <summary>
-/// ÓÃ»§µÇÂ¼¼ÇÂ¼Êä³öÄ£ĞÍ
+/// ç”¨æˆ·ç™»å½•è®°å½•è¾“å‡ºæ¨¡å‹
 /// </summary>
 public class LoginRecordViewModel : BaseDto
 {
 	/// <summary>
-	/// µÇÂ¼µãIP
+	/// ç™»å½•ç‚¹IP
 	/// </summary>
 	public string IP { get; set; }
 
 	/// <summary>
-	/// µÇÂ¼Ê±¼ä
+	/// ç™»å½•æ—¶é—´
 	/// </summary>
 	public DateTime LoginTime { get; set; }
 
 	/// <summary>
-	/// ËùÔÚÊ¡·İ
+	/// æ‰€åœ¨çœä»½
 	/// </summary>
 	public string Province { get; set; }
 
 	/// <summary>
-	/// ÏêÏ¸µØÀíÎ»ÖÃ
+	/// è¯¦ç»†åœ°ç†ä½ç½®
 	/// </summary>
 	public string PhysicAddress { get; set; }
 
 	/// <summary>
-	/// µÇÂ¼ÀàĞÍ
+	/// ç™»å½•ç±»å‹
 	/// </summary>
 	public LoginType LoginType { get; set; }
 
 	/// <summary>
-	/// µÇÂ½ÕßID
+	/// ç™»é™†è€…ID
 	/// </summary>
 	public int UserInfoId { get; set; }
 }

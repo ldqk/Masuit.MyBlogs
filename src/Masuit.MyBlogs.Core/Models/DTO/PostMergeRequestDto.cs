@@ -1,12 +1,12 @@
-namespace Masuit.MyBlogs.Core.Models.DTO;
+锘縩amespace Masuit.MyBlogs.Core.Models.DTO;
 
 /// <summary>
-/// 文章修改请求
+/// 鏂囩珷淇敼璇锋眰
 /// </summary>
 public class PostMergeRequestDto : PostMergeRequestDtoBase
 {
 	/// <summary>
-	/// 文章内容
+	/// 鏂囩珷鍐呭
 	/// </summary>
 	public string Content { get; set; }
 }

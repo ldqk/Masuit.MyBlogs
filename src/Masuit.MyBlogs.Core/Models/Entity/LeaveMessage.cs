@@ -1,4 +1,4 @@
-using Masuit.MyBlogs.Core.Models.Validation;
+ï»¿using Masuit.MyBlogs.Core.Models.Validation;
 using Masuit.Tools.Core.Validator;
 using System.ComponentModel;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -7,7 +7,7 @@ using System.Reflection.Emit;
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ÁôÑÔ°å
+/// ç•™è¨€æ¿
 /// </summary>
 [Table("LeaveMessage")]
 public class LeaveMessage : BaseEntity, ITreeParent<LeaveMessage>, ITreeChildren<LeaveMessage>, IEntityTypeConfiguration<LeaveMessage>
@@ -21,58 +21,58 @@ public class LeaveMessage : BaseEntity, ITreeParent<LeaveMessage>, ITreeChildren
     }
 
     /// <summary>
-    /// êÇ³Æ
+    /// æ˜µç§°
     /// </summary>
-    [Required(ErrorMessage = "êÇ³Æ²»ÄÜÎª¿Õ£¡")]
+    [Required(ErrorMessage = "æ˜µç§°ä¸èƒ½ä¸ºç©ºï¼")]
     public string NickName { get; set; }
 
     /// <summary>
-    /// ÄÚÈİ
+    /// å†…å®¹
     /// </summary>
-    [Required(ErrorMessage = "ÁôÑÔÄÚÈİ²»ÄÜÎª¿Õ£¡"), SubmitCheck]
+    [Required(ErrorMessage = "ç•™è¨€å†…å®¹ä¸èƒ½ä¸ºç©ºï¼"), SubmitCheck]
     public string Content { get; set; }
 
     /// <summary>
-    /// ·¢±íÊ±¼ä
+    /// å‘è¡¨æ—¶é—´
     /// </summary>
     public DateTime PostDate { get; set; }
 
     /// <summary>
-    /// ÓÊÏä
+    /// é‚®ç®±
     /// </summary>
     [IsEmail]
     public string Email { get; set; }
 
     /// <summary>
-    /// ¸¸¼¶ID
+    /// çˆ¶çº§ID
     /// </summary>
     public int? ParentId { get; set; }
 
     /// <summary>
-    /// ä¯ÀÀÆ÷°æ±¾
+    /// æµè§ˆå™¨ç‰ˆæœ¬
     /// </summary>
     [StringLength(255)]
     public string Browser { get; set; }
 
     /// <summary>
-    /// ²Ù×÷ÏµÍ³°æ±¾
+    /// æ“ä½œç³»ç»Ÿç‰ˆæœ¬
     /// </summary>
     [StringLength(255)]
     public string OperatingSystem { get; set; }
 
     /// <summary>
-    /// ÊÇ·ñÊÇ²©Ö÷
+    /// æ˜¯å¦æ˜¯åšä¸»
     /// </summary>
     [DefaultValue(false)]
     public bool IsMaster { get; set; }
 
     /// <summary>
-    /// Ìá½»ÈËIP
+    /// æäº¤äººIP
     /// </summary>
     public string IP { get; set; }
 
     /// <summary>
-    /// µØÀíĞÅÏ¢
+    /// åœ°ç†ä¿¡æ¯
     /// </summary>
     public string Location { get; set; }
 
@@ -81,12 +81,12 @@ public class LeaveMessage : BaseEntity, ITreeParent<LeaveMessage>, ITreeChildren
     public string Path { get; set; }
 
     /// <summary>
-    /// ¸¸½Úµã
+    /// çˆ¶èŠ‚ç‚¹
     /// </summary>
     public LeaveMessage Parent { get; set; }
 
     /// <summary>
-    /// ×Ó¼¶
+    /// å­çº§
     /// </summary>
     public ICollection<LeaveMessage> Children { get; set; }
 

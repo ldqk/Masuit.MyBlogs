@@ -1,7 +1,7 @@
-namespace Masuit.MyBlogs.Core.Models.Entity;
+﻿namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ϵͳ����
+/// 系统锟斤拷锟斤拷
 /// </summary>
 [Table("SystemSetting")]
 public class SystemSetting : BaseEntity
@@ -11,13 +11,13 @@ public class SystemSetting : BaseEntity
 		Status = Status.Available;
 	}
 	/// <summary>
-	/// ��������
+	/// 锟斤拷锟斤拷锟斤拷锟斤拷
 	/// </summary>
 	[Required]
 	public string Name { get; set; }
 
 	/// <summary>
-	/// ֵ
+	/// 值
 	/// </summary>
 	public string Value { get; set; }
 

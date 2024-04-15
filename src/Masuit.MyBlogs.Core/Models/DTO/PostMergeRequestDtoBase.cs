@@ -1,47 +1,47 @@
-namespace Masuit.MyBlogs.Core.Models.DTO;
+ï»¿namespace Masuit.MyBlogs.Core.Models.DTO;
 
 /// <summary>
-/// ÎÄÕÂĞŞ¸ÄÇëÇó
+/// æ–‡ç« ä¿®æ”¹è¯·æ±‚
 /// </summary>
 public class PostMergeRequestDtoBase : BaseDto
 {
 	/// <summary>
-	/// Ô­ÎÄid
+	/// åŸæ–‡id
 	/// </summary>
 	public int PostId { get; set; }
 
 	/// <summary>
-	/// Ô­±êÌâ
+	/// åŸæ ‡é¢˜
 	/// </summary>
 	public string PostTitle { get; set; }
 
 	/// <summary>
-	/// ±êÌâ
+	/// æ ‡é¢˜
 	/// </summary>
 	public string Title { get; set; }
 
 	/// <summary>
-	/// ĞŞ¸ÄÈË
+	/// ä¿®æ”¹äºº
 	/// </summary>
 	public string Modifier { get; set; }
 
 	/// <summary>
-	/// ĞŞ¸ÄÈËÓÊÏä
+	/// ä¿®æ”¹äººé‚®ç®±
 	/// </summary>
 	public string ModifierEmail { get; set; }
 
 	/// <summary>
-	/// ºÏ²¢×´Ì¬
+	/// åˆå¹¶çŠ¶æ€
 	/// </summary>
 	public MergeStatus MergeState { get; set; }
 
 	/// <summary>
-	/// Ìá½»Ê±¼ä
+	/// æäº¤æ—¶é—´
 	/// </summary>
 	public DateTime SubmitTime { get; set; }
 
 	/// <summary>
-	/// Ìá½»ÈËIP
+	/// æäº¤äººIP
 	/// </summary>
 	public string IP { get; set; }
 }

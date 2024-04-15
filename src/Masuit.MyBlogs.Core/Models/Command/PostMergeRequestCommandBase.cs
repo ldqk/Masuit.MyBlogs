@@ -1,21 +1,21 @@
-using Masuit.MyBlogs.Core.Models.Validation;
+ï»¿using Masuit.MyBlogs.Core.Models.Validation;
 
 namespace Masuit.MyBlogs.Core.Models.Command;
 
 /// <summary>
-/// ÎÄÕÂĞŞ¸ÄÇëÇó
+/// æ–‡ç« ä¿®æ”¹è¯·æ±‚
 /// </summary>
 public class PostMergeRequestCommandBase : BaseDto
 {
 	/// <summary>
-	/// ±êÌâ
+	/// æ ‡é¢˜
 	/// </summary>
-	[Required(ErrorMessage = "ÎÄÕÂ±êÌâ²»ÄÜÎª¿Õ£¡"), MaxLength(128, ErrorMessage = "ÎÄÕÂ±êÌâ×î³¤Ö§³Ö128¸ö×Ö·û£¡"), MinLength(4, ErrorMessage = "ÎÄÕÂ±êÌâ×îÉÙ4¸ö×Ö·û£¡")]
+	[Required(ErrorMessage = "æ–‡ç« æ ‡é¢˜ä¸èƒ½ä¸ºç©ºï¼"), MaxLength(128, ErrorMessage = "æ–‡ç« æ ‡é¢˜æœ€é•¿æ”¯æŒ128ä¸ªå­—ç¬¦ï¼"), MinLength(4, ErrorMessage = "æ–‡ç« æ ‡é¢˜æœ€å°‘4ä¸ªå­—ç¬¦ï¼")]
 	public string Title { get; set; }
 
 	/// <summary>
-	/// ÎÄÕÂÄÚÈİ
+	/// æ–‡ç« å†…å®¹
 	/// </summary>
-	[Required(ErrorMessage = "ÎÄÕÂÄÚÈİ²»ÄÜÎª¿Õ£¡"), SubmitCheck(20, 1000000, false)]
+	[Required(ErrorMessage = "æ–‡ç« å†…å®¹ä¸èƒ½ä¸ºç©ºï¼"), SubmitCheck(20, 1000000, false)]
 	public string Content { get; set; }
 }

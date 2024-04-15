@@ -1,7 +1,7 @@
-namespace Masuit.MyBlogs.Core.Models.Entity;
+ï»¿namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// µ¼º½²Ëµ¥
+/// å¯¼èˆªèœå•
 /// </summary>
 [Table("Menu")]
 public class Menu : BaseEntity, ITree<Menu>, ITreeEntity<Menu, int>
@@ -14,49 +14,49 @@ public class Menu : BaseEntity, ITree<Menu>, ITreeEntity<Menu, int>
     }
 
     /// <summary>
-    /// Ãû×Ö
+    /// åå­—
     /// </summary>
-    [Required(ErrorMessage = "²Ëµ¥Ãû²»ÄÜÎª¿Õ£¡")]
+    [Required(ErrorMessage = "èœå•åä¸èƒ½ä¸ºç©ºï¼")]
     public string Name { get; set; }
 
     /// <summary>
-    /// ¸¸½Úµã
+    /// çˆ¶èŠ‚ç‚¹
     /// </summary>
     public Menu Parent { get; set; }
 
     /// <summary>
-    /// ×Ó¼¶
+    /// å­çº§
     /// </summary>
     public ICollection<Menu> Children { get; set; }
 
     /// <summary>
-    /// Í¼±ê
+    /// å›¾æ ‡
     /// </summary>
     public string Icon { get; set; }
 
     /// <summary>
     /// URL
     /// </summary>
-    [Required(ErrorMessage = "²Ëµ¥µÄURL²»ÄÜÎª¿Õ£¡")]
+    [Required(ErrorMessage = "èœå•çš„URLä¸èƒ½ä¸ºç©ºï¼")]
     public string Url { get; set; }
 
     /// <summary>
-    /// ÅÅĞòºÅ
+    /// æ’åºå·
     /// </summary>
     public int Sort { get; set; }
 
     /// <summary>
-    /// ¸¸¼¶ID
+    /// çˆ¶çº§ID
     /// </summary>
     public int? ParentId { get; set; }
 
     /// <summary>
-    /// ²Ëµ¥ÀàĞÍ
+    /// èœå•ç±»å‹
     /// </summary>
     public virtual MenuType MenuType { get; set; }
 
     /// <summary>
-    /// ÊÇ·ñÔÚĞÂ±êÇ©Ò³´ò¿ª
+    /// æ˜¯å¦åœ¨æ–°æ ‡ç­¾é¡µæ‰“å¼€
     /// </summary>
     public bool NewTab { get; set; }
 

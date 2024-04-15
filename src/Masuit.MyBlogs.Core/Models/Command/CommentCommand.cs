@@ -1,10 +1,10 @@
-using Masuit.MyBlogs.Core.Models.Validation;
+ï»¿using Masuit.MyBlogs.Core.Models.Validation;
 using Masuit.Tools.Core.Validator;
 
 namespace Masuit.MyBlogs.Core.Models.Command;
 
 /// <summary>
-/// ÆÀÂÛ±íÊäÈëÄ£ĞÍ
+/// è¯„è®ºè¡¨è¾“å…¥æ¨¡å‹
 /// </summary>
 public class CommentCommand : BaseEntity
 {
@@ -14,53 +14,53 @@ public class CommentCommand : BaseEntity
 	}
 
 	/// <summary>
-	/// êÇ³Æ
+	/// æ˜µç§°
 	/// </summary>
-	[Required(ErrorMessage = "êÇ³Æ²»ÄÜÎª¿Õ£¡"), MaxLength(36, ErrorMessage = "êÇ³Æ×î¶àÖ»ÄÜ24¸ö×Ö·û£¡"), MinLength(2, ErrorMessage = "êÇ³ÆÖÁÉÙ2¸ö×Ö£¡")]
+	[Required(ErrorMessage = "æ˜µç§°ä¸èƒ½ä¸ºç©ºï¼"), MaxLength(36, ErrorMessage = "æ˜µç§°æœ€å¤šåªèƒ½24ä¸ªå­—ç¬¦ï¼"), MinLength(2, ErrorMessage = "æ˜µç§°è‡³å°‘2ä¸ªå­—ï¼")]
 	public string NickName { get; set; }
 
 	/// <summary>
-	/// ÓÊÏä
+	/// é‚®ç®±
 	/// </summary>
 	[IsEmail]
 	public string Email { get; set; }
 
 	/// <summary>
-	/// ÆÀÂÛÄÚÈİ
+	/// è¯„è®ºå†…å®¹
 	/// </summary>
-	[Required(ErrorMessage = "ÆÀÂÛÄÚÈİ²»ÄÜÎª¿Õ£¡"), SubmitCheck(2, 500)]
+	[Required(ErrorMessage = "è¯„è®ºå†…å®¹ä¸èƒ½ä¸ºç©ºï¼"), SubmitCheck(2, 500)]
 	public string Content { get; set; }
 
 	/// <summary>
-	/// ¸¸¼¶ID
+	/// çˆ¶çº§ID
 	/// </summary>
 	public int? ParentId { get; set; }
 
 	/// <summary>
-	/// ÎÄÕÂID
+	/// æ–‡ç« ID
 	/// </summary>
 	public int PostId { get; set; }
 
 	/// <summary>
-	/// ä¯ÀÀÆ÷°æ±¾
+	/// æµè§ˆå™¨ç‰ˆæœ¬
 	/// </summary>
 	[StringLength(255)]
 	public string Browser { get; set; }
 
 	/// <summary>
-	/// ²Ù×÷ÏµÍ³°æ±¾
+	/// æ“ä½œç³»ç»Ÿç‰ˆæœ¬
 	/// </summary>
 	[StringLength(255)]
 	public string OperatingSystem { get; set; }
 
 	/// <summary>
-	/// ÑéÖ¤Âë
+	/// éªŒè¯ç 
 	/// </summary>
 	public string Code { get; set; }
 
 	/// <summary>
-	/// ÊÇ·ñÒÑ½ÓÊÜÌõ¿î
+	/// æ˜¯å¦å·²æ¥å—æ¡æ¬¾
 	/// </summary>
-	[AssignTrue(ErrorMessage = "ÇëÏÈÍ¬Òâ½ÓÊÜ±¾Õ¾µÄ¡¶ÆÀÂÛĞëÖª¡·")]
+	[AssignTrue(ErrorMessage = "è¯·å…ˆåŒæ„æ¥å—æœ¬ç«™çš„ã€Šè¯„è®ºé¡»çŸ¥ã€‹")]
 	public bool Agree { get; set; }
 }

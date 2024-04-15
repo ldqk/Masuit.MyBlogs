@@ -1,9 +1,9 @@
-using Masuit.MyBlogs.Core.Models.Validation;
+ï»¿using Masuit.MyBlogs.Core.Models.Validation;
 
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ÍøÕ¾¹«¸æ
+/// ç½‘ç«™å…¬å‘Š
 /// </summary>
 [Table("Notice")]
 public class Notice : BaseEntity
@@ -16,49 +16,49 @@ public class Notice : BaseEntity
 	}
 
 	/// <summary>
-	/// ±êÌâ
+	/// æ ‡é¢˜
 	/// </summary>
-	[Required(ErrorMessage = "¹«¸æ±êÌâ²»ÄÜÎª¿Õ£¡")]
+	[Required(ErrorMessage = "å…¬å‘Šæ ‡é¢˜ä¸èƒ½ä¸ºç©ºï¼")]
 	public string Title { get; set; }
 
 	/// <summary>
-	/// ÄÚÈİ
+	/// å†…å®¹
 	/// </summary>
-	[Required(ErrorMessage = "¹«¸æÄÚÈİ²»ÄÜÎª¿Õ£¡"), SubmitCheck(3000, false)]
+	[Required(ErrorMessage = "å…¬å‘Šå†…å®¹ä¸èƒ½ä¸ºç©ºï¼"), SubmitCheck(3000, false)]
 	public string Content { get; set; }
 
 	/// <summary>
-	/// ·¢±íÊ±¼ä
+	/// å‘è¡¨æ—¶é—´
 	/// </summary>
 	public DateTime PostDate { get; set; }
 
 	/// <summary>
-	/// ĞŞ¸ÄÊ±¼ä
+	/// ä¿®æ”¹æ—¶é—´
 	/// </summary>
 	public DateTime ModifyDate { get; set; }
 
 	/// <summary>
-	/// ä¯ÀÀÈËÊı
+	/// æµè§ˆäººæ•°
 	/// </summary>
 	public int ViewCount { get; set; }
 
 	/// <summary>
-	/// ÉúĞ§Ê±¼ä
+	/// ç”Ÿæ•ˆæ—¶é—´
 	/// </summary>
 	public DateTime? StartTime { get; set; }
 
 	/// <summary>
-	/// Ê§Ğ§Ê±¼ä
+	/// å¤±æ•ˆæ—¶é—´
 	/// </summary>
 	public DateTime? EndTime { get; set; }
 
 	/// <summary>
-	/// ¹«¸æ×´Ì¬
+	/// å…¬å‘ŠçŠ¶æ€
 	/// </summary>
 	public NoticeStatus NoticeStatus { get; set; }
 
 	/// <summary>
-	/// ÊÇ·ñµ¯´°ÌáÊ¾
+	/// æ˜¯å¦å¼¹çª—æç¤º
 	/// </summary>
 	public bool StrongAlert { get; set; }
 }

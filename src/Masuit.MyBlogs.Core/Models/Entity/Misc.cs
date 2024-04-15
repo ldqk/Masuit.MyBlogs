@@ -1,9 +1,9 @@
-using Masuit.MyBlogs.Core.Models.Validation;
+ï»¿using Masuit.MyBlogs.Core.Models.Validation;
 
 namespace Masuit.MyBlogs.Core.Models.Entity;
 
 /// <summary>
-/// ÔÓÏîÒ³
+/// æ‚é¡¹é¡µ
 /// </summary>
 [Table("Misc")]
 public class Misc : BaseEntity
@@ -16,24 +16,24 @@ public class Misc : BaseEntity
 	}
 
 	/// <summary>
-	/// ±êÌâ
+	/// æ ‡é¢˜
 	/// </summary>
-	[Required(ErrorMessage = "±êÌâ²»ÄÜÎª¿Õ£¡")]
+	[Required(ErrorMessage = "æ ‡é¢˜ä¸èƒ½ä¸ºç©ºï¼")]
 	public string Title { get; set; }
 
 	/// <summary>
-	/// ÄÚÈİ
+	/// å†…å®¹
 	/// </summary>
-	[Required(ErrorMessage = "ÄÚÈİ²»ÄÜÎª¿Õ£¡"), SubmitCheck(100000, false)]
+	[Required(ErrorMessage = "å†…å®¹ä¸èƒ½ä¸ºç©ºï¼"), SubmitCheck(100000, false)]
 	public string Content { get; set; }
 
 	/// <summary>
-	/// ·¢±íÊ±¼ä
+	/// å‘è¡¨æ—¶é—´
 	/// </summary>
 	public DateTime PostDate { get; set; }
 
 	/// <summary>
-	/// ĞŞ¸ÄÊ±¼ä
+	/// ä¿®æ”¹æ—¶é—´
 	/// </summary>
 	public DateTime ModifyDate { get; set; }
 }
