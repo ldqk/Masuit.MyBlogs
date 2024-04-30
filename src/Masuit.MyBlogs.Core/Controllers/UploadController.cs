@@ -143,7 +143,7 @@ public sealed class UploadController : Controller
             img.Value = path[HostEnvironment.WebRootPath.Length..].Replace("\\", "/");
         }
 
-        return body.InnerHtml.HtmlSanitizerCustom(attributes: new[] { "dir", "lang" });
+        return body.InnerHtml.HtmlSanitizerCustom(attributes: ["dir", "lang"]);
     }
 
     private static async Task SaveFile(IFormFile file, string path)
