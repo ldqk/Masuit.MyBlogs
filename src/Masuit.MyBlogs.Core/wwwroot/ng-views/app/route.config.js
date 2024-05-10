@@ -1,7 +1,7 @@
 ﻿"use strict";
 myApp.config([
     "$stateProvider", "$urlRouterProvider", "$locationProvider",
-    function($stateProvider, $urlRouterProvider, $locationProvider) {
+    function ($stateProvider, $urlRouterProvider, $locationProvider) {
         $locationProvider.hashPrefix('');
         $urlRouterProvider.otherwise("/home");
         var vpath = "/ng-views/views";
@@ -11,9 +11,9 @@ myApp.config([
             templateUrl: vpath + "/dashboard.html",
             controller: "dashboard",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/system.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/system.js"]);
+                }
                 ]
             }
         }).state("post-list", {
@@ -21,17 +21,17 @@ myApp.config([
             templateUrl: vpath + "/post/postlist.html",
             controller: "postlist as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: [
-                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
-                                    "https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js",
-                                ],
-                                cache: true
-                            }, cpath + "/post.js"
-                        ]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: [
+                                "https://gitee.com/maplemei/xm-select/raw/master/dist/xm-select.js",
+                                "https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js",
+                            ],
+                            cache: true
+                        }, cpath + "/post.js"
+                    ]);
+                }
                 ]
             }
         }).state("merge-list", {
@@ -39,9 +39,9 @@ myApp.config([
             templateUrl: vpath + "/merge/list.html",
             controller: "mergelist as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/merge.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/merge.js"]);
+                }
                 ]
             }
         }).state("merge-compare", {
@@ -50,7 +50,7 @@ myApp.config([
             controller: "mergecompare",
             resolve: {
                 deps: [
-                    "$ocLazyLoad", function($ocLazyLoad) {
+                    "$ocLazyLoad", function ($ocLazyLoad) {
                         return $ocLazyLoad.load([cpath + "/merge.js"]);
                     }
                 ]
@@ -60,18 +60,18 @@ myApp.config([
             templateUrl: vpath + "/merge/edit.html",
             controller: "mergeedit",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: [
-                                    "https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js",
-                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
-                                    "/Assets/layui/inputTag.css",
-                                ],
-                                cache: true
-                            }, cpath + "/merge.js"
-                        ]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: [
+                                "https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js",
+                                "https://gitee.com/maplemei/xm-select/raw/master/dist/xm-select.js",
+                                "/Assets/layui/inputTag.css",
+                            ],
+                            cache: true
+                        }, cpath + "/merge.js"
+                    ]);
+                }
                 ]
             }
         }).state("post-pending", {
@@ -79,9 +79,9 @@ myApp.config([
             templateUrl: vpath + "/post/pending.html",
             controller: "postpending as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/post.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/post.js"]);
+                }
                 ]
             }
         }).state("write-blog", {
@@ -89,19 +89,19 @@ myApp.config([
             templateUrl: vpath + "/post/writeblog.html",
             controller: "writeblog",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: [
-                                    "https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js",
-                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
-                                    "/Assets/layui/inputTag.css",
-                                ],
-                                cache: true
-                            },
-                            cpath + "/post.js"
-                        ]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: [
+                                "https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js",
+                                "https://gitee.com/maplemei/xm-select/raw/master/dist/xm-select.js",
+                                "/Assets/layui/inputTag.css",
+                            ],
+                            cache: true
+                        },
+                        cpath + "/post.js"
+                    ]);
+                }
                 ]
             }
         }).state("edit-blog", {
@@ -109,18 +109,18 @@ myApp.config([
             templateUrl: vpath + "/post/edit.html",
             controller: "postedit",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([{
-                                files: [
-                                    "https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js",
-                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
-                                    "/Assets/layui/inputTag.css",
-                                ],
-                                cache: true
-                            },
-                            cpath + "/post.js"
-                        ]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([{
+                        files: [
+                            "https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js",
+                            "https://gitee.com/maplemei/xm-select/raw/master/dist/xm-select.js",
+                            "/Assets/layui/inputTag.css",
+                        ],
+                        cache: true
+                    },
+                    cpath + "/post.js"
+                    ]);
+                }
                 ]
             }
         }).state("partner", {
@@ -128,16 +128,16 @@ myApp.config([
             templateUrl: vpath + "/partner.html",
             controller: "partner as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([{
-                                files: [
-                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
-                                    "https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js",
-                                ],
-                                cache: true
-                            }, cpath + "/partner.js"
-                        ]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([{
+                        files: [
+                            "https://gitee.com/maplemei/xm-select/raw/master/dist/xm-select.js",
+                            "https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js",
+                        ],
+                        cache: true
+                    }, cpath + "/partner.js"
+                    ]);
+                }
                 ]
             }
         }).state("users", {
@@ -145,15 +145,15 @@ myApp.config([
             templateUrl: vpath + "/users.html",
             controller: "users as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([{
-                                files: [
-                                    "https://maplemei.gitee.io/xm-select/xm-select.js",
-                                ],
-                                cache: true
-                            }, cpath + "/users.js"
-                        ]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([{
+                        files: [
+                            "https://gitee.com/maplemei/xm-select/raw/master/dist/xm-select.js",
+                        ],
+                        cache: true
+                    }, cpath + "/users.js"
+                    ]);
+                }
                 ]
             }
         }).state("post-cat", {
@@ -161,9 +161,9 @@ myApp.config([
             templateUrl: vpath + "/post/cat.html",
             controller: "category as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/post.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/post.js"]);
+                }
                 ]
             }
         }).state("share", {
@@ -171,9 +171,9 @@ myApp.config([
             templateUrl: vpath + "/post/share.html",
             controller: "share as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/post.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/post.js"]);
+                }
                 ]
             }
         }).state("menu", {
@@ -181,17 +181,17 @@ myApp.config([
             templateUrl: vpath + "/menu.html",
             controller: "menu",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: [
-                                    "https://cdn.staticfile.org/angular-ui-tree/2.22.6/angular-ui-tree.min.css",
-                                    "/Content/checkbox.min.css"
-                                ],
-                                cache: true
-                            }, cpath + "/menu.js"
-                        ]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: [
+                                "https://cdn.staticfile.org/angular-ui-tree/2.22.6/angular-ui-tree.min.css",
+                                "/Content/checkbox.min.css"
+                            ],
+                            cache: true
+                        }, cpath + "/menu.js"
+                    ]);
+                }
                 ]
             }
         }).state("comment-list", {
@@ -199,9 +199,9 @@ myApp.config([
             templateUrl: vpath + "/comment/list.html",
             controller: "comment as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/comment.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/comment.js"]);
+                }
                 ]
             }
         }).state("system-panel", {
@@ -209,14 +209,14 @@ myApp.config([
             templateUrl: vpath + "/system/home.html",
             controller: "system",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: ["/vs/editor/editor.main.css","/vs/loader.js","/vs/editor/editor.main.nls.js","/vs/editor/editor.main.js","https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
-                                cache: true
-                            }, cpath + "/system.js"
-                        ]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ["/vs/editor/editor.main.css", "/vs/loader.js", "/vs/editor/editor.main.nls.js", "/vs/editor/editor.main.js", "https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
+                            cache: true
+                        }, cpath + "/system.js"
+                    ]);
+                }
                 ]
             }
         }).state("system-log", {
@@ -224,9 +224,9 @@ myApp.config([
             templateUrl: vpath + "/system/log.html",
             controller: "log",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/system.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/system.js"]);
+                }
                 ]
             }
         }).state("system-firewall", {
@@ -234,18 +234,18 @@ myApp.config([
             templateUrl: vpath + "/system/firewall.html",
             controller: "firewall as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: [
-                                    "/vs/editor/editor.main.css","/vs/loader.js","/vs/editor/editor.main.nls.js","/vs/editor/editor.main.js",
-                                    "https://cdn.jsdelivr.net/gh/abodelot/jquery.json-viewer@master/json-viewer/jquery.json-viewer.css",
-                                    "https://cdn.jsdelivr.net/gh/abodelot/jquery.json-viewer@master/json-viewer/jquery.json-viewer.js"
-                                ],
-                                cache: true
-                            }, cpath + "/system.js"
-                        ]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: [
+                                "/vs/editor/editor.main.css", "/vs/loader.js", "/vs/editor/editor.main.nls.js", "/vs/editor/editor.main.js",
+                                "https://cdn.jsdelivr.net/gh/abodelot/jquery.json-viewer@master/json-viewer/jquery.json-viewer.css",
+                                "https://cdn.jsdelivr.net/gh/abodelot/jquery.json-viewer@master/json-viewer/jquery.json-viewer.js"
+                            ],
+                            cache: true
+                        }, cpath + "/system.js"
+                    ]);
+                }
                 ]
             }
         }).state("email", {
@@ -253,9 +253,9 @@ myApp.config([
             templateUrl: vpath + "/system/email.html",
             controller: "email",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/system.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/system.js"]);
+                }
                 ]
             }
         }).state("filemanager", {
@@ -263,9 +263,9 @@ myApp.config([
             templateUrl: vpath + "/system/file.html",
             controller: "file",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/system.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/system.js"]);
+                }
                 ]
             }
         }).state("taskcenter", {
@@ -273,9 +273,9 @@ myApp.config([
             templateUrl: vpath + "/system/task.html",
             controller: "task",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/system.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/system.js"]);
+                }
                 ]
             }
         }).state("comment", {
@@ -283,9 +283,9 @@ myApp.config([
             templateUrl: vpath + "/comment/index.html",
             controller: "comment as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/comment.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/comment.js"]);
+                }
                 ]
             }
         }).state("msg", {
@@ -293,9 +293,9 @@ myApp.config([
             templateUrl: vpath + "/msg/index.html",
             controller: "msg as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/msg.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/msg.js"]);
+                }
                 ]
             }
         }).state("msgs", {
@@ -303,9 +303,9 @@ myApp.config([
             templateUrl: vpath + "/msg/msgs.html",
             controller: "msgs as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/msg.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/msg.js"]);
+                }
                 ]
             }
         }).state("sendbox", {
@@ -313,12 +313,12 @@ myApp.config([
             templateUrl: vpath + "/system/sendbox.html",
             controller: "sendbox as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([{
-                            files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
-                            cache: true
-                        },cpath + "/system.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([{
+                        files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
+                        cache: true
+                    }, cpath + "/system.js"]);
+                }
                 ]
             }
         }).state("search", {
@@ -326,9 +326,9 @@ myApp.config([
             templateUrl: vpath + "/analysis/search.html",
             controller: "searchAnalysis as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/analysis.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/analysis.js"]);
+                }
                 ]
             }
         }).state("notice-add", {
@@ -336,14 +336,14 @@ myApp.config([
             templateUrl: vpath + "/notice/index.html",
             controller: "noticeAdd",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
-                                cache: true
-                            }, cpath + "/notice.js"
-                        ]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
+                            cache: true
+                        }, cpath + "/notice.js"
+                    ]);
+                }
                 ]
             }
         }).state("notice-list", {
@@ -351,9 +351,9 @@ myApp.config([
             templateUrl: vpath + "/notice/list.html",
             controller: "noticeList as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/notice.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/notice.js"]);
+                }
                 ]
             }
         }).state("misc-add", {
@@ -361,14 +361,14 @@ myApp.config([
             templateUrl: vpath + "/misc/index.html",
             controller: "miscAdd",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
-                            {
-                                files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
-                                cache: true
-                            }, cpath + "/misc.js"
-                        ]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
+                            cache: true
+                        }, cpath + "/misc.js"
+                    ]);
+                }
                 ]
             }
         }).state("misc-list", {
@@ -376,9 +376,9 @@ myApp.config([
             templateUrl: vpath + "/misc/list.html",
             controller: "miscList as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/misc.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/misc.js"]);
+                }
                 ]
             }
         }).state("links", {
@@ -386,9 +386,9 @@ myApp.config([
             templateUrl: vpath + "/links.html",
             controller: "links as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/links.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/links.js"]);
+                }
                 ]
             }
         }).state("seminar", {
@@ -396,9 +396,9 @@ myApp.config([
             templateUrl: vpath + "/seminar.html",
             controller: "seminar as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/seminar.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/seminar.js"]);
+                }
                 ]
             }
         }).state("donate", {
@@ -406,9 +406,9 @@ myApp.config([
             templateUrl: vpath + "/donate.html",
             controller: "donate as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([cpath + "/donate.js"]);
-                    }
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([cpath + "/donate.js"]);
+                }
                 ]
             }
         }).state("values", {
@@ -416,13 +416,13 @@ myApp.config([
             templateUrl: vpath + "/values.html",
             controller: "values as list",
             resolve: {
-                deps: ["$ocLazyLoad", function($ocLazyLoad) {
-                        return $ocLazyLoad.load([
+                deps: ["$ocLazyLoad", function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
                         {
                             files: ["https://apps.bdimg.com/libs/ueditor/1.4.3.1/ueditor.all.min.js"],
                             cache: true
                         }, cpath + "/values.js"]);
-                    }
+                }
                 ]
             }
         }).state("loginrecord", {
@@ -431,7 +431,7 @@ myApp.config([
             controller: "loginrecord as list",
             resolve: {
                 deps: [
-                    "$ocLazyLoad", function($ocLazyLoad) {
+                    "$ocLazyLoad", function ($ocLazyLoad) {
                         return $ocLazyLoad.load([cpath + "/loginrecord.js"]);
                     }
                 ]

@@ -20,7 +20,8 @@ public sealed class CategoryController : BaseController
     public ActionResult GetCategories()
     {
         var categories = CategoryService.GetQuery<string, CategoryCommand>(c => c.Status == Status.Available, c => c.Name).ToList();
-        return ResultData(Mapper.Map<List<CategoryDto>>(categories).ToTree());
+        var list = Mapper.Map<List<CategoryDto>>(categories);
+        return ResultData(list.ToTree());
     }
 
     /// <summary>
