@@ -124,12 +124,11 @@ public sealed class FirewallController : Controller
     /// 反爬虫检测
     /// </summary>
     /// <param name="id"></param>
-    /// <param name="cacheManager"></param>
     /// <param name="env"></param>
     /// <returns></returns>
     [HttpGet("/craw/{id}")]
     [ServiceFilter(typeof(FirewallAttribute))]
-    public IActionResult AntiCrawler(string id, [FromServices] IRedisClient cacheManager, [FromServices] IWebHostEnvironment env)
+    public IActionResult AntiCrawler(string id, [FromServices] IWebHostEnvironment env)
     {
         if (Request.IsRobot())
         {
@@ -153,12 +152,11 @@ public sealed class FirewallController : Controller
                 Request.Headers
             }.ToJsonString()
         });
-        cacheManager.Incr("AntiCrawler:" + ip);
-        cacheManager.Expire("AntiCrawler:" + ip, TimeSpan.FromMinutes(10));
-        if (cacheManager.Get<int>("AntiCrawler:" + ip) > 3)
+        RedisClient.Incr(nameof(AntiCrawler) + ":" + ip);
+        RedisClient.Expire(nameof(AntiCrawler) + ":" + ip, TimeSpan.FromMinutes(10));
+        if (RedisClient.Get<int>(nameof(AntiCrawler) + ":" + ip) > 3)
         {
-            Response.StatusCode = 429;
-            return Content("");
+            return Conflict();
         }
 
         var sitemap = Path.Combine(env.WebRootPath, "sitemap.txt");

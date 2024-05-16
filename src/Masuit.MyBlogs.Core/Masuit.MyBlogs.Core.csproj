@@ -41,7 +41,7 @@
 
     <ItemGroup>
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
-        <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="7.0.0" />
+        <PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="7.0.1" />
         <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
         <PackageReference Include="CHTCHSConv" Version="1.0.0" />
         <PackageReference Include="CLRStats" Version="1.0.0" />
@@ -55,12 +55,12 @@
         <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.8.1" />
         <PackageReference Include="Markdig" Version="0.37.0" />
         <PackageReference Include="MaxMind.GeoIP2" Version="5.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.4" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.4" />
-        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.4" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.5" />
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.5" />
         <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
         <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
         <PackageReference Include="OpenXmlPowerTools-NetStandard" Version="4.6.23-alpha4" />
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.3.8" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
