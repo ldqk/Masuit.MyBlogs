@@ -108,9 +108,9 @@ public sealed class SystemController : AdminController
     /// <returns></returns>
     public ActionResult GetSettings()
     {
-        var list = SystemSettingService.GetAll().Select(s => new
+        var list = CommonHelper.SystemSettings.Select(s => new
         {
-            s.Name,
+            Name = s.Key.Item,
             s.Value
         }).ToPooledListScope();
         return ResultData(list);

@@ -97,6 +97,31 @@
                     <span class="el-switch-style" ng-click="EnableRss()"></span>
                 </span>
             </div>
+            <div class="input-group" ng-if="Settings.EnableRss== 'true'">
+                <span class="input-group-addon">
+                    订阅从
+                </span>
+                <select ng-model="Settings.RssStart" class="form-control">
+                    <option ng-value="'-1'">1天前</option>
+                    <option ng-value="'-2'">2天前</option>
+                    <option ng-value="'-3'">3天前</option>
+                    <option ng-value="'-4'">4天前</option>
+                    <option ng-value="'-5'">5天前</option>
+                </select>
+            </div>
+            <div class="input-group" ng-if="Settings.EnableRss== 'true'">
+                <span class="input-group-addon">
+                    到
+                </span>
+                <select ng-model="Settings.RssEnd" class="form-control">
+                    <option ng-value="'0'">现在</option>
+                    <option ng-value="'-2'">2小时前</option>
+                    <option ng-value="'-5'">5小时前</option>
+                    <option ng-value="'-12'">12小时前</option>
+                    <option ng-value="'-24'">1天前</option>
+                    <option ng-value="'-48'">2天前</option>
+                </select>
+            </div>
         </div>
         <div class="input-group">
             <span class="input-group-addon">资源管理器根目录：</span>

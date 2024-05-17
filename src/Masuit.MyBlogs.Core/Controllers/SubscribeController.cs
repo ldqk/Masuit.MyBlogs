@@ -3,7 +3,6 @@ using FreeRedis;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.Tools.Mime;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,6 +21,8 @@ public sealed class SubscribeController : Controller
     public IAdvertisementService AdvertisementService { get; set; }
 
     public IRedisClient RedisClient { get; set; }
+    private static DateTime StartTime => DateTime.Now.AddDays(CommonHelper.SystemSettings.GetOrAdd("RssStart", "-1").ToInt32());
+    private static DateTime EndTime => DateTime.Now.AddHours(CommonHelper.SystemSettings.GetOrAdd("RssEnd", "-2").ToInt32());
 
     /// <summary>
     /// RSS订阅
@@ -257,7 +258,7 @@ public sealed class SubscribeController : Controller
 
         string scheme = Request.Scheme;
         var host = Request.Host;
-        var post = await PostService.GetAsync(p => p.Rss && p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章未找到");
+        var post = await PostService.GetAsync(p => p.ModifyDate >= StartTime && p.ModifyDate <= EndTime && p.Rss && p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章未找到");
         CheckPermission(post);
         var summary = await post.Content.GetSummary(300, 50);
         var item = new Item()
@@ -298,7 +299,8 @@ public sealed class SubscribeController : Controller
     {
         var ipLocation = Request.Location();
         var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent] + "|" + Request.Headers.Where(x => x.Key.StartsWith("cf-")).Select(x => x.Value).Join("|"); ;
-        return p => p.Status == Status.Published && p.LimitMode != RegionLimitMode.OnlyForSearchEngine
+        return p => p.ModifyDate >= StartTime && p.ModifyDate <= EndTime
+            && p.Status == Status.Published && p.LimitMode != RegionLimitMode.OnlyForSearchEngine
             && (p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true :
                 p.LimitMode == RegionLimitMode.AllowRegion ? Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase) :
                 p.LimitMode == RegionLimitMode.ForbidRegion ? !Regex.IsMatch(location, p.Regions, RegexOptions.IgnoreCase) :
