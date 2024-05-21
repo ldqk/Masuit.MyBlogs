@@ -1,17 +1,14 @@
 ﻿using AngleSharp;
-using DocumentFormat.OpenXml.Packaging;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.UEditor;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
-using OpenXmlPowerTools;
-using Polly;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using Masuit.Tools.Mime;
 using Configuration = AngleSharp.Configuration;
+using Mammoth;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -75,53 +72,11 @@ public sealed class UploadController : Controller
         });
     }
 
-    private static async Task<string> ConvertToHtml(IFormFile file)
-    {
-        var docfile = Path.Combine(Environment.GetEnvironmentVariable("temp") ?? "upload", file.FileName);
-        try
-        {
-            await using var ms = file.OpenReadStream();
-            await using var fs = System.IO.File.Create(docfile, 1024, FileOptions.DeleteOnClose);
-            await ms.CopyToAsync(fs);
-            using var doc = WordprocessingDocument.Open(fs, true);
-            var pageTitle = file.FileName;
-            var part = doc.CoreFilePropertiesPart;
-            if (part != null)
-            {
-                pageTitle ??= (string)part.GetXDocument().Descendants(DC.title).FirstOrDefault();
-            }
-
-            var settings = new HtmlConverterSettings()
-            {
-                PageTitle = pageTitle,
-                FabricateCssClasses = false,
-                RestrictToSupportedLanguages = false,
-                RestrictToSupportedNumberingFormats = false,
-                ImageHandler = imageInfo =>
-                {
-                    using var stream = new PooledMemoryStream();
-                    imageInfo.Bitmap.Save(stream, imageInfo.Bitmap.RawFormat);
-                    var base64String = Convert.ToBase64String(stream.ToArray());
-                    return new XElement(Xhtml.img, new XAttribute(NoNamespace.src, $"data:{imageInfo.ContentType};base64," + base64String), imageInfo.ImgStyleAttribute, imageInfo.AltText != null ? new XAttribute(NoNamespace.alt, imageInfo.AltText) : null);
-                }
-            };
-            var htmlElement = HtmlConverter.ConvertToHtml(doc, settings);
-            var html = new XDocument(new XDocumentType("html", null, null, null), htmlElement);
-            var htmlString = html.ToString(SaveOptions.DisableFormatting);
-            return htmlString;
-        }
-        finally
-        {
-            if (System.IO.File.Exists(docfile))
-            {
-                Policy.Handle<IOException>().WaitAndRetry(5, i => TimeSpan.FromSeconds(1)).Execute(() => System.IO.File.Delete(docfile));
-            }
-        }
-    }
-
     private async Task<string> SaveAsHtml(IFormFile file)
     {
-        var html = await ConvertToHtml(file);
+        await using var ms = file.OpenReadStream();
+        var converter = new DocumentConverter();
+        var html = converter.ConvertToHtml(ms).Value;
         var context = BrowsingContext.New(Configuration.Default);
         var doc = context.OpenAsync(req => req.Content(html)).Result;
         var body = doc.Body;

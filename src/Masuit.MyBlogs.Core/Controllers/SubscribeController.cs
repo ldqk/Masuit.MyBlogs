@@ -36,10 +36,9 @@ public sealed class SubscribeController : Controller
             throw new NotFoundException("不允许订阅");
         }
 
-        var time = DateTime.Today.AddDays(-1);
         string scheme = Request.Scheme;
         var host = Request.Host;
-        var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && p.ModifyDate >= time), p => p.ModifyDate, false).Select(p => new
+        var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss), p => p.ModifyDate, false).Select(p => new
         {
             p.Content,
             p.Modifier,
@@ -125,12 +124,11 @@ public sealed class SubscribeController : Controller
             throw new NotFoundException("不允许订阅");
         }
 
-        var time = DateTime.Today.AddDays(-1);
         string scheme = Request.Scheme;
         var host = Request.Host;
         var category = await categoryService.GetByIdAsync(id) ?? throw new NotFoundException("分类未找到");
         var cids = category.Flatten().Select(c => c.Id).ToArray();
-        var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && cids.Contains(p.CategoryId) && p.ModifyDate >= time), p => p.ModifyDate, false).Select(p => new
+        var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && cids.Contains(p.CategoryId)), p => p.ModifyDate, false).Select(p => new
         {
             p.Content,
             p.Modifier,
@@ -191,11 +189,10 @@ public sealed class SubscribeController : Controller
             throw new NotFoundException("不允许订阅");
         }
 
-        var time = DateTime.Today.AddDays(-1);
         string scheme = Request.Scheme;
         var host = Request.Host;
         var seminar = await seminarService.GetByIdAsync(id) ?? throw new NotFoundException("专题未找到");
-        var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && p.Seminar.Any(s => s.Id == id) && p.ModifyDate >= time), p => p.ModifyDate, false).Select(p => new
+        var raw = PostService.GetQuery(PostBaseWhere().And(p => p.Rss && p.Seminar.Any(s => s.Id == id)), p => p.ModifyDate, false).Select(p => new
         {
             p.Content,
             p.Modifier,

@@ -53,6 +53,7 @@
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.1" />
         <PackageReference Include="htmldiff.net" Version="1.4.2" />
         <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.8.1" />
+        <PackageReference Include="Mammoth.Core" Version="1.0.1" />
         <PackageReference Include="Markdig" Version="0.37.0" />
         <PackageReference Include="MaxMind.GeoIP2" Version="5.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.5" />
@@ -61,7 +62,6 @@
         <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
         <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
-        <PackageReference Include="OpenXmlPowerTools-NetStandard" Version="4.6.23-alpha4" />
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.3.8" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
         <PackageReference Include="Rin" Version="2.6.0" />
