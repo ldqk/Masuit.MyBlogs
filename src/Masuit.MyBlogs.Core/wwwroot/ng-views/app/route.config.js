@@ -185,7 +185,7 @@ myApp.config([
                     return $ocLazyLoad.load([
                         {
                             files: [
-                                "https://cdn.staticfile.org/angular-ui-tree/2.22.6/angular-ui-tree.min.css",
+                                "https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/angular-ui-tree/2.22.6/angular-ui-tree.min.css",
                                 "/Content/checkbox.min.css"
                             ],
                             cache: true

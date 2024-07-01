@@ -48,14 +48,13 @@
     <meta property="article:published_time" content="@ViewData.GetValueOrDefault(nameof(Post.PostDate),() => DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss")">
     <meta property="article:modified_time" content="@ViewData.GetValueOrDefault(nameof(Post.ModifyDate),() => DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss")">
     <link href="@Context.Request.GetEncodedUrl()" rel="canonical">
-    <link href="//cdn.staticfile.org" rel="preconnect">
     @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Styles", ""))
-    <link href="https://cdn.staticfile.org/normalize/8.0.1/normalize.min.css" rel="stylesheet" async defer>
-    <link href="https://cdn.staticfile.org/limonte-sweetalert2/6.11.5/sweetalert2.min.css" rel="stylesheet" async defer>
-    <link href="https://cdn.staticfile.org/notie/4.3.1/notie.min.css" rel="stylesheet" async defer>
-    <link href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" async defer>
-    <link href="https://cdn.staticfile.org/animate.css/3.7.0/animate.min.css" rel="stylesheet" async defer>
-    <link href="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/normalize/8.0.1/normalize.min.css" rel="stylesheet" async defer>
+    <link href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/limonte-sweetalert2/6.11.5/sweetalert2.min.css" rel="stylesheet" async defer>
+    <link href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/notie/4.3.1/notie.min.css" rel="stylesheet" async defer>
+    <link href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" async defer>
+    <link href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/animate.css/3.7.0/animate.min.css" rel="stylesheet" async defer>
+    <link href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" async defer>
     <environment names="Development">
         <link href="~/fonts/icomoon.css" rel="stylesheet" />
@@ -71,16 +70,16 @@
     <environment names="Stage,Production">
         @await Styles.RenderAsync("~/bundles/main.css")
     </environment>
-    <script src="https://cdn.staticfile.org/bluebird/3.5.3/bluebird.min.js" async defer></script>
-    <script src="https://cdn.staticfile.org/modernizr/2010.07.06dev/modernizr.min.js" async defer></script>
-    <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/limonte-sweetalert2/6.6.9/sweetalert2.min.js" async defer></script>
-    <script src="https://cdn.staticfile.org/notie/4.3.1/notie.min.js" async defer></script>
-    <script src="https://cdn.staticfile.org/jquery.form/4.2.2/jquery.form.min.js" async defer></script>
-    <script src="https://cdn.staticfile.org/jqueryui/1.9.2/jquery.ui.widget.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.staticfile.org/lazysizes/5.3.2/lazysizes.min.js" async></script>
-    <script src="https://cdn.staticfile.org/js-cookie/3.0.1/js.cookie.min.js"></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/bluebird/3.5.3/bluebird.min.js" async defer></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/modernizr/2010.07.06dev/modernizr.min.js" async defer></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/limonte-sweetalert2/6.6.9/sweetalert2.min.js" async defer></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/notie/4.3.1/notie.min.js" async defer></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery.form/4.2.2/jquery.form.min.js" async defer></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/jqueryui/1.9.2/jquery.ui.widget.min.js"></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/lazysizes/5.3.2/lazysizes.min.js" async></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/js-cookie/3.0.1/js.cookie.min.js"></script>
     <script src="~/Scripts/layer/layer.js"></script>
     <script src="~/Assets/layui/layui.js"></script>
     <script src="~/Scripts/platform.js"></script>
