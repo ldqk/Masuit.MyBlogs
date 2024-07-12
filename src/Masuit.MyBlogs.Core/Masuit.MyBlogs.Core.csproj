@@ -56,9 +56,9 @@
         <PackageReference Include="Mammoth.Core" Version="1.0.1" />
         <PackageReference Include="Markdig" Version="0.37.0" />
         <PackageReference Include="MaxMind.GeoIP2" Version="5.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.6" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.6" />
-        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.7" />
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.7" />
         <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
         <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />

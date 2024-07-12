@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     Random r = new Random();
 }
-<link href="~/Assets/UEditor/third-party/SyntaxHighlighter/styles/shCore.css" rel="stylesheet" />
+<link href="~/Assets/UEditor/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet" />
 <style>
     .bg-title {
         height: 50vh;
@@ -55,8 +55,7 @@
         @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
     </article>
 </div>
-<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/shCore.js"></script>
-<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/scripts/bundle.min.js"></script>
+<script src="~/Assets/UEditor/third-party/SyntaxHighlighter/shCore.js"></script>
 <script>
     SyntaxHighlighter.all();
     SyntaxHighlighter.defaults['toolbar'] = false;
