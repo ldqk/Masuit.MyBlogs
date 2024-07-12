@@ -113,10 +113,6 @@ hangfire的可视化管理页面
 #### 文件管理
 服务器文件的在线管理，支持浏览、预览、压缩、解压缩、创建文件夹、上传、下载、打包下载等文件的基本操作。
 ![image](https://user-images.githubusercontent.com/20254980/127089568-5d3bcef6-5ad7-4f44-b30d-b7253be2d3fb.png)
-#### onedrive网盘程序
-基于[YukiDrive](https://github.com/YukiCoco/YukiDrive)二次开发的内嵌网盘应用。
-![image](https://user-images.githubusercontent.com/20254980/127090161-09fa9337-4601-4eaa-b47c-cefd8242910d.png)
-![image](https://user-images.githubusercontent.com/20254980/127090259-868e38f8-abbe-474e-bdd3-4c241b49d1b5.png)
 
 ### 项目架构
 - 项目采用单体架构，方便部署和配置，传统的MVC模式，ASP.NET Core MVC+EF Core的简单架构。  
