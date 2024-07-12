@@ -4,7 +4,7 @@
 <head>
     <title></title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <script type="text/javascript" src="../internal.js?aea0c61c"></script>
+    <script type="text/javascript" src="../internal.js?04dbe7f0"></script>
     <style type="text/css">
         .wrapper {
             width: 600px;
@@ -129,10 +129,10 @@
         </div>
     </div>
 </div>
-<script src="../../third-party/jquery-1.10.2.js?628072e7"></script>
-<script src="../../third-party/webuploader/webuploader.js?f37088cc"></script>
-<script type="text/javascript" src="../../third-party/clipboard/clipboard.js?555edf0a"></script>
-<script type="text/javascript" src="wordimage.js?f4efe813"></script>
+<script src="../../third-party/jquery-1.10.2.js?25f4b625"></script>
+<script src="../../third-party/webuploader/webuploader.js?2e7e9092"></script>
+<script type="text/javascript" src="../../third-party/clipboard/clipboard.js?bae63983"></script>
+<script type="text/javascript" src="wordimage.js?94055851"></script>
 <script type="text/javascript">
     editor.setOpt({
         wordImageFieldName: "upfile",
@@ -183,6 +183,7 @@
         } : false
     });
     uploader.on('uploadSuccess', function (file, res) {
+        res = editor.getOpt('serverResponsePrepare')(res);
         if ('state' in res) {
             if (res.state === 'SUCCESS') {
                 if (res.url) {
