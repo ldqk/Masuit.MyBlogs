@@ -1,4 +1,5 @@
 ﻿using Masuit.Tools.AspNetCore.ModelBinder;
+using Masuit.Tools.Core;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -10,7 +11,7 @@ public sealed class ValuesController : AdminController
 	[HttpGet("list")]
 	public async Task<ActionResult> GetAll()
 	{
-		return ResultData(await VariablesService.GetAllNoTracking().ToListAsync());
+		return ResultData(await VariablesService.GetAllNoTracking().ToListWithNoLockAsync());
 	}
 
 	[HttpPost]

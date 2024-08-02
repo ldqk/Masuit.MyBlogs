@@ -7,6 +7,7 @@ using Masuit.Tools.Excel;
 using Microsoft.Net.Http.Headers;
 using System.Net;
 using System.Text.RegularExpressions;
+using Masuit.Tools.Core;
 using Masuit.Tools.Mime;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -222,7 +223,7 @@ public sealed class AdvertisementController : BaseController
 			{
 				Date = g.Key,
 				Count = g.Count()
-			}).OrderBy(a => a.Date).ToListAsync(cancellationToken);
+			}).OrderBy(a => a.Date).ToListWithNoLockAsync(cancellationToken);
 			if (list1.Count == 0)
 			{
 				return Ok(Array.Empty<int>());
@@ -233,7 +234,7 @@ public sealed class AdvertisementController : BaseController
 			{
 				Date = g.Key,
 				Count = g.Count()
-			}).OrderBy(a => a.Date).ToListAsync(cancellationToken);
+			}).OrderBy(a => a.Date).ToListWithNoLockAsync(cancellationToken);
 
 			// 将数据填充成连续的数据
 			for (var i = start1; i <= DateTime.Today; i = i.AddDays(1))
@@ -257,7 +258,7 @@ public sealed class AdvertisementController : BaseController
 		{
 			Date = g.Key,
 			Count = g.Count()
-		}).OrderBy(a => a.Date).ToListAsync(cancellationToken);
+		}).OrderBy(a => a.Date).ToListWithNoLockAsync(cancellationToken);
 		var min = list.Min(a => a.Date);
 		var max = list.Max(a => a.Date);
 		for (var i = min; i < max; i = i.AddDays(1))
@@ -286,7 +287,7 @@ public sealed class AdvertisementController : BaseController
 			{
 				Date = g.Key,
 				Count = g.Count()
-			}).OrderBy(a => a.Date).ToListAsync(cancellationToken);
+			}).OrderBy(a => a.Date).ToListWithNoLockAsync(cancellationToken);
 			if (list1.Count == 0)
 			{
 				return Ok(Array.Empty<int>());
@@ -297,7 +298,7 @@ public sealed class AdvertisementController : BaseController
 			{
 				Date = g.Key,
 				Count = g.Count()
-			}).OrderBy(a => a.Date).ToListAsync(cancellationToken);
+			}).OrderBy(a => a.Date).ToListWithNoLockAsync(cancellationToken);
 
 			// 将数据填充成连续的数据
 			for (var i = start1; i <= DateTime.Today; i = i.AddDays(1))
@@ -322,7 +323,7 @@ public sealed class AdvertisementController : BaseController
 		{
 			Date = g.Key,
 			Count = g.Count()
-		}).OrderBy(a => a.Date).ToListAsync(cancellationToken);
+		}).OrderBy(a => a.Date).ToListWithNoLockAsync(cancellationToken);
 		var min = list.Min(a => a.Date);
 		var max = list.Max(a => a.Date);
 		for (var i = min; i < max; i = i.AddDays(1))
