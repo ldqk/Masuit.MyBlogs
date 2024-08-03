@@ -356,7 +356,7 @@
         return diffDays;
     };
 
-    function showCharts() {
+    showCharts = function () {
         echarts.init(document.getElementById('chart')).dispose();
         let period = document.getElementById("period").value;
         window.fetch(`/post/records-chart?compare=${period > 0}&period=${period}`, {
