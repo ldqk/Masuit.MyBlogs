@@ -4,7 +4,7 @@ using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using System.Text;
-using System.Text.RegularExpressions;
+using Masuit.Tools.TextDiff;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -69,10 +69,7 @@ public sealed class MergeController : AdminController
 	{
 		var newer = await PostMergeRequestService.GetByIdAsync(mid) ?? throw new NotFoundException("待合并文章未找到");
 		var old = newer.Post;
-		var diffHelper = new HtmlDiff.HtmlDiff(old.Content, newer.Content);
-		string diffOutput = diffHelper.Build();
-		old.Content = Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty);
-		newer.Content = Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty);
+		(old.Content, newer.Content) = old.Content.HtmlDiff(newer.Content);
 		return ResultData(new { old = Mapper.Map<PostMergeRequestDto>(old), newer = Mapper.Map<PostMergeRequestDto>(newer) });
 	}
 

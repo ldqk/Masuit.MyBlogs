@@ -24,6 +24,7 @@ using EFCoreSecondLevelCacheInterceptor;
 using FreeRedis;
 using Masuit.Tools.Core;
 using Masuit.Tools.Mime;
+using Masuit.Tools.TextDiff;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -195,11 +196,10 @@ public sealed class PostController : BaseController
 		var right = v1 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
 		var left = v2 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
 		main.Id = id;
-		var diff = new HtmlDiff.HtmlDiff(left.Content, right.Content);
-		var diffOutput = diff.Build();
-		left.Content = await ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<ins.+?</ins>", string.Empty), @"<\w+></\w+>", string.Empty)).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint(ClientIP.ToString()));
+		var (html1, html2) = left.Content.HtmlDiff(right.Content);
+		left.Content = await ReplaceVariables(html1).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint(ClientIP.ToString()));
 		left.ModifyDate = left.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-		right.Content = await ReplaceVariables(Regex.Replace(Regex.Replace(diffOutput, "<del.+?</del>", string.Empty), @"<\w+></\w+>", string.Empty)).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint(ClientIP.ToString()));
+		right.Content = await ReplaceVariables(html2).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint(ClientIP.ToString()));
 		right.ModifyDate = right.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
 		ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location(), main.CategoryId, main.Label);
 		ViewBag.DisableCopy = post.DisableCopy;
@@ -430,7 +430,7 @@ public sealed class PostController : BaseController
 	[HttpPost("{id}/pushmerge")]
 	public async Task<ActionResult> PushMerge([FromServices] IInternalMessageService messageService, [FromServices] IPostMergeRequestService postMergeRequestService, PostMergeRequestCommand dto)
 	{
-		if (RedisHelper.Get("code:" + dto.ModifierEmail) != dto.Code)
+		if (await RedisHelper.GetAsync("code:" + dto.ModifierEmail) != dto.Code)
 		{
 			return ResultData(null, false, "验证码错误！");
 		}
@@ -488,7 +488,7 @@ public sealed class PostController : BaseController
 			return ResultData(null, false, "操作失败！");
 		}
 
-		RedisHelper.Expire("code:" + dto.ModifierEmail, 1);
+		await RedisHelper.ExpireAsync("code:" + dto.ModifierEmail, 1);
 		await messageService.AddEntitySavedAsync(new InternalMessage()
 		{
 			Title = $"来自【{dto.Modifier}】对文章《{post.Title}》的修改请求",
@@ -496,8 +496,7 @@ public sealed class PostController : BaseController
 			Link = "#/merge/compare?id=" + merge.Id
 		});
 
-		var htmlDiff = new HtmlDiff.HtmlDiff(post.Content.RemoveHtmlTag(), dto.Content.RemoveHtmlTag());
-		var diff = htmlDiff.Build();
+		var diff = post.Content.RemoveHtmlTag().HtmlDiffMerge(dto.Content.RemoveHtmlTag());
 		var content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/merge-request.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8))
 			.Set("title", post.Title)
 			.Set("link", Url.Action("Index", "Dashboard", new { }, Request.Scheme) + "#/merge/compare?id=" + merge.Id)
