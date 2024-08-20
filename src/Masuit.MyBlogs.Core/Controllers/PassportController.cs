@@ -10,6 +10,7 @@ using System.Net;
 using System.Web;
 using Dispose.Scope;
 using FreeRedis;
+using Masuit.MyBlogs.Core.Extensions;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -124,13 +125,13 @@ public sealed class PassportController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public ActionResult Login([FromServices] IRedisClient cacheManager, string username, string password, string valid, string remem)
     {
-        string validSession = HttpContext.Session.Get<string>("valid") ?? string.Empty; //将验证码从Session中取出来，用于登录验证比较
+        string validSession = HttpContext.GetRedisSession<string>("valid") ?? string.Empty; //将验证码从Session中取出来，用于登录验证比较
         if (string.IsNullOrEmpty(validSession) || !valid.Trim().Equals(validSession, StringComparison.InvariantCultureIgnoreCase))
         {
             return ResultData(null, false, "验证码错误");
         }
 
-        HttpContext.Session.Remove("valid"); //验证成功就销毁验证码Session，非常重要
+        HttpContext.RemoveRedisSession("valid"); //验证成功就销毁验证码Session，非常重要
         if (string.IsNullOrEmpty(username.Trim()) || string.IsNullOrEmpty(password.Trim()))
         {
             return ResultData(null, false, "用户名或密码不能为空");
@@ -159,7 +160,7 @@ public sealed class PassportController : Controller
         }
 
         HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
-        if (remem.Trim().Contains(new[] { "on", "true" })) //是否记住登录
+        if (remem.Trim().Contains(["on", "true"])) //是否记住登录
         {
             Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()), new CookieOptions()
             {
@@ -191,10 +192,10 @@ public sealed class PassportController : Controller
     /// 生成验证码
     /// </summary>
     /// <returns></returns>
-    public ActionResult ValidateCode()
+    public ActionResult ValidateCode([FromServices] IRedisClient redis)
     {
-        string code = Tools.Strings.ValidateCode.CreateValidateCode(6);
-        HttpContext.Session.Set("valid", code); //将验证码生成到Session中
+        string code = redis.GetOrAdd("captcha:"+ClientIP,Tools.Strings.ValidateCode.CreateValidateCode(6),TimeSpan.FromSeconds(5));
+        HttpContext.SetRedisSession("valid", code); //将验证码生成到Session中
         var stream = code.CreateValidateGraphic().RegisterDisposeScope();
         return this.ResumeFile(stream, ContentType.Jpeg, "验证码.jpg");
     }
@@ -207,7 +208,7 @@ public sealed class PassportController : Controller
     [HttpPost]
     public ActionResult CheckValidateCode(string code)
     {
-        string validSession = HttpContext.Session.Get<string>("valid");
+        string validSession = HttpContext.GetRedisSession<string>("valid");
         if (string.IsNullOrEmpty(validSession) || !code.Trim().Equals(validSession, StringComparison.InvariantCultureIgnoreCase))
         {
             return ResultData(null, false, "验证码错误");

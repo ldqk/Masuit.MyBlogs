@@ -136,6 +136,7 @@ public class Startup
         maindb.Database.EnsureCreated();
         loggerdb.Database.EnsureCreated();
         app.InitSettings();
+        app.UseRedisSession();
         app.UseDisposeScope();
         app.UseLuceneSearch(env, hangfire, luceneIndexerOptions);
         app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For
