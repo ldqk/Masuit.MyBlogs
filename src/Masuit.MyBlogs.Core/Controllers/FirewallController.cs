@@ -8,19 +8,15 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using Masuit.MyBlogs.Core.Extensions;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
-public sealed class FirewallController : Controller
+public sealed class FirewallController(IHttpClientFactory httpClientFactory) : Controller
 {
     public IRedisClient RedisClient { get; set; }
 
-    private readonly HttpClient _httpClient;
-
-    public FirewallController(IHttpClientFactory httpClientFactory)
-    {
-        _httpClient = httpClientFactory.CreateClient();
-    }
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient();
 
     /// <summary>
     /// JS挑战，5秒盾
@@ -49,11 +45,11 @@ public sealed class FirewallController : Controller
     /// 验证码
     /// </summary>
     /// <returns></returns>
-    [HttpGet("/challenge-captcha.jpg")]
+    [HttpGet("/challenge-captcha.jpg"), DistributedLockFilter]
     [ResponseCache(NoStore = true, Duration = 0)]
     public ActionResult CaptchaChallenge()
     {
-        string code = ValidateCode.CreateValidateCode(6);
+        string code = RedisClient.GetOrAdd("captcha:" + HttpContext.Connection.RemoteIpAddress.ToString(), ValidateCode.CreateValidateCode(6), TimeSpan.FromSeconds(5));
         HttpContext.Session.Set("challenge-captcha", code);
         var stream = code.CreateValidateGraphic().RegisterDisposeScope();
         return this.ResumeFile(stream, ContentType.Jpeg, "验证码.jpg");
@@ -90,7 +86,7 @@ public sealed class FirewallController : Controller
     /// CloudflareTurnstile验证
     /// </summary>
     /// <returns></returns>
-    [HttpPost("/turnstile-handler"), AutoValidateAntiforgeryToken]
+    [HttpPost("/turnstile-handler"), AutoValidateAntiforgeryToken, DistributedLockFilter]
     public async Task<ActionResult> CloudflareTurnstileHandler()
     {
         var form = await Request.ReadFormAsync();

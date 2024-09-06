@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using Masuit.MyBlogs.Core.Extensions;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -145,7 +146,7 @@ public sealed class ErrorController : Controller
     /// <param name="email"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall]
+    [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, DistributedLockFilter]
     public ActionResult CheckViewToken(string email, string token)
     {
         if (string.IsNullOrEmpty(token))
@@ -178,7 +179,7 @@ public sealed class ErrorController : Controller
     /// <param name="userInfoService"></param>
     /// <param name="email"></param>
     /// <returns></returns>
-    [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 100, VaryByQueryKeys = new[] { "email" })]
+    [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 100, VaryByQueryKeys = new[] { "email" }), DistributedLockFilter]
     public ActionResult GetViewToken([FromServices] IUserInfoService userInfoService, string email)
     {
         var validator = new IsEmailAttribute();

@@ -7,11 +7,11 @@ function loadingDone() {
     $(".loading1").hide();
 }
 
-var clearSelect = "getSelection" in window ? function() {
-        window.getSelection().removeAllRanges();
-    } : function() {
-        document.selection.empty();
-    };
+var clearSelect = "getSelection" in window ? function () {
+    window.getSelection().removeAllRanges();
+} : function () {
+    document.selection.empty();
+};
 
 function hackClip() {
     let transfer = document.createElement('input');
@@ -26,57 +26,57 @@ function hackClip() {
 
 /**禁止复制 */
 function CopyrightProtect() {
-    setInterval(function() {
-            try {
-                (function() {}["constructor"]("debugger")());
-                $(".article-content").on("keydown", function(e) {
-                    var currKey = 0, evt = e || window.event;
-                    currKey = evt.keyCode || evt.which || evt.charCode;
-                    if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85)) { //禁止F12，Ctrl+C，Ctrl+U
-                        clearSelect();
-                        evt.cancelBubble = true;
-                        evt.returnValue = false;
-                        return true;
-                    }
-                });
-                document.onkeydown = function(e) {
-                    var currKey = 0, evt = e || window.event;
-                    currKey = evt.keyCode || evt.which || evt.charCode;
-                    if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
-                        clearSelect();
-                        evt.cancelBubble = true;
-                        evt.returnValue = false;
-                        return false;
-                    }
+    setInterval(function () {
+        try {
+            (function () { }["constructor"]("debugger")());
+            $(".article-content").on("keydown", function (e) {
+                var currKey = 0, evt = e || window.event;
+                currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85)) { //禁止F12，Ctrl+C，Ctrl+U
+                    clearSelect();
+                    evt.cancelBubble = true;
+                    evt.returnValue = false;
                     return true;
                 }
-                document.ondragstart = function(e) {
-                    e.returnValue = false;
-                    hackClip();
+            });
+            document.onkeydown = function (e) {
+                var currKey = 0, evt = e || window.event;
+                currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
+                    clearSelect();
+                    evt.cancelBubble = true;
+                    evt.returnValue = false;
                     return false;
                 }
-                $(".article-content").on("copy", function(e) {
-                    e.returnValue = false;
-                    hackClip();
-                    return false;
-                });
-                document.oncontextmenu = function(e) {
-                    e.returnValue = false;
-                    hackClip();
-                    return false;
-                }
-            } catch (ex) {
-                console.error(ex);
+                return true;
             }
-        }, 500);
+            document.ondragstart = function (e) {
+                e.returnValue = false;
+                hackClip();
+                return false;
+            }
+            $(".article-content").on("copy", function (e) {
+                e.returnValue = false;
+                hackClip();
+                return false;
+            });
+            document.oncontextmenu = function (e) {
+                e.returnValue = false;
+                hackClip();
+                return false;
+            }
+        } catch (ex) {
+            console.error(ex);
+        }
+    }, 500);
 }
 
 /**禁止编辑器内复制 */
 function CopyrightProtect4Editor() {
-    setInterval(function() {
+    setInterval(function () {
         try {
-            (function() {}["constructor"]("debugger")());
-            document.getElementById("ueditor_0").contentWindow.document.body.onkeydown = function(e) {
+            (function () { }["constructor"]("debugger")());
+            document.getElementById("ueditor_0").contentWindow.document.body.onkeydown = function (e) {
                 var currKey = 0, evt = e || window.event;
                 currKey = evt.keyCode || evt.which || evt.charCode;
                 if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && currKey == 88) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
@@ -87,67 +87,68 @@ function CopyrightProtect4Editor() {
                 }
                 return true;
             }
-            document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function(e) {
+            document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function (e) {
                 e.returnValue = false;
                 hackClip();
                 return false;
             }
-            document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function(e) {
+            document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function (e) {
                 e.returnValue = false;
                 hackClip();
                 return false;
             }
         } catch (ex) {
             console.error(ex);
-        }}, 500);
+        }
+    }, 500);
 }
 
 /**禁止全局复制 */
 function GlobalCopyrightProtect() {
-    setInterval(function() {
-            try {
-                (function() {}["constructor"]("debugger")());
-                $(".article-content").on("keydown", function(e) {
-                    var currKey = 0, evt = e || window.event;
-                    currKey = evt.keyCode || evt.which || evt.charCode;
-                    if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85)) { //禁止F12，Ctrl+C，Ctrl+U
-                        evt.cancelBubble = true;
-                        evt.returnValue = false;
-                        clearSelect();
-                        return false;
-                    }
-                    return true;
-                });
-                document.onkeydown = function(e) {
-                    var currKey = 0, evt = e || window.event;
-                    currKey = evt.keyCode || evt.which || evt.charCode;
-                    if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
-                        evt.cancelBubble = true;
-                        evt.returnValue = false;
-                        clearSelect();
-                        return false;
-                    }
-                    return true;
-                }
-                document.ondragstart = function(e) {
-                    e.returnValue = false;
-                    hackClip();
+    setInterval(function () {
+        try {
+            (function () { }["constructor"]("debugger")());
+            $(".article-content").on("keydown", function (e) {
+                var currKey = 0, evt = e || window.event;
+                currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85)) { //禁止F12，Ctrl+C，Ctrl+U
+                    evt.cancelBubble = true;
+                    evt.returnValue = false;
+                    clearSelect();
                     return false;
                 }
-                $(".article-content").on("copy", function(e) {
-                    e.returnValue = false;
-                    hackClip();
-                    return false;
-                });
-                document.oncontextmenu = function() {
-                    event.returnValue = false;
-                    hackClip();
+                return true;
+            });
+            document.onkeydown = function (e) {
+                var currKey = 0, evt = e || window.event;
+                currKey = evt.keyCode || evt.which || evt.charCode;
+                if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
+                    evt.cancelBubble = true;
+                    evt.returnValue = false;
+                    clearSelect();
                     return false;
                 }
-            } catch (ex) {
-                console.error(ex);
+                return true;
             }
-        }, 500);
+            document.ondragstart = function (e) {
+                e.returnValue = false;
+                hackClip();
+                return false;
+            }
+            $(".article-content").on("copy", function (e) {
+                e.returnValue = false;
+                hackClip();
+                return false;
+            });
+            document.oncontextmenu = function () {
+                event.returnValue = false;
+                hackClip();
+                return false;
+            }
+        } catch (ex) {
+            console.error(ex);
+        }
+    }, 500);
 }
 
 function GetOperatingSystem(os) {
@@ -195,20 +196,20 @@ function getFile(obj, inputName) {
 }
 
 function post(url, params, callback, error) {
-    var formData = new FormData();
-    Object.keys(params).forEach(function(key) {
-        formData.append(key, params[key]);
-    });
     window.fetch(url, {
         credentials: 'include',
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json', // 设置请求头，告诉服务器发送的是 JSON 数据
+            'RequestVerificationToken': params.__RequestVerificationToken
+        },
         mode: 'cors',
-        body: formData
-    }).then(function(response) {
+        body: JSON.stringify(params)
+    }).then(function (response) {
         return response.json();
-    }).then(function(data) {
+    }).then(function (data) {
         callback(data);
-    }).catch(function(e) {
+    }).catch(function (e) {
         loadingDone();
         if (error) {
             error(e);
@@ -221,11 +222,11 @@ function get(url, callback, error) {
         credentials: 'include',
         method: 'GET',
         mode: 'cors'
-    }).then(function(response) {
+    }).then(function (response) {
         return response.json();
-    }).then(function(data) {
+    }).then(function (data) {
         callback(data);
-    }).catch(function(e) {
+    }).catch(function (e) {
         loadingDone();
         if (error) {
             error(e);
@@ -246,15 +247,15 @@ async function blockCategory(id, name) {
             showLoaderOnConfirm: true,
             animation: true,
             allowOutsideClick: false
-        }).then(async function() {
-            Cookies.set("HideCategories", value.split(",").filter(function(item) { return item != id }).join(","), { expires: 365 });
+        }).then(async function () {
+            Cookies.set("HideCategories", value.split(",").filter(function (item) { return item != id }).join(","), { expires: 365 });
             swal({
                 text: "取消屏蔽成功",
                 type: "success",
                 showConfirmButton: false,
                 timer: 1500
             }).catch(swal.noop);
-        }, function() {}).catch(swal.noop);
+        }, function () { }).catch(swal.noop);
     } else {
         await swal({
             title: "确认屏蔽【" + name + "】吗？",
@@ -266,7 +267,7 @@ async function blockCategory(id, name) {
             showLoaderOnConfirm: true,
             animation: true,
             allowOutsideClick: false
-        }).then(async function() {
+        }).then(async function () {
             Cookies.set("HideCategories", id + "," + value, { expires: 365 });
             swal({
                 text: "屏蔽成功",
@@ -274,7 +275,7 @@ async function blockCategory(id, name) {
                 showConfirmButton: false,
                 timer: 1500
             }).catch(swal.noop);
-        }, function() {}).catch(swal.noop);
+        }, function () { }).catch(swal.noop);
     }
 }
 
@@ -289,10 +290,10 @@ async function disableSafemode() {
         showLoaderOnConfirm: true,
         animation: true,
         allowOutsideClick: false
-    }).then(async function() {
+    }).then(async function () {
         Cookies.set("Nsfw", 0, { expires: 3650 });
         location.reload();
-    }, function() {}).catch(swal.noop);
+    }, function () { }).catch(swal.noop);
 }
 
 async function enableSafemode() {
@@ -302,7 +303,7 @@ async function enableSafemode() {
 }
 
 /*默认安全模式*/
-;$(function() {
+; $(function () {
     if (Cookies.get("Nsfw") != "0") {
         $("body").append("<a style='position:fixed;left:0;bottom:0;color:black;z-index:10;text-shadow: 0px 0px 1px #000;' onclick='disableSafemode()'>安全模式</a>");
     }

@@ -122,7 +122,7 @@ public sealed class PassportController : Controller
     /// <param name="valid"></param>
     /// <param name="remem"></param>
     /// <returns></returns>
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken, DistributedLockFilter]
     public ActionResult Login([FromServices] IRedisClient cacheManager, string username, string password, string valid, string remem)
     {
         string validSession = HttpContext.GetRedisSession<string>("valid") ?? string.Empty; //将验证码从Session中取出来，用于登录验证比较
@@ -194,7 +194,7 @@ public sealed class PassportController : Controller
     /// <returns></returns>
     public ActionResult ValidateCode([FromServices] IRedisClient redis)
     {
-        string code = redis.GetOrAdd("captcha:"+ClientIP,Tools.Strings.ValidateCode.CreateValidateCode(6),TimeSpan.FromSeconds(5));
+        string code = redis.GetOrAdd("captcha:" + ClientIP, Tools.Strings.ValidateCode.CreateValidateCode(6), TimeSpan.FromSeconds(5));
         HttpContext.SetRedisSession("valid", code); //将验证码生成到Session中
         var stream = code.CreateValidateGraphic().RegisterDisposeScope();
         return this.ResumeFile(stream, ContentType.Jpeg, "验证码.jpg");
@@ -205,7 +205,7 @@ public sealed class PassportController : Controller
     /// </summary>
     /// <param name="code"></param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpPost, DistributedLockFilter]
     public ActionResult CheckValidateCode(string code)
     {
         string validSession = HttpContext.GetRedisSession<string>("valid");

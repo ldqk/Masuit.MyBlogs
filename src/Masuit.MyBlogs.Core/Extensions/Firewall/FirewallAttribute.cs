@@ -23,7 +23,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
     public IRedisClient RedisClient { get; set; }
 
-    private static readonly char[] Separator = { ',', '|', '，' };
+    private static readonly char[] Separator = [',', '|', '，'];
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -228,6 +228,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
         if (times <= limit)
         {
             await next();
+            return;
         }
 
         if (times > limit * 1.2)

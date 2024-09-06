@@ -7,6 +7,7 @@ using Masuit.Tools.Logging;
 using Microsoft.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -29,8 +30,8 @@ public sealed class CommentController : BaseController
     /// <param name="blocklistService"></param>
     /// <param name="cmd"></param>
     /// <returns></returns>
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<ActionResult> Submit([FromServices] IInternalMessageService messageService, [FromServices] IEmailBlocklistService blocklistService, CommentCommand cmd)
+    [HttpPost, ValidateAntiForgeryToken, DistributedLockFilter]
+    public async Task<ActionResult> Submit([FromServices] IInternalMessageService messageService, [FromServices] IEmailBlocklistService blocklistService, [FromBodyOrDefault] CommentCommand cmd)
     {
         var match = Regex.Match(cmd.NickName + cmd.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
         if (match.Success)
@@ -186,7 +187,7 @@ public sealed class CommentController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpPost, DistributedLockFilter]
     public async Task<ActionResult> CommentVote(int id)
     {
         if (HttpContext.Session.Get("cm" + id) != null)

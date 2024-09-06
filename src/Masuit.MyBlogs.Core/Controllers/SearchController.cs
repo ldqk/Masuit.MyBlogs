@@ -78,7 +78,7 @@ public sealed class SearchController : BaseController
     /// <param name="size"></param>
     /// <param name="search"></param>
     /// <returns></returns>
-    [MyAuthorize, HttpPost("search/SearchList"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "search" })]
+    [MyAuthorize, HttpPost("search/SearchList"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "search" }), DistributedLockFilter]
     public ActionResult SearchList([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 200, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string search = "")
     {
         var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.Keywords.Contains(search);
@@ -109,7 +109,7 @@ public sealed class SearchController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost, MyAuthorize]
+    [HttpPost, MyAuthorize, DistributedLockFilter]
     public async Task<ActionResult> Delete(int id)
     {
         bool b = await SearchDetailsService.DeleteByIdAsync(id) > 0;

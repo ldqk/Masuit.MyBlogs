@@ -7,6 +7,7 @@ using Masuit.Tools.Logging;
 using Microsoft.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -113,8 +114,8 @@ public sealed class MsgController : BaseController
     /// <param name="blocklistService"></param>
     /// <param name="cmd"></param>
     /// <returns></returns>
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<ActionResult> Submit([FromServices] IEmailBlocklistService blocklistService, LeaveMessageCommand cmd)
+    [HttpPost, ValidateAntiForgeryToken, DistributedLockFilter]
+    public async Task<ActionResult> Submit([FromServices] IEmailBlocklistService blocklistService, [FromBodyOrDefault] LeaveMessageCommand cmd)
     {
         var match = Regex.Match(cmd.NickName + cmd.Content.RemoveHtmlTag(), CommonHelper.BanRegex);
         if (match.Success)

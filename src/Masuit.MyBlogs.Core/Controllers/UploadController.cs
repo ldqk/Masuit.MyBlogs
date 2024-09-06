@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using Masuit.Tools.Mime;
 using Configuration = AngleSharp.Configuration;
 using Mammoth;
+using Masuit.MyBlogs.Core.Extensions;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -37,7 +38,7 @@ public sealed class UploadController : Controller
     /// 上传Word转码
     /// </summary>
     /// <returns></returns>
-    [HttpPost]
+    [HttpPost, DistributedLockFilter]
     public async Task<ActionResult> UploadWord(CancellationToken cancellationToken)
     {
         var form = await Request.ReadFormAsync(cancellationToken);
@@ -206,7 +207,7 @@ public sealed class UploadController : Controller
     /// <param name="file"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    [HttpPost("upload"), ApiExplorerSettings(IgnoreApi = false)]
+    [HttpPost("upload"), ApiExplorerSettings(IgnoreApi = false), DistributedLockFilter]
     public async Task<ActionResult> UploadFile([FromServices] ImagebedClient imagebedClient, IFormFile file, CancellationToken cancellationToken)
     {
         string path;
