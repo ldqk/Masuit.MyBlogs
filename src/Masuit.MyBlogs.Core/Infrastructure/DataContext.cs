@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using EntityFramework.Exceptions.Common;
 using EntityFramework.Exceptions.PostgreSQL;
+using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.Mapping;
 
@@ -163,4 +164,8 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public virtual DbSet<PostTag> PostTags { get; set; }
 
     public virtual DbSet<EmailBlocklist> EmailBlocklist { get; set; }
+
+    public virtual DbSet<IpInterceptLog> IpInterceptLogs { get; set; }
+
+    public virtual DbSet<IpReportLog> IpReportLogs { get; set; }
 }

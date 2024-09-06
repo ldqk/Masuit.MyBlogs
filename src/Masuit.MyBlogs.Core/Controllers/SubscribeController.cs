@@ -21,7 +21,11 @@ public sealed class SubscribeController : Controller
     public IAdvertisementService AdvertisementService { get; set; }
 
     public IRedisClient RedisClient { get; set; }
+
+    public IFirewallService FirewallService { get; set; }
+
     private static DateTime StartTime => DateTime.Now.AddDays(CommonHelper.SystemSettings.GetOrAdd("RssStart", "-1").ToInt32());
+
     private static DateTime EndTime => DateTime.Now.AddHours(CommonHelper.SystemSettings.GetOrAdd("RssEnd", "-2").ToInt32());
 
     /// <summary>
@@ -350,8 +354,7 @@ public sealed class SubscribeController : Controller
 
     private void Disallow(Post post)
     {
-        RedisClient.IncrBy("interceptCount", 1);
-        RedisClient.LPush("intercept", new IpIntercepter()
+        FirewallService.AddIntercept(new IpInterceptLog()
         {
             IP = HttpContext.Connection.RemoteIpAddress.ToString(),
             RequestUrl = $"//{Request.Host}/{post.Id}",

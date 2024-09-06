@@ -30,6 +30,8 @@ public sealed class SystemController : AdminController
 
     public IEmailBlocklistService EmailBlocklistService { get; set; }
 
+    public IFirewallService FirewallService { get; set; }
+
     public ActionResult GetServers()
     {
         var servers = PerfCounter.CreateDataSource().Select(c => c.ServerIP).Distinct().ToArray();
@@ -328,10 +330,10 @@ public sealed class SystemController : AdminController
     /// <returns></returns>
     public ActionResult InterceptLog()
     {
-        var list = RedisHelper.LRange<IpIntercepter>("intercept", 0, -1);
+        var list = FirewallService.GetAll();
         return ResultData(new
         {
-            interceptCount = RedisHelper.Get("interceptCount"),
+            interceptCount = FirewallService.TotalCount(),
             list,
             ranking = list.GroupBy(i => i.IP).Where(g => g.Count() > 1).Select(g =>
             {
@@ -356,7 +358,7 @@ public sealed class SystemController : AdminController
     /// <returns></returns>
     public ActionResult ClearInterceptLog()
     {
-        bool b = RedisHelper.Del("intercept") > 0;
+        bool b = FirewallService.Clear();
         return ResultData(null, b, b ? "拦截日志清除成功！" : "拦截日志清除失败！");
     }
 

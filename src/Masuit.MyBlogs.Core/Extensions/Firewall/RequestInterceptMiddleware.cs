@@ -18,6 +18,7 @@ public class RequestInterceptMiddleware
     private readonly RequestDelegate _next;
     private readonly IRedisClient _redisClient;
     private readonly IRequestLogger _requestLogger;
+    private readonly IFirewallService _firewallService;
 
     /// <summary>
     /// 构造函数
@@ -25,11 +26,13 @@ public class RequestInterceptMiddleware
     /// <param name="next"></param>
     /// <param name="requestLogger"></param>
     /// <param name="redisClient"></param>
-    public RequestInterceptMiddleware(RequestDelegate next, IRequestLogger requestLogger, IRedisClient redisClient)
+    /// <param name="firewallService"></param>
+    public RequestInterceptMiddleware(RequestDelegate next, IRequestLogger requestLogger, IRedisClient redisClient, IFirewallService firewallService)
     {
         _next = next;
         _requestLogger = requestLogger;
         _redisClient = redisClient;
+        _firewallService = firewallService;
     }
 
     public Task Invoke(HttpContext context)
@@ -52,8 +55,7 @@ public class RequestInterceptMiddleware
         var match = Regex.Match(path ?? "", CommonHelper.BanRegex);
         if (match.Length > 0)
         {
-            _redisClient.IncrBy("interceptCount", 1);
-            _redisClient.LPush("intercept", new IpIntercepter
+            _firewallService.AddIntercept(new IpInterceptLog
             {
                 IP = ip,
                 RequestUrl = requestUrl,

@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 
-public sealed class CloudflareRepoter(HttpClient httpClient, IConfiguration configuration) : IFirewallRepoter
+public sealed class CloudflareRepoter(HttpClient httpClient, IConfiguration configuration, DataContext dataContext) : IFirewallRepoter
 {
     public string ReporterName { get; set; } = "cloudflare";
 
@@ -14,35 +14,51 @@ public sealed class CloudflareRepoter(HttpClient httpClient, IConfiguration conf
         ReportAsync(ip).Wait();
     }
 
-    public Task ReportAsync(IPAddress ip)
+    public Task<bool> ReportAsync(IPAddress ip)
     {
+        var s = ip.ToString();
+        if (dataContext.IpReportLogs.Any(e => e.IP == s))
+        {
+            return Task.FromResult(false);
+        }
+
         var scope = configuration["FirewallService:Cloudflare:Scope"];
         var zoneid = configuration["FirewallService:Cloudflare:ZoneId"];
         var fallbackPolicy = Policy.HandleInner<HttpRequestException>().FallbackAsync(_ =>
         {
             LogManager.Info($"cloudflare请求出错，{ip}上报失败！");
-            return Task.CompletedTask;
+            return Task.FromResult(false);
         });
         var retryPolicy = Policy.HandleInner<HttpRequestException>().RetryAsync(3);
-        return fallbackPolicy.WrapAsync(retryPolicy).ExecuteAsync(() => httpClient.PostAsJsonAsync($"https://api.cloudflare.com/client/v4/{scope}/{zoneid}/firewall/access_rules/rules", new
+        return fallbackPolicy.WrapAsync(retryPolicy).ExecuteAsync(async () =>
         {
-            mode = "block",
-            notes = $"恶意请求IP{ip.GetIPLocation()}",
-            configuration = new
+            await httpClient.PostAsJsonAsync($"https://api.cloudflare.com/client/v4/{scope}/{zoneid}/firewall/access_rules/rules", new
             {
-                target = ip.AddressFamily switch
+                mode = "block",
+                notes = $"恶意请求IP{ip.GetIPLocation()}",
+                configuration = new
                 {
-                    AddressFamily.InterNetworkV6 => "ip6",
-                    _ => "ip"
-                },
-                value = ip.ToString()
-            }
-        }).ContinueWith(t =>
-        {
-            if (!t.Result.IsSuccessStatusCode)
+                    target = ip.AddressFamily switch
+                    {
+                        AddressFamily.InterNetworkV6 => "ip6",
+                        _ => "ip"
+                    },
+                    value = s
+                }
+            }).ContinueWith(t =>
             {
-                throw new HttpRequestException("请求失败");
-            }
-        }));
+                if (!t.Result.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException("请求失败");
+                }
+            });
+            dataContext.IpReportLogs.Add(new IpReportLog
+            {
+                IP = s,
+                Time = DateTime.Now
+            });
+            await dataContext.SaveChangesAsync();
+            return true;
+        });
     }
 }

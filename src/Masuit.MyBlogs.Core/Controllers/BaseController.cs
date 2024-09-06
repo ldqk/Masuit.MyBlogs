@@ -32,21 +32,23 @@ public class BaseController : Controller
 
     public IRedisClient RedisHelper { get; set; }
 
-    public UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
+    public IFirewallService FirewallService { get; set; }
+
+    protected UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
 
     /// <summary>
     /// 客户端的真实IP
     /// </summary>
-    public IPAddress ClientIP => HttpContext.Connection.RemoteIpAddress;
+    protected IPAddress ClientIP => HttpContext.Connection.RemoteIpAddress;
 
     /// <summary>
     /// 普通访客是否token合法
     /// </summary>
-    public bool VisitorTokenValid => Request.Cookies.ContainsKey("FullAccessToken") && Request.Cookies["Email"].MDString(AppConfig.BaiduAK).Equals(Request.Cookies["FullAccessToken"]);
+    private bool VisitorTokenValid => Request.Cookies.ContainsKey("FullAccessToken") && Request.Cookies["Email"].MDString(AppConfig.BaiduAK).Equals(Request.Cookies["FullAccessToken"]);
 
-    public int[] HideCategories => Request.GetHideCategories();
+    private int[] HideCategories => Request.GetHideCategories();
 
-    public bool SafeMode => !Request.Cookies.ContainsKey("Nsfw") || Request.Cookies["Nsfw"] == "1";
+    private bool SafeMode => !Request.Cookies.ContainsKey("Nsfw") || Request.Cookies["Nsfw"] == "1";
 
     /// <summary>
     /// 响应数据
@@ -326,8 +328,7 @@ public class BaseController : Controller
             remark += "，发生了IP切换，原始IP：" + rawip.Base64Decrypt();
         }
 
-        RedisHelper.IncrBy("interceptCount", 1);
-        RedisHelper.LPush("intercept", new IpIntercepter()
+        FirewallService.AddIntercept(new IpInterceptLog()
         {
             IP = ip,
             RequestUrl = $"//{Request.Host}/{post.Id}",

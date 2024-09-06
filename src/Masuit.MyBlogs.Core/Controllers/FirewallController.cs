@@ -16,6 +16,8 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
 {
     public IRedisClient RedisClient { get; set; }
 
+    public IFirewallService FirewallService { get; set; }
+
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient();
 
     /// <summary>
@@ -124,7 +126,7 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
     /// <returns></returns>
     [HttpGet("/craw/{id}")]
     [ServiceFilter(typeof(FirewallAttribute))]
-    public IActionResult AntiCrawler(string id, [FromServices] IWebHostEnvironment env)
+    public async Task<IActionResult> AntiCrawler(string id, [FromServices] IWebHostEnvironment env)
     {
         if (Request.IsRobot())
         {
@@ -132,7 +134,7 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
         }
 
         var ip = HttpContext.Connection.RemoteIpAddress.ToString();
-        RedisClient.LPush("intercept", new IpIntercepter()
+        await FirewallService.AddInterceptAsync(new IpInterceptLog()
         {
             IP = ip,
             RequestUrl = Request.GetDisplayUrl(),
@@ -148,8 +150,8 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
                 Request.Headers
             }.ToJsonString()
         });
-        RedisClient.Incr(nameof(AntiCrawler) + ":" + ip);
-        RedisClient.Expire(nameof(AntiCrawler) + ":" + ip, TimeSpan.FromMinutes(10));
+        await RedisClient.IncrAsync(nameof(AntiCrawler) + ":" + ip);
+        await RedisClient.ExpireAsync(nameof(AntiCrawler) + ":" + ip, TimeSpan.FromMinutes(10));
         if (RedisClient.Get<int>(nameof(AntiCrawler) + ":" + ip) > 3)
         {
             return Conflict();

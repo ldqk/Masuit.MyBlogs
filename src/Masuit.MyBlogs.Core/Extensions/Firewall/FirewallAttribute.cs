@@ -23,6 +23,8 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
     public IRedisClient RedisClient { get; set; }
 
+    public IFirewallService FirewallService { get; set; }
+
     private static readonly char[] Separator = [',', '|', '，'];
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -41,6 +43,13 @@ public sealed class FirewallAttribute : IAsyncActionFilter
         request.Headers.Values.Contains("");
         var ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
         var tokenValid = request.Cookies.ContainsKey("FullAccessToken") && request.Cookies["Email"].MDString(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]);
+
+        //攻击重定向
+        if (!string.IsNullOrWhiteSpace(CommonHelper.SystemSettings["AttackRedirects"]) && await FirewallService.ReportedAsync(ip))
+        {
+            context.Result = new RedirectResult(CommonHelper.SystemSettings["AttackRedirects"].Split(["\r", "\n"], StringSplitOptions.RemoveEmptyEntries).OrderByRandom().First());
+            return;
+        }
 
         //黑名单
         if (ip.IsDenyIpAddress() && !tokenValid)
@@ -244,8 +253,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
     private async Task AccessDeny(string ip, HttpRequest request, string remark)
     {
         var path = HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8);
-        await RedisClient.IncrByAsync("interceptCount", 1);
-        await RedisClient.LPushAsync("intercept", new IpIntercepter
+        await FirewallService.AddInterceptAsync(new IpInterceptLog
         {
             IP = ip,
             RequestUrl = HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + path),
@@ -262,7 +270,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
             }.ToJsonString()
         });
         var key = "FirewallRepoter:" + FirewallRepoter.ReporterName + ":" + ip;
-        if (!MemoryCache.TryGetValue(key, out _) && (await RedisClient.LRangeAsync<IpIntercepter>("intercept", 0, -1)).Count(x => x.IP == ip) >= CommonHelper.SystemSettings.GetOrAdd("LimitIPInterceptTimes", "30").ToInt32())
+        if (!MemoryCache.TryGetValue(key, out _) && FirewallService.InterceptCount(ip) >= CommonHelper.SystemSettings.GetOrAdd("LimitIPInterceptTimes", "30").ToInt32())
         {
             LogManager.Info($"准备上报IP{ip}到{FirewallRepoter.ReporterName}");
             await FirewallRepoter.ReportAsync(IPAddress.Parse(ip)).ContinueWith(_ =>
