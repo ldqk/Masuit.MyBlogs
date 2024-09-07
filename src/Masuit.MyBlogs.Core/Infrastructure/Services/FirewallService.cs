@@ -50,7 +50,7 @@ public class FirewallService(DataContext dataContext, IRedisClient redis) : IFir
 
     public List<IpInterceptLog> GetAll()
     {
-        return dataContext.IpInterceptLogs.OrderByDescending(e => e.Time).Cacheable().ToList();
+        return Buffer.Union(dataContext.IpInterceptLogs.OrderByDescending(e => e.Time).Cacheable()).ToList();
     }
 
     public IQueryable<IpInterceptLog> Queryable()

@@ -201,7 +201,7 @@ function post(url, params, callback, error) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json', // 设置请求头，告诉服务器发送的是 JSON 数据
-            'RequestVerificationToken': params.__RequestVerificationToken
+            'RequestVerificationToken': params ? params["__RequestVerificationToken"] : null
         },
         mode: 'cors',
         body: JSON.stringify(params)

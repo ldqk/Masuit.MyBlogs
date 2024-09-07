@@ -187,7 +187,7 @@ public sealed class CommentController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost, DistributedLockFilter]
+    [HttpPost("/Comment/{id}/Vote"), DistributedLockFilter]
     public async Task<ActionResult> CommentVote(int id)
     {
         if (HttpContext.Session.Get("cm" + id) != null)

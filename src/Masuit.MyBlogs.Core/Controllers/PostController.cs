@@ -211,6 +211,7 @@ public sealed class PostController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
+    [HttpPost("/post/votedown/{id}")]
     public async Task<ActionResult> VoteDown(int id)
     {
         if (HttpContext.Session.Get("post-vote" + id) != null)
@@ -232,6 +233,7 @@ public sealed class PostController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
+    [HttpPost("/post/voteup/{id}")]
     public async Task<ActionResult> VoteUp(int id)
     {
         if (HttpContext.Session.Get("post-vote" + id) != null)
