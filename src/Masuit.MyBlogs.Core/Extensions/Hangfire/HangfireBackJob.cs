@@ -50,8 +50,9 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
         var userInfoService = _serviceScope.ServiceProvider.GetRequiredService<IUserInfoService>();
         var settingService = _serviceScope.ServiceProvider.GetRequiredService<ISystemSettingService>();
         var u = userInfoService.GetByUsername(userInfo.Username);
-        u.LoginRecord.Add(record);
-        userInfoService.SaveChanges();
+        var recordService = _serviceScope.ServiceProvider.GetRequiredService<ILoginRecordService>();
+        recordService.AddEntity(record);
+        recordService.SaveChanges();
         var content = new Template(File.ReadAllText(Path.Combine(_hostEnvironment.WebRootPath, "template", "login.html")))
             .Set("name", u.Username)
             .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
