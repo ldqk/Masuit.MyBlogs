@@ -2,10 +2,11 @@
 using Polly;
 using System.Net;
 using System.Net.Sockets;
+using Masuit.Tools.Core;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 
-public sealed class CloudflareRepoter(HttpClient httpClient, IConfiguration configuration, DataContext dataContext) : IFirewallRepoter
+public sealed class CloudflareReporter(HttpClient httpClient, IConfiguration configuration, DataContext dataContext) : IFirewallReporter
 {
     public string ReporterName { get; set; } = "cloudflare";
 
@@ -14,12 +15,12 @@ public sealed class CloudflareRepoter(HttpClient httpClient, IConfiguration conf
         ReportAsync(ip).Wait();
     }
 
-    public Task<bool> ReportAsync(IPAddress ip)
+    public async Task<bool> ReportAsync(IPAddress ip)
     {
         var s = ip.ToString();
-        if (dataContext.IpReportLogs.Any(e => e.IP == s))
+        if (await dataContext.IpReportLogs.AnyWithNoLockAsync(e => e.IP == s))
         {
-            return Task.FromResult(false);
+            return false;
         }
 
         var scope = configuration["FirewallService:Cloudflare:Scope"];
@@ -30,7 +31,7 @@ public sealed class CloudflareRepoter(HttpClient httpClient, IConfiguration conf
             return Task.FromResult(false);
         });
         var retryPolicy = Policy.HandleInner<HttpRequestException>().RetryAsync(3);
-        return fallbackPolicy.WrapAsync(retryPolicy).ExecuteAsync(async () =>
+        return await fallbackPolicy.WrapAsync(retryPolicy).ExecuteAsync(async () =>
         {
             await httpClient.PostAsJsonAsync($"https://api.cloudflare.com/client/v4/{scope}/{zoneid}/firewall/access_rules/rules", new
             {

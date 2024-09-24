@@ -25,7 +25,7 @@ public sealed class PassportController : Controller
     /// </summary>
     public IUserInfoService UserInfoService { get; set; }
 
-    public IFirewallRepoter FirewallRepoter { get; set; }
+    public IFirewallReporter FirewallReporter { get; set; }
 
     public IMapper Mapper { get; set; }
 
@@ -153,7 +153,7 @@ public sealed class PassportController : Controller
             var times = cacheManager.Incr("LoginError:" + ClientIP);
             if (times > 30)
             {
-                FirewallRepoter.ReportAsync(IPAddress.Parse(ClientIP)).ContinueWith(_ => LogManager.Info($"多次登录用户名或密码错误，疑似爆破行为，已上报IP{ClientIP}至：" + FirewallRepoter.ReporterName));
+                FirewallReporter.ReportAsync(IPAddress.Parse(ClientIP)).ContinueWith(_ => LogManager.Info($"多次登录用户名或密码错误，疑似爆破行为，已上报IP{ClientIP}至：" + FirewallReporter.ReporterName));
             }
 
             return ResultData(null, false, "用户名或密码错误");

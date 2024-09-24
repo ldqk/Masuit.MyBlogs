@@ -386,10 +386,10 @@ public sealed class SystemController : AdminController
     /// <summary>
     /// 将IP添加到黑名单
     /// </summary>
-    /// <param name="firewallRepoter"></param>
+    /// <param name="firewallReporter"></param>
     /// <param name="ip"></param>
     /// <returns></returns>
-    public async Task<ActionResult> AddToBlackList([FromServices] IFirewallRepoter firewallRepoter, [FromBodyOrDefault] string ip)
+    public async Task<ActionResult> AddToBlackList([FromServices] IFirewallReporter firewallReporter, [FromBodyOrDefault] string ip)
     {
         if (!ip.MatchInetAddress())
         {
@@ -401,7 +401,7 @@ public sealed class SystemController : AdminController
         await new FileInfo(Path.Combine(basedir, "App_Data", "denyip.txt")).ShareReadWrite().WriteAllTextAsync(CommonHelper.DenyIP, Encoding.UTF8);
         CommonHelper.IPWhiteList.Remove(ip);
         await new FileInfo(Path.Combine(basedir, "App_Data", "whitelist.txt")).ShareReadWrite().WriteAllTextAsync(string.Join(",", CommonHelper.IPWhiteList.Distinct()), Encoding.UTF8);
-        await firewallRepoter.ReportAsync(IPAddress.Parse(ip));
+        await firewallReporter.ReportAsync(IPAddress.Parse(ip));
         return ResultData(null);
     }
 

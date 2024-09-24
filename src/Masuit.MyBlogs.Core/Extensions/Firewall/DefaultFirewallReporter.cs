@@ -1,8 +1,9 @@
 ﻿using System.Net;
+using Masuit.Tools.Core;
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 
-public sealed class DefaultFirewallRepoter(DataContext dataContext) : IFirewallRepoter
+public sealed class DefaultFirewallReporter(DataContext dataContext) : IFirewallReporter
 {
     public string ReporterName { get; set; }
 
@@ -13,7 +14,7 @@ public sealed class DefaultFirewallRepoter(DataContext dataContext) : IFirewallR
     public void Report(IPAddress ip)
     {
         var s = ip.ToString();
-        if (dataContext.IpReportLogs.Any(e => e.IP == s))
+        if (dataContext.IpReportLogs.AnyWithNoLock(e => e.IP == s))
         {
             return;
         }
@@ -33,7 +34,7 @@ public sealed class DefaultFirewallRepoter(DataContext dataContext) : IFirewallR
     public async Task<bool> ReportAsync(IPAddress ip)
     {
         var s = ip.ToString();
-        if (dataContext.IpReportLogs.Any(e => e.IP == s))
+        if (await dataContext.IpReportLogs.AnyWithNoLockAsync(e => e.IP == s))
         {
             return false;
         }

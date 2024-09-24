@@ -8,12 +8,13 @@ namespace Masuit.MyBlogs.Core.Infrastructure.Services;
 public class FirewallService(DataContext dataContext, IRedisClient redis) : IFirewallService
 {
     private static readonly ConcurrentQueue<IpInterceptLog> Buffer = new();
+    private DateTime _lastSave = DateTime.Now;
 
     public void AddIntercept(IpInterceptLog log)
     {
         Buffer.Enqueue(log);
         redis.IncrBy("interceptCount", 1);
-        if (Buffer.Count >= 100)
+        if (Buffer.Count >= 10 || DateTime.Now - _lastSave > TimeSpan.FromMinutes(10))
         {
             while (Buffer.TryDequeue(out var item))
             {
@@ -21,6 +22,7 @@ public class FirewallService(DataContext dataContext, IRedisClient redis) : IFir
             }
 
             dataContext.SaveChanges();
+            _lastSave = DateTime.Now;
         }
     }
 
@@ -28,13 +30,15 @@ public class FirewallService(DataContext dataContext, IRedisClient redis) : IFir
     {
         Buffer.Enqueue(log);
         await redis.IncrByAsync("interceptCount", 1);
-        if (Buffer.Count >= 100)
+        if (Buffer.Count >= 10 || DateTime.Now - _lastSave > TimeSpan.FromMinutes(10))
         {
             while (Buffer.TryDequeue(out var item))
             {
                 dataContext.Add(item);
             }
+
             await dataContext.SaveChangesAsync();
+            _lastSave = DateTime.Now;
         }
     }
 

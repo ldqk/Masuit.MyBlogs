@@ -5,7 +5,7 @@ public class IpInterceptLog
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
-    [StringLength(32)]
+    [StringLength(64)]
     public string IP { get; set; }
 
     public string RequestUrl { get; set; }
@@ -30,7 +30,7 @@ public class IpInterceptLog
 
 public class IpReportLog
 {
-    [Key, StringLength(32), DatabaseGenerated(DatabaseGeneratedOption.Identity), ConcurrencyCheck]
+    [Key, StringLength(64), ConcurrencyCheck]
     public string IP { get; set; }
 
     public DateTime Time { get; set; }

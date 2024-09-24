@@ -17,7 +17,7 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 
 public sealed class FirewallAttribute : IAsyncActionFilter
 {
-    public IFirewallRepoter FirewallRepoter { get; set; }
+    public IFirewallReporter FirewallReporter { get; set; }
 
     public IMemoryCache MemoryCache { get; set; }
 
@@ -269,14 +269,14 @@ public sealed class FirewallAttribute : IAsyncActionFilter
                 request.Headers
             }.ToJsonString()
         });
-        var key = "FirewallRepoter:" + FirewallRepoter.ReporterName + ":" + ip;
+        var key = "FirewallReporter:" + FirewallReporter.ReporterName + ":" + ip;
         if (!MemoryCache.TryGetValue(key, out _) && FirewallService.InterceptCount(ip) >= CommonHelper.SystemSettings.GetOrAdd("LimitIPInterceptTimes", "30").ToInt32())
         {
-            LogManager.Info($"准备上报IP{ip}到{FirewallRepoter.ReporterName}");
-            await FirewallRepoter.ReportAsync(IPAddress.Parse(ip)).ContinueWith(_ =>
+            LogManager.Info($"准备上报IP{ip}到{FirewallReporter.ReporterName}");
+            await FirewallReporter.ReportAsync(IPAddress.Parse(ip)).ContinueWith(_ =>
             {
                 MemoryCache.Set(key, 1, TimeSpan.FromDays(1));
-                LogManager.Info($"访问频次限制，已上报IP{ip}至：" + FirewallRepoter.ReporterName);
+                LogManager.Info($"访问频次限制，已上报IP{ip}至：" + FirewallReporter.ReporterName);
             });
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 
-public interface IFirewallRepoter
+public interface IFirewallReporter
 {
     string ReporterName { get; set; }
 
