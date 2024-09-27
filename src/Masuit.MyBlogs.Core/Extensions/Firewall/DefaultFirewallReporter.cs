@@ -38,7 +38,7 @@ public sealed class DefaultFirewallReporter(DataContext dataContext) : IFirewall
         {
             return false;
         }
-        dataContext.IpReportLogs.Add(new IpReportLog
+        await dataContext.IpReportLogs.AddAsync(new IpReportLog
         {
             IP = s,
             Time = DateTime.Now

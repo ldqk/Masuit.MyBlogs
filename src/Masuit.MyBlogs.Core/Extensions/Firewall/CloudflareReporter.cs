@@ -25,12 +25,12 @@ public sealed class CloudflareReporter(HttpClient httpClient, IConfiguration con
 
         var scope = configuration["FirewallService:Cloudflare:Scope"];
         var zoneid = configuration["FirewallService:Cloudflare:ZoneId"];
-        var fallbackPolicy = Policy.HandleInner<HttpRequestException>().FallbackAsync(_ =>
+        var fallbackPolicy = Policy<bool>.HandleInner<HttpRequestException>().FallbackAsync(_ =>
         {
             LogManager.Info($"cloudflare请求出错，{ip}上报失败！");
             return Task.FromResult(false);
         });
-        var retryPolicy = Policy.HandleInner<HttpRequestException>().RetryAsync(3);
+        var retryPolicy = Policy<bool>.HandleInner<HttpRequestException>().RetryAsync(3);
         return await fallbackPolicy.WrapAsync(retryPolicy).ExecuteAsync(async () =>
         {
             await httpClient.PostAsJsonAsync($"https://api.cloudflare.com/client/v4/{scope}/{zoneid}/firewall/access_rules/rules", new
@@ -53,7 +53,7 @@ public sealed class CloudflareReporter(HttpClient httpClient, IConfiguration con
                     throw new HttpRequestException("请求失败");
                 }
             });
-            dataContext.IpReportLogs.Add(new IpReportLog
+            await dataContext.IpReportLogs.AddAsync(new IpReportLog
             {
                 IP = s,
                 Time = DateTime.Now

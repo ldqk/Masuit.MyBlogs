@@ -273,11 +273,12 @@ public sealed class FirewallAttribute : IAsyncActionFilter
         if (!MemoryCache.TryGetValue(key, out _) && FirewallService.InterceptCount(ip) >= CommonHelper.SystemSettings.GetOrAdd("LimitIPInterceptTimes", "30").ToInt32())
         {
             LogManager.Info($"准备上报IP{ip}到{FirewallReporter.ReporterName}");
-            await FirewallReporter.ReportAsync(IPAddress.Parse(ip)).ContinueWith(_ =>
+            var reported = await FirewallReporter.ReportAsync(IPAddress.Parse(ip));
+            if (reported)
             {
                 MemoryCache.Set(key, 1, TimeSpan.FromDays(1));
                 LogManager.Info($"访问频次限制，已上报IP{ip}至：" + FirewallReporter.ReporterName);
-            });
+            }
         }
     }
 }
