@@ -76,7 +76,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
             var msg = CommonHelper.SystemSettings.GetOrAdd("UserAgentBlockedMsg", "当前浏览器不支持访问本站");
             context.Result = new ContentResult
             {
-                Content = Markdown.ToHtml(Template.Create(msg).Set("browser", agent.Browser + " " + agent.BrowserVersion).Set("os", agent.Platform).Render()),
+                Content = Markdown.ToHtml(Template.Create(msg).Set("browser", agent.Browser + " " + agent.BrowserVersion).Set("os", agent.Platform).Set("link", HttpUtility.UrlDecode(request.Scheme + "://" + request.Host + HttpUtility.UrlDecode(request.Path + request.QueryString, Encoding.UTF8))).Render()),
                 ContentType = ContentType.Html + "; charset=utf-8",
                 StatusCode = 403
             };
