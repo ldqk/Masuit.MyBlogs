@@ -345,7 +345,7 @@
             });
         });
         $("#pass").on("click", function (e) {
-            window.post("/post/pass", { id:@Model.Id}, function (data) {
+            window.post("/post/pass/"+@Model.Id,null, function (data) {
                 window.notie.alert({
                     type: 1,
                     text: data.Message,
@@ -361,7 +361,7 @@
             });
         });
         $("#pin").on("click", function (e) {
-            window.post("/post/Fixtop", { id: @Model.Id }, function (data) {
+            window.post("/post/Fixtop/"+@Model.Id,null, function (data) {
                 window.notie.alert({
                     type: 1,
                     text: data.Message,

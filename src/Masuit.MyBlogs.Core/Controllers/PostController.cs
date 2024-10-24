@@ -269,7 +269,7 @@ public sealed class PostController : BaseController
     [HttpPost, ValidateAntiForgeryToken, DistributedLockFilter]
     public async Task<ActionResult> Publish([FromBodyOrDefault] PostCommand post, [Required(ErrorMessage = "验证码不能为空"), FromBodyOrDefault] string code, CancellationToken cancellationToken)
     {
-        if (RedisHelper.Get("code:" + post.Email) != code)
+        if (await RedisHelper.GetAsync("code:" + post.Email) != code)
         {
             return ResultData(null, false, "验证码错误！");
         }
@@ -311,7 +311,7 @@ public sealed class PostController : BaseController
             return ResultData(null, false, "文章发表失败！");
         }
 
-        RedisHelper.Expire("code:" + p.Email, 1);
+        await RedisHelper.ExpireAsync("code:" + p.Email, 1);
         var content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/publish.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8))
             .Set("link", Url.Action("Details", "Post", new { id = p.Id }, Request.Scheme))
             .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
@@ -1012,7 +1012,7 @@ public sealed class PostController : BaseController
     [HttpPost("post/{id}/ChangeSeminar"), DistributedLockFilter]
     public async Task<ActionResult> ChangeSeminar(int id, string sids)
     {
-        var post = PostService.GetQuery(e => e.Id == id).Include(e => e.Seminar).FirstOrDefault() ?? throw new NotFoundException("文章不存在");
+        var post = await PostService.GetQuery(e => e.Id == id).Include(e => e.Seminar).FirstOrDefaultAsync() ?? throw new NotFoundException("文章不存在");
         post.Seminar.Clear();
         if (!string.IsNullOrEmpty(sids))
         {
