@@ -5,12 +5,12 @@
     ViewBag.Title = "房贷多次提前还款试算模型计算器";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="container">
+<div class="container-fluid">
     <ol class="cd-breadcrumb triangle">
         <li><a asp-controller="Home" asp-action="Index">首页</a></li>
         <li class="current">
             <em>@ViewBag.Title</em>
         </li>
     </ol>
+    @(await Html.RenderComponentAsync<Loan>(RenderMode.ServerPrerendered, new { IP = Context.Connection.RemoteIpAddress.ToString() }))
 </div>
-@(await Html.RenderComponentAsync<Loan>(RenderMode.ServerPrerendered, new { IP = Context.Connection.RemoteIpAddress.ToString() }))
