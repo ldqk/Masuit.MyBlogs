@@ -22,6 +22,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using Windows = Masuit.Tools.Win32.Windows;
 
 namespace Masuit.MyBlogs.Core
 {
@@ -56,7 +57,7 @@ namespace Masuit.MyBlogs.Core
                     }));
                 });
                 Console.WriteLine($"导入自定义词库完成，耗时{time}s");
-                Windows.ClearMemorySilent();
+                Masuit.Tools.Win32.Windows.ClearMemorySilent();
                 are.Set();
             });
 
