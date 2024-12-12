@@ -194,7 +194,7 @@
     public static Masuit.MyBlogs.Core.Common.PerformanceCounter GetCurrentPerformanceCounter()
     {
         try {
-            return IPerfCounter.GetCurrentPerformanceCounter();
+            return IPerfCounter.List.LastOrDefault()??IPerfCounter.GetCurrentPerformanceCounter();
         }
         catch (Exception e) {
             LogManager.Error(e.Demystify());
@@ -216,7 +216,7 @@
 
     public Dictionary<string, dynamic> GetCounterPercent()
     {
-        var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==_ip).OrderByRandom().Take(5000).ToList();
+        var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==_ip).OrderByRandom().Take(15000).ToList();
         var cpuLoads = counters.Select(c => c.CpuLoad).ToList();
         var memUse = counters.Select(c => c.MemoryUsage).ToList();
         var reads = counters.Select(c => c.DiskRead).ToList();

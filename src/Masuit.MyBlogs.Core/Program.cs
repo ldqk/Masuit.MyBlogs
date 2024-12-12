@@ -11,7 +11,6 @@ try
     if (Environment.OSVersion.Platform is not (PlatformID.MacOSX or PlatformID.Unix))
     {
         // 设置相关进程优先级为高于正常，防止其他进程影响应用程序的运行性能
-        Process.GetProcessesByName("mysqld").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
         Process.GetProcessesByName("pg_ctl").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
         Process.GetProcessesByName("postgres").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
         Process.GetProcessesByName("redis-server").ForEach(p => p.PriorityClass = ProcessPriorityClass.AboveNormal);
@@ -23,13 +22,7 @@ catch
     // ignored
 }
 
-// 确保IP数据库正常
-if (!"223.5.5.5".GetIPLocation().Contains("阿里"))
-{
-    throw new Exception("IP地址库初始化失败，请重启应用！");
-}
-
-Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => builder.AddJsonFile("appsettings.json", true, true)).ConfigureLogging(logger => logger.AddRinLogger()).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureWebHostDefaults(hostBuilder => hostBuilder.UseQuic().UseKestrel(opt =>
+await Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => builder.AddJsonFile("appsettings.json", true, true)).ConfigureLogging(logger => logger.AddRinLogger()).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureWebHostDefaults(hostBuilder => hostBuilder.UseQuic().UseKestrel(opt =>
 {
     var config = opt.ApplicationServices.GetService<IConfiguration>();
     var port = config["Port"] ?? "5000";
@@ -50,4 +43,4 @@ Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => builder.Add
 
     opt.Limits.MaxRequestBodySize = null;
     Console.WriteLine($"应用程序监听端口：http：{port}，https：{sslport}");
-}).UseStartup<Startup>()).Build().Run();
+}).UseStartup<Startup>()).Build().RunAsync();

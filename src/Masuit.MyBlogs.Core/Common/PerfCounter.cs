@@ -9,7 +9,7 @@ namespace Masuit.MyBlogs.Core.Common;
 
 public interface IPerfCounter
 {
-    public static ConcurrentLimitedQueue<PerformanceCounter> List { get; } = new(50000);
+    public static ConcurrentLimitedQueue<PerformanceCounter> List { get; } = new(150000);
 
     public static readonly DateTime StartTime = DateTime.Now;
 
@@ -108,7 +108,7 @@ public sealed class PerfCounterInDatabase(LoggerDbContext dbContext) : IPerfCoun
             dbContext.Add(result);
         }
 
-        var start = DateTime.Now.AddMonths(-1).GetTotalMilliseconds();
+        var start = DateTime.Now.AddMonths(-2).GetTotalMilliseconds();
         dbContext.Set<PerformanceCounter>().Where(e => e.Time < start).ExecuteDelete();
         dbContext.SaveChanges();
     }

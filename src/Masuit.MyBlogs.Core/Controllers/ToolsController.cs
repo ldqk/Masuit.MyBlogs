@@ -56,7 +56,6 @@ public sealed class ToolsController : BaseController
         {
             Location = loc.Coodinate,
             Address = loc.Address,
-            Address2 = loc.Address2,
             Network = new NetworkInfo
             {
                 Asn = asn.AutonomousSystemNumber,
