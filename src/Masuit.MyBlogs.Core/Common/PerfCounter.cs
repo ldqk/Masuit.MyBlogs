@@ -10,7 +10,7 @@ namespace Masuit.MyBlogs.Core.Common;
 public interface IPerfCounter
 {
     public static ConcurrentLimitedQueue<PerformanceCounter> List { get; } = new(150000);
-
+    public static Process CurrentProcess = System.Diagnostics.Process.GetCurrentProcess();
     public static readonly DateTime StartTime = DateTime.Now;
 
     public static void Init()
@@ -46,6 +46,8 @@ public interface IPerfCounter
     {
         var time = DateTime.Now.GetTotalMilliseconds();
         var load = SystemInfo.CpuLoad;
+        var processCpuUsage = CurrentProcess.GetProcessCpuUsage();
+        var processMemory = CurrentProcess.GetProcessMemory() / SystemInfo.PhysicalMemory.ConvertTo<float>() * 100;
         var mem = (1 - SystemInfo.MemoryAvailable.ConvertTo<float>() / SystemInfo.PhysicalMemory.ConvertTo<float>()) * 100;
 
         var read = SystemInfo.GetDiskData(DiskData.Read) / 1024f;
@@ -57,7 +59,9 @@ public interface IPerfCounter
         {
             Time = time,
             CpuLoad = load,
+            ProcessCpuLoad = processCpuUsage,
             MemoryUsage = mem,
+            ProcessMemoryUsage = processMemory,
             DiskRead = read,
             DiskWrite = write,
             Download = down,
@@ -169,10 +173,14 @@ public sealed class PerformanceCounter
     /// </summary>
     public float CpuLoad { get; set; }
 
+    public float ProcessCpuLoad { get; set; }
+
     /// <summary>
     /// 内存使用率
     /// </summary>
     public float MemoryUsage { get; set; }
+
+    public float ProcessMemoryUsage { get; set; }
 
     /// <summary>
     /// 磁盘读

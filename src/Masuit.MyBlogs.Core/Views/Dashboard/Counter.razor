@@ -96,14 +96,18 @@
             <th>@_cacheHits.ToString("P")</th>
         </tr>
         <tr>
-            <td>MAC地址</td>
-            <th colspan="3">@_macs.Join(" , ")</th>
             <td>Redis执行命令数</td>
             <th>@_redisStats["total_commands_processed"]</th>
+            <td>网站CPU使用率</td>
+            <th>@(_process.GetProcessCpuUsage().ToDecimal(2))%</th>
+            <td>网站内存使用</td>
+            <th>@(_process.GetProcessMemory().ToDecimal(2)) MB</th>
         </tr>
         <tr>
+            <td>MAC地址</td>
+            <th>@_macs.Join(" , ")</th>
             <td>IP地址</td>
-            <th colspan="3">@_ips.Join(" , ")</th>
+            <th>@_ips.Join(" , ")</th>
             <td>在线人数</td>
             <th>@CacheManager.SCard("GlobalOnline") 人</th>
         </tr>
@@ -218,7 +222,9 @@
     {
         var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==_ip).OrderByRandom().Take(15000).ToList();
         var cpuLoads = counters.Select(c => c.CpuLoad).ToList();
+        var processCpuLoads = counters.Select(c => c.ProcessCpuLoad).ToList();
         var memUse = counters.Select(c => c.MemoryUsage).ToList();
+        var processMemUse = counters.Select(c => c.ProcessMemoryUsage).ToList();
         var reads = counters.Select(c => c.DiskRead).ToList();
         var writes = counters.Select(c => c.DiskWrite).ToList();
         var downloads = counters.Select(c => c.Download).ToList();
@@ -243,6 +249,26 @@
                 p999 = memUse.Percentile(99.9).ToDecimal(2),
                 average = counters.Average(c => c.MemoryUsage).ToDecimal(2),
                 stdev = memUse.StandardDeviation().ToDecimal(2),
+            },
+            ["网站CPU使用率(%)"] = new
+            {
+                p50 = processCpuLoads.Percentile(50).ToDecimal(2),
+                p75 = processCpuLoads.Percentile(75).ToDecimal(2),
+                p90 = processCpuLoads.Percentile(90).ToDecimal(2),
+                p99 = processCpuLoads.Percentile(99).ToDecimal(2),
+                p999 = processCpuLoads.Percentile(99.9).ToDecimal(2),
+                average = counters.Average(c => c.ProcessCpuLoad).ToDecimal(2),
+                stdev = processCpuLoads.StandardDeviation().ToDecimal(2),
+            },
+            ["网站内存使用率(%)"] = new
+            {
+                p50 = processMemUse.Percentile(50).ToDecimal(2),
+                p75 = processMemUse.Percentile(75).ToDecimal(2),
+                p90 = processMemUse.Percentile(90).ToDecimal(2),
+                p99 = processMemUse.Percentile(99).ToDecimal(2),
+                p999 = processMemUse.Percentile(99.9).ToDecimal(2),
+                average = counters.Average(c => c.ProcessMemoryUsage).ToDecimal(2),
+                stdev = processMemUse.StandardDeviation().ToDecimal(2),
             },
             ["磁盘读(KBps)"] = new
             {

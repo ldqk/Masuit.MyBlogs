@@ -63,11 +63,13 @@ public sealed class SystemController : AdminController
         {
             Time = g.Key * ticks,
             CpuLoad = g.Average(c => c.CpuLoad),
+            ProcessCpuLoad = g.Average(c => c.ProcessCpuLoad),
             DiskRead = g.Average(c => c.DiskRead),
             DiskWrite = g.Average(c => c.DiskWrite),
             Download = g.Average(c => c.Download),
             Upload = g.Average(c => c.Upload),
-            MemoryUsage = g.Average(c => c.MemoryUsage)
+            MemoryUsage = g.Average(c => c.MemoryUsage),
+            ProcessMemoryUsage = g.Average(c => c.ProcessMemoryUsage),
         }).OrderBy(c => c.Time).ToPooledListScope();
         return Ok(new
         {
@@ -76,10 +78,20 @@ public sealed class SystemController : AdminController
                 c.Time,
                 c.CpuLoad.ToDecimal(2)
             }),
+            processCpu = list.Select(c => new[]
+            {
+                c.Time,
+                c.ProcessCpuLoad.ToDecimal(2)
+            }),
             mem = list.Select(c => new[]
             {
                 c.Time,
                 c.MemoryUsage.ToDecimal(2)
+            }),
+            processMem = list.Select(c => new[]
+            {
+                c.Time,
+                c.ProcessMemoryUsage.ToDecimal(2)
             }),
             read = list.Select(c => new[]
             {

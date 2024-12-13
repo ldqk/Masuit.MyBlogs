@@ -27,26 +27,44 @@
                 roundCap: true
             },
             data: [{
-                    value: 0,
-                    name: 'CPU',
-                    title: {
-                        offsetCenter: ['-20%', '80%']
-                    },
-                    detail: {
-                        offsetCenter: ['-20%', '95%']
-                    }
+                value: 0,
+                name: 'CPU',
+                title: {
+                    offsetCenter: ['-25%', '80%']
                 },
-                {
-                    value: 0,
-                    name: '内存',
-                    title: {
-                        offsetCenter: ['20%', '80%']
-                    },
-                    detail: {
-                        offsetCenter: ['20%', '95%']
-                    }
+                detail: {
+                    offsetCenter: ['-25%', '95%']
                 }
-            ],
+            },
+            {
+                value: 0,
+                name: '内存',
+                title: {
+                    offsetCenter: ['25%', '80%']
+                },
+                detail: {
+                    offsetCenter: ['25%', '95%']
+                }
+            }, {
+                value: 0,
+                name: 'CPU(网站)',
+                title: {
+                    offsetCenter: ['-75%', '80%']
+                },
+                detail: {
+                    offsetCenter: ['-75%', '95%']
+                }
+            },
+            {
+                value: 0,
+                name: '内存(网站)',
+                title: {
+                    offsetCenter: ['75%', '80%']
+                },
+                detail: {
+                    offsetCenter: ['75%', '95%']
+                }
+            }],
             title: {
                 fontSize: 14
             },
@@ -74,22 +92,22 @@ function showIO(data) {
             }
         },
         dataZoom: [{
-                type: 'inside',
-                start: 70,
-                end: 100,
-                minValueSpan: 100
-            }, {
-                start: 70,
-                end: 100,
-                minValueSpan: 100
-            }],
+            type: 'inside',
+            start: 70,
+            end: 100,
+            minValueSpan: 100
+        }, {
+            start: 70,
+            end: 100,
+            minValueSpan: 100
+        }],
         xAxis: {
             type: 'time',
             interval: 20000,
             axisLabel: {
-                formatter:function (value){
-                    var dt=new Date(value);
-                    return dt.getHours()+":"+dt.getMinutes()+":"+dt.getSeconds()
+                formatter: function (value) {
+                    var dt = new Date(value);
+                    return dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds()
                 }
             },
             splitLine: {
@@ -97,50 +115,50 @@ function showIO(data) {
             }
         },
         yAxis: [{
-                name: '磁盘',
-                type: 'value',
-                splitLine: {
-                    show: false
-                }
-            },
-            {
-                name: '网络',
-                type: 'value',
-                splitLine: {
-                    show: false
-                }
+            name: '磁盘',
+            type: 'value',
+            splitLine: {
+                show: false
             }
+        },
+        {
+            name: '网络',
+            type: 'value',
+            splitLine: {
+                show: false
+            }
+        }
         ],
         legend: {
             data: ['磁盘读(KBps)', '磁盘写(KBps)', "网络上行(KBps)", "网络下行(KBps)"]
         },
         series: [{
-                name: '磁盘读(KBps)',
-                type: 'line',
-                showSymbol: false,
-                hoverAnimation: false,
-                data: data.read
-            }, {
-                name: '磁盘写(KBps)',
-                type: 'line',
-                showSymbol: false,
-                hoverAnimation: false,
-                data: data.write
-            }, {
-                name: '网络上行(KBps)',
-                yAxisIndex: 1,
-                type: 'line',
-                showSymbol: false,
-                hoverAnimation: false,
-                data: data.up
-            }, {
-                name: '网络下行(KBps)',
-                yAxisIndex: 1,
-                type: 'line',
-                showSymbol: false,
-                hoverAnimation: false,
-                data: data.down
-            }]
+            name: '磁盘读(KBps)',
+            type: 'line',
+            showSymbol: false,
+            hoverAnimation: false,
+            data: data.read
+        }, {
+            name: '磁盘写(KBps)',
+            type: 'line',
+            showSymbol: false,
+            hoverAnimation: false,
+            data: data.write
+        }, {
+            name: '网络上行(KBps)',
+            yAxisIndex: 1,
+            type: 'line',
+            showSymbol: false,
+            hoverAnimation: false,
+            data: data.up
+        }, {
+            name: '网络下行(KBps)',
+            yAxisIndex: 1,
+            type: 'line',
+            showSymbol: false,
+            hoverAnimation: false,
+            data: data.down
+        }]
     });
     return myChart;
 }
@@ -150,27 +168,27 @@ function getServers() {
         credentials: 'include',
         method: 'GET',
         mode: 'cors'
-    }).then(function(response) {
+    }).then(function (response) {
         return response.json();
-    }).then(function(data) {
-        var arr=[];
+    }).then(function (data) {
+        var arr = [];
         for (var i = 0; i < data.length; i++) {
-            arr.push({name:data[i],value:data[i]});
+            arr.push({ name: data[i], value: data[i] });
         }
 
         xmSelect.render({
             el: '#servers',
             tips: '请选择服务器',
             model: {
-                 icon: 'hidden',
-                 label: { type: 'text' }
+                icon: 'hidden',
+                label: { type: 'text' }
             },
             radio: true,
             clickClose: true,
             autoRow: true, //选项过多,自动换行
-            data:arr,
+            data: arr,
             on: function (data) {
-                if (data.arr.length>0) {
+                if (data.arr.length > 0) {
                     showLine(data.arr[0].value);
                 }
             }
@@ -180,13 +198,13 @@ function getServers() {
 
 function showLine(ip) {
     clearInterval(window.counterInterval);
-    window.fetch("/system/GetCounterHistory?ip="+ip, {
+    window.fetch("/system/GetCounterHistory?ip=" + ip, {
         credentials: 'include',
         method: 'GET',
         mode: 'cors'
-    }).then(function(response) {
+    }).then(function (response) {
         return response.json();
-    }).then(function(data) {
+    }).then(function (data) {
         var myChart = echarts.init(document.getElementById("container-cpu"));
         myChart.setOption({
             visualMap: [{
@@ -214,9 +232,9 @@ function showLine(ip) {
                 type: 'time',
                 interval: 20000,
                 axisLabel: {
-                    formatter:function (value){
-                        var dt=new Date(value);
-                        return dt.getHours()+":"+dt.getMinutes()+":"+dt.getSeconds()
+                    formatter: function (value) {
+                        var dt = new Date(value);
+                        return dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds()
                     }
                 },
                 splitLine: {
@@ -232,7 +250,7 @@ function showLine(ip) {
                 max: 100
             },
             legend: {
-                data: ['CPU使用率', '内存使用率']
+                data: ['CPU使用率', '网站CPU使用率', '内存使用率', '网站内存使用率']
             },
             series: [{
                 name: 'CPU使用率',
@@ -252,6 +270,12 @@ function showLine(ip) {
                     ]
                 }
             }, {
+                name: '网站CPU使用率',
+                type: 'line',
+                showSymbol: false,
+                hoverAnimation: false,
+                data: data.processCpu
+            }, {
                 name: '内存使用率',
                 type: 'line',
                 showSymbol: false,
@@ -268,14 +292,22 @@ function showLine(ip) {
                         { type: 'average', name: '平均值' }
                     ]
                 }
+            }, {
+                name: '网站内存使用率',
+                type: 'line',
+                showSymbol: false,
+                hoverAnimation: false,
+                data: data.processMem
             }]
         });
         var rateChart = showSpeed();
         var ioChart = showIO(data);
-        window.counterInterval = setInterval(function() {
+        window.counterInterval = setInterval(function () {
             DotNet.invokeMethodAsync('Masuit.MyBlogs.Core', 'GetCurrentPerformanceCounter').then(item => {
                 data.cpu.push([item.time, item.cpuLoad.toFixed(2)]);
                 data.mem.push([item.time, item.memoryUsage.toFixed(2)]);
+                data.processCpu.push([item.time, item.processCpuLoad.toFixed(2)]);
+                data.processMem.push([item.time, item.processMemoryUsage.toFixed(2)]);
                 data.read.push([item.time, item.diskRead.toFixed(2)]);
                 data.write.push([item.time, item.diskWrite.toFixed(2)]);
                 data.up.push([item.time, item.upload.toFixed(2)]);
@@ -284,7 +316,11 @@ function showLine(ip) {
                     series: [{
                         data: data.cpu
                     }, {
+                        data: data.processCpu
+                    }, {
                         data: data.mem
+                    }, {
+                        data: data.processMem
                     }]
                 });
                 ioChart.setOption({
@@ -301,10 +337,12 @@ function showLine(ip) {
                 let option = rateChart.getOption();
                 option.series[0].data[0].value = item.cpuLoad.toFixed(2);
                 option.series[0].data[1].value = item.memoryUsage.toFixed(2);
+                option.series[0].data[2].value = item.processCpuLoad.toFixed(2);
+                option.series[0].data[3].value = item.processMemoryUsage.toFixed(2);
                 rateChart.setOption(option, true);
             });
         }, 2000);
-    }).catch(function(e) {
+    }).catch(function (e) {
         console.error(e);
     });
 }
