@@ -47,7 +47,7 @@ public interface IPerfCounter
         var time = DateTime.Now.GetTotalMilliseconds();
         var load = SystemInfo.CpuLoad;
         var processCpuUsage = CurrentProcess.GetProcessCpuUsage();
-        var processMemory = CurrentProcess.GetProcessMemory() / SystemInfo.PhysicalMemory.ConvertTo<float>() * 100;
+        var processMemory = CurrentProcess.GetProcessMemory() * 1024 * 1024 / SystemInfo.PhysicalMemory.ConvertTo<float>() * 100;
         var mem = (1 - SystemInfo.MemoryAvailable.ConvertTo<float>() / SystemInfo.PhysicalMemory.ConvertTo<float>()) * 100;
 
         var read = SystemInfo.GetDiskData(DiskData.Read) / 1024f;
