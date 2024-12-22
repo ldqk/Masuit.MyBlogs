@@ -22,7 +22,7 @@ catch
     // ignored
 }
 
-await Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => builder.AddJsonFile("appsettings.json", true, true)).ConfigureLogging(logger => logger.AddRinLogger()).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureWebHostDefaults(hostBuilder => hostBuilder.UseQuic().UseKestrel(opt =>
+await Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => builder.AddJsonFile("appsettings.json", true, true)).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureWebHostDefaults(hostBuilder => hostBuilder.UseQuic().UseKestrel(opt =>
 {
     var config = opt.ApplicationServices.GetService<IConfiguration>();
     var port = config["Port"] ?? "5000";

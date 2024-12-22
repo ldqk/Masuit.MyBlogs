@@ -10,7 +10,6 @@
 @using Masuit.Tools.Maths
 @using System.Collections.Frozen
 @using System.Net.NetworkInformation
-@using PerformanceCounter = System.Diagnostics.PerformanceCounter
 
 @inject IPerfCounter PerfCounter;
 @inject IJSRuntime JavaScript;
@@ -99,9 +98,9 @@
             <td>Redis执行命令数</td>
             <th>@_redisStats["total_commands_processed"]</th>
             <td>网站CPU使用率</td>
-            <th>@(_process.GetProcessCpuUsage().ToDecimal(2))%</th>
+            <th>@(GetCurrentPerformanceCounter().ProcessCpuLoad.ToDecimal(2))%</th>
             <td>网站内存使用</td>
-            <th>@(_process.GetProcessMemory().ToDecimal(2)) MB</th>
+            <th>@(GetCurrentPerformanceCounter().ProcessMemoryUsage.ToDecimal(2)) MB</th>
         </tr>
         <tr>
             <td>MAC地址</td>
@@ -195,15 +194,21 @@
     }
 
     [JSInvokable]
-    public static Masuit.MyBlogs.Core.Common.PerformanceCounter GetCurrentPerformanceCounter()
+    public static Common.PerformanceCounter GetCurrentPerformanceCounter()
     {
         try {
             return IPerfCounter.List.LastOrDefault()??IPerfCounter.GetCurrentPerformanceCounter();
         }
         catch (Exception e) {
             LogManager.Error(e.Demystify());
-            return new Masuit.MyBlogs.Core.Common.PerformanceCounter();
+            return new Common.PerformanceCounter();
         }
+    }
+
+    [JSInvokable]
+    public static long GetTotalMemory()
+    {
+        return SystemInfo.PhysicalMemory;
     }
 
     public void ClearMemory()
@@ -223,8 +228,8 @@
         var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==_ip).OrderByRandom().Take(15000).ToList();
         var cpuLoads = counters.Select(c => c.CpuLoad).ToList();
         var processCpuLoads = counters.Select(c => c.ProcessCpuLoad).ToList();
-        var memUse = counters.Select(c => c.MemoryUsage).ToList();
-        var processMemUse = counters.Select(c => c.ProcessMemoryUsage).ToList();
+        var memUse = counters.Select(c => c.MemoryUsage * 1048576 / SystemInfo.PhysicalMemory).ToList();
+        var processMemUse = counters.Select(c => c.ProcessMemoryUsage * 1048576 / SystemInfo.PhysicalMemory).ToList();
         var reads = counters.Select(c => c.DiskRead).ToList();
         var writes = counters.Select(c => c.DiskWrite).ToList();
         var downloads = counters.Select(c => c.Download).ToList();

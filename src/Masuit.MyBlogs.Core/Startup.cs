@@ -114,7 +114,6 @@ public class Startup
             handler.UseProxy = true;
         });
         services.AddHttpForwarder();
-        services.AddRin();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
@@ -152,11 +151,6 @@ public class Startup
         app.SetupHttpsRedirection(Configuration);
         app.UseDefaultFiles().UseWhen(c => Regex.IsMatch(c.Request.Path.Value + "", @"(\.jpg|\.jpeg|\.png|\.bmp|\.webp|\.tiff|\.pbm)$", RegexOptions.IgnoreCase), builder => builder.UseImageSharp()).UseStaticFiles();
         app.UseSession().UseCookiePolicy(); //注入Session
-#if DEBUG
-
-        app.UseRin();
-        app.UseRinDiagnosticsHandler();
-#endif
         app.UseWhen(c => c.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true, builder =>
         {
             builder.UseMiniProfiler();

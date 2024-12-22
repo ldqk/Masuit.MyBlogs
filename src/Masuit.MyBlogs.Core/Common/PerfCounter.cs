@@ -45,16 +45,15 @@ public interface IPerfCounter
     public static PerformanceCounter GetCurrentPerformanceCounter()
     {
         var time = DateTime.Now.GetTotalMilliseconds();
-        var load = SystemInfo.CpuLoad;
-        var processCpuUsage = CurrentProcess.GetProcessCpuUsage();
-        var processMemory = CurrentProcess.GetProcessMemory() * 1024 * 1024 / SystemInfo.PhysicalMemory.ConvertTo<float>() * 100;
-        var mem = (1 - SystemInfo.MemoryAvailable.ConvertTo<float>() / SystemInfo.PhysicalMemory.ConvertTo<float>()) * 100;
-
-        var read = SystemInfo.GetDiskData(DiskData.Read) / 1024f;
-        var write = SystemInfo.GetDiskData(DiskData.Write) / 1024;
-
-        var up = SystemInfo.GetNetData(NetData.Received) / 1024;
-        var down = SystemInfo.GetNetData(NetData.Sent) / 1024;
+        var result = Task.WhenAll(Task.Run(() => SystemInfo.CpuLoad),
+            Task.Run(CurrentProcess.GetProcessCpuUsage),
+            Task.Run(() => CurrentProcess.GetProcessMemory()),
+            Task.Run(() => (SystemInfo.PhysicalMemory - SystemInfo.MemoryAvailable) * 1f / 1024 / 1024),
+            Task.Run(() => SystemInfo.GetDiskData(DiskData.Read) / 1024f),
+            Task.Run(() => SystemInfo.GetDiskData(DiskData.Write) / 1024f),
+            Task.Run(() => SystemInfo.GetNetData(NetData.Received) / 1024),
+            Task.Run(() => SystemInfo.GetNetData(NetData.Sent) / 1024)).Result;
+        var (load, processCpuUsage, processMemory, mem, read, write, up, down) = (result[0], result[1], result[2], result[3], result[4], result[5], result[6], result[7]);
         return new PerformanceCounter()
         {
             Time = time,
@@ -77,10 +76,6 @@ public interface IPerfCounter
 
 public sealed class DefaultPerfCounter : IPerfCounter
 {
-    static DefaultPerfCounter()
-    {
-    }
-
     public IQueryable<PerformanceCounter> CreateDataSource()
     {
         return IPerfCounter.List.AsQueryable();
@@ -176,10 +171,13 @@ public sealed class PerformanceCounter
     public float ProcessCpuLoad { get; set; }
 
     /// <summary>
-    /// 内存使用率
+    /// 内存使用量(MB)
     /// </summary>
     public float MemoryUsage { get; set; }
 
+    /// <summary>
+    /// 进程内存使用量(MB)
+    /// </summary>
     public float ProcessMemoryUsage { get; set; }
 
     /// <summary>

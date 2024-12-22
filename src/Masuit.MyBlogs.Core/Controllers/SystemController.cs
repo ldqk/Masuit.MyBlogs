@@ -86,12 +86,12 @@ public sealed class SystemController : AdminController
             mem = list.Select(c => new[]
             {
                 c.Time,
-                c.MemoryUsage.ToDecimal(2)
+                (c.MemoryUsage * 1048576 / SystemInfo.PhysicalMemory).ToDecimal(2)
             }),
             processMem = list.Select(c => new[]
             {
                 c.Time,
-                c.ProcessMemoryUsage.ToDecimal(2)
+                (c.ProcessMemoryUsage * 1048576 / SystemInfo.PhysicalMemory).ToDecimal(2)
             }),
             read = list.Select(c => new[]
             {
