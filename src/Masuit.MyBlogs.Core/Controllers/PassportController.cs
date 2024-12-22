@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Hangfire;
+﻿using Hangfire;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
@@ -11,6 +10,7 @@ using System.Web;
 using Dispose.Scope;
 using FreeRedis;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Models;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -26,8 +26,6 @@ public sealed class PassportController : Controller
     public IUserInfoService UserInfoService { get; set; }
 
     public IFirewallReporter FirewallReporter { get; set; }
-
-    public IMapper Mapper { get; set; }
 
     /// <summary>
     /// 客户端的真实IP
@@ -225,7 +223,7 @@ public sealed class PassportController : Controller
     {
         var user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-        user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
+        user = UserInfoService.GetByUsername("masuit").ToDto();
 #endif
 
         return ResultData(user);

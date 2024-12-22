@@ -1,6 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using System.Net;
+using Masuit.MyBlogs.Core.Models;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -25,7 +26,7 @@ public sealed class UserController : AdminController
 
         userInfo.Username = username;
         bool b = await UserInfoService.SaveChangesAsync() > 0;
-        return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? $"用户名修改成功，新用户名为{username}。" : "用户名修改失败！");
+        return ResultData(userInfo.ToDto(), b, b ? $"用户名修改成功，新用户名为{username}。" : "用户名修改失败！");
     }
 
     /// <summary>
@@ -39,7 +40,7 @@ public sealed class UserController : AdminController
         UserInfo userInfo = await UserInfoService.GetByIdAsync(id);
         userInfo.NickName = username;
         bool b = await UserInfoService.SaveChangesAsync() > 0;
-        return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? $"昵称修改成功，新昵称为{username}。" : "昵称修改失败！");
+        return ResultData(userInfo.ToDto(), b, b ? $"昵称修改成功，新昵称为{username}。" : "昵称修改失败！");
     }
 
     /// <summary>
@@ -84,7 +85,7 @@ public sealed class UserController : AdminController
         UserInfo userInfo = await UserInfoService.GetByIdAsync(id);
         userInfo.Avatar = path;
         bool b = await UserInfoService.SaveChangesAsync() > 0;
-        return ResultData(Mapper.Map<UserInfoDto>(userInfo), b, b ? "头像修改成功。" : "头像修改失败！");
+        return ResultData(userInfo.ToDto(), b, b ? "头像修改成功。" : "头像修改失败！");
     }
 
     /// <summary>
@@ -99,13 +100,13 @@ public sealed class UserController : AdminController
         var userInfo = UserInfoService.GetByUsername(model.Username);
         if (userInfo is null)
         {
-            userInfo = Mapper.Map<UserInfo>(model);
+            userInfo = model.ToUserInfo();
             userInfo.Password = "123456";
             UserInfoService.Register(userInfo);
             return ResultData(null, true, "用户保存成功");
         }
 
-        Mapper.Map(model, userInfo);
+        model.Update(userInfo);
         var b = await UserInfoService.SaveChangesAsync() > 0;
         return ResultData(null, b, b ? "用户保存成功" : "用户保存失败");
     }
@@ -140,7 +141,7 @@ public sealed class UserController : AdminController
             where = u => u.Username.Contains(search) || u.NickName.Contains(search) || u.Email.Contains(search) || u.QQorWechat.Contains(search);
         }
 
-        var pages = UserInfoService.GetPages<int, UserInfoDto>(page, size, where, u => u.Id, false);
+        var pages = UserInfoService.GetQuery(where, u => u.Id, false).ProjectDto().ToPagedListNoLock(page, size);
         return Ok(pages);
     }
 }

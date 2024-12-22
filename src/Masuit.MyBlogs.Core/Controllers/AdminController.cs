@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using Dispose.Scope;
+﻿using Dispose.Scope;
 using FreeRedis;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.MyBlogs.Core.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -19,8 +19,6 @@ public class AdminController : Controller
     public IUserInfoService UserInfoService { get; set; }
 
     public IRedisClient RedisHelper { get; set; }
-
-    public IMapper Mapper { get; set; }
 
     /// <summary>
     /// 返回结果json
@@ -48,7 +46,7 @@ public class AdminController : Controller
         base.OnActionExecuting(context);
         var user = context.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-        user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
+        user = UserInfoService.GetByUsername("masuit").ToDto();
         context.HttpContext.Session.Set(SessionKey.UserInfo, user);
 #endif
         if (user == null && Request.Cookies.Any(x => x.Key == "username" || x.Key == "password")) //执行自动登录

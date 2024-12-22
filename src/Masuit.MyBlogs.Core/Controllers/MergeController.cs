@@ -1,9 +1,9 @@
-﻿using AutoMapper;
-using Hangfire;
+﻿using Hangfire;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using System.Text;
+using Masuit.MyBlogs.Core.Models;
 using Masuit.Tools.TextDiff;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -15,8 +15,6 @@ public sealed class MergeController : AdminController
 
     public IWebHostEnvironment HostEnvironment { get; set; }
 
-    public MapperConfiguration MapperConfig { get; set; }
-
     /// <summary>
     /// 获取合并详情
     /// </summary>
@@ -25,7 +23,7 @@ public sealed class MergeController : AdminController
     [HttpGet("{id}")]
     public async Task<ActionResult> Get(int id)
     {
-        var p = Mapper.Map<PostMergeRequestDto>(await PostMergeRequestService.GetByIdAsync(id));
+        var p = (await PostMergeRequestService.GetByIdAsync(id)).ToDto();
         if (p != null)
         {
             p.SubmitTime = p.SubmitTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -50,7 +48,7 @@ public sealed class MergeController : AdminController
             where = where.And(r => r.Title.Contains(kw) || r.Content.Contains(kw) || r.Modifier.Contains(kw) || r.ModifierEmail.Contains(kw));
         }
 
-        var list = PostMergeRequestService.GetQuery(where).OrderByDescending(d => d.MergeState == MergeStatus.Pending).ThenByDescending(r => r.Id).ToPagedList<PostMergeRequest, PostMergeRequestDtoBase>(page, size, MapperConfig);
+        var list = PostMergeRequestService.GetQuery(where).OrderByDescending(d => d.MergeState == MergeStatus.Pending).ThenByDescending(r => r.Id).ProjectDtoBase().ToPagedList(page, size);
         foreach (var item in list.Data)
         {
             item.SubmitTime = item.SubmitTime.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -70,7 +68,7 @@ public sealed class MergeController : AdminController
         var newer = await PostMergeRequestService.GetByIdAsync(mid) ?? throw new NotFoundException("待合并文章未找到");
         var old = newer.Post;
         (old.Content, newer.Content) = old.Content.HtmlDiff(newer.Content);
-        return ResultData(new { old = Mapper.Map<PostMergeRequestDto>(old), newer = Mapper.Map<PostMergeRequestDto>(newer) });
+        return ResultData(new { old = old.ToDto(), newer = newer.ToDto() });
     }
 
     /// <summary>
@@ -82,9 +80,9 @@ public sealed class MergeController : AdminController
     public async Task<IActionResult> Merge(int id)
     {
         var merge = await PostMergeRequestService.GetByIdAsync(id) ?? throw new NotFoundException("待合并文章未找到");
-        var history = Mapper.Map<PostHistoryVersion>(merge.Post);
+        var history = merge.Post.ToHistoryVersion();
         history.Id = 0;
-        merge.Post = Mapper.Map(merge, merge.Post);
+        merge.Post = merge.UpdatePost(merge.Post);
         merge.Post.PostHistoryVersion.Add(history);
         merge.Post.ModifyDate = DateTime.Now;
         merge.MergeState = MergeStatus.Merged;
@@ -109,7 +107,7 @@ public sealed class MergeController : AdminController
     public async Task<IActionResult> Merge([FromBodyOrDefault] PostMergeRequestCommandBase dto)
     {
         var merge = await PostMergeRequestService.GetByIdAsync(dto.Id) ?? throw new NotFoundException("待合并文章未找到");
-        Mapper.Map(dto, merge);
+        dto.Update(merge);
         var b = await PostMergeRequestService.SaveChangesAsync() > 0;
         return b ? await Merge(merge.Id) : ResultData(null, false, "文章合并失败！");
     }

@@ -22,6 +22,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using EFCoreSecondLevelCacheInterceptor;
 using FreeRedis;
+using Masuit.MyBlogs.Core.Models;
 using Masuit.Tools.Core;
 using Masuit.Tools.Mime;
 using Masuit.Tools.TextDiff;
@@ -91,8 +92,8 @@ public sealed class PostController : BaseController
         ViewBag.Keyword = post.Keyword + "," + post.Label;
         ViewBag.Desc = await post.Content.GetSummary(200);
         var modifyDate = post.ModifyDate;
-        ViewBag.Next = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate > modifyDate && (p.LimitMode ?? 0) == RegionLimitMode.All && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate);
-        ViewBag.Prev = await PostService.GetFromCacheAsync<DateTime, PostModelBase>(p => p.ModifyDate < modifyDate && (p.LimitMode ?? 0) == RegionLimitMode.All && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate, false);
+        ViewBag.Next = await PostService.GetQuery(p => p.ModifyDate > modifyDate && (p.LimitMode ?? 0) == RegionLimitMode.All && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate).ProjectModelBase().Cacheable().FirstOrDefaultAsync();
+        ViewBag.Prev = await PostService.GetQuery(p => p.ModifyDate < modifyDate && (p.LimitMode ?? 0) == RegionLimitMode.All && (p.Status == Status.Published || CurrentUser.IsAdmin), p => p.ModifyDate, false).ProjectModelBase().Cacheable().FirstOrDefaultAsync();
         ViewData[nameof(post.Author)] = post.Author;
         ViewData[nameof(post.PostDate)] = post.PostDate;
         ViewData[nameof(post.ModifyDate)] = post.ModifyDate;
@@ -191,7 +192,7 @@ public sealed class PostController : BaseController
     public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
     {
         var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
-        var main = Mapper.Map<PostHistoryVersion>(post) ?? throw new NotFoundException("文章未找到");
+        var main = post.ToHistoryVersion() ?? throw new NotFoundException("文章未找到");
         CheckPermission(post);
         var right = v1 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
         var left = v2 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
@@ -294,7 +295,7 @@ public sealed class PostController : BaseController
         post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
         post.Status = Status.Pending;
         post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.HtmlSanitizerStandard().ClearImgAttributes(), cancellationToken);
-        Post p = Mapper.Map<Post>(post);
+        Post p = post.ToPost();
         p.IP = ClientIP.ToString();
         p.Modifier = p.Author;
         p.ModifierEmail = p.Email;
@@ -317,7 +318,7 @@ public sealed class PostController : BaseController
             .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
             .Set("title", p.Title).Render();
         BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(CommonHelper.SystemSettings["Title"] + "有访客投稿：", content, CommonHelper.SystemSettings["ReceiveEmail"], p.IP));
-        return ResultData(Mapper.Map<PostDto>(p), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
+        return ResultData(p.ToDto(), message: "文章发表成功，待站长审核通过以后将显示到列表中！");
     }
 
     /// <summary>
@@ -461,8 +462,8 @@ public sealed class PostController : BaseController
 
         if (post.Email.Equals(dto.ModifierEmail))
         {
-            var history = Mapper.Map<PostHistoryVersion>(post);
-            Mapper.Map(dto, post);
+            var history = post.ToHistoryVersion();
+            dto.Update(post);
             post.PostHistoryVersion.Add(history);
             post.ModifyDate = DateTime.Now;
             return await PostService.SaveChangesAsync() > 0 ? ResultData(null, true, "你是文章原作者，无需审核，文章已自动更新并在首页展示！") : ResultData(null, false, "操作失败！");
@@ -473,13 +474,13 @@ public sealed class PostController : BaseController
         var merge = post.PostMergeRequests.FirstOrDefault(r => r.Id == dto.Id && r.MergeState != MergeStatus.Merged);
         if (merge != null)
         {
-            Mapper.Map(dto, merge);
+            dto.Update(merge);
             merge.SubmitTime = DateTime.Now;
             merge.MergeState = MergeStatus.Pending;
         }
         else
         {
-            merge = Mapper.Map<PostMergeRequest>(dto);
+            merge = dto.ToEntity();
             merge.SubmitTime = DateTime.Now;
             post.PostMergeRequests.Add(merge);
         }
@@ -615,7 +616,7 @@ public sealed class PostController : BaseController
     public ActionResult Get(int id)
     {
         var post = PostService.GetQuery(e => e.Id == id).Include(e => e.Seminar).FirstOrDefault() ?? throw new NotFoundException("文章未找到");
-        var model = Mapper.Map<PostDto>(post);
+        var model = post.ToDto();
         model.Seminars = post.Seminar.Select(s => s.Id).Join(",");
         return ResultData(model);
     }
@@ -641,8 +642,8 @@ public sealed class PostController : BaseController
 
         var list = orderby switch
         {
-            OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.Status).ThenByDescending(p => p.IsFixedTop).ThenByDescending(p => p.PostVisitRecordStats.Average(t => t.Count)).ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig),
-            _ => await PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig)
+            OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.Status).ThenByDescending(p => p.IsFixedTop).ThenByDescending(p => p.PostVisitRecordStats.Average(t => t.Count)).ProjectDataModel().ToPagedListAsync(page, size),
+            _ => await PostService.GetQuery(where).OrderBy($"{nameof(Post.Status)} desc,{nameof(Post.IsFixedTop)} desc,{orderby.GetDisplay()} desc").ProjectDataModel().ToPagedListAsync(page, size)
         };
         foreach (var item in list.Data)
         {
@@ -670,7 +671,7 @@ public sealed class PostController : BaseController
             where = where.And(p => p.Title.Contains(search) || p.Author.Contains(search) || p.Email.Contains(search) || p.Label.Contains(search));
         }
 
-        var pages = await PostService.GetQuery(where).OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).ToPagedListAsync<Post, PostDataModel>(page, size, MapperConfig);
+        var pages = await PostService.GetQuery(where).OrderByDescending(p => p.IsFixedTop).ThenByDescending(p => p.ModifyDate).ProjectDataModel().ToPagedListAsync(page, size);
         foreach (var item in pages.Data)
         {
             item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -683,37 +684,37 @@ public sealed class PostController : BaseController
     /// <summary>
     /// 编辑
     /// </summary>
-    /// <param name="post"></param>
+    /// <param name="cmd"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost, MyAuthorize, DistributedLockFilter]
-    public async Task<ActionResult> Edit([FromBodyOrDefault] PostCommand post, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> Edit([FromBodyOrDefault] PostCommand cmd, CancellationToken cancellationToken = default)
     {
-        post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.Trim().ClearImgAttributes(), cancellationToken);
-        if (!ValidatePost(post, out var resultData))
+        cmd.Content = await ImagebedClient.ReplaceImgSrc(await cmd.Content.Trim().ClearImgAttributes(), cancellationToken);
+        if (!ValidatePost(cmd, out var resultData))
         {
             return resultData;
         }
 
-        Post p = await PostService.GetByIdAsync(post.Id);
-        if (post.Reserve && p.Status == Status.Published)
+        Post post = await PostService.GetByIdAsync(cmd.Id);
+        if (cmd.Reserve && post.Status == Status.Published)
         {
-            if (p.Content.HammingDistance(post.Content) > 0)
+            if (post.Content.HammingDistance(cmd.Content) > 0)
             {
-                var history = Mapper.Map<PostHistoryVersion>(p);
-                history.PostId = p.Id;
+                var history = post.ToHistoryVersion();
+                history.PostId = post.Id;
                 PostHistoryVersionService.AddEntity(history);
             }
 
-            if (p.Title.HammingDistance(post.Title) > 10 && CommentService.Any(c => c.PostId == p.Id && c.ParentId == null))
+            if (post.Title.HammingDistance(cmd.Title) > 10 && CommentService.Any(c => c.PostId == post.Id && c.ParentId == null))
             {
                 CommentService.AddEntity(new Comment
                 {
                     Status = Status.Published,
                     NickName = "系统自动评论",
-                    Email = p.Email,
-                    Content = $"<p style=\"color:red\">温馨提示：由于文章发生了重大更新，本条评论之前的所有评论仅作为原文《{p.Title}》的历史评论保留，不作为本文的最新评论参考，请知悉！了解更多信息，请查阅本文的历史修改记录。</p>",
-                    PostId = p.Id,
+                    Email = post.Email,
+                    Content = $"<p style=\"color:red\">温馨提示：由于文章发生了重大更新，本条评论之前的所有评论仅作为原文《{post.Title}》的历史评论保留，不作为本文的最新评论参考，请知悉！了解更多信息，请查阅本文的历史修改记录。</p>",
+                    PostId = post.Id,
                     CommentDate = DateTime.Now,
                     IsMaster = true,
                     IsAuthor = true,
@@ -724,24 +725,24 @@ public sealed class PostController : BaseController
                 });
             }
 
-            p.ModifyDate = DateTime.Now;
+            post.ModifyDate = DateTime.Now;
             var user = HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
-            post.Modifier = string.IsNullOrEmpty(post.Modifier) ? user.NickName : post.Modifier;
-            post.ModifierEmail = string.IsNullOrEmpty(post.ModifierEmail) ? user.Email : post.ModifierEmail;
+            cmd.Modifier = string.IsNullOrEmpty(cmd.Modifier) ? user.NickName : cmd.Modifier;
+            cmd.ModifierEmail = string.IsNullOrEmpty(cmd.ModifierEmail) ? user.Email : cmd.ModifierEmail;
         }
 
-        Mapper.Map(post, p);
-        p.IP = ClientIP.ToString();
-        p.Seminar.Clear();
-        if (!string.IsNullOrEmpty(post.Seminars))
+        cmd.Update(post);
+        post.IP = ClientIP.ToString();
+        post.Seminar.Clear();
+        if (!string.IsNullOrEmpty(cmd.Seminars))
         {
-            var tmp = post.Seminars.Split(',', StringSplitOptions.RemoveEmptyEntries).Distinct().Select(int.Parse).ToArray();
+            var tmp = cmd.Seminars.Split(',', StringSplitOptions.RemoveEmptyEntries).Distinct().Select(int.Parse).ToArray();
             var seminars = SeminarService.GetQuery(s => tmp.Contains(s.Id)).ToPooledListScope();
-            p.Seminar.AddRange(seminars);
+            post.Seminar.AddRange(seminars);
         }
 
-        (p.Keyword + "," + p.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(KeywordsManager.AddWords);
-        PostTagService.AddOrUpdate(t => t.Name, p.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
+        (post.Keyword + "," + post.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(KeywordsManager.AddWords);
+        PostTagService.AddOrUpdate(t => t.Name, post.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
         {
             Name = s,
             Count = PostService.Count(t => t.Label.Contains(s))
@@ -752,40 +753,40 @@ public sealed class PostController : BaseController
             return ResultData(null, false, "文章修改失败！");
         }
 
-        if (p.LimitMode == RegionLimitMode.OnlyForSearchEngine)
+        if (post.LimitMode == RegionLimitMode.OnlyForSearchEngine)
         {
-            SearchEngine.LuceneIndexer.Delete(p);
+            SearchEngine.LuceneIndexer.Delete(post);
         }
-        return ResultData(Mapper.Map<PostDto>(p), message: "文章修改成功！");
+        return ResultData(post.ToDto(), message: "文章修改成功！");
     }
 
     /// <summary>
     /// 发布
     /// </summary>
-    /// <param name="post"></param>
+    /// <param name="cmd"></param>
     /// <param name="timespan"></param>
     /// <param name="schedule"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [MyAuthorize, HttpPost, DistributedLockFilter]
-    public async Task<ActionResult> Write([FromBodyOrDefault] PostCommand post, [FromBodyOrDefault] DateTime? timespan, [FromBodyOrDefault] bool schedule = false, CancellationToken cancellationToken = default)
+    public async Task<ActionResult> Write([FromBodyOrDefault] PostCommand cmd, [FromBodyOrDefault] DateTime? timespan, [FromBodyOrDefault] bool schedule = false, CancellationToken cancellationToken = default)
     {
-        post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.Trim().ClearImgAttributes(), cancellationToken);
-        if (!ValidatePost(post, out var resultData))
+        cmd.Content = await ImagebedClient.ReplaceImgSrc(await cmd.Content.Trim().ClearImgAttributes(), cancellationToken);
+        if (!ValidatePost(cmd, out var resultData))
         {
             return resultData;
         }
 
-        post.Status = Status.Published;
-        Post p = Mapper.Map<Post>(post);
-        p.Modifier = p.Author;
-        p.ModifierEmail = p.Email;
-        p.IP = ClientIP.ToString();
-        p.Rss = p.LimitMode is null or RegionLimitMode.All;
-        if (!string.IsNullOrEmpty(post.Seminars))
+        cmd.Status = Status.Published;
+        Post post = cmd.ToPost();
+        post.Modifier = post.Author;
+        post.ModifierEmail = post.Email;
+        post.IP = ClientIP.ToString();
+        post.Rss = post.LimitMode is null or RegionLimitMode.All;
+        if (!string.IsNullOrEmpty(cmd.Seminars))
         {
-            var tmp = post.Seminars.Split(',').Distinct().Select(int.Parse).ToArray();
-            p.Seminar.AddRange(SeminarService[s => tmp.Contains(s.Id)]);
+            var tmp = cmd.Seminars.Split(',').Distinct().Select(int.Parse).ToArray();
+            post.Seminar.AddRange(SeminarService[s => tmp.Contains(s.Id)]);
         }
 
         if (schedule)
@@ -795,16 +796,16 @@ public sealed class PostController : BaseController
                 return ResultData(null, false, "如果要定时发布，请选择正确的一个将来时间点！");
             }
 
-            p.Status = Status.Schedule;
-            p.PostDate = timespan.Value.ToUniversalTime();
-            p.ModifyDate = timespan.Value.ToUniversalTime();
-            BackgroundJob.Enqueue<IHangfireBackJob>(job => job.PublishPost(p));
-            return ResultData(Mapper.Map<PostDto>(p), message: $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！");
+            post.Status = Status.Schedule;
+            post.PostDate = timespan.Value.ToUniversalTime();
+            post.ModifyDate = timespan.Value.ToUniversalTime();
+            BackgroundJob.Enqueue<IHangfireBackJob>(job => job.PublishPost(post));
+            return ResultData(post.ToDto(), message: $"文章于{timespan.Value:yyyy-MM-dd HH:mm:ss}将会自动发表！");
         }
 
-        PostService.AddEntity(p);
-        (p.Keyword + "," + p.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(KeywordsManager.AddWords);
-        PostTagService.AddOrUpdate(t => t.Name, p.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
+        PostService.AddEntity(post);
+        (post.Keyword + "," + post.Label).Split(',', StringSplitOptions.RemoveEmptyEntries).ForEach(KeywordsManager.AddWords);
+        PostTagService.AddOrUpdate(t => t.Name, post.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
         {
             Name = s,
             Count = PostService.Count(t => t.Label.Contains(s))
@@ -815,9 +816,9 @@ public sealed class PostController : BaseController
             return ResultData(null, false, "文章发表失败！");
         }
 
-        if (p.LimitMode == RegionLimitMode.OnlyForSearchEngine)
+        if (post.LimitMode == RegionLimitMode.OnlyForSearchEngine)
         {
-            SearchEngine.LuceneIndexer.Delete(p);
+            SearchEngine.LuceneIndexer.Delete(post);
         }
 
         return ResultData(null, true, "文章发表成功！");
@@ -1097,7 +1098,7 @@ public sealed class PostController : BaseController
             var keys = await RedisHelper.KeysAsync(nameof(PostOnline) + ":*");
             var sets = keys.Select(s => (Id: s.Split(':')[1].ToInt32(), Clients: RedisHelper.SMembers(s))).ToArray();
             var ids = sets.OrderByDescending(t => t.Clients.Length).Take(10).Select(t => t.Id).ToArray();
-            var mostHots = await PostService.GetQuery<PostModelBase>(p => ids.Contains(p.Id)).ToListWithNoLockAsync(cancellationToken).ContinueWith(t =>
+            var mostHots = await PostService.GetQuery(p => ids.Contains(p.Id)).ProjectModelBase().ToListWithNoLockAsync(cancellationToken).ContinueWith(t =>
             {
                 foreach (var item in t.Result)
                 {
@@ -1161,7 +1162,7 @@ public sealed class PostController : BaseController
             where = where.And(e => Regex.IsMatch(e.IP + e.Location + e.Referer + e.RequestUrl, kw, RegexOptions.IgnoreCase));
         }
 
-        var pages = await PostVisitRecordService.GetPagesAsync<DateTime, PostVisitRecordViewModel>(page, size, where, e => e.Time, false);
+        var pages = await PostVisitRecordService.GetQuery(where, e => e.Time, false).ProjectViewModel().ToPagedListNoLockAsync(page, size);
         return Ok(pages);
     }
 
@@ -1174,7 +1175,7 @@ public sealed class PostController : BaseController
     [ProducesResponseType(typeof(PagedList<PostVisitRecordViewModel>), (int)HttpStatusCode.OK)]
     public IActionResult ExportPostVisitRecords(int id)
     {
-        var list = PostVisitRecordService.GetQuery<DateTime, PostVisitRecordViewModel>(e => e.PostId == id, e => e.Time, false).ToPooledListScope();
+        var list = PostVisitRecordService.GetQuery(e => e.PostId == id, e => e.Time, false).ProjectViewModel().ToPooledListScope();
         using var ms = list.ToExcel();
         var post = PostService[id];
         return this.ResumeFile(ms.ToArray(), ContentType.Xlsx, post.Title + "访问记录.xlsx");

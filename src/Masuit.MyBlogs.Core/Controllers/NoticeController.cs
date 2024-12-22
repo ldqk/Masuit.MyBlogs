@@ -1,7 +1,9 @@
-﻿using Masuit.MyBlogs.Core.Extensions;
+﻿using EFCoreSecondLevelCacheInterceptor;
+using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Models;
 using Masuit.Tools.AspNetCore.ModelBinder;
+using Masuit.Tools.Core;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -26,7 +28,7 @@ public sealed class NoticeController : BaseController
     [Route("notice"), AllowAccessFirewall, Route("n", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size" }, VaryByHeader = "Cookie")]
     public ActionResult Index([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
     {
-        var list = NoticeService.GetPagesFromCache<DateTime, NoticeDto>(page, size, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false);
+        var list = NoticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false).ProjectDto().ToCachedPagedList(page, size);
         ViewData["page"] = new Pagination(page, size, list.TotalCount);
         foreach (var n in list.Data)
         {
@@ -167,7 +169,7 @@ public sealed class NoticeController : BaseController
     [MyAuthorize]
     public ActionResult Get(int id)
     {
-        var notice = NoticeService.Get<NoticeDto>(n => n.Id == id);
+        var notice = NoticeService.Get(n => n.Id == id).ToDto();
         if (notice != null)
         {
             notice.ModifyDate = notice.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -185,7 +187,7 @@ public sealed class NoticeController : BaseController
     [ResponseCache(Duration = 600, VaryByHeader = "Cookie"), AllowAccessFirewall]
     public async Task<ActionResult> Last()
     {
-        var notice = await NoticeService.GetFromCacheAsync<DateTime, NoticeDto>(n => n.NoticeStatus == NoticeStatus.Normal && n.StrongAlert, n => n.ModifyDate, false);
+        var notice = await NoticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal && n.StrongAlert, n => n.ModifyDate, false).ProjectDto().Cacheable().FirstOrDefaultWithNoLockAsync();
         if (notice == null)
         {
             return ResultData(null, false);
@@ -197,12 +199,11 @@ public sealed class NoticeController : BaseController
         }
 
         await NoticeService.GetQuery(n => n.Id == notice.Id).ExecuteUpdateAsync(calls => calls.SetProperty(n => n.ViewCount, n => n.ViewCount + 1));
-        var dto = Mapper.Map<NoticeDto>(notice);
-        Response.Cookies.Append("last-notice", dto.Id.ToString(), new CookieOptions()
+        Response.Cookies.Append("last-notice", notice.Id.ToString(), new CookieOptions()
         {
             Expires = DateTime.Now.AddYears(1),
             SameSite = SameSiteMode.Lax
         });
-        return ResultData(dto);
+        return ResultData(notice);
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.International.Converters.TraditionalChineseToSimplifiedConverter;
 using Dispose.Scope;
 using EFCoreSecondLevelCacheInterceptor;
+using Masuit.MyBlogs.Core.Models;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -82,7 +83,7 @@ public sealed class SearchController : BaseController
     public ActionResult SearchList([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 200, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string search = "")
     {
         var where = string.IsNullOrEmpty(search) ? (Expression<Func<SearchDetails, bool>>)(s => true) : s => s.Keywords.Contains(search);
-        var pages = SearchDetailsService.GetPages<DateTime, SearchDetailsDto>(page, size, where, s => s.SearchTime, false);
+        var pages = SearchDetailsService.GetQuery(where, s => s.SearchTime, false).ProjectDto().ToPagedListNoLock(page, size);
         return Ok(pages);
     }
 

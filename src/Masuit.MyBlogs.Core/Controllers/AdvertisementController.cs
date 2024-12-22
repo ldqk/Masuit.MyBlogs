@@ -1,5 +1,4 @@
-﻿using AutoMapper.QueryableExtensions;
-using Dispose.Scope;
+﻿using Dispose.Scope;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
@@ -7,6 +6,7 @@ using Masuit.Tools.Excel;
 using Microsoft.Net.Http.Headers;
 using System.Net;
 using System.Text.RegularExpressions;
+using Masuit.MyBlogs.Core.Models;
 using Masuit.Tools.Core;
 using Masuit.Tools.Mime;
 
@@ -59,7 +59,7 @@ public sealed class AdvertisementController : BaseController
             where = where.And(p => Regex.IsMatch(p.Title + p.Description + p.Url, kw, RegexOptions.IgnoreCase));
         }
 
-        var queryable = AdsService.GetQuery(where).ProjectTo<AdvertisementViewModel>(MapperConfig).OrderByDescending(p => p.Status == Status.Available);
+        var queryable = AdsService.GetQuery(where).ProjectViewModel().OrderByDescending(p => p.Status == Status.Available);
         switch (orderBy)
         {
             case AdvertiseOrderBy.Price:
@@ -117,7 +117,7 @@ public sealed class AdvertisementController : BaseController
             return ResultData(null, false, "宣传小图不能为空");
         }
 
-        Mapper.Map(model, entity);
+        model.Update(entity);
         var b = await AdsService.AddOrUpdateSavedAsync(a => a.Id, entity) > 0;
         return ResultData(null, b, b ? "保存成功" : "保存失败");
     }
@@ -190,7 +190,7 @@ public sealed class AdvertisementController : BaseController
             where = where.And(e => Regex.IsMatch(e.IP + e.Location + e.Referer, kw));
         }
 
-        var pages = await ClickRecordService.GetPagesAsync<DateTime, AdvertisementClickRecordViewModel>(page, size, where, e => e.Time, false);
+        var pages = await ClickRecordService.GetQuery(where).OrderByDescending(e => e.Time).ProjectViewModel().ToPagedListNoLockAsync(page, size);
         return Ok(pages);
     }
 
@@ -202,7 +202,7 @@ public sealed class AdvertisementController : BaseController
     [HttpGet("/partner/{id}/records-export"), MyAuthorize]
     public IActionResult ExportClickRecords(int id)
     {
-        var list = ClickRecordService.GetQuery<DateTime, AdvertisementClickRecordViewModel>(e => e.AdvertisementId == id, e => e.Time, false).ToPooledListScope();
+        var list = ClickRecordService.GetQuery(e => e.AdvertisementId == id, e => e.Time, false).ProjectViewModel().ToPooledListScope();
         using var ms = list.ToExcel();
         var advertisement = AdsService[id];
         return this.ResumeFile(ms.ToArray(), ContentType.Xlsx, advertisement.Title + "访问记录.xlsx");
@@ -345,7 +345,7 @@ public sealed class AdvertisementController : BaseController
     [HttpGet("/partner/{id}/insight"), MyAuthorize]
     public IActionResult ClickRecordsInsight(int id)
     {
-        return View(Mapper.Map<AdvertisementViewModel>(AdsService[id]));
+        return View(AdsService[id].ToViewModel());
     }
 
     /// <summary>

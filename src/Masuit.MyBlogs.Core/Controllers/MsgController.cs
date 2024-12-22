@@ -7,6 +7,7 @@ using Masuit.Tools.Logging;
 using Microsoft.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
+using Masuit.MyBlogs.Core.Models;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -71,7 +72,7 @@ public sealed class MsgController : BaseController
                 parentTotal = 1,
                 page,
                 size,
-                rows = Mapper.Map<IList<LeaveMessageViewModel>>(layer.ToTree(e => e.Id, e => e.ParentId))
+                rows = layer.ToTree(e => e.Id, e => e.ParentId).ToViewModel()
             });
         }
 
@@ -101,7 +102,7 @@ public sealed class MsgController : BaseController
                 parentTotal = total,
                 page,
                 size,
-                rows = Mapper.Map<List<LeaveMessageViewModel>>(messages.OrderByDescending(c => c.PostDate).ToTree(c => c.Id, c => c.ParentId))
+                rows = messages.OrderByDescending(c => c.PostDate).ToTree(c => c.Id, c => c.ParentId).ToViewModel()
             });
         }
 
@@ -153,7 +154,7 @@ public sealed class MsgController : BaseController
             }
         }
 
-        var msg = Mapper.Map<LeaveMessage>(cmd);
+        var msg = cmd.ToLeaveMessage();
         if (cmd.ParentId > 0)
         {
             msg.GroupTag = LeaveMessageService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.GroupTag).FirstOrDefault();
@@ -282,7 +283,7 @@ public sealed class MsgController : BaseController
     [MyAuthorize]
     public async Task<ActionResult> GetPendingMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
     {
-        var list = await LeaveMessageService.GetPagesAsync<DateTime, LeaveMessageDto>(page, size, m => m.Status == Status.Pending, l => l.PostDate, false);
+        var list = await LeaveMessageService.GetQuery(m => m.Status == Status.Pending, l => l.PostDate, false).ProjectDto().ToPagedListAsync(page, size);
         foreach (var m in list.Data)
         {
             m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));

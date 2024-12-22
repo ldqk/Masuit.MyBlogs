@@ -2,8 +2,6 @@
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
 using Masuit.MyBlogs.Core.Infrastructure.Repository.Interface;
@@ -14,11 +12,12 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using EFCoreSecondLevelCacheInterceptor;
 using FreeRedis;
+using Masuit.MyBlogs.Core.Models;
 using Configuration = AngleSharp.Configuration;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services;
 
-public sealed class PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, IRedisClient cacheManager, ICategoryRepository categoryRepository, IMapper mapper, IPostTagsRepository postTagsRepository) : BaseService<Post>(repository, searchEngine, searcher), IPostService
+public sealed class PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, IRedisClient cacheManager, ICategoryRepository categoryRepository, IPostTagsRepository postTagsRepository) : BaseService<Post>(repository, searchEngine, searcher), IPostService
 {
     /// <summary>
     /// 文章高亮关键词处理
@@ -81,7 +80,7 @@ public sealed class PostService(IPostRepository repository, ISearchEngine<DataCo
             var searchResult = SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
             var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).DistinctBy(s => s.Entity.Id).ToList();
             var ids = entities.Select(s => s.Entity.Id).ToArray();
-            var dic = GetQuery(whereBase.And(p => ids.Contains(p.Id) && p.LimitMode != RegionLimitMode.OnlyForSearchEngine)).ProjectTo<PostDto>(mapper.ConfigurationProvider).ToFrozenDictionary(p => p.Id);
+            var dic = GetQuery(whereBase.And(p => ids.Contains(p.Id) && p.LimitMode != RegionLimitMode.OnlyForSearchEngine)).ProjectDto().ToFrozenDictionary(p => p.Id);
             var posts = entities.Where(s => dic.ContainsKey(s.Entity.Id)).Select(s => dic[s.Entity.Id]).ToList();
             var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
             var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
@@ -101,7 +100,7 @@ public sealed class PostService(IPostRepository repository, ISearchEngine<DataCo
     {
         var cids = posts.Select(p => p.CategoryId).Distinct().ToArray();
         var categories = categoryRepository.GetQuery(c => cids.Contains(c.Id)).Include(c => c.Parent).ToFrozenDictionary(c => c.Id);
-        posts.ForEach(p => p.Category = mapper.Map<CategoryDto_P>(categories[p.CategoryId]));
+        posts.ForEach(p => p.Category = categories[p.CategoryId].ToDto_P());
     }
 
     /// <summary>

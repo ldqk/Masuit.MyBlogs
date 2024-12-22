@@ -3,6 +3,8 @@ using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using System.Text;
 using Dispose.Scope;
+using EFCoreSecondLevelCacheInterceptor;
+using Masuit.MyBlogs.Core.Models;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -24,7 +26,7 @@ public sealed class LinksController : BaseController
     [Route("links"), ResponseCache(Duration = 600, VaryByHeader = "Cookie"), AllowAccessFirewall]
     public async Task<ActionResult> Index([FromServices] IWebHostEnvironment hostEnvironment)
     {
-        var list = LinksService.GetQueryFromCache<bool, LinksDto>(l => l.Status == Status.Available, l => l.Recommend, false);
+        var list = LinksService.GetQuery(l => l.Status == Status.Available, l => l.Recommend, false).ProjectDto().Cacheable().ToList();
         var html = await new FileInfo(Path.Combine(hostEnvironment.WebRootPath, "template", "links.html")).ShareReadWrite().ReadAllTextAsync(Encoding.UTF8);
         ViewBag.Html = ReplaceVariables(html);
         ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.InPage, Request.Location());
@@ -155,7 +157,7 @@ public sealed class LinksController : BaseController
     [MyAuthorize]
     public ActionResult Get()
     {
-        var list = LinksService.GetAll<LinksDto>().OrderBy(p => p.Status).ThenByDescending(p => p.Recommend).ThenByDescending(p => p.Id).ToPooledListScope();
+        var list = LinksService.GetAll().OrderBy(p => p.Status).ThenByDescending(p => p.Recommend).ThenByDescending(p => p.Id).ProjectDto().ToPooledListScope();
         return ResultData(list);
     }
 

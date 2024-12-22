@@ -1,6 +1,5 @@
 ﻿using System.Collections.Frozen;
 using AngleSharp;
-using AutoMapper.QueryableExtensions;
 using Dispose.Scope;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models;
@@ -43,8 +42,8 @@ public sealed class HomeController : BaseController
     public async Task<ActionResult> Index([FromServices] IFastShareService fastShareService)
     {
         var postsQuery = PostService.GetQuery(PostBaseWhere()); //准备文章的查询
-        var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ToPagedListAsync<Post, PostDto>(1, 15, MapperConfig);
-        posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).ProjectTo<PostDto>(MapperConfig).Cacheable().ToPooledListScope().OrderByRandom());
+        var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ProjectDto().ToPagedListAsync(1, 15);
+        posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).ProjectDto().Cacheable().ToPooledListScope().OrderByRandom());
         if (Request.IsRobot())
         {
             return View("SEO_List", posts);
@@ -83,12 +82,12 @@ public sealed class HomeController : BaseController
         var h24 = DateTime.Today.AddDays(-1);
         var posts = orderBy switch
         {
-            OrderBy.Trending => await postsQuery.Where(p => !p.IsFixedTop).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(t => t.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-            _ => await postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            OrderBy.Trending => await postsQuery.Where(p => !p.IsFixedTop).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(t => t.Count)).ProjectDto().ToPagedListAsync(page, size),
+            _ => await postsQuery.Where(p => !p.IsFixedTop).OrderBy((orderBy ?? OrderBy.ModifyDate).GetDisplay() + " desc").ProjectDto().ToPagedListAsync(page, size)
         };
         if (page == 1)
         {
-            posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).ProjectTo<PostDto>(MapperConfig).ToPooledListScope().OrderByRandom());
+            posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).ProjectDto().ToPooledListScope().OrderByRandom());
         }
 
         if (Request.IsRobot())
@@ -131,8 +130,8 @@ public sealed class HomeController : BaseController
         var h24 = DateTime.Today.AddDays(-1);
         var posts = orderBy switch
         {
-            OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-            _ => await queryable.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ProjectDto().ToPagedListAsync(page, size),
+            _ => await queryable.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ProjectDto().ToPagedListAsync(page, size)
         };
         if (Request.IsRobot())
         {
@@ -182,8 +181,8 @@ public sealed class HomeController : BaseController
         var h24 = DateTime.Today.AddDays(-1);
         var posts = orderBy switch
         {
-            OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-            _ => await queryable.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            OrderBy.Trending => await queryable.OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ProjectDto().ToPagedListAsync(page, size),
+            _ => await queryable.OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ProjectDto().ToPagedListAsync(page, size)
         };
         if (Request.IsRobot())
         {
@@ -220,8 +219,8 @@ public sealed class HomeController : BaseController
         var h24 = DateTime.Today.AddDays(-1);
         var posts = orderBy switch
         {
-            OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-            _ => await PostService.GetQuery(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            OrderBy.Trending => await PostService.GetQuery(where).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ProjectDto().ToPagedListAsync(page, size),
+            _ => await PostService.GetQuery(where).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ProjectDto().ToPagedListAsync(page, size)
         };
         if (Request.IsRobot())
         {
@@ -260,8 +259,8 @@ public sealed class HomeController : BaseController
         var h24 = DateTime.Today.AddDays(-1);
         var posts = orderBy switch
         {
-            OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId))).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ToPagedListAsync<Post, PostDto>(page, size, MapperConfig),
-            _ => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId))).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ToPagedListAsync<Post, PostDto>(page, size, MapperConfig)
+            OrderBy.Trending => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId))).OrderByDescending(p => p.PostVisitRecordStats.Where(e => e.Date >= h24).Sum(e => e.Count)).ProjectDto().ToPagedListAsync(page, size),
+            _ => await PostService.GetQuery(PostBaseWhere().And(p => cids.Contains(p.CategoryId))).OrderBy($"{nameof(PostDto.IsFixedTop)} desc,{(orderBy ?? OrderBy.ModifyDate).GetDisplay()} desc").ProjectDto().ToPagedListAsync(page, size)
         };
         if (Request.IsRobot())
         {
@@ -339,8 +338,8 @@ public sealed class HomeController : BaseController
     /// <returns></returns>
     private HomePageViewModel GetIndexPageViewModel()
     {
-        var postsQuery = PostService.GetQuery<PostDto>(PostBaseWhere()); //准备文章的查询
-        var notices = NoticeService.GetPagesFromCache<DateTime, NoticeDto>(1, 5, n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false); //加载前5条公告
+        var postsQuery = PostService.GetQuery(PostBaseWhere()); //准备文章的查询
+        var notices = NoticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false).ProjectDto().ToCachedPagedList(1, 5); //加载前5条公告
         var cats = CategoryService.GetQuery(c => c.Status == Status.Available && c.Post.Count > 0).OrderBy(c => c.Name).ThenBy(c => c.Path).AsNoTracking().Select(c => new Category
         {
             Id = c.Id,
@@ -353,16 +352,16 @@ public sealed class HomeController : BaseController
             1 => nameof(OrderBy.VoteUpCount),
             2 => nameof(OrderBy.AverageViewCount),
             _ => nameof(OrderBy.TotalViewCount)
-        } + " desc").Skip(0).Take(5).Cacheable().ToPooledListScope(); //热门文章
+        } + " desc").Skip(0).Take(5).ProjectDto().Cacheable().ToPooledListScope(); //热门文章
         var tagdic = PostService.GetTags().OrderByRandom().Take(20).ToFrozenDictionary(x => x.Key, x => Math.Min(x.Value + 12, 32)); //统计标签
         return new HomePageViewModel
         {
-            Categories = Mapper.Map<List<CategoryDto_P>>(cats.ToTree(c => c.Id, c => c.ParentId).Flatten()),
+            Categories = cats.ToTree(c => c.Id, c => c.ParentId).Flatten().ToDto_P(),
             HotSearch = hotSearches,
             Notices = notices.Data,
             Tags = tagdic,
             Top5Post = hot5Post,
-            PostsQueryable = postsQuery
+            PostsQueryable = postsQuery.ProjectDto()
         };
     }
 }

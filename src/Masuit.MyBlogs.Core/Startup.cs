@@ -103,7 +103,7 @@ public class Startup
         services.AutoRegisterServices();
         services.AddRazorPages();
         services.AddServerSideBlazor();
-        services.AddMapper().AddMyMvc().AddHealthChecks();
+        services.AddMyMvc().AddHealthChecks();
         services.SetupImageSharp();
         services.AddHttpContextAccessor();
         services.AddReverseProxy().LoadFromConfig(Configuration.GetSection("ReverseProxy")).ConfigureHttpClient((context, handler) =>

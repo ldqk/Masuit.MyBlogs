@@ -1,5 +1,4 @@
 ﻿using System.Collections.Frozen;
-using AutoMapper;
 using FreeRedis;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Net.Http.Headers;
 using System.Net;
 using System.Text.RegularExpressions;
+using Masuit.MyBlogs.Core.Models;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -25,10 +25,6 @@ public class BaseController : Controller
     public IAdvertisementService AdsService { get; set; }
 
     public IVariablesService VariablesService { get; set; }
-
-    public IMapper Mapper { get; set; }
-
-    public MapperConfiguration MapperConfig { get; set; }
 
     public IRedisClient RedisHelper { get; set; }
 
@@ -118,7 +114,7 @@ public class BaseController : Controller
 #if DEBUG
         if (HttpContext.Connection.RemoteIpAddress.IsPrivateIP())
         {
-            user = Mapper.Map<UserInfoDto>(UserInfoService.GetByUsername("masuit"));
+            user = UserInfoService.GetByUsername("masuit").ToDto();
             context.HttpContext.Session.Set(SessionKey.UserInfo, user);
         }
 #endif

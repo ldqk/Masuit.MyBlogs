@@ -7,6 +7,7 @@ using Masuit.Tools.Logging;
 using Microsoft.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
+using Masuit.MyBlogs.Core.Models;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -76,7 +77,7 @@ public sealed class CommentController : BaseController
             }
         }
 
-        var comment = Mapper.Map<Comment>(cmd);
+        var comment = cmd.ToComment();
         if (cmd.ParentId > 0)
         {
             comment.GroupTag = CommentService.GetQuery(c => c.Id == cmd.ParentId).Select(c => c.GroupTag).FirstOrDefault();
@@ -238,7 +239,7 @@ public sealed class CommentController : BaseController
                 parentTotal = 1,
                 page,
                 size,
-                rows = Mapper.Map<IList<CommentViewModel>>(layer.ToTree(c => c.Id, c => c.ParentId))
+                rows = layer.ToTree(c => c.Id, c => c.ParentId).ToViewModel()
             });
         }
 
@@ -269,7 +270,7 @@ public sealed class CommentController : BaseController
                 parentTotal = total,
                 page,
                 size,
-                rows = Mapper.Map<IList<CommentViewModel>>(comments.OrderByDescending(c => c.CommentDate).ToTree(c => c.Id, c => c.ParentId))
+                rows = comments.OrderByDescending(c => c.CommentDate).ToTree(c => c.Id, c => c.ParentId).ToViewModel()
             });
         }
 
@@ -331,7 +332,7 @@ public sealed class CommentController : BaseController
     [MyAuthorize]
     public async Task<ActionResult> GetPendingComments([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
     {
-        var pages = await CommentService.GetPagesAsync<DateTime, CommentDto>(page, size, c => c.Status == Status.Pending, c => c.CommentDate, false);
+        var pages = await CommentService.GetQuery(c => c.Status == Status.Pending, c => c.CommentDate, false).ProjectDto().ToPagedListNoLockAsync(page, size);
         foreach (var item in pages.Data)
         {
             item.CommentDate = item.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));

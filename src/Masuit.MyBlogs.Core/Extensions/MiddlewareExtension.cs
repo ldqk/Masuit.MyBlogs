@@ -1,5 +1,4 @@
-﻿using Masuit.MyBlogs.Core.Configs;
-using Masuit.Tools.Mime;
+﻿using Masuit.Tools.Mime;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.WebEncoders;
@@ -7,29 +6,13 @@ using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.IO.Compression;
-using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
 
 namespace Masuit.MyBlogs.Core.Extensions;
 
 public static class MiddlewareExtension
 {
-    /// <summary>
-    /// automapper
-    /// </summary>
-    /// <param name="services"></param>
-    /// <returns></returns>
-    public static IServiceCollection AddMapper(this IServiceCollection services)
-    {
-        var mc = new MapperConfiguration(cfg => cfg.AddExpressionMapping().AddProfile(new MappingProfile()));
-        services.AddAutoMapper(cfg => cfg.AddExpressionMapping().AddProfile(new MappingProfile()), Assembly.GetExecutingAssembly());
-        services.AddSingleton(mc);
-        return services;
-    }
-
     /// <summary>
     /// mvc
     /// </summary>

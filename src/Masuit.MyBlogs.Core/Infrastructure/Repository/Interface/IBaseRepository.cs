@@ -21,13 +21,6 @@ public interface IBaseRepository<T> : IDisposable where T : LuceneIndexableBaseE
     /// <summary>
     /// 获取所有实体
     /// </summary>
-    /// <typeparam name="TDto">映射实体</typeparam>
-    /// <returns>还未执行的SQL语句</returns>
-    IQueryable<TDto> GetAll<TDto>() where TDto : class;
-
-    /// <summary>
-    /// 获取所有实体
-    /// </summary>
     /// <typeparam name="TS">排序</typeparam>
     /// <param name="orderby">排序字段</param>
     /// <param name="isAsc">是否升序</param>
@@ -53,16 +46,6 @@ public interface IBaseRepository<T> : IDisposable where T : LuceneIndexableBaseE
     PooledList<T> GetAllFromCache<TS>(Expression<Func<T, TS>> orderby, bool isAsc = true);
 
     /// <summary>
-    /// 获取所有实体
-    /// </summary>
-    /// <typeparam name="TS">排序</typeparam>
-    /// <typeparam name="TDto">映射实体</typeparam>
-    /// <param name="orderby">排序字段</param>
-    /// <param name="isAsc">是否升序</param>
-    /// <returns>还未执行的SQL语句</returns>
-    IQueryable<TDto> GetAll<TS, TDto>(Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class;
-
-    /// <summary>
     /// 基本查询方法，获取一个集合
     /// </summary>
     /// <param name="where">查询条件</param>
@@ -80,25 +63,6 @@ public interface IBaseRepository<T> : IDisposable where T : LuceneIndexableBaseE
     IOrderedQueryable<T> GetQuery<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
 
     /// <summary>
-    /// 基本查询方法，获取一个被AutoMapper映射后的集合
-    /// </summary>
-    /// <param name="where">查询条件</param>
-    /// <returns>还未执行的SQL语句</returns>
-    IQueryable<TDto> GetQuery<TDto>(Expression<Func<T, bool>> @where) where TDto : class;
-
-    /// <summary>
-    /// 基本查询方法，获取一个被AutoMapper映射后的集合
-    /// </summary>
-    /// <typeparam name="TS">排序字段</typeparam>
-    /// <typeparam name="TDto">输出类型</typeparam>
-    /// <param name="where">查询条件</param>
-    /// <param name="orderby">排序字段</param>
-    /// <param name="isAsc">是否升序</param>
-    /// <returns>还未执行的SQL语句</returns>
-    /// <returns></returns>
-    IQueryable<TDto> GetQuery<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class;
-
-    /// <summary>
     /// 基本查询方法，获取一个集合，优先从二级缓存读取
     /// </summary>
     /// <param name="where">查询条件</param>
@@ -114,19 +78,6 @@ public interface IBaseRepository<T> : IDisposable where T : LuceneIndexableBaseE
     /// <param name="isAsc">是否升序</param>
     /// <returns></returns>
     PooledList<T> GetQueryFromCache<TS>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true);
-
-    PooledList<TDto> GetQueryFromCache<TDto>(Expression<Func<T, bool>> where) where TDto : class;
-
-    /// <summary>
-    /// 基本查询方法，获取一个被AutoMapper映射后的集合，优先从二级缓存读取
-    /// </summary>
-    /// <typeparam name="TS">排序字段</typeparam>
-    /// <typeparam name="TDto">输出类型</typeparam>
-    /// <param name="where">查询条件</param>
-    /// <param name="orderby">排序方式</param>
-    /// <param name="isAsc">是否升序</param>
-    /// <returns></returns>
-    PooledList<TDto> GetQueryFromCache<TS, TDto>(Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc = true) where TDto : class;
 
     /// <summary>
     /// 基本查询方法，获取一个集合（不跟踪实体）
@@ -168,46 +119,6 @@ public interface IBaseRepository<T> : IDisposable where T : LuceneIndexableBaseE
     /// <param name="isAsc">是否升序</param>
     /// <returns>实体</returns>
     T Get<TS>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true);
-
-    /// <summary>
-    /// 获取第一条被AutoMapper映射后的数据
-    /// </summary>
-    /// <param name="where">查询条件</param>
-    /// <returns>实体</returns>
-    TDto Get<TDto>(Expression<Func<T, bool>> @where) where TDto : class;
-
-    /// <summary>
-    /// 获取第一条被AutoMapper映射后的数据
-    /// </summary>
-    /// <typeparam name="TS">排序</typeparam>
-    /// <typeparam name="TDto">映射实体</typeparam>
-    /// <param name="where">查询条件</param>
-    /// <param name="orderby">排序字段</param>
-    /// <param name="isAsc">是否升序</param>
-    /// <returns>映射实体</returns>
-    TDto Get<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class;
-
-    /// <summary>
-    /// 获取第一条被AutoMapper映射后的数据
-    /// </summary>
-    /// <typeparam name="TS">排序</typeparam>
-    /// <typeparam name="TDto">映射实体</typeparam>
-    /// <param name="where">查询条件</param>
-    /// <param name="orderby">排序字段</param>
-    /// <param name="isAsc">是否升序</param>
-    /// <returns>映射实体</returns>
-    Task<TDto> GetAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class;
-
-    /// <summary>
-    /// 从二级缓存获取第一条被AutoMapper映射后的数据
-    /// </summary>
-    /// <typeparam name="TS">排序</typeparam>
-    /// <typeparam name="TDto">映射实体</typeparam>
-    /// <param name="where">查询条件</param>
-    /// <param name="orderby">排序字段</param>
-    /// <param name="isAsc">是否升序</param>
-    /// <returns>映射实体</returns>
-    Task<TDto> GetFromCacheAsync<TS, TDto>(Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc = true) where TDto : class;
 
     /// <summary>
     /// 获取第一条数据
@@ -260,19 +171,6 @@ public interface IBaseRepository<T> : IDisposable where T : LuceneIndexableBaseE
     PagedList<T> GetPages<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc);
 
     /// <summary>
-    /// 标准分页查询方法，取出被AutoMapper映射后的数据集合
-    /// </summary>
-    /// <typeparam name="TS"></typeparam>
-    /// <typeparam name="TDto"></typeparam>
-    /// <param name="pageIndex">第几页</param>
-    /// <param name="pageSize">每页大小</param>
-    /// <param name="where">where Lambda条件表达式</param>
-    /// <param name="orderby">orderby Lambda条件表达式</param>
-    /// <param name="isAsc">升序降序</param>
-    /// <returns></returns>
-    PagedList<TDto> GetPages<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc) where TDto : class;
-
-    /// <summary>
     /// 标准分页查询方法
     /// </summary>
     /// <typeparam name="TS"></typeparam>
@@ -283,32 +181,6 @@ public interface IBaseRepository<T> : IDisposable where T : LuceneIndexableBaseE
     /// <param name="isAsc">升序降序</param>
     /// <returns></returns>
     Task<PagedList<T>> GetPagesAsync<TS>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc);
-
-    /// <summary>
-    /// 标准分页查询方法，取出被AutoMapper映射后的数据集合
-    /// </summary>
-    /// <typeparam name="TS"></typeparam>
-    /// <typeparam name="TDto"></typeparam>
-    /// <param name="pageIndex">第几页</param>
-    /// <param name="pageSize">每页大小</param>
-    /// <param name="where">where Lambda条件表达式</param>
-    /// <param name="orderby">orderby Lambda条件表达式</param>
-    /// <param name="isAsc">升序降序</param>
-    /// <returns></returns>
-    Task<PagedList<TDto>> GetPagesAsync<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> where, Expression<Func<T, TS>> orderby, bool isAsc) where TDto : class;
-
-    /// <summary>
-    /// 标准分页查询方法，优先从二级缓存读取，取出被AutoMapper映射后的数据集合
-    /// </summary>
-    /// <typeparam name="TS"></typeparam>
-    /// <typeparam name="TDto"></typeparam>
-    /// <param name="pageIndex">第几页</param>
-    /// <param name="pageSize">每页大小</param>
-    /// <param name="where">where Lambda条件表达式</param>
-    /// <param name="orderby">orderby Lambda条件表达式</param>
-    /// <param name="isAsc">升序降序</param>
-    /// <returns></returns>
-    PagedList<TDto> GetPagesFromCache<TS, TDto>(int pageIndex, int pageSize, Expression<Func<T, bool>> @where, Expression<Func<T, TS>> @orderby, bool isAsc) where TDto : class;
 
     /// <summary>
     /// 标准分页查询方法（不跟踪实体）
