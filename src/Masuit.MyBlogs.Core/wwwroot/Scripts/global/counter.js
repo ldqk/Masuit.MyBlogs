@@ -306,9 +306,9 @@ function showLine(ip) {
             window.counterInterval = setInterval(function () {
                 DotNet.invokeMethodAsync('Masuit.MyBlogs.Core', 'GetCurrentPerformanceCounter').then(item => {
                     data.cpu.push([item.time, item.cpuLoad.toFixed(2)]);
-                    data.mem.push([item.time, (item.memoryUsage / res).toFixed(2)]);
+                    data.mem.push([item.time, (item.memoryUsage / res * 100).toFixed(2)]);
                     data.processCpu.push([item.time, item.processCpuLoad.toFixed(2)]);
-                    data.processMem.push([item.time, (item.processMemoryUsage / res).toFixed(2)]);
+                    data.processMem.push([item.time, (item.processMemoryUsage / res * 100).toFixed(2)]);
                     data.read.push([item.time, item.diskRead.toFixed(2)]);
                     data.write.push([item.time, item.diskWrite.toFixed(2)]);
                     data.up.push([item.time, item.upload.toFixed(2)]);
@@ -337,9 +337,9 @@ function showLine(ip) {
                     });
                     let option = rateChart.getOption();
                     option.series[0].data[0].value = item.cpuLoad.toFixed(2);
-                    option.series[0].data[1].value = (item.memoryUsage / res).toFixed(2);
+                    option.series[0].data[1].value = (item.memoryUsage / res * 100).toFixed(2);
                     option.series[0].data[2].value = item.processCpuLoad.toFixed(2);
-                    option.series[0].data[3].value = (item.processMemoryUsage / res).toFixed(2);
+                    option.series[0].data[3].value = (item.processMemoryUsage / res * 100).toFixed(2);
                     rateChart.setOption(option, true);
                 });
             }, 2000);

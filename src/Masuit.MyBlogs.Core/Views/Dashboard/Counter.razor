@@ -208,7 +208,7 @@
     [JSInvokable]
     public static long GetTotalMemory()
     {
-        return SystemInfo.PhysicalMemory;
+        return SystemInfo.PhysicalMemory/1048576;
     }
 
     public void ClearMemory()
@@ -228,8 +228,8 @@
         var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==_ip).OrderByRandom().Take(15000).ToList();
         var cpuLoads = counters.Select(c => c.CpuLoad).ToList();
         var processCpuLoads = counters.Select(c => c.ProcessCpuLoad).ToList();
-        var memUse = counters.Select(c => c.MemoryUsage * 1048576 / SystemInfo.PhysicalMemory).ToList();
-        var processMemUse = counters.Select(c => c.ProcessMemoryUsage * 1048576 / SystemInfo.PhysicalMemory).ToList();
+        var memUse = counters.Select(c => c.MemoryUsage).ToList();
+        var processMemUse = counters.Select(c => c.ProcessMemoryUsage).ToList();
         var reads = counters.Select(c => c.DiskRead).ToList();
         var writes = counters.Select(c => c.DiskWrite).ToList();
         var downloads = counters.Select(c => c.Download).ToList();
@@ -245,7 +245,7 @@
                 average = counters.Average(c => c.CpuLoad).ToDecimal(2),
                 stdev = cpuLoads.StandardDeviation().ToDecimal(2),
             },
-            ["内存使用率(%)"] = new
+            ["内存使用量(MB)"] = new
             {
                 p50 = memUse.Percentile(50).ToDecimal(2),
                 p75 = memUse.Percentile(75).ToDecimal(2),
@@ -265,7 +265,7 @@
                 average = counters.Average(c => c.ProcessCpuLoad).ToDecimal(2),
                 stdev = processCpuLoads.StandardDeviation().ToDecimal(2),
             },
-            ["网站内存使用率(%)"] = new
+            ["网站内存使用量(MB)"] = new
             {
                 p50 = processMemUse.Percentile(50).ToDecimal(2),
                 p75 = processMemUse.Percentile(75).ToDecimal(2),
