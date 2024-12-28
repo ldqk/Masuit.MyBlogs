@@ -1,4 +1,5 @@
-﻿using Riok.Mapperly.Abstractions;
+﻿using Masuit.MyBlogs.Core.Models.Entity;
+using Riok.Mapperly.Abstractions;
 
 namespace Masuit.MyBlogs.Core.Models;
 
@@ -18,14 +19,7 @@ public static partial class PostMapper
     [MapProperty("PostHistoryVersion", nameof(PostDataModel.ModifyCount))]
     [MapProperty(nameof(post.TotalViewCount), nameof(PostDataModel.ViewCount))]
     [MapProperty("Seminar", nameof(PostDataModel.Seminars))]
-    private static partial PostDataModel MapDataModel(Post post);
-
-    public static PostDataModel ToDataModel(this Post post)
-    {
-        var model = MapDataModel(post);
-        model.LimitDesc = MapLimitDesc(post.LimitMode ?? RegionLimitMode.All, post.Regions, post.ExceptRegions);
-        return model;
-    }
+    public static partial PostDataModel MapDataModel(Post post);
 
     [MapperIgnoreTarget(nameof(post.Id))]
     [MapProperty(nameof(post.Id), nameof(PostHistoryVersion.PostId))]
@@ -42,6 +36,9 @@ public static partial class PostMapper
 
     public static partial IQueryable<PostDto> ProjectDto(this IQueryable<Post> q);
 
+    [MapProperty("PostHistoryVersion", nameof(PostDataModel.ModifyCount))]
+    [MapProperty(nameof(Post.TotalViewCount), nameof(PostDataModel.ViewCount))]
+    [MapProperty("Seminar", nameof(PostDataModel.Seminars))]
     public static partial IQueryable<PostDataModel> ProjectDataModel(this IQueryable<Post> q);
 
     public static partial IQueryable<PostModelBase> ProjectModelBase(this IQueryable<Post> q);
@@ -55,8 +52,6 @@ public static partial class PostMapper
     public static string MapCategoryName(Category category) => category.Name;
 
     public static int MapCommentCount(ICollection<Comment> comments) => comments.Count;
-
-    public static string MapLimitDesc(RegionLimitMode limitMode, string regions, string ExceptRegions) => limitMode > RegionLimitMode.All ? string.Format(limitMode.GetDescription(), regions, ExceptRegions) : "无限制";
 
     public static int[] MapSeminars(ICollection<Seminar> seminars) => seminars.Select(s => s.Id).ToArray();
 }
