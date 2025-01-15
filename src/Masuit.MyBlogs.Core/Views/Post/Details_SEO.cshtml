@@ -1,11 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.AspNetCore.Http.Extensions
 @model Masuit.MyBlogs.Core.Models.Entity.Post
 
 @{
     ViewBag.Title = Model.Title;
     Layout = null;
-    var summary = $"若页面无法访问，可通过搜索引擎网页快照(inurl:{Context.Request.GetDisplayUrl()})进行浏览。{await Model.Content.GetSummary()}";
+    var summary = await Model.Content.GetSummary();
 }
 <!DOCTYPE html>
 <html lang="zh-CN">
