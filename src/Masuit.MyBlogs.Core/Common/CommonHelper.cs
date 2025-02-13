@@ -337,7 +337,7 @@ namespace Masuit.MyBlogs.Core.Common
                     {
                         case "Text":
                             var watermarkText = SystemSettings["Watermark"];
-                            return watermarker.AddWatermark(watermarkText, AppContext.BaseDirectory + "App_Data/华康勘亭流.ttf", 20, Color.LightGray, position, 30);
+                            return watermarker.AddWatermark(watermarkText, AppContext.BaseDirectory + "App_Data/华康勘亭流.ttf", 20, Color.LightGray.WithAlpha(0.5f), position, 30);
 
                         case "Image":
                             {

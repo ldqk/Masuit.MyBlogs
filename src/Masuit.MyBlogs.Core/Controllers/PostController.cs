@@ -1088,6 +1088,7 @@ public sealed class PostController : BaseController
     public async Task<IActionResult> Statistic(CancellationToken cancellationToken = default)
     {
         Response.ContentType = "text/event-stream";
+        Response.Headers.Add("X-Accel-Buffering", "no");
         while (true)
         {
             if (cancellationToken.IsCancellationRequested)

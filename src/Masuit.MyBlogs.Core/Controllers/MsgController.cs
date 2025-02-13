@@ -363,6 +363,7 @@ public sealed class MsgController : BaseController
     public async Task<ActionResult> GetUnreadMsgs(CancellationToken cancellationToken)
     {
         Response.ContentType = "text/event-stream";
+        Response.Headers.Add("X-Accel-Buffering", "no");
         while (true)
         {
             if (cancellationToken.IsCancellationRequested)

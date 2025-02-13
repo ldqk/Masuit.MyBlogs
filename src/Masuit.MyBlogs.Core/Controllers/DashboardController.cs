@@ -38,6 +38,7 @@ public sealed class DashboardController : AdminController
     public async Task<ActionResult> GetMessages([FromServices] IPostService postService, [FromServices] ILeaveMessageService leaveMessageService, [FromServices] ICommentService commentService, CancellationToken cancellationToken)
     {
         Response.ContentType = "text/event-stream";
+        Response.Headers.Add("X-Accel-Buffering", "no");
         while (true)
         {
             if (cancellationToken.IsCancellationRequested)
