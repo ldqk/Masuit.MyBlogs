@@ -636,7 +636,7 @@ public sealed class PostController : BaseController
 
         if (!string.IsNullOrEmpty(kw))
         {
-            kw = Regex.Escape(kw);
+            kw = kw.Split('|', StringSplitOptions.RemoveEmptyEntries).Select(Regex.Escape).Join("|");
             where = where.And(p => Regex.IsMatch(p.Title + p.Author + p.Email + p.Content, kw, RegexOptions.IgnoreCase));
         }
 

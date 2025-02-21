@@ -197,10 +197,10 @@ namespace Masuit.MyBlogs.Core.Common
         /// </summary>
         /// <param name="html"></param>
         /// <returns></returns>
-        public static async Task<string> ClearImgAttributes(this string html)
+        public static async Task<string> ClearImgAttributes(this string html, CancellationToken cancellationToken = default)
         {
             var context = BrowsingContext.New(Configuration.Default);
-            var doc = await context.OpenAsync(req => req.Content(html));
+            var doc = await context.OpenAsync(req => req.Content(html), cancel: cancellationToken);
             var nodes = doc.DocumentElement.GetElementsByTagName("img");
             var allows = new[] { "src", "data-original", "width", "style", "class" };
             foreach (var node in nodes)
@@ -225,10 +225,10 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="html"></param>
         /// <param name="title"></param>
         /// <returns></returns>
-        public static async Task<string> ReplaceImgAttribute(this string html, string title)
+        public static async Task<string> ReplaceImgAttribute(this string html, string title, CancellationToken cancellationToken = default)
         {
             var context = BrowsingContext.New(Configuration.Default);
-            var doc = await context.OpenAsync(req => req.Content(html));
+            var doc = await context.OpenAsync(req => req.Content(html), cancel: cancellationToken);
             var nodes = doc.DocumentElement.GetElementsByTagName("img");
             foreach (var node in nodes)
             {
@@ -270,7 +270,7 @@ namespace Masuit.MyBlogs.Core.Common
         /// <summary>
         /// html添加指纹信息
         /// </summary>
-        public static async Task<string> InjectFingerprint(this string html, string ip)
+        public static async Task<string> InjectFingerprint(this string html, string ip, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(html))
             {
@@ -280,7 +280,7 @@ namespace Masuit.MyBlogs.Core.Common
             try
             {
                 var context = BrowsingContext.New(Configuration.Default);
-                var document = await context.OpenAsync(req => req.Content(html));
+                var document = await context.OpenAsync(req => req.Content(html), cancel: cancellationToken);
                 var elements = document.DocumentElement.GetElementsByTagName("p").SelectMany(e => e.ChildNodes).Flatten(n => n.ChildNodes).OfType<IText>().OrderByRandom().Take(5);
                 foreach (var e in elements)
                 {
@@ -301,14 +301,14 @@ namespace Masuit.MyBlogs.Core.Common
         /// <param name="length">截取长度</param>
         /// <param name="min">摘要最少字数</param>
         /// <returns></returns>
-        public static Task<string> GetSummary(this string html, int length = 150, int min = 10)
+        public static Task<string> GetSummary(this string html, int length = 150, int min = 10, CancellationToken cancellationToken = default)
         {
             var context = BrowsingContext.New(Configuration.Default);
-            return context.OpenAsync(req => req.Content(html)).ContinueWith(t =>
+            return context.OpenAsync(req => req.Content(html), cancel: cancellationToken).ContinueWith(t =>
             {
                 var summary = t.Result.DocumentElement.GetElementsByTagName("p").FirstOrDefault(n => n.TextContent.Length > min)?.TextContent ?? "没有摘要";
                 return summary.Length > length ? summary[..length] + "..." : summary;
-            });
+            }, cancellationToken);
         }
 
         public static string TrimQuery(this string path)
