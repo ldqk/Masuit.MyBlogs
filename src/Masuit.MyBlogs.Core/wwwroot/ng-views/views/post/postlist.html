@@ -25,6 +25,10 @@
             </div>
         </div>
         <div class="input-group">
+                <input type="checkbox" ng-change="search(kw)" ng-model="useRegex" id="regex"/>
+                <label class="input-group-addon" for="regex">使用正则表达式</label>
+        </div>
+        <div class="input-group">
             <span class="input-group-addon">分类：</span>
             <div class="form-control" id="category" style="width: 200px"></div>
         </div>

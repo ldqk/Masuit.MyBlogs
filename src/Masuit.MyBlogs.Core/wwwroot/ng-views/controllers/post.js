@@ -3,6 +3,7 @@
     self.stats = [];
     self.data = {};
     $scope.kw = "";
+    $scope.useRegex = false;
     $scope.orderby = 1;
     $scope.CategoryId = "";
     $scope.paginationConf = {
@@ -113,8 +114,8 @@
     });
 
     this.GetPageData = function (page, size) {
-        let params = { page, size, kw: $scope.kw, orderby: $scope.orderby, cid: $scope.CategoryId };
-        $http.get(`/post/getpagedata?page=${page || 1}&size=${size}&kw=${$scope.kw}&orderby=${$scope.orderby}&cid=${$scope.CategoryId}`).then(function (res) {
+        let params = { page, size, kw: $scope.kw, useRegex: $scope.useRegex, orderby: $scope.orderby, cid: $scope.CategoryId };
+        $http.get(`/post/getpagedata?page=${page || 1}&size=${size}&kw=${$scope.kw}&useRegex=${$scope.useRegex}&orderby=${$scope.orderby}&cid=${$scope.CategoryId}`).then(function (res) {
             $scope.paginationConf.totalItems = res.data.TotalCount;
             $("div[ng-table-pagination]").remove();
             self.tableParams = new NgTableParams({ count: 50000 }, {

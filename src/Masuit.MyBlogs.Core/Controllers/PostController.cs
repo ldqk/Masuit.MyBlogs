@@ -626,7 +626,7 @@ public sealed class PostController : BaseController
     /// </summary>
     /// <returns></returns>
     [MyAuthorize]
-    public async Task<ActionResult> GetPageData([FromServices] IRedisClient cacheManager, int page = 1, [Range(1, 200, ErrorMessage = "页大小必须介于{1}-{2}")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null)
+    public async Task<ActionResult> GetPageData([FromServices] IRedisClient cacheManager, int page = 1, [Range(1, 200, ErrorMessage = "页大小必须介于{1}-{2}")] int size = 10, OrderBy orderby = OrderBy.ModifyDate, string kw = "", int? cid = null, bool useRegex = false)
     {
         Expression<Func<Post, bool>> where = p => true;
         if (cid.HasValue)
@@ -636,8 +636,7 @@ public sealed class PostController : BaseController
 
         if (!string.IsNullOrEmpty(kw))
         {
-            kw = kw.Split('|', StringSplitOptions.RemoveEmptyEntries).Select(Regex.Escape).Join("|");
-            where = where.And(p => Regex.IsMatch(p.Title + p.Author + p.Email + p.Content, kw, RegexOptions.IgnoreCase));
+            where = useRegex ? where.And(p => Regex.IsMatch(p.Title + p.Author + p.Email + p.Content + p.ProtectContent, kw, RegexOptions.IgnoreCase)) : where.And(p => (p.Title + p.Author + p.Email + p.Content + p.ProtectContent).Contains(kw));
         }
 
         var list = orderby switch
