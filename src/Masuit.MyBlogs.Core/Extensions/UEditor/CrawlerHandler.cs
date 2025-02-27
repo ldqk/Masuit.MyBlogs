@@ -74,7 +74,7 @@ public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration con
                 }
 
                 var fileName = Path.GetFileNameWithoutExtension(SourceUrl).Next(s => Regex.Matches(s, @"\w+").LastOrDefault()?.Value);
-                ServerUrl = PathFormatter.Format(fileName, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload") + UeditorConfig.GetString("catcherPathFormat")) + MimeMapper.ExtTypes[response.Content.Headers.ContentType?.MediaType ?? "image/jpeg"];
+                ServerUrl = PathFormatter.Format(fileName, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload") + UeditorConfig.GetString("catcherPathFormat")) + MimeMapper.ExtTypes[response.Content.Headers.ContentType?.MediaType ?? "image/jpeg"][0];
                 return response.Content.ReadAsStreamAsync().Result;
             }
 
