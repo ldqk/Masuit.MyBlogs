@@ -121,6 +121,7 @@ namespace Masuit.MyBlogs.Core.Common
             return DenyIP.Contains(ip) || DenyIPRange.AsParallel().Any(kv => kv.Key.StartsWith(ip.Split('.')[0]) && ip.IpAddressInRange(kv.Key, kv.Value));
         }
 
+        private static readonly QQWrySearcher IPSearcher = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "qqwry.dat"));
         public static readonly DatabaseReader MaxmindReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-City.mmdb"));
         private static readonly DatabaseReader MaxmindAsnReader = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "GeoLite2-ASN.mmdb"));
 
@@ -169,11 +170,15 @@ namespace Masuit.MyBlogs.Core.Common
             {
                 ip = ip.MapToIPv4();
             }
+
+            var qqwry = IPSearcher.GetIpLocation(ip);
             return new IPLocation(countryName, cityName, asn.AutonomousSystemOrganization, asn.AutonomousSystemNumber)
             {
                 Coodinate = city.Location,
                 Continent = continent,
-                State = city.MostSpecificSubdivision.Names.GetValueOrDefault("zh-CN") ?? city.MostSpecificSubdivision.Name ?? Areas.FirstOrDefault(a => a.CountryCode == city.Country.IsoCode && (a.City == cityName || a.City_EN == city.City.Name))?.State
+                State = city.MostSpecificSubdivision.Names.GetValueOrDefault("zh-CN") ?? city.MostSpecificSubdivision.Name ?? Areas.FirstOrDefault(a => a.CountryCode == city.Country.IsoCode && (a.City == cityName || a.City_EN == city.City.Name))?.State,
+                Address2 = qqwry.City,
+                Network2 = qqwry.Network
             };
         }
 
@@ -389,7 +394,10 @@ namespace Masuit.MyBlogs.Core.Common
 
         public string Address => new[] { Continent, Country, State, City }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("");
 
+        public string Address2 { get; set; }
+
         public string Network => ASN.HasValue ? ISP + "(AS" + ASN + ")" : ISP;
+        public string Network2 { get; set; }
 
         public Location Coodinate { get; set; }
 
@@ -407,7 +415,7 @@ namespace Masuit.MyBlogs.Core.Common
                 network = "未知网络";
             }
 
-            return new[] { address, network }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("|");
+            return new[] { address, Address2, network, Network2 }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("|");
         }
 
         public static implicit operator string(IPLocation entry)
@@ -417,7 +425,7 @@ namespace Masuit.MyBlogs.Core.Common
 
         public void Deconstruct(out string location, out string network, out string info)
         {
-            location = Address;
+            location = new[] { Address, Address2 }.Where(s => !string.IsNullOrEmpty(s)).Distinct().Join("|");
             network = Network;
             info = ToString();
         }
@@ -430,27 +438,6 @@ namespace Masuit.MyBlogs.Core.Common
         public bool Contains(params string[] s)
         {
             return ToString().Contains(s);
-        }
-
-        public record CountryCity(string Continent, string Country, string State, string City)
-        {
-            public void Deconstruct(out string continent, out string country, out string state, out string city)
-            {
-                country = Country;
-                city = City;
-                continent = Continent;
-                state = State;
-            }
-
-            public static implicit operator string(CountryCity entry)
-            {
-                return entry.ToString();
-            }
-
-            public override string ToString()
-            {
-                return Continent + Country + State + City;
-            }
         }
     }
 }

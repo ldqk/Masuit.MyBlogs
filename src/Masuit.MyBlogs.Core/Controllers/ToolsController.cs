@@ -56,14 +56,16 @@ public sealed class ToolsController : BaseController
         {
             Location = loc.Coodinate,
             Address = loc.Address,
+            Address2 = loc.Address2,
             Network = new NetworkInfo
             {
                 Asn = asn.AutonomousSystemNumber,
                 Router = asn.Network + "",
                 Organization = loc.ISP
             },
+            Network2 = loc.Network2,
             TimeZone = loc.Coodinate.TimeZone + $"  UTC{TZConvert.GetTimeZoneInfo(loc.Coodinate.TimeZone ?? "Asia/Shanghai").BaseUtcOffset.Hours:+#;-#;0}",
-            IsProxy = loc.Network.Contains(new[] { "cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business", "ASN" }) || domain.Length > 1 || await IsProxy(ipAddress, cts.Token),
+            IsProxy = loc.Network.Contains(["cloud", "Compute", "Serv", "Tech", "Solution", "Host", "云", "Datacenter", "Data Center", "Business", "ASN"]) || domain.Length > 1 || await IsProxy(ipAddress, cts.Token),
             Domain = domain
         };
         if (Request.Method.Equals(HttpMethods.Get) || (Request.Headers[HeaderNames.Accept] + "").StartsWith(ContentType.Json))
