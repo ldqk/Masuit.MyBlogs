@@ -2,12 +2,9 @@
 using Masuit.MyBlogs.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using System.Diagnostics;
-using System.Net;
 using AngleSharp.Text;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-QQWrySearcher IPSearcher = new(Path.Combine(AppContext.BaseDirectory + "App_Data", "qqwry.dat"));
-var (city, network) = IPSearcher.GetIpLocation(IPAddress.Parse("2409:891f:6b40:11e8:25ed:834e:394b:793a"));
 try
 {
     if (Environment.OSVersion.Platform is not (PlatformID.MacOSX or PlatformID.Unix))
