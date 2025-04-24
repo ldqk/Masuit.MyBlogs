@@ -25,7 +25,7 @@ public sealed class AdvertisementController : BaseController
     [HttpGet("/p{id:int}"), HttpGet("{id:int}", Order = 1), ResponseCache(Duration = 3600)]
     public async Task<IActionResult> Redirect(int id)
     {
-        var ad = await AdsService.GetByIdAsync(id) ?? throw new NotFoundException("推广链接不存在");
+        var ad = await AdsService.GetAsync(a => a.Id == id && a.Status == Status.Available) ?? throw new NotFoundException("推广链接不存在");
         if (!Request.IsRobot() && string.IsNullOrEmpty(HttpContext.Session.Get<string>("ads" + id)))
         {
             HttpContext.Session.Set("ads" + id, id.ToString());
