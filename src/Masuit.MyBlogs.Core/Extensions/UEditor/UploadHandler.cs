@@ -45,9 +45,9 @@ public class UploadHandler(HttpContext context, UploadConfig config) : Handler(c
                 stream2.Position = 0;
                 if (format != null && !Regex.IsMatch(format.Name, "JPEG|PNG|Webp|GIF", RegexOptions.IgnoreCase))
                 {
-                    using var image = await Image.LoadAsync(stream2);
+                    using var image = await Image.LoadAsync(stream2, cts.Token);
                     var memoryStream = new PooledMemoryStream();
-                    await image.SaveAsJpegAsync(memoryStream);
+                    await image.SaveAsJpegAsync(memoryStream, cancellationToken: cts.Token);
                     await stream2.DisposeAsync();
                     stream2 = memoryStream;
                     savePath = savePath.Replace(Path.GetExtension(savePath), ".jpg");
@@ -62,7 +62,7 @@ public class UploadHandler(HttpContext context, UploadConfig config) : Handler(c
                 else
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(localPath));
-                    await File.WriteAllBytesAsync(localPath, await stream2.ToArrayAsync());
+                    await File.WriteAllBytesAsync(localPath, await stream2.ToArrayAsync(cancellationToken: cts.Token), cts.Token);
                     Result.Url = savePath;
                 }
 
