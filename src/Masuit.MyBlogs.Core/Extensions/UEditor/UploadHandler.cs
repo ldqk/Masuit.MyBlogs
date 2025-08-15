@@ -1,6 +1,7 @@
 ﻿using Masuit.Tools.Logging;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using SixLabors.ImageSharp;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor;
 
@@ -40,7 +41,7 @@ public class UploadHandler(HttpContext context, UploadConfig config) : Handler(c
             try
             {
                 var stream2 = stream.AddWatermark();
-                var format = await Image.DetectFormatAsync(stream2).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
+                var format = await Image.DetectFormatAsync(stream2, cts.Token).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
                 stream2.Position = 0;
                 if (format != null && !Regex.IsMatch(format.Name, "JPEG|PNG|Webp|GIF", RegexOptions.IgnoreCase))
                 {

@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Extensions;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Core.Validator;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -13,7 +14,7 @@ public sealed class ValidateController : BaseController
     /// <param name="email"></param>
     /// <returns></returns>
     [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" }), DistributedLockFilter]
-    public ActionResult SendCode(string email)
+    public ActionResult SendCode([FromBodyOrDefault] string email)
     {
         var validator = new IsEmailAttribute();
         if (!validator.IsValid(email))

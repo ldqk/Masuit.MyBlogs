@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Newtonsoft.Json;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Webp;
 using TimeZoneConverter;
 using ArgumentException = System.ArgumentException;

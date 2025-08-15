@@ -3,6 +3,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Masuit.Tools.Files;
 using Polly;
+using SixLabors.ImageSharp;
 
 namespace Masuit.MyBlogs.Core.Extensions.UEditor;
 
@@ -86,7 +87,7 @@ public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration con
             return this;
         }
 
-        var format = await Image.DetectFormatAsync(stream).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
+        var format = await Image.DetectFormatAsync(stream, token).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : null);
         stream.Position = 0;
         if (format != null)
         {
