@@ -49,7 +49,7 @@ public static partial class PostMapper
 
     public static RegionLimitMode MapLimitMode(RegionLimitMode? limitMode) => limitMode ?? RegionLimitMode.All;
 
-    public static string MapCategoryName(Category category) => category.Name;
+    public static string MapCategoryName(Category category) => category?.Name;
 
     public static int MapCommentCount(ICollection<Comment> comments) => comments.Count;
 
