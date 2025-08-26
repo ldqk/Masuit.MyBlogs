@@ -84,7 +84,7 @@ public sealed class PassportController : Controller
         if (Request.Cookies.Count > 2)
         {
             string name = Request.Cookies["username"];
-            string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.BaiduAK);
+            string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.ConnString);
             var userInfo = UserInfoService.Login(name, pwd);
             if (userInfo != null)
             {
@@ -165,7 +165,7 @@ public sealed class PassportController : Controller
                 Expires = DateTime.Now.AddYears(1),
                 SameSite = SameSiteMode.Lax
             });
-            Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.BaiduAK), new CookieOptions()
+            Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.ConnString), new CookieOptions()
             {
                 Expires = DateTime.Now.AddYears(1),
                 SameSite = SameSiteMode.Lax

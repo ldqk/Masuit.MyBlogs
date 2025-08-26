@@ -40,7 +40,7 @@ public class BaseController : Controller
     /// <summary>
     /// 普通访客是否token合法
     /// </summary>
-    private bool VisitorTokenValid => Request.Cookies.ContainsKey("FullAccessToken") && Request.Cookies["Email"].MDString(AppConfig.BaiduAK).Equals(Request.Cookies["FullAccessToken"]);
+    private bool VisitorTokenValid => Request.Cookies.ContainsKey("FullAccessToken") && Request.Cookies["Email"].MDString(AppConfig.ConnString).Equals(Request.Cookies["FullAccessToken"]);
 
     private int[] HideCategories => Request.GetHideCategories();
 
@@ -134,7 +134,7 @@ public class BaseController : Controller
         {
             var name = Request.Cookies["username"];
             var pwd = Request.Cookies["password"];
-            var userInfo = UserInfoService.Login(name, pwd.DesDecrypt(AppConfig.BaiduAK));
+            var userInfo = UserInfoService.Login(name, pwd.DesDecrypt(AppConfig.ConnString));
             if (userInfo != null)
             {
                 Response.Cookies.Append("username", name, new CookieOptions
@@ -186,7 +186,7 @@ public class BaseController : Controller
                 return "验证码错误！";
             }
         }
-        else if (Request.Cookies["ValidateKey"].DesDecrypt(AppConfig.BaiduAK) != email)
+        else if (Request.Cookies["ValidateKey"].DesDecrypt(AppConfig.ConnString) != email)
         {
             Response.Cookies.Delete("Email");
             Response.Cookies.Delete("NickName");
@@ -213,7 +213,7 @@ public class BaseController : Controller
             Expires = DateTimeOffset.Now.AddYears(1),
             SameSite = SameSiteMode.Lax
         });
-        Response.Cookies.Append("ValidateKey", email.DesEncrypt(AppConfig.BaiduAK), new CookieOptions()
+        Response.Cookies.Append("ValidateKey", email.DesEncrypt(AppConfig.ConnString), new CookieOptions()
         {
             Expires = DateTimeOffset.Now.AddYears(1),
             SameSite = SameSiteMode.Lax

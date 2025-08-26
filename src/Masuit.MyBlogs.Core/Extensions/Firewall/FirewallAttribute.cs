@@ -42,7 +42,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
         request.Headers.Values.Contains("");
         var ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
-        var tokenValid = request.Cookies.ContainsKey("FullAccessToken") && request.Cookies["Email"].MDString(AppConfig.BaiduAK).Equals(request.Cookies["FullAccessToken"]);
+        var tokenValid = request.Cookies.ContainsKey("FullAccessToken") && request.Cookies["Email"].MDString(AppConfig.ConnString).Equals(request.Cookies["FullAccessToken"]);
 
         //攻击重定向
         if (!string.IsNullOrWhiteSpace(CommonHelper.SystemSettings["AttackRedirects"]) && await FirewallService.ReportedAsync(ip))
@@ -142,7 +142,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
         try
         {
-            if (request.Cookies.TryGetValue(SessionKey.ChallengeBypass, out var time) && time.AESDecrypt(AppConfig.BaiduAK).ToDateTime() > DateTime.Now)
+            if (request.Cookies.TryGetValue(SessionKey.ChallengeBypass, out var time) && time.AESDecrypt(AppConfig.ConnString).ToDateTime() > DateTime.Now)
             {
                 context.HttpContext.Session.Set("js-challenge", 1);
                 await next();

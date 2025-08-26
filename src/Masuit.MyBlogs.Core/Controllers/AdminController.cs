@@ -52,7 +52,7 @@ public class AdminController : Controller
         if (user == null && Request.Cookies.Any(x => x.Key == "username" || x.Key == "password")) //执行自动登录
         {
             string name = Request.Cookies["username"];
-            string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.BaiduAK);
+            string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.ConnString);
             var userInfo = UserInfoService.Login(name, pwd);
             if (userInfo != null)
             {

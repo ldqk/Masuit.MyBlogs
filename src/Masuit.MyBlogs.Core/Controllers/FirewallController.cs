@@ -30,7 +30,7 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
         try
         {
             HttpContext.Session.Set("js-challenge", 1);
-            Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.BaiduAK), new CookieOptions()
+            Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.ConnString), new CookieOptions()
             {
                 SameSite = SameSiteMode.Lax,
                 Expires = DateTime.Now.AddDays(1)
@@ -74,7 +74,7 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
         {
             HttpContext.Session.Set("js-challenge", 1);
             HttpContext.Session.Remove("challenge-captcha");
-            Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.BaiduAK), new CookieOptions()
+            Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.ConnString), new CookieOptions()
             {
                 SameSite = SameSiteMode.Lax,
                 Expires = DateTime.Now.AddDays(1)
@@ -107,7 +107,7 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
             if (result.Success)
             {
                 HttpContext.Session.Set("js-challenge", 1);
-                Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.BaiduAK), new CookieOptions()
+                Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.ConnString), new CookieOptions()
                 {
                     SameSite = SameSiteMode.Lax,
                     Expires = DateTime.Now.AddDays(1)

@@ -11,11 +11,6 @@ public class AppConfig
     public static string ConnString { get; set; }
 
     /// <summary>
-    /// 百度AK
-    /// </summary>
-    public static string BaiduAK { get; set; }
-
-    /// <summary>
     /// Redis连接字符串
     /// </summary>
     public static string Redis { get; set; }

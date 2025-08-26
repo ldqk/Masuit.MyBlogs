@@ -165,7 +165,7 @@ public sealed class ErrorController : Controller
             Expires = DateTime.Now.AddYears(1),
             SameSite = SameSiteMode.Lax
         });
-        Response.Cookies.Append("FullAccessToken", email.MDString(AppConfig.BaiduAK), new CookieOptions
+        Response.Cookies.Append("FullAccessToken", email.MDString(AppConfig.ConnString), new CookieOptions
         {
             Expires = DateTime.Now.AddYears(1),
             SameSite = SameSiteMode.Lax

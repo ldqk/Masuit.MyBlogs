@@ -52,7 +52,6 @@ public class Startup
         {
             Configuration = configuration;
             AppConfig.ConnString = configuration["Database:" + nameof(AppConfig.ConnString)];
-            AppConfig.BaiduAK = configuration[nameof(AppConfig.BaiduAK)];
             AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
             AppConfig.TrueClientIPHeader = configuration[nameof(AppConfig.TrueClientIPHeader)] ?? "CF-Connecting-IP";
             AppConfig.EnableIPDirect = bool.Parse(configuration[nameof(AppConfig.EnableIPDirect)] ?? "false");

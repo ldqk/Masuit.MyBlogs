@@ -10,7 +10,7 @@
 @if (!string.IsNullOrEmpty(Model.ProtectContent)&&Model.ProtectContentMode==ProtectContentMode.AuthorizeVisiable)
 {
     <div class="row protected-content" id="@SnowFlake.NewId">
-        @if (!string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")) || Context.Request.Cookies["Email"].MDString3(AppConfig.BaiduAK).Equals(Context.Request.Cookies["PostAccessToken"]))
+        @if (!string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")) || Context.Request.Cookies["Email"].MDString3(AppConfig.ConnString).Equals(Context.Request.Cookies["PostAccessToken"]))
         {
             <p class="text-red text-center size20">↓↓↓以下是文章加密部分↓↓↓</p>
             @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))

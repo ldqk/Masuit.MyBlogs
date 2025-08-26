@@ -367,7 +367,7 @@ public sealed class PostController : BaseController
                 Expires = DateTime.Now.AddYears(1),
                 SameSite = SameSiteMode.Lax
             });
-            Response.Cookies.Append("PostAccessToken", email.MDString3(AppConfig.BaiduAK), new CookieOptions
+            Response.Cookies.Append("PostAccessToken", email.MDString3(AppConfig.ConnString), new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(1),
                 SameSite = SameSiteMode.Lax

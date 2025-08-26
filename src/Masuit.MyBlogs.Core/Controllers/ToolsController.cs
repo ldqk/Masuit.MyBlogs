@@ -1,13 +1,8 @@
 ﻿using AngleSharp;
 using DnsClient;
-using Masuit.MyBlogs.Core.Configs;
 using Masuit.Tools.Mime;
 using Masuit.Tools.Core.Validator;
-using MaxMind.GeoIP2.Exceptions;
-using MaxMind.GeoIP2.Responses;
 using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
-using Polly;
 using System.Net;
 using TimeZoneConverter;
 using Configuration = AngleSharp.Configuration;
@@ -18,14 +13,9 @@ namespace Masuit.MyBlogs.Core.Controllers;
 /// 黑科技
 /// </summary>
 [Route("tools")]
-public sealed class ToolsController : BaseController
+public sealed class ToolsController(IHttpClientFactory httpClientFactory) : BaseController
 {
-    private readonly HttpClient _httpClient;
-
-    public ToolsController(IHttpClientFactory httpClientFactory)
-    {
-        _httpClient = httpClientFactory.CreateClient();
-    }
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient();
 
     /// <summary>
     /// 获取ip地址详细信息
@@ -97,110 +87,6 @@ public sealed class ToolsController : BaseController
             }
             return false;
         });
-    }
-
-    /// <summary>
-    /// 根据经纬度获取详细地理信息
-    /// </summary>
-    /// <param name="lat"></param>
-    /// <param name="lng"></param>
-    /// <returns></returns>
-    [HttpGet("pos"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "lat", "lng" })]
-    public async Task<ActionResult> Position(string lat, string lng)
-    {
-        if (string.IsNullOrEmpty(lat) || string.IsNullOrEmpty(lng))
-        {
-            var ip = ClientIP;
-#if DEBUG
-            var r = new Random();
-            ip = IPAddress.Parse($"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}");
-#endif
-            var location = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
-            var address = new PhysicsAddress()
-            {
-                Status = 0,
-                AddressResult = new AddressResult()
-                {
-                    FormattedAddress = ip.GetIPLocation().Address,
-                    Location = new Location()
-                    {
-                        Lng = (decimal)location.Location.Longitude.GetValueOrDefault(),
-                        Lat = (decimal)location.Location.Latitude.GetValueOrDefault()
-                    }
-                }
-            };
-            return View(address);
-        }
-
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        var s = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?location={lat},{lng}&output=json&pois=1&ak={AppConfig.BaiduAK}", cts.Token).ContinueWith(t =>
-        {
-            if (t.IsCompletedSuccessfully)
-            {
-                return JsonConvert.DeserializeObject<PhysicsAddress>(t.Result);
-            }
-
-            return new PhysicsAddress();
-        });
-
-        return View(s);
-    }
-
-    /// <summary>
-    /// 详细地理信息转经纬度
-    /// </summary>
-    /// <param name="addr"></param>
-    /// <returns></returns>
-    [Route("addr"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "addr" })]
-    public async Task<ActionResult> Address(string addr)
-    {
-        if (string.IsNullOrEmpty(addr))
-        {
-            var ip = ClientIP;
-#if DEBUG
-            Random r = new Random();
-            ip = IPAddress.Parse($"{r.Next(210)}.{r.Next(255)}.{r.Next(255)}.{r.Next(255)}");
-#endif
-            var location = Policy<CityResponse>.Handle<AddressNotFoundException>().Fallback(() => new CityResponse()).Execute(() => CommonHelper.MaxmindReader.City(ip));
-            var address = new PhysicsAddress()
-            {
-                Status = 0,
-                AddressResult = new AddressResult
-                {
-                    FormattedAddress = ip.GetIPLocation().Address,
-                    Location = new Location
-                    {
-                        Lng = (decimal)location.Location.Longitude.GetValueOrDefault(),
-                        Lat = (decimal)location.Location.Latitude.GetValueOrDefault()
-                    }
-                }
-            };
-            ViewBag.Address = address.AddressResult.FormattedAddress;
-            if (Request.Method.Equals(HttpMethods.Get) || (Request.Headers[HeaderNames.Accept] + "").StartsWith(ContentType.Json))
-            {
-                return View(address.AddressResult.Location);
-            }
-
-            return Json(address.AddressResult.Location);
-        }
-
-        ViewBag.Address = addr;
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        var physicsAddress = await _httpClient.GetStringAsync($"http://api.map.baidu.com/geocoder/v2/?output=json&address={addr}&ak={AppConfig.BaiduAK}", cts.Token).ContinueWith(t =>
-        {
-            if (t.IsCompletedSuccessfully)
-            {
-                return JsonConvert.DeserializeObject<PhysicsAddress>(t.Result);
-            }
-
-            return new PhysicsAddress();
-        });
-        if (Request.Method.Equals(HttpMethods.Get) || (Request.Headers[HeaderNames.Accept] + "").StartsWith(ContentType.Json))
-        {
-            return View(physicsAddress?.AddressResult?.Location);
-        }
-
-        return Json(physicsAddress?.AddressResult?.Location);
     }
 
     [HttpGet("loan")]
