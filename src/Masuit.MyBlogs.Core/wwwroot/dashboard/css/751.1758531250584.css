@@ -1,0 +1,17 @@
+
+.merge-edit-container[data-v-66f55451] {
+  padding: 16px;
+}
+.editor-container[data-v-66f55451] {
+  position: relative;
+  border-radius: 4px;
+}
+.block[data-v-66f55451] {
+  display: block;
+}
+@media (max-width: 768px) {
+.merge-edit-container[data-v-66f55451] {
+    padding: 8px;
+}
+}
+

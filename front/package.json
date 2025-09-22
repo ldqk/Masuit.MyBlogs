@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "node predev.js && vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build&&node cleanBuild.js",
     "lint": "vue-cli-service lint",
     "analyzer": "cross-env use_analyzer=true npm run build"
   },

@@ -56,7 +56,7 @@
                             var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
                             if (user.IsAdmin)
                             {
-                                <a class="btn btn-primary" asp-controller="Dashboard" asp-action="Index" asp-fragment="/notice/index?id=@Model.Id" target="_blank">修改</a>
+                                <a class="btn btn-primary" href="/dashboard/notice/write?id =@Model.Id" target="_blank">修改</a>
                             }
                         }
                     </div>

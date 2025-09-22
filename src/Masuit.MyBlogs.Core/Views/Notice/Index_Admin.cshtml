@@ -9,7 +9,7 @@
         <li><a asp-controller="Home" asp-action="Index">首页</a></li>
         <li class="current"><em>@ViewBag.Title</em></li>
     </ol>
-    <a asp-controller="Dashboard" asp-action="Index" asp-fragment="/notice/index" class="btn btn-info">发布新公告</a>
+    <a href="/dashboard/notice/write" class="btn btn-info">发布新公告</a>
     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
         @foreach (var n in Model)
         {
@@ -25,7 +25,7 @@
                     <div class="panel-body">
                         <div class="btn-group">
                             <a class="btn btn-info" onclick="del(@n.Id,'@n.Title')">删除</a>
-                            <a class="btn btn-danger" asp-controller="Dashboard" asp-action="Index" asp-fragment="/notice/index?id=@n.Id" target="_blank">修改</a>
+                            <a class="btn btn-danger" href="/dashboard/notice/write?id=@n.Id" target="_blank">修改</a>
                         </div>
                         @Html.Raw(n.Content)
                     </div>

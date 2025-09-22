@@ -1,5 +1,10 @@
 ﻿<template>
-<div class="write-blog-container">
+<div v-if="pageLoading">
+  <q-inner-loading :showing="pageLoading">
+    <q-spinner color="primary" size="100px" />
+  </q-inner-loading>
+</div>
+<div class="write-blog-container" v-else>
   <!-- 文章标题 -->
   <div class="row">
     <q-input autogrow class="col" v-model="post.Title" label="文章标题" outlined required :rules="[val => !!val || '请输入文章标题', val => val.length >= 2 || '标题至少2个字符', val => val.length <= 128 || '标题最多128个字符']">
@@ -242,6 +247,7 @@ const post = reactive({
 
 // UI 状态
 const loading = ref(false)
+const pageLoading = ref(true)
 const uploading = ref(false)
 const showUploadDialog = ref(false)
 const showDraftDialog = ref(false)
@@ -660,6 +666,7 @@ onMounted(async () => {
     startDraftTimer()
   }
   document.querySelector('.q-page-container').addEventListener('scroll', handleScroll)
+  pageLoading.value = false
 })
 
 // 组件卸载

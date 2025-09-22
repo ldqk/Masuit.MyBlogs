@@ -1,0 +1,73 @@
+
+.loginrecord-list-container[data-v-2fab7904] {
+  padding: 16px;
+}
+.controls-row[data-v-2fab7904] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* 表格样式优化 */
+[data-v-2fab7904] .vxe-table {
+  font-size: 14px;
+}
+[data-v-2fab7904] .vxe-table .vxe-body--column {
+  padding: 8px 12px;
+}
+[data-v-2fab7904] .vxe-table .vxe-header--column {
+  font-weight: 600;
+  background-color: #fafafa;
+}
+
+/* 按钮样式 */
+.q-btn[data-v-2fab7904] {
+  border-radius: 6px;
+}
+
+/* 状态芯片样式 */
+.q-chip[data-v-2fab7904] {
+  font-size: 12px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+.loginrecord-list-container[data-v-2fab7904] {
+    padding: 8px;
+}
+.controls-row[data-v-2fab7904] {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+  /* 移动端表格滚动 */
+[data-v-2fab7904] .vxe-table {
+    font-size: 12px;
+}
+[data-v-2fab7904] .vxe-table .vxe-body--column {
+    padding: 6px 8px;
+}
+}
+@media (max-width: 576px) {
+.loginrecord-list-container[data-v-2fab7904] {
+    padding: 4px;
+}
+}
+
+/* 分页组件样式 */
+[data-v-2fab7904] .q-pagination {
+  margin-right: 16px;
+}
+
+/* 工具提示样式 */
+[data-v-2fab7904] .q-tooltip {
+  font-size: 12px;
+}
+
+/* 加载状态优化 */
+[data-v-2fab7904] .vxe-table--loading {
+  opacity: 0.6;
+}
+

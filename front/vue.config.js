@@ -25,6 +25,9 @@ module.exports = {
     '@kangc'
   ],
 
+  // 项目打包文件夹
+  outputDir: '../src/Masuit.MyBlogs.Core/wwwroot/dashboard',
+
   // 静态资源文件夹 *注：当生成的资源覆写 filename 或 chunkFilename 时，assetsDir 会被忽略。
   // assetsDir: 'static',
 
@@ -141,9 +144,9 @@ module.exports = {
       .rule('typescript')
       .test(/\.ts$/)
       .exclude
-        .add(/node_modules/)
-        .add(/\.d\.ts$/)
-        .end()
+      .add(/node_modules/)
+      .add(/\.d\.ts$/)
+      .end()
       .use('ts-loader')
       .loader('ts-loader')
       .options({
@@ -168,11 +171,11 @@ module.exports = {
     sourceMap: false,
     extract: process.env.NODE_ENV === 'production'
       ? {
-          // 合并CSS文件减少文件数量
-          filename: `css/[name].${timeStamp}.css`,
-          chunkFilename: `css/[name].${timeStamp}.css`,
-          ignoreOrder: true // 忽略CSS顺序警告
-        }
+        // 合并CSS文件减少文件数量
+        filename: `css/[name].${timeStamp}.css`,
+        chunkFilename: `css/[name].${timeStamp}.css`,
+        ignoreOrder: true // 忽略CSS顺序警告
+      }
       : false
   }
 }
