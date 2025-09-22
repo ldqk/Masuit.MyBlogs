@@ -90,31 +90,6 @@ const goBack = () => {
   router.push('/misc/list')
 }
 
-// 滚动事件处理（编辑器工具栏固定）
-const handleScroll = () => {
-  if (!editorRef.value?.$el) return
-
-  const toolbar = editorRef.value.$el.querySelector('.edui-editor-toolbarbox')
-  if (!toolbar) return
-
-  const editorRect = editorRef.value.$el.getBoundingClientRect()
-
-  if (editorRect.top < 84 && editorRect.bottom > 200) {
-    if (!toolbar.style.top) {
-      toolbar.style.position = 'fixed'
-      toolbar.style.top = '84px'
-      toolbar.style.zIndex = '2'
-    }
-  } else {
-    if (toolbar.style.position) {
-      toolbar.style.position = ''
-      toolbar.style.top = ''
-      toolbar.style.zIndex = ''
-      toolbar.style.width = editorRef.value.$el.style.width
-    }
-  }
-}
-
 // 生命周期钩子
 onMounted(() => {
   // 检查是否有编辑 ID
@@ -130,13 +105,65 @@ onMounted(() => {
   }
 })
 
+// 组件卸载
 onUnmounted(() => {
-  // 清理滚动事件监听器
-  const container = document.querySelector('.q-page-container')
-  if (container) {
-    container.removeEventListener('scroll', handleScroll)
+  if (scrollDebounceTimer) {
+    clearTimeout(scrollDebounceTimer)
   }
+  // 清理滚动事件监听器
+  document.querySelector('.q-page-container').removeEventListener('scroll', handleScroll)
 })
+
+let scrollDebounceTimer: any = null
+let editorToolbarFixed = false
+// 滚动事件处理
+const handleScroll = () => {
+  // 清除之前的防抖定时器
+  if (scrollDebounceTimer) {
+    clearTimeout(scrollDebounceTimer)
+  }
+
+  // 使用防抖，减少频繁执行
+  scrollDebounceTimer = setTimeout(() => {
+    handleScrollLogic()
+  }, 100)
+}
+
+// 实际的滚动处理逻辑
+const handleScrollLogic = () => {
+  if (editorRef.value?.$el == null) {
+    return;
+  }
+  const toolbar = editorRef.value.$el.querySelector('.edui-editor-toolbarbox');
+  if (toolbar) {
+    const editorRect = editorRef.value.$el.getBoundingClientRect()
+    const shouldFix = editorRect.top < 84 && editorRect.bottom > 300
+
+    // 只在状态真正改变时才操作DOM
+    if (shouldFix && !editorToolbarFixed) {
+      // 固定工具栏
+      const editorWidth = editorRef.value.$el.offsetWidth
+      toolbar.style.cssText = `
+          position: fixed !important;
+          top: 84px !important;
+          z-index: 1000 !important;
+          width: ${editorWidth}px !important;
+          transition: all 0.5s ease !important;
+        `
+      editorToolbarFixed = true
+    } else if (!shouldFix && editorToolbarFixed) {
+      // 取消固定
+      toolbar.style.cssText = `
+          position: static !important;
+          top: auto !important;
+          z-index: auto !important;
+          width: auto !important;
+          transition: all 0.5s ease !important;
+        `
+      editorToolbarFixed = false
+    }
+  }
+}
 </script>
 <style scoped lang="scss">
 .misc-write-page {

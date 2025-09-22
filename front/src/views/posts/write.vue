@@ -674,47 +674,95 @@ onUnmounted(() => {
   if (draftTimer) {
     clearInterval(draftTimer)
   }
+  if (scrollDebounceTimer) {
+    clearTimeout(scrollDebounceTimer)
+  }
   // 清理滚动事件监听器
-  document.querySelector('.q-page-container').removeEventListener('scroll', handleScroll)
+  document.querySelector('.q-page-container')?.removeEventListener('scroll', handleScroll)
 })
 
-// 滚动事件处理
+let scrollDebounceTimer: any = null
+let editorToolbarFixed = false
+let protectEditorToolbarFixed = false
+
+// 滚动事件处理 - 优化版本，解决抖动问题
 const handleScroll = () => {
-  if (editor.value?.$el == null) {
-    return;
+  // 清除之前的防抖定时器
+  if (scrollDebounceTimer) {
+    clearTimeout(scrollDebounceTimer)
   }
-  const toolbar = editor.value.$el.querySelector('.edui-editor-toolbarbox');
-  if (editor.value.$el.getBoundingClientRect().top < 84 && editor.value.$el.getBoundingClientRect().bottom > 200) {
-    if (!toolbar.style.top) {
-      toolbar.style.position = 'fixed'
-      toolbar.style.top = '84px'
-      toolbar.style.zIndex = '2'
-    }
-  } else {
-    if (toolbar.style.position) {
-      toolbar.style.position = ''
-      toolbar.style.top = ''
-      toolbar.style.zIndex = ''
-      toolbar.style.width = editor.value.$el.style.width;
+
+  // 使用防抖，减少频繁执行
+  scrollDebounceTimer = setTimeout(() => {
+    handleScrollLogic()
+  }, 100)
+}
+
+// 实际的滚动处理逻辑
+const handleScrollLogic = () => {
+  // 处理主编辑器工具栏
+  if (editor.value?.$el) {
+    const toolbar = editor.value.$el.querySelector('.edui-editor-toolbarbox')
+    if (toolbar) {
+      const editorRect = editor.value.$el.getBoundingClientRect()
+      const shouldFix = editorRect.top < 84 && editorRect.bottom > 300
+
+      // 只在状态真正改变时才操作DOM
+      if (shouldFix && !editorToolbarFixed) {
+        // 固定工具栏
+        const editorWidth = editor.value.$el.offsetWidth
+        toolbar.style.cssText = `
+          position: fixed !important;
+          top: 84px !important;
+          z-index: 1000 !important;
+          width: ${editorWidth}px !important;
+          transition: all 0.5s ease !important;
+        `
+        editorToolbarFixed = true
+      } else if (!shouldFix && editorToolbarFixed) {
+        // 取消固定
+        toolbar.style.cssText = `
+          position: static !important;
+          top: auto !important;
+          z-index: auto !important;
+          width: auto !important;
+          transition: all 0.5s ease !important;
+        `
+        editorToolbarFixed = false
+      }
     }
   }
 
-  if (protectContentEditor.value?.$el == null) {
-    return;
-  }
-  const toolbar2 = protectContentEditor.value.$el.querySelector('.edui-editor-toolbarbox');
-  if (protectContentEditor.value.$el.getBoundingClientRect().top < 84 && protectContentEditor.value.$el.getBoundingClientRect().bottom > 210) {
-    if (!toolbar2.style.top) {
-      toolbar2.style.position = 'fixed'
-      toolbar2.style.top = '84px'
-      toolbar2.style.zIndex = '2'
-    }
-  } else {
-    if (toolbar2.style.position) {
-      toolbar2.style.position = ''
-      toolbar2.style.top = ''
-      toolbar2.style.zIndex = ''
-      toolbar2.style.width = protectContentEditor.value.$el.style.width;
+  // 处理保护内容编辑器工具栏
+  if (protectContentEditor.value?.$el) {
+    const toolbar2 = protectContentEditor.value.$el.querySelector('.edui-editor-toolbarbox')
+    if (toolbar2) {
+      const protectEditorRect = protectContentEditor.value.$el.getBoundingClientRect()
+      const shouldFix = protectEditorRect.top < 84 && protectEditorRect.bottom > 300
+
+      // 只在状态真正改变时才操作DOM
+      if (shouldFix && !protectEditorToolbarFixed) {
+        // 固定工具栏
+        const protectEditorWidth = protectContentEditor.value.$el.offsetWidth
+        toolbar2.style.cssText = `
+          position: fixed !important;
+          top: 84px !important;
+          z-index: 1000 !important;
+          width: ${protectEditorWidth}px !important;
+          transition: all 0.2s ease !important;
+        `
+        protectEditorToolbarFixed = true
+      } else if (!shouldFix && protectEditorToolbarFixed) {
+        // 取消固定
+        toolbar2.style.cssText = `
+          position: static !important;
+          top: auto !important;
+          z-index: auto !important;
+          width: auto !important;
+          transition: all 0.2s ease !important;
+        `
+        protectEditorToolbarFixed = false
+      }
     }
   }
 }
