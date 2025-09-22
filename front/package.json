@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vue-cli-service serve",
+    "dev": "node predev.js && vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "analyzer": "cross-env use_analyzer=true npm run build"
@@ -13,6 +13,7 @@
     "axios": "^1.12.2",
     "core-js": "^3.45.1",
     "dayjs": "^1.11.18",
+    "fs-extra": "^11.3.2",
     "monaco-editor": "^0.53.0",
     "pinia": "^3.0.3",
     "quasar": "^2.18.5",
