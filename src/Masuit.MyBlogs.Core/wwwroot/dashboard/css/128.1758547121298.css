@@ -1,0 +1,192 @@
+
+.search-analysis-container[data-v-5f698902] {
+  padding: 16px;
+}
+.controls-row[data-v-5f698902] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.search-input[data-v-5f698902] {
+  min-width: 250px;
+}
+
+/* 表格样式优化 */
+[data-v-5f698902] .vxe-table {
+  font-size: 14px;
+}
+[data-v-5f698902] .vxe-table .vxe-body--column {
+  padding: 8px 12px;
+}
+[data-v-5f698902] .vxe-table .vxe-header--column {
+  font-weight: 600;
+  background-color: #fafafa;
+}
+
+/* 链接样式 */
+.keyword-link[data-v-5f698902] {
+  color: #1976d2;
+  text-decoration: none;
+  font-weight: 500;
+}
+.keyword-link[data-v-5f698902]:hover {
+  color: #1565c0;
+  text-decoration: underline;
+}
+.ip-link[data-v-5f698902] {
+  color: #1976d2;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+}
+.ip-link[data-v-5f698902]:hover {
+  color: #1565c0;
+  text-decoration: underline;
+}
+.region-info[data-v-5f698902] {
+  color: #666;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+/* IP信息样式 */
+.ip-info[data-v-5f698902] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* 按钮样式 */
+.q-btn[data-v-5f698902] {
+  border-radius: 6px;
+}
+
+/* 卡片样式 */
+[data-v-5f698902] .q-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+[data-v-5f698902] .q-card .q-card-section {
+  padding: 16px 20px;
+}
+
+/* 统计表格样式 */
+[data-v-5f698902] .q-table {
+  box-shadow: none;
+}
+[data-v-5f698902] .q-table .q-table__top {
+  padding: 0;
+}
+[data-v-5f698902] .q-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+[data-v-5f698902] .q-table th {
+  font-weight: 600;
+  color: #333;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+.search-analysis-container[data-v-5f698902] {
+    padding: 8px;
+}
+.controls-row[data-v-5f698902] {
+    flex-direction: column;
+    align-items: stretch;
+}
+.row .col-md-4[data-v-5f698902],
+  .row .col-md-8[data-v-5f698902] {
+    margin-bottom: 8px;
+}
+.search-input[data-v-5f698902] {
+    min-width: auto;
+}
+
+  /* 移动端表格滚动 */
+[data-v-5f698902] .vxe-table {
+    font-size: 12px;
+}
+[data-v-5f698902] .vxe-table .vxe-body--column {
+    padding: 6px 8px;
+}
+
+  /* 移动端IP信息调整 */
+.ip-info[data-v-5f698902] {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+  /* 移动端卡片网格调整 */
+.row .col-md-4[data-v-5f698902] {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+}
+@media (max-width: 576px) {
+.search-analysis-container[data-v-5f698902] {
+    padding: 4px;
+}
+
+  /* 小屏幕下按钮尺寸调整 */
+[data-v-5f698902] .vxe-table .q-btn {
+    min-width: 28px;
+    padding: 4px;
+}
+
+  /* 卡片标题调整 */
+[data-v-5f698902] .q-card .text-h6 {
+    font-size: 1.1rem;
+}
+}
+
+/* 弹窗样式优化 */
+[data-v-5f698902] .q-dialog .q-card {
+  max-width: 90vw;
+  border-radius: 12px;
+}
+
+/* 分页组件样式 */
+[data-v-5f698902] .q-pagination {
+  margin-right: 16px;
+}
+
+/* 工具提示样式 */
+[data-v-5f698902] .q-tooltip {
+  font-size: 12px;
+}
+
+/* 加载状态优化 */
+[data-v-5f698902] .vxe-table--loading {
+  opacity: 0.6;
+}
+
+/* 表格行悬停效果 */
+[data-v-5f698902] .vxe-table .vxe-body--row:hover {
+  background-color: #f5f5f5;
+}
+
+/* 统计卡片标题样式 */
+[data-v-5f698902] .q-card .text-h6 {
+  color: #1976d2;
+  font-weight: 600;
+}
+[data-v-5f698902] .q-card .text-caption {
+  margin-top: 4px;
+}
+
+/* 数字格式化样式 */
+.number-highlight[data-v-5f698902] {
+  font-weight: 600;
+  color: #1976d2;
+}
+
+/* 统计表格序号列样式 */
+[data-v-5f698902] .q-table tbody td:first-child {
+  font-weight: 600;
+  color: #666;
+}
+
