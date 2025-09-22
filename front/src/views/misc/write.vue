@@ -99,7 +99,7 @@ const handleScroll = () => {
 
   const editorRect = editorRef.value.$el.getBoundingClientRect()
 
-  if (editorRect.top < 84 && editorRect.bottom > 250) {
+  if (editorRect.top < 84 && editorRect.bottom > 200) {
     if (!toolbar.style.top) {
       toolbar.style.position = 'fixed'
       toolbar.style.top = '84px'

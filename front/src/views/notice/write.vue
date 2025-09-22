@@ -179,7 +179,7 @@ const handleScroll = () => {
     return;
   }
   const toolbar = editor.value.$el.querySelector('.edui-editor-toolbarbox');
-  if (editor.value.$el.getBoundingClientRect().top < 84 && editor.value.$el.getBoundingClientRect().bottom > 250) {
+  if (editor.value.$el.getBoundingClientRect().top < 84 && editor.value.$el.getBoundingClientRect().bottom > 200) {
     if (!toolbar.style.top) {
       toolbar.style.position = 'fixed'
       toolbar.style.top = '84px'
