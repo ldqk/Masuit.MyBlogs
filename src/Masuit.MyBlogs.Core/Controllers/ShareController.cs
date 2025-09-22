@@ -41,7 +41,7 @@ public sealed class ShareController : AdminController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost, DistributedLockFilter]
+    [HttpDelete("/share/{id}"), DistributedLockFilter]
     public async Task<ActionResult> Remove(int id)
     {
         bool b = await FastShareService.DeleteByIdAsync(id) > 0;

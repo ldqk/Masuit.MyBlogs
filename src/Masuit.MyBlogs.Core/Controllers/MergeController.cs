@@ -82,7 +82,7 @@ public sealed class MergeController : AdminController
         var merge = await PostMergeRequestService.GetByIdAsync(id) ?? throw new NotFoundException("待合并文章未找到");
         var history = merge.Post.ToHistoryVersion();
         history.Id = 0;
-        merge.Post = merge.UpdatePost(merge.Post);
+        merge.Post.ApplyUpdate(merge);
         merge.Post.PostHistoryVersion.Add(history);
         merge.Post.ModifyDate = DateTime.Now;
         merge.MergeState = MergeStatus.Merged;

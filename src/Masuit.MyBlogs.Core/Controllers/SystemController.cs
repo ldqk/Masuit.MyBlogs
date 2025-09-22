@@ -246,7 +246,8 @@ public sealed class SystemController : AdminController
     /// <returns></returns>
     public ActionResult<PooledList<JObject>> SendBox()
     {
-        return RedisHelper.SUnion(RedisHelper.Keys("Email:*")).Select(JObject.Parse).OrderByDescending(o => o["time"]).ToPooledListScope();
+        var keys = RedisHelper.Keys("Email:*");
+        return RedisHelper.SUnion(keys).Select(JObject.Parse).OrderByDescending(o => o["time"]).ToPooledListScope();
     }
 
     public ActionResult BounceEmail([FromBodyOrDefault] string email)

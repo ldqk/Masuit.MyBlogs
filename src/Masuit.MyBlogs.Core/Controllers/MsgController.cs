@@ -372,7 +372,7 @@ public sealed class MsgController : BaseController
             }
             await Response.WriteAsync($"event: message\n", cancellationToken);
             var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).ToPooledListScope();
-            await Response.WriteAsync("data:" + msgs.ToJsonString() + "\r\r");
+            await Response.WriteAsync("data:" + msgs.ToJsonString() + "\r\r", cancellationToken: cancellationToken);
             await Response.Body.FlushAsync(cancellationToken);
             await Task.Delay(5000, cancellationToken);
         }

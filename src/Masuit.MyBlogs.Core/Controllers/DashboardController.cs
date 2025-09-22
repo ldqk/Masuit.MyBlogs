@@ -3,26 +3,28 @@ using Masuit.Tools.Logging;
 using Polly;
 using System.Text;
 using Dispose.Scope;
+using Masuit.Tools.Mime;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
 /// <summary>
 /// 控制面板
 /// </summary>
-public sealed class DashboardController : AdminController
+public sealed class DashboardController(IWebHostEnvironment env) : AdminController
 {
     /// <summary>
     /// 控制面板
     /// </summary>
     /// <returns></returns>
-    [Route("dashboard"), ResponseCache(Duration = 60, VaryByHeader = "Cookie")]
+    [Route("dashboard"), Route("dashboard/{**route}", Order = 999), ResponseCache(Duration = 60, VaryByHeader = "Cookie")]
     public ActionResult Index()
     {
         Response.Cookies.Append("lang", "zh-cn", new CookieOptions()
         {
             Expires = DateTime.Now.AddYears(1),
         });
-        return View();
+        var html = System.IO.File.ReadAllText(Path.Combine(env.WebRootPath, "dashboard", "index.html"));
+        return Content(html, ContentType.Html);
     }
 
     [Route("counter")]
@@ -71,7 +73,7 @@ public sealed class DashboardController : AdminController
                 post,
                 msgs,
                 comments
-            }.ToJsonString() + "\r\r");
+            }.ToJsonString() + "\r\r", cancellationToken: cancellationToken);
             await Response.Body.FlushAsync(cancellationToken);
             await Task.Delay(5000, cancellationToken);
         }

@@ -27,7 +27,11 @@ public static partial class PostMergeRequestMapper
 
     [MapperIgnoreTarget(nameof(request.Id))]
     [MapperIgnoreTarget(nameof(Post.Status))]
-    public static partial Post UpdatePost(this PostMergeRequest request, Post post);
+    public static partial void UpdatePost(this PostMergeRequest request, Post post);
+
+    [MapperIgnoreTarget(nameof(request.Id))]
+    [MapperIgnoreTarget(nameof(Post.Status))]
+    public static partial void ApplyUpdate([MappingTarget] this Post post, PostMergeRequest request);
 
     [MapperIgnoreTarget(nameof(request.Id))]
     [MapperIgnoreTarget(nameof(request.Status))]

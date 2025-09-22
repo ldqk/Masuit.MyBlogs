@@ -94,15 +94,9 @@ public static class MiddlewareExtension
                 .Include("/ng-views/filemanager/css/dialogs.css")
                 .Include("/ng-views/filemanager/css/main.css")
                 .Include("/Content/common/loading.min.css");
-            bundles.AddCss("/dashboard.css")
-                .Include("/fonts/icomoon.css")
-                .Include("/Assets/fileupload/filestyle.css")
-                .Include("/Content/common/loading.min.css")
-                .Include("/Content/checkbox.min.css")
-                .Include("/ng-views/css/app.css");
             bundles.AddCss("/article.css")
                 .Include("/Assets/jquery.tocify/jquery.tocify.css")
-                .Include("/Assets/UEditor/third-party/SyntaxHighlighter/shCoreDefault.css")
+                .Include("/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css")
                 .Include("/Assets/highlight/css/highlight.css");
 
             bundles.AddJs("/main.js")
@@ -130,7 +124,7 @@ public static class MiddlewareExtension
                 .Include("/ng-views/filemanager/js/controllers/main.js")
                 .Include("/ng-views/filemanager/js/controllers/selector-controller.js");
             bundles.AddJs("/article.js")
-                .Include("/Assets/UEditor/third-party/SyntaxHighlighter/shCore.js")
+                .Include("/UEditorPlus/third-party/SyntaxHighlighter/shCore.js")
                 .Include("/Assets/jquery.tocify/jquery.tocify.js")
                 .Include("/Scripts/global/article.js");
         });

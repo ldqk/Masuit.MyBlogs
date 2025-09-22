@@ -617,7 +617,7 @@ public sealed class PostController : BaseController
     {
         var post = PostService.GetQuery(e => e.Id == id).Include(e => e.Seminar).FirstOrDefault() ?? throw new NotFoundException("文章未找到");
         var model = post.ToDto();
-        model.Seminars = post.Seminar.Select(s => s.Id).Join(",");
+        model.Seminars = post.Seminar.Select(s => s.Id).ToArray();
         return ResultData(model);
     }
 
@@ -733,10 +733,9 @@ public sealed class PostController : BaseController
         cmd.Update(post);
         post.IP = ClientIP.ToString();
         post.Seminar.Clear();
-        if (!string.IsNullOrEmpty(cmd.Seminars))
+        if (cmd.Seminars.Length > 0)
         {
-            var tmp = cmd.Seminars.Split(',', StringSplitOptions.RemoveEmptyEntries).Distinct().Select(int.Parse).ToArray();
-            var seminars = SeminarService.GetQuery(s => tmp.Contains(s.Id)).ToPooledListScope();
+            var seminars = SeminarService.GetQuery(s => cmd.Seminars.Contains(s.Id)).ToPooledListScope();
             post.Seminar.AddRange(seminars);
         }
 
@@ -782,10 +781,9 @@ public sealed class PostController : BaseController
         post.ModifierEmail = post.Email;
         post.IP = ClientIP.ToString();
         post.Rss = post.LimitMode is null or RegionLimitMode.All;
-        if (!string.IsNullOrEmpty(cmd.Seminars))
+        if (cmd.Seminars.Length > 0)
         {
-            var tmp = cmd.Seminars.Split(',').Distinct().Select(int.Parse).ToArray();
-            post.Seminar.AddRange(SeminarService[s => tmp.Contains(s.Id)]);
+            post.Seminar.AddRange(SeminarService[s => cmd.Seminars.Contains(s.Id)]);
         }
 
         if (schedule)
@@ -1336,7 +1334,7 @@ public sealed class PostController : BaseController
     [ProducesResponseType(typeof(List<string>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> GetRegions(string name)
     {
-        return ResultData(await PostService.GetAll().Select(p => EF.Property<string>(p, name)).Distinct().ToListWithNoLockAsync());
+        return ResultData(await PostService.GetAll().Select(p => EF.Property<string>(p, name)).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToListWithNoLockAsync());
     }
 
     #endregion 后端管理

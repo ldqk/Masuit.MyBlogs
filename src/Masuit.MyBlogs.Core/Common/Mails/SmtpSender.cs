@@ -8,6 +8,7 @@ public sealed class SmtpSender(IRedisClient redisClient) : IMailSender
     [AutomaticRetry(Attempts = 1, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
     public Task Send(string title, string content, string tos, string clientip)
     {
+#if !DEBUG
         new Email()
         {
             EnableSsl = bool.Parse(CommonHelper.SystemSettings.GetOrAdd("EnableSsl", "true")),
@@ -19,6 +20,8 @@ public sealed class SmtpSender(IRedisClient redisClient) : IMailSender
             Subject = title,
             Tos = tos
         }.Send();
+#endif
+
         redisClient.SAdd($"Email:{DateTime.Now:yyyyMMdd}", new { title, content, tos, time = DateTime.Now, clientip });
         redisClient.Expire($"Email:{DateTime.Now:yyyyMMdd}", 86400);
         return Task.CompletedTask;

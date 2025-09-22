@@ -96,12 +96,12 @@ public sealed class LinksController : BaseController
     /// <summary>
     /// 添加友链
     /// </summary>
-    /// <param name="links"></param>
+    /// <param name="dto"></param>
     /// <returns></returns>
     [MyAuthorize, DistributedLockFilter]
-    public async Task<ActionResult> Save([FromBodyOrDefault] Links links)
+    public async Task<ActionResult> Save([FromBody] LinksDto dto)
     {
-        bool b = await LinksService.AddOrUpdateSavedAsync(l => l.Id, links) > 0;
+        bool b = await LinksService.AddOrUpdateSavedAsync(l => l.Id, dto.ToLinks()) > 0;
         return b ? ResultData(null, message: "添加成功！") : ResultData(null, false, "添加失败！");
     }
 

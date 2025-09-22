@@ -1,0 +1,61 @@
+html {
+    height: 100%;
+    box-sizing: border-box;
+    color: #2c3e50;
+}
+body, #app{
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow: hidden;
+    font-family: 'Roboto', '-apple-system', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+}
+
+aside {
+    top: 86px !important;
+}
+
+.app-main{
+    width: 100%;
+    position: relative;
+}
+.echarts{
+    width: 100% !important;
+    height: 100% !important;
+}
+.main-content{
+    height: 100%;
+    background-color: #fcfcff;
+    max-width: 100%;
+}
+
+/* 只让页面容器滚动，保持菜单和头部固定 */
+.q-page-container {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* 确保页面内容可以滚动 */
+.q-page {
+    min-height: 100vh;
+}
+h1{
+  font-size: 40px;
+}
+h2{
+  font-size: 32px;
+}
+h3{
+  font-size: 24px;
+}
+h4{
+  font-size: 20px;
+}
+h5{
+  font-size: 18px;
+}
+h6{
+  font-size: 16px;
+}

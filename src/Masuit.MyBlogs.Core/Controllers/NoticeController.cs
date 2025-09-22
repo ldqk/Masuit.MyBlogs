@@ -148,10 +148,13 @@ public sealed class NoticeController : BaseController
     /// </summary>
     /// <param name="page"></param>
     /// <param name="size"></param>
+    /// <param name="keywords"></param>
     /// <returns></returns>
-    public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+    public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string keywords = null)
     {
-        var list = NoticeService.GetPagesNoTracking(page, size, n => true, n => n.ModifyDate, false);
+        Expression<Func<Notice, bool>> where = n => true;
+
+        var list = NoticeService.GetPagesNoTracking(page, size, where.AndIf(!string.IsNullOrWhiteSpace(keywords), n => n.Title.Contains(keywords) || n.Content.Contains(keywords)), n => n.ModifyDate, false);
         foreach (var n in list.Data)
         {
             n.ModifyDate = n.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
