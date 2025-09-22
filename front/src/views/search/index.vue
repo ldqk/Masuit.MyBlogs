@@ -107,16 +107,15 @@
             <div class="text-h6">月度搜索排行</div>
           </q-card-section>
           <q-card-section>
-            <q-table :rows="hotKeyData.month" :columns="rankColumns" row-key="Keywords" hide-pagination :pagination="{ rowsPerPage: 0 }" flat>
-              <template #body-cell-index="props">
-                <q-td :props="props"> {{ props.rowIndex + 1 }} </q-td>
-              </template>
-              <template #body-cell-keywords="props">
-                <q-td :props="props">
-                  <a :href="`/search/${props.row.Keywords}`" target="_blank" class="keyword-link"> {{ props.row.Keywords }} </a>
-                </q-td>
-              </template>
-            </q-table>
+            <vxe-table :data="hotKeyData.month" :loading="loading" stripe border>
+              <vxe-column type="seq" title="序号" width="60" />
+              <vxe-column field="Keywords" title="关键词">
+                <template #default="{ row }">
+                  <a :href="`/search/${row.Keywords}`" target="_blank" class="keyword-link"> {{ row.Keywords }} </a>
+                </template>
+              </vxe-column>
+              <vxe-column field="Count" title="搜索次数" width="120"></vxe-column>
+            </vxe-table>
           </q-card-section>
         </q-card>
       </div>
@@ -127,13 +126,15 @@
             <div class="text-h6">本周搜索排行</div>
           </q-card-section>
           <q-card-section>
-            <q-table :rows="hotKeyData.week" :columns="weekTodayColumns" row-key="Keywords" hide-pagination :pagination="{ rowsPerPage: 0 }" flat>
-              <template #body-cell-keywords="props">
-                <q-td :props="props">
-                  <a :href="`/search/${props.row.Keywords}`" target="_blank" class="keyword-link"> {{ props.row.Keywords }} </a>
-                </q-td>
-              </template>
-            </q-table>
+            <vxe-table :data="hotKeyData.week" :loading="loading" stripe border>
+              <vxe-column type="seq" title="序号" width="60" />
+              <vxe-column field="Keywords" title="关键词">
+                <template #default="{ row }">
+                  <a :href="`/search/${row.Keywords}`" target="_blank" class="keyword-link"> {{ row.Keywords }} </a>
+                </template>
+              </vxe-column>
+              <vxe-column field="Count" title="搜索次数" width="120"></vxe-column>
+            </vxe-table>
           </q-card-section>
         </q-card>
       </div>
@@ -144,13 +145,15 @@
             <div class="text-h6">今日搜索排行</div>
           </q-card-section>
           <q-card-section>
-            <q-table :rows="hotKeyData.today" :columns="weekTodayColumns" row-key="Keywords" hide-pagination :pagination="{ rowsPerPage: 0 }" flat>
-              <template #body-cell-keywords="props">
-                <q-td :props="props">
-                  <a :href="`/search/${props.row.Keywords}`" target="_blank" class="keyword-link"> {{ props.row.Keywords }} </a>
-                </q-td>
-              </template>
-            </q-table>
+            <vxe-table :data="hotKeyData.today" :loading="loading" stripe border>
+              <vxe-column type="seq" title="序号" width="60" />
+              <vxe-column field="Keywords" title="关键词">
+                <template #default="{ row }">
+                  <a :href="`/search/${row.Keywords}`" target="_blank" class="keyword-link"> {{ row.Keywords }} </a>
+                </template>
+              </vxe-column>
+              <vxe-column field="Count" title="搜索次数" width="120"></vxe-column>
+            </vxe-table>
           </q-card-section>
         </q-card>
       </div>
@@ -165,16 +168,15 @@
             <div class="text-caption text-grey-6">(搜索结果为0的热词)</div>
           </q-card-section>
           <q-card-section>
-            <q-table :rows="hotKeyData.wish_month" :columns="rankColumns" row-key="Keywords" hide-pagination :pagination="{ rowsPerPage: 0 }" flat>
-              <template #body-cell-index="props">
-                <q-td :props="props"> {{ props.rowIndex + 1 }} </q-td>
-              </template>
-              <template #body-cell-keywords="props">
-                <q-td :props="props">
-                  <a :href="`/search/${props.row.Keywords}`" target="_blank" class="keyword-link"> {{ props.row.Keywords }} </a>
-                </q-td>
-              </template>
-            </q-table>
+            <vxe-table :data="hotKeyData.wish_month" :loading="loading" stripe border>
+              <vxe-column type="seq" title="序号" width="60" />
+              <vxe-column field="Keywords" title="关键词">
+                <template #default="{ row }">
+                  <a :href="`/search/${row.Keywords}`" target="_blank" class="keyword-link"> {{ row.Keywords }} </a>
+                </template>
+              </vxe-column>
+              <vxe-column field="Count" title="搜索次数" width="120"></vxe-column>
+            </vxe-table>
           </q-card-section>
         </q-card>
       </div>
@@ -186,13 +188,15 @@
             <div class="text-caption text-grey-6">(搜索结果为0的热词)</div>
           </q-card-section>
           <q-card-section>
-            <q-table :rows="hotKeyData.wish_week" :columns="weekTodayColumns" row-key="Keywords" hide-pagination :pagination="{ rowsPerPage: 0 }" flat>
-              <template #body-cell-keywords="props">
-                <q-td :props="props">
-                  <a :href="`/search/${props.row.Keywords}`" target="_blank" class="keyword-link"> {{ props.row.Keywords }} </a>
-                </q-td>
-              </template>
-            </q-table>
+            <vxe-table :data="hotKeyData.wish_week" :loading="loading" stripe border>
+              <vxe-column type="seq" title="序号" width="60" />
+              <vxe-column field="Keywords" title="关键词">
+                <template #default="{ row }">
+                  <a :href="`/search/${row.Keywords}`" target="_blank" class="keyword-link"> {{ row.Keywords }} </a>
+                </template>
+              </vxe-column>
+              <vxe-column field="Count" title="搜索次数" width="120"></vxe-column>
+            </vxe-table>
           </q-card-section>
         </q-card>
       </div>
@@ -204,13 +208,15 @@
             <div class="text-caption text-grey-6">(搜索结果为0的热词)</div>
           </q-card-section>
           <q-card-section>
-            <q-table :rows="hotKeyData.wish_today" :columns="weekTodayColumns" row-key="Keywords" hide-pagination :pagination="{ rowsPerPage: 0 }" flat>
-              <template #body-cell-keywords="props">
-                <q-td :props="props">
-                  <a :href="`/search/${props.row.Keywords}`" target="_blank" class="keyword-link"> {{ props.row.Keywords }} </a>
-                </q-td>
-              </template>
-            </q-table>
+            <vxe-table :data="hotKeyData.wish_today" :loading="loading" stripe border>
+              <vxe-column type="seq" title="序号" width="60" />
+              <vxe-column field="Keywords" title="关键词">
+                <template #default="{ row }">
+                  <a :href="`/search/${row.Keywords}`" target="_blank" class="keyword-link"> {{ row.Keywords }} </a>
+                </template>
+              </vxe-column>
+              <vxe-column field="Count" title="搜索次数" width="120"></vxe-column>
+            </vxe-table>
           </q-card-section>
         </q-card>
       </div>
@@ -281,18 +287,6 @@ const hotKeyData = ref<HotKeyData>({
 
 // 表格引用
 const tableRef = ref(null)
-
-// 表格列定义
-const rankColumns = [
-  { name: 'index', label: '序号', field: 'index', align: 'center' as const },
-  { name: 'keywords', label: '关键词', field: 'Keywords', align: 'left' as const },
-  { name: 'count', label: '搜索次数', field: 'Count', align: 'center' as const }
-]
-
-const weekTodayColumns = [
-  { name: 'keywords', label: '关键词', field: 'Keywords', align: 'left' as const },
-  { name: 'count', label: '搜索次数', field: 'Count', align: 'center' as const }
-]
 
 // 方法
 const formatDateTime = (dateTime: string) => {
