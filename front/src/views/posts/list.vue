@@ -50,7 +50,18 @@
             </template>
           </vxe-column>
           <!-- 作者邮箱列 -->
-          <vxe-column field="Email" title="作者邮箱" width="180" />
+          <vxe-column field="Email" title="作者邮箱" width="180" /><!-- 分类列 -->
+          <vxe-column field="CategoryId" title="分类" width="200">
+            <template #default="{ row }">
+              <q-select outlined v-model="row.CategoryId" :options="filteredCategoryOptions" option-value="Id" option-label="Name" map-options emit-value dense borderless @update:model-value="(val) => changeCategory(row.Id, val)" use-input input-debounce="300" @filter="filterCategoryOptions" />
+            </template>
+          </vxe-column>
+          <!-- 专题列 -->
+          <vxe-column field="Seminars" title="专题" width="270">
+            <template #default="{ row }">
+              <q-select use-chips outlined v-model="row.Seminars" :options="filteredSeminarOptions" option-value="Id" option-label="Title" multiple dense borderless @update:model-value="(val) => changeSeminar(row.Id, val)" map-options use-input input-debounce="300" @filter="filterSeminarOptions" />
+            </template>
+          </vxe-column>
           <!-- 阅读量列-->
           <vxe-column v-if="showColumns.includes('ViewCount')" field="ViewCount" title="阅读" min-width="70">
             <template #default="{ row }">
@@ -69,18 +80,6 @@
           </vxe-column>
           <!-- 修改次数列-->
           <vxe-column v-if="showColumns.includes('ModifyCount')" field="ModifyCount" title="修改次数" width="80" />
-          <!-- 分类列 -->
-          <vxe-column v-if="showColumns.includes('Category')" field="CategoryId" title="分类" width="200">
-            <template #default="{ row }">
-              <q-select outlined v-model="row.CategoryId" :options="filteredCategoryOptions" option-value="Id" option-label="Name" map-options emit-value dense borderless @update:model-value="(val) => changeCategory(row.Id, val)" use-input input-debounce="300" @filter="filterCategoryOptions" />
-            </template>
-          </vxe-column>
-          <!-- 专题列 -->
-          <vxe-column v-if="showColumns.includes('Seminars')" field="Seminars" title="专题" width="270">
-            <template #default="{ row }">
-              <q-select use-chips outlined v-model="row.Seminars" :options="filteredSeminarOptions" option-value="Id" option-label="Title" multiple dense borderless @update:model-value="(val) => changeSeminar(row.Id, val)" map-options use-input input-debounce="300" @filter="filterSeminarOptions" />
-            </template>
-          </vxe-column>
           <!-- 标签列-->
           <vxe-column v-if="showColumns.includes('Label')" field="Label" title="标签" width="160" />
           <!-- 支持数列-->
@@ -359,8 +358,6 @@ const columnOptions = [
   { label: "阅读量", value: 'ViewCount' },
   { label: "在看数", value: 'Online' },
   { label: "发表时间", value: 'PostDate' },
-  { label: "分类", value: 'Category' },
-  { label: "专题", value: 'Seminars' },
   { label: "修改次数", value: 'ModifyCount' },
   { label: "标签", value: 'Label' },
   { label: "支持数", value: 'VoteUpCount' },
