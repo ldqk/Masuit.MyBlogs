@@ -76,6 +76,8 @@
             "blockquote",   // 引用
             "pasteplain",   // 纯文本粘贴模式
             '|',
+            "paragraph",           // 段落格式
+            "insertcode",          // 插入代码
             "fontfamily",          // 字体
             "fontsize",            // 字号
             "forecolor",    // 字体颜色
@@ -93,9 +95,6 @@
             "link",                // 超链接
             "unlink",              // 取消链接
             "emotion",             // 表情
-            '|',
-            "paragraph",           // 段落格式
-            "insertcode",          // 插入代码
             '|',
             "simpleupload",        // 单图上传
             "insertimage",         // 多图上传
@@ -126,7 +125,7 @@
             "attachment",          // 附件
             "formula",             // 公式
             'print',
-            "contentimport",
+            //"contentimport",
         ]]
 
         // 自定义工具栏按钮点击，返回 true 表示已经处理点击，会阻止默认事件

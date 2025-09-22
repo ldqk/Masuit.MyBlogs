@@ -5,6 +5,8 @@
   </q-inner-loading>
 </div>
 <div class="write-blog-container" v-else>
+  <div class="text-h6" v-if="route.query.id">编辑ID：{{ post.Id }}</div>
+  <div class="text-h6" v-if="route.query.refer">复制来源ID：{{ route.query.refer }}</div>
   <!-- 文章标题 -->
   <div class="row">
     <q-input autogrow class="col" v-model="post.Title" label="文章标题" outlined required :rules="[val => !!val || '请输入文章标题', val => val.length >= 2 || '标题至少2个字符', val => val.length <= 128 || '标题最多128个字符']">
