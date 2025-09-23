@@ -94,7 +94,7 @@
       </div>
       <div class="q-mb-md">
         <div class="text-subtitle1 q-mb-sm">UA限制提示语：</div>
-        <div ref="userAgentBlockedMsgEditor" class="editor-container" style="height: 200px"></div>
+        <div ref="userAgentBlockedMsgEditor" class="editor-container" style="height: 400px"></div>
       </div>
     </q-card-section>
   </q-card>
@@ -104,47 +104,46 @@
       <div class="text-h6 q-mb-md">
         <q-icon name="security" class="q-mr-sm" /> 拦截日志 <q-chip v-if="interceptCount > 0" color="negative" text-color="white" :label="`累计拦截 ${interceptCount} 次`" class="q-ml-sm" />
       </div>
-      <!-- 操作按钮 -->
-      <div class="row q-gutter-md q-mb-md items-center">
-        <div class="col-auto">
-          <q-btn color="negative" icon="delete" label="清空日志" :loading="clearingLogs">
-            <q-popup-proxy transition-show="scale" transition-hide="scale">
-              <q-card>
-                <q-card-section class="row items-center">
-                  <q-icon name="warning" color="red" size="2rem" class="q-mr-sm" />
-                  <div>
-                    <div class="text-h6">确认清空拦截日志吗？</div>
-                    <div class="text-subtitle2">清空后将无法恢复！</div>
-                  </div>
-                </q-card-section>
-                <q-card-actions align="right">
-                  <q-btn color="negative" label="确认" v-close-popup @click="clearLogs" />
-                  <q-btn color="primary" label="取消" v-close-popup />
-                </q-card-actions>
-              </q-card>
-            </q-popup-proxy>
-          </q-btn>
-        </div>
-        <div class="col-auto">
-          <q-toggle v-model="distinctLogs" label="按IP去重" @update:model-value="toggleDistinct" />
-        </div>
-        <div class="col-auto">
-          <q-btn color="primary" icon="refresh" label="刷新" @click="loadInterceptLogs" :loading="loadingLogs" />
-        </div>
-        <div class="col-4 text-right">
-          <q-input autofocus v-model="searchTerm" dense outlined placeholder="搜索IP、请求URL、来源URL、UserAgent、备注" @keyup.enter="loadInterceptLogs" debounce="100">
-            <template #prepend>
-              <q-icon name="search" class="cursor-pointer" />
-            </template>
-            <template #append>
-              <q-icon name="close" class="cursor-pointer" v-if="searchTerm" @click="searchTerm = ''" />
-            </template>
-          </q-input>
-        </div>
-      </div>
       <!-- 拦截日志表格 -->
       <div v-if="logs.length === 0" class="text-center q-pa-md text-grey-6"> 暂无拦截日志 </div>
-      <div v-else>
+      <div v-else><!-- 操作按钮 -->
+        <div class="row q-gutter-md q-mb-md items-center">
+          <div class="col-auto">
+            <q-btn color="negative" icon="delete" label="清空日志" :loading="clearingLogs">
+              <q-popup-proxy transition-show="scale" transition-hide="scale">
+                <q-card>
+                  <q-card-section class="row items-center">
+                    <q-icon name="warning" color="red" size="2rem" class="q-mr-sm" />
+                    <div>
+                      <div class="text-h6">确认清空拦截日志吗？</div>
+                      <div class="text-subtitle2">清空后将无法恢复！</div>
+                    </div>
+                  </q-card-section>
+                  <q-card-actions align="right">
+                    <q-btn color="negative" label="确认" v-close-popup @click="clearLogs" />
+                    <q-btn color="primary" label="取消" v-close-popup />
+                  </q-card-actions>
+                </q-card>
+              </q-popup-proxy>
+            </q-btn>
+          </div>
+          <div class="col-auto">
+            <q-toggle v-model="distinctLogs" label="按IP去重" @update:model-value="toggleDistinct" />
+          </div>
+          <div class="col-auto">
+            <q-btn color="primary" icon="refresh" label="刷新" @click="loadInterceptLogs" :loading="loadingLogs" />
+          </div>
+          <div class="col-4 text-right">
+            <q-input autofocus v-model="searchTerm" dense outlined placeholder="搜索IP、请求URL、来源URL、UserAgent、备注" @keyup.enter="loadInterceptLogs" debounce="100">
+              <template #prepend>
+                <q-icon name="search" class="cursor-pointer" />
+              </template>
+              <template #append>
+                <q-icon name="close" class="cursor-pointer" v-if="searchTerm" @click="searchTerm = ''" />
+              </template>
+            </q-input>
+          </div>
+        </div>
         <!-- 表格 -->
         <vxe-table ref="tableRef" :data="paginatedLogs" stripe border :loading="loadingLogs">
           <vxe-column field="IP" title="IP地址" width="160" sortable>
@@ -236,7 +235,7 @@
                     </div>
                   </q-card-section>
                   <q-card-actions align="right">
-                    <q-btn flat label="确认" color="negative" v-close-popup @click="addToBlackList(row.IP)" />
+                    <q-btn flat label="确认" color="negative" v-close-popup @click="addToBlackList(row.Key)" />
                     <q-btn flat label="取消" color="primary" v-close-popup />
                   </q-card-actions>
                 </q-card>
@@ -437,9 +436,10 @@ const firewallEnabled = computed({
 
 // 分页计算属性
 const filteredLogs = computed(() => {
+  const filtered = logs.value.filter((x) => x.IP?.includes(searchTerm.value) || x.RequestUrl?.includes(searchTerm.value) || x.Referer?.includes(searchTerm.value) || x.UserAgent?.includes(searchTerm.value) || x.Remark?.includes(searchTerm.value));
   if (distinctLogs.value) {
     // 按IP去重
-    return logs.value.reduce((acc: InterceptLog[], current: InterceptLog) => {
+    return filtered.reduce((acc: InterceptLog[], current: InterceptLog) => {
       const exists = acc.find((item) => item.IP === current.IP);
       if (!exists) {
         acc.push(current);
@@ -447,14 +447,7 @@ const filteredLogs = computed(() => {
       return acc;
     }, []);
   }
-  return logs.value.filter(
-    (x) =>
-      x.IP?.includes(searchTerm.value) ||
-      x.RequestUrl?.includes(searchTerm.value) ||
-      x.Referer?.includes(searchTerm.value) ||
-      x.UserAgent?.includes(searchTerm.value) ||
-      x.Remark?.includes(searchTerm.value)
-  );
+  return filtered;
 });
 
 const totalPages = computed(() => {
@@ -605,7 +598,7 @@ const editIPBlackList = async () => {
 const editIPRangeBlackList = async () => {
   try {
     const response = (await api.get("/system/GetIPRangeBlackList")) as ApiResponse;
-    if (response?.Success && response.Data) {
+    if (response?.Success) {
       currentListType.value = "IP地址段黑名单";
       currentListTitle.value = "编辑IP地址段黑名单";
       currentIPList.value = response.Data;
@@ -639,14 +632,14 @@ const saveIPList = async () => {
   try {
     let endpoint = "";
     if (currentListType.value === "IP黑名单") {
-      endpoint = "/system/IpBlackList";
+      endpoint = "/system/SetIpBlackList";
     } else if (currentListType.value === "IP地址段黑名单") {
-      endpoint = "/system/IPRangeBlackList";
+      endpoint = "/system/SetIPRangeBlackList";
     } else if (currentListType.value === "IP白名单") {
-      endpoint = "/system/IpWhiteList";
+      endpoint = "/system/SetIpWhiteList";
     }
 
-    const response = (await api.post(endpoint, currentIPList.value)) as ApiResponse;
+    const response = (await api.post(endpoint, { content: currentIPList.value })) as ApiResponse;
     if (response?.Success) {
       toast.success("保存成功", { autoClose: 2000, position: "top-center" });
       closeIPListDialog();
@@ -674,7 +667,7 @@ const closeIPListDialog = () => {
 
 // 添加到白名单
 const addToWhiteList = async (ip: string) => {
-  const data = (await api.post(`/system/AddToWhiteList/${ip}`)) as ApiResponse;
+  const data = (await api.post(`/system/AddToWhiteList`, { ip })) as ApiResponse;
   toast.success(data?.Message || "已加入白名单", {
     autoClose: 2000,
     position: "top-center",
@@ -683,7 +676,7 @@ const addToWhiteList = async (ip: string) => {
 
 // 加入黑名单
 const addToBlackList = async (ip: string) => {
-  const data = (await api.post(`/system/AddToBlackList/${ip}`)) as ApiResponse;
+  const data = (await api.post(`/system/AddToBlackList`, { ip })) as ApiResponse;
   toast.success(data?.Message || "已加入黑名单", {
     autoClose: 2000,
     position: "top-center",

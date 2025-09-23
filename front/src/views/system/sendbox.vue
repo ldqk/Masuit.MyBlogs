@@ -307,7 +307,7 @@ const viewMailDetail = (mail: MailItem) => {
 
 // 加入黑名单
 const addToBlackList = async (ip: string) => {
-  const data = await api.post(`/system/AddToBlackList/${ip}`) as ApiResponse
+  const data = await api.post(`/system/AddToBlackList`, { ip }) as ApiResponse
   toast.success(data?.Message || '已加入黑名单', { autoClose: 2000, position: 'top-center' })
 }
 

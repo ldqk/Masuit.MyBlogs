@@ -48,8 +48,8 @@
       </div>
       <!-- 广告表格 -->
       <div v-else>
-        <vxe-table ref="tableRef" :data="advertisements" :loading="loading" border stripe :scroll-y="{ enabled: true }" :sort-config="{ remote: true }" @sort-change="onSortChange">
-          <vxe-column field="Id" title="ID" width="80" sortable />
+        <vxe-table ref="tableRef" :data="advertisements" :loading="loading" border stripe :scroll-y="{ enabled: true }" :sort-config="{ remote: true }">
+          <vxe-column field="Id" title="ID" width="80" />
           <vxe-column field="Title" title="标题" min-width="300">
             <template #default="{ row }">
               <q-btn flat dense color="primary" :label="row.Title" @click="showDetailDialog(row)" />
@@ -61,48 +61,60 @@
             </template>
           </vxe-column>
           <!-- 当前竞价列 -->
-          <vxe-column v-if="showColumns.includes('Price')" field="Price" title="当前竞价" width="100">
+          <vxe-column v-if="showColumns.includes('Price')" field="Price" title="当前竞价" width="80">
             <template #default="{ row }"> ¥{{ row.Price || 0 }} </template>
-          </vxe-column>
-          <!-- 当月曝光量列 -->
-          <vxe-column v-if="showColumns.includes('DisplayCount')" field="DisplayCount" title="当月曝光量" width="120" />
-          <!-- 当月点击列 -->
-          <vxe-column v-if="showColumns.includes('ViewCount')" field="ViewCount" title="当月点击" width="100" />
-          <!-- 日均点击列 -->
-          <vxe-column v-if="showColumns.includes('AverageViewCount')" field="AverageViewCount" title="日均点击" width="100">
-            <template #default="{ row }"> {{ row.AverageViewCount?.toFixed(2) }} </template>
-          </vxe-column>
-          <!-- 点击率列 -->
-          <vxe-column v-if="showColumns.includes('ClickRate')" field="ClickRate" title="点击率" width="100">
-            <template #default="{ row }"> {{ row.ClickRate?.toFixed(2) }}% </template>
-          </vxe-column>
-          <!-- 分类列 -->
+          </vxe-column><!-- 分类列 -->
           <vxe-column v-if="showColumns.includes('CategoryIds')" field="CategoryIds" title="分类" width="260" show-overflow>
             <template #default="{ row }">
               <q-select use-chips outlined :model-value="getCategoryIdsArray(row.CategoryIds)" @update:model-value="(val) => changeAdvertisementCategory(row, val)" :options="categoryOptions" option-value="value" option-label="label" multiple dense borderless map-options emit-value placeholder="选择分类" />
             </template>
           </vxe-column>
+          <!-- 当月曝光量列 -->
+          <vxe-column v-if="showColumns.includes('DisplayCount')" field="DisplayCount" title="当月曝光量" width="100" />
+          <!-- 当月点击列 -->
+          <vxe-column v-if="showColumns.includes('ViewCount')" field="ViewCount" title="当月点击" width="80" />
+          <!-- 日均点击列 -->
+          <vxe-column v-if="showColumns.includes('AverageViewCount')" field="AverageViewCount" title="日均点击" width="80">
+            <template #default="{ row }"> {{ row.AverageViewCount?.toFixed(2) }} </template>
+          </vxe-column>
+          <!-- 点击率列 -->
+          <vxe-column v-if="showColumns.includes('ClickRate')" field="ClickRate" title="点击率" width="70">
+            <template #default="{ row }"> {{ row.ClickRate?.toFixed(2) }}% </template>
+          </vxe-column>
           <!-- 创建时间列 -->
-          <vxe-column v-if="showColumns.includes('CreateTime')" field="CreateTime" title="创建时间" width="120">
+          <vxe-column v-if="showColumns.includes('CreateTime')" field="CreateTime" title="创建时间" width="100">
             <template #default="{ row }"> {{ formatDate(row.CreateTime) }} </template>
           </vxe-column>
           <!-- 修改时间列 -->
-          <vxe-column v-if="showColumns.includes('UpdateTime')" field="UpdateTime" title="修改时间" width="120">
+          <vxe-column v-if="showColumns.includes('UpdateTime')" field="UpdateTime" title="修改时间" width="100">
             <template #default="{ row }"> {{ formatDate(row.UpdateTime) }} </template>
           </vxe-column>
-          <vxe-column field="Status" title="状态" width="80">
+          <vxe-column field="Status" title="状态" width="50" fixed="right">
             <template #default="{ row }">
-              <q-toggle :model-value="row.Status === 1" @update:model-value="changeStatus(row)" color="positive" />
+              <q-toggle dense :model-value="row.Status === 1" @update:model-value="changeStatus(row)" color="positive">
+                <q-tooltip class="bg-green"> {{ row.Status === 1 ? '已上架' : '已下架' }} </q-tooltip>
+              </q-toggle>
             </template>
           </vxe-column>
           <vxe-column title="操作" width="160" fixed="right">
             <template #default="{ row }">
-              <q-btn dense flat size="sm" color="info" icon="visibility" @click="showDetailDialog(row)" />
-              <q-btn dense flat size="sm" color="primary" icon="edit" @click="editAdvertisement(row)" />
-              <q-btn dense flat size="sm" color="secondary" icon="content_copy" @click="copyAdvertisement(row)" />
-              <q-btn dense flat size="sm" color="warning" icon="schedule" @click="showDelayDialog(row)" />
-              <q-btn dense flat size="sm" color="accent" icon="insights" @click="showInsight(row)" />
+              <q-btn dense flat size="sm" color="info" icon="visibility" @click="showDetailDialog(row)">
+                <q-tooltip class="bg-info">查看详情</q-tooltip>
+              </q-btn>
+              <q-btn dense flat size="sm" color="primary" icon="edit" @click="editAdvertisement(row)">
+                <q-tooltip class="bg-primary">编辑广告</q-tooltip>
+              </q-btn>
+              <q-btn dense flat size="sm" color="secondary" icon="content_copy" @click="copyAdvertisement(row)">
+                <q-tooltip class="bg-secondary">复制广告</q-tooltip>
+              </q-btn>
+              <q-btn dense flat size="sm" color="warning" icon="schedule" @click="showDelayDialog(row)">
+                <q-tooltip class="bg-warning">延长广告投放时间</q-tooltip>
+              </q-btn>
+              <q-btn dense flat size="sm" color="accent" icon="insights" @click="showInsight(row)">
+                <q-tooltip class="bg-accent">查看广告统计数据</q-tooltip>
+              </q-btn>
               <q-btn dense flat size="sm" color="negative" icon="delete">
+                <q-tooltip class="bg-negative">删除广告</q-tooltip>
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
                   <q-card>
                     <q-card-section class="row items-center">
@@ -832,12 +844,6 @@ const onPageChange = () => {
 
 const onPageSizeChange = () => {
   pagination.value.page = 1
-  loadPageData()
-}
-
-// 表格排序处理
-const onSortChange = ({ field, order }: { field: string; order: string }) => {
-  // 处理表格排序逻辑
   loadPageData()
 }
 

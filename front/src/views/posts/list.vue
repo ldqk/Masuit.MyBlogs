@@ -40,12 +40,14 @@
           <!-- 标题列 -->
           <vxe-column field="Title" title="标题" min-width="240" fixed="left">
             <template #default="{ row }">
+              <q-tooltip class="bg-grey" v-if="row.AverageViewCount < 1 && row.IsNsfw === false && row.LimitDesc === '无限制'">日均浏览量低于1</q-tooltip>
               <a :href="`/${row.Id}`" target="_blank" :class="{ 'text-grey text-bold': row.AverageViewCount < 1 && row.IsNsfw === false && row.LimitDesc === '无限制' }"> {{ row.Title }} </a>
             </template>
           </vxe-column>
           <!-- 作者列 -->
           <vxe-column field="Author" title="作者" width="120">
             <template #default="{ row }">
+              <q-tooltip class="bg-grey" v-if="row.AverageViewCount < 1 && row.IsNsfw === false && row.LimitDesc === '无限制'">日均浏览量低于1</q-tooltip>
               <a :href="`/author/${row.Author}`" target="_blank" :class="{ 'text-grey text-bold': row.AverageViewCount < 1 && row.IsNsfw === false && row.LimitDesc === '无限制' }">{{ row.Author }}</a>
             </template>
           </vxe-column>
@@ -65,6 +67,7 @@
           <!-- 阅读量列-->
           <vxe-column v-if="showColumns.includes('ViewCount')" field="ViewCount" title="阅读" min-width="70">
             <template #default="{ row }">
+              <q-tooltip class="bg-grey" v-if="row.AverageViewCount < 1">日均浏览量低于1</q-tooltip>
               <span :class="{ 'text-grey': row.AverageViewCount < 1 }"> {{ row.ViewCount }} </span>
             </template>
           </vxe-column>
