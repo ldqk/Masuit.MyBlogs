@@ -637,6 +637,43 @@ function exec(scrawlObj) {
         addMaskLayer(lang.scrawlUpLoading);
         var base64 = scrawlObj.getCanvasData();
         if (!!base64) {
+
+            var successHandler = function (res) {
+                var imgObj = {},
+                    url = editor.options.scrawlUrlPrefix + res.url;
+                imgObj.src = url;
+                imgObj._src = url;
+                imgObj.alt = res.original || '';
+                editor.execCommand("insertImage", imgObj);
+                dialog.close();
+                // 触发上传涂鸦事件
+                editor.fireEvent("uploadsuccess", {
+                    res: res,
+                    type: 'scrawl'
+                });
+            };
+
+            if(editor.getOpt('uploadServiceEnable')) {
+                var file = utils.base64toBlob(base64, 'image/png');
+                editor.getOpt('uploadServiceUpload')('image', file, {
+                    success: function( res ) {
+                        if (!scrawlObj.isCancelScrawl) {
+                            successHandler(res);
+                        }
+                    },
+                    error: function( err ) {
+                        alert(lang.imageError + ' : '+err);
+                        dialog.close();
+                    },
+                    progress: function( percent ) {
+
+                    }
+                }, {
+                    from: 'scrawl'
+                });
+                return;
+            }
+
             var options = {
                 timeout: 100000,
                 headers: editor.options.serverHeaders || {},
@@ -645,22 +682,10 @@ function exec(scrawlObj) {
                         var responseObj;
                         responseObj = eval("(" + xhr.responseText + ")");
                         if (responseObj.state === "SUCCESS") {
-                            var imgObj = {},
-                                url = editor.options.scrawlUrlPrefix + responseObj.url;
-                            imgObj.src = url;
-                            imgObj._src = url;
-                            imgObj.alt = responseObj.original || '';
-                            editor.execCommand("insertImage", imgObj);
-                            dialog.close();
-                            // 触发上传涂鸦事件
-                            editor.fireEvent("uploadsuccess", {
-                                res: responseObj,
-                                type: 'scrawl'
-                            });
+                            successHandler(responseObj);
                         } else {
                             alert(responseObj.state);
                         }
-
                     }
                 },
                 onerror: function () {

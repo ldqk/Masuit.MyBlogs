@@ -1,4 +1,10178 @@
-/* WebUploader 1.0.0 */!function(a,b){var c,d={},e=function(a,b){var c,d,e;if("string"==typeof a)return h(a);for(c=[],d=a.length,e=0;d>e;e++)c.push(h(a[e]));return b.apply(null,c)},f=function(a,b,c){2===arguments.length&&(c=b,b=null),e(b||[],function(){g(a,c,arguments)})},g=function(a,b,c){var f,g={exports:b};"function"==typeof b&&(c.length||(c=[e,g.exports,g]),f=b.apply(null,c),void 0!==f&&(g.exports=f)),d[a]=g.exports},h=function(b){var c=d[b]||a[b];if(!c)throw new Error("`"+b+"` is undefined");return c},i=function(a){var b,c,e,f,g,h;h=function(a){return a&&a.charAt(0).toUpperCase()+a.substr(1)};for(b in d)if(c=a,d.hasOwnProperty(b)){for(e=b.split("/"),g=h(e.pop());f=h(e.shift());)c[f]=c[f]||{},c=c[f];c[g]=d[b]}return a},j=function(c){return a.__dollar=c,i(b(a,f,e))};"object"==typeof module&&"object"==typeof module.exports?module.exports=j():"function"==typeof define&&define.amd?define(["jquery"],j):(c=a.WebUploader,a.WebUploader=j(),a.WebUploader.noConflict=function(){a.WebUploader=c})}(window,function(a,b,c){return b("dollar-third",[],function(){var b=a.require,c=a.__dollar||a.jQuery||a.Zepto||b("jquery")||b("zepto");if(!c)throw new Error("jQuery or Zepto not found!");return c}),b("dollar",["dollar-third"],function(a){return a}),b("promise-third",["dollar"],function(a){return{Deferred:a.Deferred,when:a.when,isPromise:function(a){return a&&"function"==typeof a.then}}}),b("promise",["promise-third"],function(a){return a}),b("base",["dollar","promise"],function(b,c){function d(a){return function(){return h.apply(a,arguments)}}function e(a,b){return function(){return a.apply(b,arguments)}}function f(a){var b;return Object.create?Object.create(a):(b=function(){},b.prototype=a,new b)}var g=function(){},h=Function.call;return{version:"1.0.0",$:b,Deferred:c.Deferred,isPromise:c.isPromise,when:c.when,browser:function(a){var b={},c=a.match(/WebKit\/([\d.]+)/),d=a.match(/Chrome\/([\d.]+)/)||a.match(/CriOS\/([\d.]+)/),e=a.match(/MSIE\s([\d\.]+)/)||a.match(/(?:trident)(?:.*rv:([\w.]+))?/i),f=a.match(/Firefox\/([\d.]+)/),g=a.match(/Safari\/([\d.]+)/),h=a.match(/OPR\/([\d.]+)/);return c&&(b.webkit=parseFloat(c[1])),d&&(b.chrome=parseFloat(d[1])),e&&(b.ie=parseFloat(e[1])),f&&(b.firefox=parseFloat(f[1])),g&&(b.safari=parseFloat(g[1])),h&&(b.opera=parseFloat(h[1])),b}(navigator.userAgent),os:function(a){var b={},c=a.match(/(?:Android);?[\s\/]+([\d.]+)?/),d=a.match(/(?:iPad|iPod|iPhone).*OS\s([\d_]+)/);return c&&(b.android=parseFloat(c[1])),d&&(b.ios=parseFloat(d[1].replace(/_/g,"."))),b}(navigator.userAgent),inherits:function(a,c,d){var e;return"function"==typeof c?(e=c,c=null):e=c&&c.hasOwnProperty("constructor")?c.constructor:function(){return a.apply(this,arguments)},b.extend(!0,e,a,d||{}),e.__super__=a.prototype,e.prototype=f(a.prototype),c&&b.extend(!0,e.prototype,c),e},noop:g,bindFn:e,log:function(){return a.console?e(console.log,console):g}(),nextTick:function(){return function(a){setTimeout(a,1)}}(),slice:d([].slice),guid:function(){var a=0;return function(b){for(var c=(+new Date).toString(32),d=0;5>d;d++)c+=Math.floor(65535*Math.random()).toString(32);return(b||"wu_")+c+(a++).toString(32)}}(),formatSize:function(a,b,c){var d;for(c=c||["B","K","M","G","TB"];(d=c.shift())&&a>1024;)a/=1024;return("B"===d?a:a.toFixed(b||2))+d}}}),b("mediator",["base"],function(a){function b(a,b,c,d){return f.grep(a,function(a){return!(!a||b&&a.e!==b||c&&a.cb!==c&&a.cb._cb!==c||d&&a.ctx!==d)})}function c(a,b,c){f.each((a||"").split(h),function(a,d){c(d,b)})}function d(a,b){for(var c,d=!1,e=-1,f=a.length;++e<f;)if(c=a[e],c.cb.apply(c.ctx2,b)===!1){d=!0;break}return!d}var e,f=a.$,g=[].slice,h=/\s+/;return e={on:function(a,b,d){var e,f=this;return b?(e=this._events||(this._events=[]),c(a,b,function(a,b){var c={e:a};c.cb=b,c.ctx=d,c.ctx2=d||f,c.id=e.length,e.push(c)}),this):this},once:function(a,b,d){var e=this;return b?(c(a,b,function(a,b){var c=function(){return e.off(a,c),b.apply(d||e,arguments)};c._cb=b,e.on(a,c,d)}),e):e},off:function(a,d,e){var g=this._events;return g?a||d||e?(c(a,d,function(a,c){f.each(b(g,a,c,e),function(){delete g[this.id]})}),this):(this._events=[],this):this},trigger:function(a){var c,e,f;return this._events&&a?(c=g.call(arguments,1),e=b(this._events,a),f=b(this._events,"all"),d(e,c)&&d(f,arguments)):this}},f.extend({installTo:function(a){return f.extend(a,e)}},e)}),b("uploader",["base","mediator"],function(a,b){function c(a){this.options=d.extend(!0,{},c.options,a),this._init(this.options)}var d=a.$;return c.options={debug:!1},b.installTo(c.prototype),d.each({upload:"start-upload",stop:"stop-upload",getFile:"get-file",getFiles:"get-files",addFile:"add-file",addFiles:"add-file",sort:"sort-files",removeFile:"remove-file",cancelFile:"cancel-file",skipFile:"skip-file",retry:"retry",isInProgress:"is-in-progress",makeThumb:"make-thumb",md5File:"md5-file",getDimension:"get-dimension",addButton:"add-btn",predictRuntimeType:"predict-runtime-type",refresh:"refresh",disable:"disable",enable:"enable",reset:"reset"},function(a,b){c.prototype[a]=function(){return this.request(b,arguments)}}),d.extend(c.prototype,{state:"pending",_init:function(a){var b=this;b.request("init",a,function(){b.state="ready",b.trigger("ready")})},option:function(a,b){var c=this.options;return arguments.length>1?(d.isPlainObject(b)&&d.isPlainObject(c[a])?d.extend(c[a],b):c[a]=b,void 0):a?c[a]:c},getStats:function(){var a=this.request("get-stats");return a?{successNum:a.numOfSuccess,progressNum:a.numOfProgress,cancelNum:a.numOfCancel,invalidNum:a.numOfInvalid,uploadFailNum:a.numOfUploadFailed,queueNum:a.numOfQueue,interruptNum:a.numOfInterrupt}:{}},trigger:function(a){var c=[].slice.call(arguments,1),e=this.options,f="on"+a.substring(0,1).toUpperCase()+a.substring(1);return b.trigger.apply(this,arguments)===!1||d.isFunction(e[f])&&e[f].apply(this,c)===!1||d.isFunction(this[f])&&this[f].apply(this,c)===!1||b.trigger.apply(b,[this,a].concat(c))===!1?!1:!0},destroy:function(){this.request("destroy",arguments),this.off()},request:a.noop}),a.create=c.create=function(a){return new c(a)},a.Uploader=c,c}),b("runtime/runtime",["base","mediator"],function(a,b){function c(b){this.options=d.extend({container:document.body},b),this.uid=a.guid("rt_")}var d=a.$,e={},f=function(a){for(var b in a)if(a.hasOwnProperty(b))return b;return null};return d.extend(c.prototype,{getContainer:function(){var a,b,c=this.options;return this._container?this._container:(a=d(c.container||document.body),b=d(document.createElement("div")),b.attr("id","rt_"+this.uid),b.css({position:"absolute",top:"0px",left:"0px",width:"1px",height:"1px",overflow:"hidden"}),a.append(b),a.addClass("webuploader-container"),this._container=b,this._parent=a,b)},init:a.noop,exec:a.noop,destroy:function(){this._container&&this._container.remove(),this._parent&&this._parent.removeClass("webuploader-container"),this.off()}}),c.orders="html5,flash",c.addRuntime=function(a,b){e[a]=b},c.hasRuntime=function(a){return!!(a?e[a]:f(e))},c.create=function(a,b){var g,h;if(b=b||c.orders,d.each(b.split(/\s*,\s*/g),function(){return e[this]?(g=this,!1):void 0}),g=g||f(e),!g)throw new Error("Runtime Error");return h=new e[g](a)},b.installTo(c.prototype),c}),b("runtime/client",["base","mediator","runtime/runtime"],function(a,b,c){function d(b,d){var f,g=a.Deferred();this.uid=a.guid("client_"),this.runtimeReady=function(a){return g.done(a)},this.connectRuntime=function(b,h){if(f)throw new Error("already connected!");return g.done(h),"string"==typeof b&&e.get(b)&&(f=e.get(b)),f=f||e.get(null,d),f?(a.$.extend(f.options,b),f.__promise.then(g.resolve),f.__client++):(f=c.create(b,b.runtimeOrder),f.__promise=g.promise(),f.once("ready",g.resolve),f.init(),e.add(f),f.__client=1),d&&(f.__standalone=d),f},this.getRuntime=function(){return f},this.disconnectRuntime=function(){f&&(f.__client--,f.__client<=0&&(e.remove(f),delete f.__promise,f.destroy()),f=null)},this.exec=function(){if(f){var c=a.slice(arguments);return b&&c.unshift(b),f.exec.apply(this,c)}},this.getRuid=function(){return f&&f.uid},this.destroy=function(a){return function(){a&&a.apply(this,arguments),this.trigger("destroy"),this.off(),this.exec("destroy"),this.disconnectRuntime()}}(this.destroy)}var e;return e=function(){var a={};return{add:function(b){a[b.uid]=b},get:function(b,c){var d;if(b)return a[b];for(d in a)if(!c||!a[d].__standalone)return a[d];return null},remove:function(b){delete a[b.uid]}}}(),b.installTo(d.prototype),d}),b("lib/dnd",["base","mediator","runtime/client"],function(a,b,c){function d(a){a=this.options=e.extend({},d.options,a),a.container=e(a.container),a.container.length&&c.call(this,"DragAndDrop")}var e=a.$;return d.options={accept:null,disableGlobalDnd:!1},a.inherits(c,{constructor:d,init:function(){var a=this;a.connectRuntime(a.options,function(){a.exec("init"),a.trigger("ready")})}}),b.installTo(d.prototype),d}),b("widgets/widget",["base","uploader"],function(a,b){function c(a){if(!a)return!1;var b=a.length,c=e.type(a);return 1===a.nodeType&&b?!0:"array"===c||"function"!==c&&"string"!==c&&(0===b||"number"==typeof b&&b>0&&b-1 in a)}function d(a){this.owner=a,this.options=a.options}var e=a.$,f=b.prototype._init,g=b.prototype.destroy,h={},i=[];return e.extend(d.prototype,{init:a.noop,invoke:function(a,b){var c=this.responseMap;return c&&a in c&&c[a]in this&&e.isFunction(this[c[a]])?this[c[a]].apply(this,b):h},request:function(){return this.owner.request.apply(this.owner,arguments)}}),e.extend(b.prototype,{_init:function(){var a=this,b=a._widgets=[],c=a.options.disableWidgets||"";return e.each(i,function(d,e){(!c||!~c.indexOf(e._name))&&b.push(new e(a))}),f.apply(a,arguments)},request:function(b,d,e){var f,g,i,j,k=0,l=this._widgets,m=l&&l.length,n=[],o=[];for(d=c(d)?d:[d];m>k;k++)f=l[k],g=f.invoke(b,d),g!==h&&(a.isPromise(g)?o.push(g):n.push(g));return e||o.length?(i=a.when.apply(a,o),j=i.pipe?"pipe":"then",i[j](function(){var b=a.Deferred(),c=arguments;return 1===c.length&&(c=c[0]),setTimeout(function(){b.resolve(c)},1),b.promise()})[e?j:"done"](e||a.noop)):n[0]},destroy:function(){g.apply(this,arguments),this._widgets=null}}),b.register=d.register=function(b,c){var f,g={init:"init",destroy:"destroy",name:"anonymous"};return 1===arguments.length?(c=b,e.each(c,function(a){return"_"===a[0]||"name"===a?("name"===a&&(g.name=c.name),void 0):(g[a.replace(/[A-Z]/g,"-$&").toLowerCase()]=a,void 0)})):g=e.extend(g,b),c.responseMap=g,f=a.inherits(d,c),f._name=g.name,i.push(f),f},b.unRegister=d.unRegister=function(a){if(a&&"anonymous"!==a)for(var b=i.length;b--;)i[b]._name===a&&i.splice(b,1)},d}),b("widgets/filednd",["base","uploader","lib/dnd","widgets/widget"],function(a,b,c){var d=a.$;return b.options.dnd="",b.register({name:"dnd",init:function(b){if(b.dnd&&"html5"===this.request("predict-runtime-type")){var e,f=this,g=a.Deferred(),h=d.extend({},{disableGlobalDnd:b.disableGlobalDnd,container:b.dnd,accept:b.accept});return this.dnd=e=new c(h),e.once("ready",g.resolve),e.on("drop",function(a){f.request("add-file",[a])}),e.on("accept",function(a){return f.owner.trigger("dndAccept",a)}),e.init(),g.promise()}},destroy:function(){this.dnd&&this.dnd.destroy()}})}),b("lib/filepaste",["base","mediator","runtime/client"],function(a,b,c){function d(a){a=this.options=e.extend({},a),a.container=e(a.container||document.body),c.call(this,"FilePaste")}var e=a.$;return a.inherits(c,{constructor:d,init:function(){var a=this;a.connectRuntime(a.options,function(){a.exec("init"),a.trigger("ready")})}}),b.installTo(d.prototype),d}),b("widgets/filepaste",["base","uploader","lib/filepaste","widgets/widget"],function(a,b,c){var d=a.$;return b.register({name:"paste",init:function(b){if(b.paste&&"html5"===this.request("predict-runtime-type")){var e,f=this,g=a.Deferred(),h=d.extend({},{container:b.paste,accept:b.accept});return this.paste=e=new c(h),e.once("ready",g.resolve),e.on("paste",function(a){f.owner.request("add-file",[a])}),e.init(),g.promise()}},destroy:function(){this.paste&&this.paste.destroy()}})}),b("lib/blob",["base","runtime/client"],function(a,b){function c(a,c){var d=this;d.source=c,d.ruid=a,this.size=c.size||0,this.type=!c.type&&this.ext&&~"jpg,jpeg,png,gif,bmp".indexOf(this.ext)?"image/"+("jpg"===this.ext?"jpeg":this.ext):c.type||"application/octet-stream",b.call(d,"Blob"),this.uid=c.uid||this.uid,a&&d.connectRuntime(a)}return a.inherits(b,{constructor:c,slice:function(a,b){return this.exec("slice",a,b)},getSource:function(){return this.source}}),c}),b("lib/file",["base","lib/blob"],function(a,b){function c(a,c){var f;this.name=c.name||"untitled"+d++,f=e.exec(c.name)?RegExp.$1.toLowerCase():"",!f&&c.type&&(f=/\/(jpg|jpeg|png|gif|bmp)$/i.exec(c.type)?RegExp.$1.toLowerCase():"",this.name+="."+f),this.ext=f,this.lastModifiedDate=c.lastModifiedDate||c.lastModified&&new Date(c.lastModified).toLocaleString()||(new Date).toLocaleString(),b.apply(this,arguments)}var d=1,e=/\.([^.]+)$/;return a.inherits(b,c)}),b("lib/filepicker",["base","runtime/client","lib/file"],function(b,c,d){function e(a){if(a=this.options=f.extend({},e.options,a),a.container=f(a.id),!a.container.length)throw new Error("按钮指定错误");a.innerHTML=a.innerHTML||a.label||a.container.html()||"",a.button=f(a.button||document.createElement("div")),a.button.html(a.innerHTML),a.container.html(a.button),c.call(this,"FilePicker",!0)}var f=b.$;return e.options={button:null,container:null,label:null,innerHTML:null,multiple:!0,accept:null,name:"file",style:"webuploader-pick"},b.inherits(c,{constructor:e,init:function(){var c=this,e=c.options,g=e.button,h=e.style;h&&g.addClass("webuploader-pick"),c.on("all",function(a){var b;switch(a){case"mouseenter":h&&g.addClass("webuploader-pick-hover");break;case"mouseleave":h&&g.removeClass("webuploader-pick-hover");break;case"change":b=c.exec("getFiles"),c.trigger("select",f.map(b,function(a){return a=new d(c.getRuid(),a),a._refer=e.container,a}),e.container)}}),c.connectRuntime(e,function(){c.refresh(),c.exec("init",e),c.trigger("ready")}),this._resizeHandler=b.bindFn(this.refresh,this),f(a).on("resize",this._resizeHandler)},refresh:function(){var a=this.getRuntime().getContainer(),b=this.options.button,c=b[0]&&b[0].offsetWidth||b.outerWidth()||b.width(),d=b[0]&&b[0].offsetHeight||b.outerHeight()||b.height(),e=b.offset();c&&d&&a.css({bottom:"auto",right:"auto",width:c+"px",height:d+"px"}).offset(e)},enable:function(){var a=this.options.button;a.removeClass("webuploader-pick-disable"),this.refresh()},disable:function(){var a=this.options.button;this.getRuntime().getContainer().css({top:"-99999px"}),a.addClass("webuploader-pick-disable")},destroy:function(){var b=this.options.button;f(a).off("resize",this._resizeHandler),b.removeClass("webuploader-pick-disable webuploader-pick-hover webuploader-pick")}}),e}),b("widgets/filepicker",["base","uploader","lib/filepicker","widgets/widget"],function(a,b,c){var d=a.$;return d.extend(b.options,{pick:null,accept:null}),b.register({name:"picker",init:function(a){return this.pickers=[],a.pick&&this.addBtn(a.pick)},refresh:function(){d.each(this.pickers,function(){this.refresh()})},addBtn:function(b){var e=this,f=e.options,g=f.accept,h=[];if(b)return d.isPlainObject(b)||(b={id:b}),d(b.id).each(function(){var i,j,k;k=a.Deferred(),i=d.extend({},b,{accept:d.isPlainObject(g)?[g]:g,swf:f.swf,runtimeOrder:f.runtimeOrder,id:this}),j=new c(i),j.once("ready",k.resolve),j.on("select",function(a){e.owner.request("add-file",[a])}),j.on("dialogopen",function(){e.owner.trigger("dialogOpen",j.button)}),j.init(),e.pickers.push(j),h.push(k.promise())}),a.when.apply(a,h)},disable:function(){d.each(this.pickers,function(){this.disable()})},enable:function(){d.each(this.pickers,function(){this.enable()})},destroy:function(){d.each(this.pickers,function(){this.destroy()}),this.pickers=null}})}),b("lib/image",["base","runtime/client","lib/blob"],function(a,b,c){function d(a){this.options=e.extend({},d.options,a),b.call(this,"Image"),this.on("load",function(){this._info=this.exec("info"),this._meta=this.exec("meta")})}var e=a.$;return d.options={quality:90,crop:!1,preserveHeaders:!1,allowMagnify:!1},a.inherits(b,{constructor:d,info:function(a){return a?(this._info=a,this):this._info},meta:function(a){return a?(this._meta=a,this):this._meta},loadFromBlob:function(a){var b=this,c=a.getRuid();this.connectRuntime(c,function(){b.exec("init",b.options),b.exec("loadFromBlob",a)})},resize:function(){var b=a.slice(arguments);return this.exec.apply(this,["resize"].concat(b))},crop:function(){var b=a.slice(arguments);return this.exec.apply(this,["crop"].concat(b))},getAsDataUrl:function(a){return this.exec("getAsDataUrl",a)},getAsBlob:function(a){var b=this.exec("getAsBlob",a);return new c(this.getRuid(),b)}}),d}),b("widgets/image",["base","uploader","lib/image","widgets/widget"],function(b,c,d){var e=null;!function(){function b(a){return(b="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(a){return typeof a}:function(a){return a&&"function"==typeof Symbol&&a.constructor===Symbol&&a!==Symbol.prototype?"symbol":typeof a})(a)}function c(a,b){var c=Object.keys(a);if(Object.getOwnPropertySymbols){var d=Object.getOwnPropertySymbols(a);b&&(d=d.filter(function(b){return Object.getOwnPropertyDescriptor(a,b).enumerable})),c.push.apply(c,d)}return c}function f(a){for(var b=1;b<arguments.length;b++){var d=null!=arguments[b]?arguments[b]:{};b%2?c(Object(d),!0).forEach(function(b){m(a,b,d[b])}):Object.getOwnPropertyDescriptors?Object.defineProperties(a,Object.getOwnPropertyDescriptors(d)):c(Object(d)).forEach(function(b){Object.defineProperty(a,b,Object.getOwnPropertyDescriptor(d,b))})}return a}function g(a,b){return l(a)||k(a,b)||i(a,b)||h()}function h(){throw TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}function i(a,b){if(a){if("string"==typeof a)return j(a,b);var c=Object.prototype.toString.call(a).slice(8,-1);if("Object"===c&&a.constructor&&(c=a.constructor.name),"Map"===c||"Set"===c)return Array.from(a);if("Arguments"===c||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(c))return j(a,b)}}function j(a,b){(null==b||b>a.length)&&(b=a.length);for(var c=0,d=Array(b);b>c;c++)d[c]=a[c];return d}function k(a,b){var c=null==a?null:"undefined"!=typeof Symbol&&a[Symbol.iterator]||a["@@iterator"];if(null!=c){var d,e,f,g,h=[],i=!0,j=!1;try{if(f=(c=c.call(a)).next,0===b){if(Object(c)!==c)return;i=!1}else for(;!(i=(d=f.call(c)).done)&&(h.push(d.value),h.length!==b);i=!0);}catch(k){j=!0,e=k}finally{try{if(!i&&null!=c.return&&(g=c.return(),Object(g)!==g))return}finally{if(j)throw e}}return h}}function l(a){return Array.isArray(a)?a:void 0}function m(a,b,c){return(b=n(b))in a?Object.defineProperty(a,b,{value:c,enumerable:!0,configurable:!0,writable:!0}):a[b]=c,a}function n(a){var c=o(a,"string");return"symbol"===b(c)?c:String(c)}function o(a,c){if("object"!==b(a)||null===a)return a;var d=a[Symbol.toPrimitive];if(void 0!==d){var e=d.call(a,c||"default");if("object"!==b(e))return e;throw TypeError("@@toPrimitive must return a primitive value.")}return("string"===c?String:Number)(a)}var p;e=(p=function(){function b(a,b){return new Promise(function(c,d){var e;return F(a).then(function(a){try{return e=a,c(new Blob([b.slice(0,2),e,b.slice(2)],{type:"image/jpeg"}))}catch(f){return d(f)}},d)})}function c(a,b){var c=arguments.length>2&&void 0!==arguments[2]?arguments[2]:Date.now();return new Promise(function(d){for(var e=a.split(","),f=e[0].match(/:(.*?);/)[1],g=globalThis.atob(e[1]),h=g.length,i=new Uint8Array(h);h--;)i[h]=g.charCodeAt(h);var j=new Blob([i],{type:f});j.name=b,j.lastModified=c,d(j)})}function e(a){return new Promise(function(b,c){var d=new P;d.onload=function(){return b(d.result)},d.onerror=function(a){return c(a)},d.readAsDataURL(a)})}function h(a){return new Promise(function(b,c){var e=new d;e.onload=function(){return b(e)},e.onerror=function(a){return c(a)},e.src=a})}function i(){if(void 0!==i.cachedResult)return i.cachedResult;var a=K.ETC,b=navigator.userAgent;return/Chrom(e|ium)/i.test(b)?a=K.CHROME:/iP(ad|od|hone)/i.test(b)&&/WebKit/i.test(b)?a=K.IOS:/Safari/i.test(b)?a=K.DESKTOP_SAFARI:/Firefox/i.test(b)?a=K.FIREFOX:(/MSIE/i.test(b)||1==!!document.documentMode)&&(a=K.IE),i.cachedResult=a,i.cachedResult}function j(a,b){for(var c=L[i()],d=a,e=b,f=d*e,g=d>e?e/d:d/e;f>c*c;){var h=(c+d)/2,j=(c+e)/2;j>h?(e=j,d=j*g):(e=h*g,d=h),f=d*e}return{width:d,height:e}}function k(a,b){var c,d;try{if(d=(c=new OffscreenCanvas(a,b)).getContext("2d"),null===d)throw Error("getContext of OffscreenCanvas returns null")}catch(e){d=(c=document.createElement("canvas")).getContext("2d")}return c.width=a,c.height=b,[c,d]}function l(a,b){var c=j(a.width,a.height),d=k(c.width,c.height),e=g(d,2),f=e[0],h=e[1];return b&&/jpe?g/.test(b)&&(h.fillStyle="white",h.fillRect(0,0,f.width,f.height)),h.drawImage(a,0,0,f.width,f.height),f}function n(){return void 0!==n.cachedResult||(n.cachedResult=["iPad Simulator","iPhone Simulator","iPod Simulator","iPad","iPhone","iPod"].includes(navigator.platform)||navigator.userAgent.includes("Mac")&&"undefined"!=typeof document&&"ontouchend"in document),n.cachedResult}function o(a){var b=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return new Promise(function(c,d){var f,g,j=function(){try{return g=l(f,b.fileType||a.type),c([f,g])}catch(e){return d(e)}},k=function(){try{var b,c=function(a){try{throw a}catch(b){return d(b)}};try{return e(a).then(function(a){try{return b=a,h(b).then(function(a){try{return f=a,function(){try{return j()}catch(a){return d(a)}}()}catch(b){return c(b)}},c)}catch(e){return c(e)}},c)}catch(g){c(g)}}catch(i){return d(i)}};try{if(n()||[K.DESKTOP_SAFARI,K.MOBILE_SAFARI].includes(i()))throw Error("Skip createImageBitmap on IOS and Safari");return createImageBitmap(a).then(function(a){try{return f=a,j()}catch(b){return k()}},k)}catch(m){k()}})}function p(a,b,d,e){var f=arguments.length>4&&void 0!==arguments[4]?arguments[4]:1;return new Promise(function(g,h){function i(){return g(k)}if("image/png"===b)return n=(l=(m=a.getContext("2d")).getImageData(0,0,a.width,a.height)).data,o=I.encode([n.buffer],a.width,a.height,4096*f),(k=new Blob([o],{type:b})).name=d,k.lastModified=e,i.call(this);var j=function(){return i.call(this)};if("image/bmp"===b)return new Promise(function(b){return J.toBlob(a,b)}).then(function(a){try{return(k=a).name=d,k.lastModified=e,j.call(this)}catch(b){return h(b)}}.bind(this),h);var k,l,m,n,o,p,q=function(){return j.call(this)};return"function"==typeof OffscreenCanvas&&a instanceof OffscreenCanvas?a.convertToBlob({type:b,quality:f}).then(function(a){try{return(k=a).name=d,k.lastModified=e,q.call(this)}catch(b){return h(b)}}.bind(this),h):c(p=a.toDataURL(b,f),d,e).then(function(a){try{return k=a,q.call(this)}catch(b){return h(b)}}.bind(this),h)})}function q(a){a.width=0,a.height=0}function r(){return new Promise(function(a,b){var d,e,f,g,h;return void 0!==r.cachedResult?a(r.cachedResult):(d="data:image/jpeg;base64,/9j/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAAAAAD/2wCEAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/AABEIAAEAAgMBEQACEQEDEQH/xABKAAEAAAAAAAAAAAAAAAAAAAALEAEAAAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAAAAAAAEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8H//2Q==",c("data:image/jpeg;base64,/9j/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAAAAAD/2wCEAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/AABEIAAEAAgMBEQACEQEDEQH/xABKAAEAAAAAAAAAAAAAAAAAAAALEAEAAAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAAAAAAAEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8H//2Q==","test.jpg",Date.now()).then(function(c){try{return e=c,o(e).then(function(c){try{return f=c[1],p(f,e.type,e.name,e.lastModified).then(function(c){try{return g=c,q(f),o(g).then(function(c){try{return h=c[0],r.cachedResult=1===h.width&&2===h.height,a(r.cachedResult)}catch(d){return b(d)}},b)}catch(d){return b(d)}},b)}catch(d){return b(d)}},b)}catch(d){return b(d)}},b))})}function s(a){return new Promise(function(b,c){var d=new P;d.onload=function(a){var c=new DataView(a.target.result);if(65496!=c.getUint16(0,!1))return b(-2);for(var d=c.byteLength,e=2;d>e&&!(8>=c.getUint16(e+2,!1));){var f=c.getUint16(e,!1);if(e+=2,65505==f){if(1165519206!=c.getUint32(e+=2,!1))return b(-1);var g=18761==c.getUint16(e+=6,!1);e+=c.getUint32(e+4,g);var h=c.getUint16(e,g);e+=2;for(var i=0;h>i;i++)if(274==c.getUint16(e+12*i,g))return b(c.getUint16(e+12*i+8,g))}else{if(65280!=(65280&f))break;e+=c.getUint16(e,!1)}}return b(-1)},d.onerror=function(a){return c(a)},d.readAsArrayBuffer(a)})}function t(a,b){var c,d,e,f=a.width,h=a.height,i=b.maxWidthOrHeight,j=a;return isFinite(i)&&(f>i||h>i)&&(c=k(f,h),j=(d=g(c,2))[0],e=d[1],f>h?(j.width=i,j.height=h/f*i):(j.width=f/h*i,j.height=i),e.drawImage(a,0,0,j.width,j.height),q(a)),j}function u(a,b){var c=a.width,d=a.height,e=k(c,d),f=g(e,2),h=f[0],i=f[1];switch(b>4&&9>b?(h.width=d,h.height=c):(h.width=c,h.height=d),b){case 2:i.transform(-1,0,0,1,c,0);break;case 3:i.transform(-1,0,0,-1,c,d);break;case 4:i.transform(1,0,0,-1,0,d);break;case 5:i.transform(0,1,1,0,0,0);break;case 6:i.transform(0,1,-1,0,d,0);break;case 7:i.transform(0,-1,-1,0,d,c);break;case 8:i.transform(0,-1,1,0,0,c)}return i.drawImage(a,0,0,c,d),q(a),h}function v(a,b){var c=arguments.length>2&&void 0!==arguments[2]?arguments[2]:0;return new Promise(function(d,e){function f(){var a=arguments.length>0&&void 0!==arguments[0]?arguments[0]:5;if(b.signal&&b.signal.aborted)throw b.signal.reason;i+=a,b.onProgress(Math.min(i,100))}function h(a){if(b.signal&&b.signal.aborted)throw b.signal.reason;i=Math.min(Math.max(a,i),100),b.onProgress(i)}var i,j,l,m,n,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J;return i=c,j=b.maxIteration||10,l=1024*1024*b.maxSizeMB,f(),o(a,b).then(function(c){try{var i;return m=(i=g(c,2))[1],f(),n=t(m,b),f(),new Promise(function(c,d){function e(){return c(f)}var f;return(f=b.exifOrientation)?e.call(this):s(a).then(function(a){try{return f=a,e.call(this)}catch(b){return d(b)}}.bind(this),d)}).then(function(c){try{return v=c,f(),r().then(function(c){try{return w=c?n:u(n,v),f(),x=b.initialQuality||1,y=b.fileType||a.type,p(w,y,a.name,a.lastModified,x).then(function(c){try{var i,o=function t(){if(j--&&(E>l||E>C)){var b,c,d,f;return d=J?.95*I.width:I.width,f=J?.95*I.height:I.height,b=k(d,f),G=(c=g(b,2))[0],(H=c[1]).drawImage(I,0,0,d,f),x*="image/png"===y?.85:.95,p(G,y,a.name,a.lastModified,x).then(function(a){try{return F=a,q(I),I=G,E=F.size,h(Math.min(99,Math.floor(100*((D-E)/(D-l))))),t}catch(b){return e(b)}},e)}return[1]},r=function(){return q(I),q(G),q(n),q(w),q(m),h(100),d(F)};return z=c,f(),A=z.size>l,B=z.size>a.size,A||B?(C=a.size,E=D=z.size,I=w,J=!b.alwaysKeepResolution&&A,(i=function(a){for(;a;){if(a.then)return void a.then(i,e);try{if(a.pop){if(a.length)return a.pop()?r.call(this):a;a=o}else a=a.call(this)}catch(b){return e(b)}}}.bind(this))(o)):(h(100),d(z))}catch(s){return e(s)}}.bind(this),e)}catch(i){return e(i)}}.bind(this),e)}catch(i){return e(i)}}.bind(this),e)}catch(o){return e(o)}}.bind(this),e)})}function w(a,c){return new Promise(function(d,e){function g(){try{l.name=a.name,l.lastModified=a.lastModified}catch(c){}try{k.preserveExif&&"image/jpeg"===a.type&&(!k.fileType||k.fileType&&k.fileType===a.type)&&(l=b(a,l))}catch(e){}return d(l)}if(k=f({},c),m=0,n=(j=k).onProgress,k.maxSizeMB=k.maxSizeMB||Number.POSITIVE_INFINITY,o="boolean"!=typeof k.useWebWorker||k.useWebWorker,delete k.useWebWorker,k.onProgress=function(a){m=a,"function"==typeof n&&n(m)},!/^image/.test(a.type))return e(Error("The file given is not an image"));if(p="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope,!o||"function"!=typeof Worker||p)return v(a,k).then(function(a){try{return l=a,g.call(this)}catch(b){return e(b)}}.bind(this),e);var h,i,j,k,l,m,n,o,p,q=function(){try{return g.call(this)}catch(a){return e(a)}}.bind(this),r=function(){try{return v(a,k).then(function(a){try{return l=a,q()}catch(b){return e(b)}},e)}catch(b){return e(b)}};try{return k.libURL=k.libURL||"https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js",(h=a,i=k,new Promise(function(a,b){var c,d="\nlet scriptImported = false\nself.addEventListener('message', async (e) => {\n  const { file, id, imageCompressionLibUrl, options } = e.data\n  options.onProgress = (progress) => self.postMessage({ progress, id })\n  try {\n    if (!scriptImported) {\n      // console.log('[worker] importScripts', imageCompressionLibUrl)\n      self.importScripts(imageCompressionLibUrl)\n      scriptImported = true\n    }\n    // console.log('[worker] self', self)\n    const compressedFile = await imageCompression(file, options)\n    self.postMessage({ file: compressedFile, id })\n  } catch (e) {\n    // console.error('[worker] error', e)\n    self.postMessage({ error: e.message + '\\n' + e.stack, id })\n  }\n})\n";y||(c=[],"function"==typeof d?c.push("(".concat(d,")()")):c.push(d),y=URL.createObjectURL(new Blob(c)));var e=new Worker(y);e.addEventListener("message",function(c){if(i.signal&&i.signal.aborted)e.terminate();else if(void 0===c.data.progress){if(c.data.error)return b(Error(c.data.error)),void e.terminate();a(c.data.file),e.terminate()}else i.onProgress(c.data.progress)}),e.addEventListener("error",b),i.signal&&i.signal.addEventListener("abort",function(){b(i.signal.reason),e.terminate()}),e.postMessage({file:h,imageCompressionLibUrl:i.libURL,options:f(f({},i),{},{onProgress:void 0,signal:void 0})})})).then(function(a){try{return l=a,q()}catch(b){return r()}},r)}catch(s){r()}})}var x,y,z,A,B,C,D,E,F=function(a){return new Promise(function(b,c){var d=new FileReader;d.addEventListener("load",function(a){var d=a.target.result,e=new DataView(d),f=0;if(65496!==e.getUint16(f))return c("not a valid JPEG");for(f+=2;;){var g=e.getUint16(f);if(65498===g)break;var h=e.getUint16(f+2);if(65505===g&&1165519206===e.getUint32(f+4)){var i=f+10,j=void 0;switch(e.getUint16(i)){case 18761:j=!0;break;case 19789:j=!1;break;default:return c("TIFF header contains invalid endian")}if(42!==e.getUint16(i+2,j))return c("TIFF header contains invalid version");for(var k=e.getUint32(i+4,j),l=i+k+2+12*e.getUint16(i+k,j),m=i+k+2;l>m;m+=12)if(274==e.getUint16(m,j)){if(3!==e.getUint16(m+2,j))return c("Orientation data type is invalid");if(1!==e.getUint32(m+4,j))return c("Orientation data count is invalid");e.setUint16(m+8,1,j);break}return b(d.slice(f,f+2+h))}f+=2+h}return b(new Blob)}),d.readAsArrayBuffer(a)})},G={};z={get exports(){return G},set exports(a){G=a}},C={},z.exports=C,C.parse=function(a,b){for(var c=C.bin.readUshort,d=C.bin.readUint,e=0,f={},g=new Uint8Array(a),h=g.length-4;101010256!=d(g,h);)h--;e=h,e+=4;var i=c(g,e+=4);c(g,e+=2);var j=d(g,e+=2),k=d(g,e+=4);e+=4,e=k;for(var l=0;i>l;l++){d(g,e),e+=4,e+=4,e+=4,d(g,e+=4),j=d(g,e+=4);var m=d(g,e+=4),n=c(g,e+=4),o=c(g,e+2),p=c(g,e+4);e+=6;var q=d(g,e+=8);e+=4,e+=n+o+p,C._readLocal(g,q,f,j,m,b)}return f},C._readLocal=function(a,b,c,d,e,f){var g=C.bin.readUshort,h=C.bin.readUint;h(a,b),g(a,b+=4),g(a,b+=2);var i=g(a,b+=2);h(a,b+=2),h(a,b+=4),b+=4;var j=g(a,b+=8),k=g(a,b+=2);b+=2;var l=C.bin.readUTF8(a,b,j);if(b+=j,b+=k,f)c[l]={size:e,csize:d};else{var m=new Uint8Array(a.buffer,b);if(0==i)c[l]=new Uint8Array(m.buffer.slice(b,b+d));else{if(8!=i)throw"unknown compression method: "+i;var n=new Uint8Array(e);C.inflateRaw(m,n),c[l]=n}}},C.inflateRaw=function(a,b){return C.F.inflate(a,b)},C.inflate=function(a,b){return a[0],a[1],C.inflateRaw(new Uint8Array(a.buffer,a.byteOffset+2,a.length-6),b)},C.deflate=function(a,b){null==b&&(b={level:6});var c=0,d=new Uint8Array(50+Math.floor(1.1*a.length));d[c]=120,d[c+1]=156,c+=2,c=C.F.deflateRaw(a,d,c,b.level);var e=C.adler(a,0,a.length);return d[c+0]=255&e>>>24,d[c+1]=255&e>>>16,d[c+2]=255&e>>>8,d[c+3]=255&e>>>0,new Uint8Array(d.buffer,0,c+4)},C.deflateRaw=function(a,b){null==b&&(b={level:6});
-var c=new Uint8Array(50+Math.floor(1.1*a.length)),d=C.F.deflateRaw(a,c,d,b.level);return new Uint8Array(c.buffer,0,d)},C.encode=function(a,b){null==b&&(b=!1);var c=0,d=C.bin.writeUint,e=C.bin.writeUshort,f={};for(var g in a){var h=!C._noNeed(g)&&!b,i=a[g],j=C.crc.crc(i,0,i.length);f[g]={cpr:h,usize:i.length,crc:j,file:h?C.deflateRaw(i):i}}for(var g in f)c+=f[g].file.length+30+46+2*C.bin.sizeUTF8(g);c+=22;var k=new Uint8Array(c),l=0,m=[];for(var g in f){var n=f[g];m.push(l),l=C._writeHeader(k,l,g,n,0)}var o=0,p=l;for(var g in f)n=f[g],m.push(l),l=C._writeHeader(k,l,g,n,1,m[o++]);var q=l-p;return d(k,l,101010256),l+=4,e(k,l+=4,o),e(k,l+=2,o),d(k,l+=2,q),d(k,l+=4,p),l+=4,l+=2,k.buffer},C._noNeed=function(a){var b=a.split(".").pop().toLowerCase();return-1!="png,jpg,jpeg,zip".indexOf(b)},C._writeHeader=function(a,b,c,d,e,f){var g=C.bin.writeUint,h=C.bin.writeUshort,i=d.file;return g(a,b,0==e?67324752:33639248),b+=4,1==e&&(b+=2),h(a,b,20),h(a,b+=2,0),h(a,b+=2,d.cpr?8:0),g(a,b+=2,0),g(a,b+=4,d.crc),g(a,b+=4,i.length),g(a,b+=4,d.usize),h(a,b+=4,C.bin.sizeUTF8(c)),h(a,b+=2,0),b+=2,1==e&&(b+=2,b+=2,g(a,b+=6,f),b+=4),b+=C.bin.writeUTF8(a,b,c),0==e&&(a.set(i,b),b+=i.length),b},C.crc={table:function(){for(var a=new Uint32Array(256),b=0;256>b;b++){for(var c=b,d=0;8>d;d++)1&c?c=3988292384^c>>>1:c>>>=1;a[b]=c}return a}(),update:function(a,b,c,d){for(var e=0;d>e;e++)a=C.crc.table[255&(a^b[c+e])]^a>>>8;return a},crc:function(a,b,c){return 4294967295^C.crc.update(4294967295,a,b,c)}},C.adler=function(a,b,c){for(var d=1,e=0,f=b,g=b+c;g>f;){for(var h=Math.min(f+5552,g);h>f;)e+=d+=a[f++];d%=65521,e%=65521}return e<<16|d},C.bin={readUshort:function(a,b){return a[b]|a[b+1]<<8},writeUshort:function(a,b,c){a[b]=255&c,a[b+1]=255&c>>8},readUint:function(a,b){return 16777216*a[b+3]+(a[b+2]<<16|a[b+1]<<8|a[b])},writeUint:function(a,b,c){a[b]=255&c,a[b+1]=255&c>>8,a[b+2]=255&c>>16,a[b+3]=255&c>>24},readASCII:function(a,b,c){for(var d="",e=0;c>e;e++)d+=String.fromCharCode(a[b+e]);return d},writeASCII:function(a,b,c){for(var d=0;d<c.length;d++)a[b+d]=c.charCodeAt(d)},pad:function(a){return a.length<2?"0"+a:a},readUTF8:function(a,b,c){for(var d,e="",f=0;c>f;f++)e+="%"+C.bin.pad(a[b+f].toString(16));try{d=decodeURIComponent(e)}catch(g){return C.bin.readASCII(a,b,c)}return d},writeUTF8:function(a,b,c){for(var d=c.length,e=0,f=0;d>f;f++){var g=c.charCodeAt(f);if(0==(4294967168&g))a[b+e]=g,e++;else if(0==(4294965248&g))a[b+e]=192|g>>6,a[b+e+1]=128|63&g>>0,e+=2;else if(0==(4294901760&g))a[b+e]=224|g>>12,a[b+e+1]=128|63&g>>6,a[b+e+2]=128|63&g>>0,e+=3;else{if(0!=(4292870144&g))throw"e";a[b+e]=240|g>>18,a[b+e+1]=128|63&g>>12,a[b+e+2]=128|63&g>>6,a[b+e+3]=128|63&g>>0,e+=4}}return e},sizeUTF8:function(a){for(var b=a.length,c=0,d=0;b>d;d++){var e=a.charCodeAt(d);if(0==(4294967168&e))c++;else if(0==(4294965248&e))c+=2;else if(0==(4294901760&e))c+=3;else{if(0!=(4292870144&e))throw"e";c+=4}}return c}},C.F={},C.F.deflateRaw=function(a,b,c,d){var e=[[0,0,0,0,0],[4,4,8,4,0],[4,5,16,8,0],[4,6,16,16,0],[4,10,16,32,0],[8,16,32,32,0],[8,16,128,128,0],[8,32,128,256,0],[32,128,258,1024,1],[32,258,258,4096,1]][d],f=C.F.U,g=C.F._goodIndex;C.F._hash;var h=C.F._putsE,i=0,j=c<<3,k=0,l=a.length;if(0==d){for(;l>i;)h(b,j,i+(x=Math.min(65535,l-i))==l?1:0),j=C.F._copyExact(a,i,x,b,j+8),i+=x;return j>>>3}var m=f.lits,n=f.strt,o=f.prev,p=0,q=0,r=0,s=0,t=0,u=0;for(l>2&&(n[u=C.F._hash(a,0)]=0),i=0;l>i;i++){if(t=u,l-2>i+1){u=C.F._hash(a,i+1);var v=32767&i+1;o[v]=n[u],n[u]=v}if(i>=k){(p>14e3||q>26697)&&l-i>100&&(i>k&&(m[p]=i-k,p+=2,k=i),j=C.F._writeBlock(i==l-1||k==l?1:0,m,p,s,a,r,i-r,b,j),p=q=s=0,r=i);var w=0;l-2>i&&(w=C.F._bestMatch(a,i,o,t,Math.min(e[2],l-i),e[3]));var x=w>>>16,y=65535&w;if(0!=w){y=65535&w;var z=g(x=w>>>16,f.of0);f.lhst[257+z]++;var A=g(y,f.df0);f.dhst[A]++,s+=f.exb[z]+f.dxb[A],m[p]=x<<23|i-k,m[p+1]=y<<16|z<<8|A,p+=2,k=i+x}else f.lhst[a[i]]++;q++}}for(r==i&&0!=a.length||(i>k&&(m[p]=i-k,p+=2,k=i),j=C.F._writeBlock(1,m,p,s,a,r,i-r,b,j),p=0,q=0,p=q=s=0,r=i);0!=(7&j);)j++;return j>>>3},C.F._bestMatch=function(a,b,c,d,e,f){var g=32767&b,h=c[g],i=32767&g-h+32768;if(h==g||d!=C.F._hash(a,b-i))return 0;for(var j=0,k=0,l=Math.min(32767,b);l>=i&&0!=--f&&h!=g;){if(0==j||a[b+j]==a[b+j-i]){var m=C.F._howLong(a,b,i);if(m>j){if(k=i,(j=m)>=e)break;m>i+2&&(m=i+2);for(var n=0,o=0;m-2>o;o++){var p=32767&b-i+o+32768,q=32767&p-c[p]+32768;q>n&&(n=q,h=p)}}}i+=32767&(g=h)-(h=c[g])+32768}return j<<16|k},C.F._howLong=function(a,b,c){if(a[b]!=a[b-c]||a[b+1]!=a[b+1-c]||a[b+2]!=a[b+2-c])return 0;var d=b,e=Math.min(a.length,b+258);for(b+=3;e>b&&a[b]==a[b-c];)b++;return b-d},C.F._hash=function(a,b){return 65535&(a[b]<<8|a[b+1])+(a[b+2]<<4)},C.saved=0,C.F._writeBlock=function(a,b,c,d,e,f,g,h,i){var j,k,l,m,n,o,p,q,r,s,t,u=C.F.U,v=C.F._putsF,w=C.F._putsE;u.lhst[256]++,m=(l=C.F.getTrees())[0],n=l[1],o=l[2],p=l[3],q=l[4],r=l[5],s=l[6],t=l[7];var x=32+(0==(7&i+3)?0:8-(7&i+3))+(g<<3),y=d+C.F.contSize(u.fltree,u.lhst)+C.F.contSize(u.fdtree,u.dhst),z=d+C.F.contSize(u.ltree,u.lhst)+C.F.contSize(u.dtree,u.dhst);z+=14+3*r+C.F.contSize(u.itree,u.ihst)+(2*u.ihst[16]+3*u.ihst[17]+7*u.ihst[18]);for(var A=0;286>A;A++)u.lhst[A]=0;for(A=0;30>A;A++)u.dhst[A]=0;for(A=0;19>A;A++)u.ihst[A]=0;var B=y>x&&z>x?0:z>y?1:2;if(v(h,i,a),v(h,i+1,B),i+=3,0==B){for(;0!=(7&i);)i++;i=C.F._copyExact(e,f,g,h,i)}else{if(1==B&&(j=u.fltree,k=u.fdtree),2==B){C.F.makeCodes(u.ltree,m),C.F.revCodes(u.ltree,m),C.F.makeCodes(u.dtree,n),C.F.revCodes(u.dtree,n),C.F.makeCodes(u.itree,o),C.F.revCodes(u.itree,o),j=u.ltree,k=u.dtree,w(h,i,p-257),w(h,i+=5,q-1),w(h,i+=5,r-4),i+=4;for(var D=0;r>D;D++)w(h,i+3*D,u.itree[1+(u.ordr[D]<<1)]);i+=3*r,i=C.F._codeTiny(s,u.itree,h,i),i=C.F._codeTiny(t,u.itree,h,i)}for(var E=f,F=0;c>F;F+=2){for(var G=b[F],H=G>>>23,I=E+(8388607&G);I>E;)i=C.F._writeLit(e[E++],j,h,i);if(0!=H){var J=b[F+1],K=J>>16,L=255&J>>8,M=255&J;w(h,i=C.F._writeLit(257+L,j,h,i),H-u.of0[L]),i+=u.exb[L],v(h,i=C.F._writeLit(M,k,h,i),K-u.df0[M]),i+=u.dxb[M],E+=H}}i=C.F._writeLit(256,j,h,i)}return i},C.F._copyExact=function(a,b,c,d,e){var f=e>>>3;return d[f]=c,d[f+1]=c>>>8,d[f+2]=255-d[f],d[f+3]=255-d[f+1],f+=4,d.set(new Uint8Array(a.buffer,b,c),f),e+(c+4<<3)},C.F.getTrees=function(){for(var a=C.F.U,b=C.F._hufTree(a.lhst,a.ltree,15),c=C.F._hufTree(a.dhst,a.dtree,15),d=[],e=C.F._lenCodes(a.ltree,d),f=[],g=C.F._lenCodes(a.dtree,f),h=0;h<d.length;h+=2)a.ihst[d[h]]++;for(h=0;h<f.length;h+=2)a.ihst[f[h]]++;for(var i=C.F._hufTree(a.ihst,a.itree,7),j=19;j>4&&0==a.itree[1+(a.ordr[j-1]<<1)];)j--;return[b,c,i,e,g,j,d,f]},C.F.getSecond=function(a){for(var b=[],c=0;c<a.length;c+=2)b.push(a[c+1]);return b},C.F.nonZero=function(a){for(var b="",c=0;c<a.length;c+=2)0!=a[c+1]&&(b+=(c>>1)+",");return b},C.F.contSize=function(a,b){for(var c=0,d=0;d<b.length;d++)c+=b[d]*a[1+(d<<1)];return c},C.F._codeTiny=function(a,b,c,d){for(var e=0;e<a.length;e+=2){var f=a[e],g=a[e+1];d=C.F._writeLit(f,b,c,d);var h=16==f?2:17==f?3:7;f>15&&(C.F._putsE(c,d,g,h),d+=h)}return d},C.F._lenCodes=function(a,b){for(var c=a.length;2!=c&&0==a[c-1];)c-=2;for(var d=0;c>d;d+=2){var e=a[d+1],f=c>d+3?a[d+3]:-1,g=c>d+5?a[d+5]:-1,h=0==d?-1:a[d-1];if(0==e&&f==e&&g==e){for(var i=d+5;c>i+2&&a[i+2]==e;)i+=2;(j=Math.min(i+1-d>>>1,138))<11?b.push(17,j-3):b.push(18,j-11),d+=2*j-2}else if(e==h&&f==e&&g==e){for(i=d+5;c>i+2&&a[i+2]==e;)i+=2;var j=Math.min(i+1-d>>>1,6);b.push(16,j-3),d+=2*j-2}else b.push(e,0)}return c>>>1},C.F._hufTree=function(a,b,c){var d=[],e=a.length,f=b.length,g=0;for(g=0;f>g;g+=2)b[g]=0,b[g+1]=0;for(g=0;e>g;g++)0!=a[g]&&d.push({lit:g,f:a[g]});var h=d.length,i=d.slice(0);if(0==h)return 0;if(1==h){var j=d[0].lit;return i=0==j?1:0,b[1+(j<<1)]=1,b[1+(i<<1)]=1,1}d.sort(function(a,b){return a.f-b.f});var k=d[0],l=d[1],m=0,n=1,o=2;for(d[0]={lit:-1,f:k.f+l.f,l:k,r:l,d:0};n!=h-1;)k=m!=n&&(o==h||d[m].f<d[o].f)?d[m++]:d[o++],l=m!=n&&(o==h||d[m].f<d[o].f)?d[m++]:d[o++],d[n++]={lit:-1,f:k.f+l.f,l:k,r:l};var p=C.F.setDepth(d[n-1],0);for(p>c&&(C.F.restrictDepth(i,c,p),p=c),g=0;h>g;g++)b[1+(i[g].lit<<1)]=i[g].d;return p},C.F.setDepth=function(a,b){return-1!=a.lit?(a.d=b,b):Math.max(C.F.setDepth(a.l,b+1),C.F.setDepth(a.r,b+1))},C.F.restrictDepth=function(a,b,c){var d=0,e=1<<c-b,f=0;for(a.sort(function(a,b){return b.d==a.d?a.f-b.f:b.d-a.d}),d=0;d<a.length&&a[d].d>b;d++){var g=a[d].d;a[d].d=b,f+=e-(1<<c-g)}for(f>>>=c-b;f>0;)(g=a[d].d)<b?(a[d].d++,f-=1<<b-g-1):d++;for(;d>=0;d--)a[d].d==b&&0>f&&(a[d].d--,f++);0!=f&&console.log("debt left")},C.F._goodIndex=function(a,b){var c=0;return b[16|c]<=a&&(c|=16),b[8|c]<=a&&(c|=8),b[4|c]<=a&&(c|=4),b[2|c]<=a&&(c|=2),b[1|c]<=a&&(c|=1),c},C.F._writeLit=function(a,b,c,d){return C.F._putsF(c,d,b[a<<1]),d+b[1+(a<<1)]},C.F.inflate=function(a,b){var c=Uint8Array;if(3==a[0]&&0==a[1])return b||new c(0);var d=C.F,e=d._bitsF,f=d._bitsE,g=d._decodeTiny,h=d.makeCodes,i=d.codes2map,j=d._get17,k=d.U,l=null==b;l&&(b=new c(a.length>>>2<<3));for(var m,n,o=0,p=0,q=0,r=0,s=0,t=0,u=0,v=0,w=0;0==o;)if(o=e(a,w,1),p=e(a,w+1,2),w+=3,0!=p){if(l&&(b=C.F._check(b,v+131072)),1==p&&(m=k.flmap,n=k.fdmap,t=511,u=31),2==p){q=f(a,w,5)+257,r=f(a,w+5,5)+1,s=f(a,w+10,4)+4,w+=14;for(var x=0;38>x;x+=2)k.itree[x]=0,k.itree[x+1]=0;var y=1;for(x=0;s>x;x++){var z=f(a,w+3*x,3);k.itree[1+(k.ordr[x]<<1)]=z,z>y&&(y=z)}w+=3*s,h(k.itree,y),i(k.itree,y,k.imap),m=k.lmap,n=k.dmap,w=g(k.imap,(1<<y)-1,q+r,a,w,k.ttree);var A=d._copyOut(k.ttree,0,q,k.ltree);t=(1<<A)-1;var B=d._copyOut(k.ttree,q,r,k.dtree);u=(1<<B)-1,h(k.ltree,A),i(k.ltree,A,m),h(k.dtree,B),i(k.dtree,B,n)}for(;;){var D=m[j(a,w)&t];w+=15&D;var E=D>>>4;if(0==E>>>8)b[v++]=E;else{if(256==E)break;var F=v+E-254;if(E>264){var G=k.ldef[E-257];F=v+(G>>>3)+f(a,w,7&G),w+=7&G}var H=n[j(a,w)&u];w+=15&H;var I=H>>>4,J=k.ddef[I],K=(J>>>4)+e(a,w,15&J);for(w+=15&J,l&&(b=C.F._check(b,v+131072));F>v;)b[v]=b[v++-K],b[v]=b[v++-K],b[v]=b[v++-K],b[v]=b[v++-K];v=F}}}else{0!=(7&w)&&(w+=8-(7&w));var L=4+(w>>>3),M=a[L-4]|a[L-3]<<8;l&&(b=C.F._check(b,v+M)),b.set(new c(a.buffer,a.byteOffset+L,M),v),w=L+M<<3,v+=M}return b.length==v?b:b.slice(0,v)},C.F._check=function(a,b){var c=a.length;if(c>=b)return a;var d=new Uint8Array(Math.max(c<<1,b));return d.set(a,0),d},C.F._decodeTiny=function(a,b,c,d,e,f){for(var g=C.F._bitsE,h=C.F._get17,i=0;c>i;){var j=a[h(d,e)&b];e+=15&j;var k=j>>>4;if(15>=k)f[i]=k,i++;else{var l=0,m=0;16==k?(m=3+g(d,e,2),e+=2,l=f[i-1]):17==k?(m=3+g(d,e,3),e+=3):18==k&&(m=11+g(d,e,7),e+=7);for(var n=i+m;n>i;)f[i]=l,i++}}return e},C.F._copyOut=function(a,b,c,d){for(var e=0,f=0,g=d.length>>>1;c>f;){var h=a[f+b];d[f<<1]=0,d[1+(f<<1)]=h,h>e&&(e=h),f++}for(;g>f;)d[f<<1]=0,d[1+(f<<1)]=0,f++;return e},C.F.makeCodes=function(a,b){for(var c,d,e,f,g=C.F.U,h=a.length,i=g.bl_count,j=0;b>=j;j++)i[j]=0;for(j=1;h>j;j+=2)i[a[j]]++;var k=g.next_code;for(c=0,i[0]=0,d=1;b>=d;d++)c=c+i[d-1]<<1,k[d]=c;for(e=0;h>e;e+=2)0!=(f=a[e+1])&&(a[e]=k[f],k[f]++)},C.F.codes2map=function(a,b,c){for(var d=a.length,e=C.F.U.rev15,f=0;d>f;f+=2)if(0!=a[f+1])for(var g=f>>1,h=a[f+1],i=g<<4|h,j=b-h,k=a[f]<<j,l=k+(1<<j);k!=l;)c[e[k]>>>15-b]=i,k++},C.F.revCodes=function(a,b){for(var c=C.F.U.rev15,d=15-b,e=0;e<a.length;e+=2){var f=a[e]<<b-a[e+1];a[e]=c[f]>>>d}},C.F._putsE=function(a,b,c){c<<=7&b;var d=b>>>3;a[d]|=c,a[d+1]|=c>>>8},C.F._putsF=function(a,b,c){c<<=7&b;var d=b>>>3;a[d]|=c,a[d+1]|=c>>>8,a[d+2]|=c>>>16},C.F._bitsE=function(a,b,c){return(a[b>>>3]|a[1+(b>>>3)]<<8)>>>(7&b)&(1<<c)-1},C.F._bitsF=function(a,b,c){return(a[b>>>3]|a[1+(b>>>3)]<<8|a[2+(b>>>3)]<<16)>>>(7&b)&(1<<c)-1},C.F._get17=function(a,b){return(a[b>>>3]|a[1+(b>>>3)]<<8|a[2+(b>>>3)]<<16)>>>(7&b)},C.F._get25=function(a,b){return(a[b>>>3]|a[1+(b>>>3)]<<8|a[2+(b>>>3)]<<16|a[3+(b>>>3)]<<24)>>>(7&b)},C.F.U=(A=Uint16Array,B=Uint32Array,{next_code:new A(16),bl_count:new A(16),ordr:[16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15],of0:[3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258,999,999,999],exb:[0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0,0,0,0],ldef:new A(32),df0:[1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577,65535,65535],dxb:[0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13,0,0],ddef:new B(32),flmap:new A(512),fltree:[],fdmap:new A(32),fdtree:[],lmap:new A(32768),ltree:[],ttree:[],dmap:new A(32768),dtree:[],imap:new A(512),itree:[],rev15:new A(32768),lhst:new B(286),dhst:new B(30),ihst:new B(19),lits:new B(15e3),strt:new A(65536),prev:new A(32768)}),function(){function a(a,b,c){for(;0!=b--;)a.push(0,c)}for(var b=C.F.U,c=0;32768>c;c++){var d=c;d=(4278255360&(d=(4042322160&(d=(3435973836&(d=(2863311530&d)>>>1|(1431655765&d)<<1))>>>2|(858993459&d)<<2))>>>4|(252645135&d)<<4))>>>8|(16711935&d)<<8,b.rev15[c]=(d>>>16|d<<16)>>>17}for(c=0;32>c;c++)b.ldef[c]=b.of0[c]<<3|b.exb[c],b.ddef[c]=b.df0[c]<<4|b.dxb[c];a(b.fltree,144,8),a(b.fltree,112,9),a(b.fltree,24,7),a(b.fltree,8,8),C.F.makeCodes(b.fltree,9),C.F.codes2map(b.fltree,9,b.flmap),C.F.revCodes(b.fltree,9),a(b.fdtree,32,5),C.F.makeCodes(b.fdtree,5),C.F.codes2map(b.fdtree,5,b.fdmap),C.F.revCodes(b.fdtree,5),a(b.itree,19,0),a(b.ltree,286,0),a(b.dtree,30,0),a(b.ttree,320,0)}();var H=(D={__proto__:null,"default":G},(E=[G]).forEach(function(a){a&&"string"!=typeof a&&!Array.isArray(a)&&Object.keys(a).forEach(function(b){if("default"!==b&&!(b in D)){var c=Object.getOwnPropertyDescriptor(a,b);Object.defineProperty(D,b,c.get?c:{enumerable:!0,get:function(){return a[b]}})}})}),Object.freeze(D)),I=function(){function a(a,b,c,e){var f=b*c,g=Math.ceil(b*d(e)/8),h=new Uint8Array(4*f),i=new Uint32Array(h.buffer),j=e.ctype,k=e.depth,m=l.readUshort;if(6==j){var n=f<<2;if(8==k)for(var o=0;n>o;o+=4)h[o]=a[o],h[o+1]=a[o+1],h[o+2]=a[o+2],h[o+3]=a[o+3];if(16==k)for(o=0;n>o;o++)h[o]=a[o<<1]}else if(2==j){var p=e.tabs.tRNS;if(null==p){if(8==k)for(o=0;f>o;o++){var q=3*o;i[o]=-16777216|a[q+2]<<16|a[q+1]<<8|a[q]}if(16==k)for(o=0;f>o;o++)q=6*o,i[o]=-16777216|a[q+4]<<16|a[q+2]<<8|a[q]}else{var r=p[0],s=p[1],t=p[2];if(8==k)for(o=0;f>o;o++){var u=o<<2;q=3*o,i[o]=-16777216|a[q+2]<<16|a[q+1]<<8|a[q],a[q]==r&&a[q+1]==s&&a[q+2]==t&&(h[u+3]=0)}if(16==k)for(o=0;f>o;o++)u=o<<2,q=6*o,i[o]=-16777216|a[q+4]<<16|a[q+2]<<8|a[q],m(a,q)==r&&m(a,q+2)==s&&m(a,q+4)==t&&(h[u+3]=0)}}else if(3==j){var v,w=e.tabs.PLTE,x=e.tabs.tRNS,y=x?x.length:0;if(1==k)for(var z=0;c>z;z++){var A=z*g,B=z*b;for(o=0;b>o;o++){u=B+o<<2;var C=3*(v=1&a[A+(o>>3)]>>7-((7&o)<<0));h[u]=w[C],h[u+1]=w[C+1],h[u+2]=w[C+2],h[u+3]=y>v?x[v]:255}}if(2==k)for(z=0;c>z;z++)for(A=z*g,B=z*b,o=0;b>o;o++)u=B+o<<2,C=3*(v=3&a[A+(o>>2)]>>6-((3&o)<<1)),h[u]=w[C],h[u+1]=w[C+1],h[u+2]=w[C+2],h[u+3]=y>v?x[v]:255;if(4==k)for(z=0;c>z;z++)for(A=z*g,B=z*b,o=0;b>o;o++)u=B+o<<2,C=3*(v=15&a[A+(o>>1)]>>4-((1&o)<<2)),h[u]=w[C],h[u+1]=w[C+1],h[u+2]=w[C+2],h[u+3]=y>v?x[v]:255;if(8==k)for(o=0;f>o;o++)u=o<<2,C=3*(v=a[o]),h[u]=w[C],h[u+1]=w[C+1],h[u+2]=w[C+2],h[u+3]=y>v?x[v]:255}else if(4==j){if(8==k)for(o=0;f>o;o++){u=o<<2;var D,E=a[D=o<<1];h[u]=E,h[u+1]=E,h[u+2]=E,h[u+3]=a[D+1]}if(16==k)for(o=0;f>o;o++)u=o<<2,E=a[D=o<<2],h[u]=E,h[u+1]=E,h[u+2]=E,h[u+3]=a[D+2]}else if(0==j)for(r=e.tabs.tRNS?e.tabs.tRNS:-1,z=0;c>z;z++){var F=z*g,G=z*b;if(1==k)for(var H=0;b>H;H++){var I=(E=255*(1&a[F+(H>>>3)]>>>7-(7&H)))==255*r?0:255;i[G+H]=I<<24|E<<16|E<<8|E}else if(2==k)for(H=0;b>H;H++)I=(E=85*(3&a[F+(H>>>2)]>>>6-((3&H)<<1)))==85*r?0:255,i[G+H]=I<<24|E<<16|E<<8|E;else if(4==k)for(H=0;b>H;H++)I=(E=17*(15&a[F+(H>>>1)]>>>4-((1&H)<<2)))==17*r?0:255,i[G+H]=I<<24|E<<16|E<<8|E;else if(8==k)for(H=0;b>H;H++)I=(E=a[F+H])==r?0:255,i[G+H]=I<<24|E<<16|E<<8|E;else if(16==k)for(H=0;b>H;H++)E=a[F+(H<<1)],I=m(a,F+(H<<1))==r?0:255,i[G+H]=I<<24|E<<16|E<<8|E}return h}function b(a,b,f,g){var h=d(a),i=new Uint8Array((Math.ceil(f*h/8)+1+a.interlace)*g);return b=a.tabs.CgBI?m(b,i):c(b,i),0==a.interlace?b=e(b,a,0,f,g):1==a.interlace&&(b=function(a,b){for(var c=b.width,f=b.height,g=d(b),h=g>>3,i=Math.ceil(c*g/8),j=new Uint8Array(f*i),k=0,l=[0,0,4,0,2,0,1],m=[0,4,0,2,0,1,0],n=[8,8,8,4,4,2,2],o=[8,8,4,4,2,2,1],p=0;7>p;){for(var q=n[p],r=o[p],s=0,t=0,u=l[p];f>u;)u+=q,t++;for(var v=m[p];c>v;)v+=r,s++;var w=Math.ceil(s*g/8);e(a,b,k,s,t);for(var x=0,y=l[p];f>y;){for(var z,A=m[p],B=k+x*w<<3;c>A;){if(1==g&&(z=1&(z=a[B>>3])>>7-(7&B),j[y*i+(A>>3)]|=z<<7-((7&A)<<0)),2==g&&(z=3&(z=a[B>>3])>>6-(7&B),j[y*i+(A>>2)]|=z<<6-((3&A)<<1)),4==g&&(z=15&(z=a[B>>3])>>4-(7&B),j[y*i+(A>>1)]|=z<<4-((1&A)<<2)),g>=8)for(var C=y*i+A*h,D=0;h>D;D++)j[C+D]=a[(B>>3)+D];B+=g,A+=r}x++,y+=q}0!=s*t&&(k+=t*(1+w)),p+=1}return j}(b,a)),b}function c(a,b){return m(new Uint8Array(a.buffer,2,a.length-6),b)}function d(a){return[1,null,3,1,2,null,4][a.ctype]*a.depth}function e(a,b,c,e,g){var h,i,j=d(b),k=Math.ceil(e*j/8);j=Math.ceil(j/8);var l=a[c],m=0;if(l>1&&(a[c]=[0,0,1][l-2]),3==l)for(m=j;k>m;m++)a[m+1]=255&a[m+1]+(a[m+1-j]>>>1);for(var n=0;g>n;n++)if(l=a[(i=(h=c+n*k)+n+1)-1],m=0,0==l)for(;k>m;m++)a[h+m]=a[i+m];else if(1==l){for(;j>m;m++)a[h+m]=a[i+m];for(;k>m;m++)a[h+m]=a[i+m]+a[h+m-j]}else if(2==l)for(;k>m;m++)a[h+m]=a[i+m]+a[h+m-k];else if(3==l){for(;j>m;m++)a[h+m]=a[i+m]+(a[h+m-k]>>>1);for(;k>m;m++)a[h+m]=a[i+m]+(a[h+m-k]+a[h+m-j]>>>1)}else{for(;j>m;m++)a[h+m]=a[i+m]+f(0,a[h+m-k],0);for(;k>m;m++)a[h+m]=a[i+m]+f(a[h+m-j],a[h+m-k],a[h+m-j-k])}return a}function f(a,b,c){var d=a+b-c,e=d-a,f=d-b,g=d-c;return f*f>=e*e&&g*g>=e*e?a:g*g>=f*f?b:c}function g(a,b,c){c.width=l.readUint(a,b),b+=4,c.height=l.readUint(a,b),b+=4,c.depth=a[b],b++,c.ctype=a[b],b++,c.compress=a[b],b++,c.filter=a[b],b++,c.interlace=a[b],b++}function h(a,b,c,d,e,f,g,h,i){for(var j=Math.min(b,e),k=Math.min(c,f),l=0,m=0,n=0;k>n;n++)for(var o=0;j>o;o++)if(g>=0&&h>=0?(l=n*b+o<<2,m=(h+n)*e+g+o<<2):(l=(-h+n)*b-g+o<<2,m=n*e+o<<2),0==i)d[m]=a[l],d[m+1]=a[l+1],d[m+2]=a[l+2],d[m+3]=a[l+3];else if(1==i){var p=a[l+3]*(1/255),q=a[l]*p,r=a[l+1]*p,s=a[l+2]*p,t=d[m+3]*(1/255),u=d[m]*t,v=d[m+1]*t,w=d[m+2]*t,x=1-p,y=p+t*x,z=0==y?0:1/y;d[m+3]=255*y,d[m+0]=(q+u*x)*z,d[m+1]=(r+v*x)*z,d[m+2]=(s+w*x)*z}else if(2==i)p=a[l+3],q=a[l],r=a[l+1],s=a[l+2],t=d[m+3],u=d[m],v=d[m+1],w=d[m+2],p==t&&q==u&&r==v&&s==w?(d[m]=0,d[m+1]=0,d[m+2]=0,d[m+3]=0):(d[m]=q,d[m+1]=r,d[m+2]=s,d[m+3]=p);else if(3==i){if(p=a[l+3],q=a[l],r=a[l+1],s=a[l+2],t=d[m+3],u=d[m],v=d[m+1],w=d[m+2],p==t&&q==u&&r==v&&s==w)continue;if(220>p&&t>20)return!1}return!0}var i,j,k,l={nextZero:function(a,b){for(;0!=a[b];)b++;return b},readUshort:function(a,b){return a[b]<<8|a[b+1]},writeUshort:function(a,b,c){a[b]=255&c>>8,a[b+1]=255&c},readUint:function(a,b){return 16777216*a[b]+(a[b+1]<<16|a[b+2]<<8|a[b+3])},writeUint:function(a,b,c){a[b]=255&c>>24,a[b+1]=255&c>>16,a[b+2]=255&c>>8,a[b+3]=255&c},readASCII:function(a,b,c){for(var d="",e=0;c>e;e++)d+=String.fromCharCode(a[b+e]);return d},writeASCII:function(a,b,c){for(var d=0;d<c.length;d++)a[b+d]=c.charCodeAt(d)},readBytes:function(a,b,c){for(var d=[],e=0;c>e;e++)d.push(a[b+e]);return d},pad:function(a){return a.length<2?"0".concat(a):a},readUTF8:function(a,b,c){for(var d,e="",f=0;c>f;f++)e+="%".concat(l.pad(a[b+f].toString(16)));try{d=decodeURIComponent(e)}catch(g){return l.readASCII(a,b,c)}return d}},m=((i={H:{}}).H.N=function(a,b){var c,d,e=Uint8Array,f=0,g=0,h=0,j=0,k=0,l=0,m=0,n=0,o=0;if(3==a[0]&&0==a[1])return b||new e(0);var p=i.H,q=p.b,r=p.e,s=p.R,t=p.n,u=p.A,v=p.Z,w=p.m,x=null==b;for(x&&(b=new e(a.length>>>2<<5));0==f;)if(f=q(a,o,1),g=q(a,o+1,2),o+=3,0!=g){if(x&&(b=i.H.W(b,n+131072)),1==g&&(c=w.J,d=w.h,l=511,m=31),2==g){h=r(a,o,5)+257,j=r(a,o+5,5)+1,k=r(a,o+10,4)+4,o+=14;for(var y=1,z=0;38>z;z+=2)w.Q[z]=0,w.Q[z+1]=0;for(z=0;k>z;z++){var A=r(a,o+3*z,3);w.Q[1+(w.X[z]<<1)]=A,A>y&&(y=A)}o+=3*k,t(w.Q,y),u(w.Q,y,w.u),c=w.w,d=w.d,o=s(w.u,(1<<y)-1,h+j,a,o,w.v);var B=p.V(w.v,0,h,w.C);l=(1<<B)-1;var C=p.V(w.v,h,j,w.D);m=(1<<C)-1,t(w.C,B),u(w.C,B,c),t(w.D,C),u(w.D,C,d)}for(;;){var D=c[v(a,o)&l];o+=15&D;var E=D>>>4;if(0==E>>>8)b[n++]=E;else{if(256==E)break;var F=n+E-254;if(E>264){var G=w.q[E-257];F=n+(G>>>3)+r(a,o,7&G),o+=7&G}var H=d[v(a,o)&m];o+=15&H;var I=H>>>4,J=w.c[I],K=(J>>>4)+q(a,o,15&J);for(o+=15&J;F>n;)b[n]=b[n++-K],b[n]=b[n++-K],b[n]=b[n++-K],b[n]=b[n++-K];n=F}}}else{0!=(7&o)&&(o+=8-(7&o));var L=4+(o>>>3),M=a[L-4]|a[L-3]<<8;x&&(b=i.H.W(b,n+M)),b.set(new e(a.buffer,a.byteOffset+L,M),n),o=L+M<<3,n+=M}return b.length==n?b:b.slice(0,n)},i.H.W=function(a,b){var c=a.length;if(c>=b)return a;var d=new Uint8Array(c<<1);return d.set(a,0),d},i.H.R=function(a,b,c,d,e,f){for(var g=i.H.e,h=i.H.Z,j=0;c>j;){var k=a[h(d,e)&b];e+=15&k;var l=k>>>4;if(15>=l)f[j]=l,j++;else{var m=0,n=0;16==l?(n=3+g(d,e,2),e+=2,m=f[j-1]):17==l?(n=3+g(d,e,3),e+=3):18==l&&(n=11+g(d,e,7),e+=7);for(var o=j+n;o>j;)f[j]=m,j++}}return e},i.H.V=function(a,b,c,d){for(var e=0,f=0,g=d.length>>>1;c>f;){var h=a[f+b];d[f<<1]=0,d[1+(f<<1)]=h,h>e&&(e=h),f++}for(;g>f;)d[f<<1]=0,d[1+(f<<1)]=0,f++;return e},i.H.n=function(a,b){for(var c,d,e,f,g=i.H.m,h=a.length,j=g.j,k=0;b>=k;k++)j[k]=0;for(k=1;h>k;k+=2)j[a[k]]++;var l=g.K;for(c=0,j[0]=0,d=1;b>=d;d++)c=c+j[d-1]<<1,l[d]=c;for(e=0;h>e;e+=2)0!=(f=a[e+1])&&(a[e]=l[f],l[f]++)},i.H.A=function(a,b,c){for(var d=a.length,e=i.H.m.r,f=0;d>f;f+=2)if(0!=a[f+1])for(var g=f>>1,h=a[f+1],j=g<<4|h,k=b-h,l=a[f]<<k,m=l+(1<<k);l!=m;)c[e[l]>>>15-b]=j,l++},i.H.l=function(a,b){for(var c=i.H.m.r,d=15-b,e=0;e<a.length;e+=2){var f=a[e]<<b-a[e+1];a[e]=c[f]>>>d}},i.H.M=function(a,b,c){c<<=7&b;var d=b>>>3;a[d]|=c,a[d+1]|=c>>>8},i.H.I=function(a,b,c){c<<=7&b;var d=b>>>3;a[d]|=c,a[d+1]|=c>>>8,a[d+2]|=c>>>16},i.H.e=function(a,b,c){return(a[b>>>3]|a[1+(b>>>3)]<<8)>>>(7&b)&(1<<c)-1},i.H.b=function(a,b,c){return(a[b>>>3]|a[1+(b>>>3)]<<8|a[2+(b>>>3)]<<16)>>>(7&b)&(1<<c)-1},i.H.Z=function(a,b){return(a[b>>>3]|a[1+(b>>>3)]<<8|a[2+(b>>>3)]<<16)>>>(7&b)},i.H.i=function(a,b){return(a[b>>>3]|a[1+(b>>>3)]<<8|a[2+(b>>>3)]<<16|a[3+(b>>>3)]<<24)>>>(7&b)},i.H.m=(j=Uint16Array,k=Uint32Array,{K:new j(16),j:new j(16),X:[16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15],S:[3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258,999,999,999],T:[0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0,0,0,0],q:new j(32),p:[1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577,65535,65535],z:[0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13,0,0],c:new k(32),J:new j(512),_:[],h:new j(32),$:[],w:new j(32768),C:[],v:[],d:new j(32768),D:[],u:new j(512),Q:[],r:new j(32768),s:new k(286),Y:new k(30),a:new k(19),t:new k(15e3),k:new j(65536),g:new j(32768)}),function(){function a(a,b,c){for(;0!=b--;)a.push(0,c)}for(var b=i.H.m,c=0;32768>c;c++){var d=c;d=(4278255360&(d=(4042322160&(d=(3435973836&(d=(2863311530&d)>>>1|(1431655765&d)<<1))>>>2|(858993459&d)<<2))>>>4|(252645135&d)<<4))>>>8|(16711935&d)<<8,b.r[c]=(d>>>16|d<<16)>>>17}for(c=0;32>c;c++)b.q[c]=b.S[c]<<3|b.T[c],b.c[c]=b.p[c]<<4|b.z[c];a(b._,144,8),a(b._,112,9),a(b._,24,7),a(b._,8,8),i.H.n(b._,9),i.H.A(b._,9,b.J),i.H.l(b._,9),a(b.$,32,5),i.H.n(b.$,5),i.H.A(b.$,5,b.h),i.H.l(b.$,5),a(b.Q,19,0),a(b.C,286,0),a(b.D,30,0),a(b.v,320,0)}(),i.H.N);return{decode:function(a){for(var d,e,f=new Uint8Array(a),h=8,i=l,j=i.readUshort,k=i.readUint,n={tabs:{},frames:[]},o=new Uint8Array(f.length),p=0,q=0,r=[137,80,78,71,13,10,26,10],s=0;8>s;s++)if(f[s]!=r[s])throw"The input is not a PNG file!";for(;h<f.length;){var t=i.readUint(f,h);h+=4;var u=i.readASCII(f,h,4);if(h+=4,"IHDR"==u)g(f,h,n);else if("iCCP"==u){for(var v=h;0!=f[v];)v++;i.readASCII(f,h,v-h),f[v+1];var w=f.slice(v+2,h+t),x=null;try{x=c(w)}catch(y){x=m(w)}n.tabs[u]=x}else if("CgBI"==u)n.tabs[u]=f.slice(h,h+4);else if("IDAT"==u){for(s=0;t>s;s++)o[p+s]=f[h+s];p+=t}else if("acTL"==u)n.tabs[u]={num_frames:k(f,h),num_plays:k(f,h+4)},e=new Uint8Array(f.length);else if("fcTL"==u){0!=q&&((d=n.frames[n.frames.length-1]).data=b(n,e.slice(0,q),d.rect.width,d.rect.height),q=0);var z={x:k(f,h+12),y:k(f,h+16),width:k(f,h+4),height:k(f,h+8)},A=j(f,h+22);A=j(f,h+20)/(0==A?100:A);var B={rect:z,delay:Math.round(1e3*A),dispose:f[h+24],blend:f[h+25]};n.frames.push(B)}else if("fdAT"==u){for(s=0;t-4>s;s++)e[q+s]=f[h+s+4];q+=t-4}else if("pHYs"==u)n.tabs[u]=[i.readUint(f,h),i.readUint(f,h+4),f[h+8]];else if("cHRM"==u)for(s=0,n.tabs[u]=[];8>s;s++)n.tabs[u].push(i.readUint(f,h+4*s));else if("tEXt"==u||"zTXt"==u){null==n.tabs[u]&&(n.tabs[u]={});var C=i.nextZero(f,h),D=i.readASCII(f,h,C-h),E=h+t-C-1;if("tEXt"==u)G=i.readASCII(f,C+1,E);else{var F=c(f.slice(C+2,C+2+E));G=i.readUTF8(F,0,F.length)}n.tabs[u][D]=G}else if("iTXt"==u){null==n.tabs[u]&&(n.tabs[u]={}),C=0,v=h,C=i.nextZero(f,v),D=i.readASCII(f,v,C-v);var G,H=f[v=C+1];f[v+1],v+=2,C=i.nextZero(f,v),i.readASCII(f,v,C-v),v=C+1,C=i.nextZero(f,v),i.readUTF8(f,v,C-v),E=t-((v=C+1)-h),0==H?G=i.readUTF8(f,v,E):(F=c(f.slice(v,v+E)),G=i.readUTF8(F,0,F.length)),n.tabs[u][D]=G}else if("PLTE"==u)n.tabs[u]=i.readBytes(f,h,t);else if("hIST"==u){var I=n.tabs.PLTE.length/3;for(s=0,n.tabs[u]=[];I>s;s++)n.tabs[u].push(j(f,h+2*s))}else if("tRNS"==u)3==n.ctype?n.tabs[u]=i.readBytes(f,h,t):0==n.ctype?n.tabs[u]=j(f,h):2==n.ctype&&(n.tabs[u]=[j(f,h),j(f,h+2),j(f,h+4)]);else if("gAMA"==u)n.tabs[u]=i.readUint(f,h)/1e5;else if("sRGB"==u)n.tabs[u]=f[h];else if("bKGD"==u)0==n.ctype||4==n.ctype?n.tabs[u]=[j(f,h)]:2==n.ctype||6==n.ctype?n.tabs[u]=[j(f,h),j(f,h+2),j(f,h+4)]:3==n.ctype&&(n.tabs[u]=f[h]);else if("IEND"==u)break;h+=t,i.readUint(f,h),h+=4}return 0!=q&&((d=n.frames[n.frames.length-1]).data=b(n,e.slice(0,q),d.rect.width,d.rect.height)),n.data=b(n,o,n.width,n.height),delete n.compress,delete n.interlace,delete n.filter,n},toRGBA8:function(b){var c=b.width,d=b.height;if(null==b.tabs.acTL)return[a(b.data,c,d,b).buffer];var e=[];null==b.frames[0].data&&(b.frames[0].data=b.data);for(var f=4*c*d,g=new Uint8Array(f),i=new Uint8Array(f),j=new Uint8Array(f),k=0;k<b.frames.length;k++){var l=b.frames[k],m=l.rect.x,n=l.rect.y,o=l.rect.width,p=l.rect.height,q=a(l.data,o,p,b);if(0!=k)for(var r=0;f>r;r++)j[r]=g[r];if(0==l.blend?h(q,o,p,g,c,d,m,n,0):1==l.blend&&h(q,o,p,g,c,d,m,n,1),e.push(g.buffer.slice(0)),0==l.dispose);else if(1==l.dispose)h(i,o,p,g,c,d,m,n,0);else if(2==l.dispose)for(r=0;f>r;r++)g[r]=j[r]}return e},_paeth:f,_copyTile:h,_bin:l}}();!function(){function a(a,b,c,d){b[c]+=a[0]*d>>4,b[c+1]+=a[1]*d>>4,b[c+2]+=a[2]*d>>4,b[c+3]+=a[3]*d>>4}function b(a){return Math.max(0,Math.min(255,a))}function c(a,b){var c=a[0]-b[0],d=a[1]-b[1],e=a[2]-b[2],f=a[3]-b[3];return c*c+d*d+e*e+f*f}function d(d,e,f,g,h,i,j){null==j&&(j=1);for(var k=g.length,l=[],m=0;k>m;m++){var n=g[m];l.push([255&n>>>0,255&n>>>8,255&n>>>16,255&n>>>24])}for(m=0;k>m;m++)for(var o=4294967295,p=0,q=0;k>q;q++){var r=c(l[m],l[q]);q!=m&&o>r&&(o=r,p=q)}var s=new Uint32Array(h.buffer),t=new Int16Array(4*e*f),u=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];for(m=0;m<u.length;m++)u[m]=255*((u[m]+.5)/16-.5);for(var v=0;f>v;v++)for(var w=0;e>w;w++){m=4*(v*e+w),2!=j?x=[b(d[m]+t[m]),b(d[m+1]+t[m+1]),b(d[m+2]+t[m+2]),b(d[m+3]+t[m+3])]:(r=u[4*(3&v)+(3&w)],x=[b(d[m]+r),b(d[m+1]+r),b(d[m+2]+r),b(d[m+3]+r)]),p=0;var x,y=16777215;for(q=0;k>q;q++){var z=c(x,l[q]);y>z&&(y=z,p=q)}var A=l[p],B=[x[0]-A[0],x[1]-A[1],x[2]-A[2],x[3]-A[3]];1==j&&(w!=e-1&&a(B,t,m+4,7),v!=f-1&&(0!=w&&a(B,t,m+4*e-4,3),a(B,t,m+4*e,5),w!=e-1&&a(B,t,m+4*e+4,1))),i[m>>2]=p,s[m>>2]=g[p]}}function e(a,b,c,d,e){null==e&&(e={});var f,g=w.crc,h=u.writeUint,i=u.writeUshort,j=u.writeASCII,k=8,l=a.frames.length>1,m=!1,n=33+(l?20:0);if(null!=e.sRGB&&(n+=13),null!=e.pHYs&&(n+=21),null!=e.iCCP&&(n+=21+(f=pako.deflate(e.iCCP)).length+4),3==a.ctype){for(var o=a.plte.length,p=0;o>p;p++)255!=a.plte[p]>>>24&&(m=!0);n+=8+3*o+4+(m?8+1*o+4:0)}for(var q=0;q<a.frames.length;q++)l&&(n+=38),n+=(C=a.frames[q]).cimg.length+12,0!=q&&(n+=4);n+=12;var r=new Uint8Array(n),s=[137,80,78,71,13,10,26,10];for(p=0;8>p;p++)r[p]=s[p];if(h(r,k,13),j(r,k+=4,"IHDR"),h(r,k+=4,b),h(r,k+=4,c),r[k+=4]=a.depth,r[++k]=a.ctype,r[++k]=0,r[++k]=0,r[++k]=0,h(r,++k,g(r,k-17,17)),k+=4,null!=e.sRGB&&(h(r,k,1),j(r,k+=4,"sRGB"),r[k+=4]=e.sRGB,h(r,++k,g(r,k-5,5)),k+=4),null!=e.iCCP){var t=13+f.length;h(r,k,t),j(r,k+=4,"iCCP"),j(r,k+=4,"ICC profile"),k+=11,k+=2,r.set(f,k),h(r,k+=f.length,g(r,k-(t+4),t+4)),k+=4}if(null!=e.pHYs&&(h(r,k,9),j(r,k+=4,"pHYs"),h(r,k+=4,e.pHYs[0]),h(r,k+=4,e.pHYs[1]),r[k+=4]=e.pHYs[2],h(r,++k,g(r,k-13,13)),k+=4),l&&(h(r,k,8),j(r,k+=4,"acTL"),h(r,k+=4,a.frames.length),h(r,k+=4,null!=e.loop?e.loop:0),h(r,k+=4,g(r,k-12,12)),k+=4),3==a.ctype){for(h(r,k,3*(o=a.plte.length)),j(r,k+=4,"PLTE"),k+=4,p=0;o>p;p++){var v=3*p,x=a.plte[p],y=255&x,z=255&x>>>8,A=255&x>>>16;r[k+v+0]=y,r[k+v+1]=z,r[k+v+2]=A}if(h(r,k+=3*o,g(r,k-3*o-4,3*o+4)),k+=4,m){for(h(r,k,o),j(r,k+=4,"tRNS"),k+=4,p=0;o>p;p++)r[k+p]=255&a.plte[p]>>>24;h(r,k+=o,g(r,k-o-4,o+4)),k+=4}}var B=0;for(q=0;q<a.frames.length;q++){var C=a.frames[q];l&&(h(r,k,26),j(r,k+=4,"fcTL"),h(r,k+=4,B++),h(r,k+=4,C.rect.width),h(r,k+=4,C.rect.height),h(r,k+=4,C.rect.x),h(r,k+=4,C.rect.y),i(r,k+=4,d[q]),i(r,k+=2,1e3),r[k+=2]=C.dispose,r[++k]=C.blend,h(r,++k,g(r,k-30,30)),k+=4);var D=C.cimg;h(r,k,(o=D.length)+(0==q?0:4));var E=k+=4;j(r,k,0==q?"IDAT":"fdAT"),k+=4,0!=q&&(h(r,k,B++),k+=4),r.set(D,k),h(r,k+=o,g(r,E,k-E)),k+=4}return h(r,k,0),j(r,k+=4,"IEND"),h(r,k+=4,g(r,k-4,4)),k+=4,r.buffer}function f(a,b,c){for(var d=0;d<a.frames.length;d++){var e=a.frames[d];e.rect.width;var f=e.rect.height,g=new Uint8Array(f*e.bpl+f);e.cimg=j(e.img,f,e.bpp,e.bpl,g,b,c)}}function g(a,b,c,e,f){for(var g=f[0],j=f[1],k=f[2],m=f[3],n=f[4],o=f[5],p=6,q=8,r=255,s=0;s<a.length;s++)for(var u=new Uint8Array(a[s]),v=u.length,w=0;v>w;w+=4)r&=u[w+3];var x=255!=r,y=function(a,b,c,d,e,f){for(var g,j=[],k=0;k<a.length;k++){var l,m=new Uint8Array(a[k]),n=new Uint32Array(m.buffer),o=0,p=0,q=b,r=c,s=d?1:0;if(0!=k){for(var u=f||d||1==k||0!=j[k-2].dispose?1:2,v=0,w=1e9,x=0;u>x;x++){for(var y=new Uint8Array(a[k-1-x]),z=new Uint32Array(a[k-1-x]),A=b,B=c,C=-1,D=-1,E=0;c>E;E++)for(var F=0;b>F;F++)n[N=E*b+F]!=z[N]&&(A>F&&(A=F),F>C&&(C=F),B>E&&(B=E),E>D&&(D=E));-1==C&&(A=B=C=D=0),e&&(1==(1&A)&&A--,1==(1&B)&&B--);var G=(C-A+1)*(D-B+1);w>G&&(w=G,v=x,o=A,p=B,q=C-A+1,r=D-B+1)}y=new Uint8Array(a[k-1-v]),1==v&&(j[k-1].dispose=2),l=new Uint8Array(4*q*r),t(y,b,c,l,q,r,-o,-p,0),1==(s=t(m,b,c,l,q,r,-o,-p,3)?1:0)?i(m,b,c,l,{x:o,y:p,width:q,height:r}):t(m,b,c,l,q,r,-o,-p,0)}else l=m.slice(0);j.push({rect:{x:o,y:p,width:q,height:r},img:l,blend:s,dispose:0})}if(d)for(k=0;k<j.length;k++)if(1!=(g=j[k]).blend){var H=g.rect,I=j[k-1].rect,J=Math.min(H.x,I.x),K=Math.min(H.y,I.y),L={x:J,y:K,width:Math.max(H.x+H.width,I.x+I.width)-J,height:Math.max(H.y+H.height,I.y+I.height)-K};j[k-1].dispose=1,0!=k-1&&h(a,b,c,j,k-1,L,e),h(a,b,c,j,k,L,e)}var M=0;if(1!=a.length)for(var N=0;N<j.length;N++)M+=(g=j[N]).rect.width*g.rect.height;return j}(a,b,c,g,j,k),z={},A=[],B=[];if(0!=e){var C=[];for(w=0;w<y.length;w++)C.push(y[w].img.buffer);var D=function(a){for(var b=0,c=0;c<a.length;c++)b+=a[c].byteLength;var d=new Uint8Array(b),e=0;for(c=0;c<a.length;c++){for(var f=new Uint8Array(a[c]),g=f.length,h=0;g>h;h+=4){var i=f[h],j=f[h+1],k=f[h+2],l=f[h+3];0==l&&(i=j=k=0),d[e+h]=i,d[e+h+1]=j,d[e+h+2]=k,d[e+h+3]=l}e+=g}return d.buffer}(C),E=l(D,e);for(w=0;w<E.plte.length;w++)A.push(E.plte[w].est.rgba);var F=0;for(w=0;w<y.length;w++){var G=(J=y[w]).img.length,H=new Uint8Array(E.inds.buffer,F>>2,G>>2);B.push(H);var I=new Uint8Array(E.abuf,F,G);o&&d(J.img,J.rect.width,J.rect.height,A,I,H),J.img.set(I),F+=G}}else for(s=0;s<y.length;s++){var J=y[s],K=new Uint32Array(J.img.buffer),L=J.rect.width;for(v=K.length,H=new Uint8Array(v),B.push(H),w=0;v>w;w++){var M=K[w];if(0!=w&&M==K[w-1])H[w]=H[w-1];else if(w>L&&M==K[w-L])H[w]=H[w-L];else{var N=z[M];if(null==N&&(z[M]=N=A.length,A.push(M),A.length>=300))break;H[w]=N}}}var O=A.length;for(256>=O&&0==n&&(q=Math.max(q=2>=O?1:4>=O?2:16>=O?4:8,m)),s=0;s<y.length;s++){(J=y[s]).rect.x,J.rect.y,L=J.rect.width;var P=J.rect.height,Q=J.img;new Uint32Array(Q.buffer);var R=4*L,S=4;if(256>=O&&0==n){R=Math.ceil(q*L/8);for(var T=new Uint8Array(R*P),U=B[s],V=0;P>V;V++){w=V*R;var W=V*L;if(8==q)for(var X=0;L>X;X++)T[w+X]=U[W+X];else if(4==q)for(X=0;L>X;X++)T[w+(X>>1)]|=U[W+X]<<4-4*(1&X);else if(2==q)for(X=0;L>X;X++)T[w+(X>>2)]|=U[W+X]<<6-2*(3&X);else if(1==q)for(X=0;L>X;X++)T[w+(X>>3)]|=U[W+X]<<7-1*(7&X)}Q=T,p=3,S=1}else if(0==x&&1==y.length){T=new Uint8Array(3*L*P);
-var Y=L*P;for(w=0;Y>w;w++){var Z=3*w,$=4*w;T[Z]=Q[$],T[Z+1]=Q[$+1],T[Z+2]=Q[$+2]}Q=T,p=2,S=3,R=3*L}J.img=Q,J.bpl=R,J.bpp=S}return{ctype:p,depth:q,plte:A,frames:y}}function h(a,b,c,d,e,f,g){for(var h=Uint8Array,j=Uint32Array,k=new h(a[e-1]),l=new j(a[e-1]),m=e+1<a.length?new h(a[e+1]):null,n=new h(a[e]),o=new j(n.buffer),p=b,q=c,r=-1,s=-1,u=0;u<f.height;u++)for(var v=0;v<f.width;v++){var w=f.x+v,x=f.y+u,y=x*b+w,z=o[y];0==z||0==d[e-1].dispose&&l[y]==z&&(null==m||0!=m[4*y+3])||(p>w&&(p=w),w>r&&(r=w),q>x&&(q=x),x>s&&(s=x))}-1==r&&(p=q=r=s=0),g&&(1==(1&p)&&p--,1==(1&q)&&q--),f={x:p,y:q,width:r-p+1,height:s-q+1};var A=d[e];A.rect=f,A.blend=1,A.img=new Uint8Array(4*f.width*f.height),0==d[e-1].dispose?(t(k,b,c,A.img,f.width,f.height,-f.x,-f.y,0),i(n,b,c,A.img,f)):t(n,b,c,A.img,f.width,f.height,-f.x,-f.y,0)}function i(a,b,c,d,e){t(a,b,c,d,e.width,e.height,-e.x,-e.y,2)}function j(a,b,c,d,e,f,g){var h,i=[],j=[0,1,2,3,4];-1!=f?j=[f]:(b*d>5e5||1==c)&&(j=[0]),g&&(h={level:0});for(var l=H,m=0;m<j.length;m++){for(var n=0;b>n;n++)k(e,a,n,d,c,j[m]);i.push(l.deflate(e,h))}var o,p=1e9;for(m=0;m<i.length;m++)i[m].length<p&&(o=m,p=i[m].length);return i[o]}function k(a,b,c,d,e,f){var g=c*d,h=g+c;if(a[h]=f,h++,0==f)if(500>d)for(var i=0;d>i;i++)a[h+i]=b[g+i];else a.set(new Uint8Array(b.buffer,g,d),h);else if(1==f){for(i=0;e>i;i++)a[h+i]=b[g+i];for(i=e;d>i;i++)a[h+i]=255&b[g+i]-b[g+i-e]+256}else if(0==c){for(i=0;e>i;i++)a[h+i]=b[g+i];if(2==f)for(i=e;d>i;i++)a[h+i]=b[g+i];if(3==f)for(i=e;d>i;i++)a[h+i]=255&b[g+i]-(b[g+i-e]>>1)+256;if(4==f)for(i=e;d>i;i++)a[h+i]=255&b[g+i]-v(b[g+i-e],0,0)+256}else{if(2==f)for(i=0;d>i;i++)a[h+i]=255&b[g+i]+256-b[g+i-d];if(3==f){for(i=0;e>i;i++)a[h+i]=255&b[g+i]+256-(b[g+i-d]>>1);for(i=e;d>i;i++)a[h+i]=255&b[g+i]+256-(b[g+i-d]+b[g+i-e]>>1)}if(4==f){for(i=0;e>i;i++)a[h+i]=255&b[g+i]+256-v(0,b[g+i-d],0);for(i=e;d>i;i++)a[h+i]=255&b[g+i]+256-v(b[g+i-e],b[g+i-d],b[g+i-e-d])}}}function l(a,b){var c,d=new Uint8Array(a),e=d.slice(0),f=new Uint32Array(e.buffer),g=m(e,b),h=g[0],i=g[1],j=d.length,k=new Uint8Array(j>>2);if(d.length<2e7)for(var l=0;j>l;l+=4)c=n(h,p=d[l]*(1/255),q=d[l+1]*(1/255),r=d[l+2]*(1/255),s=d[l+3]*(1/255)),k[l>>2]=c.ind,f[l>>2]=c.est.rgba;else for(l=0;j>l;l+=4){var p=d[l]*(1/255),q=d[l+1]*(1/255),r=d[l+2]*(1/255),s=d[l+3]*(1/255);for(c=h;c.left;)c=0>=o(c.est,p,q,r,s)?c.left:c.right;k[l>>2]=c.ind,f[l>>2]=c.est.rgba}return{abuf:e.buffer,inds:k,plte:i}}function m(a,b,c){null==c&&(c=1e-4);var d=new Uint32Array(a.buffer),e={i0:0,i1:a.length,bst:null,est:null,tdst:0,left:null,right:null};e.bst=r(a,e.i0,e.i1),e.est=s(e.bst);for(var f=[e];f.length<b;){for(var g=0,h=0,i=0;i<f.length;i++)f[i].est.L>g&&(g=f[i].est.L,h=i);if(c>g)break;var j=f[h],k=p(a,d,j.i0,j.i1,j.est.e,j.est.eMq255);if(j.i0>=k||j.i1<=k)j.est.L=0;else{var l={i0:j.i0,i1:k,bst:null,est:null,tdst:0,left:null,right:null};l.bst=r(a,l.i0,l.i1),l.est=s(l.bst);var m={i0:k,i1:j.i1,bst:null,est:null,tdst:0,left:null,right:null};for(i=0,m.bst={R:[],m:[],N:j.bst.N-l.bst.N};16>i;i++)m.bst.R[i]=j.bst.R[i]-l.bst.R[i];for(i=0;4>i;i++)m.bst.m[i]=j.bst.m[i]-l.bst.m[i];m.est=s(m.bst),j.left=l,j.right=m,f[h]=l,f.push(m)}}for(f.sort(function(a,b){return b.bst.N-a.bst.N}),i=0;i<f.length;i++)f[i].ind=i;return[e,f]}function n(a,b,c,d,e){if(null==a.left){var f,g,h,i,j,k,l,m,p;return a.tdst=(f=a.est.q,g=b,h=c,i=d,j=e,k=g-f[0],l=h-f[1],m=i-f[2],k*k+l*l+m*m+(p=j-f[3])*p),a}var q=o(a.est,b,c,d,e),r=a.left,s=a.right;q>0&&(r=a.right,s=a.left);var t=n(r,b,c,d,e);if(t.tdst<=q*q)return t;var u=n(s,b,c,d,e);return u.tdst<t.tdst?u:t}function o(a,b,c,d,e){var f=a.e;return f[0]*b+f[1]*c+f[2]*d+f[3]*e-a.eMq}function p(a,b,c,d,e,f){for(d-=4;d>c;){for(;q(a,c,e)<=f;)c+=4;for(;q(a,d,e)>f;)d-=4;if(c>=d)break;var g=b[c>>2];b[c>>2]=b[d>>2],b[d>>2]=g,c+=4,d-=4}for(;q(a,c,e)>f;)c-=4;return c+4}function q(a,b,c){return a[b]*c[0]+a[b+1]*c[1]+a[b+2]*c[2]+a[b+3]*c[3]}function r(a,b,c){for(var d=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],e=[0,0,0,0],f=b;c>f;f+=4){var g=a[f]*(1/255),h=a[f+1]*(1/255),i=a[f+2]*(1/255),j=a[f+3]*(1/255);e[0]+=g,e[1]+=h,e[2]+=i,e[3]+=j,d[0]+=g*g,d[1]+=g*h,d[2]+=g*i,d[3]+=g*j,d[5]+=h*h,d[6]+=h*i,d[7]+=h*j,d[10]+=i*i,d[11]+=i*j,d[15]+=j*j}return d[4]=d[1],d[8]=d[2],d[9]=d[6],d[12]=d[3],d[13]=d[7],d[14]=d[11],{R:d,m:e,N:c-b>>2}}function s(a){var b=a.R,c=a.m,d=a.N,e=c[0],f=c[1],g=c[2],h=c[3],i=0==d?0:1/d,j=[b[0]-e*e*i,b[1]-e*f*i,b[2]-e*g*i,b[3]-e*h*i,b[4]-f*e*i,b[5]-f*f*i,b[6]-f*g*i,b[7]-f*h*i,b[8]-g*e*i,b[9]-g*f*i,b[10]-g*g*i,b[11]-g*h*i,b[12]-h*e*i,b[13]-h*f*i,b[14]-h*g*i,b[15]-h*h*i],k=j,l=x,m=[Math.random(),Math.random(),Math.random(),Math.random()],n=0,o=0;if(0!=d)for(var p=0;16>p&&(m=l.multVec(k,m),o=Math.sqrt(l.dot(m,m)),m=l.sml(1/o,m),!(0!=p&&1e-9>Math.abs(o-n)));p++)n=o;var q=[e*i,f*i,g*i,h*i];return{Cov:j,q:q,e:m,L:n,eMq255:l.dot(l.sml(255,q),m),eMq:l.dot(m,q),rgba:(Math.round(255*q[3])<<24|Math.round(255*q[2])<<16|Math.round(255*q[1])<<8|Math.round(255*q[0])<<0)>>>0}}var t=I._copyTile,u=I._bin,v=I._paeth,w={table:function(){for(var a=new Uint32Array(256),b=0;256>b;b++){for(var c=b,d=0;8>d;d++)1&c?c=3988292384^c>>>1:c>>>=1;a[b]=c}return a}(),update:function(a,b,c,d){for(var e=0;d>e;e++)a=w.table[255&(a^b[c+e])]^a>>>8;return a},crc:function(a,b,c){return 4294967295^w.update(4294967295,a,b,c)}},x={multVec:function(a,b){return[a[0]*b[0]+a[1]*b[1]+a[2]*b[2]+a[3]*b[3],a[4]*b[0]+a[5]*b[1]+a[6]*b[2]+a[7]*b[3],a[8]*b[0]+a[9]*b[1]+a[10]*b[2]+a[11]*b[3],a[12]*b[0]+a[13]*b[1]+a[14]*b[2]+a[15]*b[3]]},dot:function(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]+a[3]*b[3]},sml:function(a,b){return[a*b[0],a*b[1],a*b[2],a*b[3]]}};I.encode=function(a,b,c,d,h,i,j){null==d&&(d=0),null==j&&(j=!1);var k=g(a,b,c,d,[!1,!1,!1,0,j,!1]);return f(k,-1),e(k,b,c,h,i)},I.encodeLL=function(a,b,c,d,g,h,i,j){for(var k={ctype:0+(1==d?0:2)+(0==g?0:4),depth:h,frames:[]},l=(d+g)*h,m=l*b,n=0;n<a.length;n++)k.frames.push({rect:{x:0,y:0,width:b,height:c},img:new Uint8Array(a[n]),blend:0,dispose:1,bpp:Math.ceil(l/8),bpl:Math.ceil(m/8)});return f(k,0,!0),e(k,b,c,i,j)},I.encode.compress=g,I.encode.dither=d,I.quantize=l,I.quantize.getKDtree=m,I.quantize.getNearest=n}();var J={toArrayBuffer:function(a,b){function c(a){r.setUint16(u,a,!0),u+=2}function d(a){r.setUint32(u,a,!0),u+=4}var e,f,g,h,i=a.width,j=a.height,k=i<<2,l=a.getContext("2d").getImageData(0,0,i,j),m=new Uint32Array(l.data.buffer),n=(32*i+31)/32<<2,o=n*j,p=122+o,q=new ArrayBuffer(p),r=new DataView(q),s=1048576,t=0,u=0,v=0;c(19778),d(p),u+=4,d(122),d(108),d(i),d(-j>>>0),c(1),c(32),d(3),d(o),d(2835),d(2835),u+=8,d(16711680),d(65280),d(255),d(4278190080),d(1466527264),function w(){for(;j>t&&s>0;){for(h=122+t*n,e=0;k>e;)s--,g=(f=m[v++])>>>24,r.setUint32(h+e,f<<8|g),e+=4;t++}v<m.length?(s=1048576,setTimeout(w,J._dly)):b(q)}()},toBlob:function(a,b){this.toArrayBuffer(a,function(a){b(new Blob([a],{type:"image/bmp"}))})},_dly:9},K={CHROME:"CHROME",FIREFOX:"FIREFOX",DESKTOP_SAFARI:"DESKTOP_SAFARI",IE:"IE",IOS:"IOS",ETC:"ETC"},L=(m(x={},K.CHROME,16384),m(x,K.FIREFOX,11180),m(x,K.DESKTOP_SAFARI,16384),m(x,K.IE,8192),m(x,K.IOS,4096),m(x,K.ETC,8192),x),M="undefined"!=typeof a,N="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope,O=M&&a.cordova&&a.cordova.require&&a.cordova.require("cordova/modulemapper"),P=((M||N)&&(O&&O.getOriginalSymbol(a,"File")||"undefined"!=typeof File&&File),(M||N)&&(O&&O.getOriginalSymbol(a,"FileReader")||"undefined"!=typeof FileReader&&FileReader));return w.getDataUrlFromFile=e,w.getFilefromDataUrl=c,w.loadImage=h,w.drawImageInCanvas=l,w.drawFileInCanvas=o,w.canvasToFile=p,w.getExifOrientation=s,w.handleMaxWidthOrHeight=t,w.followExifOrientation=u,w.cleanupCanvasMemory=q,w.isAutoOrientationInBrowser=r,w.approximateBelowMaximumCanvasSizeOfBrowser=j,w.copyExifWithoutOrientation=b,w.getBrowserName=i,w.version="2.0.2",w})()}();var f,g=b.$;return f=function(a){var b=0,c=[],d=function(){for(var d;c.length&&a>b;)d=c.shift(),b+=d[0],d[1]()};return function(a,e,f){c.push([e,f]),a.once("destroy",function(){b-=e,setTimeout(d,1)}),setTimeout(d,1)}}(5242880),g.extend(c.options,{thumb:{width:110,height:110,quality:70,allowMagnify:!0,crop:!0,preserveHeaders:!1,type:"image/jpeg"},compress:{enable:!1,maxWidthOrHeight:2e3,maxSize:10485760}}),c.register({name:"image",makeThumb:function(a,b,c,e){var h,i;return a=this.request("get-file",a),a.type.match(/^image/)?(h=g.extend({},this.options.thumb),g.isPlainObject(c)&&(h=g.extend(h,c),c=null),c=c||h.width,e=e||h.height,i=new d(h),i.once("load",function(){a._info=a._info||i.info(),a._meta=a._meta||i.meta(),1>=c&&c>0&&(c=a._info.width*c),1>=e&&e>0&&(e=a._info.height*e),i.resize(c,e)}),i.once("complete",function(){b(!1,i.getAsDataUrl(h.type)),i.destroy()}),i.once("error",function(a){b(a||!0),i.destroy()}),f(i,a.source.size,function(){a._info&&i.info(a._info),a._meta&&i.meta(a._meta),i.loadFromBlob(a.source)}),void 0):(b(!0),void 0)},beforeSendFile:function(a){var c,d=this.options.compress;return a=this.request("get-file",a),d&&d.enable&&~"image/jpeg,image/jpg,image/png".indexOf(a.type)&&!a._compressed?(d=g.extend({},d),c=b.Deferred(),e(a.source.source,{maxSizeMB:d.maxSize/1024/1024,maxWidthOrHeight:d.maxWidthOrHeight}).then(function(b){d.debug&&console.log("webuploader.compress",(100*(b.size/a.size)).toFixed(2)+"%");var e=a.size;a.source.source=b,a.source.size=b.size,a.size=b.size,a.trigger("resize",b.size,e),a._compressed=!0,c.resolve()}).catch(function(a){console.error("webuploader.compress.error",a),c.resolve()}),c.promise()):void 0}})}),b("file",["base","mediator"],function(a,b){function c(){return f+g++}function d(a){this.name=a.name||"Untitled",this.size=a.size||0,this.type=a.type||"application/octet-stream",this.lastModifiedDate=a.lastModifiedDate||1*new Date,this.id=c(),this.ext=h.exec(this.name)?RegExp.$1:"",this.statusText="",i[this.id]=d.Status.INITED,this.source=a,this.loaded=0,this.on("error",function(a){this.setStatus(d.Status.ERROR,a)})}var e=a.$,f="WU_FILE_",g=0,h=/\.([^.]+)$/,i={};return e.extend(d.prototype,{setStatus:function(a,b){var c=i[this.id];"undefined"!=typeof b&&(this.statusText=b),a!==c&&(i[this.id]=a,this.trigger("statuschange",a,c))},getStatus:function(){return i[this.id]},getSource:function(){return this.source},destroy:function(){this.off(),delete i[this.id]}}),b.installTo(d.prototype),d.Status={INITED:"inited",QUEUED:"queued",PROGRESS:"progress",ERROR:"error",COMPLETE:"complete",CANCELLED:"cancelled",INTERRUPT:"interrupt",INVALID:"invalid"},d}),b("queue",["base","mediator","file"],function(a,b,c){function d(){this.stats={numOfQueue:0,numOfSuccess:0,numOfCancel:0,numOfProgress:0,numOfUploadFailed:0,numOfInvalid:0,numOfDeleted:0,numOfInterrupt:0},this._queue=[],this._map={}}var e=a.$,f=c.Status;return e.extend(d.prototype,{append:function(a){return this._queue.push(a),this._fileAdded(a),this},prepend:function(a){return this._queue.unshift(a),this._fileAdded(a),this},getFile:function(a){return"string"!=typeof a?a:this._map[a]},fetch:function(a){var b,c,d=this._queue.length;for(a=a||f.QUEUED,b=0;d>b;b++)if(c=this._queue[b],a===c.getStatus())return c;return null},sort:function(a){"function"==typeof a&&this._queue.sort(a)},getFiles:function(){for(var a,b=[].slice.call(arguments,0),c=[],d=0,f=this._queue.length;f>d;d++)a=this._queue[d],(!b.length||~e.inArray(a.getStatus(),b))&&c.push(a);return c},removeFile:function(a){var b=this._map[a.id];b&&(delete this._map[a.id],this._delFile(a),a.destroy(),this.stats.numOfDeleted++)},_fileAdded:function(a){var b=this,c=this._map[a.id];c||(this._map[a.id]=a,a.on("statuschange",function(a,c){b._onFileStatusChange(a,c)})),a.setStatus(f.QUEUED)},_delFile:function(a){for(var b=this._queue.length-1;b>=0;b--)if(this._queue[b]==a){this._queue.splice(b,1);break}},_onFileStatusChange:function(a,b){var c=this.stats;switch(b){case f.PROGRESS:c.numOfProgress--;break;case f.QUEUED:c.numOfQueue--;break;case f.ERROR:c.numOfUploadFailed--;break;case f.INVALID:c.numOfInvalid--;break;case f.INTERRUPT:c.numOfInterrupt--}switch(a){case f.QUEUED:c.numOfQueue++;break;case f.PROGRESS:c.numOfProgress++;break;case f.ERROR:c.numOfUploadFailed++;break;case f.COMPLETE:c.numOfSuccess++;break;case f.CANCELLED:c.numOfCancel++;break;case f.INVALID:c.numOfInvalid++;break;case f.INTERRUPT:c.numOfInterrupt++}}}),b.installTo(d.prototype),d}),b("widgets/queue",["base","uploader","queue","file","lib/file","runtime/client","widgets/widget"],function(a,b,c,d,e,f){var g=a.$,h=/\.\w+$/,i=d.Status;return b.register({name:"queue",init:function(b){var d,e,h,i,j,k,l,m=this;if(g.isPlainObject(b.accept)&&(b.accept=[b.accept]),b.accept){for(j=[],h=0,e=b.accept.length;e>h;h++)i=b.accept[h].extensions,i&&j.push(i);j.length&&(k="\\."+j.join(",").replace(/,/g,"$|\\.").replace(/\*/g,".*")+"$"),m.accept=new RegExp(k,"i")}return m.queue=new c,m.stats=m.queue.stats,"html5"===this.request("predict-runtime-type")?(d=a.Deferred(),this.placeholder=l=new f("Placeholder"),l.connectRuntime({runtimeOrder:"html5"},function(){m._ruid=l.getRuid(),d.resolve()}),d.promise()):void 0},_wrapFile:function(a){if(!(a instanceof d)){if(!(a instanceof e)){if(!this._ruid)throw new Error("Can't add external files.");a=new e(this._ruid,a)}a=new d(a)}return a},acceptFile:function(a){var b=!a||!a.size||this.accept&&h.exec(a.name)&&!this.accept.test(a.name);return!b},_addFile:function(a){var b=this;return a=b._wrapFile(a),b.owner.trigger("beforeFileQueued",a)?b.acceptFile(a)?(b.queue.append(a),b.owner.trigger("fileQueued",a),a):(b.owner.trigger("error","Q_TYPE_DENIED",a),void 0):void 0},getFile:function(a){return this.queue.getFile(a)},addFile:function(a){var b=this;a.length||(a=[a]),a=g.map(a,function(a){return b._addFile(a)}),a.length&&(b.owner.trigger("filesQueued",a),b.options.auto&&setTimeout(function(){b.request("start-upload")},20))},getStats:function(){return this.stats},removeFile:function(a,b){var c=this;a=a.id?a:c.queue.getFile(a),this.request("cancel-file",a),b&&this.queue.removeFile(a)},getFiles:function(){return this.queue.getFiles.apply(this.queue,arguments)},fetchFile:function(){return this.queue.fetch.apply(this.queue,arguments)},retry:function(a,b){var c,d,e,f=this;if(a)return a=a.id?a:f.queue.getFile(a),a.setStatus(i.QUEUED),b||f.request("start-upload"),void 0;for(c=f.queue.getFiles(i.ERROR),d=0,e=c.length;e>d;d++)a=c[d],a.setStatus(i.QUEUED);f.request("start-upload")},sortFiles:function(){return this.queue.sort.apply(this.queue,arguments)},reset:function(){this.owner.trigger("reset"),this.queue=new c,this.stats=this.queue.stats},destroy:function(){this.reset(),this.placeholder&&this.placeholder.destroy()}})}),b("widgets/runtime",["uploader","runtime/runtime","widgets/widget"],function(a,b){return a.support=function(){return b.hasRuntime.apply(b,arguments)},a.register({name:"runtime",init:function(){if(!this.predictRuntimeType())throw Error("Runtime Error")},predictRuntimeType:function(){var a,c,d=this.options.runtimeOrder||b.orders,e=this.type;if(!e)for(d=d.split(/\s*,\s*/g),a=0,c=d.length;c>a;a++)if(b.hasRuntime(d[a])){this.type=e=d[a];break}return e}})}),b("lib/transport",["base","runtime/client","mediator"],function(a,b,c){function d(a){var c=this;a=c.options=e.extend(!0,{},d.options,a||{}),b.call(this,"Transport"),this._blob=null,this._formData=a.formData||{},this._headers=a.headers||{},this.on("progress",this._timeout),this.on("load error",function(){c.trigger("progress",1),clearTimeout(c._timer)})}var e=a.$;return d.options={server:"",method:"POST",withCredentials:!1,fileVal:"file",timeout:12e4,formData:{},headers:{},sendAsBinary:!1},e.extend(d.prototype,{appendBlob:function(a,b,c){var d=this,e=d.options;d.getRuid()&&d.disconnectRuntime(),d.connectRuntime(b.ruid,function(){d.exec("init")}),d._blob=b,e.fileVal=a||e.fileVal,e.filename=c||e.filename},append:function(a,b){"object"==typeof a?e.extend(this._formData,a):this._formData[a]=b},setRequestHeader:function(a,b){"object"==typeof a?e.extend(this._headers,a):this._headers[a]=b},send:function(a){this.exec("send",a),this._timeout()},abort:function(){return clearTimeout(this._timer),this.exec("abort")},destroy:function(){this.trigger("destroy"),this.off(),this.exec("destroy"),this.disconnectRuntime()},getResponseHeaders:function(){return this.exec("getResponseHeaders")},getResponse:function(){return this.exec("getResponse")},getResponseAsJson:function(){return this.exec("getResponseAsJson")},getStatus:function(){return this.exec("getStatus")},_timeout:function(){var a=this,b=a.options.timeout;b&&(clearTimeout(a._timer),a._timer=setTimeout(function(){a.abort(),a.trigger("error","timeout")},b))}}),c.installTo(d.prototype),d}),b("widgets/upload",["base","uploader","file","lib/transport","widgets/widget"],function(a,b,c,d){function e(a,b){var c,d,e=[],f=a.source,g=f.size,h=b?Math.ceil(g/b):1,i=0,j=0;for(d={file:a,has:function(){return!!e.length},shift:function(){return e.shift()},unshift:function(a){e.unshift(a)}};h>j;)c=Math.min(b,g-i),e.push({file:a,start:i,end:b?i+c:g,total:g,chunks:h,chunk:j++,cuted:d}),i+=c;return a.blocks=e.concat(),a.remaning=e.length,d}var f=a.$,g=a.isPromise,h=c.Status;f.extend(b.options,{prepareNextFile:!1,chunked:!1,chunkSize:5242880,chunkRetry:2,chunkRetryDelay:1e3,threads:3,formData:{}}),b.register({name:"upload",init:function(){var b=this.owner,c=this;this.runing=!1,this.progress=!1,b.on("startUpload",function(){c.progress=!0}).on("uploadFinished",function(){c.progress=!1}),this.pool=[],this.stack=[],this.pending=[],this.remaning=0,this.__tick=a.bindFn(this._tick,this),b.on("uploadComplete",function(a){a.blocks&&f.each(a.blocks,function(a,b){b.transport&&(b.transport.abort(),b.transport.destroy()),delete b.transport}),delete a.blocks,delete a.remaning})},reset:function(){this.request("stop-upload",!0),this.runing=!1,this.pool=[],this.stack=[],this.pending=[],this.remaning=0,this._trigged=!1,this._promise=null},startUpload:function(b){var c=this;if(f.each(c.request("get-files",h.INVALID),function(){c.request("remove-file",this)}),b?(b=b.id?b:c.request("get-file",b),b.getStatus()===h.INTERRUPT?(b.setStatus(h.QUEUED),f.each(c.pool,function(a,c){c.file===b&&(c.transport&&c.transport.send(),b.setStatus(h.PROGRESS))})):b.getStatus()!==h.PROGRESS&&b.setStatus(h.QUEUED)):f.each(c.request("get-files",[h.INITED]),function(){this.setStatus(h.QUEUED)}),c.runing)return c.owner.trigger("startUpload",b),a.nextTick(c.__tick);c.runing=!0;var d=[];b||f.each(c.pool,function(a,b){var e=b.file;if(e.getStatus()===h.INTERRUPT){if(c._trigged=!1,d.push(e),b.waiting)return;b.transport?b.transport.send():c._doSend(b)}}),f.each(d,function(){this.setStatus(h.PROGRESS)}),b||f.each(c.request("get-files",h.INTERRUPT),function(){this.setStatus(h.PROGRESS)}),c._trigged=!1,a.nextTick(c.__tick),c.owner.trigger("startUpload")},stopUpload:function(b,c){var d=this;if(b===!0&&(c=b,b=null),d.runing!==!1){if(b){if(b=b.id?b:d.request("get-file",b),b.getStatus()!==h.PROGRESS&&b.getStatus()!==h.QUEUED)return;return b.setStatus(h.INTERRUPT),f.each(d.pool,function(a,e){e.file===b&&(e.transport&&e.transport.abort(),c&&(d._putback(e),d._popBlock(e)))}),d.owner.trigger("stopUpload",b),a.nextTick(d.__tick)}d.runing=!1,this._promise&&this._promise.file&&this._promise.file.setStatus(h.INTERRUPT),c&&f.each(d.pool,function(a,b){b.transport&&b.transport.abort(),b.file.setStatus(h.INTERRUPT)}),d.owner.trigger("stopUpload")}},cancelFile:function(a){a=a.id?a:this.request("get-file",a),a.blocks&&f.each(a.blocks,function(a,b){var c=b.transport;c&&(c.abort(),c.destroy(),delete b.transport)}),a.setStatus(h.CANCELLED),this.owner.trigger("fileDequeued",a)},isInProgress:function(){return!!this.progress},_getStats:function(){return this.request("get-stats")},skipFile:function(a,b){a=a.id?a:this.request("get-file",a),a.setStatus(b||h.COMPLETE),a.skipped=!0,a.blocks&&f.each(a.blocks,function(a,b){var c=b.transport;c&&(c.abort(),c.destroy(),delete b.transport)}),this.owner.trigger("uploadSkip",a)},_tick:function(){var b,c,d=this,e=d.options;return d._promise?d._promise.always(d.__tick):(d.pool.length<e.threads&&(c=d._nextBlock())?(d._trigged=!1,b=function(b){d._promise=null,b&&b.file&&d._startSend(b),a.nextTick(d.__tick)},d._promise=g(c)?c.always(b):b(c)):d.remaning||d._getStats().numOfQueue||d._getStats().numOfInterrupt||(d.runing=!1,d._trigged||a.nextTick(function(){d.owner.trigger("uploadFinished")}),d._trigged=!0),void 0)},_putback:function(a){var b;a.cuted.unshift(a),b=this.stack.indexOf(a.cuted),~b||(this.remaning++,a.file.remaning++,this.stack.unshift(a.cuted))},_getStack:function(){for(var a,b=0;a=this.stack[b++];){if(a.has()&&a.file.getStatus()===h.PROGRESS)return a;(!a.has()||a.file.getStatus()!==h.PROGRESS&&a.file.getStatus()!==h.INTERRUPT)&&this.stack.splice(--b,1)}return null},_nextBlock:function(){var a,b,c,d,f=this,h=f.options;return(a=this._getStack())?(h.prepareNextFile&&!f.pending.length&&f._prepareNextFile(),a.shift()):f.runing?(!f.pending.length&&f._getStats().numOfQueue&&f._prepareNextFile(),b=f.pending.shift(),c=function(b){return b?(a=e(b,h.chunked?h.chunkSize:0),f.stack.push(a),a.shift()):null},g(b)?(d=b.file,b=b[b.pipe?"pipe":"then"](c),b.file=d,b):c(b)):void 0},_prepareNextFile:function(){var a,b=this,c=b.request("fetch-file"),d=b.pending;c&&(a=b.request("before-send-file",c,function(){return c.getStatus()===h.PROGRESS||c.getStatus()===h.INTERRUPT?c:b._finishFile(c)}),b.owner.trigger("uploadStart",c),c.setStatus(h.PROGRESS),a.file=c,a.done(function(){var b=f.inArray(a,d);~b&&d.splice(b,1,c)}),a.fail(function(a){c.setStatus(h.ERROR,a),b.owner.trigger("uploadError",c,a),b.owner.trigger("uploadComplete",c)}),d.push(a))},_popBlock:function(a){var b=f.inArray(a,this.pool);this.pool.splice(b,1),a.file.remaning--,this.remaning--},_startSend:function(b){var c,d=this,e=b.file;return e.getStatus()!==h.PROGRESS?(e.getStatus()===h.INTERRUPT&&d._putback(b),void 0):(d.pool.push(b),d.remaning++,b.blob=1===b.chunks?e.source:e.source.slice(b.start,b.end),b.waiting=c=d.request("before-send",b,function(){delete b.waiting,e.getStatus()===h.PROGRESS?d._doSend(b):b.file.getStatus()!==h.INTERRUPT&&d._popBlock(b),a.nextTick(d.__tick)}),c.fail(function(){delete b.waiting,1===e.remaning?d._finishFile(e).always(function(){b.percentage=1,d._popBlock(b),d.owner.trigger("uploadComplete",e),a.nextTick(d.__tick)}):(b.percentage=1,d.updateFileProgress(e),d._popBlock(b),a.nextTick(d.__tick))}),void 0)},_doSend:function(b){var c,e,g=this,i=g.owner,j=f.extend({},g.options,b.options),k=b.file,l=new d(j),m=f.extend({},j.formData),n=f.extend({},j.headers);b.transport=l,l.on("destroy",function(){delete b.transport,g._popBlock(b),a.nextTick(g.__tick)}),l.on("progress",function(a){b.percentage=a,g.updateFileProgress(k)}),c=function(a){var c;return e=l.getResponseAsJson()||{},e._raw=l.getResponse(),e._headers=l.getResponseHeaders(),b.response=e,c=function(b){a=b},i.trigger("uploadAccept",b,e,c)||(a=a||"server"),a},l.on("error",function(a,d){var e,f,m=a.split("|");a=m[0],e=parseFloat(m[1]),f=m[2],b.retried=b.retried||0,b.chunks>1&&~"http,abort,server".indexOf(a.replace(/-.*/,""))&&b.retried<j.chunkRetry?(b.retried++,g.retryTimer=setTimeout(function(){l.send()},j.chunkRetryDelay||1e3)):(d||"server"!==a||(a=c(a)),k.setStatus(h.ERROR,a),i.trigger("uploadError",k,a,e,f),i.trigger("uploadComplete",k))}),l.on("load",function(){var a;return(a=c())?(l.trigger("error",a,!0),void 0):(1===k.remaning?g._finishFile(k,e):l.destroy(),void 0)}),m=f.extend(m,{id:k.id,name:k.name,type:k.type,lastModifiedDate:k.lastModifiedDate,size:k.size}),b.chunks>1&&f.extend(m,{chunks:b.chunks,chunk:b.chunk}),i.trigger("uploadBeforeSend",b,m,n),l.appendBlob(j.fileVal,b.blob,k.name),l.append(m),l.setRequestHeader(n),l.send()},_finishFile:function(a,b,c){var d=this.owner;return d.request("after-send-file",arguments,function(){a.setStatus(h.COMPLETE),d.trigger("uploadSuccess",a,b,c)}).fail(function(b){a.getStatus()===h.PROGRESS&&a.setStatus(h.ERROR,b),d.trigger("uploadError",a,b)}).always(function(){d.trigger("uploadComplete",a)})},updateFileProgress:function(a){var b=0,c=0;a.blocks&&(f.each(a.blocks,function(a,b){c+=(b.percentage||0)*(b.end-b.start)}),b=c/a.size,this.owner.trigger("uploadProgress",a,b||0))},destroy:function(){clearTimeout(this.retryTimer)}})}),b("widgets/validator",["base","uploader","file","widgets/widget"],function(a,b,c){var d,e=a.$,f={};return d={addValidator:function(a,b){f[a]=b},removeValidator:function(a){delete f[a]}},b.register({name:"validator",init:function(){var b=this;a.nextTick(function(){e.each(f,function(){this.call(b.owner)})})}}),d.addValidator("fileNumLimit",function(){var a=this,b=a.options,c=0,d=parseInt(b.fileNumLimit,10),e=!0;d&&(a.on("beforeFileQueued",function(a){return this.trigger("beforeFileQueuedCheckfileNumLimit",a,c)?(c>=d&&e&&(e=!1,this.trigger("error","Q_EXCEED_NUM_LIMIT",d,a),setTimeout(function(){e=!0},1)),c>=d?!1:!0):!1}),a.on("fileQueued",function(){c++}),a.on("fileDequeued",function(){c--}),a.on("reset",function(){c=0}))}),d.addValidator("fileSizeLimit",function(){var a=this,b=a.options,c=0,d=parseInt(b.fileSizeLimit,10),e=!0;d&&(a.on("beforeFileQueued",function(a){var b=c+a.size>d;return b&&e&&(e=!1,this.trigger("error","Q_EXCEED_SIZE_LIMIT",d,a),setTimeout(function(){e=!0},1)),b?!1:!0}),a.on("fileQueued",function(a){c+=a.size}),a.on("fileDequeued",function(a){c-=a.size}),a.on("reset",function(){c=0}))}),d.addValidator("fileSingleSizeLimit",function(){var a=this,b=a.options,d=b.fileSingleSizeLimit;d&&a.on("beforeFileQueued",function(a){return a.size>d?(a.setStatus(c.Status.INVALID,"exceed_size"),this.trigger("error","F_EXCEED_SIZE",d,a),!1):void 0})}),d.addValidator("duplicate",function(){function a(a){for(var b,c=0,d=0,e=a.length;e>d;d++)b=a.charCodeAt(d),c=b+(c<<6)+(c<<16)-c;return c}var b=this,c=b.options,d={};c.duplicate||(b.on("beforeFileQueued",function(b){var c=b.__hash||(b.__hash=a(b.name+b.size+b.lastModifiedDate));return d[c]?(this.trigger("error","F_DUPLICATE",b),!1):void 0}),b.on("fileQueued",function(a){var b=a.__hash;b&&(d[b]=!0)}),b.on("fileDequeued",function(a){var b=a.__hash;b&&delete d[b]}),b.on("reset",function(){d={}}))}),d}),b("lib/md5",["runtime/client","mediator"],function(a,b){function c(){a.call(this,"Md5")}return b.installTo(c.prototype),c.prototype.loadFromBlob=function(a){var b=this;b.getRuid()&&b.disconnectRuntime(),b.connectRuntime(a.ruid,function(){b.exec("init"),b.exec("loadFromBlob",a)})},c.prototype.getResult=function(){return this.exec("getResult")},c}),b("widgets/md5",["base","uploader","lib/md5","lib/blob","widgets/widget"],function(a,b,c,d){return b.register({name:"md5",md5File:function(b,e,f){var g=new c,h=a.Deferred(),i=b instanceof d?b:this.request("get-file",b).source;return g.on("progress load",function(a){a=a||{},h.notify(a.total?a.loaded/a.total:1)}),g.on("complete",function(){h.resolve(g.getResult())}),g.on("error",function(a){h.reject(a)}),arguments.length>1&&(e=e||0,f=f||0,0>e&&(e=i.size+e),0>f&&(f=i.size+f),f=Math.min(f,i.size),i=i.slice(e,f)),g.loadFromBlob(i),h.promise()}})}),b("runtime/compbase",[],function(){function a(a,b){this.owner=a,this.options=a.options,this.getRuntime=function(){return b},this.getRuid=function(){return b.uid},this.trigger=function(){return a.trigger.apply(a,arguments)}}return a}),b("runtime/html5/runtime",["base","runtime/runtime","runtime/compbase"],function(b,c,d){function e(){var a={},d=this,e=this.destroy;c.apply(d,arguments),d.type=f,d.exec=function(c,e){var f,h=this,i=h.uid,j=b.slice(arguments,2);return g[c]&&(f=a[i]=a[i]||new g[c](h,d),f[e])?f[e].apply(f,j):void 0},d.destroy=function(){return e&&e.apply(this,arguments)}}var f="html5",g={};return b.inherits(c,{constructor:e,init:function(){var a=this;setTimeout(function(){a.trigger("ready")},1)}}),e.register=function(a,c){var e=g[a]=b.inherits(d,c);return e},a.Blob&&a.FileReader&&a.DataView&&c.addRuntime(f,e),e}),b("runtime/html5/blob",["runtime/html5/runtime","lib/blob"],function(a,b){return a.register("Blob",{slice:function(a,c){var d=this.owner.source,e=d.slice||d.webkitSlice||d.mozSlice;return d=e.call(d,a,c),new b(this.getRuid(),d)}})}),b("runtime/html5/dnd",["base","runtime/html5/runtime","lib/file"],function(a,b,c){var d=a.$,e="webuploader-dnd-";return b.register("DragAndDrop",{init:function(){var b=this.elem=this.options.container;this.dragEnterHandler=a.bindFn(this._dragEnterHandler,this),this.dragOverHandler=a.bindFn(this._dragOverHandler,this),this.dragLeaveHandler=a.bindFn(this._dragLeaveHandler,this),this.dropHandler=a.bindFn(this._dropHandler,this),this.dndOver=!1,b.on("dragenter",this.dragEnterHandler),b.on("dragover",this.dragOverHandler),b.on("dragleave",this.dragLeaveHandler),b.on("drop",this.dropHandler),this.options.disableGlobalDnd&&(d(document).on("dragover",this.dragOverHandler),d(document).on("drop",this.dropHandler))},_dragEnterHandler:function(a){var b,c=this,d=c._denied||!1;return a=a.originalEvent||a,c.dndOver||(c.dndOver=!0,b=a.dataTransfer.items,b&&b.length&&(c._denied=d=!c.trigger("accept",b)),c.elem.addClass(e+"over"),c.elem[d?"addClass":"removeClass"](e+"denied")),a.dataTransfer.dropEffect=d?"none":"copy",!1},_dragOverHandler:function(a){var b=this.elem.parent().get(0);return b&&!d.contains(b,a.currentTarget)?!1:(clearTimeout(this._leaveTimer),this._dragEnterHandler.call(this,a),!1)},_dragLeaveHandler:function(){var a,b=this;return a=function(){b.dndOver=!1,b.elem.removeClass(e+"over "+e+"denied")},clearTimeout(b._leaveTimer),b._leaveTimer=setTimeout(a,100),!1},_dropHandler:function(a){var b,f,g=this,h=g.getRuid(),i=g.elem.parent().get(0);if(i&&!d.contains(i,a.currentTarget))return!1;a=a.originalEvent||a,b=a.dataTransfer;try{f=b.getData("text/html")}catch(j){}return g.dndOver=!1,g.elem.removeClass(e+"over"),b&&!f?(g._getTansferFiles(b,function(a){g.trigger("drop",d.map(a,function(a){return new c(h,a)}))}),!1):void 0},_getTansferFiles:function(b,c){var d,e,f,g,h,i,j,k=[],l=[];for(d=b.items,e=b.files,j=!(!d||!d[0].webkitGetAsEntry),h=0,i=e.length;i>h;h++)f=e[h],g=d&&d[h],j&&g.webkitGetAsEntry().isDirectory?l.push(this._traverseDirectoryTree(g.webkitGetAsEntry(),k)):k.push(f);a.when.apply(a,l).done(function(){k.length&&c(k)})},_traverseDirectoryTree:function(b,c){var d=a.Deferred(),e=this;return b.isFile?b.file(function(a){c.push(a),d.resolve()}):b.isDirectory&&b.createReader().readEntries(function(b){var f,g=b.length,h=[],i=[];for(f=0;g>f;f++)h.push(e._traverseDirectoryTree(b[f],i));a.when.apply(a,h).then(function(){c.push.apply(c,i),d.resolve()},d.reject)}),d.promise()},destroy:function(){var a=this.elem;a&&(a.off("dragenter",this.dragEnterHandler),a.off("dragover",this.dragOverHandler),a.off("dragleave",this.dragLeaveHandler),a.off("drop",this.dropHandler),this.options.disableGlobalDnd&&(d(document).off("dragover",this.dragOverHandler),d(document).off("drop",this.dropHandler)))}})}),b("runtime/html5/filepaste",["base","runtime/html5/runtime","lib/file"],function(a,b,c){return b.register("FilePaste",{init:function(){var b,c,d,e,f=this.options,g=this.elem=f.container,h=".*";if(f.accept){for(b=[],c=0,d=f.accept.length;d>c;c++)e=f.accept[c].mimeTypes,e&&b.push(e);b.length&&(h=b.join(","),h=h.replace(/,/g,"|").replace(/\*/g,".*"))}this.accept=h=new RegExp(h,"i"),this.hander=a.bindFn(this._pasteHander,this),g.on("paste",this.hander)},_pasteHander:function(a){var b,d,e,f,g,h=[],i=this.getRuid();for(a=a.originalEvent||a,b=a.clipboardData.items,f=0,g=b.length;g>f;f++)d=b[f],"file"===d.kind&&(e=d.getAsFile())&&h.push(new c(i,e));h.length&&(a.preventDefault(),a.stopPropagation(),this.trigger("paste",h))},destroy:function(){this.elem.off("paste",this.hander)}})}),b("runtime/html5/filepicker",["base","runtime/html5/runtime"],function(a,b){var c=a.$;return b.register("FilePicker",{init:function(){var a,b,d,e,f,g=this.getRuntime().getContainer(),h=this,i=h.owner,j=h.options,k=this.label=c(document.createElement("label")),l=this.input=c(document.createElement("input"));if(l.attr("type","file"),l.attr("capture","camera"),l.attr("name",j.name),l.addClass("webuploader-element-invisible"),k.on("click",function(a){l.trigger("click"),a.stopPropagation(),i.trigger("dialogopen")}),k.css({opacity:0,width:"100%",height:"100%",display:"block",cursor:"pointer",background:"#ffffff"}),j.multiple&&l.attr("multiple","multiple"),j.accept&&j.accept.length>0){for(a=[],b=0,d=j.accept.length;d>b;b++)a.push(j.accept[b].mimeTypes);
-l.attr("accept",a.join(","))}g.append(l),g.append(k),e=function(a){i.trigger(a.type)},f=function(a){var b;return 0===a.target.files.length?!1:(h.files=a.target.files,b=this.cloneNode(!0),b.value=null,this.parentNode.replaceChild(b,this),l.off(),l=c(b).on("change",f).on("mouseenter mouseleave",e),i.trigger("change"),void 0)},l.on("change",f),k.on("mouseenter mouseleave",e)},getFiles:function(){return this.files},destroy:function(){this.input.off(),this.label.off()}})}),b("runtime/html5/util",["base"],function(b){var c=a.createObjectURL&&a||a.URL&&URL.revokeObjectURL&&URL||a.webkitURL,d=b.noop,e=d;return c&&(d=function(){return c.createObjectURL.apply(c,arguments)},e=function(){return c.revokeObjectURL.apply(c,arguments)}),{createObjectURL:d,revokeObjectURL:e,dataURL2Blob:function(a){var b,c,d,e,f,g;for(g=a.split(","),b=~g[0].indexOf("base64")?atob(g[1]):decodeURIComponent(g[1]),d=new ArrayBuffer(b.length),c=new Uint8Array(d),e=0;e<b.length;e++)c[e]=b.charCodeAt(e);return f=g[0].split(":")[1].split(";")[0],this.arrayBufferToBlob(d,f)},dataURL2ArrayBuffer:function(a){var b,c,d,e;for(e=a.split(","),b=~e[0].indexOf("base64")?atob(e[1]):decodeURIComponent(e[1]),c=new Uint8Array(b.length),d=0;d<b.length;d++)c[d]=b.charCodeAt(d);return c.buffer},arrayBufferToBlob:function(b,c){var d,e=a.BlobBuilder||a.WebKitBlobBuilder;return e?(d=new e,d.append(b),d.getBlob(c)):new Blob([b],c?{type:c}:{})},canvasToDataUrl:function(a,b,c){return a.toDataURL(b,c/100)},parseMeta:function(a,b){b(!1,{})},updateImageHead:function(a){return a}}}),b("runtime/html5/imagemeta",["runtime/html5/util"],function(a){var b;return b={parsers:{65505:[]},maxMetaDataSize:262144,parse:function(a,b){var c=this,d=new FileReader;d.onload=function(){b(!1,c._parse(this.result)),d=d.onload=d.onerror=null},d.onerror=function(a){b(a.message),d=d.onload=d.onerror=null},a=a.slice(0,c.maxMetaDataSize),d.readAsArrayBuffer(a.getSource())},_parse:function(a,c){if(!(a.byteLength<6)){var d,e,f,g,h=new DataView(a),i=2,j=h.byteLength-4,k=i,l={};if(65496===h.getUint16(0)){for(;j>i&&(d=h.getUint16(i),d>=65504&&65519>=d||65534===d)&&(e=h.getUint16(i+2)+2,!(i+e>h.byteLength));){if(f=b.parsers[d],!c&&f)for(g=0;g<f.length;g+=1)f[g].call(b,h,i,e,l);i+=e,k=i}k>6&&(l.imageHead=a.slice?a.slice(2,k):new Uint8Array(a).subarray(2,k))}return l}},updateImageHead:function(a,b){var c,d,e,f=this._parse(a,!0);return e=2,f.imageHead&&(e=2+f.imageHead.byteLength),d=a.slice?a.slice(e):new Uint8Array(a).subarray(e),c=new Uint8Array(b.byteLength+2+d.byteLength),c[0]=255,c[1]=216,c.set(new Uint8Array(b),2),c.set(new Uint8Array(d),b.byteLength+2),c.buffer}},a.parseMeta=function(){return b.parse.apply(b,arguments)},a.updateImageHead=function(){return b.updateImageHead.apply(b,arguments)},b}),b("runtime/html5/imagemeta/exif",["base","runtime/html5/imagemeta"],function(a,b){var c={};return c.ExifMap=function(){return this},c.ExifMap.prototype.map={Orientation:274},c.ExifMap.prototype.get=function(a){return this[a]||this[this.map[a]]},c.exifTagTypes={1:{getValue:function(a,b){return a.getUint8(b)},size:1},2:{getValue:function(a,b){return String.fromCharCode(a.getUint8(b))},size:1,ascii:!0},3:{getValue:function(a,b,c){return a.getUint16(b,c)},size:2},4:{getValue:function(a,b,c){return a.getUint32(b,c)},size:4},5:{getValue:function(a,b,c){return a.getUint32(b,c)/a.getUint32(b+4,c)},size:8},9:{getValue:function(a,b,c){return a.getInt32(b,c)},size:4},10:{getValue:function(a,b,c){return a.getInt32(b,c)/a.getInt32(b+4,c)},size:8}},c.exifTagTypes[7]=c.exifTagTypes[1],c.getExifValue=function(b,d,e,f,g,h){var i,j,k,l,m,n,o=c.exifTagTypes[f];if(!o)return a.log("Invalid Exif data: Invalid tag type."),void 0;if(i=o.size*g,j=i>4?d+b.getUint32(e+8,h):e+8,j+i>b.byteLength)return a.log("Invalid Exif data: Invalid data offset."),void 0;if(1===g)return o.getValue(b,j,h);for(k=[],l=0;g>l;l+=1)k[l]=o.getValue(b,j+l*o.size,h);if(o.ascii){for(m="",l=0;l<k.length&&(n=k[l],"\0"!==n);l+=1)m+=n;return m}return k},c.parseExifTag=function(a,b,d,e,f){var g=a.getUint16(d,e);f.exif[g]=c.getExifValue(a,b,d,a.getUint16(d+2,e),a.getUint32(d+4,e),e)},c.parseExifTags=function(b,c,d,e,f){var g,h,i;if(d+6>b.byteLength)return a.log("Invalid Exif data: Invalid directory offset."),void 0;if(g=b.getUint16(d,e),h=d+2+12*g,h+4>b.byteLength)return a.log("Invalid Exif data: Invalid directory size."),void 0;for(i=0;g>i;i+=1)this.parseExifTag(b,c,d+2+12*i,e,f);return b.getUint32(h,e)},c.parseExifData=function(b,d,e,f){var g,h,i=d+10;if(1165519206===b.getUint32(d+4)){if(i+8>b.byteLength)return a.log("Invalid Exif data: Invalid segment size."),void 0;if(0!==b.getUint16(d+8))return a.log("Invalid Exif data: Missing byte alignment offset."),void 0;switch(b.getUint16(i)){case 18761:g=!0;break;case 19789:g=!1;break;default:return a.log("Invalid Exif data: Invalid byte alignment marker."),void 0}if(42!==b.getUint16(i+2,g))return a.log("Invalid Exif data: Missing TIFF marker."),void 0;h=b.getUint32(i+4,g),f.exif=new c.ExifMap,h=c.parseExifTags(b,i,i+h,g,f)}},b.parsers[65505].push(c.parseExifData),c}),b("runtime/html5/jpegencoder",[],function(){function a(a){function b(a){for(var b=[16,11,10,16,24,40,51,61,12,12,14,19,26,58,60,55,14,13,16,24,40,57,69,56,14,17,22,29,51,87,80,62,18,22,37,56,68,109,103,77,24,35,55,64,81,104,113,92,49,64,78,87,103,121,120,101,72,92,95,98,112,100,103,99],c=0;64>c;c++){var d=y((b[c]*a+50)/100);1>d?d=1:d>255&&(d=255),z[P[c]]=d}for(var e=[17,18,24,47,99,99,99,99,18,21,26,66,99,99,99,99,24,26,56,99,99,99,99,99,47,66,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99],f=0;64>f;f++){var g=y((e[f]*a+50)/100);1>g?g=1:g>255&&(g=255),A[P[f]]=g}for(var h=[1,1.387039845,1.306562965,1.175875602,1,.785694958,.5411961,.275899379],i=0,j=0;8>j;j++)for(var k=0;8>k;k++)B[i]=1/(8*z[P[i]]*h[j]*h[k]),C[i]=1/(8*A[P[i]]*h[j]*h[k]),i++}function c(a,b){for(var c=0,d=0,e=new Array,f=1;16>=f;f++){for(var g=1;g<=a[f];g++)e[b[d]]=[],e[b[d]][0]=c,e[b[d]][1]=f,d++,c++;c*=2}return e}function d(){t=c(Q,R),u=c(U,V),v=c(S,T),w=c(W,X)}function e(){for(var a=1,b=2,c=1;15>=c;c++){for(var d=a;b>d;d++)E[32767+d]=c,D[32767+d]=[],D[32767+d][1]=c,D[32767+d][0]=d;for(var e=-(b-1);-a>=e;e++)E[32767+e]=c,D[32767+e]=[],D[32767+e][1]=c,D[32767+e][0]=b-1+e;a<<=1,b<<=1}}function f(){for(var a=0;256>a;a++)O[a]=19595*a,O[a+256>>0]=38470*a,O[a+512>>0]=7471*a+32768,O[a+768>>0]=-11059*a,O[a+1024>>0]=-21709*a,O[a+1280>>0]=32768*a+8421375,O[a+1536>>0]=-27439*a,O[a+1792>>0]=-5329*a}function g(a){for(var b=a[0],c=a[1]-1;c>=0;)b&1<<c&&(I|=1<<J),c--,J--,0>J&&(255==I?(h(255),h(0)):h(I),J=7,I=0)}function h(a){H.push(N[a])}function i(a){h(255&a>>8),h(255&a)}function j(a,b){var c,d,e,f,g,h,i,j,k,l=0,m=8,n=64;for(k=0;m>k;++k){c=a[l],d=a[l+1],e=a[l+2],f=a[l+3],g=a[l+4],h=a[l+5],i=a[l+6],j=a[l+7];var o=c+j,p=c-j,q=d+i,r=d-i,s=e+h,t=e-h,u=f+g,v=f-g,w=o+u,x=o-u,y=q+s,z=q-s;a[l]=w+y,a[l+4]=w-y;var A=.707106781*(z+x);a[l+2]=x+A,a[l+6]=x-A,w=v+t,y=t+r,z=r+p;var B=.382683433*(w-z),C=.5411961*w+B,D=1.306562965*z+B,E=.707106781*y,G=p+E,H=p-E;a[l+5]=H+C,a[l+3]=H-C,a[l+1]=G+D,a[l+7]=G-D,l+=8}for(l=0,k=0;m>k;++k){c=a[l],d=a[l+8],e=a[l+16],f=a[l+24],g=a[l+32],h=a[l+40],i=a[l+48],j=a[l+56];var I=c+j,J=c-j,K=d+i,L=d-i,M=e+h,N=e-h,O=f+g,P=f-g,Q=I+O,R=I-O,S=K+M,T=K-M;a[l]=Q+S,a[l+32]=Q-S;var U=.707106781*(T+R);a[l+16]=R+U,a[l+48]=R-U,Q=P+N,S=N+L,T=L+J;var V=.382683433*(Q-T),W=.5411961*Q+V,X=1.306562965*T+V,Y=.707106781*S,Z=J+Y,$=J-Y;a[l+40]=$+W,a[l+24]=$-W,a[l+8]=Z+X,a[l+56]=Z-X,l++}var _;for(k=0;n>k;++k)_=a[k]*b[k],F[k]=_>0?0|_+.5:0|_-.5;return F}function k(){i(65504),i(16),h(74),h(70),h(73),h(70),h(0),h(1),h(1),h(0),i(1),i(1),h(0),h(0)}function l(a,b){i(65472),i(17),h(8),i(b),i(a),h(3),h(1),h(17),h(0),h(2),h(17),h(1),h(3),h(17),h(1)}function m(){i(65499),i(132),h(0);for(var a=0;64>a;a++)h(z[a]);h(1);for(var b=0;64>b;b++)h(A[b])}function n(){i(65476),i(418),h(0);for(var a=0;16>a;a++)h(Q[a+1]);for(var b=0;11>=b;b++)h(R[b]);h(16);for(var c=0;16>c;c++)h(S[c+1]);for(var d=0;161>=d;d++)h(T[d]);h(1);for(var e=0;16>e;e++)h(U[e+1]);for(var f=0;11>=f;f++)h(V[f]);h(17);for(var g=0;16>g;g++)h(W[g+1]);for(var j=0;161>=j;j++)h(X[j])}function o(){i(65498),i(12),h(3),h(1),h(0),h(2),h(17),h(3),h(17),h(0),h(63),h(0)}function p(a,b,c,d,e){for(var f,h=e[0],i=e[240],k=16,l=63,m=64,n=j(a,b),o=0;m>o;++o)G[P[o]]=n[o];var p=G[0]-c;c=G[0],0==p?g(d[0]):(f=32767+p,g(d[E[f]]),g(D[f]));for(var q=63;q>0&&0==G[q];q--);if(0==q)return g(h),c;for(var r,s=1;q>=s;){for(var t=s;0==G[s]&&q>=s;++s);var u=s-t;if(u>=k){r=u>>4;for(var v=1;r>=v;++v)g(i);u=15&u}f=32767+G[s],g(e[(u<<4)+E[f]]),g(D[f]),s++}return q!=l&&g(h),c}function q(){for(var a=String.fromCharCode,b=0;256>b;b++)N[b]=a(b)}function r(a){if(0>=a&&(a=1),a>100&&(a=100),x!=a){var c=0;c=50>a?Math.floor(5e3/a):Math.floor(200-2*a),b(c),x=a}}function s(){a||(a=50),q(),d(),e(),f(),r(a)}Math.round;var t,u,v,w,x,y=Math.floor,z=new Array(64),A=new Array(64),B=new Array(64),C=new Array(64),D=new Array(65535),E=new Array(65535),F=new Array(64),G=new Array(64),H=[],I=0,J=7,K=new Array(64),L=new Array(64),M=new Array(64),N=new Array(256),O=new Array(2048),P=[0,1,5,6,14,15,27,28,2,4,7,13,16,26,29,42,3,8,12,17,25,30,41,43,9,11,18,24,31,40,44,53,10,19,23,32,39,45,52,54,20,22,33,38,46,51,55,60,21,34,37,47,50,56,59,61,35,36,48,49,57,58,62,63],Q=[0,0,1,5,1,1,1,1,1,1,0,0,0,0,0,0,0],R=[0,1,2,3,4,5,6,7,8,9,10,11],S=[0,0,2,1,3,3,2,4,3,5,5,4,4,0,0,1,125],T=[1,2,3,0,4,17,5,18,33,49,65,6,19,81,97,7,34,113,20,50,129,145,161,8,35,66,177,193,21,82,209,240,36,51,98,114,130,9,10,22,23,24,25,26,37,38,39,40,41,42,52,53,54,55,56,57,58,67,68,69,70,71,72,73,74,83,84,85,86,87,88,89,90,99,100,101,102,103,104,105,106,115,116,117,118,119,120,121,122,131,132,133,134,135,136,137,138,146,147,148,149,150,151,152,153,154,162,163,164,165,166,167,168,169,170,178,179,180,181,182,183,184,185,186,194,195,196,197,198,199,200,201,202,210,211,212,213,214,215,216,217,218,225,226,227,228,229,230,231,232,233,234,241,242,243,244,245,246,247,248,249,250],U=[0,0,3,1,1,1,1,1,1,1,1,1,0,0,0,0,0],V=[0,1,2,3,4,5,6,7,8,9,10,11],W=[0,0,2,1,2,4,4,3,4,7,5,4,4,0,1,2,119],X=[0,1,2,3,17,4,5,33,49,6,18,65,81,7,97,113,19,34,50,129,8,20,66,145,161,177,193,9,35,51,82,240,21,98,114,209,10,22,36,52,225,37,241,23,24,25,26,38,39,40,41,42,53,54,55,56,57,58,67,68,69,70,71,72,73,74,83,84,85,86,87,88,89,90,99,100,101,102,103,104,105,106,115,116,117,118,119,120,121,122,130,131,132,133,134,135,136,137,138,146,147,148,149,150,151,152,153,154,162,163,164,165,166,167,168,169,170,178,179,180,181,182,183,184,185,186,194,195,196,197,198,199,200,201,202,210,211,212,213,214,215,216,217,218,226,227,228,229,230,231,232,233,234,242,243,244,245,246,247,248,249,250];this.encode=function(a,b){b&&r(b),H=new Array,I=0,J=7,i(65496),k(),m(),l(a.width,a.height),n(),o();var c=0,d=0,e=0;I=0,J=7,this.encode.displayName="_encode_";for(var f,h,j,q,s,x,y,z,A,D=a.data,E=a.width,F=a.height,G=4*E,N=0;F>N;){for(f=0;G>f;){for(s=G*N+f,x=s,y=-1,z=0,A=0;64>A;A++)z=A>>3,y=4*(7&A),x=s+z*G+y,N+z>=F&&(x-=G*(N+1+z-F)),f+y>=G&&(x-=f+y-G+4),h=D[x++],j=D[x++],q=D[x++],K[A]=(O[h]+O[j+256>>0]+O[q+512>>0]>>16)-128,L[A]=(O[h+768>>0]+O[j+1024>>0]+O[q+1280>>0]>>16)-128,M[A]=(O[h+1280>>0]+O[j+1536>>0]+O[q+1792>>0]>>16)-128;c=p(K,B,c,t,v),d=p(L,C,d,u,w),e=p(M,C,e,u,w),f+=32}N+=8}if(J>=0){var P=[];P[1]=J+1,P[0]=(1<<J+1)-1,g(P)}i(65497);var Q="data:image/jpeg;base64,"+btoa(H.join(""));return H=[],Q},s()}return a.encode=function(b,c){var d=new a(c);return d.encode(b)},a}),b("runtime/html5/androidpatch",["runtime/html5/util","runtime/html5/jpegencoder","base"],function(a,b,c){var d,e=a.canvasToDataUrl;a.canvasToDataUrl=function(a,f,g){var h,i,j,k,l;return c.os.android?("image/jpeg"===f&&"undefined"==typeof d&&(k=e.apply(null,arguments),l=k.split(","),k=~l[0].indexOf("base64")?atob(l[1]):decodeURIComponent(l[1]),k=k.substring(0,2),d=255===k.charCodeAt(0)&&216===k.charCodeAt(1)),"image/jpeg"!==f||d?e.apply(null,arguments):(i=a.width,j=a.height,h=a.getContext("2d"),b.encode(h.getImageData(0,0,i,j),g))):e.apply(null,arguments)}}),b("runtime/html5/image",["base","runtime/html5/runtime","runtime/html5/util"],function(a,b,c){var d="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D";return b.register("Image",{modified:!1,init:function(){var a=this,b=new Image;b.onload=function(){a._info={type:a.type,width:this.width,height:this.height},a._metas||"image/jpeg"!==a.type?a.owner.trigger("load"):c.parseMeta(a._blob,function(b,c){a._metas=c,a.owner.trigger("load")})},b.onerror=function(){a.owner.trigger("error")},a._img=b},loadFromBlob:function(a){var b=this,d=b._img;b._blob=a,b.type=a.type,d.src=c.createObjectURL(a.getSource()),b.owner.once("load",function(){c.revokeObjectURL(d.src)})},resize:function(a,b){var c=this._canvas||(this._canvas=document.createElement("canvas"));this._resize(this._img,c,a,b),this._blob=null,this.modified=!0,this.owner.trigger("complete","resize")},crop:function(a,b,c,d,e){var f=this._canvas||(this._canvas=document.createElement("canvas")),g=this.options,h=this._img,i=h.naturalWidth,j=h.naturalHeight,k=this.getOrientation();e=e||1,f.width=c,f.height=d,g.preserveHeaders||this._rotate2Orientaion(f,k),this._renderImageToCanvas(f,h,-a,-b,i*e,j*e),this._blob=null,this.modified=!0,this.owner.trigger("complete","crop")},getAsBlob:function(a){var b,d=this._blob,e=this.options;if(a=a||this.type,this.modified||this.type!==a){if(b=this._canvas,"image/jpeg"===a){if(d=c.canvasToDataUrl(b,a,e.quality),e.preserveHeaders&&this._metas&&this._metas.imageHead)return d=c.dataURL2ArrayBuffer(d),d=c.updateImageHead(d,this._metas.imageHead),d=c.arrayBufferToBlob(d,a)}else d=c.canvasToDataUrl(b,a);d=c.dataURL2Blob(d)}return d},getAsDataUrl:function(a){var b=this.options;return a=a||this.type,"image/jpeg"===a?c.canvasToDataUrl(this._canvas,a,b.quality):this._canvas.toDataURL(a)},getOrientation:function(){return this._metas&&this._metas.exif&&this._metas.exif.get("Orientation")||1},info:function(a){return a?(this._info=a,this):this._info},meta:function(a){return a?(this._metas=a,this):this._metas},destroy:function(){var a=this._canvas;this._img.onload=null,a&&(a.getContext("2d").clearRect(0,0,a.width,a.height),a.width=a.height=0,this._canvas=null),this._img.src=d,this._img=this._blob=null},_resize:function(a,b,c,d){var e,f,g,h,i,j=this.options,k=a.width,l=a.height,m=this.getOrientation();~[5,6,7,8].indexOf(m)&&(c^=d,d^=c,c^=d),e=Math[j.crop?"max":"min"](c/k,d/l),j.allowMagnify||(e=Math.min(1,e)),f=k*e,g=l*e,j.crop?(b.width=c,b.height=d):(b.width=f,b.height=g),h=(b.width-f)/2,i=(b.height-g)/2,j.preserveHeaders||this._rotate2Orientaion(b,m),this._renderImageToCanvas(b,a,h,i,f,g)},_rotate2Orientaion:function(a,b){var c=a.width,d=a.height,e=a.getContext("2d");switch(b){case 5:case 6:case 7:case 8:a.width=d,a.height=c}switch(b){case 2:e.translate(c,0),e.scale(-1,1);break;case 3:e.translate(c,d),e.rotate(Math.PI);break;case 4:e.translate(0,d),e.scale(1,-1);break;case 5:e.rotate(.5*Math.PI),e.scale(1,-1);break;case 6:e.rotate(.5*Math.PI),e.translate(0,-d);break;case 7:e.rotate(.5*Math.PI),e.translate(c,-d),e.scale(-1,1);break;case 8:e.rotate(-.5*Math.PI),e.translate(-c,0)}},_renderImageToCanvas:function(){function b(a,b,c){var d,e,f,g=document.createElement("canvas"),h=g.getContext("2d"),i=0,j=c,k=c;for(g.width=1,g.height=c,h.drawImage(a,0,0),d=h.getImageData(0,0,1,c).data;k>i;)e=d[4*(k-1)+3],0===e?j=k:i=k,k=j+i>>1;return f=k/c,0===f?1:f}function c(a){var b,c,d=a.naturalWidth,e=a.naturalHeight;return d*e>1048576?(b=document.createElement("canvas"),b.width=b.height=1,c=b.getContext("2d"),c.drawImage(a,-d+1,0),0===c.getImageData(0,0,1,1).data[3]):!1}return a.os.ios?a.os.ios>=7?function(a,c,d,e,f,g){var h=c.naturalWidth,i=c.naturalHeight,j=b(c,h,i);return a.getContext("2d").drawImage(c,0,0,h*j,i*j,d,e,f,g)}:function(a,d,e,f,g,h){var i,j,k,l,m,n,o,p=d.naturalWidth,q=d.naturalHeight,r=a.getContext("2d"),s=c(d),t="image/jpeg"===this.type,u=1024,v=0,w=0;for(s&&(p/=2,q/=2),r.save(),i=document.createElement("canvas"),i.width=i.height=u,j=i.getContext("2d"),k=t?b(d,p,q):1,l=Math.ceil(u*g/p),m=Math.ceil(u*h/q/k);q>v;){for(n=0,o=0;p>n;)j.clearRect(0,0,u,u),j.drawImage(d,-n,-v),r.drawImage(i,0,0,u,u,e+o,f+w,l,m),n+=u,o+=l;v+=u,w+=m}r.restore(),i=j=null}:function(b){var c=a.slice(arguments,1),d=b.getContext("2d");d.drawImage.apply(d,c)}}()})}),b("runtime/html5/transport",["base","runtime/html5/runtime"],function(a,b){var c=a.noop,d=a.$;return b.register("Transport",{init:function(){this._status=0,this._response=null},send:function(){var b,c,e,f=this.owner,g=this.options,h=this._initAjax(),i=f._blob,j=g.server;g.sendAsBinary?(j+=g.attachInfoToQuery!==!1?(/\?/.test(j)?"&":"?")+d.param(f._formData):"",c=i.getSource()):(b=new FormData,d.each(f._formData,function(a,c){b.append(a,c)}),b.append(g.fileVal,i.getSource(),g.filename||f._formData.name||"")),g.withCredentials&&"withCredentials"in h?(h.open(g.method,j,!0),h.withCredentials=!0):h.open(g.method,j),this._setRequestHeader(h,g.headers),c?(h.overrideMimeType&&h.overrideMimeType("application/octet-stream"),a.os.android?(e=new FileReader,e.onload=function(){h.send(this.result),e=e.onload=null},e.readAsArrayBuffer(c)):h.send(c)):h.send(b)},getResponse:function(){return this._response},getResponseAsJson:function(){return this._parseJson(this._response)},getResponseHeaders:function(){return this._headers},getStatus:function(){return this._status},abort:function(){var a=this._xhr;a&&(a.upload.onprogress=c,a.onreadystatechange=c,a.abort(),this._xhr=a=null)},destroy:function(){this.abort()},_parseHeader:function(a){var b={};return a&&a.replace(/^([^\:]+):(.*)$/gm,function(a,c,d){b[c.trim()]=d.trim()}),b},_initAjax:function(){var a=this,b=new XMLHttpRequest,d=this.options;return!d.withCredentials||"withCredentials"in b||"undefined"==typeof XDomainRequest||(b=new XDomainRequest),b.upload.onprogress=function(b){var c=0;return b.lengthComputable&&(c=b.loaded/b.total),a.trigger("progress",c)},b.onreadystatechange=function(){if(4===b.readyState){b.upload.onprogress=c,b.onreadystatechange=c,a._xhr=null,a._status=b.status;var d="|",e=d+b.status+d+b.statusText;return b.status>=200&&b.status<300?(a._response=b.responseText,a._headers=a._parseHeader(b.getAllResponseHeaders()),a.trigger("load")):b.status>=500&&b.status<600?(a._response=b.responseText,a._headers=a._parseHeader(b.getAllResponseHeaders()),a.trigger("error","server"+e)):a.trigger("error",a._status?"http"+e:"abort")}},a._xhr=b,b},_setRequestHeader:function(a,b){d.each(b,function(b,c){a.setRequestHeader(b,c)})},_parseJson:function(a){var b;try{b=JSON.parse(a)}catch(c){b={}}return b}})}),b("runtime/html5/md5",["runtime/html5/runtime"],function(a){var b=function(a,b){return 4294967295&a+b},c=function(a,c,d,e,f,g){return c=b(b(c,a),b(e,g)),b(c<<f|c>>>32-f,d)},d=function(a,b,d,e,f,g,h){return c(b&d|~b&e,a,b,f,g,h)},e=function(a,b,d,e,f,g,h){return c(b&e|d&~e,a,b,f,g,h)},f=function(a,b,d,e,f,g,h){return c(b^d^e,a,b,f,g,h)},g=function(a,b,d,e,f,g,h){return c(d^(b|~e),a,b,f,g,h)},h=function(a,c){var h=a[0],i=a[1],j=a[2],k=a[3];h=d(h,i,j,k,c[0],7,-680876936),k=d(k,h,i,j,c[1],12,-389564586),j=d(j,k,h,i,c[2],17,606105819),i=d(i,j,k,h,c[3],22,-1044525330),h=d(h,i,j,k,c[4],7,-176418897),k=d(k,h,i,j,c[5],12,1200080426),j=d(j,k,h,i,c[6],17,-1473231341),i=d(i,j,k,h,c[7],22,-45705983),h=d(h,i,j,k,c[8],7,1770035416),k=d(k,h,i,j,c[9],12,-1958414417),j=d(j,k,h,i,c[10],17,-42063),i=d(i,j,k,h,c[11],22,-1990404162),h=d(h,i,j,k,c[12],7,1804603682),k=d(k,h,i,j,c[13],12,-40341101),j=d(j,k,h,i,c[14],17,-1502002290),i=d(i,j,k,h,c[15],22,1236535329),h=e(h,i,j,k,c[1],5,-165796510),k=e(k,h,i,j,c[6],9,-1069501632),j=e(j,k,h,i,c[11],14,643717713),i=e(i,j,k,h,c[0],20,-373897302),h=e(h,i,j,k,c[5],5,-701558691),k=e(k,h,i,j,c[10],9,38016083),j=e(j,k,h,i,c[15],14,-660478335),i=e(i,j,k,h,c[4],20,-405537848),h=e(h,i,j,k,c[9],5,568446438),k=e(k,h,i,j,c[14],9,-1019803690),j=e(j,k,h,i,c[3],14,-187363961),i=e(i,j,k,h,c[8],20,1163531501),h=e(h,i,j,k,c[13],5,-1444681467),k=e(k,h,i,j,c[2],9,-51403784),j=e(j,k,h,i,c[7],14,1735328473),i=e(i,j,k,h,c[12],20,-1926607734),h=f(h,i,j,k,c[5],4,-378558),k=f(k,h,i,j,c[8],11,-2022574463),j=f(j,k,h,i,c[11],16,1839030562),i=f(i,j,k,h,c[14],23,-35309556),h=f(h,i,j,k,c[1],4,-1530992060),k=f(k,h,i,j,c[4],11,1272893353),j=f(j,k,h,i,c[7],16,-155497632),i=f(i,j,k,h,c[10],23,-1094730640),h=f(h,i,j,k,c[13],4,681279174),k=f(k,h,i,j,c[0],11,-358537222),j=f(j,k,h,i,c[3],16,-722521979),i=f(i,j,k,h,c[6],23,76029189),h=f(h,i,j,k,c[9],4,-640364487),k=f(k,h,i,j,c[12],11,-421815835),j=f(j,k,h,i,c[15],16,530742520),i=f(i,j,k,h,c[2],23,-995338651),h=g(h,i,j,k,c[0],6,-198630844),k=g(k,h,i,j,c[7],10,1126891415),j=g(j,k,h,i,c[14],15,-1416354905),i=g(i,j,k,h,c[5],21,-57434055),h=g(h,i,j,k,c[12],6,1700485571),k=g(k,h,i,j,c[3],10,-1894986606),j=g(j,k,h,i,c[10],15,-1051523),i=g(i,j,k,h,c[1],21,-2054922799),h=g(h,i,j,k,c[8],6,1873313359),k=g(k,h,i,j,c[15],10,-30611744),j=g(j,k,h,i,c[6],15,-1560198380),i=g(i,j,k,h,c[13],21,1309151649),h=g(h,i,j,k,c[4],6,-145523070),k=g(k,h,i,j,c[11],10,-1120210379),j=g(j,k,h,i,c[2],15,718787259),i=g(i,j,k,h,c[9],21,-343485551),a[0]=b(h,a[0]),a[1]=b(i,a[1]),a[2]=b(j,a[2]),a[3]=b(k,a[3])},i=function(a){var b,c=[];for(b=0;64>b;b+=4)c[b>>2]=a.charCodeAt(b)+(a.charCodeAt(b+1)<<8)+(a.charCodeAt(b+2)<<16)+(a.charCodeAt(b+3)<<24);return c},j=function(a){var b,c=[];for(b=0;64>b;b+=4)c[b>>2]=a[b]+(a[b+1]<<8)+(a[b+2]<<16)+(a[b+3]<<24);return c},k=function(a){var b,c,d,e,f,g,j=a.length,k=[1732584193,-271733879,-1732584194,271733878];for(b=64;j>=b;b+=64)h(k,i(a.substring(b-64,b)));for(a=a.substring(b-64),c=a.length,d=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],b=0;c>b;b+=1)d[b>>2]|=a.charCodeAt(b)<<(b%4<<3);if(d[b>>2]|=128<<(b%4<<3),b>55)for(h(k,d),b=0;16>b;b+=1)d[b]=0;return e=8*j,e=e.toString(16).match(/(.*?)(.{0,8})$/),f=parseInt(e[2],16),g=parseInt(e[1],16)||0,d[14]=f,d[15]=g,h(k,d),k},l=function(a){var b,c,d,e,f,g,i=a.length,k=[1732584193,-271733879,-1732584194,271733878];for(b=64;i>=b;b+=64)h(k,j(a.subarray(b-64,b)));for(a=i>b-64?a.subarray(b-64):new Uint8Array(0),c=a.length,d=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],b=0;c>b;b+=1)d[b>>2]|=a[b]<<(b%4<<3);if(d[b>>2]|=128<<(b%4<<3),b>55)for(h(k,d),b=0;16>b;b+=1)d[b]=0;return e=8*i,e=e.toString(16).match(/(.*?)(.{0,8})$/),f=parseInt(e[2],16),g=parseInt(e[1],16)||0,d[14]=f,d[15]=g,h(k,d),k},m=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"],n=function(a){var b,c="";for(b=0;4>b;b+=1)c+=m[15&a>>8*b+4]+m[15&a>>8*b];return c},o=function(a){var b;for(b=0;b<a.length;b+=1)a[b]=n(a[b]);return a.join("")},p=function(a){return o(k(a))},q=function(){this.reset()};return"5d41402abc4b2a76b9719d911017c592"!==p("hello")&&(b=function(a,b){var c=(65535&a)+(65535&b),d=(a>>16)+(b>>16)+(c>>16);return d<<16|65535&c}),q.prototype.append=function(a){return/[\u0080-\uFFFF]/.test(a)&&(a=unescape(encodeURIComponent(a))),this.appendBinary(a),this},q.prototype.appendBinary=function(a){this._buff+=a,this._length+=a.length;var b,c=this._buff.length;for(b=64;c>=b;b+=64)h(this._state,i(this._buff.substring(b-64,b)));return this._buff=this._buff.substr(b-64),this},q.prototype.end=function(a){var b,c,d=this._buff,e=d.length,f=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];for(b=0;e>b;b+=1)f[b>>2]|=d.charCodeAt(b)<<(b%4<<3);return this._finish(f,e),c=a?this._state:o(this._state),this.reset(),c},q.prototype._finish=function(a,b){var c,d,e,f=b;if(a[f>>2]|=128<<(f%4<<3),f>55)for(h(this._state,a),f=0;16>f;f+=1)a[f]=0;c=8*this._length,c=c.toString(16).match(/(.*?)(.{0,8})$/),d=parseInt(c[2],16),e=parseInt(c[1],16)||0,a[14]=d,a[15]=e,h(this._state,a)},q.prototype.reset=function(){return this._buff="",this._length=0,this._state=[1732584193,-271733879,-1732584194,271733878],this},q.prototype.destroy=function(){delete this._state,delete this._buff,delete this._length},q.hash=function(a,b){/[\u0080-\uFFFF]/.test(a)&&(a=unescape(encodeURIComponent(a)));var c=k(a);return b?c:o(c)},q.hashBinary=function(a,b){var c=k(a);return b?c:o(c)},q.ArrayBuffer=function(){this.reset()},q.ArrayBuffer.prototype.append=function(a){var b,c=this._concatArrayBuffer(this._buff,a),d=c.length;for(this._length+=a.byteLength,b=64;d>=b;b+=64)h(this._state,j(c.subarray(b-64,b)));return this._buff=d>b-64?c.subarray(b-64):new Uint8Array(0),this},q.ArrayBuffer.prototype.end=function(a){var b,c,d=this._buff,e=d.length,f=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];for(b=0;e>b;b+=1)f[b>>2]|=d[b]<<(b%4<<3);return this._finish(f,e),c=a?this._state:o(this._state),this.reset(),c},q.ArrayBuffer.prototype._finish=q.prototype._finish,q.ArrayBuffer.prototype.reset=function(){return this._buff=new Uint8Array(0),this._length=0,this._state=[1732584193,-271733879,-1732584194,271733878],this},q.ArrayBuffer.prototype.destroy=q.prototype.destroy,q.ArrayBuffer.prototype._concatArrayBuffer=function(a,b){var c=a.length,d=new Uint8Array(c+b.byteLength);return d.set(a),d.set(new Uint8Array(b),c),d},q.ArrayBuffer.hash=function(a,b){var c=l(new Uint8Array(a));return b?c:o(c)},a.register("Md5",{init:function(){},loadFromBlob:function(a){var b,c,d=a.getSource(),e=2097152,f=Math.ceil(d.size/e),g=0,h=this.owner,i=new q.ArrayBuffer,j=this,k=d.mozSlice||d.webkitSlice||d.slice;c=new FileReader,b=function(){var l,m;l=g*e,m=Math.min(l+e,d.size),c.onload=function(b){i.append(b.target.result),h.trigger("progress",{total:a.size,loaded:m})},c.onloadend=function(){c.onloadend=c.onload=null,++g<f?setTimeout(b,1):setTimeout(function(){h.trigger("load"),j.result=i.end(),b=a=d=i=null,h.trigger("complete")},50)},c.readAsArrayBuffer(k.call(d,l,m))},b()},getResult:function(){return this.result}})}),b("preset/all",["base","widgets/filednd","widgets/filepaste","widgets/filepicker","widgets/image","widgets/queue","widgets/runtime","widgets/upload","widgets/validator","widgets/md5","runtime/html5/blob","runtime/html5/dnd","runtime/html5/filepaste","runtime/html5/filepicker","runtime/html5/imagemeta/exif","runtime/html5/androidpatch","runtime/html5/image","runtime/html5/transport","runtime/html5/md5"],function(a){return a}),b("widgets/log",["base","uploader","widgets/widget"],function(a,b){function c(a){var b=e.extend({},d,a),c=f.replace(/^(.*)\?/,"$1"+e.param(b)),g=new Image;g.src=c}var d,e=a.$,f=" http://static.tieba.baidu.com/tb/pms/img/st.gif??",g=(location.hostname||location.host||"protected").toLowerCase(),h=g&&/baidu/i.exec(g);if(h)return d={dv:3,master:"webuploader",online:/test/.exec(g)?0:1,module:"",product:g,type:0},b.register({name:"log",init:function(){var a=this.owner,b=0,d=0;a.on("error",function(a){c({type:2,c_error_code:a})}).on("uploadError",function(a,b){c({type:2,c_error_code:"UPLOAD_ERROR",c_reason:""+b})}).on("uploadComplete",function(a){b++,d+=a.size}).on("uploadFinished",function(){c({c_count:b,c_size:d}),b=d=0}),c({c_usage:1})}})}),b("webuploader",["preset/all","widgets/log"],function(a){return a}),c("webuploader")});
+/*! WebUploader 1.0.0 */
+
+
+/**
+ * @fileOverview 让内部各个部件的代码可以用[amd](https://github.com/amdjs/amdjs-api/wiki/AMD)模块定义方式组织起来。
+ *
+ * AMD API 内部的简单不完全实现，请忽略。只有当WebUploader被合并成一个文件的时候才会引入。
+ */
+(function( root, factory ) {
+    var modules = {},
+
+        // 内部require, 简单不完全实现。
+        // https://github.com/amdjs/amdjs-api/wiki/require
+        _require = function( deps, callback ) {
+            var args, len, i;
+
+            // 如果deps不是数组，则直接返回指定module
+            if ( typeof deps === 'string' ) {
+                return getModule( deps );
+            } else {
+                args = [];
+                for( len = deps.length, i = 0; i < len; i++ ) {
+                    args.push( getModule( deps[ i ] ) );
+                }
+
+                return callback.apply( null, args );
+            }
+        },
+
+        // 内部define，暂时不支持不指定id.
+        _define = function( id, deps, factory ) {
+            if ( arguments.length === 2 ) {
+                factory = deps;
+                deps = null;
+            }
+
+            _require( deps || [], function() {
+                setModule( id, factory, arguments );
+            });
+        },
+
+        // 设置module, 兼容CommonJs写法。
+        setModule = function( id, factory, args ) {
+            var module = {
+                    exports: factory
+                },
+                returned;
+
+            if ( typeof factory === 'function' ) {
+                args.length || (args = [ _require, module.exports, module ]);
+                returned = factory.apply( null, args );
+                returned !== undefined && (module.exports = returned);
+            }
+
+            modules[ id ] = module.exports;
+        },
+
+        // 根据id获取module
+        getModule = function( id ) {
+            var module = modules[ id ] || root[ id ];
+
+            if ( !module ) {
+                throw new Error( '`' + id + '` is undefined' );
+            }
+
+            return module;
+        },
+
+        // 将所有modules，将路径ids装换成对象。
+        exportsTo = function( obj ) {
+            var key, host, parts, part, last, ucFirst;
+
+            // make the first character upper case.
+            ucFirst = function( str ) {
+                return str && (str.charAt( 0 ).toUpperCase() + str.substr( 1 ));
+            };
+
+            for ( key in modules ) {
+                host = obj;
+
+                if ( !modules.hasOwnProperty( key ) ) {
+                    continue;
+                }
+
+                parts = key.split('/');
+                last = ucFirst( parts.pop() );
+
+                while( (part = ucFirst( parts.shift() )) ) {
+                    host[ part ] = host[ part ] || {};
+                    host = host[ part ];
+                }
+
+                host[ last ] = modules[ key ];
+            }
+
+            return obj;
+        },
+
+        makeExport = function( dollar ) {
+            root.__dollar = dollar;
+
+            // exports every module.
+            return exportsTo( factory( root, _define, _require ) );
+        },
+
+        origin;
+
+    if ( typeof module === 'object' && typeof module.exports === 'object' ) {
+
+        // For CommonJS and CommonJS-like environments where a proper window is present,
+        module.exports = makeExport();
+    } else if ( typeof define === 'function' && define.amd ) {
+
+        // Allow using this built library as an AMD module
+        // in another project. That other project will only
+        // see this AMD call, not the internal modules in
+        // the closure below.
+        define([ 'jquery' ], makeExport );
+    } else {
+
+        // Browser globals case. Just assign the
+        // result to a property on the global.
+        origin = root.WebUploader;
+        root.WebUploader = makeExport();
+        root.WebUploader.noConflict = function() {
+            root.WebUploader = origin;
+        };
+    }
+})( window, function( window, define, require ) {
+
+
+    /**
+     * @fileOverview jQuery or Zepto
+     * @require "jquery"
+     * @require "zepto"
+     */
+    define('dollar-third',[],function() {
+        var req = window.require;
+        var $ = window.__dollar || 
+            window.jQuery || 
+            window.Zepto || 
+            req('jquery') || 
+            req('zepto');
+    
+        if ( !$ ) {
+            throw new Error('jQuery or Zepto not found!');
+        }
+    
+        return $;
+    });
+    
+    /**
+     * @fileOverview Dom 操作相关
+     */
+    define('dollar',[
+        'dollar-third'
+    ], function( _ ) {
+        return _;
+    });
+    /**
+     * @fileOverview 使用jQuery的Promise
+     */
+    define('promise-third',[
+        'dollar'
+    ], function( $ ) {
+        return {
+            Deferred: $.Deferred,
+            when: $.when,
+    
+            isPromise: function( anything ) {
+                return anything && typeof anything.then === 'function';
+            }
+        };
+    });
+    /**
+     * @fileOverview Promise/A+
+     */
+    define('promise',[
+        'promise-third'
+    ], function( _ ) {
+        return _;
+    });
+    /**
+     * @fileOverview 基础类方法。
+     */
+    
+    /**
+     * Web Uploader内部类的详细说明，以下提及的功能类，都可以在`WebUploader`这个变量中访问到。
+     *
+     * As you know, Web Uploader的每个文件都是用过[AMD](https://github.com/amdjs/amdjs-api/wiki/AMD)规范中的`define`组织起来的, 每个Module都会有个module id.
+     * 默认module id为该文件的路径，而此路径将会转化成名字空间存放在WebUploader中。如：
+     *
+     * * module `base`：WebUploader.Base
+     * * module `file`: WebUploader.File
+     * * module `lib/dnd`: WebUploader.Lib.Dnd
+     * * module `runtime/html5/dnd`: WebUploader.Runtime.Html5.Dnd
+     *
+     *
+     * 以下文档中对类的使用可能省略掉了`WebUploader`前缀。
+     * @module WebUploader
+     * @title WebUploader API文档
+     */
+    define('base',[
+        'dollar',
+        'promise'
+    ], function( $, promise ) {
+    
+        var noop = function() {},
+            call = Function.call;
+    
+        // http://jsperf.com/uncurrythis
+        // 反科里化
+        function uncurryThis( fn ) {
+            return function() {
+                return call.apply( fn, arguments );
+            };
+        }
+    
+        function bindFn( fn, context ) {
+            return function() {
+                return fn.apply( context, arguments );
+            };
+        }
+    
+        function createObject( proto ) {
+            var f;
+    
+            if ( Object.create ) {
+                return Object.create( proto );
+            } else {
+                f = function() {};
+                f.prototype = proto;
+                return new f();
+            }
+        }
+    
+    
+        /**
+         * 基础类，提供一些简单常用的方法。
+         * @class Base
+         */
+        return {
+    
+            /**
+             * @property {String} version 当前版本号。
+             */
+            version: '1.0.0',
+    
+            /**
+             * @property {jQuery|Zepto} $ 引用依赖的jQuery或者Zepto对象。
+             */
+            $: $,
+    
+            Deferred: promise.Deferred,
+    
+            isPromise: promise.isPromise,
+    
+            when: promise.when,
+    
+            /**
+             * @description  简单的浏览器检查结果。
+             *
+             * * `webkit`  webkit版本号，如果浏览器为非webkit内核，此属性为`undefined`。
+             * * `chrome`  chrome浏览器版本号，如果浏览器为chrome，此属性为`undefined`。
+             * * `ie`  ie浏览器版本号，如果浏览器为非ie，此属性为`undefined`。**暂不支持ie10+**
+             * * `firefox`  firefox浏览器版本号，如果浏览器为非firefox，此属性为`undefined`。
+             * * `safari`  safari浏览器版本号，如果浏览器为非safari，此属性为`undefined`。
+             * * `opera`  opera浏览器版本号，如果浏览器为非opera，此属性为`undefined`。
+             *
+             * @property {Object} [browser]
+             */
+            browser: (function( ua ) {
+                var ret = {},
+                    webkit = ua.match( /WebKit\/([\d.]+)/ ),
+                    chrome = ua.match( /Chrome\/([\d.]+)/ ) ||
+                        ua.match( /CriOS\/([\d.]+)/ ),
+    
+                    ie = ua.match( /MSIE\s([\d\.]+)/ ) ||
+                        ua.match( /(?:trident)(?:.*rv:([\w.]+))?/i ),
+                    firefox = ua.match( /Firefox\/([\d.]+)/ ),
+                    safari = ua.match( /Safari\/([\d.]+)/ ),
+                    opera = ua.match( /OPR\/([\d.]+)/ );
+    
+                webkit && (ret.webkit = parseFloat( webkit[ 1 ] ));
+                chrome && (ret.chrome = parseFloat( chrome[ 1 ] ));
+                ie && (ret.ie = parseFloat( ie[ 1 ] ));
+                firefox && (ret.firefox = parseFloat( firefox[ 1 ] ));
+                safari && (ret.safari = parseFloat( safari[ 1 ] ));
+                opera && (ret.opera = parseFloat( opera[ 1 ] ));
+    
+                return ret;
+            })( navigator.userAgent ),
+    
+            /**
+             * @description  操作系统检查结果。
+             *
+             * * `android`  如果在android浏览器环境下，此值为对应的android版本号，否则为`undefined`。
+             * * `ios` 如果在ios浏览器环境下，此值为对应的ios版本号，否则为`undefined`。
+             * @property {Object} [os]
+             */
+            os: (function( ua ) {
+                var ret = {},
+    
+                    // osx = !!ua.match( /\(Macintosh\; Intel / ),
+                    android = ua.match( /(?:Android);?[\s\/]+([\d.]+)?/ ),
+                    ios = ua.match( /(?:iPad|iPod|iPhone).*OS\s([\d_]+)/ );
+    
+                // osx && (ret.osx = true);
+                android && (ret.android = parseFloat( android[ 1 ] ));
+                ios && (ret.ios = parseFloat( ios[ 1 ].replace( /_/g, '.' ) ));
+    
+                return ret;
+            })( navigator.userAgent ),
+    
+            /**
+             * 实现类与类之间的继承。
+             * @method inherits
+             * @grammar Base.inherits( super ) => child
+             * @grammar Base.inherits( super, protos ) => child
+             * @grammar Base.inherits( super, protos, statics ) => child
+             * @param  {Class} super 父类
+             * @param  {Object | Function} [protos] 子类或者对象。如果对象中包含constructor，子类将是用此属性值。
+             * @param  {Function} [protos.constructor] 子类构造器，不指定的话将创建个临时的直接执行父类构造器的方法。
+             * @param  {Object} [statics] 静态属性或方法。
+             * @return {Class} 返回子类。
+             * @example
+             * function Person() {
+             *     console.log( 'Super' );
+             * }
+             * Person.prototype.hello = function() {
+             *     console.log( 'hello' );
+             * };
+             *
+             * var Manager = Base.inherits( Person, {
+             *     world: function() {
+             *         console.log( 'World' );
+             *     }
+             * });
+             *
+             * // 因为没有指定构造器，父类的构造器将会执行。
+             * var instance = new Manager();    // => Super
+             *
+             * // 继承子父类的方法
+             * instance.hello();    // => hello
+             * instance.world();    // => World
+             *
+             * // 子类的__super__属性指向父类
+             * console.log( Manager.__super__ === Person );    // => true
+             */
+            inherits: function( Super, protos, staticProtos ) {
+                var child;
+    
+                if ( typeof protos === 'function' ) {
+                    child = protos;
+                    protos = null;
+                } else if ( protos && protos.hasOwnProperty('constructor') ) {
+                    child = protos.constructor;
+                } else {
+                    child = function() {
+                        return Super.apply( this, arguments );
+                    };
+                }
+    
+                // 复制静态方法
+                $.extend( true, child, Super, staticProtos || {} );
+    
+                /* jshint camelcase: false */
+    
+                // 让子类的__super__属性指向父类。
+                child.__super__ = Super.prototype;
+    
+                // 构建原型，添加原型方法或属性。
+                // 暂时用Object.create实现。
+                child.prototype = createObject( Super.prototype );
+                protos && $.extend( true, child.prototype, protos );
+    
+                return child;
+            },
+    
+            /**
+             * 一个不做任何事情的方法。可以用来赋值给默认的callback.
+             * @method noop
+             */
+            noop: noop,
+    
+            /**
+             * 返回一个新的方法，此方法将已指定的`context`来执行。
+             * @grammar Base.bindFn( fn, context ) => Function
+             * @method bindFn
+             * @example
+             * var doSomething = function() {
+             *         console.log( this.name );
+             *     },
+             *     obj = {
+             *         name: 'Object Name'
+             *     },
+             *     aliasFn = Base.bind( doSomething, obj );
+             *
+             *  aliasFn();    // => Object Name
+             *
+             */
+            bindFn: bindFn,
+    
+            /**
+             * 引用Console.log如果存在的话，否则引用一个[空函数noop](#WebUploader:Base.noop)。
+             * @grammar Base.log( args... ) => undefined
+             * @method log
+             */
+            log: (function() {
+                if ( window.console ) {
+                    return bindFn( console.log, console );
+                }
+                return noop;
+            })(),
+    
+            nextTick: (function() {
+    
+                return function( cb ) {
+                    setTimeout( cb, 1 );
+                };
+    
+                // @bug 当浏览器不在当前窗口时就停了。
+                // var next = window.requestAnimationFrame ||
+                //     window.webkitRequestAnimationFrame ||
+                //     window.mozRequestAnimationFrame ||
+                //     function( cb ) {
+                //         window.setTimeout( cb, 1000 / 60 );
+                //     };
+    
+                // // fix: Uncaught TypeError: Illegal invocation
+                // return bindFn( next, window );
+            })(),
+    
+            /**
+             * 被[uncurrythis](http://www.2ality.com/2011/11/uncurrying-this.html)的数组slice方法。
+             * 将用来将非数组对象转化成数组对象。
+             * @grammar Base.slice( target, start[, end] ) => Array
+             * @method slice
+             * @example
+             * function doSomthing() {
+             *     var args = Base.slice( arguments, 1 );
+             *     console.log( args );
+             * }
+             *
+             * doSomthing( 'ignored', 'arg2', 'arg3' );    // => Array ["arg2", "arg3"]
+             */
+            slice: uncurryThis( [].slice ),
+    
+            /**
+             * 生成唯一的ID
+             * @method guid
+             * @grammar Base.guid() => String
+             * @grammar Base.guid( prefx ) => String
+             */
+            guid: (function() {
+                var counter = 0;
+    
+                return function( prefix ) {
+                    var guid = (+new Date()).toString( 32 ),
+                        i = 0;
+    
+                    for ( ; i < 5; i++ ) {
+                        guid += Math.floor( Math.random() * 65535 ).toString( 32 );
+                    }
+    
+                    return (prefix || 'wu_') + guid + (counter++).toString( 32 );
+                };
+            })(),
+    
+            /**
+             * 格式化文件大小, 输出成带单位的字符串
+             * @method formatSize
+             * @grammar Base.formatSize( size ) => String
+             * @grammar Base.formatSize( size, pointLength ) => String
+             * @grammar Base.formatSize( size, pointLength, units ) => String
+             * @param {Number} size 文件大小
+             * @param {Number} [pointLength=2] 精确到的小数点数。
+             * @param {Array} [units=[ 'B', 'K', 'M', 'G', 'TB' ]] 单位数组。从字节，到千字节，一直往上指定。如果单位数组里面只指定了到了K(千字节)，同时文件大小大于M, 此方法的输出将还是显示成多少K.
+             * @example
+             * console.log( Base.formatSize( 100 ) );    // => 100B
+             * console.log( Base.formatSize( 1024 ) );    // => 1.00K
+             * console.log( Base.formatSize( 1024, 0 ) );    // => 1K
+             * console.log( Base.formatSize( 1024 * 1024 ) );    // => 1.00M
+             * console.log( Base.formatSize( 1024 * 1024 * 1024 ) );    // => 1.00G
+             * console.log( Base.formatSize( 1024 * 1024 * 1024, 0, ['B', 'KB', 'MB'] ) );    // => 1024MB
+             */
+            formatSize: function( size, pointLength, units ) {
+                var unit;
+    
+                units = units || [ 'B', 'K', 'M', 'G', 'TB' ];
+    
+                while ( (unit = units.shift()) && size > 1024 ) {
+                    size = size / 1024;
+                }
+    
+                return (unit === 'B' ? size : size.toFixed( pointLength || 2 )) +
+                        unit;
+            }
+        };
+    });
+    /**
+     * 事件处理类，可以独立使用，也可以扩展给对象使用。
+     * @fileOverview Mediator
+     */
+    define('mediator',[
+        'base'
+    ], function( Base ) {
+        var $ = Base.$,
+            slice = [].slice,
+            separator = /\s+/,
+            protos;
+    
+        // 根据条件过滤出事件handlers.
+        function findHandlers( arr, name, callback, context ) {
+            return $.grep( arr, function( handler ) {
+                return handler &&
+                        (!name || handler.e === name) &&
+                        (!callback || handler.cb === callback ||
+                        handler.cb._cb === callback) &&
+                        (!context || handler.ctx === context);
+            });
+        }
+    
+        function eachEvent( events, callback, iterator ) {
+            // 不支持对象，只支持多个event用空格隔开
+            $.each( (events || '').split( separator ), function( _, key ) {
+                iterator( key, callback );
+            });
+        }
+    
+        function triggerHanders( events, args ) {
+            var stoped = false,
+                i = -1,
+                len = events.length,
+                handler;
+    
+            while ( ++i < len ) {
+                handler = events[ i ];
+    
+                if ( handler.cb.apply( handler.ctx2, args ) === false ) {
+                    stoped = true;
+                    break;
+                }
+            }
+    
+            return !stoped;
+        }
+    
+        protos = {
+    
+            /**
+             * 绑定事件。
+             *
+             * `callback`方法在执行时，arguments将会来源于trigger的时候携带的参数。如
+             * ```javascript
+             * var obj = {};
+             *
+             * // 使得obj有事件行为
+             * Mediator.installTo( obj );
+             *
+             * obj.on( 'testa', function( arg1, arg2 ) {
+             *     console.log( arg1, arg2 ); // => 'arg1', 'arg2'
+             * });
+             *
+             * obj.trigger( 'testa', 'arg1', 'arg2' );
+             * ```
+             *
+             * 如果`callback`中，某一个方法`return false`了，则后续的其他`callback`都不会被执行到。
+             * 切会影响到`trigger`方法的返回值，为`false`。
+             *
+             * `on`还可以用来添加一个特殊事件`all`, 这样所有的事件触发都会响应到。同时此类`callback`中的arguments有一个不同处，
+             * 就是第一个参数为`type`，记录当前是什么事件在触发。此类`callback`的优先级比脚低，会再正常`callback`执行完后触发。
+             * ```javascript
+             * obj.on( 'all', function( type, arg1, arg2 ) {
+             *     console.log( type, arg1, arg2 ); // => 'testa', 'arg1', 'arg2'
+             * });
+             * ```
+             *
+             * @method on
+             * @grammar on( name, callback[, context] ) => self
+             * @param  {String}   name     事件名，支持多个事件用空格隔开
+             * @param  {Function} callback 事件处理器
+             * @param  {Object}   [context]  事件处理器的上下文。
+             * @return {self} 返回自身，方便链式
+             * @chainable
+             * @class Mediator
+             */
+            on: function( name, callback, context ) {
+                var me = this,
+                    set;
+    
+                if ( !callback ) {
+                    return this;
+                }
+    
+                set = this._events || (this._events = []);
+    
+                eachEvent( name, callback, function( name, callback ) {
+                    var handler = { e: name };
+    
+                    handler.cb = callback;
+                    handler.ctx = context;
+                    handler.ctx2 = context || me;
+                    handler.id = set.length;
+    
+                    set.push( handler );
+                });
+    
+                return this;
+            },
+    
+            /**
+             * 绑定事件，且当handler执行完后，自动解除绑定。
+             * @method once
+             * @grammar once( name, callback[, context] ) => self
+             * @param  {String}   name     事件名
+             * @param  {Function} callback 事件处理器
+             * @param  {Object}   [context]  事件处理器的上下文。
+             * @return {self} 返回自身，方便链式
+             * @chainable
+             */
+            once: function( name, callback, context ) {
+                var me = this;
+    
+                if ( !callback ) {
+                    return me;
+                }
+    
+                eachEvent( name, callback, function( name, callback ) {
+                    var once = function() {
+                            me.off( name, once );
+                            return callback.apply( context || me, arguments );
+                        };
+    
+                    once._cb = callback;
+                    me.on( name, once, context );
+                });
+    
+                return me;
+            },
+    
+            /**
+             * 解除事件绑定
+             * @method off
+             * @grammar off( [name[, callback[, context] ] ] ) => self
+             * @param  {String}   [name]     事件名
+             * @param  {Function} [callback] 事件处理器
+             * @param  {Object}   [context]  事件处理器的上下文。
+             * @return {self} 返回自身，方便链式
+             * @chainable
+             */
+            off: function( name, cb, ctx ) {
+                var events = this._events;
+    
+                if ( !events ) {
+                    return this;
+                }
+    
+                if ( !name && !cb && !ctx ) {
+                    this._events = [];
+                    return this;
+                }
+    
+                eachEvent( name, cb, function( name, cb ) {
+                    $.each( findHandlers( events, name, cb, ctx ), function() {
+                        delete events[ this.id ];
+                    });
+                });
+    
+                return this;
+            },
+    
+            /**
+             * 触发事件
+             * @method trigger
+             * @grammar trigger( name[, args...] ) => self
+             * @param  {String}   type     事件名
+             * @param  {*} [...] 任意参数
+             * @return {Boolean} 如果handler中return false了，则返回false, 否则返回true
+             */
+            trigger: function( type ) {
+                var args, events, allEvents;
+    
+                if ( !this._events || !type ) {
+                    return this;
+                }
+    
+                args = slice.call( arguments, 1 );
+                events = findHandlers( this._events, type );
+                allEvents = findHandlers( this._events, 'all' );
+    
+                return triggerHanders( events, args ) &&
+                        triggerHanders( allEvents, arguments );
+            }
+        };
+    
+        /**
+         * 中介者，它本身是个单例，但可以通过[installTo](#WebUploader:Mediator:installTo)方法，使任何对象具备事件行为。
+         * 主要目的是负责模块与模块之间的合作，降低耦合度。
+         *
+         * @class Mediator
+         */
+        return $.extend({
+    
+            /**
+             * 可以通过这个接口，使任何对象具备事件功能。
+             * @method installTo
+             * @param  {Object} obj 需要具备事件行为的对象。
+             * @return {Object} 返回obj.
+             */
+            installTo: function( obj ) {
+                return $.extend( obj, protos );
+            }
+    
+        }, protos );
+    });
+    /**
+     * @fileOverview Uploader上传类
+     */
+    define('uploader',[
+        'base',
+        'mediator'
+    ], function( Base, Mediator ) {
+    
+        var $ = Base.$;
+    
+        /**
+         * 上传入口类。
+         * @class Uploader
+         * @constructor
+         * @grammar new Uploader( opts ) => Uploader
+         * @example
+         * var uploader = WebUploader.Uploader({
+         *     swf: 'path_of_swf/Uploader.swf',
+         *
+         *     // 开起分片上传。
+         *     chunked: true
+         * });
+         */
+        function Uploader( opts ) {
+            this.options = $.extend( true, {}, Uploader.options, opts );
+            this._init( this.options );
+        }
+    
+        // default Options
+        // widgets中有相应扩展
+        Uploader.options = {
+            // 是否开启调试模式
+            debug: false,
+        };
+        Mediator.installTo( Uploader.prototype );
+    
+        // 批量添加纯命令式方法。
+        $.each({
+            upload: 'start-upload',
+            stop: 'stop-upload',
+            getFile: 'get-file',
+            getFiles: 'get-files',
+            addFile: 'add-file',
+            addFiles: 'add-file',
+            sort: 'sort-files',
+            removeFile: 'remove-file',
+            cancelFile: 'cancel-file',
+            skipFile: 'skip-file',
+            retry: 'retry',
+            isInProgress: 'is-in-progress',
+            makeThumb: 'make-thumb',
+            md5File: 'md5-file',
+            getDimension: 'get-dimension',
+            addButton: 'add-btn',
+            predictRuntimeType: 'predict-runtime-type',
+            refresh: 'refresh',
+            disable: 'disable',
+            enable: 'enable',
+            reset: 'reset'
+        }, function( fn, command ) {
+            Uploader.prototype[ fn ] = function() {
+                return this.request( command, arguments );
+            };
+        });
+    
+        $.extend( Uploader.prototype, {
+            state: 'pending',
+    
+            _init: function( opts ) {
+                var me = this;
+    
+                me.request( 'init', opts, function() {
+                    me.state = 'ready';
+                    me.trigger('ready');
+                });
+            },
+    
+            /**
+             * 获取或者设置Uploader配置项。
+             * @method option
+             * @grammar option( key ) => *
+             * @grammar option( key, val ) => self
+             * @example
+             *
+             * // 初始状态图片上传前不会压缩
+             * var uploader = new WebUploader.Uploader({
+             *     compress: null;
+             * });
+             *
+             * // 修改后图片上传前，尝试将图片压缩到1600 * 1600
+             * uploader.option( 'compress', {
+             *     width: 1600,
+             *     height: 1600
+             * });
+             */
+            option: function( key, val ) {
+                var opts = this.options;
+    
+                // setter
+                if ( arguments.length > 1 ) {
+    
+                    if ( $.isPlainObject( val ) &&
+                            $.isPlainObject( opts[ key ] ) ) {
+                        $.extend( opts[ key ], val );
+                    } else {
+                        opts[ key ] = val;
+                    }
+    
+                } else {    // getter
+                    return key ? opts[ key ] : opts;
+                }
+            },
+    
+            /**
+             * 获取文件统计信息。返回一个包含一下信息的对象。
+             * * `successNum` 上传成功的文件数
+             * * `progressNum` 上传中的文件数
+             * * `cancelNum` 被删除的文件数
+             * * `invalidNum` 无效的文件数
+             * * `uploadFailNum` 上传失败的文件数
+             * * `queueNum` 还在队列中的文件数
+             * * `interruptNum` 被暂停的文件数
+             * @method getStats
+             * @grammar getStats() => Object
+             */
+            getStats: function() {
+                // return this._mgr.getStats.apply( this._mgr, arguments );
+                var stats = this.request('get-stats');
+    
+                return stats ? {
+                    successNum: stats.numOfSuccess,
+                    progressNum: stats.numOfProgress,
+    
+                    // who care?
+                    // queueFailNum: 0,
+                    cancelNum: stats.numOfCancel,
+                    invalidNum: stats.numOfInvalid,
+                    uploadFailNum: stats.numOfUploadFailed,
+                    queueNum: stats.numOfQueue,
+                    interruptNum: stats.numOfInterrupt
+                } : {};
+            },
+    
+            // 需要重写此方法来来支持opts.onEvent和instance.onEvent的处理器
+            trigger: function( type/*, args...*/ ) {
+                var args = [].slice.call( arguments, 1 ),
+                    opts = this.options,
+                    name = 'on' + type.substring( 0, 1 ).toUpperCase() +
+                        type.substring( 1 );
+    
+                if (
+                        // 调用通过on方法注册的handler.
+                        Mediator.trigger.apply( this, arguments ) === false ||
+    
+                        // 调用opts.onEvent
+                        $.isFunction( opts[ name ] ) &&
+                        opts[ name ].apply( this, args ) === false ||
+    
+                        // 调用this.onEvent
+                        $.isFunction( this[ name ] ) &&
+                        this[ name ].apply( this, args ) === false ||
+    
+                        // 广播所有uploader的事件。
+                        Mediator.trigger.apply( Mediator,
+                        [ this, type ].concat( args ) ) === false ) {
+    
+                    return false;
+                }
+    
+                return true;
+            },
+    
+            /**
+             * 销毁 webuploader 实例
+             * @method destroy
+             * @grammar destroy() => undefined
+             */
+            destroy: function() {
+                this.request( 'destroy', arguments );
+                this.off();
+            },
+    
+            // widgets/widget.js将补充此方法的详细文档。
+            request: Base.noop
+        });
+    
+        /**
+         * 创建Uploader实例，等同于new Uploader( opts );
+         * @method create
+         * @class Base
+         * @static
+         * @grammar Base.create( opts ) => Uploader
+         */
+        Base.create = Uploader.create = function( opts ) {
+            return new Uploader( opts );
+        };
+    
+        // 暴露Uploader，可以通过它来扩展业务逻辑。
+        Base.Uploader = Uploader;
+    
+        return Uploader;
+    });
+    
+    /**
+     * @fileOverview Runtime管理器，负责Runtime的选择, 连接
+     */
+    define('runtime/runtime',[
+        'base',
+        'mediator'
+    ], function( Base, Mediator ) {
+    
+        var $ = Base.$,
+            factories = {},
+    
+            // 获取对象的第一个key
+            getFirstKey = function( obj ) {
+                for ( var key in obj ) {
+                    if ( obj.hasOwnProperty( key ) ) {
+                        return key;
+                    }
+                }
+                return null;
+            };
+    
+        // 接口类。
+        function Runtime( options ) {
+            this.options = $.extend({
+                container: document.body
+            }, options );
+            this.uid = Base.guid('rt_');
+        }
+    
+        $.extend( Runtime.prototype, {
+    
+            getContainer: function() {
+                var opts = this.options,
+                    parent, container;
+    
+                if ( this._container ) {
+                    return this._container;
+                }
+    
+                parent = $( opts.container || document.body );
+                container = $( document.createElement('div') );
+    
+                container.attr( 'id', 'rt_' + this.uid );
+                container.css({
+                    position: 'absolute',
+                    top: '0px',
+                    left: '0px',
+                    width: '1px',
+                    height: '1px',
+                    overflow: 'hidden'
+                });
+    
+                parent.append( container );
+                parent.addClass('webuploader-container');
+                this._container = container;
+                this._parent = parent;
+                return container;
+            },
+    
+            init: Base.noop,
+            exec: Base.noop,
+    
+            destroy: function() {
+                this._container && this._container.remove();
+                this._parent && this._parent.removeClass('webuploader-container');
+                this.off();
+            }
+        });
+    
+        Runtime.orders = 'html5,flash';
+    
+    
+        /**
+         * 添加Runtime实现。
+         * @param {String} type    类型
+         * @param {Runtime} factory 具体Runtime实现。
+         */
+        Runtime.addRuntime = function( type, factory ) {
+            factories[ type ] = factory;
+        };
+    
+        Runtime.hasRuntime = function( type ) {
+            return !!(type ? factories[ type ] : getFirstKey( factories ));
+        };
+    
+        Runtime.create = function( opts, orders ) {
+            var type, runtime;
+    
+            orders = orders || Runtime.orders;
+            $.each( orders.split( /\s*,\s*/g ), function() {
+                if ( factories[ this ] ) {
+                    type = this;
+                    return false;
+                }
+            });
+    
+            type = type || getFirstKey( factories );
+    
+            if ( !type ) {
+                throw new Error('Runtime Error');
+            }
+    
+            runtime = new factories[ type ]( opts );
+            return runtime;
+        };
+    
+        Mediator.installTo( Runtime.prototype );
+        return Runtime;
+    });
+    
+    /**
+     * @fileOverview Runtime管理器，负责Runtime的选择, 连接
+     */
+    define('runtime/client',[
+        'base',
+        'mediator',
+        'runtime/runtime'
+    ], function( Base, Mediator, Runtime ) {
+    
+        var cache;
+    
+        cache = (function() {
+            var obj = {};
+    
+            return {
+                add: function( runtime ) {
+                    obj[ runtime.uid ] = runtime;
+                },
+    
+                get: function( ruid, standalone ) {
+                    var i;
+    
+                    if ( ruid ) {
+                        return obj[ ruid ];
+                    }
+    
+                    for ( i in obj ) {
+                        // 有些类型不能重用，比如filepicker.
+                        if ( standalone && obj[ i ].__standalone ) {
+                            continue;
+                        }
+    
+                        return obj[ i ];
+                    }
+    
+                    return null;
+                },
+    
+                remove: function( runtime ) {
+                    delete obj[ runtime.uid ];
+                }
+            };
+        })();
+    
+        function RuntimeClient( component, standalone ) {
+            var deferred = Base.Deferred(),
+                runtime;
+    
+            this.uid = Base.guid('client_');
+    
+            // 允许runtime没有初始化之前，注册一些方法在初始化后执行。
+            this.runtimeReady = function( cb ) {
+                return deferred.done( cb );
+            };
+    
+            this.connectRuntime = function( opts, cb ) {
+    
+                // already connected.
+                if ( runtime ) {
+                    throw new Error('already connected!');
+                }
+    
+                deferred.done( cb );
+    
+                if ( typeof opts === 'string' && cache.get( opts ) ) {
+                    runtime = cache.get( opts );
+                }
+    
+                // 像filePicker只能独立存在，不能公用。
+                runtime = runtime || cache.get( null, standalone );
+    
+                // 需要创建
+                if ( !runtime ) {
+                    runtime = Runtime.create( opts, opts.runtimeOrder );
+                    runtime.__promise = deferred.promise();
+                    runtime.once( 'ready', deferred.resolve );
+                    runtime.init();
+                    cache.add( runtime );
+                    runtime.__client = 1;
+                } else {
+                    // 来自cache
+                    Base.$.extend( runtime.options, opts );
+                    runtime.__promise.then( deferred.resolve );
+                    runtime.__client++;
+                }
+    
+                standalone && (runtime.__standalone = standalone);
+                return runtime;
+            };
+    
+            this.getRuntime = function() {
+                return runtime;
+            };
+    
+            this.disconnectRuntime = function() {
+                if ( !runtime ) {
+                    return;
+                }
+    
+                runtime.__client--;
+    
+                if ( runtime.__client <= 0 ) {
+                    cache.remove( runtime );
+                    delete runtime.__promise;
+                    runtime.destroy();
+                }
+    
+                runtime = null;
+            };
+    
+            this.exec = function() {
+                if ( !runtime ) {
+                    return;
+                }
+    
+                var args = Base.slice( arguments );
+                component && args.unshift( component );
+    
+                return runtime.exec.apply( this, args );
+            };
+    
+            this.getRuid = function() {
+                return runtime && runtime.uid;
+            };
+    
+            this.destroy = (function( destroy ) {
+                return function() {
+                    destroy && destroy.apply( this, arguments );
+                    this.trigger('destroy');
+                    this.off();
+                    this.exec('destroy');
+                    this.disconnectRuntime();
+                };
+            })( this.destroy );
+        }
+    
+        Mediator.installTo( RuntimeClient.prototype );
+        return RuntimeClient;
+    });
+    /**
+     * @fileOverview 错误信息
+     */
+    define('lib/dnd',[
+        'base',
+        'mediator',
+        'runtime/client'
+    ], function( Base, Mediator, RuntimeClent ) {
+    
+        var $ = Base.$;
+    
+        function DragAndDrop( opts ) {
+            opts = this.options = $.extend({}, DragAndDrop.options, opts );
+    
+            opts.container = $( opts.container );
+    
+            if ( !opts.container.length ) {
+                return;
+            }
+    
+            RuntimeClent.call( this, 'DragAndDrop' );
+        }
+    
+        DragAndDrop.options = {
+            accept: null,
+            disableGlobalDnd: false
+        };
+    
+        Base.inherits( RuntimeClent, {
+            constructor: DragAndDrop,
+    
+            init: function() {
+                var me = this;
+    
+                me.connectRuntime( me.options, function() {
+                    me.exec('init');
+                    me.trigger('ready');
+                });
+            }
+        });
+    
+        Mediator.installTo( DragAndDrop.prototype );
+    
+        return DragAndDrop;
+    });
+    /**
+     * @fileOverview 组件基类。
+     */
+    define('widgets/widget',[
+        'base',
+        'uploader'
+    ], function( Base, Uploader ) {
+    
+        var $ = Base.$,
+            _init = Uploader.prototype._init,
+            _destroy = Uploader.prototype.destroy,
+            IGNORE = {},
+            widgetClass = [];
+    
+        function isArrayLike( obj ) {
+            if ( !obj ) {
+                return false;
+            }
+    
+            var length = obj.length,
+                type = $.type( obj );
+    
+            if ( obj.nodeType === 1 && length ) {
+                return true;
+            }
+    
+            return type === 'array' || type !== 'function' && type !== 'string' &&
+                    (length === 0 || typeof length === 'number' && length > 0 &&
+                    (length - 1) in obj);
+        }
+    
+        function Widget( uploader ) {
+            this.owner = uploader;
+            this.options = uploader.options;
+        }
+    
+        $.extend( Widget.prototype, {
+    
+            init: Base.noop,
+    
+            // 类Backbone的事件监听声明，监听uploader实例上的事件
+            // widget直接无法监听事件，事件只能通过uploader来传递
+            invoke: function( apiName, args ) {
+    
+                /*
+                    {
+                        'make-thumb': 'makeThumb'
+                    }
+                 */
+                var map = this.responseMap;
+    
+                // 如果无API响应声明则忽略
+                if ( !map || !(apiName in map) || !(map[ apiName ] in this) ||
+                        !$.isFunction( this[ map[ apiName ] ] ) ) {
+    
+                    return IGNORE;
+                }
+    
+                return this[ map[ apiName ] ].apply( this, args );
+    
+            },
+    
+            /**
+             * 发送命令。当传入`callback`或者`handler`中返回`promise`时。返回一个当所有`handler`中的promise都完成后完成的新`promise`。
+             * @method request
+             * @grammar request( command, args ) => * | Promise
+             * @grammar request( command, args, callback ) => Promise
+             * @for  Uploader
+             */
+            request: function() {
+                return this.owner.request.apply( this.owner, arguments );
+            }
+        });
+    
+        // 扩展Uploader.
+        $.extend( Uploader.prototype, {
+    
+            /**
+             * @property {String | Array} [disableWidgets=undefined]
+             * @namespace options
+             * @for Uploader
+             * @description 默认所有 Uploader.register 了的 widget 都会被加载，如果禁用某一部分，请通过此 option 指定黑名单。
+             */
+    
+            // 覆写_init用来初始化widgets
+            _init: function() {
+                var me = this,
+                    widgets = me._widgets = [],
+                    deactives = me.options.disableWidgets || '';
+    
+                $.each( widgetClass, function( _, klass ) {
+                    (!deactives || !~deactives.indexOf( klass._name )) &&
+                        widgets.push( new klass( me ) );
+                });
+    
+                return _init.apply( me, arguments );
+            },
+    
+            request: function( apiName, args, callback ) {
+                var i = 0,
+                    widgets = this._widgets,
+                    len = widgets && widgets.length,
+                    rlts = [],
+                    dfds = [],
+                    widget, rlt, promise, key;
+    
+                args = isArrayLike( args ) ? args : [ args ];
+    
+                for ( ; i < len; i++ ) {
+                    widget = widgets[ i ];
+                    rlt = widget.invoke( apiName, args );
+    
+                    if ( rlt !== IGNORE ) {
+    
+                        // Deferred对象
+                        if ( Base.isPromise( rlt ) ) {
+                            dfds.push( rlt );
+                        } else {
+                            rlts.push( rlt );
+                        }
+                    }
+                }
+    
+                // 如果有callback，则用异步方式。
+                if ( callback || dfds.length ) {
+                    promise = Base.when.apply( Base, dfds );
+                    key = promise.pipe ? 'pipe' : 'then';
+    
+                    // 很重要不能删除。删除了会死循环。
+                    // 保证执行顺序。让callback总是在下一个 tick 中执行。
+                    return promise[ key ](function() {
+                                var deferred = Base.Deferred(),
+                                    args = arguments;
+    
+                                if ( args.length === 1 ) {
+                                    args = args[ 0 ];
+                                }
+    
+                                setTimeout(function() {
+                                    deferred.resolve( args );
+                                }, 1 );
+    
+                                return deferred.promise();
+                            })[ callback ? key : 'done' ]( callback || Base.noop );
+                } else {
+                    return rlts[ 0 ];
+                }
+            },
+    
+            destroy: function() {
+                _destroy.apply( this, arguments );
+                this._widgets = null;
+            }
+        });
+    
+        /**
+         * 添加组件
+         * @grammar Uploader.register(proto);
+         * @grammar Uploader.register(map, proto);
+         * @param  {object} responseMap API 名称与函数实现的映射
+         * @param  {object} proto 组件原型，构造函数通过 constructor 属性定义
+         * @method Uploader.register
+         * @for Uploader
+         * @example
+         * Uploader.register({
+         *     'make-thumb': 'makeThumb'
+         * }, {
+         *     init: function( options ) {},
+         *     makeThumb: function() {}
+         * });
+         *
+         * Uploader.register({
+         *     'make-thumb': function() {
+         *         
+         *     }
+         * });
+         */
+        Uploader.register = Widget.register = function( responseMap, widgetProto ) {
+            var map = { init: 'init', destroy: 'destroy', name: 'anonymous' },
+                klass;
+    
+            if ( arguments.length === 1 ) {
+                widgetProto = responseMap;
+    
+                // 自动生成 map 表。
+                $.each(widgetProto, function(key) {
+                    if ( key[0] === '_' || key === 'name' ) {
+                        key === 'name' && (map.name = widgetProto.name);
+                        return;
+                    }
+    
+                    map[key.replace(/[A-Z]/g, '-$&').toLowerCase()] = key;
+                });
+    
+            } else {
+                map = $.extend( map, responseMap );
+            }
+    
+            widgetProto.responseMap = map;
+            klass = Base.inherits( Widget, widgetProto );
+            klass._name = map.name;
+            widgetClass.push( klass );
+    
+            return klass;
+        };
+    
+        /**
+         * 删除插件，只有在注册时指定了名字的才能被删除。
+         * @grammar Uploader.unRegister(name);
+         * @param  {string} name 组件名字
+         * @method Uploader.unRegister
+         * @for Uploader
+         * @example
+         *
+         * Uploader.register({
+         *     name: 'custom',
+         *     
+         *     'make-thumb': function() {
+         *         
+         *     }
+         * });
+         *
+         * Uploader.unRegister('custom');
+         */
+        Uploader.unRegister = Widget.unRegister = function( name ) {
+            if ( !name || name === 'anonymous' ) {
+                return;
+            }
+            
+            // 删除指定的插件。
+            for ( var i = widgetClass.length; i--; ) {
+                if ( widgetClass[i]._name === name ) {
+                    widgetClass.splice(i, 1)
+                }
+            }
+        };
+    
+        return Widget;
+    });
+    /**
+     * @fileOverview DragAndDrop Widget。
+     */
+    define('widgets/filednd',[
+        'base',
+        'uploader',
+        'lib/dnd',
+        'widgets/widget'
+    ], function( Base, Uploader, Dnd ) {
+        var $ = Base.$;
+    
+        Uploader.options.dnd = '';
+    
+        /**
+         * @property {Selector} [dnd=undefined]  指定Drag And Drop拖拽的容器，如果不指定，则不启动。
+         * @namespace options
+         * @for Uploader
+         */
+        
+        /**
+         * @property {Selector} [disableGlobalDnd=false]  是否禁掉整个页面的拖拽功能，如果不禁用，图片拖进来的时候会默认被浏览器打开。
+         * @namespace options
+         * @for Uploader
+         */
+    
+        /**
+         * @event dndAccept
+         * @param {DataTransferItemList} items DataTransferItem
+         * @description 阻止此事件可以拒绝某些类型的文件拖入进来。目前只有 chrome 提供这样的 API，且只能通过 mime-type 验证。
+         * @for  Uploader
+         */
+        return Uploader.register({
+            name: 'dnd',
+            
+            init: function( opts ) {
+    
+                if ( !opts.dnd ||
+                        this.request('predict-runtime-type') !== 'html5' ) {
+                    return;
+                }
+    
+                var me = this,
+                    deferred = Base.Deferred(),
+                    options = $.extend({}, {
+                        disableGlobalDnd: opts.disableGlobalDnd,
+                        container: opts.dnd,
+                        accept: opts.accept
+                    }),
+                    dnd;
+    
+                this.dnd = dnd = new Dnd( options );
+    
+                dnd.once( 'ready', deferred.resolve );
+                dnd.on( 'drop', function( files ) {
+                    me.request( 'add-file', [ files ]);
+                });
+    
+                // 检测文件是否全部允许添加。
+                dnd.on( 'accept', function( items ) {
+                    return me.owner.trigger( 'dndAccept', items );
+                });
+    
+                dnd.init();
+    
+                return deferred.promise();
+            },
+    
+            destroy: function() {
+                this.dnd && this.dnd.destroy();
+            }
+        });
+    });
+    
+    /**
+     * @fileOverview 错误信息
+     */
+    define('lib/filepaste',[
+        'base',
+        'mediator',
+        'runtime/client'
+    ], function( Base, Mediator, RuntimeClent ) {
+    
+        var $ = Base.$;
+    
+        function FilePaste( opts ) {
+            opts = this.options = $.extend({}, opts );
+            opts.container = $( opts.container || document.body );
+            RuntimeClent.call( this, 'FilePaste' );
+        }
+    
+        Base.inherits( RuntimeClent, {
+            constructor: FilePaste,
+    
+            init: function() {
+                var me = this;
+    
+                me.connectRuntime( me.options, function() {
+                    me.exec('init');
+                    me.trigger('ready');
+                });
+            }
+        });
+    
+        Mediator.installTo( FilePaste.prototype );
+    
+        return FilePaste;
+    });
+    /**
+     * @fileOverview 组件基类。
+     */
+    define('widgets/filepaste',[
+        'base',
+        'uploader',
+        'lib/filepaste',
+        'widgets/widget'
+    ], function( Base, Uploader, FilePaste ) {
+        var $ = Base.$;
+    
+        /**
+         * @property {Selector} [paste=undefined]  指定监听paste事件的容器，如果不指定，不启用此功能。此功能为通过粘贴来添加截屏的图片。建议设置为`document.body`.
+         * @namespace options
+         * @for Uploader
+         */
+        return Uploader.register({
+            name: 'paste',
+            
+            init: function( opts ) {
+    
+                if ( !opts.paste ||
+                        this.request('predict-runtime-type') !== 'html5' ) {
+                    return;
+                }
+    
+                var me = this,
+                    deferred = Base.Deferred(),
+                    options = $.extend({}, {
+                        container: opts.paste,
+                        accept: opts.accept
+                    }),
+                    paste;
+    
+                this.paste = paste = new FilePaste( options );
+    
+                paste.once( 'ready', deferred.resolve );
+                paste.on( 'paste', function( files ) {
+                    me.owner.request( 'add-file', [ files ]);
+                });
+                paste.init();
+    
+                return deferred.promise();
+            },
+    
+            destroy: function() {
+                this.paste && this.paste.destroy();
+            }
+        });
+    });
+    /**
+     * @fileOverview Blob
+     */
+    define('lib/blob',[
+        'base',
+        'runtime/client'
+    ], function( Base, RuntimeClient ) {
+    
+        function Blob( ruid, source ) {
+            var me = this;
+    
+            me.source = source;
+            me.ruid = ruid;
+            this.size = source.size || 0;
+    
+            // 如果没有指定 mimetype, 但是知道文件后缀。
+            if ( !source.type && this.ext &&
+                    ~'jpg,jpeg,png,gif,bmp'.indexOf( this.ext ) ) {
+                this.type = 'image/' + (this.ext === 'jpg' ? 'jpeg' : this.ext);
+            } else {
+                this.type = source.type || 'application/octet-stream';
+            }
+    
+            RuntimeClient.call( me, 'Blob' );
+            this.uid = source.uid || this.uid;
+    
+            if ( ruid ) {
+                me.connectRuntime( ruid );
+            }
+        }
+    
+        Base.inherits( RuntimeClient, {
+            constructor: Blob,
+    
+            slice: function( start, end ) {
+                return this.exec( 'slice', start, end );
+            },
+    
+            getSource: function() {
+                return this.source;
+            }
+        });
+    
+        return Blob;
+    });
+    /**
+     * 为了统一化Flash的File和HTML5的File而存在。
+     * 以至于要调用Flash里面的File，也可以像调用HTML5版本的File一下。
+     * @fileOverview File
+     */
+    define('lib/file',[
+        'base',
+        'lib/blob'
+    ], function( Base, Blob ) {
+    
+        var uid = 1,
+            rExt = /\.([^.]+)$/;
+    
+        function File( ruid, file ) {
+            var ext;
+    
+            this.name = file.name || ('untitled' + uid++);
+            ext = rExt.exec( file.name ) ? RegExp.$1.toLowerCase() : '';
+    
+            // todo 支持其他类型文件的转换。
+            // 如果有 mimetype, 但是文件名里面没有找出后缀规律
+            if ( !ext && file.type ) {
+                ext = /\/(jpg|jpeg|png|gif|bmp)$/i.exec( file.type ) ?
+                        RegExp.$1.toLowerCase() : '';
+                this.name += '.' + ext;
+            }
+    
+            this.ext = ext;
+            this.lastModifiedDate = file.lastModifiedDate || 
+                    file.lastModified && new Date(file.lastModified).toLocaleString() ||
+                    (new Date()).toLocaleString();
+    
+            Blob.apply( this, arguments );
+        }
+    
+        return Base.inherits( Blob, File );
+    });
+    
+    /**
+     * @fileOverview 错误信息
+     */
+    define('lib/filepicker',[
+        'base',
+        'runtime/client',
+        'lib/file'
+    ], function( Base, RuntimeClient, File ) {
+    
+        var $ = Base.$;
+    
+        function FilePicker( opts ) {
+            opts = this.options = $.extend({}, FilePicker.options, opts );
+    
+            opts.container = $( opts.id );
+    
+            if ( !opts.container.length ) {
+                throw new Error('按钮指定错误');
+            }
+    
+            opts.innerHTML = opts.innerHTML || opts.label ||
+                    opts.container.html() || '';
+    
+            opts.button = $( opts.button || document.createElement('div') );
+            opts.button.html( opts.innerHTML );
+            opts.container.html( opts.button );
+    
+            RuntimeClient.call( this, 'FilePicker', true );
+        }
+    
+        FilePicker.options = {
+            button: null,
+            container: null,
+            label: null,
+            innerHTML: null,
+            multiple: true,
+            accept: null,
+            name: 'file',
+            style: 'webuploader-pick'   //pick element class attribute, default is "webuploader-pick"
+        };
+    
+        Base.inherits( RuntimeClient, {
+            constructor: FilePicker,
+    
+            init: function() {
+                var me = this,
+                    opts = me.options,
+                    button = opts.button,
+                    style = opts.style;
+    
+                if (style)
+                    button.addClass('webuploader-pick');
+    
+                me.on( 'all', function( type ) {
+                    var files;
+    
+                    switch ( type ) {
+                        case 'mouseenter':
+                            if (style)
+                                button.addClass('webuploader-pick-hover');
+                            break;
+    
+                        case 'mouseleave':
+                            if (style)
+                                button.removeClass('webuploader-pick-hover');
+                            break;
+    
+                        case 'change':
+                            files = me.exec('getFiles');
+                            me.trigger( 'select', $.map( files, function( file ) {
+                                file = new File( me.getRuid(), file );
+    
+                                // 记录来源。
+                                file._refer = opts.container;
+                                return file;
+                            }), opts.container );
+                            break;
+                    }
+                });
+    
+                me.connectRuntime( opts, function() {
+                    me.refresh();
+                    me.exec( 'init', opts );
+                    me.trigger('ready');
+                });
+    
+                this._resizeHandler = Base.bindFn( this.refresh, this );
+                $( window ).on( 'resize', this._resizeHandler );
+            },
+    
+            refresh: function() {
+                var shimContainer = this.getRuntime().getContainer(),
+                    button = this.options.button,
+                    /*
+                    width = button.outerWidth ?
+                            button.outerWidth() : button.width(),
+    
+                    height = button.outerHeight ?
+                            button.outerHeight() : button.height(),
+                    */
+                    width = button[0] && button[0].offsetWidth || button.outerWidth() || button.width(),
+                    height = button[0] && button[0].offsetHeight || button.outerHeight() || button.height(),
+                    pos = button.offset();
+    
+                width && height && shimContainer.css({
+                    bottom: 'auto',
+                    right: 'auto',
+                    width: width + 'px',
+                    height: height + 'px'
+                }).offset( pos );
+            },
+    
+            enable: function() {
+                var btn = this.options.button;
+    
+                btn.removeClass('webuploader-pick-disable');
+                this.refresh();
+            },
+    
+            disable: function() {
+                var btn = this.options.button;
+    
+                this.getRuntime().getContainer().css({
+                    top: '-99999px'
+                });
+    
+                btn.addClass('webuploader-pick-disable');
+            },
+    
+            destroy: function() {
+                var btn = this.options.button;
+                $( window ).off( 'resize', this._resizeHandler );
+                btn.removeClass('webuploader-pick-disable webuploader-pick-hover ' +
+                    'webuploader-pick');
+            }
+        });
+    
+        return FilePicker;
+    });
+    
+    /**
+     * @fileOverview 文件选择相关
+     */
+    define('widgets/filepicker',[
+        'base',
+        'uploader',
+        'lib/filepicker',
+        'widgets/widget'
+    ], function( Base, Uploader, FilePicker ) {
+        var $ = Base.$;
+    
+        $.extend( Uploader.options, {
+    
+            /**
+             * @property {Selector | Object} [pick=undefined]
+             * @namespace options
+             * @for Uploader
+             * @description 指定选择文件的按钮容器，不指定则不创建按钮。
+             *
+             * * `id` {Seletor|dom} 指定选择文件的按钮容器，不指定则不创建按钮。**注意** 这里虽然写的是 id, 但是不是只支持 id, 还支持 class, 或者 dom 节点。
+             * * `label` {String} 请采用 `innerHTML` 代替
+             * * `innerHTML` {String} 指定按钮文字。不指定时优先从指定的容器中看是否自带文字。
+             * * `multiple` {Boolean} 是否开起同时选择多个文件能力。
+             */
+            pick: null,
+    
+            /**
+             * @property {Array} [accept=null]
+             * @namespace options
+             * @for Uploader
+             * @description 指定接受哪些类型的文件。 由于目前还有ext转mimeType表，所以这里需要分开指定。
+             *
+             * * `title` {String} 文字描述
+             * * `extensions` {String} 允许的文件后缀，不带点，多个用逗号分割。
+             * * `mimeTypes` {String} 多个用逗号分割。
+             *
+             * 如：
+             *
+             * ```
+             * {
+             *     title: 'Images',
+             *     extensions: 'gif,jpg,jpeg,bmp,png',
+             *     mimeTypes: 'image/*'
+             * }
+             * ```
+             */
+            accept: null/*{
+                title: 'Images',
+                extensions: 'gif,jpg,jpeg,bmp,png',
+                mimeTypes: 'image/*'
+            }*/
+        });
+    
+        return Uploader.register({
+            name: 'picker',
+    
+            init: function( opts ) {
+                this.pickers = [];
+                return opts.pick && this.addBtn( opts.pick );
+            },
+    
+            refresh: function() {
+                $.each( this.pickers, function() {
+                    this.refresh();
+                });
+            },
+    
+            /**
+             * @method addButton
+             * @for Uploader
+             * @grammar addButton( pick ) => Promise
+             * @description
+             * 添加文件选择按钮，如果一个按钮不够，需要调用此方法来添加。参数跟[options.pick](#WebUploader:Uploader:options)一致。
+             * @example
+             * uploader.addButton({
+             *     id: '#btnContainer',
+             *     innerHTML: '选择文件'
+             * });
+             */
+            addBtn: function( pick ) {
+                var me = this,
+                    opts = me.options,
+                    accept = opts.accept,
+                    promises = [];
+    
+                if ( !pick ) {
+                    return;
+                }
+    
+                $.isPlainObject( pick ) || (pick = {
+                    id: pick
+                });
+    
+                $( pick.id ).each(function() {
+                    var options, picker, deferred;
+    
+                    deferred = Base.Deferred();
+    
+                    options = $.extend({}, pick, {
+                        accept: $.isPlainObject( accept ) ? [ accept ] : accept,
+                        swf: opts.swf,
+                        runtimeOrder: opts.runtimeOrder,
+                        id: this
+                    });
+    
+                    picker = new FilePicker( options );
+    
+                    picker.once( 'ready', deferred.resolve );
+                    picker.on( 'select', function( files ) {
+                        me.owner.request( 'add-file', [ files ]);
+                    });
+                    picker.on('dialogopen', function() {
+                        me.owner.trigger('dialogOpen', picker.button);
+                    });
+                    picker.init();
+    
+                    me.pickers.push( picker );
+    
+                    promises.push( deferred.promise() );
+                });
+    
+                return Base.when.apply( Base, promises );
+            },
+    
+            disable: function() {
+                $.each( this.pickers, function() {
+                    this.disable();
+                });
+            },
+    
+            enable: function() {
+                $.each( this.pickers, function() {
+                    this.enable();
+                });
+            },
+    
+            destroy: function() {
+                $.each( this.pickers, function() {
+                    this.destroy();
+                });
+                this.pickers = null;
+            }
+        });
+    });
+    /**
+     * @fileOverview Image
+     */
+    define('lib/image',[
+        'base',
+        'runtime/client',
+        'lib/blob'
+    ], function( Base, RuntimeClient, Blob ) {
+        var $ = Base.$;
+    
+        // 构造器。
+        function Image( opts ) {
+            this.options = $.extend({}, Image.options, opts );
+            RuntimeClient.call( this, 'Image' );
+    
+            this.on( 'load', function() {
+                this._info = this.exec('info');
+                this._meta = this.exec('meta');
+            });
+        }
+    
+        // 默认选项。
+        Image.options = {
+    
+            // 默认的图片处理质量
+            quality: 90,
+    
+            // 是否裁剪
+            crop: false,
+    
+            // 是否保留头部信息
+            preserveHeaders: false,
+    
+            // 是否允许放大。
+            allowMagnify: false
+        };
+    
+        // 继承RuntimeClient.
+        Base.inherits( RuntimeClient, {
+            constructor: Image,
+    
+            info: function( val ) {
+    
+                // setter
+                if ( val ) {
+                    this._info = val;
+                    return this;
+                }
+    
+                // getter
+                return this._info;
+            },
+    
+            meta: function( val ) {
+    
+                // setter
+                if ( val ) {
+                    this._meta = val;
+                    return this;
+                }
+    
+                // getter
+                return this._meta;
+            },
+    
+            loadFromBlob: function( blob ) {
+                var me = this,
+                    ruid = blob.getRuid();
+    
+                this.connectRuntime( ruid, function() {
+                    me.exec( 'init', me.options );
+                    me.exec( 'loadFromBlob', blob );
+                });
+            },
+    
+            resize: function() {
+                var args = Base.slice( arguments );
+                return this.exec.apply( this, [ 'resize' ].concat( args ) );
+            },
+    
+            crop: function() {
+                var args = Base.slice( arguments );
+                return this.exec.apply( this, [ 'crop' ].concat( args ) );
+            },
+    
+            getAsDataUrl: function( type ) {
+                return this.exec( 'getAsDataUrl', type );
+            },
+    
+            getAsBlob: function( type ) {
+                var blob = this.exec( 'getAsBlob', type );
+    
+                return new Blob( this.getRuid(), blob );
+            }
+        });
+    
+        return Image;
+    });
+    /**
+     * Browser Image Compression
+     * v2.0.2
+     * by Donald <donaldcwl@gmail.com>
+     * https://github.com/Donaldcwl/browser-image-compression
+     */
+    define('lib/browser-image-compression',[], function () {
+    
+        var __assign = (this && this.__assign) || function () {
+            __assign = Object.assign || function (t) {
+                for (var s, i = 1, n = arguments.length; i < n; i++) {
+                    s = arguments[i];
+                    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                        t[p] = s[p];
+                }
+                return t;
+            };
+            return __assign.apply(this, arguments);
+        };
+    
+        var _a;
+    
+        function _mergeNamespaces(e, t) {
+            return t.forEach((function (t) {
+                t && "string" != typeof t && !Array.isArray(t) && Object.keys(t).forEach((function (r) {
+                    if ("default" !== r && !(r in e)) {
+                        var i = Object.getOwnPropertyDescriptor(t, r);
+                        Object.defineProperty(e, r, i.get ? i : {
+                            enumerable: !0, get: function () {
+                                return t[r];
+                            }
+                        });
+                    }
+                }));
+            })), Object.freeze(e);
+        }
+    
+        function copyExifWithoutOrientation(e, t) {
+            return new Promise((function (r, i) {
+                var o;
+                return getApp1Segment(e).then((function (e) {
+                    try {
+                        return o = e, r(new window.Blob([t.slice(0, 2), o, t.slice(2)], {type: "image/jpeg"}));
+                    } catch (e) {
+                        return i(e);
+                    }
+                }), i);
+            }));
+        }
+    
+        var getApp1Segment = function (e) {
+            return new Promise((function (t, r) {
+                var i = new FileReader;
+                i.addEventListener("load", (function (_a) {
+                    var e = _a.target.result;
+                    var i = new DataView(e);
+                    var o = 0;
+                    if (65496 !== i.getUint16(o))
+                        return r("not a valid JPEG");
+                    for (o += 2; ;) {
+                        var a_1 = i.getUint16(o);
+                        if (65498 === a_1)
+                            break;
+                        var s_1 = i.getUint16(o + 2);
+                        if (65505 === a_1 && 1165519206 === i.getUint32(o + 4)) {
+                            var a_2 = o + 10;
+                            var f_1 = void 0;
+                            switch (i.getUint16(a_2)) {
+                                case 18761:
+                                    f_1 = !0;
+                                    break;
+                                case 19789:
+                                    f_1 = !1;
+                                    break;
+                                default:
+                                    return r("TIFF header contains invalid endian");
+                            }
+                            if (42 !== i.getUint16(a_2 + 2, f_1))
+                                return r("TIFF header contains invalid version");
+                            var l_1 = i.getUint32(a_2 + 4, f_1), c = a_2 + l_1 + 2 + 12 * i.getUint16(a_2 + l_1, f_1);
+                            for (var e_1 = a_2 + l_1 + 2; e_1 < c; e_1 += 12) {
+                                if (274 == i.getUint16(e_1, f_1)) {
+                                    if (3 !== i.getUint16(e_1 + 2, f_1))
+                                        return r("Orientation data type is invalid");
+                                    if (1 !== i.getUint32(e_1 + 4, f_1))
+                                        return r("Orientation data count is invalid");
+                                    i.setUint16(e_1 + 8, 1, f_1);
+                                    break;
+                                }
+                            }
+                            return t(e.slice(o, o + 2 + s_1));
+                        }
+                        o += 2 + s_1;
+                    }
+                    return t(new window.Blob);
+                })), i.readAsArrayBuffer(e);
+            }));
+        };
+        var e = {};
+        !function (e) {
+            var t, r, UZIP = {};
+            e.exports = UZIP, UZIP.parse = function (e, t) {
+                for (var r = UZIP.bin.readUshort, i = UZIP.bin.readUint, o = 0, a = {}, s = new Uint8Array(e), f = s.length - 4; 101010256 != i(s, f);)
+                    f--;
+                o = f;
+                o += 4;
+                var l = r(s, o += 4);
+                r(s, o += 2);
+                var c = i(s, o += 2), u = i(s, o += 4);
+                o += 4, o = u;
+                for (var h = 0; h < l; h++) {
+                    i(s, o), o += 4, o += 4, o += 4, i(s, o += 4);
+                    c = i(s, o += 4);
+                    var d = i(s, o += 4), A = r(s, o += 4), g = r(s, o + 2), p = r(s, o + 4);
+                    o += 6;
+                    var m = i(s, o += 8);
+                    o += 4, o += A + g + p, UZIP._readLocal(s, m, a, c, d, t);
+                }
+                return a;
+            }, UZIP._readLocal = function (e, t, r, i, o, a) {
+                var s = UZIP.bin.readUshort, f = UZIP.bin.readUint;
+                f(e, t), s(e, t += 4), s(e, t += 2);
+                var l = s(e, t += 2);
+                f(e, t += 2), f(e, t += 4), t += 4;
+                var c = s(e, t += 8), u = s(e, t += 2);
+                t += 2;
+                var h = UZIP.bin.readUTF8(e, t, c);
+                if (t += c, t += u, a)
+                    r[h] = {size: o, csize: i};
+                else {
+                    var d = new Uint8Array(e.buffer, t);
+                    if (0 == l)
+                        r[h] = new Uint8Array(d.buffer.slice(t, t + i));
+                    else {
+                        if (8 != l)
+                            throw "unknown compression method: " + l;
+                        var A = new Uint8Array(o);
+                        UZIP.inflateRaw(d, A), r[h] = A;
+                    }
+                }
+            }, UZIP.inflateRaw = function (e, t) {
+                return UZIP.F.inflate(e, t);
+            }, UZIP.inflate = function (e, t) {
+                return e[0], e[1], UZIP.inflateRaw(new Uint8Array(e.buffer, e.byteOffset + 2, e.length - 6), t);
+            }, UZIP.deflate = function (e, t) {
+                null == t && (t = {level: 6});
+                var r = 0, i = new Uint8Array(50 + Math.floor(1.1 * e.length));
+                i[r] = 120, i[r + 1] = 156, r += 2, r = UZIP.F.deflateRaw(e, i, r, t.level);
+                var o = UZIP.adler(e, 0, e.length);
+                return i[r + 0] = o >>> 24 & 255, i[r + 1] = o >>> 16 & 255, i[r + 2] = o >>> 8 & 255, i[r + 3] = o >>> 0 & 255, new Uint8Array(i.buffer, 0, r + 4);
+            }, UZIP.deflateRaw = function (e, t) {
+                null == t && (t = {level: 6});
+                var r = new Uint8Array(50 + Math.floor(1.1 * e.length)), i = UZIP.F.deflateRaw(e, r, i, t.level);
+                return new Uint8Array(r.buffer, 0, i);
+            }, UZIP.encode = function (e, t) {
+                null == t && (t = !1);
+                var r = 0, i = UZIP.bin.writeUint, o = UZIP.bin.writeUshort, a = {};
+                for (var s in e) {
+                    var f = !UZIP._noNeed(s) && !t, l = e[s], c = UZIP.crc.crc(l, 0, l.length);
+                    a[s] = {cpr: f, usize: l.length, crc: c, file: f ? UZIP.deflateRaw(l) : l};
+                }
+                for (var s in a)
+                    r += a[s].file.length + 30 + 46 + 2 * UZIP.bin.sizeUTF8(s);
+                r += 22;
+                var u = new Uint8Array(r), h = 0, d = [];
+                for (var s in a) {
+                    var A = a[s];
+                    d.push(h), h = UZIP._writeHeader(u, h, s, A, 0);
+                }
+                var g = 0, p = h;
+                for (var s in a) {
+                    A = a[s];
+                    d.push(h), h = UZIP._writeHeader(u, h, s, A, 1, d[g++]);
+                }
+                var m = h - p;
+                return i(u, h, 101010256), h += 4, o(u, h += 4, g), o(u, h += 2, g), i(u, h += 2, m), i(u, h += 4, p), h += 4, h += 2, u.buffer;
+            }, UZIP._noNeed = function (e) {
+                var t = e.split(".").pop().toLowerCase();
+                return -1 != "png,jpg,jpeg,zip".indexOf(t);
+            }, UZIP._writeHeader = function (e, t, r, i, o, a) {
+                var s = UZIP.bin.writeUint, f = UZIP.bin.writeUshort, l = i.file;
+                return s(e, t, 0 == o ? 67324752 : 33639248), t += 4, 1 == o && (t += 2), f(e, t, 20), f(e, t += 2, 0), f(e, t += 2, i.cpr ? 8 : 0), s(e, t += 2, 0), s(e, t += 4, i.crc), s(e, t += 4, l.length), s(e, t += 4, i.usize), f(e, t += 4, UZIP.bin.sizeUTF8(r)), f(e, t += 2, 0), t += 2, 1 == o && (t += 2, t += 2, s(e, t += 6, a), t += 4), t += UZIP.bin.writeUTF8(e, t, r), 0 == o && (e.set(l, t), t += l.length), t;
+            }, UZIP.crc = {
+                table: function () {
+                    for (var e = new Uint32Array(256), t = 0; t < 256; t++) {
+                        for (var r = t, i = 0; i < 8; i++)
+                            1 & r ? r = 3988292384 ^ r >>> 1 : r >>>= 1;
+                        e[t] = r;
+                    }
+                    return e;
+                }(), update: function (e, t, r, i) {
+                    for (var o = 0; o < i; o++)
+                        e = UZIP.crc.table[255 & (e ^ t[r + o])] ^ e >>> 8;
+                    return e;
+                }, crc: function (e, t, r) {
+                    return 4294967295 ^ UZIP.crc.update(4294967295, e, t, r);
+                }
+            }, UZIP.adler = function (e, t, r) {
+                for (var i = 1, o = 0, a = t, s = t + r; a < s;) {
+                    for (var f = Math.min(a + 5552, s); a < f;)
+                        o += i += e[a++];
+                    i %= 65521, o %= 65521;
+                }
+                return o << 16 | i;
+            }, UZIP.bin = {
+                readUshort: function (e, t) {
+                    return e[t] | e[t + 1] << 8;
+                }, writeUshort: function (e, t, r) {
+                    e[t] = 255 & r, e[t + 1] = r >> 8 & 255;
+                }, readUint: function (e, t) {
+                    return 16777216 * e[t + 3] + (e[t + 2] << 16 | e[t + 1] << 8 | e[t]);
+                }, writeUint: function (e, t, r) {
+                    e[t] = 255 & r, e[t + 1] = r >> 8 & 255, e[t + 2] = r >> 16 & 255, e[t + 3] = r >> 24 & 255;
+                }, readASCII: function (e, t, r) {
+                    for (var i = "", o = 0; o < r; o++)
+                        i += String.fromCharCode(e[t + o]);
+                    return i;
+                }, writeASCII: function (e, t, r) {
+                    for (var i = 0; i < r.length; i++)
+                        e[t + i] = r.charCodeAt(i);
+                }, pad: function (e) {
+                    return e.length < 2 ? "0" + e : e;
+                }, readUTF8: function (e, t, r) {
+                    for (var i, o = "", a = 0; a < r; a++)
+                        o += "%" + UZIP.bin.pad(e[t + a].toString(16));
+                    try {
+                        i = decodeURIComponent(o);
+                    } catch (i) {
+                        return UZIP.bin.readASCII(e, t, r);
+                    }
+                    return i;
+                }, writeUTF8: function (e, t, r) {
+                    for (var i = r.length, o = 0, a = 0; a < i; a++) {
+                        var s = r.charCodeAt(a);
+                        if (0 == (4294967168 & s))
+                            e[t + o] = s, o++;
+                        else if (0 == (4294965248 & s))
+                            e[t + o] = 192 | s >> 6, e[t + o + 1] = 128 | s >> 0 & 63, o += 2;
+                        else if (0 == (4294901760 & s))
+                            e[t + o] = 224 | s >> 12, e[t + o + 1] = 128 | s >> 6 & 63, e[t + o + 2] = 128 | s >> 0 & 63, o += 3;
+                        else {
+                            if (0 != (4292870144 & s))
+                                throw "e";
+                            e[t + o] = 240 | s >> 18, e[t + o + 1] = 128 | s >> 12 & 63, e[t + o + 2] = 128 | s >> 6 & 63, e[t + o + 3] = 128 | s >> 0 & 63, o += 4;
+                        }
+                    }
+                    return o;
+                }, sizeUTF8: function (e) {
+                    for (var t = e.length, r = 0, i = 0; i < t; i++) {
+                        var o = e.charCodeAt(i);
+                        if (0 == (4294967168 & o))
+                            r++;
+                        else if (0 == (4294965248 & o))
+                            r += 2;
+                        else if (0 == (4294901760 & o))
+                            r += 3;
+                        else {
+                            if (0 != (4292870144 & o))
+                                throw "e";
+                            r += 4;
+                        }
+                    }
+                    return r;
+                }
+            }, UZIP.F = {}, UZIP.F.deflateRaw = function (e, t, r, i) {
+                var o = [[0, 0, 0, 0, 0], [4, 4, 8, 4, 0], [4, 5, 16, 8, 0], [4, 6, 16, 16, 0], [4, 10, 16, 32, 0], [8, 16, 32, 32, 0], [8, 16, 128, 128, 0], [8, 32, 128, 256, 0], [32, 128, 258, 1024, 1], [32, 258, 258, 4096, 1]][i],
+                    a = UZIP.F.U, s = UZIP.F._goodIndex;
+                UZIP.F._hash;
+                var f = UZIP.F._putsE, l = 0, c = r << 3, u = 0, h = e.length;
+                if (0 == i) {
+                    for (; l < h;) {
+                        f(t, c, l + (_ = Math.min(65535, h - l)) == h ? 1 : 0), c = UZIP.F._copyExact(e, l, _, t, c + 8), l += _;
+                    }
+                    return c >>> 3;
+                }
+                var d = a.lits, A = a.strt, g = a.prev, p = 0, m = 0, w = 0, v = 0, b = 0, y = 0;
+                for (h > 2 && (A[y = UZIP.F._hash(e, 0)] = 0), l = 0; l < h; l++) {
+                    if (b = y, l + 1 < h - 2) {
+                        y = UZIP.F._hash(e, l + 1);
+                        var E = l + 1 & 32767;
+                        g[E] = A[y], A[y] = E;
+                    }
+                    if (u <= l) {
+                        (p > 14e3 || m > 26697) && h - l > 100 && (u < l && (d[p] = l - u, p += 2, u = l), c = UZIP.F._writeBlock(l == h - 1 || u == h ? 1 : 0, d, p, v, e, w, l - w, t, c), p = m = v = 0, w = l);
+                        var F = 0;
+                        l < h - 2 && (F = UZIP.F._bestMatch(e, l, g, b, Math.min(o[2], h - l), o[3]));
+                        var _ = F >>> 16, B = 65535 & F;
+                        if (0 != F) {
+                            B = 65535 & F;
+                            var U = s(_ = F >>> 16, a.of0);
+                            a.lhst[257 + U]++;
+                            var C = s(B, a.df0);
+                            a.dhst[C]++, v += a.exb[U] + a.dxb[C], d[p] = _ << 23 | l - u, d[p + 1] = B << 16 | U << 8 | C, p += 2, u = l + _;
+                        } else
+                            a.lhst[e[l]]++;
+                        m++;
+                    }
+                }
+                for (w == l && 0 != e.length || (u < l && (d[p] = l - u, p += 2, u = l), c = UZIP.F._writeBlock(1, d, p, v, e, w, l - w, t, c), p = 0, m = 0, p = m = v = 0, w = l); 0 != (7 & c);)
+                    c++;
+                return c >>> 3;
+            }, UZIP.F._bestMatch = function (e, t, r, i, o, a) {
+                var s = 32767 & t, f = r[s], l = s - f + 32768 & 32767;
+                if (f == s || i != UZIP.F._hash(e, t - l))
+                    return 0;
+                for (var c = 0, u = 0, h = Math.min(32767, t); l <= h && 0 != --a && f != s;) {
+                    if (0 == c || e[t + c] == e[t + c - l]) {
+                        var d = UZIP.F._howLong(e, t, l);
+                        if (d > c) {
+                            if (u = l, (c = d) >= o)
+                                break;
+                            l + 2 < d && (d = l + 2);
+                            for (var A = 0, g = 0; g < d - 2; g++) {
+                                var p = t - l + g + 32768 & 32767, m = p - r[p] + 32768 & 32767;
+                                m > A && (A = m, f = p);
+                            }
+                        }
+                    }
+                    l += (s = f) - (f = r[s]) + 32768 & 32767;
+                }
+                return c << 16 | u;
+            }, UZIP.F._howLong = function (e, t, r) {
+                if (e[t] != e[t - r] || e[t + 1] != e[t + 1 - r] || e[t + 2] != e[t + 2 - r])
+                    return 0;
+                var i = t, o = Math.min(e.length, t + 258);
+                for (t += 3; t < o && e[t] == e[t - r];)
+                    t++;
+                return t - i;
+            }, UZIP.F._hash = function (e, t) {
+                return (e[t] << 8 | e[t + 1]) + (e[t + 2] << 4) & 65535;
+            }, UZIP.saved = 0, UZIP.F._writeBlock = function (e, t, r, i, o, a, s, f, l) {
+                var c, u, h, d, A, g, p, m, w, v = UZIP.F.U, b = UZIP.F._putsF, y = UZIP.F._putsE;
+                v.lhst[256]++, u = (c = UZIP.F.getTrees())[0], h = c[1], d = c[2], A = c[3], g = c[4], p = c[5], m = c[6], w = c[7];
+                var E = 32 + (0 == (l + 3 & 7) ? 0 : 8 - (l + 3 & 7)) + (s << 3),
+                    F = i + UZIP.F.contSize(v.fltree, v.lhst) + UZIP.F.contSize(v.fdtree, v.dhst),
+                    _ = i + UZIP.F.contSize(v.ltree, v.lhst) + UZIP.F.contSize(v.dtree, v.dhst);
+                _ += 14 + 3 * p + UZIP.F.contSize(v.itree, v.ihst) + (2 * v.ihst[16] + 3 * v.ihst[17] + 7 * v.ihst[18]);
+                for (var B = 0; B < 286; B++)
+                    v.lhst[B] = 0;
+                for (B = 0; B < 30; B++)
+                    v.dhst[B] = 0;
+                for (B = 0; B < 19; B++)
+                    v.ihst[B] = 0;
+                var U = E < F && E < _ ? 0 : F < _ ? 1 : 2;
+                if (b(f, l, e), b(f, l + 1, U), l += 3, 0 == U) {
+                    for (; 0 != (7 & l);)
+                        l++;
+                    l = UZIP.F._copyExact(o, a, s, f, l);
+                } else {
+                    var C, I;
+                    if (1 == U && (C = v.fltree, I = v.fdtree), 2 == U) {
+                        UZIP.F.makeCodes(v.ltree, u), UZIP.F.revCodes(v.ltree, u), UZIP.F.makeCodes(v.dtree, h), UZIP.F.revCodes(v.dtree, h), UZIP.F.makeCodes(v.itree, d), UZIP.F.revCodes(v.itree, d), C = v.ltree, I = v.dtree, y(f, l, A - 257), y(f, l += 5, g - 1), y(f, l += 5, p - 4), l += 4;
+                        for (var Q = 0; Q < p; Q++)
+                            y(f, l + 3 * Q, v.itree[1 + (v.ordr[Q] << 1)]);
+                        l += 3 * p, l = UZIP.F._codeTiny(m, v.itree, f, l), l = UZIP.F._codeTiny(w, v.itree, f, l);
+                    }
+                    for (var M = a, x = 0; x < r; x += 2) {
+                        for (var T = t[x], S = T >>> 23, R = M + (8388607 & T); M < R;)
+                            l = UZIP.F._writeLit(o[M++], C, f, l);
+                        if (0 != S) {
+                            var O = t[x + 1], P = O >> 16, H = O >> 8 & 255, L = 255 & O;
+                            y(f, l = UZIP.F._writeLit(257 + H, C, f, l), S - v.of0[H]), l += v.exb[H], b(f, l = UZIP.F._writeLit(L, I, f, l), P - v.df0[L]), l += v.dxb[L], M += S;
+                        }
+                    }
+                    l = UZIP.F._writeLit(256, C, f, l);
+                }
+                return l;
+            }, UZIP.F._copyExact = function (e, t, r, i, o) {
+                var a = o >>> 3;
+                return i[a] = r, i[a + 1] = r >>> 8, i[a + 2] = 255 - i[a], i[a + 3] = 255 - i[a + 1], a += 4, i.set(new Uint8Array(e.buffer, t, r), a), o + (r + 4 << 3);
+            }, UZIP.F.getTrees = function () {
+                for (var e = UZIP.F.U, t = UZIP.F._hufTree(e.lhst, e.ltree, 15), r = UZIP.F._hufTree(e.dhst, e.dtree, 15), i = [], o = UZIP.F._lenCodes(e.ltree, i), a = [], s = UZIP.F._lenCodes(e.dtree, a), f = 0; f < i.length; f += 2)
+                    e.ihst[i[f]]++;
+                for (f = 0; f < a.length; f += 2)
+                    e.ihst[a[f]]++;
+                for (var l = UZIP.F._hufTree(e.ihst, e.itree, 7), c = 19; c > 4 && 0 == e.itree[1 + (e.ordr[c - 1] << 1)];)
+                    c--;
+                return [t, r, l, o, s, c, i, a];
+            }, UZIP.F.getSecond = function (e) {
+                for (var t = [], r = 0; r < e.length; r += 2)
+                    t.push(e[r + 1]);
+                return t;
+            }, UZIP.F.nonZero = function (e) {
+                for (var t = "", r = 0; r < e.length; r += 2)
+                    0 != e[r + 1] && (t += (r >> 1) + ",");
+                return t;
+            }, UZIP.F.contSize = function (e, t) {
+                for (var r = 0, i = 0; i < t.length; i++)
+                    r += t[i] * e[1 + (i << 1)];
+                return r;
+            }, UZIP.F._codeTiny = function (e, t, r, i) {
+                for (var o = 0; o < e.length; o += 2) {
+                    var a = e[o], s = e[o + 1];
+                    i = UZIP.F._writeLit(a, t, r, i);
+                    var f = 16 == a ? 2 : 17 == a ? 3 : 7;
+                    a > 15 && (UZIP.F._putsE(r, i, s, f), i += f);
+                }
+                return i;
+            }, UZIP.F._lenCodes = function (e, t) {
+                for (var r = e.length; 2 != r && 0 == e[r - 1];)
+                    r -= 2;
+                for (var i = 0; i < r; i += 2) {
+                    var o = e[i + 1], a = i + 3 < r ? e[i + 3] : -1, s = i + 5 < r ? e[i + 5] : -1,
+                        f = 0 == i ? -1 : e[i - 1];
+                    if (0 == o && a == o && s == o) {
+                        for (var l = i + 5; l + 2 < r && e[l + 2] == o;)
+                            l += 2;
+                        (c = Math.min(l + 1 - i >>> 1, 138)) < 11 ? t.push(17, c - 3) : t.push(18, c - 11), i += 2 * c - 2;
+                    } else if (o == f && a == o && s == o) {
+                        for (l = i + 5; l + 2 < r && e[l + 2] == o;)
+                            l += 2;
+                        var c = Math.min(l + 1 - i >>> 1, 6);
+                        t.push(16, c - 3), i += 2 * c - 2;
+                    } else
+                        t.push(o, 0);
+                }
+                return r >>> 1;
+            }, UZIP.F._hufTree = function (e, t, r) {
+                var i = [], o = e.length, a = t.length, s = 0;
+                for (s = 0; s < a; s += 2)
+                    t[s] = 0, t[s + 1] = 0;
+                for (s = 0; s < o; s++)
+                    0 != e[s] && i.push({lit: s, f: e[s]});
+                var f = i.length, l = i.slice(0);
+                if (0 == f)
+                    return 0;
+                if (1 == f) {
+                    var c = i[0].lit;
+                    l = 0 == c ? 1 : 0;
+                    return t[1 + (c << 1)] = 1, t[1 + (l << 1)] = 1, 1;
+                }
+                i.sort((function (e, t) {
+                    return e.f - t.f;
+                }));
+                var u = i[0], h = i[1], d = 0, A = 1, g = 2;
+                for (i[0] = {
+                    lit: -1,
+                    f: u.f + h.f,
+                    l: u,
+                    r: h,
+                    d: 0
+                }; A != f - 1;)
+                    u = d != A && (g == f || i[d].f < i[g].f) ? i[d++] : i[g++], h = d != A && (g == f || i[d].f < i[g].f) ? i[d++] : i[g++], i[A++] = {
+                        lit: -1,
+                        f: u.f + h.f,
+                        l: u,
+                        r: h
+                    };
+                var p = UZIP.F.setDepth(i[A - 1], 0);
+                for (p > r && (UZIP.F.restrictDepth(l, r, p), p = r), s = 0; s < f; s++)
+                    t[1 + (l[s].lit << 1)] = l[s].d;
+                return p;
+            }, UZIP.F.setDepth = function (e, t) {
+                return -1 != e.lit ? (e.d = t, t) : Math.max(UZIP.F.setDepth(e.l, t + 1), UZIP.F.setDepth(e.r, t + 1));
+            }, UZIP.F.restrictDepth = function (e, t, r) {
+                var i = 0, o = 1 << r - t, a = 0;
+                for (e.sort((function (e, t) {
+                    return t.d == e.d ? e.f - t.f : t.d - e.d;
+                })), i = 0; i < e.length && e[i].d > t; i++) {
+                    var s = e[i].d;
+                    e[i].d = t, a += o - (1 << r - s);
+                }
+                for (a >>>= r - t; a > 0;) {
+                    (s = e[i].d) < t ? (e[i].d++, a -= 1 << t - s - 1) : i++;
+                }
+                for (; i >= 0; i--)
+                    e[i].d == t && a < 0 && (e[i].d--, a++);
+                0 != a && console.log("debt left");
+            }, UZIP.F._goodIndex = function (e, t) {
+                var r = 0;
+                return t[16 | r] <= e && (r |= 16), t[8 | r] <= e && (r |= 8), t[4 | r] <= e && (r |= 4), t[2 | r] <= e && (r |= 2), t[1 | r] <= e && (r |= 1), r;
+            }, UZIP.F._writeLit = function (e, t, r, i) {
+                return UZIP.F._putsF(r, i, t[e << 1]), i + t[1 + (e << 1)];
+            }, UZIP.F.inflate = function (e, t) {
+                var r = Uint8Array;
+                if (3 == e[0] && 0 == e[1])
+                    return t || new r(0);
+                var i = UZIP.F, o = i._bitsF, a = i._bitsE, s = i._decodeTiny, f = i.makeCodes, l = i.codes2map,
+                    c = i._get17, u = i.U, h = null == t;
+                h && (t = new r(e.length >>> 2 << 3));
+                for (var d, A, g = 0, p = 0, m = 0, w = 0, v = 0, b = 0, y = 0, E = 0, F = 0; 0 == g;)
+                    if (g = o(e, F, 1), p = o(e, F + 1, 2), F += 3, 0 != p) {
+                        if (h && (t = UZIP.F._check(t, E + (1 << 17))), 1 == p && (d = u.flmap, A = u.fdmap, b = 511, y = 31), 2 == p) {
+                            m = a(e, F, 5) + 257, w = a(e, F + 5, 5) + 1, v = a(e, F + 10, 4) + 4, F += 14;
+                            for (var _ = 0; _ < 38; _ += 2)
+                                u.itree[_] = 0, u.itree[_ + 1] = 0;
+                            var B = 1;
+                            for (_ = 0; _ < v; _++) {
+                                var U = a(e, F + 3 * _, 3);
+                                u.itree[1 + (u.ordr[_] << 1)] = U, U > B && (B = U);
+                            }
+                            F += 3 * v, f(u.itree, B), l(u.itree, B, u.imap), d = u.lmap, A = u.dmap, F = s(u.imap, (1 << B) - 1, m + w, e, F, u.ttree);
+                            var C = i._copyOut(u.ttree, 0, m, u.ltree);
+                            b = (1 << C) - 1;
+                            var I = i._copyOut(u.ttree, m, w, u.dtree);
+                            y = (1 << I) - 1, f(u.ltree, C), l(u.ltree, C, d), f(u.dtree, I), l(u.dtree, I, A);
+                        }
+                        for (; ;) {
+                            var Q = d[c(e, F) & b];
+                            F += 15 & Q;
+                            var M = Q >>> 4;
+                            if (M >>> 8 == 0)
+                                t[E++] = M;
+                            else {
+                                if (256 == M)
+                                    break;
+                                var x = E + M - 254;
+                                if (M > 264) {
+                                    var T = u.ldef[M - 257];
+                                    x = E + (T >>> 3) + a(e, F, 7 & T), F += 7 & T;
+                                }
+                                var S = A[c(e, F) & y];
+                                F += 15 & S;
+                                var R = S >>> 4, O = u.ddef[R], P = (O >>> 4) + o(e, F, 15 & O);
+                                for (F += 15 & O, h && (t = UZIP.F._check(t, E + (1 << 17))); E < x;)
+                                    t[E] = t[E++ - P], t[E] = t[E++ - P], t[E] = t[E++ - P], t[E] = t[E++ - P];
+                                E = x;
+                            }
+                        }
+                    } else {
+                        0 != (7 & F) && (F += 8 - (7 & F));
+                        var H = 4 + (F >>> 3), L = e[H - 4] | e[H - 3] << 8;
+                        h && (t = UZIP.F._check(t, E + L)), t.set(new r(e.buffer, e.byteOffset + H, L), E), F = H + L << 3, E += L;
+                    }
+                return t.length == E ? t : t.slice(0, E);
+            }, UZIP.F._check = function (e, t) {
+                var r = e.length;
+                if (t <= r)
+                    return e;
+                var i = new Uint8Array(Math.max(r << 1, t));
+                return i.set(e, 0), i;
+            }, UZIP.F._decodeTiny = function (e, t, r, i, o, a) {
+                for (var s = UZIP.F._bitsE, f = UZIP.F._get17, l = 0; l < r;) {
+                    var c = e[f(i, o) & t];
+                    o += 15 & c;
+                    var u = c >>> 4;
+                    if (u <= 15)
+                        a[l] = u, l++;
+                    else {
+                        var h = 0, d = 0;
+                        16 == u ? (d = 3 + s(i, o, 2), o += 2, h = a[l - 1]) : 17 == u ? (d = 3 + s(i, o, 3), o += 3) : 18 == u && (d = 11 + s(i, o, 7), o += 7);
+                        for (var A = l + d; l < A;)
+                            a[l] = h, l++;
+                    }
+                }
+                return o;
+            }, UZIP.F._copyOut = function (e, t, r, i) {
+                for (var o = 0, a = 0, s = i.length >>> 1; a < r;) {
+                    var f = e[a + t];
+                    i[a << 1] = 0, i[1 + (a << 1)] = f, f > o && (o = f), a++;
+                }
+                for (; a < s;)
+                    i[a << 1] = 0, i[1 + (a << 1)] = 0, a++;
+                return o;
+            }, UZIP.F.makeCodes = function (e, t) {
+                for (var r, i, o, a, s = UZIP.F.U, f = e.length, l = s.bl_count, c = 0; c <= t; c++)
+                    l[c] = 0;
+                for (c = 1; c < f; c += 2)
+                    l[e[c]]++;
+                var u = s.next_code;
+                for (r = 0, l[0] = 0, i = 1; i <= t; i++)
+                    r = r + l[i - 1] << 1, u[i] = r;
+                for (o = 0; o < f; o += 2)
+                    0 != (a = e[o + 1]) && (e[o] = u[a], u[a]++);
+            }, UZIP.F.codes2map = function (e, t, r) {
+                for (var i = e.length, o = UZIP.F.U.rev15, a = 0; a < i; a += 2)
+                    if (0 != e[a + 1])
+                        for (var s = a >> 1, f = e[a + 1], l = s << 4 | f, c = t - f, u = e[a] << c, h = u + (1 << c); u != h;) {
+                            r[o[u] >>> 15 - t] = l, u++;
+                        }
+            }, UZIP.F.revCodes = function (e, t) {
+                for (var r = UZIP.F.U.rev15, i = 15 - t, o = 0; o < e.length; o += 2) {
+                    var a = e[o] << t - e[o + 1];
+                    e[o] = r[a] >>> i;
+                }
+            }, UZIP.F._putsE = function (e, t, r) {
+                r <<= 7 & t;
+                var i = t >>> 3;
+                e[i] |= r, e[i + 1] |= r >>> 8;
+            }, UZIP.F._putsF = function (e, t, r) {
+                r <<= 7 & t;
+                var i = t >>> 3;
+                e[i] |= r, e[i + 1] |= r >>> 8, e[i + 2] |= r >>> 16;
+            }, UZIP.F._bitsE = function (e, t, r) {
+                return (e[t >>> 3] | e[1 + (t >>> 3)] << 8) >>> (7 & t) & (1 << r) - 1;
+            }, UZIP.F._bitsF = function (e, t, r) {
+                return (e[t >>> 3] | e[1 + (t >>> 3)] << 8 | e[2 + (t >>> 3)] << 16) >>> (7 & t) & (1 << r) - 1;
+            }, UZIP.F._get17 = function (e, t) {
+                return (e[t >>> 3] | e[1 + (t >>> 3)] << 8 | e[2 + (t >>> 3)] << 16) >>> (7 & t);
+            }, UZIP.F._get25 = function (e, t) {
+                return (e[t >>> 3] | e[1 + (t >>> 3)] << 8 | e[2 + (t >>> 3)] << 16 | e[3 + (t >>> 3)] << 24) >>> (7 & t);
+            }, UZIP.F.U = (t = Uint16Array, r = Uint32Array, {
+                next_code: new t(16),
+                bl_count: new t(16),
+                ordr: [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15],
+                of0: [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 999, 999, 999],
+                exb: [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, 0, 0, 0],
+                ldef: new t(32),
+                df0: [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577, 65535, 65535],
+                dxb: [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 0, 0],
+                ddef: new r(32),
+                flmap: new t(512),
+                fltree: [],
+                fdmap: new t(32),
+                fdtree: [],
+                lmap: new t(32768),
+                ltree: [],
+                ttree: [],
+                dmap: new t(32768),
+                dtree: [],
+                imap: new t(512),
+                itree: [],
+                rev15: new t(32768),
+                lhst: new r(286),
+                dhst: new r(30),
+                ihst: new r(19),
+                lits: new r(15e3),
+                strt: new t(65536),
+                prev: new t(32768)
+            }), function () {
+                for (var e = UZIP.F.U, t = 0; t < 32768; t++) {
+                    var r = t;
+                    r = (4278255360 & (r = (4042322160 & (r = (3435973836 & (r = (2863311530 & r) >>> 1 | (1431655765 & r) << 1)) >>> 2 | (858993459 & r) << 2)) >>> 4 | (252645135 & r) << 4)) >>> 8 | (16711935 & r) << 8, e.rev15[t] = (r >>> 16 | r << 16) >>> 17;
+                }
+    
+                function pushV(e, t, r) {
+                    for (; 0 != t--;)
+                        e.push(0, r);
+                }
+    
+                for (t = 0; t < 32; t++)
+                    e.ldef[t] = e.of0[t] << 3 | e.exb[t], e.ddef[t] = e.df0[t] << 4 | e.dxb[t];
+                pushV(e.fltree, 144, 8), pushV(e.fltree, 112, 9), pushV(e.fltree, 24, 7), pushV(e.fltree, 8, 8), UZIP.F.makeCodes(e.fltree, 9), UZIP.F.codes2map(e.fltree, 9, e.flmap), UZIP.F.revCodes(e.fltree, 9), pushV(e.fdtree, 32, 5), UZIP.F.makeCodes(e.fdtree, 5), UZIP.F.codes2map(e.fdtree, 5, e.fdmap), UZIP.F.revCodes(e.fdtree, 5), pushV(e.itree, 19, 0), pushV(e.ltree, 286, 0), pushV(e.dtree, 30, 0), pushV(e.ttree, 320, 0);
+            }();
+        }({
+            get exports() {
+                return e;
+            }, set exports(t) {
+                e = t;
+            }
+        });
+        var UZIP = _mergeNamespaces({__proto__: null, default: e}, [e]);
+        var UPNG = function () {
+            var e = {
+                nextZero: function (e, t) {
+                    for (; 0 != e[t];)
+                        t++;
+                    return t;
+                },
+                readUshort: function (e, t) {
+                    return e[t] << 8 | e[t + 1];
+                },
+                writeUshort: function (e, t, r) {
+                    e[t] = r >> 8 & 255, e[t + 1] = 255 & r;
+                },
+                readUint: function (e, t) {
+                    return 16777216 * e[t] + (e[t + 1] << 16 | e[t + 2] << 8 | e[t + 3]);
+                },
+                writeUint: function (e, t, r) {
+                    e[t] = r >> 24 & 255, e[t + 1] = r >> 16 & 255, e[t + 2] = r >> 8 & 255, e[t + 3] = 255 & r;
+                },
+                readASCII: function (e, t, r) {
+                    var i = "";
+                    for (var o_1 = 0; o_1 < r; o_1++)
+                        i += String.fromCharCode(e[t + o_1]);
+                    return i;
+                },
+                writeASCII: function (e, t, r) {
+                    for (var i_1 = 0; i_1 < r.length; i_1++)
+                        e[t + i_1] = r.charCodeAt(i_1);
+                },
+                readBytes: function (e, t, r) {
+                    var i = [];
+                    for (var o_2 = 0; o_2 < r; o_2++)
+                        i.push(e[t + o_2]);
+                    return i;
+                },
+                pad: function (e) {
+                    return e.length < 2 ? "0".concat(e) : e;
+                },
+                readUTF8: function (t, r, i) {
+                    var o, a = "";
+                    for (var o_3 = 0; o_3 < i; o_3++)
+                        a += "%".concat(e.pad(t[r + o_3].toString(16)));
+                    try {
+                        o = decodeURIComponent(a);
+                    } catch (o) {
+                        return e.readASCII(t, r, i);
+                    }
+                    return o;
+                }
+            };
+    
+            function decodeImage(t, r, i, o) {
+                var a = r * i, s = _getBPP(o), f = Math.ceil(r * s / 8), l = new Uint8Array(4 * a),
+                    c = new Uint32Array(l.buffer), u = o.ctype, h = o.depth, d = e.readUshort;
+                if (6 == u) {
+                    var e_2 = a << 2;
+                    if (8 == h)
+                        for (var A = 0; A < e_2; A += 4)
+                            l[A] = t[A], l[A + 1] = t[A + 1], l[A + 2] = t[A + 2], l[A + 3] = t[A + 3];
+                    if (16 == h)
+                        for (A = 0; A < e_2; A++)
+                            l[A] = t[A << 1];
+                } else if (2 == u) {
+                    var e_3 = o.tabs.tRNS;
+                    if (null == e_3) {
+                        if (8 == h)
+                            for (A = 0; A < a; A++) {
+                                var g = 3 * A;
+                                c[A] = 255 << 24 | t[g + 2] << 16 | t[g + 1] << 8 | t[g];
+                            }
+                        if (16 == h)
+                            for (A = 0; A < a; A++) {
+                                g = 6 * A;
+                                c[A] = 255 << 24 | t[g + 4] << 16 | t[g + 2] << 8 | t[g];
+                            }
+                    } else {
+                        var p = e_3[0];
+                        var r_1 = e_3[1], i_2 = e_3[2];
+                        if (8 == h)
+                            for (A = 0; A < a; A++) {
+                                var m = A << 2;
+                                g = 3 * A;
+                                c[A] = 255 << 24 | t[g + 2] << 16 | t[g + 1] << 8 | t[g], t[g] == p && t[g + 1] == r_1 && t[g + 2] == i_2 && (l[m + 3] = 0);
+                            }
+                        if (16 == h)
+                            for (A = 0; A < a; A++) {
+                                m = A << 2, g = 6 * A;
+                                c[A] = 255 << 24 | t[g + 4] << 16 | t[g + 2] << 8 | t[g], d(t, g) == p && d(t, g + 2) == r_1 && d(t, g + 4) == i_2 && (l[m + 3] = 0);
+                            }
+                    }
+                } else if (3 == u) {
+                    var e_4 = o.tabs.PLTE, s_2 = o.tabs.tRNS, c_1 = s_2 ? s_2.length : 0;
+                    if (1 == h)
+                        for (var w = 0; w < i; w++) {
+                            var v = w * f, b = w * r;
+                            for (A = 0; A < r; A++) {
+                                m = b + A << 2;
+                                var y = 3 * (E = t[v + (A >> 3)] >> 7 - ((7 & A) << 0) & 1);
+                                l[m] = e_4[y], l[m + 1] = e_4[y + 1], l[m + 2] = e_4[y + 2], l[m + 3] = E < c_1 ? s_2[E] : 255;
+                            }
+                        }
+                    if (2 == h)
+                        for (w = 0; w < i; w++)
+                            for (v = w * f, b = w * r, A = 0; A < r; A++) {
+                                m = b + A << 2, y = 3 * (E = t[v + (A >> 2)] >> 6 - ((3 & A) << 1) & 3);
+                                l[m] = e_4[y], l[m + 1] = e_4[y + 1], l[m + 2] = e_4[y + 2], l[m + 3] = E < c_1 ? s_2[E] : 255;
+                            }
+                    if (4 == h)
+                        for (w = 0; w < i; w++)
+                            for (v = w * f, b = w * r, A = 0; A < r; A++) {
+                                m = b + A << 2, y = 3 * (E = t[v + (A >> 1)] >> 4 - ((1 & A) << 2) & 15);
+                                l[m] = e_4[y], l[m + 1] = e_4[y + 1], l[m + 2] = e_4[y + 2], l[m + 3] = E < c_1 ? s_2[E] : 255;
+                            }
+                    if (8 == h)
+                        for (A = 0; A < a; A++) {
+                            var E;
+                            m = A << 2, y = 3 * (E = t[A]);
+                            l[m] = e_4[y], l[m + 1] = e_4[y + 1], l[m + 2] = e_4[y + 2], l[m + 3] = E < c_1 ? s_2[E] : 255;
+                        }
+                } else if (4 == u) {
+                    if (8 == h)
+                        for (A = 0; A < a; A++) {
+                            m = A << 2;
+                            var F = t[_ = A << 1];
+                            l[m] = F, l[m + 1] = F, l[m + 2] = F, l[m + 3] = t[_ + 1];
+                        }
+                    if (16 == h)
+                        for (A = 0; A < a; A++) {
+                            var _;
+                            m = A << 2, F = t[_ = A << 2];
+                            l[m] = F, l[m + 1] = F, l[m + 2] = F, l[m + 3] = t[_ + 2];
+                        }
+                } else if (0 == u)
+                    for (p = o.tabs.tRNS ? o.tabs.tRNS : -1, w = 0; w < i; w++) {
+                        var e_5 = w * f, i_3 = w * r;
+                        if (1 == h)
+                            for (var B = 0; B < r; B++) {
+                                var U = (F = 255 * (t[e_5 + (B >>> 3)] >>> 7 - (7 & B) & 1)) == 255 * p ? 0 : 255;
+                                c[i_3 + B] = U << 24 | F << 16 | F << 8 | F;
+                            }
+                        else if (2 == h)
+                            for (B = 0; B < r; B++) {
+                                U = (F = 85 * (t[e_5 + (B >>> 2)] >>> 6 - ((3 & B) << 1) & 3)) == 85 * p ? 0 : 255;
+                                c[i_3 + B] = U << 24 | F << 16 | F << 8 | F;
+                            }
+                        else if (4 == h)
+                            for (B = 0; B < r; B++) {
+                                U = (F = 17 * (t[e_5 + (B >>> 1)] >>> 4 - ((1 & B) << 2) & 15)) == 17 * p ? 0 : 255;
+                                c[i_3 + B] = U << 24 | F << 16 | F << 8 | F;
+                            }
+                        else if (8 == h)
+                            for (B = 0; B < r; B++) {
+                                U = (F = t[e_5 + B]) == p ? 0 : 255;
+                                c[i_3 + B] = U << 24 | F << 16 | F << 8 | F;
+                            }
+                        else if (16 == h)
+                            for (B = 0; B < r; B++) {
+                                F = t[e_5 + (B << 1)], U = d(t, e_5 + (B << 1)) == p ? 0 : 255;
+                                c[i_3 + B] = U << 24 | F << 16 | F << 8 | F;
+                            }
+                    }
+                return l;
+            }
+    
+            function _decompress(e, r, i, o) {
+                var a = _getBPP(e), s = Math.ceil(i * a / 8), f = new Uint8Array((s + 1 + e.interlace) * o);
+                return r = e.tabs.CgBI ? t(r, f) : _inflate(r, f), 0 == e.interlace ? r = _filterZero(r, e, 0, i, o) : 1 == e.interlace && (r = function _readInterlace(e, t) {
+                    var r = t.width, i = t.height, o = _getBPP(t), a = o >> 3, s = Math.ceil(r * o / 8),
+                        f = new Uint8Array(i * s);
+                    var l = 0;
+                    var c = [0, 0, 4, 0, 2, 0, 1], u = [0, 4, 0, 2, 0, 1, 0], h = [8, 8, 8, 4, 4, 2, 2],
+                        d = [8, 8, 4, 4, 2, 2, 1];
+                    var A = 0;
+                    for (; A < 7;) {
+                        var p = h[A], m = d[A];
+                        var w = 0, v = 0, b = c[A];
+                        for (; b < i;)
+                            b += p, v++;
+                        var y = u[A];
+                        for (; y < r;)
+                            y += m, w++;
+                        var E = Math.ceil(w * o / 8);
+                        _filterZero(e, t, l, w, v);
+                        var F = 0, _ = c[A];
+                        for (; _ < i;) {
+                            var t_1 = u[A], i_4 = l + F * E << 3;
+                            for (; t_1 < r;) {
+                                var g;
+                                if (1 == o)
+                                    g = (g = e[i_4 >> 3]) >> 7 - (7 & i_4) & 1, f[_ * s + (t_1 >> 3)] |= g << 7 - ((7 & t_1) << 0);
+                                if (2 == o)
+                                    g = (g = e[i_4 >> 3]) >> 6 - (7 & i_4) & 3, f[_ * s + (t_1 >> 2)] |= g << 6 - ((3 & t_1) << 1);
+                                if (4 == o)
+                                    g = (g = e[i_4 >> 3]) >> 4 - (7 & i_4) & 15, f[_ * s + (t_1 >> 1)] |= g << 4 - ((1 & t_1) << 2);
+                                if (o >= 8) {
+                                    var r_2 = _ * s + t_1 * a;
+                                    for (var t_2 = 0; t_2 < a; t_2++)
+                                        f[r_2 + t_2] = e[(i_4 >> 3) + t_2];
+                                }
+                                i_4 += o, t_1 += m;
+                            }
+                            F++, _ += p;
+                        }
+                        w * v != 0 && (l += v * (1 + E)), A += 1;
+                    }
+                    return f;
+                }(r, e)), r;
+            }
+    
+            function _inflate(e, r) {
+                return t(new Uint8Array(e.buffer, 2, e.length - 6), r);
+            }
+    
+            var t = function () {
+                var e = {H: {}};
+                return e.H.N = function (t, r) {
+                    var i = Uint8Array;
+                    var o, a, s = 0, f = 0, l = 0, c = 0, u = 0, h = 0, d = 0, A = 0, g = 0;
+                    if (3 == t[0] && 0 == t[1])
+                        return r || new i(0);
+                    var p = e.H, m = p.b, w = p.e, v = p.R, b = p.n, y = p.A, E = p.Z, F = p.m, _ = null == r;
+                    for (_ && (r = new i(t.length >>> 2 << 5)); 0 == s;)
+                        if (s = m(t, g, 1), f = m(t, g + 1, 2), g += 3, 0 != f) {
+                            if (_ && (r = e.H.W(r, A + (1 << 17))), 1 == f && (o = F.J, a = F.h, h = 511, d = 31), 2 == f) {
+                                l = w(t, g, 5) + 257, c = w(t, g + 5, 5) + 1, u = w(t, g + 10, 4) + 4, g += 14;
+                                var e_6 = 1;
+                                for (var B = 0; B < 38; B += 2)
+                                    F.Q[B] = 0, F.Q[B + 1] = 0;
+                                for (B = 0; B < u; B++) {
+                                    var r_3 = w(t, g + 3 * B, 3);
+                                    F.Q[1 + (F.X[B] << 1)] = r_3, r_3 > e_6 && (e_6 = r_3);
+                                }
+                                g += 3 * u, b(F.Q, e_6), y(F.Q, e_6, F.u), o = F.w, a = F.d, g = v(F.u, (1 << e_6) - 1, l + c, t, g, F.v);
+                                var r_4 = p.V(F.v, 0, l, F.C);
+                                h = (1 << r_4) - 1;
+                                var i_5 = p.V(F.v, l, c, F.D);
+                                d = (1 << i_5) - 1, b(F.C, r_4), y(F.C, r_4, o), b(F.D, i_5), y(F.D, i_5, a);
+                            }
+                            for (; ;) {
+                                var e_7 = o[E(t, g) & h];
+                                g += 15 & e_7;
+                                var i_6 = e_7 >>> 4;
+                                if (i_6 >>> 8 == 0)
+                                    r[A++] = i_6;
+                                else {
+                                    if (256 == i_6)
+                                        break;
+                                    {
+                                        var e_8 = A + i_6 - 254;
+                                        if (i_6 > 264) {
+                                            var r_5 = F.q[i_6 - 257];
+                                            e_8 = A + (r_5 >>> 3) + w(t, g, 7 & r_5), g += 7 & r_5;
+                                        }
+                                        var o_4 = a[E(t, g) & d];
+                                        g += 15 & o_4;
+                                        var s_3 = o_4 >>> 4, f_2 = F.c[s_3], l_2 = (f_2 >>> 4) + m(t, g, 15 & f_2);
+                                        for (g += 15 & f_2; A < e_8;)
+                                            r[A] = r[A++ - l_2], r[A] = r[A++ - l_2], r[A] = r[A++ - l_2], r[A] = r[A++ - l_2];
+                                        A = e_8;
+                                    }
+                                }
+                            }
+                        } else {
+                            0 != (7 & g) && (g += 8 - (7 & g));
+                            var o_5 = 4 + (g >>> 3), a_3 = t[o_5 - 4] | t[o_5 - 3] << 8;
+                            _ && (r = e.H.W(r, A + a_3)), r.set(new i(t.buffer, t.byteOffset + o_5, a_3), A), g = o_5 + a_3 << 3, A += a_3;
+                        }
+                    return r.length == A ? r : r.slice(0, A);
+                }, e.H.W = function (e, t) {
+                    var r = e.length;
+                    if (t <= r)
+                        return e;
+                    var i = new Uint8Array(r << 1);
+                    return i.set(e, 0), i;
+                }, e.H.R = function (t, r, i, o, a, s) {
+                    var f = e.H.e, l = e.H.Z;
+                    var c = 0;
+                    for (; c < i;) {
+                        var e_9 = t[l(o, a) & r];
+                        a += 15 & e_9;
+                        var i_7 = e_9 >>> 4;
+                        if (i_7 <= 15)
+                            s[c] = i_7, c++;
+                        else {
+                            var e_10 = 0, t_3 = 0;
+                            16 == i_7 ? (t_3 = 3 + f(o, a, 2), a += 2, e_10 = s[c - 1]) : 17 == i_7 ? (t_3 = 3 + f(o, a, 3), a += 3) : 18 == i_7 && (t_3 = 11 + f(o, a, 7), a += 7);
+                            var r_6 = c + t_3;
+                            for (; c < r_6;)
+                                s[c] = e_10, c++;
+                        }
+                    }
+                    return a;
+                }, e.H.V = function (e, t, r, i) {
+                    var o = 0, a = 0;
+                    var s = i.length >>> 1;
+                    for (; a < r;) {
+                        var r_7 = e[a + t];
+                        i[a << 1] = 0, i[1 + (a << 1)] = r_7, r_7 > o && (o = r_7), a++;
+                    }
+                    for (; a < s;)
+                        i[a << 1] = 0, i[1 + (a << 1)] = 0, a++;
+                    return o;
+                }, e.H.n = function (t, r) {
+                    var i = e.H.m, o = t.length;
+                    var a, s, f;
+                    var l;
+                    var c = i.j;
+                    for (var u = 0; u <= r; u++)
+                        c[u] = 0;
+                    for (u = 1; u < o; u += 2)
+                        c[t[u]]++;
+                    var h = i.K;
+                    for (a = 0, c[0] = 0, s = 1; s <= r; s++)
+                        a = a + c[s - 1] << 1, h[s] = a;
+                    for (f = 0; f < o; f += 2)
+                        l = t[f + 1], 0 != l && (t[f] = h[l], h[l]++);
+                }, e.H.A = function (t, r, i) {
+                    var o = t.length, a = e.H.m.r;
+                    for (var e_11 = 0; e_11 < o; e_11 += 2)
+                        if (0 != t[e_11 + 1]) {
+                            var o_6 = e_11 >> 1, s_4 = t[e_11 + 1], f_3 = o_6 << 4 | s_4, l_3 = r - s_4;
+                            var c = t[e_11] << l_3;
+                            var u = c + (1 << l_3);
+                            for (; c != u;) {
+                                i[a[c] >>> 15 - r] = f_3, c++;
+                            }
+                        }
+                }, e.H.l = function (t, r) {
+                    var i = e.H.m.r, o = 15 - r;
+                    for (var e_12 = 0; e_12 < t.length; e_12 += 2) {
+                        var a_4 = t[e_12] << r - t[e_12 + 1];
+                        t[e_12] = i[a_4] >>> o;
+                    }
+                }, e.H.M = function (e, t, r) {
+                    r <<= 7 & t;
+                    var i = t >>> 3;
+                    e[i] |= r, e[i + 1] |= r >>> 8;
+                }, e.H.I = function (e, t, r) {
+                    r <<= 7 & t;
+                    var i = t >>> 3;
+                    e[i] |= r, e[i + 1] |= r >>> 8, e[i + 2] |= r >>> 16;
+                }, e.H.e = function (e, t, r) {
+                    return (e[t >>> 3] | e[1 + (t >>> 3)] << 8) >>> (7 & t) & (1 << r) - 1;
+                }, e.H.b = function (e, t, r) {
+                    return (e[t >>> 3] | e[1 + (t >>> 3)] << 8 | e[2 + (t >>> 3)] << 16) >>> (7 & t) & (1 << r) - 1;
+                }, e.H.Z = function (e, t) {
+                    return (e[t >>> 3] | e[1 + (t >>> 3)] << 8 | e[2 + (t >>> 3)] << 16) >>> (7 & t);
+                }, e.H.i = function (e, t) {
+                    return (e[t >>> 3] | e[1 + (t >>> 3)] << 8 | e[2 + (t >>> 3)] << 16 | e[3 + (t >>> 3)] << 24) >>> (7 & t);
+                }, e.H.m = function () {
+                    var e = Uint16Array, t = Uint32Array;
+                    return {
+                        K: new e(16),
+                        j: new e(16),
+                        X: [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15],
+                        S: [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 999, 999, 999],
+                        T: [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, 0, 0, 0],
+                        q: new e(32),
+                        p: [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577, 65535, 65535],
+                        z: [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 0, 0],
+                        c: new t(32),
+                        J: new e(512),
+                        _: [],
+                        h: new e(32),
+                        $: [],
+                        w: new e(32768),
+                        C: [],
+                        v: [],
+                        d: new e(32768),
+                        D: [],
+                        u: new e(512),
+                        Q: [],
+                        r: new e(32768),
+                        s: new t(286),
+                        Y: new t(30),
+                        a: new t(19),
+                        t: new t(15e3),
+                        k: new e(65536),
+                        g: new e(32768)
+                    };
+                }(), function () {
+                    var t = e.H.m;
+                    for (var r = 0; r < 32768; r++) {
+                        var e_13 = r;
+                        e_13 = (2863311530 & e_13) >>> 1 | (1431655765 & e_13) << 1, e_13 = (3435973836 & e_13) >>> 2 | (858993459 & e_13) << 2, e_13 = (4042322160 & e_13) >>> 4 | (252645135 & e_13) << 4, e_13 = (4278255360 & e_13) >>> 8 | (16711935 & e_13) << 8, t.r[r] = (e_13 >>> 16 | e_13 << 16) >>> 17;
+                    }
+    
+                    function n(e, t, r) {
+                        for (; 0 != t--;)
+                            e.push(0, r);
+                    }
+    
+                    for (r = 0; r < 32; r++)
+                        t.q[r] = t.S[r] << 3 | t.T[r], t.c[r] = t.p[r] << 4 | t.z[r];
+                    n(t._, 144, 8), n(t._, 112, 9), n(t._, 24, 7), n(t._, 8, 8), e.H.n(t._, 9), e.H.A(t._, 9, t.J), e.H.l(t._, 9), n(t.$, 32, 5), e.H.n(t.$, 5), e.H.A(t.$, 5, t.h), e.H.l(t.$, 5), n(t.Q, 19, 0), n(t.C, 286, 0), n(t.D, 30, 0), n(t.v, 320, 0);
+                }(), e.H.N;
+            }();
+    
+            function _getBPP(e) {
+                return [1, null, 3, 1, 2, null, 4][e.ctype] * e.depth;
+            }
+    
+            function _filterZero(e, t, r, i, o) {
+                var a = _getBPP(t);
+                var s = Math.ceil(i * a / 8);
+                var f, l;
+                a = Math.ceil(a / 8);
+                var c = e[r], u = 0;
+                if (c > 1 && (e[r] = [0, 0, 1][c - 2]), 3 == c)
+                    for (u = a; u < s; u++)
+                        e[u + 1] = e[u + 1] + (e[u + 1 - a] >>> 1) & 255;
+                for (var t_4 = 0; t_4 < o; t_4++)
+                    if (f = r + t_4 * s, l = f + t_4 + 1, c = e[l - 1], u = 0, 0 == c)
+                        for (; u < s; u++)
+                            e[f + u] = e[l + u];
+                    else if (1 == c) {
+                        for (; u < a; u++)
+                            e[f + u] = e[l + u];
+                        for (; u < s; u++)
+                            e[f + u] = e[l + u] + e[f + u - a];
+                    } else if (2 == c)
+                        for (; u < s; u++)
+                            e[f + u] = e[l + u] + e[f + u - s];
+                    else if (3 == c) {
+                        for (; u < a; u++)
+                            e[f + u] = e[l + u] + (e[f + u - s] >>> 1);
+                        for (; u < s; u++)
+                            e[f + u] = e[l + u] + (e[f + u - s] + e[f + u - a] >>> 1);
+                    } else {
+                        for (; u < a; u++)
+                            e[f + u] = e[l + u] + _paeth(0, e[f + u - s], 0);
+                        for (; u < s; u++)
+                            e[f + u] = e[l + u] + _paeth(e[f + u - a], e[f + u - s], e[f + u - a - s]);
+                    }
+                return e;
+            }
+    
+            function _paeth(e, t, r) {
+                var i = e + t - r, o = i - e, a = i - t, s = i - r;
+                return o * o <= a * a && o * o <= s * s ? e : a * a <= s * s ? t : r;
+            }
+    
+            function _IHDR(t, r, i) {
+                i.width = e.readUint(t, r), r += 4, i.height = e.readUint(t, r), r += 4, i.depth = t[r], r++, i.ctype = t[r], r++, i.compress = t[r], r++, i.filter = t[r], r++, i.interlace = t[r], r++;
+            }
+    
+            function _copyTile(e, t, r, i, o, a, s, f, l) {
+                var c = Math.min(t, o), u = Math.min(r, a);
+                var h = 0, d = 0;
+                for (var r_8 = 0; r_8 < u; r_8++)
+                    for (var a_5 = 0; a_5 < c; a_5++)
+                        if (s >= 0 && f >= 0 ? (h = r_8 * t + a_5 << 2, d = (f + r_8) * o + s + a_5 << 2) : (h = (-f + r_8) * t - s + a_5 << 2, d = r_8 * o + a_5 << 2), 0 == l)
+                            i[d] = e[h], i[d + 1] = e[h + 1], i[d + 2] = e[h + 2], i[d + 3] = e[h + 3];
+                        else if (1 == l) {
+                            var A = e[h + 3] * (1 / 255), g = e[h] * A, p = e[h + 1] * A, m = e[h + 2] * A,
+                                w = i[d + 3] * (1 / 255), v = i[d] * w, b = i[d + 1] * w, y = i[d + 2] * w;
+                            var t_5 = 1 - A, r_9 = A + w * t_5, o_7 = 0 == r_9 ? 0 : 1 / r_9;
+                            i[d + 3] = 255 * r_9, i[d + 0] = (g + v * t_5) * o_7, i[d + 1] = (p + b * t_5) * o_7, i[d + 2] = (m + y * t_5) * o_7;
+                        } else if (2 == l) {
+                            A = e[h + 3], g = e[h], p = e[h + 1], m = e[h + 2], w = i[d + 3], v = i[d], b = i[d + 1], y = i[d + 2];
+                            A == w && g == v && p == b && m == y ? (i[d] = 0, i[d + 1] = 0, i[d + 2] = 0, i[d + 3] = 0) : (i[d] = g, i[d + 1] = p, i[d + 2] = m, i[d + 3] = A);
+                        } else if (3 == l) {
+                            A = e[h + 3], g = e[h], p = e[h + 1], m = e[h + 2], w = i[d + 3], v = i[d], b = i[d + 1], y = i[d + 2];
+                            if (A == w && g == v && p == b && m == y)
+                                continue;
+                            if (A < 220 && w > 20)
+                                return !1;
+                        }
+                return !0;
+            }
+    
+            return {
+                decode: function decode(r) {
+                    var i = new Uint8Array(r);
+                    var o = 8;
+                    var a = e, s = a.readUshort, f = a.readUint, l = {tabs: {}, frames: []}, c = new Uint8Array(i.length);
+                    var u, h = 0, d = 0;
+                    var A = [137, 80, 78, 71, 13, 10, 26, 10];
+                    for (var g = 0; g < 8; g++)
+                        if (i[g] != A[g])
+                            throw "The input is not a PNG file!";
+                    for (; o < i.length;) {
+                        var e_14 = a.readUint(i, o);
+                        o += 4;
+                        var r_10 = a.readASCII(i, o, 4);
+                        if (o += 4, "IHDR" == r_10)
+                            _IHDR(i, o, l);
+                        else if ("iCCP" == r_10) {
+                            for (var p = o; 0 != i[p];)
+                                p++;
+                            a.readASCII(i, o, p - o), i[p + 1];
+                            var s_5 = i.slice(p + 2, o + e_14);
+                            var f_4 = null;
+                            try {
+                                f_4 = _inflate(s_5);
+                            } catch (e) {
+                                f_4 = t(s_5);
+                            }
+                            l.tabs[r_10] = f_4;
+                        } else if ("CgBI" == r_10)
+                            l.tabs[r_10] = i.slice(o, o + 4);
+                        else if ("IDAT" == r_10) {
+                            for (g = 0; g < e_14; g++)
+                                c[h + g] = i[o + g];
+                            h += e_14;
+                        } else if ("acTL" == r_10)
+                            l.tabs[r_10] = {
+                                num_frames: f(i, o),
+                                num_plays: f(i, o + 4)
+                            }, u = new Uint8Array(i.length);
+                        else if ("fcTL" == r_10) {
+                            if (0 != d)
+                                (E = l.frames[l.frames.length - 1]).data = _decompress(l, u.slice(0, d), E.rect.width, E.rect.height), d = 0;
+                            var e_15 = {x: f(i, o + 12), y: f(i, o + 16), width: f(i, o + 4), height: f(i, o + 8)};
+                            var t_6 = s(i, o + 22);
+                            t_6 = s(i, o + 20) / (0 == t_6 ? 100 : t_6);
+                            var r_11 = {rect: e_15, delay: Math.round(1e3 * t_6), dispose: i[o + 24], blend: i[o + 25]};
+                            l.frames.push(r_11);
+                        } else if ("fdAT" == r_10) {
+                            for (g = 0; g < e_14 - 4; g++)
+                                u[d + g] = i[o + g + 4];
+                            d += e_14 - 4;
+                        } else if ("pHYs" == r_10)
+                            l.tabs[r_10] = [a.readUint(i, o), a.readUint(i, o + 4), i[o + 8]];
+                        else if ("cHRM" == r_10) {
+                            l.tabs[r_10] = [];
+                            for (g = 0; g < 8; g++)
+                                l.tabs[r_10].push(a.readUint(i, o + 4 * g));
+                        } else if ("tEXt" == r_10 || "zTXt" == r_10) {
+                            null == l.tabs[r_10] && (l.tabs[r_10] = {});
+                            var m = a.nextZero(i, o), w = a.readASCII(i, o, m - o), v = o + e_14 - m - 1;
+                            if ("tEXt" == r_10)
+                                y = a.readASCII(i, m + 1, v);
+                            else {
+                                var b = _inflate(i.slice(m + 2, m + 2 + v));
+                                y = a.readUTF8(b, 0, b.length);
+                            }
+                            l.tabs[r_10][w] = y;
+                        } else if ("iTXt" == r_10) {
+                            null == l.tabs[r_10] && (l.tabs[r_10] = {});
+                            m = 0, p = o;
+                            m = a.nextZero(i, p);
+                            w = a.readASCII(i, p, m - p);
+                            var t_7 = i[p = m + 1];
+                            var y;
+                            i[p + 1], p += 2, m = a.nextZero(i, p), a.readASCII(i, p, m - p), p = m + 1, m = a.nextZero(i, p), a.readUTF8(i, p, m - p);
+                            v = e_14 - ((p = m + 1) - o);
+                            if (0 == t_7)
+                                y = a.readUTF8(i, p, v);
+                            else {
+                                b = _inflate(i.slice(p, p + v));
+                                y = a.readUTF8(b, 0, b.length);
+                            }
+                            l.tabs[r_10][w] = y;
+                        } else if ("PLTE" == r_10)
+                            l.tabs[r_10] = a.readBytes(i, o, e_14);
+                        else if ("hIST" == r_10) {
+                            var e_16 = l.tabs.PLTE.length / 3;
+                            l.tabs[r_10] = [];
+                            for (g = 0; g < e_16; g++)
+                                l.tabs[r_10].push(s(i, o + 2 * g));
+                        } else if ("tRNS" == r_10)
+                            3 == l.ctype ? l.tabs[r_10] = a.readBytes(i, o, e_14) : 0 == l.ctype ? l.tabs[r_10] = s(i, o) : 2 == l.ctype && (l.tabs[r_10] = [s(i, o), s(i, o + 2), s(i, o + 4)]);
+                        else if ("gAMA" == r_10)
+                            l.tabs[r_10] = a.readUint(i, o) / 1e5;
+                        else if ("sRGB" == r_10)
+                            l.tabs[r_10] = i[o];
+                        else if ("bKGD" == r_10)
+                            0 == l.ctype || 4 == l.ctype ? l.tabs[r_10] = [s(i, o)] : 2 == l.ctype || 6 == l.ctype ? l.tabs[r_10] = [s(i, o), s(i, o + 2), s(i, o + 4)] : 3 == l.ctype && (l.tabs[r_10] = i[o]);
+                        else if ("IEND" == r_10)
+                            break;
+                        o += e_14, a.readUint(i, o), o += 4;
+                    }
+                    var E;
+                    return 0 != d && ((E = l.frames[l.frames.length - 1]).data = _decompress(l, u.slice(0, d), E.rect.width, E.rect.height)), l.data = _decompress(l, c, l.width, l.height), delete l.compress, delete l.interlace, delete l.filter, l;
+                }, toRGBA8: function toRGBA8(e) {
+                    var t = e.width, r = e.height;
+                    if (null == e.tabs.acTL)
+                        return [decodeImage(e.data, t, r, e).buffer];
+                    var i = [];
+                    null == e.frames[0].data && (e.frames[0].data = e.data);
+                    var o = t * r * 4, a = new Uint8Array(o), s = new Uint8Array(o), f = new Uint8Array(o);
+                    for (var c = 0; c < e.frames.length; c++) {
+                        var u = e.frames[c], h = u.rect.x, d = u.rect.y, A = u.rect.width, g = u.rect.height,
+                            p = decodeImage(u.data, A, g, e);
+                        if (0 != c)
+                            for (var l = 0; l < o; l++)
+                                f[l] = a[l];
+                        if (0 == u.blend ? _copyTile(p, A, g, a, t, r, h, d, 0) : 1 == u.blend && _copyTile(p, A, g, a, t, r, h, d, 1), i.push(a.buffer.slice(0)), 0 == u.dispose)
+                            ;
+                        else if (1 == u.dispose)
+                            _copyTile(s, A, g, a, t, r, h, d, 0);
+                        else if (2 == u.dispose)
+                            for (l = 0; l < o; l++)
+                                a[l] = f[l];
+                    }
+                    return i;
+                }, _paeth: _paeth, _copyTile: _copyTile, _bin: e
+            };
+        }();
+        !function () {
+            var e = UPNG._copyTile, t = UPNG._bin, r = UPNG._paeth;
+            var i = {
+                table: function () {
+                    var e = new Uint32Array(256);
+                    for (var t_8 = 0; t_8 < 256; t_8++) {
+                        var r_12 = t_8;
+                        for (var e_17 = 0; e_17 < 8; e_17++)
+                            1 & r_12 ? r_12 = 3988292384 ^ r_12 >>> 1 : r_12 >>>= 1;
+                        e[t_8] = r_12;
+                    }
+                    return e;
+                }(),
+                update: function (e, t, r, o) {
+                    for (var a_6 = 0; a_6 < o; a_6++)
+                        e = i.table[255 & (e ^ t[r + a_6])] ^ e >>> 8;
+                    return e;
+                },
+                crc: function (e, t, r) {
+                    return 4294967295 ^ i.update(4294967295, e, t, r);
+                }
+            };
+    
+            function addErr(e, t, r, i) {
+                t[r] += e[0] * i >> 4, t[r + 1] += e[1] * i >> 4, t[r + 2] += e[2] * i >> 4, t[r + 3] += e[3] * i >> 4;
+            }
+    
+            function N(e) {
+                return Math.max(0, Math.min(255, e));
+            }
+    
+            function D(e, t) {
+                var r = e[0] - t[0], i = e[1] - t[1], o = e[2] - t[2], a = e[3] - t[3];
+                return r * r + i * i + o * o + a * a;
+            }
+    
+            function dither(e, t, r, i, o, a, s) {
+                null == s && (s = 1);
+                var f = i.length, l = [];
+                for (var c = 0; c < f; c++) {
+                    var e_18 = i[c];
+                    l.push([e_18 >>> 0 & 255, e_18 >>> 8 & 255, e_18 >>> 16 & 255, e_18 >>> 24 & 255]);
+                }
+                for (c = 0; c < f; c++) {
+                    var e_19 = 4294967295;
+                    for (var u = 0, h = 0; h < f; h++) {
+                        var d = D(l[c], l[h]);
+                        h != c && d < e_19 && (e_19 = d, u = h);
+                    }
+                }
+                var A = new Uint32Array(o.buffer), g = new Int16Array(t * r * 4),
+                    p = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+                for (c = 0; c < p.length; c++)
+                    p[c] = 255 * ((p[c] + .5) / 16 - .5);
+                for (var o_8 = 0; o_8 < r; o_8++)
+                    for (var w = 0; w < t; w++) {
+                        var m;
+                        c = 4 * (o_8 * t + w);
+                        if (2 != s)
+                            m = [N(e[c] + g[c]), N(e[c + 1] + g[c + 1]), N(e[c + 2] + g[c + 2]), N(e[c + 3] + g[c + 3])];
+                        else {
+                            d = p[4 * (3 & o_8) + (3 & w)];
+                            m = [N(e[c] + d), N(e[c + 1] + d), N(e[c + 2] + d), N(e[c + 3] + d)];
+                        }
+                        u = 0;
+                        var v = 16777215;
+                        for (h = 0; h < f; h++) {
+                            var e_20 = D(m, l[h]);
+                            e_20 < v && (v = e_20, u = h);
+                        }
+                        var b = l[u], y = [m[0] - b[0], m[1] - b[1], m[2] - b[2], m[3] - b[3]];
+                        1 == s && (w != t - 1 && addErr(y, g, c + 4, 7), o_8 != r - 1 && (0 != w && addErr(y, g, c + 4 * t - 4, 3), addErr(y, g, c + 4 * t, 5), w != t - 1 && addErr(y, g, c + 4 * t + 4, 1))), a[c >> 2] = u, A[c >> 2] = i[u];
+                    }
+            }
+    
+            function _main(e, r, o, a, s) {
+                null == s && (s = {});
+                var f = i.crc, l = t.writeUint, c = t.writeUshort, u = t.writeASCII;
+                var h = 8;
+                var d = e.frames.length > 1;
+                var A, g = !1, p = 33 + (d ? 20 : 0);
+                if (null != s.sRGB && (p += 13), null != s.pHYs && (p += 21), null != s.iCCP && (A = pako.deflate(s.iCCP), p += 21 + A.length + 4), 3 == e.ctype) {
+                    for (var m = e.plte.length, w = 0; w < m; w++)
+                        e.plte[w] >>> 24 != 255 && (g = !0);
+                    p += 8 + 3 * m + 4 + (g ? 8 + 1 * m + 4 : 0);
+                }
+                for (var v = 0; v < e.frames.length; v++) {
+                    d && (p += 38), p += (F = e.frames[v]).cimg.length + 12, 0 != v && (p += 4);
+                }
+                p += 12;
+                var b = new Uint8Array(p), y = [137, 80, 78, 71, 13, 10, 26, 10];
+                for (w = 0; w < 8; w++)
+                    b[w] = y[w];
+                if (l(b, h, 13), h += 4, u(b, h, "IHDR"), h += 4, l(b, h, r), h += 4, l(b, h, o), h += 4, b[h] = e.depth, h++, b[h] = e.ctype, h++, b[h] = 0, h++, b[h] = 0, h++, b[h] = 0, h++, l(b, h, f(b, h - 17, 17)), h += 4, null != s.sRGB && (l(b, h, 1), h += 4, u(b, h, "sRGB"), h += 4, b[h] = s.sRGB, h++, l(b, h, f(b, h - 5, 5)), h += 4), null != s.iCCP) {
+                    var e_21 = 13 + A.length;
+                    l(b, h, e_21), h += 4, u(b, h, "iCCP"), h += 4, u(b, h, "ICC profile"), h += 11, h += 2, b.set(A, h), h += A.length, l(b, h, f(b, h - (e_21 + 4), e_21 + 4)), h += 4;
+                }
+                if (null != s.pHYs && (l(b, h, 9), h += 4, u(b, h, "pHYs"), h += 4, l(b, h, s.pHYs[0]), h += 4, l(b, h, s.pHYs[1]), h += 4, b[h] = s.pHYs[2], h++, l(b, h, f(b, h - 13, 13)), h += 4), d && (l(b, h, 8), h += 4, u(b, h, "acTL"), h += 4, l(b, h, e.frames.length), h += 4, l(b, h, null != s.loop ? s.loop : 0), h += 4, l(b, h, f(b, h - 12, 12)), h += 4), 3 == e.ctype) {
+                    l(b, h, 3 * (m = e.plte.length)), h += 4, u(b, h, "PLTE"), h += 4;
+                    for (w = 0; w < m; w++) {
+                        var t_9 = 3 * w, r_13 = e.plte[w], i_8 = 255 & r_13, o_9 = r_13 >>> 8 & 255,
+                            a_7 = r_13 >>> 16 & 255;
+                        b[h + t_9 + 0] = i_8, b[h + t_9 + 1] = o_9, b[h + t_9 + 2] = a_7;
+                    }
+                    if (h += 3 * m, l(b, h, f(b, h - 3 * m - 4, 3 * m + 4)), h += 4, g) {
+                        l(b, h, m), h += 4, u(b, h, "tRNS"), h += 4;
+                        for (w = 0; w < m; w++)
+                            b[h + w] = e.plte[w] >>> 24 & 255;
+                        h += m, l(b, h, f(b, h - m - 4, m + 4)), h += 4;
+                    }
+                }
+                var E = 0;
+                for (v = 0; v < e.frames.length; v++) {
+                    var F = e.frames[v];
+                    d && (l(b, h, 26), h += 4, u(b, h, "fcTL"), h += 4, l(b, h, E++), h += 4, l(b, h, F.rect.width), h += 4, l(b, h, F.rect.height), h += 4, l(b, h, F.rect.x), h += 4, l(b, h, F.rect.y), h += 4, c(b, h, a[v]), h += 2, c(b, h, 1e3), h += 2, b[h] = F.dispose, h++, b[h] = F.blend, h++, l(b, h, f(b, h - 30, 30)), h += 4);
+                    var t_10 = F.cimg;
+                    l(b, h, (m = t_10.length) + (0 == v ? 0 : 4)), h += 4;
+                    var r_14 = h;
+                    u(b, h, 0 == v ? "IDAT" : "fdAT"), h += 4, 0 != v && (l(b, h, E++), h += 4), b.set(t_10, h), h += m, l(b, h, f(b, r_14, h - r_14)), h += 4;
+                }
+                return l(b, h, 0), h += 4, u(b, h, "IEND"), h += 4, l(b, h, f(b, h - 4, 4)), h += 4, b.buffer;
+            }
+    
+            function compressPNG(e, t, r) {
+                for (var i_9 = 0; i_9 < e.frames.length; i_9++) {
+                    var o_10 = e.frames[i_9];
+                    o_10.rect.width;
+                    var a_8 = o_10.rect.height, s_6 = new Uint8Array(a_8 * o_10.bpl + a_8);
+                    o_10.cimg = _filterZero(o_10.img, a_8, o_10.bpp, o_10.bpl, s_6, t, r);
+                }
+            }
+    
+            function compress(t, r, i, o, a) {
+                var s = a[0], f = a[1], l = a[2], c = a[3], u = a[4], h = a[5];
+                var d = 6, A = 8, g = 255;
+                for (var p = 0; p < t.length; p++) {
+                    var e_22 = new Uint8Array(t[p]);
+                    for (var m = e_22.length, w = 0; w < m; w += 4)
+                        g &= e_22[w + 3];
+                }
+                var v = 255 != g, b = function framize(t, r, i, o, a, s) {
+                    var f = [];
+                    for (var l = 0; l < t.length; l++) {
+                        var h_1 = new Uint8Array(t[l]), A_1 = new Uint32Array(h_1.buffer);
+                        var c;
+                        var g_1 = 0, p_1 = 0, m_1 = r, w_1 = i, v_1 = o ? 1 : 0;
+                        if (0 != l) {
+                            var b_1 = s || o || 1 == l || 0 != f[l - 2].dispose ? 1 : 2;
+                            var y_1 = 0, E_1 = 1e9;
+                            for (var e_23 = 0; e_23 < b_1; e_23++) {
+                                var u = new Uint8Array(t[l - 1 - e_23]);
+                                var o_11 = new Uint32Array(t[l - 1 - e_23]);
+                                var s_7 = r, f_5 = i, c_2 = -1, h_2 = -1;
+                                for (var e_24 = 0; e_24 < i; e_24++)
+                                    for (var t_11 = 0; t_11 < r; t_11++) {
+                                        A_1[d = e_24 * r + t_11] != o_11[d] && (t_11 < s_7 && (s_7 = t_11), t_11 > c_2 && (c_2 = t_11), e_24 < f_5 && (f_5 = e_24), e_24 > h_2 && (h_2 = e_24));
+                                    }
+                                -1 == c_2 && (s_7 = f_5 = c_2 = h_2 = 0), a && (1 == (1 & s_7) && s_7--, 1 == (1 & f_5) && f_5--);
+                                var v_2 = (c_2 - s_7 + 1) * (h_2 - f_5 + 1);
+                                v_2 < E_1 && (E_1 = v_2, y_1 = e_23, g_1 = s_7, p_1 = f_5, m_1 = c_2 - s_7 + 1, w_1 = h_2 - f_5 + 1);
+                            }
+                            u = new Uint8Array(t[l - 1 - y_1]);
+                            1 == y_1 && (f[l - 1].dispose = 2), c = new Uint8Array(m_1 * w_1 * 4), e(u, r, i, c, m_1, w_1, -g_1, -p_1, 0), v_1 = e(h_1, r, i, c, m_1, w_1, -g_1, -p_1, 3) ? 1 : 0, 1 == v_1 ? _prepareDiff(h_1, r, i, c, {
+                                x: g_1,
+                                y: p_1,
+                                width: m_1,
+                                height: w_1
+                            }) : e(h_1, r, i, c, m_1, w_1, -g_1, -p_1, 0);
+                        } else
+                            c = h_1.slice(0);
+                        f.push({rect: {x: g_1, y: p_1, width: m_1, height: w_1}, img: c, blend: v_1, dispose: 0});
+                    }
+                    if (o)
+                        for (l = 0; l < f.length; l++) {
+                            if (1 == (A = f[l]).blend)
+                                continue;
+                            var e_25 = A.rect, o_12 = f[l - 1].rect, s_8 = Math.min(e_25.x, o_12.x),
+                                c_3 = Math.min(e_25.y, o_12.y), u_1 = {
+                                    x: s_8,
+                                    y: c_3,
+                                    width: Math.max(e_25.x + e_25.width, o_12.x + o_12.width) - s_8,
+                                    height: Math.max(e_25.y + e_25.height, o_12.y + o_12.height) - c_3
+                                };
+                            f[l - 1].dispose = 1, l - 1 != 0 && _updateFrame(t, r, i, f, l - 1, u_1, a), _updateFrame(t, r, i, f, l, u_1, a);
+                        }
+                    var h = 0;
+                    if (1 != t.length)
+                        for (var d = 0; d < f.length; d++) {
+                            var A;
+                            h += (A = f[d]).rect.width * A.rect.height;
+                        }
+                    return f;
+                }(t, r, i, s, f, l), y = {}, E = [], F = [];
+                if (0 != o) {
+                    var e_26 = [];
+                    for (w = 0; w < b.length; w++)
+                        e_26.push(b[w].img.buffer);
+                    var t_12 = function concatRGBA(e) {
+                        var t = 0;
+                        for (var r = 0; r < e.length; r++)
+                            t += e[r].byteLength;
+                        var i = new Uint8Array(t);
+                        var o = 0;
+                        for (r = 0; r < e.length; r++) {
+                            var t_13 = new Uint8Array(e[r]), a_9 = t_13.length;
+                            for (var e_27 = 0; e_27 < a_9; e_27 += 4) {
+                                var r_15 = t_13[e_27], a_10 = t_13[e_27 + 1], s_9 = t_13[e_27 + 2];
+                                var f_6 = t_13[e_27 + 3];
+                                0 == f_6 && (r_15 = a_10 = s_9 = 0), i[o + e_27] = r_15, i[o + e_27 + 1] = a_10, i[o + e_27 + 2] = s_9, i[o + e_27 + 3] = f_6;
+                            }
+                            o += a_9;
+                        }
+                        return i.buffer;
+                    }(e_26), r_16 = quantize(t_12, o);
+                    for (w = 0; w < r_16.plte.length; w++)
+                        E.push(r_16.plte[w].est.rgba);
+                    var i_10 = 0;
+                    for (w = 0; w < b.length; w++) {
+                        var e_28 = (B = b[w]).img.length;
+                        var _ = new Uint8Array(r_16.inds.buffer, i_10 >> 2, e_28 >> 2);
+                        F.push(_);
+                        var t_14 = new Uint8Array(r_16.abuf, i_10, e_28);
+                        h && dither(B.img, B.rect.width, B.rect.height, E, t_14, _), B.img.set(t_14), i_10 += e_28;
+                    }
+                } else
+                    for (p = 0; p < b.length; p++) {
+                        var B = b[p];
+                        var e_29 = new Uint32Array(B.img.buffer);
+                        var U = B.rect.width;
+                        m = e_29.length, _ = new Uint8Array(m);
+                        F.push(_);
+                        for (w = 0; w < m; w++) {
+                            var t_15 = e_29[w];
+                            if (0 != w && t_15 == e_29[w - 1])
+                                _[w] = _[w - 1];
+                            else if (w > U && t_15 == e_29[w - U])
+                                _[w] = _[w - U];
+                            else {
+                                var e_30 = y[t_15];
+                                if (null == e_30 && (y[t_15] = e_30 = E.length, E.push(t_15), E.length >= 300))
+                                    break;
+                                _[w] = e_30;
+                            }
+                        }
+                    }
+                var C = E.length;
+                C <= 256 && 0 == u && (A = C <= 2 ? 1 : C <= 4 ? 2 : C <= 16 ? 4 : 8, A = Math.max(A, c));
+                for (p = 0; p < b.length; p++) {
+                    (B = b[p]).rect.x, B.rect.y;
+                    U = B.rect.width;
+                    var e_31 = B.rect.height;
+                    var t_16 = B.img;
+                    new Uint32Array(t_16.buffer);
+                    var r_17 = 4 * U, i_11 = 4;
+                    if (C <= 256 && 0 == u) {
+                        r_17 = Math.ceil(A * U / 8);
+                        var I = new Uint8Array(r_17 * e_31);
+                        var o_13 = F[p];
+                        for (var t_17 = 0; t_17 < e_31; t_17++) {
+                            w = t_17 * r_17;
+                            var e_32 = t_17 * U;
+                            if (8 == A)
+                                for (var Q = 0; Q < U; Q++)
+                                    I[w + Q] = o_13[e_32 + Q];
+                            else if (4 == A)
+                                for (Q = 0; Q < U; Q++)
+                                    I[w + (Q >> 1)] |= o_13[e_32 + Q] << 4 - 4 * (1 & Q);
+                            else if (2 == A)
+                                for (Q = 0; Q < U; Q++)
+                                    I[w + (Q >> 2)] |= o_13[e_32 + Q] << 6 - 2 * (3 & Q);
+                            else if (1 == A)
+                                for (Q = 0; Q < U; Q++)
+                                    I[w + (Q >> 3)] |= o_13[e_32 + Q] << 7 - 1 * (7 & Q);
+                        }
+                        t_16 = I, d = 3, i_11 = 1;
+                    } else if (0 == v && 1 == b.length) {
+                        I = new Uint8Array(U * e_31 * 3);
+                        var o_14 = U * e_31;
+                        for (w = 0; w < o_14; w++) {
+                            var e_33 = 3 * w, r_18 = 4 * w;
+                            I[e_33] = t_16[r_18], I[e_33 + 1] = t_16[r_18 + 1], I[e_33 + 2] = t_16[r_18 + 2];
+                        }
+                        t_16 = I, d = 2, i_11 = 3, r_17 = 3 * U;
+                    }
+                    B.img = t_16, B.bpl = r_17, B.bpp = i_11;
+                }
+                return {ctype: d, depth: A, plte: E, frames: b};
+            }
+    
+            function _updateFrame(t, r, i, o, a, s, f) {
+                var l = Uint8Array, c = Uint32Array, u = new l(t[a - 1]), h = new c(t[a - 1]),
+                    d = a + 1 < t.length ? new l(t[a + 1]) : null, A = new l(t[a]), g = new c(A.buffer);
+                var p = r, m = i, w = -1, v = -1;
+                for (var e_34 = 0; e_34 < s.height; e_34++)
+                    for (var t_18 = 0; t_18 < s.width; t_18++) {
+                        var i_12 = s.x + t_18, f_7 = s.y + e_34, l_4 = f_7 * r + i_12, c_4 = g[l_4];
+                        0 == c_4 || 0 == o[a - 1].dispose && h[l_4] == c_4 && (null == d || 0 != d[4 * l_4 + 3]) || (i_12 < p && (p = i_12), i_12 > w && (w = i_12), f_7 < m && (m = f_7), f_7 > v && (v = f_7));
+                    }
+                -1 == w && (p = m = w = v = 0), f && (1 == (1 & p) && p--, 1 == (1 & m) && m--), s = {
+                    x: p,
+                    y: m,
+                    width: w - p + 1,
+                    height: v - m + 1
+                };
+                var b = o[a];
+                b.rect = s, b.blend = 1, b.img = new Uint8Array(s.width * s.height * 4), 0 == o[a - 1].dispose ? (e(u, r, i, b.img, s.width, s.height, -s.x, -s.y, 0), _prepareDiff(A, r, i, b.img, s)) : e(A, r, i, b.img, s.width, s.height, -s.x, -s.y, 0);
+            }
+    
+            function _prepareDiff(t, r, i, o, a) {
+                e(t, r, i, o, a.width, a.height, -a.x, -a.y, 2);
+            }
+    
+            function _filterZero(e, t, r, i, o, a, s) {
+                var f = [];
+                var l, c = [0, 1, 2, 3, 4];
+                -1 != a ? c = [a] : (t * i > 5e5 || 1 == r) && (c = [0]), s && (l = {level: 0});
+                var u = UZIP;
+                for (var h = 0; h < c.length; h++) {
+                    for (var a_11 = 0; a_11 < t; a_11++)
+                        _filterLine(o, e, a_11, i, r, c[h]);
+                    f.push(u.deflate(o, l));
+                }
+                var d, A = 1e9;
+                for (h = 0; h < f.length; h++)
+                    f[h].length < A && (d = h, A = f[h].length);
+                return f[d];
+            }
+    
+            function _filterLine(e, t, i, o, a, s) {
+                var f = i * o;
+                var l = f + i;
+                if (e[l] = s, l++, 0 == s)
+                    if (o < 500)
+                        for (var c = 0; c < o; c++)
+                            e[l + c] = t[f + c];
+                    else
+                        e.set(new Uint8Array(t.buffer, f, o), l);
+                else if (1 == s) {
+                    for (c = 0; c < a; c++)
+                        e[l + c] = t[f + c];
+                    for (c = a; c < o; c++)
+                        e[l + c] = t[f + c] - t[f + c - a] + 256 & 255;
+                } else if (0 == i) {
+                    for (c = 0; c < a; c++)
+                        e[l + c] = t[f + c];
+                    if (2 == s)
+                        for (c = a; c < o; c++)
+                            e[l + c] = t[f + c];
+                    if (3 == s)
+                        for (c = a; c < o; c++)
+                            e[l + c] = t[f + c] - (t[f + c - a] >> 1) + 256 & 255;
+                    if (4 == s)
+                        for (c = a; c < o; c++)
+                            e[l + c] = t[f + c] - r(t[f + c - a], 0, 0) + 256 & 255;
+                } else {
+                    if (2 == s)
+                        for (c = 0; c < o; c++)
+                            e[l + c] = t[f + c] + 256 - t[f + c - o] & 255;
+                    if (3 == s) {
+                        for (c = 0; c < a; c++)
+                            e[l + c] = t[f + c] + 256 - (t[f + c - o] >> 1) & 255;
+                        for (c = a; c < o; c++)
+                            e[l + c] = t[f + c] + 256 - (t[f + c - o] + t[f + c - a] >> 1) & 255;
+                    }
+                    if (4 == s) {
+                        for (c = 0; c < a; c++)
+                            e[l + c] = t[f + c] + 256 - r(0, t[f + c - o], 0) & 255;
+                        for (c = a; c < o; c++)
+                            e[l + c] = t[f + c] + 256 - r(t[f + c - a], t[f + c - o], t[f + c - a - o]) & 255;
+                    }
+                }
+            }
+    
+            function quantize(e, t) {
+                var r = new Uint8Array(e), i = r.slice(0), o = new Uint32Array(i.buffer), a = getKDtree(i, t), s = a[0],
+                    f = a[1], l = r.length, c = new Uint8Array(l >> 2);
+                var u;
+                if (r.length < 2e7)
+                    for (var h = 0; h < l; h += 4) {
+                        u = getNearest(s, d = r[h] * (1 / 255), A = r[h + 1] * (1 / 255), g = r[h + 2] * (1 / 255), p = r[h + 3] * (1 / 255)), c[h >> 2] = u.ind, o[h >> 2] = u.est.rgba;
+                    }
+                else
+                    for (h = 0; h < l; h += 4) {
+                        var d = r[h] * (1 / 255), A = r[h + 1] * (1 / 255), g = r[h + 2] * (1 / 255),
+                            p = r[h + 3] * (1 / 255);
+                        for (u = s; u.left;)
+                            u = planeDst(u.est, d, A, g, p) <= 0 ? u.left : u.right;
+                        c[h >> 2] = u.ind, o[h >> 2] = u.est.rgba;
+                    }
+                return {abuf: i.buffer, inds: c, plte: f};
+            }
+    
+            function getKDtree(e, t, r) {
+                null == r && (r = 1e-4);
+                var i = new Uint32Array(e.buffer),
+                    o = {i0: 0, i1: e.length, bst: null, est: null, tdst: 0, left: null, right: null};
+                o.bst = stats(e, o.i0, o.i1), o.est = estats(o.bst);
+                var a = [o];
+                for (; a.length < t;) {
+                    var t_19 = 0, o_15 = 0;
+                    for (var s = 0; s < a.length; s++)
+                        a[s].est.L > t_19 && (t_19 = a[s].est.L, o_15 = s);
+                    if (t_19 < r)
+                        break;
+                    var f_8 = a[o_15], l_5 = splitPixels(e, i, f_8.i0, f_8.i1, f_8.est.e, f_8.est.eMq255);
+                    if (f_8.i0 >= l_5 || f_8.i1 <= l_5) {
+                        f_8.est.L = 0;
+                        continue;
+                    }
+                    var c = {i0: f_8.i0, i1: l_5, bst: null, est: null, tdst: 0, left: null, right: null};
+                    c.bst = stats(e, c.i0, c.i1), c.est = estats(c.bst);
+                    var u = {i0: l_5, i1: f_8.i1, bst: null, est: null, tdst: 0, left: null, right: null};
+                    u.bst = {R: [], m: [], N: f_8.bst.N - c.bst.N};
+                    for (s = 0; s < 16; s++)
+                        u.bst.R[s] = f_8.bst.R[s] - c.bst.R[s];
+                    for (s = 0; s < 4; s++)
+                        u.bst.m[s] = f_8.bst.m[s] - c.bst.m[s];
+                    u.est = estats(u.bst), f_8.left = c, f_8.right = u, a[o_15] = c, a.push(u);
+                }
+                a.sort((function (e, t) {
+                    return t.bst.N - e.bst.N;
+                }));
+                for (s = 0; s < a.length; s++)
+                    a[s].ind = s;
+                return [o, a];
+            }
+    
+            function getNearest(e, t, r, i, o) {
+                if (null == e.left)
+                    return e.tdst = function dist(e, t, r, i, o) {
+                        var a = t - e[0], s = r - e[1], f = i - e[2], l = o - e[3];
+                        return a * a + s * s + f * f + l * l;
+                    }(e.est.q, t, r, i, o), e;
+                var a = planeDst(e.est, t, r, i, o);
+                var s = e.left, f = e.right;
+                a > 0 && (s = e.right, f = e.left);
+                var l = getNearest(s, t, r, i, o);
+                if (l.tdst <= a * a)
+                    return l;
+                var c = getNearest(f, t, r, i, o);
+                return c.tdst < l.tdst ? c : l;
+            }
+    
+            function planeDst(e, t, r, i, o) {
+                var a = e.e;
+                return a[0] * t + a[1] * r + a[2] * i + a[3] * o - e.eMq;
+            }
+    
+            function splitPixels(e, t, r, i, o, a) {
+                for (i -= 4; r < i;) {
+                    for (; vecDot(e, r, o) <= a;)
+                        r += 4;
+                    for (; vecDot(e, i, o) > a;)
+                        i -= 4;
+                    if (r >= i)
+                        break;
+                    var s_10 = t[r >> 2];
+                    t[r >> 2] = t[i >> 2], t[i >> 2] = s_10, r += 4, i -= 4;
+                }
+                for (; vecDot(e, r, o) > a;)
+                    r -= 4;
+                return r + 4;
+            }
+    
+            function vecDot(e, t, r) {
+                return e[t] * r[0] + e[t + 1] * r[1] + e[t + 2] * r[2] + e[t + 3] * r[3];
+            }
+    
+            function stats(e, t, r) {
+                var i = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], o = [0, 0, 0, 0], a = r - t >> 2;
+                for (var a_12 = t; a_12 < r; a_12 += 4) {
+                    var t_20 = e[a_12] * (1 / 255), r_19 = e[a_12 + 1] * (1 / 255), s_11 = e[a_12 + 2] * (1 / 255),
+                        f_9 = e[a_12 + 3] * (1 / 255);
+                    o[0] += t_20, o[1] += r_19, o[2] += s_11, o[3] += f_9, i[0] += t_20 * t_20, i[1] += t_20 * r_19, i[2] += t_20 * s_11, i[3] += t_20 * f_9, i[5] += r_19 * r_19, i[6] += r_19 * s_11, i[7] += r_19 * f_9, i[10] += s_11 * s_11, i[11] += s_11 * f_9, i[15] += f_9 * f_9;
+                }
+                return i[4] = i[1], i[8] = i[2], i[9] = i[6], i[12] = i[3], i[13] = i[7], i[14] = i[11], {
+                    R: i,
+                    m: o,
+                    N: a
+                };
+            }
+    
+            function estats(e) {
+                var t = e.R, r = e.m, i = e.N, a = r[0], s = r[1], f = r[2], l = r[3], c = 0 == i ? 0 : 1 / i,
+                    u = [t[0] - a * a * c, t[1] - a * s * c, t[2] - a * f * c, t[3] - a * l * c, t[4] - s * a * c, t[5] - s * s * c, t[6] - s * f * c, t[7] - s * l * c, t[8] - f * a * c, t[9] - f * s * c, t[10] - f * f * c, t[11] - f * l * c, t[12] - l * a * c, t[13] - l * s * c, t[14] - l * f * c, t[15] - l * l * c],
+                    h = u, d = o;
+                var A = [Math.random(), Math.random(), Math.random(), Math.random()], g = 0, p = 0;
+                if (0 != i)
+                    for (var e_35 = 0; e_35 < 16 && (A = d.multVec(h, A), p = Math.sqrt(d.dot(A, A)), A = d.sml(1 / p, A), !(0 != e_35 && Math.abs(p - g) < 1e-9)); e_35++)
+                        g = p;
+                var m = [a * c, s * c, f * c, l * c];
+                return {
+                    Cov: u,
+                    q: m,
+                    e: A,
+                    L: g,
+                    eMq255: d.dot(d.sml(255, m), A),
+                    eMq: d.dot(A, m),
+                    rgba: (Math.round(255 * m[3]) << 24 | Math.round(255 * m[2]) << 16 | Math.round(255 * m[1]) << 8 | Math.round(255 * m[0]) << 0) >>> 0
+                };
+            }
+    
+            var o = {
+                multVec: function (e, t) {
+                    return [e[0] * t[0] + e[1] * t[1] + e[2] * t[2] + e[3] * t[3], e[4] * t[0] + e[5] * t[1] + e[6] * t[2] + e[7] * t[3], e[8] * t[0] + e[9] * t[1] + e[10] * t[2] + e[11] * t[3], e[12] * t[0] + e[13] * t[1] + e[14] * t[2] + e[15] * t[3]];
+                },
+                dot: function (e, t) {
+                    return e[0] * t[0] + e[1] * t[1] + e[2] * t[2] + e[3] * t[3];
+                },
+                sml: function (e, t) {
+                    return [e * t[0], e * t[1], e * t[2], e * t[3]];
+                }
+            };
+            UPNG.encode = function encode(e, t, r, i, o, a, s) {
+                null == i && (i = 0), null == s && (s = !1);
+                var f = compress(e, t, r, i, [!1, !1, !1, 0, s, !1]);
+                return compressPNG(f, -1), _main(f, t, r, o, a);
+            }, UPNG.encodeLL = function encodeLL(e, t, r, i, o, a, s, f) {
+                var l = {ctype: 0 + (1 == i ? 0 : 2) + (0 == o ? 0 : 4), depth: a, frames: []}, c = (i + o) * a, u = c * t;
+                for (var i_13 = 0; i_13 < e.length; i_13++)
+                    l.frames.push({
+                        rect: {x: 0, y: 0, width: t, height: r},
+                        img: new Uint8Array(e[i_13]),
+                        blend: 0,
+                        dispose: 1,
+                        bpp: Math.ceil(c / 8),
+                        bpl: Math.ceil(u / 8)
+                    });
+                return compressPNG(l, 0, !0), _main(l, t, r, s, f);
+            }, UPNG.encode.compress = compress, UPNG.encode.dither = dither, UPNG.quantize = quantize, UPNG.quantize.getKDtree = getKDtree, UPNG.quantize.getNearest = getNearest;
+        }();
+        var t = {
+            toArrayBuffer: function (e, r) {
+                var i = e.width, o = e.height, a = i << 2, s = e.getContext("2d").getImageData(0, 0, i, o),
+                    f = new Uint32Array(s.data.buffer), l = (32 * i + 31) / 32 << 2, c = l * o, u = 122 + c,
+                    h = new ArrayBuffer(u), d = new DataView(h), A = 1 << 20;
+                var g, p, m, w, v = A, b = 0, y = 0, E = 0;
+    
+                function set16(e) {
+                    d.setUint16(y, e, !0), y += 2;
+                }
+    
+                function set32(e) {
+                    d.setUint32(y, e, !0), y += 4;
+                }
+    
+                function seek(e) {
+                    y += e;
+                }
+    
+                set16(19778), set32(u), seek(4), set32(122), set32(108), set32(i), set32(-o >>> 0), set16(1), set16(32), set32(3), set32(c), set32(2835), set32(2835), seek(8), set32(16711680), set32(65280), set32(255), set32(4278190080), set32(1466527264), function convert() {
+                    for (; b < o && v > 0;) {
+                        for (w = 122 + b * l, g = 0; g < a;)
+                            v--, p = f[E++], m = p >>> 24, d.setUint32(w + g, p << 8 | m), g += 4;
+                        b++;
+                    }
+                    E < f.length ? (v = A, setTimeout(convert, t._dly)) : r(h);
+                }();
+            },
+            toBlob: function (e, t) {
+                this.toArrayBuffer(e, (function (e) {
+                    t(new window.Blob([e], {type: "image/bmp"}));
+                }));
+            },
+            _dly: 9
+        };
+        var r = {
+            CHROME: "CHROME",
+            FIREFOX: "FIREFOX",
+            DESKTOP_SAFARI: "DESKTOP_SAFARI",
+            IE: "IE",
+            IOS: "IOS",
+            ETC: "ETC"
+        }, i = (_a = {},
+            _a[r.CHROME] = 16384,
+            _a[r.FIREFOX] = 11180,
+            _a[r.DESKTOP_SAFARI] = 16384,
+            _a[r.IE] = 8192,
+            _a[r.IOS] = 4096,
+            _a[r.ETC] = 8192,
+            _a);
+        var o = "undefined" != typeof window,
+            a = "undefined" != typeof WorkerGlobalScope && self instanceof WorkerGlobalScope,
+            s = o && window.cordova && window.cordova.require && window.cordova.require("cordova/modulemapper"),
+            CustomFile = (o || a) && (s && s.getOriginalSymbol(window, "File") || "undefined" != typeof File && File),
+            CustomFileReader = (o || a) && (s && s.getOriginalSymbol(window, "FileReader") || "undefined" != typeof FileReader && FileReader);
+    
+        function getFilefromDataUrl(e, t, r) {
+            if (r === void 0) {
+                r = Date.now();
+            }
+            return new Promise((function (i) {
+                var o = e.split(","), a = o[0].match(/:(.*?);/)[1], s = globalThis.atob(o[1]);
+                var f = s.length;
+                var l = new Uint8Array(f);
+                for (; f--;)
+                    l[f] = s.charCodeAt(f);
+                var c = new window.Blob([l], {type: a});
+                c.name = t, c.lastModified = r, i(c);
+            }));
+        }
+    
+        function getDataUrlFromFile(e) {
+            return new Promise((function (t, r) {
+                var i = new CustomFileReader;
+                i.onload = function () {
+                    return t(i.result);
+                }, i.onerror = function (e) {
+                    return r(e);
+                }, i.readAsDataURL(e);
+            }));
+        }
+    
+        function loadImage(e) {
+            return new Promise((function (t, r) {
+                var i = new Image;
+                i.onload = function () {
+                    return t(i);
+                }, i.onerror = function (e) {
+                    return r(e);
+                }, i.src = e;
+            }));
+        }
+    
+        function getBrowserName() {
+            if (void 0 !== getBrowserName.cachedResult)
+                return getBrowserName.cachedResult;
+            var e = r.ETC;
+            var t = navigator.userAgent;
+            return /Chrom(e|ium)/i.test(t) ? e = r.CHROME : /iP(ad|od|hone)/i.test(t) && /WebKit/i.test(t) ? e = r.IOS : /Safari/i.test(t) ? e = r.DESKTOP_SAFARI : /Firefox/i.test(t) ? e = r.FIREFOX : (/MSIE/i.test(t) || !0 == !!document.documentMode) && (e = r.IE), getBrowserName.cachedResult = e, getBrowserName.cachedResult;
+        }
+    
+        function approximateBelowMaximumCanvasSizeOfBrowser(e, t) {
+            var r = getBrowserName(), o = i[r];
+            var a = e, s = t, f = a * s;
+            var l = a > s ? s / a : a / s;
+            for (; f > o * o;) {
+                var e_36 = (o + a) / 2, t_21 = (o + s) / 2;
+                e_36 < t_21 ? (s = t_21, a = t_21 * l) : (s = e_36 * l, a = e_36), f = a * s;
+            }
+            return {width: a, height: s};
+        }
+    
+        function getNewCanvasAndCtx(e, t) {
+            var r, i;
+            try {
+                if (r = new OffscreenCanvas(e, t), i = r.getContext("2d"), null === i)
+                    throw new Error("getContext of OffscreenCanvas returns null");
+            } catch (e) {
+                r = document.createElement("canvas"), i = r.getContext("2d");
+            }
+            return r.width = e, r.height = t, [r, i];
+        }
+    
+        function drawImageInCanvas(e, t) {
+            var _a = approximateBelowMaximumCanvasSizeOfBrowser(e.width, e.height), r = _a.width, i = _a.height,
+                _b = getNewCanvasAndCtx(r, i), o = _b[0], a = _b[1];
+            return t && /jpe?g/.test(t) && (a.fillStyle = "white", a.fillRect(0, 0, o.width, o.height)), a.drawImage(e, 0, 0, o.width, o.height), o;
+        }
+    
+        function isIOS() {
+            return void 0 !== isIOS.cachedResult || (isIOS.cachedResult = ["iPad Simulator", "iPhone Simulator", "iPod Simulator", "iPad", "iPhone", "iPod"].includes(navigator.platform) || navigator.userAgent.includes("Mac") && "undefined" != typeof document && "ontouchend" in document), isIOS.cachedResult;
+        }
+    
+        function drawFileInCanvas(e, t) {
+            if (t === void 0) {
+                t = {};
+            }
+            return new Promise((function (i, o) {
+                var a, s;
+                var $Try_2_Post = function () {
+                    try {
+                        return s = drawImageInCanvas(a, t.fileType || e.type), i([a, s]);
+                    } catch (e) {
+                        return o(e);
+                    }
+                }, $Try_2_Catch = function (t) {
+                    try {
+                        0;
+                        var $Try_3_Catch = function (e) {
+                            try {
+                                throw e;
+                            } catch (e) {
+                                return o(e);
+                            }
+                        };
+                        try {
+                            var t_22;
+                            return getDataUrlFromFile(e).then((function (e) {
+                                try {
+                                    return t_22 = e, loadImage(t_22).then((function (e) {
+                                        try {
+                                            return a = e, function () {
+                                                try {
+                                                    return $Try_2_Post();
+                                                } catch (e) {
+                                                    return o(e);
+                                                }
+                                            }();
+                                        } catch (e) {
+                                            return $Try_3_Catch(e);
+                                        }
+                                    }), $Try_3_Catch);
+                                } catch (e) {
+                                    return $Try_3_Catch(e);
+                                }
+                            }), $Try_3_Catch);
+                        } catch (e) {
+                            $Try_3_Catch(e);
+                        }
+                    } catch (e) {
+                        return o(e);
+                    }
+                };
+                try {
+                    if (isIOS() || [r.DESKTOP_SAFARI, r.MOBILE_SAFARI].includes(getBrowserName()))
+                        throw new Error("Skip createImageBitmap on IOS and Safari");
+                    return createImageBitmap(e).then((function (e) {
+                        try {
+                            return a = e, $Try_2_Post();
+                        } catch (e) {
+                            return $Try_2_Catch();
+                        }
+                    }), $Try_2_Catch);
+                } catch (e) {
+                    $Try_2_Catch();
+                }
+            }));
+        }
+    
+        function canvasToFile(e, r, i, o, a) {
+            if (a === void 0) {
+                a = 1;
+            }
+            return new Promise((function (s, f) {
+                var l;
+                if ("image/png" === r) {
+                    var c = void 0, u = void 0, h = void 0;
+                    return c = e.getContext("2d"), (u = c.getImageData(0, 0, e.width, e.height).data), h = UPNG.encode([u.buffer], e.width, e.height, 4096 * a), l = new window.Blob([h], {type: r}), l.name = i, l.lastModified = o, $If_4.call(this);
+                }
+                {
+                    if ("image/bmp" === r)
+                        return new Promise((function (r) {
+                            return t.toBlob(e, r);
+                        })).then(function (e) {
+                            try {
+                                return l = e, l.name = i, l.lastModified = o, $If_5.call(this);
+                            } catch (e) {
+                                return f(e);
+                            }
+                        }.bind(this), f);
+                    {
+                        if ("function" == typeof OffscreenCanvas && e instanceof OffscreenCanvas)
+                            return e.convertToBlob({
+                                type: r,
+                                quality: a
+                            }).then(function (e) {
+                                try {
+                                    return l = e, l.name = i, l.lastModified = o, $If_6.call(this);
+                                } catch (e) {
+                                    return f(e);
+                                }
+                            }.bind(this), f);
+                        {
+                            var d = void 0;
+                            return d = e.toDataURL(r, a), getFilefromDataUrl(d, i, o).then(function (e) {
+                                try {
+                                    return l = e, $If_6.call(this);
+                                } catch (e) {
+                                    return f(e);
+                                }
+                            }.bind(this), f);
+                        }
+    
+                        function $If_6() {
+                            return $If_5.call(this);
+                        }
+                    }
+    
+                    function $If_5() {
+                        return $If_4.call(this);
+                    }
+                }
+    
+                function $If_4() {
+                    return s(l);
+                }
+            }));
+        }
+    
+        function cleanupCanvasMemory(e) {
+            e.width = 0, e.height = 0;
+        }
+    
+        function isAutoOrientationInBrowser() {
+            return new Promise((function (e, t) {
+                var r, i, o, a, s;
+                return void 0 !== isAutoOrientationInBrowser.cachedResult ? e(isAutoOrientationInBrowser.cachedResult) : (r = "data:image/jpeg;base64,/9j/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAAAAAD/2wCEAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/AABEIAAEAAgMBEQACEQEDEQH/xABKAAEAAAAAAAAAAAAAAAAAAAALEAEAAAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAAAAAAAEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8H//2Q==", getFilefromDataUrl("data:image/jpeg;base64,/9j/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAAAAAD/2wCEAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/AABEIAAEAAgMBEQACEQEDEQH/xABKAAEAAAAAAAAAAAAAAAAAAAALEAEAAAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAAAAAAAEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8H//2Q==", "test.jpg", Date.now()).then((function (r) {
+                    try {
+                        return i = r, drawFileInCanvas(i).then((function (r) {
+                            try {
+                                return o = r[1], canvasToFile(o, i.type, i.name, i.lastModified).then((function (r) {
+                                    try {
+                                        return a = r, cleanupCanvasMemory(o), drawFileInCanvas(a).then((function (r) {
+                                            try {
+                                                return s = r[0], isAutoOrientationInBrowser.cachedResult = 1 === s.width && 2 === s.height, e(isAutoOrientationInBrowser.cachedResult);
+                                            } catch (e) {
+                                                return t(e);
+                                            }
+                                        }), t);
+                                    } catch (e) {
+                                        return t(e);
+                                    }
+                                }), t);
+                            } catch (e) {
+                                return t(e);
+                            }
+                        }), t);
+                    } catch (e) {
+                        return t(e);
+                    }
+                }), t));
+            }));
+        }
+    
+        function getExifOrientation(e) {
+            return new Promise((function (t, r) {
+                var i = new CustomFileReader;
+                i.onload = function (e) {
+                    var r = new DataView(e.target.result);
+                    if (65496 != r.getUint16(0, !1))
+                        return t(-2);
+                    var i = r.byteLength;
+                    var o = 2;
+                    for (; o < i;) {
+                        if (r.getUint16(o + 2, !1) <= 8)
+                            return t(-1);
+                        var e_37 = r.getUint16(o, !1);
+                        if (o += 2, 65505 == e_37) {
+                            if (1165519206 != r.getUint32(o += 2, !1))
+                                return t(-1);
+                            var e_38 = 18761 == r.getUint16(o += 6, !1);
+                            o += r.getUint32(o + 4, e_38);
+                            var i_14 = r.getUint16(o, e_38);
+                            o += 2;
+                            for (var a_13 = 0; a_13 < i_14; a_13++)
+                                if (274 == r.getUint16(o + 12 * a_13, e_38))
+                                    return t(r.getUint16(o + 12 * a_13 + 8, e_38));
+                        } else {
+                            if (65280 != (65280 & e_37))
+                                break;
+                            o += r.getUint16(o, !1);
+                        }
+                    }
+                    return t(-1);
+                }, i.onerror = function (e) {
+                    return r(e);
+                }, i.readAsArrayBuffer(e);
+            }));
+        }
+    
+        function handleMaxWidthOrHeight(e, t) {
+            var _a;
+            var r = e.width, i = e.height, o = t.maxWidthOrHeight;
+            var a, s = e;
+            return isFinite(o) && (r > o || i > o) && (_a = getNewCanvasAndCtx(r, i), s = _a[0], a = _a[1], r > i ? (s.width = o, s.height = i / r * o) : (s.width = r / i * o, s.height = o), a.drawImage(e, 0, 0, s.width, s.height), cleanupCanvasMemory(e)), s;
+        }
+    
+        function followExifOrientation(e, t) {
+            var r = e.width, i = e.height, _a = getNewCanvasAndCtx(r, i), o = _a[0], a = _a[1];
+            switch (t > 4 && t < 9 ? (o.width = i, o.height = r) : (o.width = r, o.height = i), t) {
+                case 2:
+                    a.transform(-1, 0, 0, 1, r, 0);
+                    break;
+                case 3:
+                    a.transform(-1, 0, 0, -1, r, i);
+                    break;
+                case 4:
+                    a.transform(1, 0, 0, -1, 0, i);
+                    break;
+                case 5:
+                    a.transform(0, 1, 1, 0, 0, 0);
+                    break;
+                case 6:
+                    a.transform(0, 1, -1, 0, i, 0);
+                    break;
+                case 7:
+                    a.transform(0, -1, -1, 0, i, r);
+                    break;
+                case 8:
+                    a.transform(0, -1, 1, 0, 0, r);
+            }
+            return a.drawImage(e, 0, 0, r, i), cleanupCanvasMemory(e), o;
+        }
+    
+        function compress(e, t, r) {
+            if (r === void 0) {
+                r = 0;
+            }
+            return new Promise((function (i, o) {
+                var a, s, f, l, c, u, h, d, A, g, p, m, w, v, b, y, E, F, _, B;
+    
+                function incProgress(e) {
+                    if (e === void 0) {
+                        e = 5;
+                    }
+                    if (t.signal && t.signal.aborted)
+                        throw t.signal.reason;
+                    a += e, t.onProgress(Math.min(a, 100));
+                }
+    
+                function setProgress(e) {
+                    if (t.signal && t.signal.aborted)
+                        throw t.signal.reason;
+                    a = Math.min(Math.max(e, a), 100), t.onProgress(a);
+                }
+    
+                return a = r, s = t.maxIteration || 10, f = 1024 * t.maxSizeMB * 1024, incProgress(), drawFileInCanvas(e, t).then(function (r) {
+                    try {
+                        return l = r[1], incProgress(), c = handleMaxWidthOrHeight(l, t), incProgress(), new Promise((function (r, i) {
+                            var o;
+                            if (!(o = t.exifOrientation))
+                                return getExifOrientation(e).then(function (e) {
+                                    try {
+                                        return o = e, $If_2.call(this);
+                                    } catch (e) {
+                                        return i(e);
+                                    }
+                                }.bind(this), i);
+    
+                            function $If_2() {
+                                return r(o);
+                            }
+    
+                            return $If_2.call(this);
+                        })).then(function (r) {
+                            try {
+                                return u = r, incProgress(), isAutoOrientationInBrowser().then(function (r) {
+                                    try {
+                                        return h = r ? c : followExifOrientation(c, u), incProgress(), d = t.initialQuality || 1, A = t.fileType || e.type, canvasToFile(h, A, e.name, e.lastModified, d).then(function (r) {
+                                            try {
+                                                {
+                                                    if (g = r, incProgress(), p = g.size > f, m = g.size > e.size, !p && !m)
+                                                        return setProgress(100), i(g);
+                                                    var a;
+    
+                                                    function $Loop_3() {
+                                                        var _a;
+                                                        if (s-- && (b > f || b > w)) {
+                                                            var t_23, r_20;
+                                                            return t_23 = B ? .95 * _.width : _.width, r_20 = B ? .95 * _.height : _.height, _a = getNewCanvasAndCtx(t_23, r_20), E = _a[0], F = _a[1], F.drawImage(_, 0, 0, t_23, r_20), d *= "image/png" === A ? .85 : .95, canvasToFile(E, A, e.name, e.lastModified, d).then((function (e) {
+                                                                try {
+                                                                    return y = e, cleanupCanvasMemory(_), _ = E, b = y.size, setProgress(Math.min(99, Math.floor((v - b) / (v - f) * 100))), $Loop_3;
+                                                                } catch (e) {
+                                                                    return o(e);
+                                                                }
+                                                            }), o);
+                                                        }
+                                                        return [1];
+                                                    }
+    
+                                                    return w = e.size, v = g.size, b = v, _ = h, B = !t.alwaysKeepResolution && p, (a = function (e) {
+                                                        for (; e;) {
+                                                            if (e.then)
+                                                                return void e.then(a, o);
+                                                            try {
+                                                                if (e.pop) {
+                                                                    if (e.length)
+                                                                        return e.pop() ? $Loop_3_exit.call(this) : e;
+                                                                    e = $Loop_3;
+                                                                } else
+                                                                    e = e.call(this);
+                                                            } catch (e) {
+                                                                return o(e);
+                                                            }
+                                                        }
+                                                    }.bind(this))($Loop_3);
+    
+                                                    function $Loop_3_exit() {
+                                                        return cleanupCanvasMemory(_), cleanupCanvasMemory(E), cleanupCanvasMemory(c), cleanupCanvasMemory(h), cleanupCanvasMemory(l), setProgress(100), i(y);
+                                                    }
+                                                }
+                                            } catch (u) {
+                                                return o(u);
+                                            }
+                                        }.bind(this), o);
+                                    } catch (e) {
+                                        return o(e);
+                                    }
+                                }.bind(this), o);
+                            } catch (e) {
+                                return o(e);
+                            }
+                        }.bind(this), o);
+                    } catch (e) {
+                        return o(e);
+                    }
+                }.bind(this), o);
+            }));
+        }
+    
+        var f = "\nlet scriptImported = false\nself.addEventListener('message', async (e) => {\n  const { file, id, imageCompressionLibUrl, options } = e.data\n  options.onProgress = (progress) => self.postMessage({ progress, id })\n  try {\n    if (!scriptImported) {\n      // console.log('[worker] importScripts', imageCompressionLibUrl)\n      self.importScripts(imageCompressionLibUrl)\n      scriptImported = true\n    }\n    // console.log('[worker] self', self)\n    const compressedFile = await imageCompression(file, options)\n    self.postMessage({ file: compressedFile, id })\n  } catch (e) {\n    // console.error('[worker] error', e)\n    self.postMessage({ error: e.message + '\\n' + e.stack, id })\n  }\n})\n";
+        var l;
+    
+        function compressOnWebWorker(e, t) {
+            return new Promise((function (r, i) {
+                l || (l = function createWorkerScriptURL(e) {
+                    var t = [];
+                    return "function" == typeof e ? t.push("(".concat(e, ")()")) : t.push(e), URL.createObjectURL(new window.Blob(t));
+                }(f));
+                var o = new Worker(l);
+                o.addEventListener("message", (function handler(e) {
+                    if (t.signal && t.signal.aborted)
+                        o.terminate();
+                    else if (void 0 === e.data.progress) {
+                        if (e.data.error)
+                            return i(new Error(e.data.error)), void o.terminate();
+                        r(e.data.file), o.terminate();
+                    } else
+                        t.onProgress(e.data.progress);
+                })), o.addEventListener("error", i), t.signal && t.signal.addEventListener("abort", (function () {
+                    i(t.signal.reason), o.terminate();
+                })), o.postMessage({
+                    file: e,
+                    imageCompressionLibUrl: t.libURL,
+                    options: __assign(__assign({}, t), {onProgress: void 0, signal: void 0})
+                });
+            }));
+        }
+    
+        function imageCompression(e, t) {
+            return new Promise((function (r, i) {
+                var o, a, s, f, l, c;
+                if (o = __assign({}, t), s = 0, (f = o.onProgress), o.maxSizeMB = o.maxSizeMB || Number.POSITIVE_INFINITY, l = "boolean" != typeof o.useWebWorker || o.useWebWorker, delete o.useWebWorker, o.onProgress = function (e) {
+                    s = e, "function" == typeof f && f(s);
+                }, !(e instanceof window.Blob || e instanceof CustomFile))
+                    return i(new Error("The file given is not an instance of Blob or File"));
+                if (!/^image/.test(e.type))
+                    return i(new Error("The file given is not an image"));
+                if (c = "undefined" != typeof WorkerGlobalScope && self instanceof WorkerGlobalScope, !l || "function" != typeof Worker || c)
+                    return compress(e, o).then(function (e) {
+                        try {
+                            return a = e, $If_4.call(this);
+                        } catch (e) {
+                            return i(e);
+                        }
+                    }.bind(this), i);
+                var u = function () {
+                    try {
+                        return $If_4.call(this);
+                    } catch (e) {
+                        return i(e);
+                    }
+                }.bind(this), $Try_1_Catch = function (t) {
+                    try {
+                        return compress(e, o).then((function (e) {
+                            try {
+                                return a = e, u();
+                            } catch (e) {
+                                return i(e);
+                            }
+                        }), i);
+                    } catch (e) {
+                        return i(e);
+                    }
+                };
+                try {
+                    return o.libURL = o.libURL || "https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js", compressOnWebWorker(e, o).then((function (e) {
+                        try {
+                            return a = e, u();
+                        } catch (e) {
+                            return $Try_1_Catch();
+                        }
+                    }), $Try_1_Catch);
+                } catch (e) {
+                    $Try_1_Catch();
+                }
+    
+                function $If_4() {
+                    try {
+                        a.name = e.name, a.lastModified = e.lastModified;
+                    } catch (e) {
+                    }
+                    try {
+                        o.preserveExif && "image/jpeg" === e.type && (!o.fileType || o.fileType && o.fileType === e.type) && (a = copyExifWithoutOrientation(e, a));
+                    } catch (e) {
+                    }
+                    return r(a);
+                }
+            }));
+        }
+    
+        return imageCompression.getDataUrlFromFile = getDataUrlFromFile, imageCompression.getFilefromDataUrl = getFilefromDataUrl, imageCompression.loadImage = loadImage, imageCompression.drawImageInCanvas = drawImageInCanvas, imageCompression.drawFileInCanvas = drawFileInCanvas, imageCompression.canvasToFile = canvasToFile, imageCompression.getExifOrientation = getExifOrientation, imageCompression.handleMaxWidthOrHeight = handleMaxWidthOrHeight, imageCompression.followExifOrientation = followExifOrientation, imageCompression.cleanupCanvasMemory = cleanupCanvasMemory, imageCompression.isAutoOrientationInBrowser = isAutoOrientationInBrowser, imageCompression.approximateBelowMaximumCanvasSizeOfBrowser = approximateBelowMaximumCanvasSizeOfBrowser, imageCompression.copyExifWithoutOrientation = copyExifWithoutOrientation, imageCompression.getBrowserName = getBrowserName, imageCompression.version = "2.0.2", imageCompression;
+    });
+    
+    /**
+     * @fileOverview 图片操作, 负责预览图片和上传前压缩图片
+     */
+    define('widgets/image',[
+        'base',
+        'uploader',
+        'lib/image',
+        'lib/browser-image-compression',
+        'widgets/widget'
+    ], function( Base, Uploader, Image, imageCompression ) {
+    
+        var $ = Base.$,
+            throttle;
+    
+        // 根据要处理的文件大小来节流，一次不能处理太多，会卡。
+        throttle = (function( max ) {
+            var occupied = 0,
+                waiting = [],
+                tick = function() {
+                    var item;
+    
+                    while ( waiting.length && occupied < max ) {
+                        item = waiting.shift();
+                        occupied += item[ 0 ];
+                        item[ 1 ]();
+                    }
+                };
+    
+            return function( emiter, size, cb ) {
+                waiting.push([ size, cb ]);
+                emiter.once( 'destroy', function() {
+                    occupied -= size;
+                    setTimeout( tick, 1 );
+                });
+                setTimeout( tick, 1 );
+            };
+        })( 5 * 1024 * 1024 );
+    
+        $.extend( Uploader.options, {
+    
+            /**
+             * @property {Object} [thumb]
+             * @namespace options
+             * @for Uploader
+             * @description 配置生成缩略图的选项。
+             *
+             * 默认为：
+             *
+             * ```javascript
+             * {
+             *     width: 110,
+             *     height: 110,
+             *
+             *     // 图片质量，只有type为`image/jpeg`的时候才有效。
+             *     quality: 70,
+             *
+             *     // 是否允许放大，如果想要生成小图的时候不失真，此选项应该设置为false.
+             *     allowMagnify: true,
+             *
+             *     // 是否允许裁剪。
+             *     crop: true,
+             *
+             *     // 为空的话则保留原有图片格式。
+             *     // 否则强制转换成指定的类型。
+             *     type: 'image/jpeg'
+             * }
+             * ```
+             */
+            thumb: {
+                width: 110,
+                height: 110,
+                quality: 70,
+                allowMagnify: true,
+                crop: true,
+                preserveHeaders: false,
+    
+                // 为空的话则保留原有图片格式。
+                // 否则强制转换成指定的类型。
+                // IE 8下面 base64 大小不能超过 32K 否则预览失败，而非 jpeg 编码的图片很可
+                // 能会超过 32k, 所以这里设置成预览的时候都是 image/jpeg
+                type: 'image/jpeg'
+            },
+            compress: {
+                // 是否开启
+                enable: false,
+                // 压缩最大宽度或高度
+                maxWidthOrHeight: 4000,
+                // 压缩的最大大小
+                maxSize: 10*1024*1024,
+            }
+        });
+    
+        return Uploader.register({
+    
+            name: 'image',
+    
+    
+            /**
+             * 生成缩略图，此过程为异步，所以需要传入`callback`。
+             * 通常情况在图片加入队里后调用此方法来生成预览图以增强交互效果。
+             *
+             * 当 width 或者 height 的值介于 0 - 1 时，被当成百分比使用。
+             *
+             * `callback`中可以接收到两个参数。
+             * * 第一个为error，如果生成缩略图有错误，此error将为真。
+             * * 第二个为ret, 缩略图的Data URL值。
+             *
+             * **注意**
+             * Date URL在IE6/7中不支持，所以不用调用此方法了，直接显示一张暂不支持预览图片好了。
+             * 也可以借助服务端，将 base64 数据传给服务端，生成一个临时文件供预览。
+             *
+             * @method makeThumb
+             * @grammar makeThumb( file, callback ) => undefined
+             * @grammar makeThumb( file, callback, width, height ) => undefined
+             * @for Uploader
+             * @example
+             *
+             * uploader.on( 'fileQueued', function( file ) {
+             *     var $li = ...;
+             *
+             *     uploader.makeThumb( file, function( error, ret ) {
+             *         if ( error ) {
+             *             $li.text('预览错误');
+             *         } else {
+             *             $li.append('<img alt="" src="' + ret + '" />');
+             *         }
+             *     });
+             *
+             * });
+             */
+            makeThumb: function( file, cb, width, height ) {
+                var opts, image;
+    
+                file = this.request( 'get-file', file );
+    
+                // 只预览图片格式。
+                if ( !file.type.match( /^image/ ) ) {
+                    cb( true );
+                    return;
+                }
+    
+                opts = $.extend({}, this.options.thumb );
+    
+                // 如果传入的是object.
+                if ( $.isPlainObject( width ) ) {
+                    opts = $.extend( opts, width );
+                    width = null;
+                }
+    
+                width = width || opts.width;
+                height = height || opts.height;
+    
+                image = new Image( opts );
+    
+                image.once( 'load', function() {
+                    file._info = file._info || image.info();
+                    file._meta = file._meta || image.meta();
+    
+                    // 如果 width 的值介于 0 - 1
+                    // 说明设置的是百分比。
+                    if ( width <= 1 && width > 0 ) {
+                        width = file._info.width * width;
+                    }
+    
+                    // 同样的规则应用于 height
+                    if ( height <= 1 && height > 0 ) {
+                        height = file._info.height * height;
+                    }
+    
+                    image.resize( width, height );
+                });
+    
+                // 当 resize 完后
+                image.once( 'complete', function() {
+                    cb( false, image.getAsDataUrl( opts.type ) );
+                    image.destroy();
+                });
+    
+                image.once( 'error', function( reason ) {
+                    cb( reason || true );
+                    image.destroy();
+                });
+    
+                throttle( image, file.source.size, function() {
+                    file._info && image.info( file._info );
+                    file._meta && image.meta( file._meta );
+                    image.loadFromBlob( file.source );
+                });
+            },
+    
+            beforeSendFile: function( file ) {
+                var opts = this.options.compress, image, me=this, deferred;
+    
+                // console.log('image.beforeSendFile',opts, file)
+    
+                file = this.request( 'get-file', file );
+    
+                if(file._widgetImageData){
+                    return;
+                }
+    
+                var data = {
+                    processed: false,
+                    success: false,
+                    originalSize: file.size,
+                };
+    
+                if ( !opts || !opts.enable || !~'image/jpeg,image/jpg,image/png'.indexOf( file.type ) ) {
+                    file._widgetImageData = data;
+                    return;
+                }
+    
+                opts = $.extend({}, opts );
+                deferred = Base.Deferred();
+    
+                me.owner.trigger( 'fileProcessStart', 'imageCompress', file);
+    
+                imageCompression(file.source.source,{
+                    maxSizeMB: opts.maxSize/1024/1024,
+                    maxWidthOrHeight: opts.maxWidthOrHeight,
+                }).then(function (compressedBlob) {
+                    me.owner.trigger( 'fileProcessEnd', 'imageCompress', file);
+                    if(opts.debug){
+                        console.log('webuploader.compress.output', (compressedBlob.size / file.size * 100).toFixed(2) + '%');
+                    }
+                    var oldSize = file.size;
+                    file.source.source = compressedBlob;
+                    file.source.size = compressedBlob.size;
+                    file.size = compressedBlob.size;
+                    file.trigger( 'resize', compressedBlob.size, oldSize );
+                    data.processed = true;
+                    data.success = true;
+                    file._widgetImageData = data;
+                    deferred.resolve();
+                }).catch(function (error) {
+                    console.warn('webuploader.compress.error',error);
+                    me.owner.trigger( 'fileProcessEnd', 'imageCompress', file);
+                    data.processed = true;
+                    file._widgetImageData = data;
+                    deferred.resolve();
+                });
+    
+                // image = new Image( opts );
+                //
+                // deferred.always(function() {
+                //     image.destroy();
+                //     image = null;
+                // });
+                // image.once( 'error', deferred.reject );
+                // image.once( 'load', function() {
+                //     var width = opts.width,
+                //         height = opts.height;
+                //
+                //     file._info = file._info || image.info();
+                //     file._meta = file._meta || image.meta();
+                //
+                //     // 如果 width 的值介于 0 - 1
+                //     // 说明设置的是百分比。
+                //     if ( width <= 1 && width > 0 ) {
+                //         width = file._info.width * width;
+                //     }
+                //
+                //     // 同样的规则应用于 height
+                //     if ( height <= 1 && height > 0 ) {
+                //         height = file._info.height * height;
+                //     }
+                //
+                //     image.resize( width, height );
+                // });
+                //
+                // image.once( 'complete', function() {
+                //     var blob, size;
+                //
+                //     // 移动端 UC / qq 浏览器的无图模式下
+                //     // ctx.getImageData 处理大图的时候会报 Exception
+                //     // INDEX_SIZE_ERR: DOM Exception 1
+                //     try {
+                //         blob = image.getAsBlob( opts.type );
+                //
+                //         size = file.size;
+                //
+                //         // 如果压缩后，比原来还大则不用压缩后的。
+                //         if ( !noCompressIfLarger || blob.size < size ) {
+                //             // file.source.destroy && file.source.destroy();
+                //             file.source = blob;
+                //             file.size = blob.size;
+                //
+                //             file.trigger( 'resize', blob.size, size );
+                //         }
+                //
+                //         // 标记，避免重复压缩。
+                //         file._compressed = true;
+                //         deferred.resolve();
+                //     } catch ( e ) {
+                //         // 出错了直接继续，让其上传原始图片
+                //         deferred.resolve();
+                //     }
+                // });
+                //
+                // file._info && image.info( file._info );
+                // file._meta && image.meta( file._meta );
+                //
+                // image.loadFromBlob( file.source );
+                return deferred.promise();
+            }
+        });
+    });
+    
+    /**
+     * @fileOverview 文件属性封装
+     */
+    define('file',[
+        'base',
+        'mediator'
+    ], function( Base, Mediator ) {
+    
+        var $ = Base.$,
+            idPrefix = 'WU_FILE_',
+            idSuffix = 0,
+            rExt = /\.([^.]+)$/,
+            statusMap = {};
+    
+        function gid() {
+            return idPrefix + idSuffix++;
+        }
+    
+        /**
+         * 文件类
+         * @class File
+         * @constructor 构造函数
+         * @grammar new File( source ) => File
+         * @param {Lib.File} source [lib.File](#Lib.File)实例, 此source对象是带有Runtime信息的。
+         */
+        function WUFile( source ) {
+    
+            /**
+             * 文件名，包括扩展名（后缀）
+             * @property name
+             * @type {string}
+             */
+            this.name = source.name || 'Untitled';
+    
+            /**
+             * 文件体积（字节）
+             * @property size
+             * @type {uint}
+             * @default 0
+             */
+            this.size = source.size || 0;
+    
+            /**
+             * 文件MIMETYPE类型，与文件类型的对应关系请参考[http://t.cn/z8ZnFny](http://t.cn/z8ZnFny)
+             * @property type
+             * @type {string}
+             * @default 'application/octet-stream'
+             */
+            this.type = source.type || 'application/octet-stream';
+    
+            /**
+             * 文件最后修改日期
+             * @property lastModifiedDate
+             * @type {int}
+             * @default 当前时间戳
+             */
+            this.lastModifiedDate = source.lastModifiedDate || (new Date() * 1);
+    
+            /**
+             * 文件ID，每个对象具有唯一ID，与文件名无关
+             * @property id
+             * @type {string}
+             */
+            this.id = gid();
+    
+            /**
+             * 文件扩展名，通过文件名获取，例如test.png的扩展名为png
+             * @property ext
+             * @type {string}
+             */
+            this.ext = rExt.exec( this.name ) ? RegExp.$1 : '';
+    
+    
+            /**
+             * 状态文字说明。在不同的status语境下有不同的用途。
+             * @property statusText
+             * @type {string}
+             */
+            this.statusText = '';
+    
+            // 存储文件状态，防止通过属性直接修改
+            statusMap[ this.id ] = WUFile.Status.INITED;
+    
+            this.source = source;
+            this.loaded = 0;
+    
+            this.on( 'error', function( msg ) {
+                this.setStatus( WUFile.Status.ERROR, msg );
+            });
+        }
+    
+        $.extend( WUFile.prototype, {
+    
+            /**
+             * 设置状态，状态变化时会触发`change`事件。
+             * @method setStatus
+             * @grammar setStatus( status[, statusText] );
+             * @param {File.Status|String} status [文件状态值](#WebUploader:File:File.Status)
+             * @param {String} [statusText=''] 状态说明，常在error时使用，用http, abort,server等来标记是由于什么原因导致文件错误。
+             */
+            setStatus: function( status, text ) {
+    
+                var prevStatus = statusMap[ this.id ];
+    
+                typeof text !== 'undefined' && (this.statusText = text);
+    
+                if ( status !== prevStatus ) {
+                    statusMap[ this.id ] = status;
+                    /**
+                     * 文件状态变化
+                     * @event statuschange
+                     */
+                    this.trigger( 'statuschange', status, prevStatus );
+                }
+    
+            },
+    
+            /**
+             * 获取文件状态
+             * @return {File.Status}
+             * @example
+                     文件状态具体包括以下几种类型：
+                     {
+                         // 初始化
+                        INITED:     0,
+                        // 已入队列
+                        QUEUED:     1,
+                        // 正在上传
+                        PROGRESS:     2,
+                        // 上传出错
+                        ERROR:         3,
+                        // 上传成功
+                        COMPLETE:     4,
+                        // 上传取消
+                        CANCELLED:     5
+                    }
+             */
+            getStatus: function() {
+                return statusMap[ this.id ];
+            },
+    
+            /**
+             * 获取文件原始信息。
+             * @return {*}
+             */
+            getSource: function() {
+                return this.source;
+            },
+    
+            destroy: function() {
+                this.off();
+                delete statusMap[ this.id ];
+            }
+        });
+    
+        Mediator.installTo( WUFile.prototype );
+    
+        /**
+         * 文件状态值，具体包括以下几种类型：
+         * * `inited` 初始状态
+         * * `queued` 已经进入队列, 等待上传
+         * * `progress` 上传中
+         * * `complete` 上传完成。
+         * * `error` 上传出错，可重试
+         * * `interrupt` 上传中断，可续传。
+         * * `invalid` 文件不合格，不能重试上传。会自动从队列中移除。
+         * * `cancelled` 文件被移除。
+         * @property {Object} Status
+         * @namespace File
+         * @class File
+         * @static
+         */
+        WUFile.Status = {
+            INITED:     'inited',    // 初始状态
+            QUEUED:     'queued',    // 已经进入队列, 等待上传
+            PROGRESS:   'progress',    // 上传中
+            ERROR:      'error',    // 上传出错，可重试
+            COMPLETE:   'complete',    // 上传完成。
+            CANCELLED:  'cancelled',    // 上传取消。
+            INTERRUPT:  'interrupt',    // 上传中断，可续传。
+            INVALID:    'invalid'    // 文件不合格，不能重试上传。
+        };
+    
+        return WUFile;
+    });
+    
+    /**
+     * @fileOverview 文件队列
+     */
+    define('queue',[
+        'base',
+        'mediator',
+        'file'
+    ], function( Base, Mediator, WUFile ) {
+    
+        var $ = Base.$,
+            STATUS = WUFile.Status;
+    
+        /**
+         * 文件队列, 用来存储各个状态中的文件。
+         * @class Queue
+         * @extends Mediator
+         */
+        function Queue() {
+    
+            /**
+             * 统计文件数。
+             * * `numOfQueue` 队列中的文件数。
+             * * `numOfSuccess` 上传成功的文件数
+             * * `numOfCancel` 被取消的文件数
+             * * `numOfProgress` 正在上传中的文件数
+             * * `numOfUploadFailed` 上传错误的文件数。
+             * * `numOfInvalid` 无效的文件数。
+             * * `numOfDeleted` 被移除的文件数。
+             * * `numOfInterrupt` 被中断的文件数。
+             * @property {Object} stats
+             */
+            this.stats = {
+                numOfQueue: 0,
+                numOfSuccess: 0,
+                numOfCancel: 0,
+                numOfProgress: 0,
+                numOfUploadFailed: 0,
+                numOfInvalid: 0,
+                numOfDeleted: 0,
+                numOfInterrupt: 0
+            };
+    
+            // 上传队列，仅包括等待上传的文件
+            this._queue = [];
+    
+            // 存储所有文件
+            this._map = {};
+        }
+    
+        $.extend( Queue.prototype, {
+    
+            /**
+             * 将新文件加入对队列尾部
+             *
+             * @method append
+             * @param  {File} file   文件对象
+             */
+            append: function( file ) {
+                this._queue.push( file );
+                this._fileAdded( file );
+                return this;
+            },
+    
+            /**
+             * 将新文件加入对队列头部
+             *
+             * @method prepend
+             * @param  {File} file   文件对象
+             */
+            prepend: function( file ) {
+                this._queue.unshift( file );
+                this._fileAdded( file );
+                return this;
+            },
+    
+            /**
+             * 获取文件对象
+             *
+             * @method getFile
+             * @param  {String} fileId   文件ID
+             * @return {File}
+             */
+            getFile: function( fileId ) {
+                if ( typeof fileId !== 'string' ) {
+                    return fileId;
+                }
+                return this._map[ fileId ];
+            },
+    
+            /**
+             * 从队列中取出一个指定状态的文件。
+             * @grammar fetch( status ) => File
+             * @method fetch
+             * @param {String} status [文件状态值](#WebUploader:File:File.Status)
+             * @return {File} [File](#WebUploader:File)
+             */
+            fetch: function( status ) {
+                var len = this._queue.length,
+                    i, file;
+    
+                status = status || STATUS.QUEUED;
+    
+                for ( i = 0; i < len; i++ ) {
+                    file = this._queue[ i ];
+    
+                    if ( status === file.getStatus() ) {
+                        return file;
+                    }
+                }
+    
+                return null;
+            },
+    
+            /**
+             * 对队列进行排序，能够控制文件上传顺序。
+             * @grammar sort( fn ) => undefined
+             * @method sort
+             * @param {Function} fn 排序方法
+             */
+            sort: function( fn ) {
+                if ( typeof fn === 'function' ) {
+                    this._queue.sort( fn );
+                }
+            },
+    
+            /**
+             * 获取指定类型的文件列表, 列表中每一个成员为[File](#WebUploader:File)对象。
+             * @grammar getFiles( [status1[, status2 ...]] ) => Array
+             * @method getFiles
+             * @param {String} [status] [文件状态值](#WebUploader:File:File.Status)
+             */
+            getFiles: function() {
+                var sts = [].slice.call( arguments, 0 ),
+                    ret = [],
+                    i = 0,
+                    len = this._queue.length,
+                    file;
+    
+                for ( ; i < len; i++ ) {
+                    file = this._queue[ i ];
+    
+                    if ( sts.length && !~$.inArray( file.getStatus(), sts ) ) {
+                        continue;
+                    }
+    
+                    ret.push( file );
+                }
+    
+                return ret;
+            },
+    
+            /**
+             * 在队列中删除文件。
+             * @grammar removeFile( file ) => Array
+             * @method removeFile
+             * @param {File} 文件对象。
+             */
+            removeFile: function( file ) {
+                var me = this,
+                    existing = this._map[ file.id ];
+    
+                if ( existing ) {
+                    delete this._map[ file.id ];
+                    this._delFile(file);
+                    file.destroy();
+                    this.stats.numOfDeleted++;
+    
+                }
+            },
+    
+            _fileAdded: function( file ) {
+                var me = this,
+                    existing = this._map[ file.id ];
+    
+                if ( !existing ) {
+                    this._map[ file.id ] = file;
+    
+                    file.on( 'statuschange', function( cur, pre ) {
+                        me._onFileStatusChange( cur, pre );
+                    });
+                }
+    
+                file.setStatus( STATUS.QUEUED );
+            },
+    
+            _delFile : function(file){
+                for(var i = this._queue.length - 1 ; i >= 0 ; i-- ){
+                    if(this._queue[i] == file){
+                        this._queue.splice(i,1);
+                        break;
+                    }
+                }
+            },
+    
+            _onFileStatusChange: function( curStatus, preStatus ) {
+                var stats = this.stats;
+    
+                switch ( preStatus ) {
+                    case STATUS.PROGRESS:
+                        stats.numOfProgress--;
+                        break;
+    
+                    case STATUS.QUEUED:
+                        stats.numOfQueue --;
+                        break;
+    
+                    case STATUS.ERROR:
+                        stats.numOfUploadFailed--;
+                        break;
+    
+                    case STATUS.INVALID:
+                        stats.numOfInvalid--;
+                        break;
+    
+                    case STATUS.INTERRUPT:
+                        stats.numOfInterrupt--;
+                        break;
+                }
+    
+                switch ( curStatus ) {
+                    case STATUS.QUEUED:
+                        stats.numOfQueue++;
+                        break;
+    
+                    case STATUS.PROGRESS:
+                        stats.numOfProgress++;
+                        break;
+    
+                    case STATUS.ERROR:
+                        stats.numOfUploadFailed++;
+                        break;
+    
+                    case STATUS.COMPLETE:
+                        stats.numOfSuccess++;
+                        break;
+    
+                    case STATUS.CANCELLED:
+                        stats.numOfCancel++;
+                        break;
+    
+    
+                    case STATUS.INVALID:
+                        stats.numOfInvalid++;
+                        break;
+    
+                    case STATUS.INTERRUPT:
+                        stats.numOfInterrupt++;
+                        break;
+                }
+            }
+    
+        });
+    
+        Mediator.installTo( Queue.prototype );
+    
+        return Queue;
+    });
+    
+    /**
+     * @fileOverview 队列
+     */
+    define('widgets/queue',[
+        'base',
+        'uploader',
+        'queue',
+        'file',
+        'lib/file',
+        'runtime/client',
+        'widgets/widget'
+    ], function( Base, Uploader, Queue, WUFile, File, RuntimeClient ) {
+    
+        var $ = Base.$,
+            rExt = /\.\w+$/,
+            Status = WUFile.Status;
+    
+        return Uploader.register({
+            name: 'queue',
+    
+            init: function( opts ) {
+                var me = this,
+                    deferred, len, i, item, arr, accept, runtime;
+    
+                if ( $.isPlainObject( opts.accept ) ) {
+                    opts.accept = [ opts.accept ];
+                }
+    
+                // accept中的中生成匹配正则。
+                if ( opts.accept ) {
+                    arr = [];
+    
+                    for ( i = 0, len = opts.accept.length; i < len; i++ ) {
+                        item = opts.accept[ i ].extensions;
+                        item && arr.push( item );
+                    }
+    
+                    if ( arr.length ) {
+                        accept = '\\.' + arr.join(',')
+                                .replace( /,/g, '$|\\.' )
+                                .replace( /\*/g, '.*' ) + '$';
+                    }
+    
+                    me.accept = new RegExp( accept, 'i' );
+                }
+    
+                me.queue = new Queue();
+                me.stats = me.queue.stats;
+    
+                // 如果当前不是html5运行时，那就算了。
+                // 不执行后续操作
+                if ( this.request('predict-runtime-type') !== 'html5' ) {
+                    return;
+                }
+    
+                // 创建一个 html5 运行时的 placeholder
+                // 以至于外部添加原生 File 对象的时候能正确包裹一下供 webuploader 使用。
+                deferred = Base.Deferred();
+                this.placeholder = runtime = new RuntimeClient('Placeholder');
+                runtime.connectRuntime({
+                    runtimeOrder: 'html5'
+                }, function() {
+                    me._ruid = runtime.getRuid();
+                    deferred.resolve();
+                });
+                return deferred.promise();
+            },
+    
+    
+            // 为了支持外部直接添加一个原生File对象。
+            _wrapFile: function( file ) {
+                if ( !(file instanceof WUFile) ) {
+    
+                    if ( !(file instanceof File) ) {
+                        if ( !this._ruid ) {
+                            throw new Error('Can\'t add external files.');
+                        }
+                        file = new File( this._ruid, file );
+                    }
+    
+                    file = new WUFile( file );
+                }
+    
+                return file;
+            },
+    
+            // 判断文件是否可以被加入队列
+            acceptFile: function( file ) {
+                var invalid = !file || !file.size || this.accept &&
+    
+                        // 如果名字中有后缀，才做后缀白名单处理。
+                        rExt.exec( file.name ) && !this.accept.test( file.name );
+    
+                return !invalid;
+            },
+    
+    
+            /**
+             * @event beforeFileQueued
+             * @param {File} file File对象
+             * @description 当文件被加入队列之前触发。如果此事件handler的返回值为`false`，则此文件不会被添加进入队列。
+             * @for  Uploader
+             */
+    
+            /**
+             * @event fileQueued
+             * @param {File} file File对象
+             * @description 当文件被加入队列以后触发。
+             * @for  Uploader
+             */
+    
+            _addFile: function( file ) {
+                var me = this;
+    
+                file = me._wrapFile( file );
+    
+                // 不过类型判断允许不允许，先派送 `beforeFileQueued`
+                if ( !me.owner.trigger( 'beforeFileQueued', file ) ) {
+                    return;
+                }
+    
+                // 类型不匹配，则派送错误事件，并返回。
+                if ( !me.acceptFile( file ) ) {
+                    me.owner.trigger( 'error', 'Q_TYPE_DENIED', file );
+                    return;
+                }
+    
+                me.queue.append( file );
+                me.owner.trigger( 'fileQueued', file );
+                return file;
+            },
+    
+            getFile: function( fileId ) {
+                return this.queue.getFile( fileId );
+            },
+    
+            /**
+             * @event filesQueued
+             * @param {File} files 数组，内容为原始File(lib/File）对象。
+             * @description 当一批文件添加进队列以后触发。
+             * @for  Uploader
+             */
+            
+            /**
+             * @property {Boolean} [auto=false]
+             * @namespace options
+             * @for Uploader
+             * @description 设置为 true 后，不需要手动调用上传，有文件选择即开始上传。
+             * 
+             */
+    
+            /**
+             * @method addFiles
+             * @grammar addFiles( file ) => undefined
+             * @grammar addFiles( [file1, file2 ...] ) => undefined
+             * @param {Array of File or File} [files] Files 对象 数组
+             * @description 添加文件到队列
+             * @for  Uploader
+             */
+            addFile: function( files ) {
+                var me = this;
+    
+                if ( !files.length ) {
+                    files = [ files ];
+                }
+    
+                files = $.map( files, function( file ) {
+                    return me._addFile( file );
+                });
+    			
+    			if ( files.length ) {
+    
+                    me.owner.trigger( 'filesQueued', files );
+    
+    				if ( me.options.auto ) {
+    					setTimeout(function() {
+    						me.request('start-upload');
+    					}, 20 );
+    				}
+                }
+            },
+    
+            getStats: function() {
+                return this.stats;
+            },
+    
+            /**
+             * @event fileDequeued
+             * @param {File} file File对象
+             * @description 当文件被移除队列后触发。
+             * @for  Uploader
+             */
+    
+             /**
+             * @method removeFile
+             * @grammar removeFile( file ) => undefined
+             * @grammar removeFile( id ) => undefined
+             * @grammar removeFile( file, true ) => undefined
+             * @grammar removeFile( id, true ) => undefined
+             * @param {File|id} file File对象或这File对象的id
+             * @description 移除某一文件, 默认只会标记文件状态为已取消，如果第二个参数为 `true` 则会从 queue 中移除。
+             * @for  Uploader
+             * @example
+             *
+             * $li.on('click', '.remove-this', function() {
+             *     uploader.removeFile( file );
+             * })
+             */
+            removeFile: function( file, remove ) {
+                var me = this;
+    
+                file = file.id ? file : me.queue.getFile( file );
+    
+                this.request( 'cancel-file', file );
+    
+                if ( remove ) {
+                    this.queue.removeFile( file );
+                }
+            },
+    
+            /**
+             * @method getFiles
+             * @grammar getFiles() => Array
+             * @grammar getFiles( status1, status2, status... ) => Array
+             * @description 返回指定状态的文件集合，不传参数将返回所有状态的文件。
+             * @for  Uploader
+             * @example
+             * console.log( uploader.getFiles() );    // => all files
+             * console.log( uploader.getFiles('error') )    // => all error files.
+             */
+            getFiles: function() {
+                return this.queue.getFiles.apply( this.queue, arguments );
+            },
+    
+            fetchFile: function() {
+                return this.queue.fetch.apply( this.queue, arguments );
+            },
+    
+            /**
+             * @method retry
+             * @grammar retry() => undefined
+             * @grammar retry( file ) => undefined
+             * @description 重试上传，重试指定文件，或者从出错的文件开始重新上传。
+             * @for  Uploader
+             * @example
+             * function retry() {
+             *     uploader.retry();
+             * }
+             */
+            retry: function( file, noForceStart ) {
+                var me = this,
+                    files, i, len;
+    
+                if ( file ) {
+                    file = file.id ? file : me.queue.getFile( file );
+                    file.setStatus( Status.QUEUED );
+                    noForceStart || me.request('start-upload');
+                    return;
+                }
+    
+                files = me.queue.getFiles( Status.ERROR );
+                i = 0;
+                len = files.length;
+    
+                for ( ; i < len; i++ ) {
+                    file = files[ i ];
+                    file.setStatus( Status.QUEUED );
+                }
+    
+                me.request('start-upload');
+            },
+    
+            /**
+             * @method sort
+             * @grammar sort( fn ) => undefined
+             * @description 排序队列中的文件，在上传之前调整可以控制上传顺序。
+             * @for  Uploader
+             */
+            sortFiles: function() {
+                return this.queue.sort.apply( this.queue, arguments );
+            },
+    
+            /**
+             * @event reset
+             * @description 当 uploader 被重置的时候触发。
+             * @for  Uploader
+             */
+    
+            /**
+             * @method reset
+             * @grammar reset() => undefined
+             * @description 重置uploader。目前只重置了队列。
+             * @for  Uploader
+             * @example
+             * uploader.reset();
+             */
+            reset: function() {
+                this.owner.trigger('reset');
+                this.queue = new Queue();
+                this.stats = this.queue.stats;
+            },
+    
+            destroy: function() {
+                this.reset();
+                this.placeholder && this.placeholder.destroy();
+            }
+        });
+    
+    });
+    /**
+     * @fileOverview 添加获取Runtime相关信息的方法。
+     */
+    define('widgets/runtime',[
+        'uploader',
+        'runtime/runtime',
+        'widgets/widget'
+    ], function( Uploader, Runtime ) {
+    
+        Uploader.support = function() {
+            return Runtime.hasRuntime.apply( Runtime, arguments );
+        };
+    
+        /**
+         * @property {Object} [runtimeOrder=html5,flash]
+         * @namespace options
+         * @for Uploader
+         * @description 指定运行时启动顺序。默认会先尝试 html5 是否支持，如果支持则使用 html5, 否则使用 flash.
+         *
+         * 可以将此值设置成 `flash`，来强制使用 flash 运行时。
+         */
+    
+        return Uploader.register({
+            name: 'runtime',
+    
+            init: function() {
+                if ( !this.predictRuntimeType() ) {
+                    throw Error('Runtime Error');
+                }
+            },
+    
+            /**
+             * 预测Uploader将采用哪个`Runtime`
+             * @grammar predictRuntimeType() => String
+             * @method predictRuntimeType
+             * @for  Uploader
+             */
+            predictRuntimeType: function() {
+                var orders = this.options.runtimeOrder || Runtime.orders,
+                    type = this.type,
+                    i, len;
+    
+                if ( !type ) {
+                    orders = orders.split( /\s*,\s*/g );
+    
+                    for ( i = 0, len = orders.length; i < len; i++ ) {
+                        if ( Runtime.hasRuntime( orders[ i ] ) ) {
+                            this.type = type = orders[ i ];
+                            break;
+                        }
+                    }
+                }
+    
+                return type;
+            }
+        });
+    });
+    /**
+     * @fileOverview Transport
+     */
+    define('lib/transport',[
+        'base',
+        'runtime/client',
+        'mediator'
+    ], function( Base, RuntimeClient, Mediator ) {
+    
+        var $ = Base.$;
+    
+        function Transport( opts ) {
+            var me = this;
+    
+            opts = me.options = $.extend( true, {}, Transport.options, opts || {} );
+            RuntimeClient.call( this, 'Transport' );
+    
+            this._block = null;
+            this._blob = null;
+            this._formData = opts.formData || {};
+            this._headers = opts.headers || {};
+    
+            this.on( 'progress', this._timeout );
+            this.on( 'load error', function() {
+                me.trigger( 'progress', 1 );
+                clearTimeout( me._timer );
+            });
+        }
+    
+        Transport.options = {
+            server: '',
+            method: 'POST',
+    
+            // 跨域时，是否允许携带cookie, 只有html5 runtime才有效
+            withCredentials: false,
+            fileVal: 'file',
+            timeout: 2 * 60 * 1000,    // 2分钟
+            formData: {},
+            headers: {},
+            sendAsBinary: false,
+    
+            customUploadResponse: null,
+        };
+    
+        $.extend( Transport.prototype, {
+    
+            // 添加Blob, 只能添加一次，最后一次有效。
+            appendBlob: function( key, blob, filename, block) {
+                var me = this,
+                    opts = me.options;
+    
+                if ( me.getRuid() ) {
+                    me.disconnectRuntime();
+                }
+    
+                // 连接到blob归属的同一个runtime.
+                me.connectRuntime( blob.ruid, function() {
+                    me.exec('init');
+                });
+    
+                me._block = block;
+                me._blob = blob;
+                opts.fileVal = key || opts.fileVal;
+                opts.filename = filename || opts.filename;
+            },
+    
+            // 添加其他字段
+            append: function( key, value ) {
+                if ( typeof key === 'object' ) {
+                    $.extend( this._formData, key );
+                } else {
+                    this._formData[ key ] = value;
+                }
+            },
+    
+            setRequestHeader: function( key, value ) {
+                if ( typeof key === 'object' ) {
+                    $.extend( this._headers, key );
+                } else {
+                    this._headers[ key ] = value;
+                }
+            },
+    
+            send: function( method ) {
+                var me = this,
+                    opts = me.options;
+                if( opts.customUpload ){
+                    opts.customUpload(me._block, {
+                        onProgress: function (file, percentage) {
+                            me.trigger('progress', percentage);
+                        },
+                        onSuccess: function (file, res) {
+                            me.customUploadResponse = res;
+                            me.trigger('load');
+                        },
+                        onError: function (file, error) {
+                            me.trigger('error', error, true);
+                        }
+                    });
+                }else{
+                    this.exec( 'send', method );
+                    this._timeout();
+                }
+            },
+    
+            abort: function() {
+                clearTimeout( this._timer );
+                return this.exec('abort');
+            },
+    
+            destroy: function() {
+                this.trigger('destroy');
+                this.off();
+                this.exec('destroy');
+                this.disconnectRuntime();
+            },
+    
+            getResponseHeaders: function() {
+                return this.exec('getResponseHeaders');
+            },
+    
+            getResponse: function() {
+                return this.exec('getResponse');
+            },
+    
+            getResponseAsJson: function() {
+                return this.exec('getResponseAsJson');
+            },
+    
+            getStatus: function() {
+                return this.exec('getStatus');
+            },
+    
+            _timeout: function() {
+                var me = this,
+                    duration = me.options.timeout;
+    
+                if ( !duration ) {
+                    return;
+                }
+    
+                clearTimeout( me._timer );
+                me._timer = setTimeout(function() {
+                    me.abort();
+                    me.trigger( 'error', 'timeout' );
+                }, duration );
+            }
+    
+        });
+    
+        // 让Transport具备事件功能。
+        Mediator.installTo( Transport.prototype );
+    
+        return Transport;
+    });
+    
+    /**
+     * @fileOverview 负责文件上传相关。
+     */
+    define('widgets/upload',[
+        'base',
+        'uploader',
+        'file',
+        'lib/transport',
+        'widgets/widget'
+    ], function( Base, Uploader, WUFile, Transport ) {
+    
+        var $ = Base.$,
+            isPromise = Base.isPromise,
+            Status = WUFile.Status;
+    
+        // 添加默认配置项
+        $.extend( Uploader.options, {
+    
+    
+            /**
+             * @property {Boolean} [prepareNextFile=false]
+             * @namespace options
+             * @for Uploader
+             * @description 是否允许在文件传输时提前把下一个文件准备好。
+             * 某些文件的准备工作比较耗时，比如图片压缩，md5序列化。
+             * 如果能提前在当前文件传输期处理，可以节省总体耗时。
+             */
+            prepareNextFile: false,
+    
+            /**
+             * @property {Boolean} [chunked=false]
+             * @namespace options
+             * @for Uploader
+             * @description 是否要分片处理大文件上传。
+             */
+            chunked: false,
+    
+            /**
+             * @property {Boolean} [chunkSize=5242880]
+             * @namespace options
+             * @for Uploader
+             * @description 如果要分片，分多大一片？ 默认大小为5M.
+             */
+            chunkSize: 5 * 1024 * 1024,
+    
+            /**
+             * @property {Boolean} [chunkRetry=2]
+             * @namespace options
+             * @for Uploader
+             * @description 如果某个分片由于网络问题出错，允许自动重传多少次？
+             */
+            chunkRetry: 2,
+    
+            /**
+             * @property {Number} [chunkRetryDelay=1000]
+             * @namespace options
+             * @for Uploader
+             * @description 开启重试后，设置重试延时时间, 单位毫秒。默认1000毫秒，即1秒.
+             */
+            chunkRetryDelay: 1000,
+    
+            /**
+             * @property {Boolean} [threads=3]
+             * @namespace options
+             * @for Uploader
+             * @description 上传并发数。允许同时最大上传进程数。
+             */
+            threads: 1,
+    
+    
+            /**
+             * @property {Object} [formData={}]
+             * @namespace options
+             * @for Uploader
+             * @description 文件上传请求的参数表，每次发送都会发送此对象中的参数。
+             */
+            formData: {}
+    
+            /**
+             * @property {Object} [fileVal='file']
+             * @namespace options
+             * @for Uploader
+             * @description 设置文件上传域的name。
+             */
+    
+             /**
+             * @property {Object} [method=POST]
+             * @namespace options
+             * @for Uploader
+             * @description 文件上传方式，`POST` 或者 `GET`。
+             */
+    
+            /**
+             * @property {Object} [sendAsBinary=false]
+             * @namespace options
+             * @for Uploader
+             * @description 是否已二进制的流的方式发送文件，这样整个上传内容`php://input`都为文件内容，
+             * 其他参数在$_GET数组中。
+             */
+        });
+    
+        // 负责将文件切片。
+        function CuteFile( file, chunkSize ) {
+            var pending = [],
+                blob = file.source,
+                total = blob.size,
+                chunks = chunkSize ? Math.ceil( total / chunkSize ) : 1,
+                start = 0,
+                index = 0,
+                len, api;
+    
+            api = {
+                file: file,
+    
+                has: function() {
+                    return !!pending.length;
+                },
+    
+                shift: function() {
+                    return pending.shift();
+                },
+    
+                unshift: function( block ) {
+                    pending.unshift( block );
+                }
+            };
+    
+            while ( index < chunks ) {
+                len = Math.min( chunkSize, total - start );
+    
+                pending.push({
+                    file: file,
+                    start: start,
+                    end: chunkSize ? (start + len) : total,
+                    total: total,
+                    chunks: chunks,
+                    chunk: index++,
+                    cuted: api
+                });
+                start += len;
+            }
+    
+            file.blocks = pending.concat();
+            file.remaning = pending.length;
+    
+            return api;
+        }
+    
+        Uploader.register({
+            name: 'upload',
+    
+            init: function() {
+                var owner = this.owner,
+                    me = this;
+    
+                this.runing = false;
+                this.progress = false;
+    
+                owner
+                    .on( 'startUpload', function() {
+                        me.progress = true;
+                    })
+                    .on( 'uploadFinished', function() {
+                        me.progress = false;
+                    });
+    
+                // 记录当前正在传的数据，跟threads相关
+                this.pool = [];
+    
+                // 缓存分好片的文件。
+                this.stack = [];
+    
+                // 缓存即将上传的文件。
+                this.pending = [];
+    
+                // 跟踪还有多少分片在上传中但是没有完成上传。
+                this.remaning = 0;
+                this.__tick = Base.bindFn( this._tick, this );
+    
+                // 销毁上传相关的属性。
+                owner.on( 'uploadComplete', function( file ) {
+    
+                    // 把其他块取消了。
+                    file.blocks && $.each( file.blocks, function( _, v ) {
+                        v.transport && (v.transport.abort(), v.transport.destroy());
+                        delete v.transport;
+                    });
+    
+                    delete file.blocks;
+                    delete file.remaning;
+                });
+            },
+    
+            reset: function() {
+                this.request( 'stop-upload', true );
+                this.runing = false;
+                this.pool = [];
+                this.stack = [];
+                this.pending = [];
+                this.remaning = 0;
+                this._trigged = false;
+                this._promise = null;
+            },
+    
+            /**
+             * @event startUpload
+             * @description 当开始上传流程时触发。
+             * @for  Uploader
+             */
+    
+            /**
+             * 开始上传。此方法可以从初始状态调用开始上传流程，也可以从暂停状态调用，继续上传流程。
+             *
+             * 可以指定开始某一个文件。
+             * @grammar upload() => undefined
+             * @grammar upload( file | fileId) => undefined
+             * @method upload
+             * @for  Uploader
+             */
+            startUpload: function(file) {
+                var me = this;
+    
+                // 移出invalid的文件
+                $.each( me.request( 'get-files', Status.INVALID ), function() {
+                    me.request( 'remove-file', this );
+                });
+    
+                // 如果指定了开始某个文件，则只开始指定的文件。
+                if ( file ) {
+                    file = file.id ? file : me.request( 'get-file', file );
+    
+                    if (file.getStatus() === Status.INTERRUPT) {
+                        file.setStatus( Status.QUEUED );
+    
+                        $.each( me.pool, function( _, v ) {
+    
+                            // 之前暂停过。
+                            if (v.file !== file) {
+                                return;
+                            }
+    
+                            v.transport && v.transport.send();
+                            file.setStatus( Status.PROGRESS );
+                        });
+    
+    
+                    } else if (file.getStatus() !== Status.PROGRESS) {
+                        file.setStatus( Status.QUEUED );
+                    }
+                } else {
+                    $.each( me.request( 'get-files', [ Status.INITED ] ), function() {
+                        this.setStatus( Status.QUEUED );
+                    });
+                }
+    
+                if ( me.runing ) {
+                    me.owner.trigger('startUpload', file);// 开始上传或暂停恢复的，trigger event
+                    return Base.nextTick( me.__tick );
+                }
+    
+                me.runing = true;
+                var files = [];
+    
+                // 如果有暂停的，则续传
+                file || $.each( me.pool, function( _, v ) {
+                    var file = v.file;
+    
+                    if ( file.getStatus() === Status.INTERRUPT ) {
+                        me._trigged = false;
+                        files.push(file);
+    
+                        if (v.waiting) {
+                            return;
+                        }
+    
+                        // 文件 prepare 完后，如果暂停了，这个时候只会把文件插入 pool, 而不会创建 tranport，
+                        v.transport ? v.transport.send() : me._doSend(v);
+                    }
+                });
+    
+                $.each(files, function() {
+                    this.setStatus( Status.PROGRESS );
+                });
+    
+                file || $.each( me.request( 'get-files',
+                        Status.INTERRUPT ), function() {
+                    this.setStatus( Status.PROGRESS );
+                });
+    
+                me._trigged = false;
+                Base.nextTick( me.__tick );
+                me.owner.trigger('startUpload');
+            },
+    
+            /**
+             * @event stopUpload
+             * @description 当开始上传流程暂停时触发。
+             * @for  Uploader
+             */
+    
+            /**
+             * 暂停上传。第一个参数为是否中断上传当前正在上传的文件。
+             *
+             * 如果第一个参数是文件，则只暂停指定文件。
+             * @grammar stop() => undefined
+             * @grammar stop( true ) => undefined
+             * @grammar stop( file ) => undefined
+             * @method stop
+             * @for  Uploader
+             */
+            stopUpload: function( file, interrupt ) {
+                var me = this;
+    
+                if (file === true) {
+                    interrupt = file;
+                    file = null;
+                }
+    
+                if ( me.runing === false ) {
+                    return;
+                }
+    
+                // 如果只是暂停某个文件。
+                if ( file ) {
+                    file = file.id ? file : me.request( 'get-file', file );
+    
+                    if ( file.getStatus() !== Status.PROGRESS &&
+                            file.getStatus() !== Status.QUEUED ) {
+                        return;
+                    }
+    
+                    file.setStatus( Status.INTERRUPT );
+    
+    
+                    $.each( me.pool, function( _, v ) {
+    
+                        // 只 abort 指定的文件，每一个分片。
+                        if (v.file === file) {
+                            v.transport && v.transport.abort();
+    
+                            if (interrupt) {
+                                me._putback(v);
+                                me._popBlock(v);
+                            }
+                        }
+                    });
+    
+                    me.owner.trigger('stopUpload', file);// 暂停，trigger event
+    
+                    return Base.nextTick( me.__tick );
+                }
+    
+                me.runing = false;
+    
+                // 正在准备中的文件。
+                if (this._promise && this._promise.file) {
+                    this._promise.file.setStatus( Status.INTERRUPT );
+                }
+    
+                interrupt && $.each( me.pool, function( _, v ) {
+                    v.transport && v.transport.abort();
+                    v.file.setStatus( Status.INTERRUPT );
+                });
+    
+                me.owner.trigger('stopUpload');
+            },
+    
+            /**
+             * @method cancelFile
+             * @grammar cancelFile( file ) => undefined
+             * @grammar cancelFile( id ) => undefined
+             * @param {File|id} file File对象或这File对象的id
+             * @description 标记文件状态为已取消, 同时将中断文件传输。
+             * @for  Uploader
+             * @example
+             *
+             * $li.on('click', '.remove-this', function() {
+             *     uploader.cancelFile( file );
+             * })
+             */
+            cancelFile: function( file ) {
+                file = file.id ? file : this.request( 'get-file', file );
+    
+                // 如果正在上传。
+                file.blocks && $.each( file.blocks, function( _, v ) {
+                    var _tr = v.transport;
+    
+                    if ( _tr ) {
+                        _tr.abort();
+                        _tr.destroy();
+                        delete v.transport;
+                    }
+                });
+    
+                file.setStatus( Status.CANCELLED );
+                this.owner.trigger( 'fileDequeued', file );
+            },
+    
+            /**
+             * 判断`Uploader`是否正在上传中。
+             * @grammar isInProgress() => Boolean
+             * @method isInProgress
+             * @for  Uploader
+             */
+            isInProgress: function() {
+                return !!this.progress;
+            },
+    
+            _getStats: function() {
+                return this.request('get-stats');
+            },
+    
+            /**
+             * 跳过一个文件上传，直接标记指定文件为已上传状态。
+             * @grammar skipFile( file ) => undefined
+             * @method skipFile
+             * @for  Uploader
+             */
+            skipFile: function( file, status ) {
+                file = file.id ? file : this.request( 'get-file', file );
+    
+                file.setStatus( status || Status.COMPLETE );
+                file.skipped = true;
+    
+                // 如果正在上传。
+                file.blocks && $.each( file.blocks, function( _, v ) {
+                    var _tr = v.transport;
+    
+                    if ( _tr ) {
+                        _tr.abort();
+                        _tr.destroy();
+                        delete v.transport;
+                    }
+                });
+    
+                this.owner.trigger( 'uploadSkip', file );
+            },
+    
+            /**
+             * @event uploadFinished
+             * @description 当所有文件上传结束时触发。
+             * @for  Uploader
+             */
+            _tick: function() {
+                var me = this,
+                    opts = me.options,
+                    fn, val;
+    
+                // 上一个promise还没有结束，则等待完成后再执行。
+                if ( me._promise ) {
+                    return me._promise.always( me.__tick );
+                }
+    
+                // 还有位置，且还有文件要处理的话。
+                if ( me.pool.length < opts.threads && (val = me._nextBlock()) ) {
+                    me._trigged = false;
+    
+                    fn = function( val ) {
+                        me._promise = null;
+    
+                        // 有可能是reject过来的，所以要检测val的类型。
+                        val && val.file && me._startSend( val );
+                        Base.nextTick( me.__tick );
+                    };
+    
+                    me._promise = isPromise( val ) ? val.always( fn ) : fn( val );
+    
+                // 没有要上传的了，且没有正在传输的了。
+                } else if ( !me.remaning && !me._getStats().numOfQueue &&
+                    !me._getStats().numOfInterrupt ) {
+                    me.runing = false;
+    
+                    me._trigged || Base.nextTick(function() {
+                        me.owner.trigger('uploadFinished');
+                    });
+                    me._trigged = true;
+                }
+            },
+    
+            _putback: function(block) {
+                var idx;
+    
+                block.cuted.unshift(block);
+                idx = this.stack.indexOf(block.cuted);
+    
+                if (!~idx) {
+                    // 如果不在里面，说明移除过，需要把计数还原回去。
+                    this.remaning++;
+                    block.file.remaning++;
+                    this.stack.unshift(block.cuted);
+                }
+            },
+    
+            _getStack: function() {
+                var i = 0,
+                    act;
+    
+                while ( (act = this.stack[ i++ ]) ) {
+                    if ( act.has() && act.file.getStatus() === Status.PROGRESS ) {
+                        return act;
+                    } else if (!act.has() ||
+                            act.file.getStatus() !== Status.PROGRESS &&
+                            act.file.getStatus() !== Status.INTERRUPT ) {
+    
+                        // 把已经处理完了的，或者，状态为非 progress（上传中）、
+                        // interupt（暂停中） 的移除。
+                        this.stack.splice( --i, 1 );
+                    }
+                }
+    
+                return null;
+            },
+    
+            _nextBlock: function() {
+                var me = this,
+                    opts = me.options,
+                    act, next, done, preparing;
+    
+                // 如果当前文件还有没有需要传输的，则直接返回剩下的。
+                if ( (act = this._getStack()) ) {
+    
+                    // 是否提前准备下一个文件
+                    if ( opts.prepareNextFile && !me.pending.length ) {
+                        me._prepareNextFile();
+                    }
+    
+                    return act.shift();
+    
+                // 否则，如果正在运行，则准备下一个文件，并等待完成后返回下个分片。
+                } else if ( me.runing ) {
+    
+                    // 如果缓存中有，则直接在缓存中取，没有则去queue中取。
+                    if ( !me.pending.length && me._getStats().numOfQueue ) {
+                        me._prepareNextFile();
+                    }
+    
+                    next = me.pending.shift();
+                    done = function( file ) {
+                        if ( !file ) {
+                            return null;
+                        }
+    
+                        if (opts.customUpload) {
+                            act = CuteFile(file, 0);
+                        } else {
+                            act = CuteFile(file, opts.chunked ? opts.chunkSize : 0);
+                        }
+                        me.stack.push(act);
+                        return act.shift();
+                    };
+    
+                    // 文件可能还在prepare中，也有可能已经完全准备好了。
+                    if ( isPromise( next) ) {
+                        preparing = next.file;
+                        next = next[ next.pipe ? 'pipe' : 'then' ]( done );
+                        next.file = preparing;
+                        return next;
+                    }
+    
+                    return done( next );
+                }
+            },
+    
+    
+            /**
+             * @event uploadStart
+             * @param {File} file File对象
+             * @description 某个文件开始上传前触发，一个文件只会触发一次。
+             * @for  Uploader
+             */
+            _prepareNextFile: function() {
+                var me = this,
+                    file = me.request('fetch-file'),
+                    pending = me.pending,
+                    promise;
+    
+                if ( file ) {
+                    promise = me.request( 'before-send-file', file, function() {
+    
+                        // 有可能文件被skip掉了。文件被skip掉后，状态坑定不是Queued.
+                        if ( file.getStatus() === Status.PROGRESS ||
+                            file.getStatus() === Status.INTERRUPT ) {
+                            return file;
+                        }
+    
+                        return me._finishFile( file );
+                    });
+    
+                    me.owner.trigger( 'uploadStart', file );
+                    file.setStatus( Status.PROGRESS );
+    
+                    promise.file = file;
+    
+                    // 如果还在pending中，则替换成文件本身。
+                    promise.done(function() {
+                        var idx = $.inArray( promise, pending );
+    
+                        ~idx && pending.splice( idx, 1, file );
+                    });
+    
+                    // befeore-send-file的钩子就有错误发生。
+                    promise.fail(function( reason ) {
+                        file.setStatus( Status.ERROR, reason );
+                        me.owner.trigger( 'uploadError', file, reason );
+                        me.owner.trigger( 'uploadComplete', file );
+                    });
+    
+                    pending.push( promise );
+                }
+            },
+    
+            // 让出位置了，可以让其他分片开始上传
+            _popBlock: function( block ) {
+                var idx = $.inArray( block, this.pool );
+    
+                this.pool.splice( idx, 1 );
+                block.file.remaning--;
+                this.remaning--;
+            },
+    
+            // 开始上传，可以被掉过。如果promise被reject了，则表示跳过此分片。
+            _startSend: function( block ) {
+                var me = this,
+                    file = block.file,
+                    promise;
+    
+                // 有可能在 before-send-file 的 promise 期间改变了文件状态。
+                // 如：暂停，取消
+                // 我们不能中断 promise, 但是可以在 promise 完后，不做上传操作。
+                if ( file.getStatus() !== Status.PROGRESS ) {
+    
+                    // 如果是中断，则还需要放回去。
+                    if (file.getStatus() === Status.INTERRUPT) {
+                        me._putback(block);
+                    }
+    
+                    return;
+                }
+    
+                me.pool.push( block );
+                me.remaning++;
+    
+                // 如果没有分片，则直接使用原始的。
+                // 不会丢失content-type信息。
+                block.blob = block.chunks === 1 ? file.source :
+                        file.source.slice( block.start, block.end );
+    
+                // hook, 每个分片发送之前可能要做些异步的事情。
+                block.waiting = promise = me.request( 'before-send', block, function() {
+                    delete block.waiting;
+    
+                    // 有可能文件已经上传出错了，所以不需要再传输了。
+                    if ( file.getStatus() === Status.PROGRESS ) {
+                        me._doSend( block );
+                    } else if (block.file.getStatus() !== Status.INTERRUPT) {
+                        me._popBlock(block);
+                    }
+    
+                    Base.nextTick(me.__tick);
+                });
+    
+                // 如果为fail了，则跳过此分片。
+                promise.fail(function() {
+                    delete block.waiting;
+    
+                    if ( file.remaning === 1 ) {
+                        me._finishFile( file ).always(function() {
+                            block.percentage = 1;
+                            me._popBlock( block );
+                            me.owner.trigger( 'uploadComplete', file );
+                            Base.nextTick( me.__tick );
+                        });
+                    } else {
+                        block.percentage = 1;
+                        me.updateFileProgress( file );
+                        me._popBlock( block );
+                        Base.nextTick( me.__tick );
+                    }
+                });
+            },
+    
+    
+            /**
+             * @event uploadBeforeSend
+             * @param {Object} object
+             * @param {Object} data 默认的上传参数，可以扩展此对象来控制上传参数。
+             * @param {Object} headers 可以扩展此对象来控制上传头部。
+             * @description 当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，大文件在开起分片上传的前提下此事件可能会触发多次。
+             * @for  Uploader
+             */
+    
+            /**
+             * @event uploadAccept
+             * @param {Object} object
+             * @param {Object} ret 服务端的返回数据，json格式，如果服务端不是json格式，从ret._raw中取数据，自行解析。
+             * @description 当某个文件上传到服务端响应后，会派送此事件来询问服务端响应是否有效。如果此事件handler返回值为`false`, 则此文件将派送`server`类型的`uploadError`事件。
+             * @for  Uploader
+             */
+    
+            /**
+             * @event uploadProgress
+             * @param {File} file File对象
+             * @param {Number} percentage 上传进度
+             * @description 上传过程中触发，携带上传进度。
+             * @for  Uploader
+             */
+    
+    
+            /**
+             * @event uploadError
+             * @param {File} file File对象
+             * @param {String} reason 出错的code
+             * @description 当文件上传出错时触发。
+             * @for  Uploader
+             */
+    
+            /**
+             * @event uploadSuccess
+             * @param {File} file File对象
+             * @param {Object} response 服务端返回的数据
+             * @description 当文件上传成功时触发。
+             * @for  Uploader
+             */
+    
+            /**
+             * @event uploadComplete
+             * @param {File} [file] File对象
+             * @description 不管成功或者失败，文件上传完成时触发。
+             * @for  Uploader
+             */
+    
+            // 做上传操作。
+            _doSend: function( block ) {
+                var me = this,
+                    owner = me.owner,
+                    opts = $.extend({}, me.options, block.options),
+                    file = block.file,
+                    tr = new Transport( opts ),
+                    data = $.extend({}, opts.formData ),
+                    headers = $.extend({}, opts.headers ),
+                    requestAccept, ret;
+    
+                block.transport = tr;
+    
+                tr.on( 'destroy', function() {
+                    delete block.transport;
+                    me._popBlock( block );
+                    Base.nextTick( me.__tick );
+                });
+    
+                // 广播上传进度。以文件为单位。
+                tr.on( 'progress', function( percentage ) {
+                    block.percentage = percentage;
+                    me.updateFileProgress( file );
+                });
+    
+                // 用来询问，是否返回的结果是有错误的。
+                requestAccept = function( reject ) {
+                    var fn;
+    
+                    if( opts.customUpload ){
+                        ret = tr.customUploadResponse;
+                    }else{
+                        ret = tr.getResponseAsJson() || {};
+                        ret._raw = tr.getResponse();
+                        ret._headers = tr.getResponseHeaders();
+                    }
+                    block.response = ret;
+                    fn = function( value ) {
+                        reject = value;
+                    };
+    
+                    // 服务端响应了，不代表成功了，询问是否响应正确。
+                    if ( !owner.trigger( 'uploadAccept', block, ret, fn ) ) {
+                        reject = reject || 'server';
+                    }
+    
+                    return reject;
+                };
+    
+                // 尝试重试，然后广播文件上传出错。
+                tr.on( 'error', function( type, flag ) {
+                    // 在 runtime/html5/transport.js 上为 type 加上了状态码，形式：type|status|text（如：http|403|Forbidden）
+                    // 这里把状态码解释出来，并还原后面代码所依赖的 type 变量
+                    var typeArr = type.split( '|' ), status, statusText;
+                    type = typeArr[0];
+                    status = parseFloat( typeArr[1] ),
+                    statusText = typeArr[2];
+    
+                    block.retried = block.retried || 0;
+    
+                    // 自动重试
+                    if ( block.chunks > 1 && ~'http,abort,server'.indexOf( type.replace( /-.*/, '' ) ) &&
+                            block.retried < opts.chunkRetry ) {
+    
+                        block.retried++;
+    
+                        me.retryTimer = setTimeout(function() {
+                            tr.send();
+                        }, opts.chunkRetryDelay || 1000);
+    
+                    } else {
+    
+                        // http status 500 ~ 600
+                        if ( !flag && type === 'server' ) {
+                            type = requestAccept( type );
+                        }
+    
+                        file.setStatus( Status.ERROR, type );
+                        owner.trigger( 'uploadError', file, type, status, statusText );
+                        owner.trigger( 'uploadComplete', file );
+                    }
+                });
+    
+                // 上传成功
+                tr.on( 'load', function() {
+                    var reason;
+    
+                    // 如果非预期，转向上传出错。
+                    if ( (reason = requestAccept()) ) {
+                        tr.trigger( 'error', reason, true );
+                        return;
+                    }
+    
+                    // 全部上传完成。
+                    if ( file.remaning === 1 ) {
+                        me._finishFile( file, ret );
+                    } else {
+                        tr.destroy();
+                    }
+                });
+    
+                // 配置默认的上传字段。
+                data = $.extend( data, {
+                    id: file.id,
+                    name: file.name,
+                    type: file.type,
+                    lastModifiedDate: file.lastModifiedDate,
+                    size: file.size
+                });
+    
+                block.chunks > 1 && $.extend( data, {
+                    chunks: block.chunks,
+                    chunk: block.chunk
+                });
+    
+                // 在发送之间可以添加字段什么的。。。
+                // 如果默认的字段不够使用，可以通过监听此事件来扩展
+                owner.trigger( 'uploadBeforeSend', block, data, headers );
+    
+                // 开始发送。
+                tr.appendBlob( opts.fileVal, block.blob, file.name, block);
+                tr.append( data );
+                tr.setRequestHeader( headers );
+                tr.send();
+            },
+    
+            // 完成上传。
+            _finishFile: function( file, ret, hds ) {
+                var owner = this.owner;
+    
+                return owner
+                        .request( 'after-send-file', arguments, function() {
+                            file.setStatus( Status.COMPLETE );
+                            owner.trigger( 'uploadSuccess', file, ret, hds );
+                        })
+                        .fail(function( reason ) {
+    
+                            // 如果外部已经标记为invalid什么的，不再改状态。
+                            if ( file.getStatus() === Status.PROGRESS ) {
+                                file.setStatus( Status.ERROR, reason );
+                            }
+    
+                            owner.trigger( 'uploadError', file, reason );
+                        })
+                        .always(function() {
+                            owner.trigger( 'uploadComplete', file );
+                        });
+            },
+    
+            updateFileProgress: function(file) {
+                var totalPercent = 0,
+                    uploaded = 0;
+    
+                if (!file.blocks) {
+                    return;
+                }
+    
+                $.each( file.blocks, function( _, v ) {
+                    uploaded += (v.percentage || 0) * (v.end - v.start);
+                });
+    
+                totalPercent = uploaded / file.size;
+                this.owner.trigger( 'uploadProgress', file, totalPercent || 0 );
+            },
+    
+            destroy: function() {
+                clearTimeout(this.retryTimer);
+            }
+    
+        });
+    });
+    
+    /**
+     * @fileOverview 各种验证，包括文件总大小是否超出、单文件是否超出和文件是否重复。
+     */
+    
+    define('widgets/validator',[
+        'base',
+        'uploader',
+        'file',
+        'widgets/widget'
+    ], function( Base, Uploader, WUFile ) {
+    
+        var $ = Base.$,
+            validators = {},
+            api;
+    
+        /**
+         * @event error
+         * @param {String} type 错误类型。
+         * @description 当validate不通过时，会以派送错误事件的形式通知调用者。通过`upload.on('error', handler)`可以捕获到此类错误，目前有以下错误会在特定的情况下派送错来。
+         *
+         * * `Q_EXCEED_NUM_LIMIT` 在设置了`fileNumLimit`且尝试给`uploader`添加的文件数量超出这个值时派送。
+         * * `Q_EXCEED_SIZE_LIMIT` 在设置了`Q_EXCEED_SIZE_LIMIT`且尝试给`uploader`添加的文件总大小超出这个值时派送。
+         * * `Q_TYPE_DENIED` 当文件类型不满足时触发。。
+         * @for  Uploader
+         */
+    
+        // 暴露给外面的api
+        api = {
+    
+            // 添加验证器
+            addValidator: function( type, cb ) {
+                validators[ type ] = cb;
+            },
+    
+            // 移除验证器
+            removeValidator: function( type ) {
+                delete validators[ type ];
+            }
+        };
+    
+        // 在Uploader初始化的时候启动Validators的初始化
+        Uploader.register({
+            name: 'validator',
+    
+            init: function() {
+                var me = this;
+                Base.nextTick(function() {
+                    $.each( validators, function() {
+                        this.call( me.owner );
+                    });
+                });
+            }
+        });
+    
+        /**
+         * @property {int} [fileNumLimit=undefined]
+         * @namespace options
+         * @for Uploader
+         * @description 验证文件总数量, 超出则不允许加入队列。
+         */
+        api.addValidator( 'fileNumLimit', function() {
+            var uploader = this,
+                opts = uploader.options,
+                count = 0,
+                max = parseInt( opts.fileNumLimit, 10 ),
+                flag = true;
+    
+            if ( !max ) {
+                return;
+            }
+    
+            uploader.on( 'beforeFileQueued', function( file ) {
+                    // 增加beforeFileQueuedCheckfileNumLimit验证,主要为了再次加载时(已存在历史文件)验证数量是否超过设置项
+                if (!this.trigger('beforeFileQueuedCheckfileNumLimit', file,count)) {
+                    return false;
+                }
+                if ( count >= max && flag ) {
+                    flag = false;
+                    this.trigger( 'error', 'Q_EXCEED_NUM_LIMIT', max, file );
+                    setTimeout(function() {
+                        flag = true;
+                    }, 1 );
+                }
+    
+                return count >= max ? false : true;
+            });
+    
+            uploader.on( 'fileQueued', function() {
+                count++;
+            });
+    
+            uploader.on( 'fileDequeued', function() {
+                count--;
+            });
+    
+            uploader.on( 'reset', function() {
+                count = 0;
+            });
+        });
+    
+    
+        /**
+         * @property {int} [fileSizeLimit=undefined]
+         * @namespace options
+         * @for Uploader
+         * @description 验证文件总大小是否超出限制, 超出则不允许加入队列。
+         */
+        api.addValidator( 'fileSizeLimit', function() {
+            var uploader = this,
+                opts = uploader.options,
+                count = 0,
+                max = parseInt( opts.fileSizeLimit, 10 ),
+                flag = true;
+    
+            if ( !max ) {
+                return;
+            }
+    
+            uploader.on( 'beforeFileQueued', function( file ) {
+                var invalid = count + file.size > max;
+    
+                if ( invalid && flag ) {
+                    flag = false;
+                    this.trigger( 'error', 'Q_EXCEED_SIZE_LIMIT', max, file );
+                    setTimeout(function() {
+                        flag = true;
+                    }, 1 );
+                }
+    
+                return invalid ? false : true;
+            });
+    
+            uploader.on( 'fileQueued', function( file ) {
+                count += file.size;
+            });
+    
+            uploader.on( 'fileDequeued', function( file ) {
+                count -= file.size;
+            });
+    
+            uploader.on( 'reset', function() {
+                count = 0;
+            });
+        });
+    
+        /**
+         * @property {int} [fileSingleSizeLimit=undefined]
+         * @namespace options
+         * @for Uploader
+         * @description 验证单个文件大小是否超出限制, 超出则不允许加入队列。
+         */
+        api.addValidator( 'fileSingleSizeLimit', function() {
+            var uploader = this,
+                opts = uploader.options,
+                max = opts.fileSingleSizeLimit;
+    
+            if ( !max ) {
+                return;
+            }
+    
+            uploader.on( 'beforeFileQueued', function( file ) {
+    
+                if ( file.size > max ) {
+                    file.setStatus( WUFile.Status.INVALID, 'exceed_size' );
+                    this.trigger( 'error', 'F_EXCEED_SIZE', max, file );
+                    return false;
+                }
+    
+            });
+    
+        });
+    
+        /**
+         * @property {Boolean} [duplicate=undefined]
+         * @namespace options
+         * @for Uploader
+         * @description 去重， 根据文件名字、文件大小和最后修改时间来生成hash Key.
+         */
+        api.addValidator( 'duplicate', function() {
+            var uploader = this,
+                opts = uploader.options,
+                mapping = {};
+    
+            if ( opts.duplicate ) {
+                return;
+            }
+    
+            function hashString( str ) {
+                var hash = 0,
+                    i = 0,
+                    len = str.length,
+                    _char;
+    
+                for ( ; i < len; i++ ) {
+                    _char = str.charCodeAt( i );
+                    hash = _char + (hash << 6) + (hash << 16) - hash;
+                }
+    
+                return hash;
+            }
+    
+            uploader.on( 'beforeFileQueued', function( file ) {
+                var hash = file.__hash || (file.__hash = hashString( file.name +
+                        file.size + file.lastModifiedDate ));
+    
+                // 已经重复了
+                if ( mapping[ hash ] ) {
+                    this.trigger( 'error', 'F_DUPLICATE', file );
+                    return false;
+                }
+            });
+    
+            uploader.on( 'fileQueued', function( file ) {
+                var hash = file.__hash;
+    
+                hash && (mapping[ hash ] = true);
+            });
+    
+            uploader.on( 'fileDequeued', function( file ) {
+                var hash = file.__hash;
+    
+                hash && (delete mapping[ hash ]);
+            });
+    
+            uploader.on( 'reset', function() {
+                mapping = {};
+            });
+        });
+    
+        return api;
+    });
+    
+    /**
+     * @fileOverview Md5
+     */
+    define('lib/md5',[
+        'runtime/client',
+        'mediator'
+    ], function( RuntimeClient, Mediator ) {
+    
+        function Md5() {
+            RuntimeClient.call( this, 'Md5' );
+        }
+    
+        // 让 Md5 具备事件功能。
+        Mediator.installTo( Md5.prototype );
+    
+        Md5.prototype.loadFromBlob = function( blob ) {
+            var me = this;
+    
+            if ( me.getRuid() ) {
+                me.disconnectRuntime();
+            }
+    
+            // 连接到blob归属的同一个runtime.
+            me.connectRuntime( blob.ruid, function() {
+                me.exec('init');
+                me.exec( 'loadFromBlob', blob );
+            });
+        };
+    
+        Md5.prototype.getResult = function() {
+            return this.exec('getResult');
+        };
+    
+        return Md5;
+    });
+    /**
+     * @fileOverview 图片操作, 负责预览图片和上传前压缩图片
+     */
+    define('widgets/md5',[
+        'base',
+        'uploader',
+        'lib/md5',
+        'lib/blob',
+        'widgets/widget'
+    ], function( Base, Uploader, Md5, Blob ) {
+    
+        return Uploader.register({
+            name: 'md5',
+    
+    
+            /**
+             * 计算文件 md5 值，返回一个 promise 对象，可以监听 progress 进度。
+             *
+             *
+             * @method md5File
+             * @grammar md5File( file[, start[, end]] ) => promise
+             * @for Uploader
+             * @example
+             *
+             * uploader.on( 'fileQueued', function( file ) {
+             *     var $li = ...;
+             *
+             *     uploader.md5File( file )
+             *
+             *         // 及时显示进度
+             *         .progress(function(percentage) {
+             *             console.log('Percentage:', percentage);
+             *         })
+             *
+             *         // 完成
+             *         .then(function(val) {
+             *             console.log('md5 result:', val);
+             *         });
+             *
+             * });
+             */
+            md5File: function( file, start, end ) {
+                var md5 = new Md5(),
+                    deferred = Base.Deferred(),
+                    blob = (file instanceof Blob) ? file :
+                        this.request( 'get-file', file ).source;
+    
+                md5.on( 'progress load', function( e ) {
+                    e = e || {};
+                    deferred.notify( e.total ? e.loaded / e.total : 1 );
+                });
+    
+                md5.on( 'complete', function() {
+                    deferred.resolve( md5.getResult() );
+                });
+    
+                md5.on( 'error', function( reason ) {
+                    deferred.reject( reason );
+                });
+    
+                if ( arguments.length > 1 ) {
+                    start = start || 0;
+                    end = end || 0;
+                    start < 0 && (start = blob.size + start);
+                    end < 0 && (end = blob.size + end);
+                    end = Math.min( end, blob.size );
+                    blob = blob.slice( start, end );
+                }
+    
+                md5.loadFromBlob( blob );
+    
+                return deferred.promise();
+            }
+        });
+    });
+    /**
+     * @fileOverview Runtime管理器，负责Runtime的选择, 连接
+     */
+    define('runtime/compbase',[],function() {
+    
+        function CompBase( owner, runtime ) {
+    
+            this.owner = owner;
+            this.options = owner.options;
+    
+            this.getRuntime = function() {
+                return runtime;
+            };
+    
+            this.getRuid = function() {
+                return runtime.uid;
+            };
+    
+            this.trigger = function() {
+                return owner.trigger.apply( owner, arguments );
+            };
+        }
+    
+        return CompBase;
+    });
+    /**
+     * @fileOverview Html5Runtime
+     */
+    define('runtime/html5/runtime',[
+        'base',
+        'runtime/runtime',
+        'runtime/compbase'
+    ], function( Base, Runtime, CompBase ) {
+    
+        var type = 'html5',
+            components = {};
+    
+        function Html5Runtime() {
+            var pool = {},
+                me = this,
+                destroy = this.destroy;
+    
+            Runtime.apply( me, arguments );
+            me.type = type;
+    
+    
+            // 这个方法的调用者，实际上是RuntimeClient
+            me.exec = function( comp, fn/*, args...*/) {
+                var client = this,
+                    uid = client.uid,
+                    args = Base.slice( arguments, 2 ),
+                    instance;
+    
+                if ( components[ comp ] ) {
+                    instance = pool[ uid ] = pool[ uid ] ||
+                            new components[ comp ]( client, me );
+    
+                    if ( instance[ fn ] ) {
+                        return instance[ fn ].apply( instance, args );
+                    }
+                }
+            };
+    
+            me.destroy = function() {
+                // @todo 删除池子中的所有实例
+                return destroy && destroy.apply( this, arguments );
+            };
+        }
+    
+        Base.inherits( Runtime, {
+            constructor: Html5Runtime,
+    
+            // 不需要连接其他程序，直接执行callback
+            init: function() {
+                var me = this;
+                setTimeout(function() {
+                    me.trigger('ready');
+                }, 1 );
+            }
+    
+        });
+    
+        // 注册Components
+        Html5Runtime.register = function( name, component ) {
+            var klass = components[ name ] = Base.inherits( CompBase, component );
+            return klass;
+        };
+    
+        // 注册html5运行时。
+        // 只有在支持的前提下注册。
+        if ( window.Blob && window.FileReader && window.DataView ) {
+            Runtime.addRuntime( type, Html5Runtime );
+        }
+    
+        return Html5Runtime;
+    });
+    /**
+     * @fileOverview Blob Html实现
+     */
+    define('runtime/html5/blob',[
+        'runtime/html5/runtime',
+        'lib/blob'
+    ], function( Html5Runtime, Blob ) {
+    
+        return Html5Runtime.register( 'Blob', {
+            slice: function( start, end ) {
+                var blob = this.owner.source,
+                    slice = blob.slice || blob.webkitSlice || blob.mozSlice;
+    
+                blob = slice.call( blob, start, end );
+    
+                return new Blob( this.getRuid(), blob );
+            }
+        });
+    });
+    /**
+     * @fileOverview FilePaste
+     */
+    define('runtime/html5/dnd',[
+        'base',
+        'runtime/html5/runtime',
+        'lib/file'
+    ], function( Base, Html5Runtime, File ) {
+    
+        var $ = Base.$,
+            prefix = 'webuploader-dnd-';
+    
+        return Html5Runtime.register( 'DragAndDrop', {
+            init: function() {
+                var elem = this.elem = this.options.container;
+    
+                this.dragEnterHandler = Base.bindFn( this._dragEnterHandler, this );
+                this.dragOverHandler = Base.bindFn( this._dragOverHandler, this );
+                this.dragLeaveHandler = Base.bindFn( this._dragLeaveHandler, this );
+                this.dropHandler = Base.bindFn( this._dropHandler, this );
+                this.dndOver = false;
+    
+                elem.on( 'dragenter', this.dragEnterHandler );
+                elem.on( 'dragover', this.dragOverHandler );
+                elem.on( 'dragleave', this.dragLeaveHandler );
+                elem.on( 'drop', this.dropHandler );
+    
+                if ( this.options.disableGlobalDnd ) {
+                    $( document ).on( 'dragover', this.dragOverHandler );
+                    $( document ).on( 'drop', this.dropHandler );
+                }
+            },
+    
+            _dragEnterHandler: function( e ) {
+                var me = this,
+                    denied = me._denied || false,
+                    items;
+    
+                e = e.originalEvent || e;
+    
+                if ( !me.dndOver ) {
+                    me.dndOver = true;
+    
+                    // 注意只有 chrome 支持。
+                    items = e.dataTransfer.items;
+    
+                    if ( items && items.length ) {
+                        me._denied = denied = !me.trigger( 'accept', items );
+                    }
+    
+                    me.elem.addClass( prefix + 'over' );
+                    me.elem[ denied ? 'addClass' :
+                            'removeClass' ]( prefix + 'denied' );
+                }
+    
+                e.dataTransfer.dropEffect = denied ? 'none' : 'copy';
+    
+                return false;
+            },
+    
+            _dragOverHandler: function( e ) {
+                // 只处理框内的。
+                var parentElem = this.elem.parent().get( 0 );
+                if ( parentElem && !$.contains( parentElem, e.currentTarget ) ) {
+                    return false;
+                }
+    
+                clearTimeout( this._leaveTimer );
+                this._dragEnterHandler.call( this, e );
+    
+                return false;
+            },
+    
+            _dragLeaveHandler: function() {
+                var me = this,
+                    handler;
+    
+                handler = function() {
+                    me.dndOver = false;
+                    me.elem.removeClass( prefix + 'over ' + prefix + 'denied' );
+                };
+    
+                clearTimeout( me._leaveTimer );
+                me._leaveTimer = setTimeout( handler, 100 );
+                return false;
+            },
+    
+            _dropHandler: function( e ) {
+                var me = this,
+                    ruid = me.getRuid(),
+                    parentElem = me.elem.parent().get( 0 ),
+                    dataTransfer, data;
+    
+                // 只处理框内的。
+                if ( parentElem && !$.contains( parentElem, e.currentTarget ) ) {
+                    return false;
+                }
+    
+                e = e.originalEvent || e;
+                dataTransfer = e.dataTransfer;
+    
+                // 如果是页面内拖拽，还不能处理，不阻止事件。
+                // 此处 ie11 下会报参数错误，
+                try {
+                    data = dataTransfer.getData('text/html');
+                } catch( err ) {
+                }
+    
+                me.dndOver = false;
+                me.elem.removeClass( prefix + 'over' );
+    
+                if ( !dataTransfer || data ) {
+                    return;
+                }
+    
+                me._getTansferFiles( dataTransfer, function( results ) {
+                    me.trigger( 'drop', $.map( results, function( file ) {
+                        return new File( ruid, file );
+                    }) );
+                });
+    
+                return false;
+            },
+    
+            // 如果传入 callback 则去查看文件夹，否则只管当前文件夹。
+            _getTansferFiles: function( dataTransfer, callback ) {
+                var results  = [],
+                    promises = [],
+                    items, files, file, item, i, len, canAccessFolder;
+    
+                items = dataTransfer.items;
+                files = dataTransfer.files;
+    
+                canAccessFolder = !!(items && items[ 0 ].webkitGetAsEntry);
+    
+                for ( i = 0, len = files.length; i < len; i++ ) {
+                    file = files[ i ];
+                    item = items && items[ i ];
+    
+                    if ( canAccessFolder && item.webkitGetAsEntry().isDirectory ) {
+    
+                        promises.push( this._traverseDirectoryTree(
+                                item.webkitGetAsEntry(), results ) );
+                    } else {
+                        results.push( file );
+                    }
+                }
+    
+                Base.when.apply( Base, promises ).done(function() {
+    
+                    if ( !results.length ) {
+                        return;
+                    }
+    
+                    callback( results );
+                });
+            },
+    
+            _traverseDirectoryTree: function( entry, results ) {
+                var deferred = Base.Deferred(),
+                    me = this;
+    
+                if ( entry.isFile ) {
+                    entry.file(function( file ) {
+                        results.push( file );
+                        deferred.resolve();
+                    });
+                } else if ( entry.isDirectory ) {
+                    entry.createReader().readEntries(function( entries ) {
+                        var len = entries.length,
+                            promises = [],
+                            arr = [],    // 为了保证顺序。
+                            i;
+    
+                        for ( i = 0; i < len; i++ ) {
+                            promises.push( me._traverseDirectoryTree(
+                                    entries[ i ], arr ) );
+                        }
+    
+                        Base.when.apply( Base, promises ).then(function() {
+                            results.push.apply( results, arr );
+                            deferred.resolve();
+                        }, deferred.reject );
+                    });
+                }
+    
+                return deferred.promise();
+            },
+    
+            destroy: function() {
+                var elem = this.elem;
+    
+                // 还没 init 就调用 destroy
+                if (!elem) {
+                    return;
+                }
+    
+                elem.off( 'dragenter', this.dragEnterHandler );
+                elem.off( 'dragover', this.dragOverHandler );
+                elem.off( 'dragleave', this.dragLeaveHandler );
+                elem.off( 'drop', this.dropHandler );
+    
+                if ( this.options.disableGlobalDnd ) {
+                    $( document ).off( 'dragover', this.dragOverHandler );
+                    $( document ).off( 'drop', this.dropHandler );
+                }
+            }
+        });
+    });
+    
+    /**
+     * @fileOverview FilePaste
+     */
+    define('runtime/html5/filepaste',[
+        'base',
+        'runtime/html5/runtime',
+        'lib/file'
+    ], function( Base, Html5Runtime, File ) {
+    
+        return Html5Runtime.register( 'FilePaste', {
+            init: function() {
+                var opts = this.options,
+                    elem = this.elem = opts.container,
+                    accept = '.*',
+                    arr, i, len, item;
+    
+                // accetp的mimeTypes中生成匹配正则。
+                if ( opts.accept ) {
+                    arr = [];
+    
+                    for ( i = 0, len = opts.accept.length; i < len; i++ ) {
+                        item = opts.accept[ i ].mimeTypes;
+                        item && arr.push( item );
+                    }
+    
+                    if ( arr.length ) {
+                        accept = arr.join(',');
+                        accept = accept.replace( /,/g, '|' ).replace( /\*/g, '.*' );
+                    }
+                }
+                this.accept = accept = new RegExp( accept, 'i' );
+                this.hander = Base.bindFn( this._pasteHander, this );
+                elem.on( 'paste', this.hander );
+            },
+    
+            _pasteHander: function( e ) {
+                var allowed = [],
+                    ruid = this.getRuid(),
+                    items, item, blob, i, len;
+    
+                e = e.originalEvent || e;
+                items = e.clipboardData.items;
+    
+                for ( i = 0, len = items.length; i < len; i++ ) {
+                    item = items[ i ];
+    
+                    if ( item.kind !== 'file' || !(blob = item.getAsFile()) ) {
+                        continue;
+                    }
+    
+                    allowed.push( new File( ruid, blob ) );
+                }
+    
+                if ( allowed.length ) {
+                    // 不阻止非文件粘贴（文字粘贴）的事件冒泡
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.trigger( 'paste', allowed );
+                }
+            },
+    
+            destroy: function() {
+                this.elem.off( 'paste', this.hander );
+            }
+        });
+    });
+    
+    /**
+     * @fileOverview FilePicker
+     */
+    define('runtime/html5/filepicker',[
+        'base',
+        'runtime/html5/runtime'
+    ], function( Base, Html5Runtime ) {
+    
+        var $ = Base.$;
+    
+        return Html5Runtime.register( 'FilePicker', {
+            init: function() {
+                var container = this.getRuntime().getContainer(),
+                    me = this,
+                    owner = me.owner,
+                    opts = me.options,
+                    label = this.label = $( document.createElement('label') ),
+                    input =  this.input = $( document.createElement('input') ),
+                    arr, i, len, mouseHandler, changeHandler;
+    
+                input.attr( 'type', 'file' );
+                // input.attr( 'capture', 'camera');
+                input.attr( 'name', opts.name );
+                input.addClass('webuploader-element-invisible');
+    
+                label.on( 'click', function(e) {
+                    input.trigger('click');
+                    e.stopPropagation();
+                    owner.trigger('dialogopen');
+                });
+    
+                label.css({
+                    opacity: 0,
+                    width: '100%',
+                    height: '100%',
+                    display: 'block',
+                    cursor: 'pointer',
+                    background: '#ffffff'
+                });
+    
+                if ( opts.multiple ) {
+                    input.attr( 'multiple', 'multiple' );
+                }
+    
+                // @todo Firefox不支持单独指定后缀
+                if ( opts.accept && opts.accept.length > 0 ) {
+                    arr = [];
+    
+                    for ( i = 0, len = opts.accept.length; i < len; i++ ) {
+                        arr.push( opts.accept[ i ].mimeTypes );
+                    }
+    
+                    input.attr( 'accept', arr.join(',') );
+                }
+    
+                container.append( input );
+                container.append( label );
+    
+                mouseHandler = function( e ) {
+                    owner.trigger( e.type );
+                };
+    
+                changeHandler = function( e ) {
+                    var clone;
+    
+                    // 解决chrome 56 第二次打开文件选择器，然后点击取消，依然会触发change事件的问题
+                    if (e.target.files.length === 0){
+                        return false;
+                    }
+    
+                    // 第一次上传图片后，第二次再点击弹出文件选择器窗，等待
+                    me.files = e.target.files;
+    
+    
+                    // reset input
+                    clone = this.cloneNode( true );
+                    clone.value = null;
+                    this.parentNode.replaceChild( clone, this );
+    
+                    input.off();
+                    input = $( clone ).on( 'change', changeHandler )
+                            .on( 'mouseenter mouseleave', mouseHandler );
+    
+                    owner.trigger('change');
+                }
+                input.on( 'change', changeHandler);
+                label.on( 'mouseenter mouseleave', mouseHandler );
+    
+            },
+    
+    
+            getFiles: function() {
+                return this.files;
+            },
+    
+            destroy: function() {
+                this.input.off();
+                this.label.off();
+            }
+        });
+    });
+    
+    /**
+     * Terms:
+     *
+     * Uint8Array, FileReader, BlobBuilder, atob, ArrayBuffer
+     * @fileOverview Image控件
+     */
+    define('runtime/html5/util',[
+        'base'
+    ], function( Base ) {
+    
+        var urlAPI = window.createObjectURL && window ||
+                window.URL && URL.revokeObjectURL && URL ||
+                window.webkitURL,
+            createObjectURL = Base.noop,
+            revokeObjectURL = createObjectURL;
+    
+        if ( urlAPI ) {
+    
+            // 更安全的方式调用，比如android里面就能把context改成其他的对象。
+            createObjectURL = function() {
+                return urlAPI.createObjectURL.apply( urlAPI, arguments );
+            };
+    
+            revokeObjectURL = function() {
+                return urlAPI.revokeObjectURL.apply( urlAPI, arguments );
+            };
+        }
+    
+        return {
+            createObjectURL: createObjectURL,
+            revokeObjectURL: revokeObjectURL,
+    
+            dataURL2Blob: function( dataURI ) {
+                var byteStr, intArray, ab, i, mimetype, parts;
+    
+                parts = dataURI.split(',');
+    
+                if ( ~parts[ 0 ].indexOf('base64') ) {
+                    byteStr = atob( parts[ 1 ] );
+                } else {
+                    byteStr = decodeURIComponent( parts[ 1 ] );
+                }
+    
+                ab = new ArrayBuffer( byteStr.length );
+                intArray = new Uint8Array( ab );
+    
+                for ( i = 0; i < byteStr.length; i++ ) {
+                    intArray[ i ] = byteStr.charCodeAt( i );
+                }
+    
+                mimetype = parts[ 0 ].split(':')[ 1 ].split(';')[ 0 ];
+    
+                return this.arrayBufferToBlob( ab, mimetype );
+            },
+    
+            dataURL2ArrayBuffer: function( dataURI ) {
+                var byteStr, intArray, i, parts;
+    
+                parts = dataURI.split(',');
+    
+                if ( ~parts[ 0 ].indexOf('base64') ) {
+                    byteStr = atob( parts[ 1 ] );
+                } else {
+                    byteStr = decodeURIComponent( parts[ 1 ] );
+                }
+    
+                intArray = new Uint8Array( byteStr.length );
+    
+                for ( i = 0; i < byteStr.length; i++ ) {
+                    intArray[ i ] = byteStr.charCodeAt( i );
+                }
+    
+                return intArray.buffer;
+            },
+    
+            arrayBufferToBlob: function( buffer, type ) {
+                var builder = window.BlobBuilder || window.WebKitBlobBuilder,
+                    bb;
+    
+                // android不支持直接new Blob, 只能借助blobbuilder.
+                if ( builder ) {
+                    bb = new builder();
+                    bb.append( buffer );
+                    return bb.getBlob( type );
+                }
+    
+                return new Blob([ buffer ], type ? { type: type } : {} );
+            },
+    
+            // 抽出来主要是为了解决android下面canvas.toDataUrl不支持jpeg.
+            // 你得到的结果是png.
+            canvasToDataUrl: function( canvas, type, quality ) {
+                return canvas.toDataURL( type, quality / 100 );
+            },
+    
+            // imagemeat会复写这个方法，如果用户选择加载那个文件了的话。
+            parseMeta: function( blob, callback ) {
+                callback( false, {});
+            },
+    
+            // imagemeat会复写这个方法，如果用户选择加载那个文件了的话。
+            updateImageHead: function( data ) {
+                return data;
+            }
+        };
+    });
+    /**
+     * Terms:
+     *
+     * Uint8Array, FileReader, BlobBuilder, atob, ArrayBuffer
+     * @fileOverview Image控件
+     */
+    define('runtime/html5/imagemeta',[
+        'runtime/html5/util'
+    ], function( Util ) {
+    
+        var api;
+    
+        api = {
+            parsers: {
+                0xffe1: []
+            },
+    
+            maxMetaDataSize: 262144,
+    
+            parse: function( blob, cb ) {
+                var me = this,
+                    fr = new FileReader();
+    
+                fr.onload = function() {
+                    cb( false, me._parse( this.result ) );
+                    fr = fr.onload = fr.onerror = null;
+                };
+    
+                fr.onerror = function( e ) {
+                    cb( e.message );
+                    fr = fr.onload = fr.onerror = null;
+                };
+    
+                blob = blob.slice( 0, me.maxMetaDataSize );
+                fr.readAsArrayBuffer( blob.getSource() );
+            },
+    
+            _parse: function( buffer, noParse ) {
+                if ( buffer.byteLength < 6 ) {
+                    return;
+                }
+    
+                var dataview = new DataView( buffer ),
+                    offset = 2,
+                    maxOffset = dataview.byteLength - 4,
+                    headLength = offset,
+                    ret = {},
+                    markerBytes, markerLength, parsers, i;
+    
+                if ( dataview.getUint16( 0 ) === 0xffd8 ) {
+    
+                    while ( offset < maxOffset ) {
+                        markerBytes = dataview.getUint16( offset );
+    
+                        if ( markerBytes >= 0xffe0 && markerBytes <= 0xffef ||
+                                markerBytes === 0xfffe ) {
+    
+                            markerLength = dataview.getUint16( offset + 2 ) + 2;
+    
+                            if ( offset + markerLength > dataview.byteLength ) {
+                                break;
+                            }
+    
+                            parsers = api.parsers[ markerBytes ];
+    
+                            if ( !noParse && parsers ) {
+                                for ( i = 0; i < parsers.length; i += 1 ) {
+                                    parsers[ i ].call( api, dataview, offset,
+                                            markerLength, ret );
+                                }
+                            }
+    
+                            offset += markerLength;
+                            headLength = offset;
+                        } else {
+                            break;
+                        }
+                    }
+    
+                    if ( headLength > 6 ) {
+                        if ( buffer.slice ) {
+                            ret.imageHead = buffer.slice( 2, headLength );
+                        } else {
+                            // Workaround for IE10, which does not yet
+                            // support ArrayBuffer.slice:
+                            ret.imageHead = new Uint8Array( buffer )
+                                    .subarray( 2, headLength );
+                        }
+                    }
+                }
+    
+                return ret;
+            },
+    
+            updateImageHead: function( buffer, head ) {
+                var data = this._parse( buffer, true ),
+                    buf1, buf2, bodyoffset;
+    
+    
+                bodyoffset = 2;
+                if ( data.imageHead ) {
+                    bodyoffset = 2 + data.imageHead.byteLength;
+                }
+    
+                if ( buffer.slice ) {
+                    buf2 = buffer.slice( bodyoffset );
+                } else {
+                    buf2 = new Uint8Array( buffer ).subarray( bodyoffset );
+                }
+    
+                buf1 = new Uint8Array( head.byteLength + 2 + buf2.byteLength );
+    
+                buf1[ 0 ] = 0xFF;
+                buf1[ 1 ] = 0xD8;
+                buf1.set( new Uint8Array( head ), 2 );
+                buf1.set( new Uint8Array( buf2 ), head.byteLength + 2 );
+    
+                return buf1.buffer;
+            }
+        };
+    
+        Util.parseMeta = function() {
+            return api.parse.apply( api, arguments );
+        };
+    
+        Util.updateImageHead = function() {
+            return api.updateImageHead.apply( api, arguments );
+        };
+    
+        return api;
+    });
+    /**
+     * 代码来自于：https://github.com/blueimp/JavaScript-Load-Image
+     * 暂时项目中只用了orientation.
+     *
+     * 去除了 Exif Sub IFD Pointer, GPS Info IFD Pointer, Exif Thumbnail.
+     * @fileOverview EXIF解析
+     */
+    
+    // Sample
+    // ====================================
+    // Make : Apple
+    // Model : iPhone 4S
+    // Orientation : 1
+    // XResolution : 72 [72/1]
+    // YResolution : 72 [72/1]
+    // ResolutionUnit : 2
+    // Software : QuickTime 7.7.1
+    // DateTime : 2013:09:01 22:53:55
+    // ExifIFDPointer : 190
+    // ExposureTime : 0.058823529411764705 [1/17]
+    // FNumber : 2.4 [12/5]
+    // ExposureProgram : Normal program
+    // ISOSpeedRatings : 800
+    // ExifVersion : 0220
+    // DateTimeOriginal : 2013:09:01 22:52:51
+    // DateTimeDigitized : 2013:09:01 22:52:51
+    // ComponentsConfiguration : YCbCr
+    // ShutterSpeedValue : 4.058893515764426
+    // ApertureValue : 2.5260688216892597 [4845/1918]
+    // BrightnessValue : -0.3126686601998395
+    // MeteringMode : Pattern
+    // Flash : Flash did not fire, compulsory flash mode
+    // FocalLength : 4.28 [107/25]
+    // SubjectArea : [4 values]
+    // FlashpixVersion : 0100
+    // ColorSpace : 1
+    // PixelXDimension : 2448
+    // PixelYDimension : 3264
+    // SensingMethod : One-chip color area sensor
+    // ExposureMode : 0
+    // WhiteBalance : Auto white balance
+    // FocalLengthIn35mmFilm : 35
+    // SceneCaptureType : Standard
+    define('runtime/html5/imagemeta/exif',[
+        'base',
+        'runtime/html5/imagemeta'
+    ], function( Base, ImageMeta ) {
+    
+        var EXIF = {};
+    
+        EXIF.ExifMap = function() {
+            return this;
+        };
+    
+        EXIF.ExifMap.prototype.map = {
+            'Orientation': 0x0112
+        };
+    
+        EXIF.ExifMap.prototype.get = function( id ) {
+            return this[ id ] || this[ this.map[ id ] ];
+        };
+    
+        EXIF.exifTagTypes = {
+            // byte, 8-bit unsigned int:
+            1: {
+                getValue: function( dataView, dataOffset ) {
+                    return dataView.getUint8( dataOffset );
+                },
+                size: 1
+            },
+    
+            // ascii, 8-bit byte:
+            2: {
+                getValue: function( dataView, dataOffset ) {
+                    return String.fromCharCode( dataView.getUint8( dataOffset ) );
+                },
+                size: 1,
+                ascii: true
+            },
+    
+            // short, 16 bit int:
+            3: {
+                getValue: function( dataView, dataOffset, littleEndian ) {
+                    return dataView.getUint16( dataOffset, littleEndian );
+                },
+                size: 2
+            },
+    
+            // long, 32 bit int:
+            4: {
+                getValue: function( dataView, dataOffset, littleEndian ) {
+                    return dataView.getUint32( dataOffset, littleEndian );
+                },
+                size: 4
+            },
+    
+            // rational = two long values,
+            // first is numerator, second is denominator:
+            5: {
+                getValue: function( dataView, dataOffset, littleEndian ) {
+                    return dataView.getUint32( dataOffset, littleEndian ) /
+                        dataView.getUint32( dataOffset + 4, littleEndian );
+                },
+                size: 8
+            },
+    
+            // slong, 32 bit signed int:
+            9: {
+                getValue: function( dataView, dataOffset, littleEndian ) {
+                    return dataView.getInt32( dataOffset, littleEndian );
+                },
+                size: 4
+            },
+    
+            // srational, two slongs, first is numerator, second is denominator:
+            10: {
+                getValue: function( dataView, dataOffset, littleEndian ) {
+                    return dataView.getInt32( dataOffset, littleEndian ) /
+                        dataView.getInt32( dataOffset + 4, littleEndian );
+                },
+                size: 8
+            }
+        };
+    
+        // undefined, 8-bit byte, value depending on field:
+        EXIF.exifTagTypes[ 7 ] = EXIF.exifTagTypes[ 1 ];
+    
+        EXIF.getExifValue = function( dataView, tiffOffset, offset, type, length,
+                littleEndian ) {
+    
+            var tagType = EXIF.exifTagTypes[ type ],
+                tagSize, dataOffset, values, i, str, c;
+    
+            if ( !tagType ) {
+                Base.log('Invalid Exif data: Invalid tag type.');
+                return;
+            }
+    
+            tagSize = tagType.size * length;
+    
+            // Determine if the value is contained in the dataOffset bytes,
+            // or if the value at the dataOffset is a pointer to the actual data:
+            dataOffset = tagSize > 4 ? tiffOffset + dataView.getUint32( offset + 8,
+                    littleEndian ) : (offset + 8);
+    
+            if ( dataOffset + tagSize > dataView.byteLength ) {
+                Base.log('Invalid Exif data: Invalid data offset.');
+                return;
+            }
+    
+            if ( length === 1 ) {
+                return tagType.getValue( dataView, dataOffset, littleEndian );
+            }
+    
+            values = [];
+    
+            for ( i = 0; i < length; i += 1 ) {
+                values[ i ] = tagType.getValue( dataView,
+                        dataOffset + i * tagType.size, littleEndian );
+            }
+    
+            if ( tagType.ascii ) {
+                str = '';
+    
+                // Concatenate the chars:
+                for ( i = 0; i < values.length; i += 1 ) {
+                    c = values[ i ];
+    
+                    // Ignore the terminating NULL byte(s):
+                    if ( c === '\u0000' ) {
+                        break;
+                    }
+                    str += c;
+                }
+    
+                return str;
+            }
+            return values;
+        };
+    
+        EXIF.parseExifTag = function( dataView, tiffOffset, offset, littleEndian,
+                data ) {
+    
+            var tag = dataView.getUint16( offset, littleEndian );
+            data.exif[ tag ] = EXIF.getExifValue( dataView, tiffOffset, offset,
+                    dataView.getUint16( offset + 2, littleEndian ),    // tag type
+                    dataView.getUint32( offset + 4, littleEndian ),    // tag length
+                    littleEndian );
+        };
+    
+        EXIF.parseExifTags = function( dataView, tiffOffset, dirOffset,
+                littleEndian, data ) {
+    
+            var tagsNumber, dirEndOffset, i;
+    
+            if ( dirOffset + 6 > dataView.byteLength ) {
+                Base.log('Invalid Exif data: Invalid directory offset.');
+                return;
+            }
+    
+            tagsNumber = dataView.getUint16( dirOffset, littleEndian );
+            dirEndOffset = dirOffset + 2 + 12 * tagsNumber;
+    
+            if ( dirEndOffset + 4 > dataView.byteLength ) {
+                Base.log('Invalid Exif data: Invalid directory size.');
+                return;
+            }
+    
+            for ( i = 0; i < tagsNumber; i += 1 ) {
+                this.parseExifTag( dataView, tiffOffset,
+                        dirOffset + 2 + 12 * i,    // tag offset
+                        littleEndian, data );
+            }
+    
+            // Return the offset to the next directory:
+            return dataView.getUint32( dirEndOffset, littleEndian );
+        };
+    
+        // EXIF.getExifThumbnail = function(dataView, offset, length) {
+        //     var hexData,
+        //         i,
+        //         b;
+        //     if (!length || offset + length > dataView.byteLength) {
+        //         Base.log('Invalid Exif data: Invalid thumbnail data.');
+        //         return;
+        //     }
+        //     hexData = [];
+        //     for (i = 0; i < length; i += 1) {
+        //         b = dataView.getUint8(offset + i);
+        //         hexData.push((b < 16 ? '0' : '') + b.toString(16));
+        //     }
+        //     return 'data:image/jpeg,%' + hexData.join('%');
+        // };
+    
+        EXIF.parseExifData = function( dataView, offset, length, data ) {
+    
+            var tiffOffset = offset + 10,
+                littleEndian, dirOffset;
+    
+            // Check for the ASCII code for "Exif" (0x45786966):
+            if ( dataView.getUint32( offset + 4 ) !== 0x45786966 ) {
+                // No Exif data, might be XMP data instead
+                return;
+            }
+            if ( tiffOffset + 8 > dataView.byteLength ) {
+                Base.log('Invalid Exif data: Invalid segment size.');
+                return;
+            }
+    
+            // Check for the two null bytes:
+            if ( dataView.getUint16( offset + 8 ) !== 0x0000 ) {
+                Base.log('Invalid Exif data: Missing byte alignment offset.');
+                return;
+            }
+    
+            // Check the byte alignment:
+            switch ( dataView.getUint16( tiffOffset ) ) {
+                case 0x4949:
+                    littleEndian = true;
+                    break;
+    
+                case 0x4D4D:
+                    littleEndian = false;
+                    break;
+    
+                default:
+                    Base.log('Invalid Exif data: Invalid byte alignment marker.');
+                    return;
+            }
+    
+            // Check for the TIFF tag marker (0x002A):
+            if ( dataView.getUint16( tiffOffset + 2, littleEndian ) !== 0x002A ) {
+                Base.log('Invalid Exif data: Missing TIFF marker.');
+                return;
+            }
+    
+            // Retrieve the directory offset bytes, usually 0x00000008 or 8 decimal:
+            dirOffset = dataView.getUint32( tiffOffset + 4, littleEndian );
+            // Create the exif object to store the tags:
+            data.exif = new EXIF.ExifMap();
+            // Parse the tags of the main image directory and retrieve the
+            // offset to the next directory, usually the thumbnail directory:
+            dirOffset = EXIF.parseExifTags( dataView, tiffOffset,
+                    tiffOffset + dirOffset, littleEndian, data );
+    
+            // 尝试读取缩略图
+            // if ( dirOffset ) {
+            //     thumbnailData = {exif: {}};
+            //     dirOffset = EXIF.parseExifTags(
+            //         dataView,
+            //         tiffOffset,
+            //         tiffOffset + dirOffset,
+            //         littleEndian,
+            //         thumbnailData
+            //     );
+    
+            //     // Check for JPEG Thumbnail offset:
+            //     if (thumbnailData.exif[0x0201]) {
+            //         data.exif.Thumbnail = EXIF.getExifThumbnail(
+            //             dataView,
+            //             tiffOffset + thumbnailData.exif[0x0201],
+            //             thumbnailData.exif[0x0202] // Thumbnail data length
+            //         );
+            //     }
+            // }
+        };
+    
+        ImageMeta.parsers[ 0xffe1 ].push( EXIF.parseExifData );
+        return EXIF;
+    });
+    /**
+     * 这个方式性能不行，但是可以解决android里面的toDataUrl的bug
+     * android里面toDataUrl('image/jpege')得到的结果却是png.
+     *
+     * 所以这里没辙，只能借助这个工具
+     * @fileOverview jpeg encoder
+     */
+    define('runtime/html5/jpegencoder',[], function( require, exports, module ) {
+    
+        /*
+          Copyright (c) 2008, Adobe Systems Incorporated
+          All rights reserved.
+    
+          Redistribution and use in source and binary forms, with or without
+          modification, are permitted provided that the following conditions are
+          met:
+    
+          * Redistributions of source code must retain the above copyright notice,
+            this list of conditions and the following disclaimer.
+    
+          * Redistributions in binary form must reproduce the above copyright
+            notice, this list of conditions and the following disclaimer in the
+            documentation and/or other materials provided with the distribution.
+    
+          * Neither the name of Adobe Systems Incorporated nor the names of its
+            contributors may be used to endorse or promote products derived from
+            this software without specific prior written permission.
+    
+          THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+          IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+          THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+          PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+          CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+          EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+          PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+          PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+          LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+          NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+          SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+        */
+        /*
+        JPEG encoder ported to JavaScript and optimized by Andreas Ritter, www.bytestrom.eu, 11/2009
+    
+        Basic GUI blocking jpeg encoder
+        */
+    
+        function JPEGEncoder(quality) {
+          var self = this;
+            var fround = Math.round;
+            var ffloor = Math.floor;
+            var YTable = new Array(64);
+            var UVTable = new Array(64);
+            var fdtbl_Y = new Array(64);
+            var fdtbl_UV = new Array(64);
+            var YDC_HT;
+            var UVDC_HT;
+            var YAC_HT;
+            var UVAC_HT;
+    
+            var bitcode = new Array(65535);
+            var category = new Array(65535);
+            var outputfDCTQuant = new Array(64);
+            var DU = new Array(64);
+            var byteout = [];
+            var bytenew = 0;
+            var bytepos = 7;
+    
+            var YDU = new Array(64);
+            var UDU = new Array(64);
+            var VDU = new Array(64);
+            var clt = new Array(256);
+            var RGB_YUV_TABLE = new Array(2048);
+            var currentQuality;
+    
+            var ZigZag = [
+                     0, 1, 5, 6,14,15,27,28,
+                     2, 4, 7,13,16,26,29,42,
+                     3, 8,12,17,25,30,41,43,
+                     9,11,18,24,31,40,44,53,
+                    10,19,23,32,39,45,52,54,
+                    20,22,33,38,46,51,55,60,
+                    21,34,37,47,50,56,59,61,
+                    35,36,48,49,57,58,62,63
+                ];
+    
+            var std_dc_luminance_nrcodes = [0,0,1,5,1,1,1,1,1,1,0,0,0,0,0,0,0];
+            var std_dc_luminance_values = [0,1,2,3,4,5,6,7,8,9,10,11];
+            var std_ac_luminance_nrcodes = [0,0,2,1,3,3,2,4,3,5,5,4,4,0,0,1,0x7d];
+            var std_ac_luminance_values = [
+                    0x01,0x02,0x03,0x00,0x04,0x11,0x05,0x12,
+                    0x21,0x31,0x41,0x06,0x13,0x51,0x61,0x07,
+                    0x22,0x71,0x14,0x32,0x81,0x91,0xa1,0x08,
+                    0x23,0x42,0xb1,0xc1,0x15,0x52,0xd1,0xf0,
+                    0x24,0x33,0x62,0x72,0x82,0x09,0x0a,0x16,
+                    0x17,0x18,0x19,0x1a,0x25,0x26,0x27,0x28,
+                    0x29,0x2a,0x34,0x35,0x36,0x37,0x38,0x39,
+                    0x3a,0x43,0x44,0x45,0x46,0x47,0x48,0x49,
+                    0x4a,0x53,0x54,0x55,0x56,0x57,0x58,0x59,
+                    0x5a,0x63,0x64,0x65,0x66,0x67,0x68,0x69,
+                    0x6a,0x73,0x74,0x75,0x76,0x77,0x78,0x79,
+                    0x7a,0x83,0x84,0x85,0x86,0x87,0x88,0x89,
+                    0x8a,0x92,0x93,0x94,0x95,0x96,0x97,0x98,
+                    0x99,0x9a,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,
+                    0xa8,0xa9,0xaa,0xb2,0xb3,0xb4,0xb5,0xb6,
+                    0xb7,0xb8,0xb9,0xba,0xc2,0xc3,0xc4,0xc5,
+                    0xc6,0xc7,0xc8,0xc9,0xca,0xd2,0xd3,0xd4,
+                    0xd5,0xd6,0xd7,0xd8,0xd9,0xda,0xe1,0xe2,
+                    0xe3,0xe4,0xe5,0xe6,0xe7,0xe8,0xe9,0xea,
+                    0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,
+                    0xf9,0xfa
+                ];
+    
+            var std_dc_chrominance_nrcodes = [0,0,3,1,1,1,1,1,1,1,1,1,0,0,0,0,0];
+            var std_dc_chrominance_values = [0,1,2,3,4,5,6,7,8,9,10,11];
+            var std_ac_chrominance_nrcodes = [0,0,2,1,2,4,4,3,4,7,5,4,4,0,1,2,0x77];
+            var std_ac_chrominance_values = [
+                    0x00,0x01,0x02,0x03,0x11,0x04,0x05,0x21,
+                    0x31,0x06,0x12,0x41,0x51,0x07,0x61,0x71,
+                    0x13,0x22,0x32,0x81,0x08,0x14,0x42,0x91,
+                    0xa1,0xb1,0xc1,0x09,0x23,0x33,0x52,0xf0,
+                    0x15,0x62,0x72,0xd1,0x0a,0x16,0x24,0x34,
+                    0xe1,0x25,0xf1,0x17,0x18,0x19,0x1a,0x26,
+                    0x27,0x28,0x29,0x2a,0x35,0x36,0x37,0x38,
+                    0x39,0x3a,0x43,0x44,0x45,0x46,0x47,0x48,
+                    0x49,0x4a,0x53,0x54,0x55,0x56,0x57,0x58,
+                    0x59,0x5a,0x63,0x64,0x65,0x66,0x67,0x68,
+                    0x69,0x6a,0x73,0x74,0x75,0x76,0x77,0x78,
+                    0x79,0x7a,0x82,0x83,0x84,0x85,0x86,0x87,
+                    0x88,0x89,0x8a,0x92,0x93,0x94,0x95,0x96,
+                    0x97,0x98,0x99,0x9a,0xa2,0xa3,0xa4,0xa5,
+                    0xa6,0xa7,0xa8,0xa9,0xaa,0xb2,0xb3,0xb4,
+                    0xb5,0xb6,0xb7,0xb8,0xb9,0xba,0xc2,0xc3,
+                    0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xd2,
+                    0xd3,0xd4,0xd5,0xd6,0xd7,0xd8,0xd9,0xda,
+                    0xe2,0xe3,0xe4,0xe5,0xe6,0xe7,0xe8,0xe9,
+                    0xea,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,
+                    0xf9,0xfa
+                ];
+    
+            function initQuantTables(sf){
+                    var YQT = [
+                        16, 11, 10, 16, 24, 40, 51, 61,
+                        12, 12, 14, 19, 26, 58, 60, 55,
+                        14, 13, 16, 24, 40, 57, 69, 56,
+                        14, 17, 22, 29, 51, 87, 80, 62,
+                        18, 22, 37, 56, 68,109,103, 77,
+                        24, 35, 55, 64, 81,104,113, 92,
+                        49, 64, 78, 87,103,121,120,101,
+                        72, 92, 95, 98,112,100,103, 99
+                    ];
+    
+                    for (var i = 0; i < 64; i++) {
+                        var t = ffloor((YQT[i]*sf+50)/100);
+                        if (t < 1) {
+                            t = 1;
+                        } else if (t > 255) {
+                            t = 255;
+                        }
+                        YTable[ZigZag[i]] = t;
+                    }
+                    var UVQT = [
+                        17, 18, 24, 47, 99, 99, 99, 99,
+                        18, 21, 26, 66, 99, 99, 99, 99,
+                        24, 26, 56, 99, 99, 99, 99, 99,
+                        47, 66, 99, 99, 99, 99, 99, 99,
+                        99, 99, 99, 99, 99, 99, 99, 99,
+                        99, 99, 99, 99, 99, 99, 99, 99,
+                        99, 99, 99, 99, 99, 99, 99, 99,
+                        99, 99, 99, 99, 99, 99, 99, 99
+                    ];
+                    for (var j = 0; j < 64; j++) {
+                        var u = ffloor((UVQT[j]*sf+50)/100);
+                        if (u < 1) {
+                            u = 1;
+                        } else if (u > 255) {
+                            u = 255;
+                        }
+                        UVTable[ZigZag[j]] = u;
+                    }
+                    var aasf = [
+                        1.0, 1.387039845, 1.306562965, 1.175875602,
+                        1.0, 0.785694958, 0.541196100, 0.275899379
+                    ];
+                    var k = 0;
+                    for (var row = 0; row < 8; row++)
+                    {
+                        for (var col = 0; col < 8; col++)
+                        {
+                            fdtbl_Y[k]  = (1.0 / (YTable [ZigZag[k]] * aasf[row] * aasf[col] * 8.0));
+                            fdtbl_UV[k] = (1.0 / (UVTable[ZigZag[k]] * aasf[row] * aasf[col] * 8.0));
+                            k++;
+                        }
+                    }
+                }
+    
+                function computeHuffmanTbl(nrcodes, std_table){
+                    var codevalue = 0;
+                    var pos_in_table = 0;
+                    var HT = new Array();
+                    for (var k = 1; k <= 16; k++) {
+                        for (var j = 1; j <= nrcodes[k]; j++) {
+                            HT[std_table[pos_in_table]] = [];
+                            HT[std_table[pos_in_table]][0] = codevalue;
+                            HT[std_table[pos_in_table]][1] = k;
+                            pos_in_table++;
+                            codevalue++;
+                        }
+                        codevalue*=2;
+                    }
+                    return HT;
+                }
+    
+                function initHuffmanTbl()
+                {
+                    YDC_HT = computeHuffmanTbl(std_dc_luminance_nrcodes,std_dc_luminance_values);
+                    UVDC_HT = computeHuffmanTbl(std_dc_chrominance_nrcodes,std_dc_chrominance_values);
+                    YAC_HT = computeHuffmanTbl(std_ac_luminance_nrcodes,std_ac_luminance_values);
+                    UVAC_HT = computeHuffmanTbl(std_ac_chrominance_nrcodes,std_ac_chrominance_values);
+                }
+    
+                function initCategoryNumber()
+                {
+                    var nrlower = 1;
+                    var nrupper = 2;
+                    for (var cat = 1; cat <= 15; cat++) {
+                        //Positive numbers
+                        for (var nr = nrlower; nr<nrupper; nr++) {
+                            category[32767+nr] = cat;
+                            bitcode[32767+nr] = [];
+                            bitcode[32767+nr][1] = cat;
+                            bitcode[32767+nr][0] = nr;
+                        }
+                        //Negative numbers
+                        for (var nrneg =-(nrupper-1); nrneg<=-nrlower; nrneg++) {
+                            category[32767+nrneg] = cat;
+                            bitcode[32767+nrneg] = [];
+                            bitcode[32767+nrneg][1] = cat;
+                            bitcode[32767+nrneg][0] = nrupper-1+nrneg;
+                        }
+                        nrlower <<= 1;
+                        nrupper <<= 1;
+                    }
+                }
+    
+                function initRGBYUVTable() {
+                    for(var i = 0; i < 256;i++) {
+                        RGB_YUV_TABLE[i]            =  19595 * i;
+                        RGB_YUV_TABLE[(i+ 256)>>0]  =  38470 * i;
+                        RGB_YUV_TABLE[(i+ 512)>>0]  =   7471 * i + 0x8000;
+                        RGB_YUV_TABLE[(i+ 768)>>0]  = -11059 * i;
+                        RGB_YUV_TABLE[(i+1024)>>0]  = -21709 * i;
+                        RGB_YUV_TABLE[(i+1280)>>0]  =  32768 * i + 0x807FFF;
+                        RGB_YUV_TABLE[(i+1536)>>0]  = -27439 * i;
+                        RGB_YUV_TABLE[(i+1792)>>0]  = - 5329 * i;
+                    }
+                }
+    
+                // IO functions
+                function writeBits(bs)
+                {
+                    var value = bs[0];
+                    var posval = bs[1]-1;
+                    while ( posval >= 0 ) {
+                        if (value & (1 << posval) ) {
+                            bytenew |= (1 << bytepos);
+                        }
+                        posval--;
+                        bytepos--;
+                        if (bytepos < 0) {
+                            if (bytenew == 0xFF) {
+                                writeByte(0xFF);
+                                writeByte(0);
+                            }
+                            else {
+                                writeByte(bytenew);
+                            }
+                            bytepos=7;
+                            bytenew=0;
+                        }
+                    }
+                }
+    
+                function writeByte(value)
+                {
+                    byteout.push(clt[value]); // write char directly instead of converting later
+                }
+    
+                function writeWord(value)
+                {
+                    writeByte((value>>8)&0xFF);
+                    writeByte((value   )&0xFF);
+                }
+    
+                // DCT & quantization core
+                function fDCTQuant(data, fdtbl)
+                {
+                    var d0, d1, d2, d3, d4, d5, d6, d7;
+                    /* Pass 1: process rows. */
+                    var dataOff=0;
+                    var i;
+                    var I8 = 8;
+                    var I64 = 64;
+                    for (i=0; i<I8; ++i)
+                    {
+                        d0 = data[dataOff];
+                        d1 = data[dataOff+1];
+                        d2 = data[dataOff+2];
+                        d3 = data[dataOff+3];
+                        d4 = data[dataOff+4];
+                        d5 = data[dataOff+5];
+                        d6 = data[dataOff+6];
+                        d7 = data[dataOff+7];
+    
+                        var tmp0 = d0 + d7;
+                        var tmp7 = d0 - d7;
+                        var tmp1 = d1 + d6;
+                        var tmp6 = d1 - d6;
+                        var tmp2 = d2 + d5;
+                        var tmp5 = d2 - d5;
+                        var tmp3 = d3 + d4;
+                        var tmp4 = d3 - d4;
+    
+                        /* Even part */
+                        var tmp10 = tmp0 + tmp3;    /* phase 2 */
+                        var tmp13 = tmp0 - tmp3;
+                        var tmp11 = tmp1 + tmp2;
+                        var tmp12 = tmp1 - tmp2;
+    
+                        data[dataOff] = tmp10 + tmp11; /* phase 3 */
+                        data[dataOff+4] = tmp10 - tmp11;
+    
+                        var z1 = (tmp12 + tmp13) * 0.707106781; /* c4 */
+                        data[dataOff+2] = tmp13 + z1; /* phase 5 */
+                        data[dataOff+6] = tmp13 - z1;
+    
+                        /* Odd part */
+                        tmp10 = tmp4 + tmp5; /* phase 2 */
+                        tmp11 = tmp5 + tmp6;
+                        tmp12 = tmp6 + tmp7;
+    
+                        /* The rotator is modified from fig 4-8 to avoid extra negations. */
+                        var z5 = (tmp10 - tmp12) * 0.382683433; /* c6 */
+                        var z2 = 0.541196100 * tmp10 + z5; /* c2-c6 */
+                        var z4 = 1.306562965 * tmp12 + z5; /* c2+c6 */
+                        var z3 = tmp11 * 0.707106781; /* c4 */
+    
+                        var z11 = tmp7 + z3;    /* phase 5 */
+                        var z13 = tmp7 - z3;
+    
+                        data[dataOff+5] = z13 + z2; /* phase 6 */
+                        data[dataOff+3] = z13 - z2;
+                        data[dataOff+1] = z11 + z4;
+                        data[dataOff+7] = z11 - z4;
+    
+                        dataOff += 8; /* advance pointer to next row */
+                    }
+    
+                    /* Pass 2: process columns. */
+                    dataOff = 0;
+                    for (i=0; i<I8; ++i)
+                    {
+                        d0 = data[dataOff];
+                        d1 = data[dataOff + 8];
+                        d2 = data[dataOff + 16];
+                        d3 = data[dataOff + 24];
+                        d4 = data[dataOff + 32];
+                        d5 = data[dataOff + 40];
+                        d6 = data[dataOff + 48];
+                        d7 = data[dataOff + 56];
+    
+                        var tmp0p2 = d0 + d7;
+                        var tmp7p2 = d0 - d7;
+                        var tmp1p2 = d1 + d6;
+                        var tmp6p2 = d1 - d6;
+                        var tmp2p2 = d2 + d5;
+                        var tmp5p2 = d2 - d5;
+                        var tmp3p2 = d3 + d4;
+                        var tmp4p2 = d3 - d4;
+    
+                        /* Even part */
+                        var tmp10p2 = tmp0p2 + tmp3p2;  /* phase 2 */
+                        var tmp13p2 = tmp0p2 - tmp3p2;
+                        var tmp11p2 = tmp1p2 + tmp2p2;
+                        var tmp12p2 = tmp1p2 - tmp2p2;
+    
+                        data[dataOff] = tmp10p2 + tmp11p2; /* phase 3 */
+                        data[dataOff+32] = tmp10p2 - tmp11p2;
+    
+                        var z1p2 = (tmp12p2 + tmp13p2) * 0.707106781; /* c4 */
+                        data[dataOff+16] = tmp13p2 + z1p2; /* phase 5 */
+                        data[dataOff+48] = tmp13p2 - z1p2;
+    
+                        /* Odd part */
+                        tmp10p2 = tmp4p2 + tmp5p2; /* phase 2 */
+                        tmp11p2 = tmp5p2 + tmp6p2;
+                        tmp12p2 = tmp6p2 + tmp7p2;
+    
+                        /* The rotator is modified from fig 4-8 to avoid extra negations. */
+                        var z5p2 = (tmp10p2 - tmp12p2) * 0.382683433; /* c6 */
+                        var z2p2 = 0.541196100 * tmp10p2 + z5p2; /* c2-c6 */
+                        var z4p2 = 1.306562965 * tmp12p2 + z5p2; /* c2+c6 */
+                        var z3p2 = tmp11p2 * 0.707106781; /* c4 */
+    
+                        var z11p2 = tmp7p2 + z3p2;  /* phase 5 */
+                        var z13p2 = tmp7p2 - z3p2;
+    
+                        data[dataOff+40] = z13p2 + z2p2; /* phase 6 */
+                        data[dataOff+24] = z13p2 - z2p2;
+                        data[dataOff+ 8] = z11p2 + z4p2;
+                        data[dataOff+56] = z11p2 - z4p2;
+    
+                        dataOff++; /* advance pointer to next column */
+                    }
+    
+                    // Quantize/descale the coefficients
+                    var fDCTQuant;
+                    for (i=0; i<I64; ++i)
+                    {
+                        // Apply the quantization and scaling factor & Round to nearest integer
+                        fDCTQuant = data[i]*fdtbl[i];
+                        outputfDCTQuant[i] = (fDCTQuant > 0.0) ? ((fDCTQuant + 0.5)|0) : ((fDCTQuant - 0.5)|0);
+                        //outputfDCTQuant[i] = fround(fDCTQuant);
+    
+                    }
+                    return outputfDCTQuant;
+                }
+    
+                function writeAPP0()
+                {
+                    writeWord(0xFFE0); // marker
+                    writeWord(16); // length
+                    writeByte(0x4A); // J
+                    writeByte(0x46); // F
+                    writeByte(0x49); // I
+                    writeByte(0x46); // F
+                    writeByte(0); // = "JFIF",'\0'
+                    writeByte(1); // versionhi
+                    writeByte(1); // versionlo
+                    writeByte(0); // xyunits
+                    writeWord(1); // xdensity
+                    writeWord(1); // ydensity
+                    writeByte(0); // thumbnwidth
+                    writeByte(0); // thumbnheight
+                }
+    
+                function writeSOF0(width, height)
+                {
+                    writeWord(0xFFC0); // marker
+                    writeWord(17);   // length, truecolor YUV JPG
+                    writeByte(8);    // precision
+                    writeWord(height);
+                    writeWord(width);
+                    writeByte(3);    // nrofcomponents
+                    writeByte(1);    // IdY
+                    writeByte(0x11); // HVY
+                    writeByte(0);    // QTY
+                    writeByte(2);    // IdU
+                    writeByte(0x11); // HVU
+                    writeByte(1);    // QTU
+                    writeByte(3);    // IdV
+                    writeByte(0x11); // HVV
+                    writeByte(1);    // QTV
+                }
+    
+                function writeDQT()
+                {
+                    writeWord(0xFFDB); // marker
+                    writeWord(132);    // length
+                    writeByte(0);
+                    for (var i=0; i<64; i++) {
+                        writeByte(YTable[i]);
+                    }
+                    writeByte(1);
+                    for (var j=0; j<64; j++) {
+                        writeByte(UVTable[j]);
+                    }
+                }
+    
+                function writeDHT()
+                {
+                    writeWord(0xFFC4); // marker
+                    writeWord(0x01A2); // length
+    
+                    writeByte(0); // HTYDCinfo
+                    for (var i=0; i<16; i++) {
+                        writeByte(std_dc_luminance_nrcodes[i+1]);
+                    }
+                    for (var j=0; j<=11; j++) {
+                        writeByte(std_dc_luminance_values[j]);
+                    }
+    
+                    writeByte(0x10); // HTYACinfo
+                    for (var k=0; k<16; k++) {
+                        writeByte(std_ac_luminance_nrcodes[k+1]);
+                    }
+                    for (var l=0; l<=161; l++) {
+                        writeByte(std_ac_luminance_values[l]);
+                    }
+    
+                    writeByte(1); // HTUDCinfo
+                    for (var m=0; m<16; m++) {
+                        writeByte(std_dc_chrominance_nrcodes[m+1]);
+                    }
+                    for (var n=0; n<=11; n++) {
+                        writeByte(std_dc_chrominance_values[n]);
+                    }
+    
+                    writeByte(0x11); // HTUACinfo
+                    for (var o=0; o<16; o++) {
+                        writeByte(std_ac_chrominance_nrcodes[o+1]);
+                    }
+                    for (var p=0; p<=161; p++) {
+                        writeByte(std_ac_chrominance_values[p]);
+                    }
+                }
+    
+                function writeSOS()
+                {
+                    writeWord(0xFFDA); // marker
+                    writeWord(12); // length
+                    writeByte(3); // nrofcomponents
+                    writeByte(1); // IdY
+                    writeByte(0); // HTY
+                    writeByte(2); // IdU
+                    writeByte(0x11); // HTU
+                    writeByte(3); // IdV
+                    writeByte(0x11); // HTV
+                    writeByte(0); // Ss
+                    writeByte(0x3f); // Se
+                    writeByte(0); // Bf
+                }
+    
+                function processDU(CDU, fdtbl, DC, HTDC, HTAC){
+                    var EOB = HTAC[0x00];
+                    var M16zeroes = HTAC[0xF0];
+                    var pos;
+                    var I16 = 16;
+                    var I63 = 63;
+                    var I64 = 64;
+                    var DU_DCT = fDCTQuant(CDU, fdtbl);
+                    //ZigZag reorder
+                    for (var j=0;j<I64;++j) {
+                        DU[ZigZag[j]]=DU_DCT[j];
+                    }
+                    var Diff = DU[0] - DC; DC = DU[0];
+                    //Encode DC
+                    if (Diff==0) {
+                        writeBits(HTDC[0]); // Diff might be 0
+                    } else {
+                        pos = 32767+Diff;
+                        writeBits(HTDC[category[pos]]);
+                        writeBits(bitcode[pos]);
+                    }
+                    //Encode ACs
+                    var end0pos = 63; // was const... which is crazy
+                    for (; (end0pos>0)&&(DU[end0pos]==0); end0pos--) {};
+                    //end0pos = first element in reverse order !=0
+                    if ( end0pos == 0) {
+                        writeBits(EOB);
+                        return DC;
+                    }
+                    var i = 1;
+                    var lng;
+                    while ( i <= end0pos ) {
+                        var startpos = i;
+                        for (; (DU[i]==0) && (i<=end0pos); ++i) {}
+                        var nrzeroes = i-startpos;
+                        if ( nrzeroes >= I16 ) {
+                            lng = nrzeroes>>4;
+                            for (var nrmarker=1; nrmarker <= lng; ++nrmarker)
+                                writeBits(M16zeroes);
+                            nrzeroes = nrzeroes&0xF;
+                        }
+                        pos = 32767+DU[i];
+                        writeBits(HTAC[(nrzeroes<<4)+category[pos]]);
+                        writeBits(bitcode[pos]);
+                        i++;
+                    }
+                    if ( end0pos != I63 ) {
+                        writeBits(EOB);
+                    }
+                    return DC;
+                }
+    
+                function initCharLookupTable(){
+                    var sfcc = String.fromCharCode;
+                    for(var i=0; i < 256; i++){ ///// ACHTUNG // 255
+                        clt[i] = sfcc(i);
+                    }
+                }
+    
+                this.encode = function(image,quality) // image data object
+                {
+                    // var time_start = new Date().getTime();
+    
+                    if(quality) setQuality(quality);
+    
+                    // Initialize bit writer
+                    byteout = new Array();
+                    bytenew=0;
+                    bytepos=7;
+    
+                    // Add JPEG headers
+                    writeWord(0xFFD8); // SOI
+                    writeAPP0();
+                    writeDQT();
+                    writeSOF0(image.width,image.height);
+                    writeDHT();
+                    writeSOS();
+    
+    
+                    // Encode 8x8 macroblocks
+                    var DCY=0;
+                    var DCU=0;
+                    var DCV=0;
+    
+                    bytenew=0;
+                    bytepos=7;
+    
+    
+                    this.encode.displayName = "_encode_";
+    
+                    var imageData = image.data;
+                    var width = image.width;
+                    var height = image.height;
+    
+                    var quadWidth = width*4;
+                    var tripleWidth = width*3;
+    
+                    var x, y = 0;
+                    var r, g, b;
+                    var start,p, col,row,pos;
+                    while(y < height){
+                        x = 0;
+                        while(x < quadWidth){
+                        start = quadWidth * y + x;
+                        p = start;
+                        col = -1;
+                        row = 0;
+    
+                        for(pos=0; pos < 64; pos++){
+                            row = pos >> 3;// /8
+                            col = ( pos & 7 ) * 4; // %8
+                            p = start + ( row * quadWidth ) + col;
+    
+                            if(y+row >= height){ // padding bottom
+                                p-= (quadWidth*(y+1+row-height));
+                            }
+    
+                            if(x+col >= quadWidth){ // padding right
+                                p-= ((x+col) - quadWidth +4)
+                            }
+    
+                            r = imageData[ p++ ];
+                            g = imageData[ p++ ];
+                            b = imageData[ p++ ];
+    
+    
+                            /* // calculate YUV values dynamically
+                            YDU[pos]=((( 0.29900)*r+( 0.58700)*g+( 0.11400)*b))-128; //-0x80
+                            UDU[pos]=(((-0.16874)*r+(-0.33126)*g+( 0.50000)*b));
+                            VDU[pos]=((( 0.50000)*r+(-0.41869)*g+(-0.08131)*b));
+                            */
+    
+                            // use lookup table (slightly faster)
+                            YDU[pos] = ((RGB_YUV_TABLE[r]             + RGB_YUV_TABLE[(g +  256)>>0] + RGB_YUV_TABLE[(b +  512)>>0]) >> 16)-128;
+                            UDU[pos] = ((RGB_YUV_TABLE[(r +  768)>>0] + RGB_YUV_TABLE[(g + 1024)>>0] + RGB_YUV_TABLE[(b + 1280)>>0]) >> 16)-128;
+                            VDU[pos] = ((RGB_YUV_TABLE[(r + 1280)>>0] + RGB_YUV_TABLE[(g + 1536)>>0] + RGB_YUV_TABLE[(b + 1792)>>0]) >> 16)-128;
+    
+                        }
+    
+                        DCY = processDU(YDU, fdtbl_Y, DCY, YDC_HT, YAC_HT);
+                        DCU = processDU(UDU, fdtbl_UV, DCU, UVDC_HT, UVAC_HT);
+                        DCV = processDU(VDU, fdtbl_UV, DCV, UVDC_HT, UVAC_HT);
+                        x+=32;
+                        }
+                        y+=8;
+                    }
+    
+    
+                    ////////////////////////////////////////////////////////////////
+    
+                    // Do the bit alignment of the EOI marker
+                    if ( bytepos >= 0 ) {
+                        var fillbits = [];
+                        fillbits[1] = bytepos+1;
+                        fillbits[0] = (1<<(bytepos+1))-1;
+                        writeBits(fillbits);
+                    }
+    
+                    writeWord(0xFFD9); //EOI
+    
+                    var jpegDataUri = 'data:image/jpeg;base64,' + btoa(byteout.join(''));
+    
+                    byteout = [];
+    
+                    // benchmarking
+                    // var duration = new Date().getTime() - time_start;
+                    // console.log('Encoding time: '+ currentQuality + 'ms');
+                    //
+    
+                    return jpegDataUri
+            }
+    
+            function setQuality(quality){
+                if (quality <= 0) {
+                    quality = 1;
+                }
+                if (quality > 100) {
+                    quality = 100;
+                }
+    
+                if(currentQuality == quality) return // don't recalc if unchanged
+    
+                var sf = 0;
+                if (quality < 50) {
+                    sf = Math.floor(5000 / quality);
+                } else {
+                    sf = Math.floor(200 - quality*2);
+                }
+    
+                initQuantTables(sf);
+                currentQuality = quality;
+                // console.log('Quality set to: '+quality +'%');
+            }
+    
+            function init(){
+                // var time_start = new Date().getTime();
+                if(!quality) quality = 50;
+                // Create tables
+                initCharLookupTable()
+                initHuffmanTbl();
+                initCategoryNumber();
+                initRGBYUVTable();
+    
+                setQuality(quality);
+                // var duration = new Date().getTime() - time_start;
+                // console.log('Initialization '+ duration + 'ms');
+            }
+    
+            init();
+    
+        };
+    
+        JPEGEncoder.encode = function( data, quality ) {
+            var encoder = new JPEGEncoder( quality );
+    
+            return encoder.encode( data );
+        }
+    
+        return JPEGEncoder;
+    });
+    /**
+     * @fileOverview Fix android canvas.toDataUrl bug.
+     */
+    define('runtime/html5/androidpatch',[
+        'runtime/html5/util',
+        'runtime/html5/jpegencoder',
+        'base'
+    ], function( Util, encoder, Base ) {
+        var origin = Util.canvasToDataUrl,
+            supportJpeg;
+    
+        Util.canvasToDataUrl = function( canvas, type, quality ) {
+            var ctx, w, h, fragement, parts;
+    
+            // 非android手机直接跳过。
+            if ( !Base.os.android ) {
+                return origin.apply( null, arguments );
+            }
+    
+            // 检测是否canvas支持jpeg导出，根据数据格式来判断。
+            // JPEG 前两位分别是：255, 216
+            if ( type === 'image/jpeg' && typeof supportJpeg === 'undefined' ) {
+                fragement = origin.apply( null, arguments );
+    
+                parts = fragement.split(',');
+    
+                if ( ~parts[ 0 ].indexOf('base64') ) {
+                    fragement = atob( parts[ 1 ] );
+                } else {
+                    fragement = decodeURIComponent( parts[ 1 ] );
+                }
+    
+                fragement = fragement.substring( 0, 2 );
+    
+                supportJpeg = fragement.charCodeAt( 0 ) === 255 &&
+                        fragement.charCodeAt( 1 ) === 216;
+            }
+    
+            // 只有在android环境下才修复
+            if ( type === 'image/jpeg' && !supportJpeg ) {
+                w = canvas.width;
+                h = canvas.height;
+                ctx = canvas.getContext('2d');
+    
+                return encoder.encode( ctx.getImageData( 0, 0, w, h ), quality );
+            }
+    
+            return origin.apply( null, arguments );
+        };
+    });
+    /**
+     * @fileOverview Image
+     */
+    define('runtime/html5/image',[
+        'base',
+        'runtime/html5/runtime',
+        'runtime/html5/util'
+    ], function( Base, Html5Runtime, Util ) {
+    
+        var BLANK = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
+    
+        return Html5Runtime.register( 'Image', {
+    
+            // flag: 标记是否被修改过。
+            modified: false,
+    
+            init: function() {
+                var me = this,
+                    img = new Image();
+    
+                img.onload = function() {
+    
+                    me._info = {
+                        type: me.type,
+                        width: this.width,
+                        height: this.height
+                    };
+    
+                    //debugger;
+    
+                    // 读取meta信息。
+                    if ( !me._metas && 'image/jpeg' === me.type ) {
+                        Util.parseMeta( me._blob, function( error, ret ) {
+                            me._metas = ret;
+                            me.owner.trigger('load');
+                        });
+                    } else {
+                        me.owner.trigger('load');
+                    }
+                };
+    
+                img.onerror = function() {
+                    me.owner.trigger('error');
+                };
+    
+                me._img = img;
+            },
+    
+            loadFromBlob: function( blob ) {
+                var me = this,
+                    img = me._img;
+    
+                me._blob = blob;
+                me.type = blob.type;
+                img.src = Util.createObjectURL( blob.getSource() );
+                me.owner.once( 'load', function() {
+                    Util.revokeObjectURL( img.src );
+                });
+            },
+    
+            resize: function( width, height ) {
+                var canvas = this._canvas ||
+                        (this._canvas = document.createElement('canvas'));
+    
+                this._resize( this._img, canvas, width, height );
+                this._blob = null;    // 没用了，可以删掉了。
+                this.modified = true;
+                this.owner.trigger( 'complete', 'resize' );
+            },
+    
+            crop: function( x, y, w, h, s ) {
+                var cvs = this._canvas ||
+                        (this._canvas = document.createElement('canvas')),
+                    opts = this.options,
+                    img = this._img,
+                    iw = img.naturalWidth,
+                    ih = img.naturalHeight,
+                    orientation = this.getOrientation();
+    
+                s = s || 1;
+    
+                // todo 解决 orientation 的问题。
+                // values that require 90 degree rotation
+                // if ( ~[ 5, 6, 7, 8 ].indexOf( orientation ) ) {
+    
+                //     switch ( orientation ) {
+                //         case 6:
+                //             tmp = x;
+                //             x = y;
+                //             y = iw * s - tmp - w;
+                //             console.log(ih * s, tmp, w)
+                //             break;
+                //     }
+    
+                //     (w ^= h, h ^= w, w ^= h);
+                // }
+    
+                cvs.width = w;
+                cvs.height = h;
+    
+                opts.preserveHeaders || this._rotate2Orientaion( cvs, orientation );
+                this._renderImageToCanvas( cvs, img, -x, -y, iw * s, ih * s );
+    
+                this._blob = null;    // 没用了，可以删掉了。
+                this.modified = true;
+                this.owner.trigger( 'complete', 'crop' );
+            },
+    
+            getAsBlob: function( type ) {
+                var blob = this._blob,
+                    opts = this.options,
+                    canvas;
+    
+                type = type || this.type;
+    
+                // blob需要重新生成。
+                if ( this.modified || this.type !== type ) {
+                    canvas = this._canvas;
+    
+                    if ( type === 'image/jpeg' ) {
+    
+                        blob = Util.canvasToDataUrl( canvas, type, opts.quality );
+    
+                        if ( opts.preserveHeaders && this._metas &&
+                                this._metas.imageHead ) {
+    
+                            blob = Util.dataURL2ArrayBuffer( blob );
+                            blob = Util.updateImageHead( blob,
+                                    this._metas.imageHead );
+                            blob = Util.arrayBufferToBlob( blob, type );
+                            return blob;
+                        }
+                    } else {
+                        blob = Util.canvasToDataUrl( canvas, type );
+                    }
+    
+                    blob = Util.dataURL2Blob( blob );
+                }
+    
+                return blob;
+            },
+    
+            getAsDataUrl: function( type ) {
+                var opts = this.options;
+    
+                type = type || this.type;
+    
+                if ( type === 'image/jpeg' ) {
+                    return Util.canvasToDataUrl( this._canvas, type, opts.quality );
+                } else {
+                    return this._canvas.toDataURL( type );
+                }
+            },
+    
+            getOrientation: function() {
+                return this._metas && this._metas.exif &&
+                        this._metas.exif.get('Orientation') || 1;
+            },
+    
+            info: function( val ) {
+    
+                // setter
+                if ( val ) {
+                    this._info = val;
+                    return this;
+                }
+    
+                // getter
+                return this._info;
+            },
+    
+            meta: function( val ) {
+    
+                // setter
+                if ( val ) {
+                    this._metas = val;
+                    return this;
+                }
+    
+                // getter
+                return this._metas;
+            },
+    
+            destroy: function() {
+                var canvas = this._canvas;
+                this._img.onload = null;
+    
+                if ( canvas ) {
+                    canvas.getContext('2d')
+                            .clearRect( 0, 0, canvas.width, canvas.height );
+                    canvas.width = canvas.height = 0;
+                    this._canvas = null;
+                }
+    
+                // 释放内存。非常重要，否则释放不了image的内存。
+                this._img.src = BLANK;
+                this._img = this._blob = null;
+            },
+    
+            _resize: function( img, cvs, width, height ) {
+                var opts = this.options,
+                    naturalWidth = img.width,
+                    naturalHeight = img.height,
+                    orientation = this.getOrientation(),
+                    scale, w, h, x, y;
+    
+                // values that require 90 degree rotation
+                if ( ~[ 5, 6, 7, 8 ].indexOf( orientation ) ) {
+    
+                    // 交换width, height的值。
+                    width ^= height;
+                    height ^= width;
+                    width ^= height;
+                }
+    
+                scale = Math[ opts.crop ? 'max' : 'min' ]( width / naturalWidth,
+                        height / naturalHeight );
+    
+                // 不允许放大。
+                opts.allowMagnify || (scale = Math.min( 1, scale ));
+    
+                w = naturalWidth * scale;
+                h = naturalHeight * scale;
+    
+                if ( opts.crop ) {
+                    cvs.width = width;
+                    cvs.height = height;
+                } else {
+                    cvs.width = w;
+                    cvs.height = h;
+                }
+    
+                x = (cvs.width - w) / 2;
+                y = (cvs.height - h) / 2;
+    
+                opts.preserveHeaders || this._rotate2Orientaion( cvs, orientation );
+    
+                this._renderImageToCanvas( cvs, img, x, y, w, h );
+            },
+    
+            _rotate2Orientaion: function( canvas, orientation ) {
+                var width = canvas.width,
+                    height = canvas.height,
+                    ctx = canvas.getContext('2d');
+    
+                switch ( orientation ) {
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        canvas.width = height;
+                        canvas.height = width;
+                        break;
+                }
+    
+                switch ( orientation ) {
+                    case 2:    // horizontal flip
+                        ctx.translate( width, 0 );
+                        ctx.scale( -1, 1 );
+                        break;
+    
+                    case 3:    // 180 rotate left
+                        ctx.translate( width, height );
+                        ctx.rotate( Math.PI );
+                        break;
+    
+                    case 4:    // vertical flip
+                        ctx.translate( 0, height );
+                        ctx.scale( 1, -1 );
+                        break;
+    
+                    case 5:    // vertical flip + 90 rotate right
+                        ctx.rotate( 0.5 * Math.PI );
+                        ctx.scale( 1, -1 );
+                        break;
+    
+                    case 6:    // 90 rotate right
+                        ctx.rotate( 0.5 * Math.PI );
+                        ctx.translate( 0, -height );
+                        break;
+    
+                    case 7:    // horizontal flip + 90 rotate right
+                        ctx.rotate( 0.5 * Math.PI );
+                        ctx.translate( width, -height );
+                        ctx.scale( -1, 1 );
+                        break;
+    
+                    case 8:    // 90 rotate left
+                        ctx.rotate( -0.5 * Math.PI );
+                        ctx.translate( -width, 0 );
+                        break;
+                }
+            },
+    
+            // https://github.com/stomita/ios-imagefile-megapixel/
+            // blob/master/src/megapix-image.js
+            _renderImageToCanvas: (function() {
+    
+                // 如果不是ios, 不需要这么复杂！
+                if ( !Base.os.ios ) {
+                    return function( canvas ) {
+                        var args = Base.slice( arguments, 1 ),
+                            ctx = canvas.getContext('2d');
+    
+                        ctx.drawImage.apply( ctx, args );
+                    };
+                }
+    
+                /**
+                 * Detecting vertical squash in loaded image.
+                 * Fixes a bug which squash image vertically while drawing into
+                 * canvas for some images.
+                 */
+                function detectVerticalSquash( img, iw, ih ) {
+                    var canvas = document.createElement('canvas'),
+                        ctx = canvas.getContext('2d'),
+                        sy = 0,
+                        ey = ih,
+                        py = ih,
+                        data, alpha, ratio;
+    
+    
+                    canvas.width = 1;
+                    canvas.height = ih;
+                    ctx.drawImage( img, 0, 0 );
+                    data = ctx.getImageData( 0, 0, 1, ih ).data;
+    
+                    // search image edge pixel position in case
+                    // it is squashed vertically.
+                    while ( py > sy ) {
+                        alpha = data[ (py - 1) * 4 + 3 ];
+    
+                        if ( alpha === 0 ) {
+                            ey = py;
+                        } else {
+                            sy = py;
+                        }
+    
+                        py = (ey + sy) >> 1;
+                    }
+    
+                    ratio = (py / ih);
+                    return (ratio === 0) ? 1 : ratio;
+                }
+    
+                // fix ie7 bug
+                // http://stackoverflow.com/questions/11929099/
+                // html5-canvas-drawimage-ratio-bug-ios
+                if ( Base.os.ios >= 7 ) {
+                    return function( canvas, img, x, y, w, h ) {
+                        var iw = img.naturalWidth,
+                            ih = img.naturalHeight,
+                            vertSquashRatio = detectVerticalSquash( img, iw, ih );
+    
+                        return canvas.getContext('2d').drawImage( img, 0, 0,
+                                iw * vertSquashRatio, ih * vertSquashRatio,
+                                x, y, w, h );
+                    };
+                }
+    
+                /**
+                 * Detect subsampling in loaded image.
+                 * In iOS, larger images than 2M pixels may be
+                 * subsampled in rendering.
+                 */
+                function detectSubsampling( img ) {
+                    var iw = img.naturalWidth,
+                        ih = img.naturalHeight,
+                        canvas, ctx;
+    
+                    // subsampling may happen overmegapixel image
+                    if ( iw * ih > 1024 * 1024 ) {
+                        canvas = document.createElement('canvas');
+                        canvas.width = canvas.height = 1;
+                        ctx = canvas.getContext('2d');
+                        ctx.drawImage( img, -iw + 1, 0 );
+    
+                        // subsampled image becomes half smaller in rendering size.
+                        // check alpha channel value to confirm image is covering
+                        // edge pixel or not. if alpha value is 0
+                        // image is not covering, hence subsampled.
+                        return ctx.getImageData( 0, 0, 1, 1 ).data[ 3 ] === 0;
+                    } else {
+                        return false;
+                    }
+                }
+    
+    
+                return function( canvas, img, x, y, width, height ) {
+                    var iw = img.naturalWidth,
+                        ih = img.naturalHeight,
+                        ctx = canvas.getContext('2d'),
+                        subsampled = detectSubsampling( img ),
+                        doSquash = this.type === 'image/jpeg',
+                        d = 1024,
+                        sy = 0,
+                        dy = 0,
+                        tmpCanvas, tmpCtx, vertSquashRatio, dw, dh, sx, dx;
+    
+                    if ( subsampled ) {
+                        iw /= 2;
+                        ih /= 2;
+                    }
+    
+                    ctx.save();
+                    tmpCanvas = document.createElement('canvas');
+                    tmpCanvas.width = tmpCanvas.height = d;
+    
+                    tmpCtx = tmpCanvas.getContext('2d');
+                    vertSquashRatio = doSquash ?
+                            detectVerticalSquash( img, iw, ih ) : 1;
+    
+                    dw = Math.ceil( d * width / iw );
+                    dh = Math.ceil( d * height / ih / vertSquashRatio );
+    
+                    while ( sy < ih ) {
+                        sx = 0;
+                        dx = 0;
+                        while ( sx < iw ) {
+                            tmpCtx.clearRect( 0, 0, d, d );
+                            tmpCtx.drawImage( img, -sx, -sy );
+                            ctx.drawImage( tmpCanvas, 0, 0, d, d,
+                                    x + dx, y + dy, dw, dh );
+                            sx += d;
+                            dx += dw;
+                        }
+                        sy += d;
+                        dy += dh;
+                    }
+                    ctx.restore();
+                    tmpCanvas = tmpCtx = null;
+                };
+            })()
+        });
+    });
+    
+    /**
+     * @fileOverview Transport
+     * @todo 支持chunked传输，优势：
+     * 可以将大文件分成小块，挨个传输，可以提高大文件成功率，当失败的时候，也只需要重传那小部分，
+     * 而不需要重头再传一次。另外断点续传也需要用chunked方式。
+     */
+    define('runtime/html5/transport',[
+        'base',
+        'runtime/html5/runtime'
+    ], function( Base, Html5Runtime ) {
+    
+        var noop = Base.noop,
+            $ = Base.$;
+    
+        return Html5Runtime.register( 'Transport', {
+            init: function() {
+                this._status = 0;
+                this._response = null;
+            },
+    
+            send: function() {
+                var owner = this.owner,
+                    opts = this.options,
+                    xhr = this._initAjax(),
+                    blob = owner._blob,
+                    server = opts.server,
+                    formData, binary, fr;
+    
+                if ( opts.sendAsBinary ) {
+                    server += opts.attachInfoToQuery !== false ? ((/\?/.test( server ) ? '&' : '?') +
+                            $.param( owner._formData )) : '';
+    
+                    binary = blob.getSource();
+                } else {
+                    formData = new FormData();
+                    $.each( owner._formData, function( k, v ) {
+                        formData.append( k, v );
+                    });
+    
+                    formData.append( opts.fileVal, blob.getSource(),
+                            opts.filename || owner._formData.name || '' );
+                }
+    
+                if ( opts.withCredentials && 'withCredentials' in xhr ) {
+                    xhr.open( opts.method, server, true );
+                    xhr.withCredentials = true;
+                } else {
+                    xhr.open( opts.method, server );
+                }
+    
+                this._setRequestHeader( xhr, opts.headers );
+    
+                if ( binary ) {
+                    // 强制设置成 content-type 为文件流。
+                    xhr.overrideMimeType &&
+                            xhr.overrideMimeType('application/octet-stream');
+    
+                    // android直接发送blob会导致服务端接收到的是空文件。
+                    // bug详情。
+                    // https://code.google.com/p/android/issues/detail?id=39882
+                    // 所以先用fileReader读取出来再通过arraybuffer的方式发送。
+                    if ( Base.os.android ) {
+                        fr = new FileReader();
+    
+                        fr.onload = function() {
+                            xhr.send( this.result );
+                            fr = fr.onload = null;
+                        };
+    
+                        fr.readAsArrayBuffer( binary );
+                    } else {
+                        xhr.send( binary );
+                    }
+                } else {
+                    xhr.send( formData );
+                }
+            },
+    
+            getResponse: function() {
+                return this._response;
+            },
+    
+            getResponseAsJson: function() {
+                return this._parseJson( this._response );
+            },
+    
+            getResponseHeaders: function() {
+                return this._headers;
+            },
+    
+            getStatus: function() {
+                return this._status;
+            },
+    
+            abort: function() {
+                var xhr = this._xhr;
+    
+                if ( xhr ) {
+                    xhr.upload.onprogress = noop;
+                    xhr.onreadystatechange = noop;
+                    xhr.abort();
+    
+                    this._xhr = xhr = null;
+                }
+            },
+    
+            destroy: function() {
+                this.abort();
+            },
+    
+            _parseHeader: function(raw) {
+                var ret = {};
+    
+                raw && raw.replace(/^([^\:]+):(.*)$/mg, function(_, key, value) {
+                    ret[key.trim()] = value.trim();
+                });
+    
+                return ret;
+            },
+    
+            _initAjax: function() {
+                var me = this,
+                    xhr = new XMLHttpRequest(),
+                    opts = this.options;
+    
+                if ( opts.withCredentials && !('withCredentials' in xhr) &&
+                        typeof XDomainRequest !== 'undefined' ) {
+                    xhr = new XDomainRequest();
+                }
+    
+                xhr.upload.onprogress = function( e ) {
+                    var percentage = 0;
+    
+                    if ( e.lengthComputable ) {
+                        percentage = e.loaded / e.total;
+                    }
+    
+                    return me.trigger( 'progress', percentage );
+                };
+    
+                xhr.onreadystatechange = function() {
+    
+                    if ( xhr.readyState !== 4 ) {
+                        return;
+                    }
+    
+                    xhr.upload.onprogress = noop;
+                    xhr.onreadystatechange = noop;
+                    me._xhr = null;
+                    me._status = xhr.status;
+    
+                    var separator = '|', // 分隔符
+                         // 拼接的状态，在 widgets/upload.js 会有代码用到这个分隔符
+                        status = separator + xhr.status +
+                                 separator + xhr.statusText;
+    
+                    if ( xhr.status >= 200 && xhr.status < 300 ) {
+                        me._response = xhr.responseText;
+                        me._headers = me._parseHeader(xhr.getAllResponseHeaders());
+                        return me.trigger('load');
+                    } else if ( xhr.status >= 500 && xhr.status < 600 ) {
+                        me._response = xhr.responseText;
+                        me._headers = me._parseHeader(xhr.getAllResponseHeaders());
+                        return me.trigger( 'error', 'server' + status );
+                    }
+    
+    
+                    return me.trigger( 'error', me._status ? 'http' + status : 'abort' );
+                };
+    
+                me._xhr = xhr;
+                return xhr;
+            },
+    
+            _setRequestHeader: function( xhr, headers ) {
+                $.each( headers, function( key, val ) {
+                    xhr.setRequestHeader( key, val );
+                });
+            },
+    
+            _parseJson: function( str ) {
+                var json;
+    
+                try {
+                    json = JSON.parse( str );
+                } catch ( ex ) {
+                    json = {};
+                }
+    
+                return json;
+            }
+        });
+    });
+    
+    /**
+     * @fileOverview  Transport flash实现
+     */
+    define('runtime/html5/md5',[
+        'runtime/html5/runtime'
+    ], function( FlashRuntime ) {
+    
+        /*
+         * Fastest md5 implementation around (JKM md5)
+         * Credits: Joseph Myers
+         *
+         * @see http://www.myersdaily.org/joseph/javascript/md5-text.html
+         * @see http://jsperf.com/md5-shootout/7
+         */
+    
+        /* this function is much faster,
+          so if possible we use it. Some IEs
+          are the only ones I know of that
+          need the idiotic second function,
+          generated by an if clause.  */
+        var add32 = function (a, b) {
+            return (a + b) & 0xFFFFFFFF;
+        },
+    
+        cmn = function (q, a, b, x, s, t) {
+            a = add32(add32(a, q), add32(x, t));
+            return add32((a << s) | (a >>> (32 - s)), b);
+        },
+    
+        ff = function (a, b, c, d, x, s, t) {
+            return cmn((b & c) | ((~b) & d), a, b, x, s, t);
+        },
+    
+        gg = function (a, b, c, d, x, s, t) {
+            return cmn((b & d) | (c & (~d)), a, b, x, s, t);
+        },
+    
+        hh = function (a, b, c, d, x, s, t) {
+            return cmn(b ^ c ^ d, a, b, x, s, t);
+        },
+    
+        ii = function (a, b, c, d, x, s, t) {
+            return cmn(c ^ (b | (~d)), a, b, x, s, t);
+        },
+    
+        md5cycle = function (x, k) {
+            var a = x[0],
+                b = x[1],
+                c = x[2],
+                d = x[3];
+    
+            a = ff(a, b, c, d, k[0], 7, -680876936);
+            d = ff(d, a, b, c, k[1], 12, -389564586);
+            c = ff(c, d, a, b, k[2], 17, 606105819);
+            b = ff(b, c, d, a, k[3], 22, -1044525330);
+            a = ff(a, b, c, d, k[4], 7, -176418897);
+            d = ff(d, a, b, c, k[5], 12, 1200080426);
+            c = ff(c, d, a, b, k[6], 17, -1473231341);
+            b = ff(b, c, d, a, k[7], 22, -45705983);
+            a = ff(a, b, c, d, k[8], 7, 1770035416);
+            d = ff(d, a, b, c, k[9], 12, -1958414417);
+            c = ff(c, d, a, b, k[10], 17, -42063);
+            b = ff(b, c, d, a, k[11], 22, -1990404162);
+            a = ff(a, b, c, d, k[12], 7, 1804603682);
+            d = ff(d, a, b, c, k[13], 12, -40341101);
+            c = ff(c, d, a, b, k[14], 17, -1502002290);
+            b = ff(b, c, d, a, k[15], 22, 1236535329);
+    
+            a = gg(a, b, c, d, k[1], 5, -165796510);
+            d = gg(d, a, b, c, k[6], 9, -1069501632);
+            c = gg(c, d, a, b, k[11], 14, 643717713);
+            b = gg(b, c, d, a, k[0], 20, -373897302);
+            a = gg(a, b, c, d, k[5], 5, -701558691);
+            d = gg(d, a, b, c, k[10], 9, 38016083);
+            c = gg(c, d, a, b, k[15], 14, -660478335);
+            b = gg(b, c, d, a, k[4], 20, -405537848);
+            a = gg(a, b, c, d, k[9], 5, 568446438);
+            d = gg(d, a, b, c, k[14], 9, -1019803690);
+            c = gg(c, d, a, b, k[3], 14, -187363961);
+            b = gg(b, c, d, a, k[8], 20, 1163531501);
+            a = gg(a, b, c, d, k[13], 5, -1444681467);
+            d = gg(d, a, b, c, k[2], 9, -51403784);
+            c = gg(c, d, a, b, k[7], 14, 1735328473);
+            b = gg(b, c, d, a, k[12], 20, -1926607734);
+    
+            a = hh(a, b, c, d, k[5], 4, -378558);
+            d = hh(d, a, b, c, k[8], 11, -2022574463);
+            c = hh(c, d, a, b, k[11], 16, 1839030562);
+            b = hh(b, c, d, a, k[14], 23, -35309556);
+            a = hh(a, b, c, d, k[1], 4, -1530992060);
+            d = hh(d, a, b, c, k[4], 11, 1272893353);
+            c = hh(c, d, a, b, k[7], 16, -155497632);
+            b = hh(b, c, d, a, k[10], 23, -1094730640);
+            a = hh(a, b, c, d, k[13], 4, 681279174);
+            d = hh(d, a, b, c, k[0], 11, -358537222);
+            c = hh(c, d, a, b, k[3], 16, -722521979);
+            b = hh(b, c, d, a, k[6], 23, 76029189);
+            a = hh(a, b, c, d, k[9], 4, -640364487);
+            d = hh(d, a, b, c, k[12], 11, -421815835);
+            c = hh(c, d, a, b, k[15], 16, 530742520);
+            b = hh(b, c, d, a, k[2], 23, -995338651);
+    
+            a = ii(a, b, c, d, k[0], 6, -198630844);
+            d = ii(d, a, b, c, k[7], 10, 1126891415);
+            c = ii(c, d, a, b, k[14], 15, -1416354905);
+            b = ii(b, c, d, a, k[5], 21, -57434055);
+            a = ii(a, b, c, d, k[12], 6, 1700485571);
+            d = ii(d, a, b, c, k[3], 10, -1894986606);
+            c = ii(c, d, a, b, k[10], 15, -1051523);
+            b = ii(b, c, d, a, k[1], 21, -2054922799);
+            a = ii(a, b, c, d, k[8], 6, 1873313359);
+            d = ii(d, a, b, c, k[15], 10, -30611744);
+            c = ii(c, d, a, b, k[6], 15, -1560198380);
+            b = ii(b, c, d, a, k[13], 21, 1309151649);
+            a = ii(a, b, c, d, k[4], 6, -145523070);
+            d = ii(d, a, b, c, k[11], 10, -1120210379);
+            c = ii(c, d, a, b, k[2], 15, 718787259);
+            b = ii(b, c, d, a, k[9], 21, -343485551);
+    
+            x[0] = add32(a, x[0]);
+            x[1] = add32(b, x[1]);
+            x[2] = add32(c, x[2]);
+            x[3] = add32(d, x[3]);
+        },
+    
+        /* there needs to be support for Unicode here,
+           * unless we pretend that we can redefine the MD-5
+           * algorithm for multi-byte characters (perhaps
+           * by adding every four 16-bit characters and
+           * shortening the sum to 32 bits). Otherwise
+           * I suggest performing MD-5 as if every character
+           * was two bytes--e.g., 0040 0025 = @%--but then
+           * how will an ordinary MD-5 sum be matched?
+           * There is no way to standardize text to something
+           * like UTF-8 before transformation; speed cost is
+           * utterly prohibitive. The JavaScript standard
+           * itself needs to look at this: it should start
+           * providing access to strings as preformed UTF-8
+           * 8-bit unsigned value arrays.
+           */
+        md5blk = function (s) {
+            var md5blks = [],
+                i; /* Andy King said do it this way. */
+    
+            for (i = 0; i < 64; i += 4) {
+                md5blks[i >> 2] = s.charCodeAt(i) + (s.charCodeAt(i + 1) << 8) + (s.charCodeAt(i + 2) << 16) + (s.charCodeAt(i + 3) << 24);
+            }
+            return md5blks;
+        },
+    
+        md5blk_array = function (a) {
+            var md5blks = [],
+                i; /* Andy King said do it this way. */
+    
+            for (i = 0; i < 64; i += 4) {
+                md5blks[i >> 2] = a[i] + (a[i + 1] << 8) + (a[i + 2] << 16) + (a[i + 3] << 24);
+            }
+            return md5blks;
+        },
+    
+        md51 = function (s) {
+            var n = s.length,
+                state = [1732584193, -271733879, -1732584194, 271733878],
+                i,
+                length,
+                tail,
+                tmp,
+                lo,
+                hi;
+    
+            for (i = 64; i <= n; i += 64) {
+                md5cycle(state, md5blk(s.substring(i - 64, i)));
+            }
+            s = s.substring(i - 64);
+            length = s.length;
+            tail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            for (i = 0; i < length; i += 1) {
+                tail[i >> 2] |= s.charCodeAt(i) << ((i % 4) << 3);
+            }
+            tail[i >> 2] |= 0x80 << ((i % 4) << 3);
+            if (i > 55) {
+                md5cycle(state, tail);
+                for (i = 0; i < 16; i += 1) {
+                    tail[i] = 0;
+                }
+            }
+    
+            // Beware that the final length might not fit in 32 bits so we take care of that
+            tmp = n * 8;
+            tmp = tmp.toString(16).match(/(.*?)(.{0,8})$/);
+            lo = parseInt(tmp[2], 16);
+            hi = parseInt(tmp[1], 16) || 0;
+    
+            tail[14] = lo;
+            tail[15] = hi;
+    
+            md5cycle(state, tail);
+            return state;
+        },
+    
+        md51_array = function (a) {
+            var n = a.length,
+                state = [1732584193, -271733879, -1732584194, 271733878],
+                i,
+                length,
+                tail,
+                tmp,
+                lo,
+                hi;
+    
+            for (i = 64; i <= n; i += 64) {
+                md5cycle(state, md5blk_array(a.subarray(i - 64, i)));
+            }
+    
+            // Not sure if it is a bug, however IE10 will always produce a sub array of length 1
+            // containing the last element of the parent array if the sub array specified starts
+            // beyond the length of the parent array - weird.
+            // https://connect.microsoft.com/IE/feedback/details/771452/typed-array-subarray-issue
+            a = (i - 64) < n ? a.subarray(i - 64) : new Uint8Array(0);
+    
+            length = a.length;
+            tail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            for (i = 0; i < length; i += 1) {
+                tail[i >> 2] |= a[i] << ((i % 4) << 3);
+            }
+    
+            tail[i >> 2] |= 0x80 << ((i % 4) << 3);
+            if (i > 55) {
+                md5cycle(state, tail);
+                for (i = 0; i < 16; i += 1) {
+                    tail[i] = 0;
+                }
+            }
+    
+            // Beware that the final length might not fit in 32 bits so we take care of that
+            tmp = n * 8;
+            tmp = tmp.toString(16).match(/(.*?)(.{0,8})$/);
+            lo = parseInt(tmp[2], 16);
+            hi = parseInt(tmp[1], 16) || 0;
+    
+            tail[14] = lo;
+            tail[15] = hi;
+    
+            md5cycle(state, tail);
+    
+            return state;
+        },
+    
+        hex_chr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'],
+    
+        rhex = function (n) {
+            var s = '',
+                j;
+            for (j = 0; j < 4; j += 1) {
+                s += hex_chr[(n >> (j * 8 + 4)) & 0x0F] + hex_chr[(n >> (j * 8)) & 0x0F];
+            }
+            return s;
+        },
+    
+        hex = function (x) {
+            var i;
+            for (i = 0; i < x.length; i += 1) {
+                x[i] = rhex(x[i]);
+            }
+            return x.join('');
+        },
+    
+        md5 = function (s) {
+            return hex(md51(s));
+        },
+    
+    
+    
+        ////////////////////////////////////////////////////////////////////////////
+    
+        /**
+         * SparkMD5 OOP implementation.
+         *
+         * Use this class to perform an incremental md5, otherwise use the
+         * static methods instead.
+         */
+        SparkMD5 = function () {
+            // call reset to init the instance
+            this.reset();
+        };
+    
+    
+        // In some cases the fast add32 function cannot be used..
+        if (md5('hello') !== '5d41402abc4b2a76b9719d911017c592') {
+            add32 = function (x, y) {
+                var lsw = (x & 0xFFFF) + (y & 0xFFFF),
+                    msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+                return (msw << 16) | (lsw & 0xFFFF);
+            };
+        }
+    
+    
+        /**
+         * Appends a string.
+         * A conversion will be applied if an utf8 string is detected.
+         *
+         * @param {String} str The string to be appended
+         *
+         * @return {SparkMD5} The instance itself
+         */
+        SparkMD5.prototype.append = function (str) {
+            // converts the string to utf8 bytes if necessary
+            if (/[\u0080-\uFFFF]/.test(str)) {
+                str = unescape(encodeURIComponent(str));
+            }
+    
+            // then append as binary
+            this.appendBinary(str);
+    
+            return this;
+        };
+    
+        /**
+         * Appends a binary string.
+         *
+         * @param {String} contents The binary string to be appended
+         *
+         * @return {SparkMD5} The instance itself
+         */
+        SparkMD5.prototype.appendBinary = function (contents) {
+            this._buff += contents;
+            this._length += contents.length;
+    
+            var length = this._buff.length,
+                i;
+    
+            for (i = 64; i <= length; i += 64) {
+                md5cycle(this._state, md5blk(this._buff.substring(i - 64, i)));
+            }
+    
+            this._buff = this._buff.substr(i - 64);
+    
+            return this;
+        };
+    
+        /**
+         * Finishes the incremental computation, reseting the internal state and
+         * returning the result.
+         * Use the raw parameter to obtain the raw result instead of the hex one.
+         *
+         * @param {Boolean} raw True to get the raw result, false to get the hex result
+         *
+         * @return {String|Array} The result
+         */
+        SparkMD5.prototype.end = function (raw) {
+            var buff = this._buff,
+                length = buff.length,
+                i,
+                tail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ret;
+    
+            for (i = 0; i < length; i += 1) {
+                tail[i >> 2] |= buff.charCodeAt(i) << ((i % 4) << 3);
+            }
+    
+            this._finish(tail, length);
+            ret = !!raw ? this._state : hex(this._state);
+    
+            this.reset();
+    
+            return ret;
+        };
+    
+        /**
+         * Finish the final calculation based on the tail.
+         *
+         * @param {Array}  tail   The tail (will be modified)
+         * @param {Number} length The length of the remaining buffer
+         */
+        SparkMD5.prototype._finish = function (tail, length) {
+            var i = length,
+                tmp,
+                lo,
+                hi;
+    
+            tail[i >> 2] |= 0x80 << ((i % 4) << 3);
+            if (i > 55) {
+                md5cycle(this._state, tail);
+                for (i = 0; i < 16; i += 1) {
+                    tail[i] = 0;
+                }
+            }
+    
+            // Do the final computation based on the tail and length
+            // Beware that the final length may not fit in 32 bits so we take care of that
+            tmp = this._length * 8;
+            tmp = tmp.toString(16).match(/(.*?)(.{0,8})$/);
+            lo = parseInt(tmp[2], 16);
+            hi = parseInt(tmp[1], 16) || 0;
+    
+            tail[14] = lo;
+            tail[15] = hi;
+            md5cycle(this._state, tail);
+        };
+    
+        /**
+         * Resets the internal state of the computation.
+         *
+         * @return {SparkMD5} The instance itself
+         */
+        SparkMD5.prototype.reset = function () {
+            this._buff = "";
+            this._length = 0;
+            this._state = [1732584193, -271733879, -1732584194, 271733878];
+    
+            return this;
+        };
+    
+        /**
+         * Releases memory used by the incremental buffer and other aditional
+         * resources. If you plan to use the instance again, use reset instead.
+         */
+        SparkMD5.prototype.destroy = function () {
+            delete this._state;
+            delete this._buff;
+            delete this._length;
+        };
+    
+    
+        /**
+         * Performs the md5 hash on a string.
+         * A conversion will be applied if utf8 string is detected.
+         *
+         * @param {String}  str The string
+         * @param {Boolean} raw True to get the raw result, false to get the hex result
+         *
+         * @return {String|Array} The result
+         */
+        SparkMD5.hash = function (str, raw) {
+            // converts the string to utf8 bytes if necessary
+            if (/[\u0080-\uFFFF]/.test(str)) {
+                str = unescape(encodeURIComponent(str));
+            }
+    
+            var hash = md51(str);
+    
+            return !!raw ? hash : hex(hash);
+        };
+    
+        /**
+         * Performs the md5 hash on a binary string.
+         *
+         * @param {String}  content The binary string
+         * @param {Boolean} raw     True to get the raw result, false to get the hex result
+         *
+         * @return {String|Array} The result
+         */
+        SparkMD5.hashBinary = function (content, raw) {
+            var hash = md51(content);
+    
+            return !!raw ? hash : hex(hash);
+        };
+    
+        /**
+         * SparkMD5 OOP implementation for array buffers.
+         *
+         * Use this class to perform an incremental md5 ONLY for array buffers.
+         */
+        SparkMD5.ArrayBuffer = function () {
+            // call reset to init the instance
+            this.reset();
+        };
+    
+        ////////////////////////////////////////////////////////////////////////////
+    
+        /**
+         * Appends an array buffer.
+         *
+         * @param {ArrayBuffer} arr The array to be appended
+         *
+         * @return {SparkMD5.ArrayBuffer} The instance itself
+         */
+        SparkMD5.ArrayBuffer.prototype.append = function (arr) {
+            // TODO: we could avoid the concatenation here but the algorithm would be more complex
+            //       if you find yourself needing extra performance, please make a PR.
+            var buff = this._concatArrayBuffer(this._buff, arr),
+                length = buff.length,
+                i;
+    
+            this._length += arr.byteLength;
+    
+            for (i = 64; i <= length; i += 64) {
+                md5cycle(this._state, md5blk_array(buff.subarray(i - 64, i)));
+            }
+    
+            // Avoids IE10 weirdness (documented above)
+            this._buff = (i - 64) < length ? buff.subarray(i - 64) : new Uint8Array(0);
+    
+            return this;
+        };
+    
+        /**
+         * Finishes the incremental computation, reseting the internal state and
+         * returning the result.
+         * Use the raw parameter to obtain the raw result instead of the hex one.
+         *
+         * @param {Boolean} raw True to get the raw result, false to get the hex result
+         *
+         * @return {String|Array} The result
+         */
+        SparkMD5.ArrayBuffer.prototype.end = function (raw) {
+            var buff = this._buff,
+                length = buff.length,
+                tail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                i,
+                ret;
+    
+            for (i = 0; i < length; i += 1) {
+                tail[i >> 2] |= buff[i] << ((i % 4) << 3);
+            }
+    
+            this._finish(tail, length);
+            ret = !!raw ? this._state : hex(this._state);
+    
+            this.reset();
+    
+            return ret;
+        };
+    
+        SparkMD5.ArrayBuffer.prototype._finish = SparkMD5.prototype._finish;
+    
+        /**
+         * Resets the internal state of the computation.
+         *
+         * @return {SparkMD5.ArrayBuffer} The instance itself
+         */
+        SparkMD5.ArrayBuffer.prototype.reset = function () {
+            this._buff = new Uint8Array(0);
+            this._length = 0;
+            this._state = [1732584193, -271733879, -1732584194, 271733878];
+    
+            return this;
+        };
+    
+        /**
+         * Releases memory used by the incremental buffer and other aditional
+         * resources. If you plan to use the instance again, use reset instead.
+         */
+        SparkMD5.ArrayBuffer.prototype.destroy = SparkMD5.prototype.destroy;
+    
+        /**
+         * Concats two array buffers, returning a new one.
+         *
+         * @param  {ArrayBuffer} first  The first array buffer
+         * @param  {ArrayBuffer} second The second array buffer
+         *
+         * @return {ArrayBuffer} The new array buffer
+         */
+        SparkMD5.ArrayBuffer.prototype._concatArrayBuffer = function (first, second) {
+            var firstLength = first.length,
+                result = new Uint8Array(firstLength + second.byteLength);
+    
+            result.set(first);
+            result.set(new Uint8Array(second), firstLength);
+    
+            return result;
+        };
+    
+        /**
+         * Performs the md5 hash on an array buffer.
+         *
+         * @param {ArrayBuffer} arr The array buffer
+         * @param {Boolean}     raw True to get the raw result, false to get the hex result
+         *
+         * @return {String|Array} The result
+         */
+        SparkMD5.ArrayBuffer.hash = function (arr, raw) {
+            var hash = md51_array(new Uint8Array(arr));
+    
+            return !!raw ? hash : hex(hash);
+        };
+        
+        return FlashRuntime.register( 'Md5', {
+            init: function() {
+                // do nothing.
+            },
+    
+            loadFromBlob: function( file ) {
+                var blob = file.getSource(),
+                    chunkSize = 2 * 1024 * 1024,
+                    chunks = Math.ceil( blob.size / chunkSize ),
+                    chunk = 0,
+                    owner = this.owner,
+                    spark = new SparkMD5.ArrayBuffer(),
+                    me = this,
+                    blobSlice = blob.mozSlice || blob.webkitSlice || blob.slice,
+                    loadNext, fr;
+    
+                fr = new FileReader();
+    
+                loadNext = function() {
+                    var start, end;
+    
+                    start = chunk * chunkSize;
+                    end = Math.min( start + chunkSize, blob.size );
+    
+                    fr.onload = function( e ) {
+                        spark.append( e.target.result );
+                        owner.trigger( 'progress', {
+                            total: file.size,
+                            loaded: end
+                        });
+                    };
+    
+                    fr.onloadend = function() {
+                        fr.onloadend = fr.onload = null;
+    
+                        if ( ++chunk < chunks ) {
+                            setTimeout( loadNext, 1 );
+                        } else {
+                            setTimeout(function(){
+                                owner.trigger('load');
+                                me.result = spark.end();
+                                loadNext = file = blob = spark = null;
+                                owner.trigger('complete');
+                            }, 50 );
+                        }
+                    };
+    
+                    fr.readAsArrayBuffer( blobSlice.call( blob, start, end ) );
+                };
+    
+                loadNext();
+            },
+    
+            getResult: function() {
+                return this.result;
+            }
+        });
+    });
+    /**
+     * @fileOverview 完全版本。
+     */
+    define('preset/all',[
+        'base',
+    
+        // widgets
+        'widgets/filednd',
+        'widgets/filepaste',
+        'widgets/filepicker',
+        'widgets/image',
+        'widgets/queue',
+        'widgets/runtime',
+        'widgets/upload',
+        'widgets/validator',
+        'widgets/md5',
+    
+        // runtimes
+        // html5
+        'runtime/html5/blob',
+        'runtime/html5/dnd',
+        'runtime/html5/filepaste',
+        'runtime/html5/filepicker',
+        'runtime/html5/imagemeta/exif',
+        'runtime/html5/androidpatch',
+        'runtime/html5/image',
+        'runtime/html5/transport',
+        'runtime/html5/md5',
+    
+        // flash
+        // 'runtime/flash/filepicker',
+        // 'runtime/flash/image',
+        // 'runtime/flash/transport',
+        // 'runtime/flash/blob',
+        // 'runtime/flash/md5'
+    ], function( Base ) {
+        return Base;
+    });
+    
+    /**
+     * @fileOverview 日志组件，主要用来收集错误信息，可以帮助 webuploader 更好的定位问题和发展。
+     *
+     * 如果您不想要启用此功能，请在打包的时候去掉 log 模块。
+     *
+     * 或者可以在初始化的时候通过 options.disableWidgets 属性禁用。
+     *
+     * 如：
+     * WebUploader.create({
+     *     ...
+     *
+     *     disableWidgets: 'log',
+     *
+     *     ...
+     * })
+     */
+    define('widgets/log',[
+        'base',
+        'uploader',
+        'widgets/widget'
+    ], function( Base, Uploader ) {
+        var $ = Base.$,
+            logUrl = ' http://static.tieba.baidu.com/tb/pms/img/st.gif??',
+            product = (location.hostname || location.host || 'protected').toLowerCase(),
+    
+            // 只针对 baidu 内部产品用户做统计功能。
+            enable = product && /baidu/i.exec(product),
+            base;
+    
+        if (!enable) {
+            return;
+        }
+    
+        base = {
+            dv: 3,
+            master: 'webuploader',
+            online: /test/.exec(product) ? 0 : 1,
+            module: '',
+            product: product,
+            type: 0
+        };
+    
+        function send(data) {
+            var obj = $.extend({}, base, data),
+                url = logUrl.replace(/^(.*)\?/, '$1' + $.param( obj )),
+                image = new Image();
+    
+            image.src = url;
+        }
+    
+        return Uploader.register({
+            name: 'log',
+    
+            init: function() {
+                var owner = this.owner,
+                    count = 0,
+                    size = 0;
+    
+                owner
+                    .on('error', function(code) {
+                        send({
+                            type: 2,
+                            c_error_code: code
+                        });
+                    })
+                    .on('uploadError', function(file, reason) {
+                        send({
+                            type: 2,
+                            c_error_code: 'UPLOAD_ERROR',
+                            c_reason: '' + reason
+                        });
+                    })
+                    .on('uploadComplete', function(file) {
+                        count++;
+                        size += file.size;
+                    }).
+                    on('uploadFinished', function() {
+                        send({
+                            c_count: count,
+                            c_size: size
+                        });
+                        count = size = 0;
+                    });
+    
+                send({
+                    c_usage: 1
+                });
+            }
+        });
+    });
+    /**
+     * @fileOverview Uploader上传类
+     */
+    define('webuploader',[
+        'preset/all',
+        'widgets/log'
+    ], function( preset ) {
+        return preset;
+    });
+    return require('webuploader');
+});

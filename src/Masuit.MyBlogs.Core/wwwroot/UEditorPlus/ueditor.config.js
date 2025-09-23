@@ -10,14 +10,8 @@
  **************************提示********************************/
 
 (function () {
-    /**
-     * 编辑器资源文件根路径。它所表示的含义是：以编辑器实例化页面为当前路径，指向编辑器资源文件（即dialog等文件夹）的路径。
-     * 鉴于很多同学在使用编辑器的时候出现的种种路径问题，此处强烈建议大家使用"相对于网站根目录的相对路径"进行配置。
-     * "相对于网站根目录的相对路径"也就是以斜杠开头的形如"/myProject/ueditor/"这样的路径。
-     * 如果站点中有多个不在同一层级的页面需要实例化编辑器，且引用了同一UEditor的时候，此处的URL可能不适用于每个页面的编辑器。
-     * 因此，UEditor提供了针对不同页面的编辑器可单独配置的根路径，具体来说，在需要实例化编辑器的页面最顶部写上如下代码即可。当然，需要令此处的URL等于对应的配置。
-     * window.UEDITOR_HOME_URL = "/xxxx/xxxx/";
-     */
+    // 资源文件根路径，如果你的页面不是放在根目录下，请注意修改这个路径
+    // 通常情况下这个可以配置成静态资源CDN的地址
     var URL, CORS_URL;
     if (window.UEDITOR_HOME_URL) {
         URL = window.UEDITOR_HOME_URL;
@@ -28,6 +22,8 @@
     } else {
         URL = getUEBasePath();
     }
+    // 需要能跨域的静态资源请求，主要用户弹窗页面等静态资源
+    // 通常情况下这个可以配置成静态资源CDN的地址
     if (window.UEDITOR_CORS_URL) {
         CORS_URL = window.UEDITOR_CORS_URL;
     } else if (window.__msRoot) {
@@ -52,9 +48,18 @@
 
         // 服务器统一请求接口路径
         serverUrl: "/fileuploader",
+
+        // 从服务器获取配置
+        loadConfigFromServer: true,
+
         // 服务器统一请求头信息，会在所有请求中带上该信息
         serverHeaders: {
             // 'Authorization': 'Bearer xxx'
+        },
+        // 服务器返回参数统一转换方法，可以在这里统一处理返回参数
+        serverResponsePrepare: function (res) {
+            // console.log('serverResponsePrepare', res);
+            return res;
         },
 
         //工具栏上的所有的功能按钮和下拉框，可以在new编辑器的实例时选择自己需要的重新定义
@@ -126,7 +131,12 @@
             "formula",             // 公式
             'print',
             //"contentimport",
+            // 'ai'
         ]]
+        // 动态选项配置，该值可以通过后端配置接口动态返回，动态控制toolbars的功能
+        , toolbarShows: {
+            // "ai": false,
+        }
 
         // 自定义工具栏按钮点击，返回 true 表示已经处理点击，会阻止默认事件
         , toolbarCallback: function (cmd, editor) {
@@ -145,6 +155,33 @@
             //     editor.execCommand('insertHtml', '<p><a href="xxx.zip">下载文件</a></p>');
             //     return true;
             // }
+        }
+
+        // 自定义上传功能
+        , uploadServiceEnable: false
+        // 自定义上传函数，需要在这个函数中实现自定义上传逻辑
+        // type 上传类型，image 图片，video 视频，audio 音频，attachment 附件
+        // file 文件对象
+        // callback 回调函数，需要在上传完成后调用 callback.success、callback.error、callback.progress
+        // option 上传配置，其他一些未来扩展配置
+        , uploadServiceUpload: function (type, file, callback, option) {
+            console.log('uploadServiceUpload', type, file, callback, option);
+            // var i = 0;
+            // var call = function(){
+            //     i++;
+            //     if(i > 3){
+            //         callback.success({
+            //             "state": "SUCCESS",
+            //             "url": "https://ms-assets.modstart.com/demo/modstart.jpg",
+            //         })
+            //         return;
+            //     }
+            //     setTimeout(function(){
+            //         callback.progress(0.3 * i);
+            //         call();
+            //     },500);
+            // }
+            // call();
         }
 
         // 插入图片自定义配置
@@ -271,7 +308,7 @@
         // ,initialFrameHeight:320
 
         // 编辑器初始化结束后,编辑区域是否是只读的，默认是false
-        //, readonly: false
+        , readonly: false
 
         // getContent时，是否删除空的inlineElement节点（包括嵌套的情况）
         , autoClearEmptyNode: true
@@ -284,12 +321,8 @@
         // 启用图片拉伸缩放
         //,imageScaleEnabled: true
 
-        //启用自动保存
-        , enableAutoSave: false
-        //自动保存间隔时间， 单位ms
-        , saveInterval: 500000
         // 是否开启初始化时即全屏，默认关闭
-        //, fullscreen: false
+        , fullscreen: false
 
         // 图片操作的浮层开关，默认打开
         //,imagePopup:true
@@ -358,21 +391,25 @@
         //,autoTransWordToList:false  //禁止word中粘贴进来的列表自动变成列表标签
 
         // 字体设置 label 留空支持多语言自动切换，若配置，则以配置值为准
-        , 'fontfamily': [
-            { label: '', name: 'songti', val: '宋体,SimSun' },
-            { label: '', name: 'kaiti', val: '楷体,楷体_GB2312, SimKai' },
-            { label: '', name: 'yahei', val: '微软雅黑,Microsoft YaHei' },
-            { label: '', name: 'heiti', val: '黑体, SimHei' },
-            { label: '', name: 'lishu', val: '隶书, SimLi' },
-            { label: '', name: 'arial', val: 'arial, helvetica,sans-serif' },
-            { label: '', name: 'timesNewRoman', val: 'times new roman' }
-        ]
+        //,'fontfamily':[
+        //    { label:'',name:'songti',val:'宋体,SimSun'},
+        //    { label:'',name:'kaiti',val:'楷体,楷体_GB2312, SimKai'},
+        //    { label:'',name:'yahei',val:'微软雅黑,Microsoft YaHei'},
+        //    { label:'',name:'heiti',val:'黑体, SimHei'},
+        //    { label:'',name:'lishu',val:'隶书, SimLi'},
+        //    { label:'',name:'andaleMono',val:'andale mono'},
+        //    { label:'',name:'arial',val:'arial, helvetica,sans-serif'},
+        //    { label:'',name:'arialBlack',val:'arial black,avant garde'},
+        //    { label:'',name:'comicSansMs',val:'comic sans ms'},
+        //    { label:'',name:'impact',val:'impact,chicago'},
+        //    { label:'',name:'timesNewRoman',val:'times new roman'}
+        //]
 
         // 字号
-        , 'fontsize': [10, 11, 12, 14, 16, 18, 20, 24, 36, 48, 72, 96]
+        //,'fontsize':[10, 11, 12, 14, 16, 18, 20, 24, 36]
 
         // 段落格式 值留空时支持多语言自动识别，若配置，则以配置值为准
-        , 'paragraph': { 'p': '', 'h3': '', 'h4': '', 'h5': '', 'h6': '' }
+        //,'paragraph':{'p':'', 'h1':'', 'h2':'', 'h3':'', 'h4':'', 'h5':'', 'h6':''}
 
         // 段间距 值和显示的名字相同
         //,'rowspacingtop':['5', '10', '15', '20', '25']
@@ -416,32 +453,29 @@
 
         //快捷菜单
         , shortcutMenu: [
+            // "ai",           // AI智能
             // "fontfamily",   // 字体
             // "fontsize",     // 字号
-            "bold",         // 加粗
-            "italic",       // 斜体
-            "underline",    // 下划线
-            "strikethrough",// 删除线
-            "fontborder",   // 字符边框
-            "forecolor",    // 字体颜色
-            // "shadowcolor", // 字体阴影
-            "backcolor",   // 背景色
-            "imagenone",
-            "imageleft",
-            "imagecenter",
-            "imageright",
-            "insertimage",
+            "bold",            // 加粗
+            "italic",          // 斜体
+            "underline",       // 下划线
+            "strikethrough",   // 删除线
+            "fontborder",      // 字符边框
+            "forecolor",       // 字体颜色
+            "backcolor",       // 背景色
+            "imagenone",       // 图片默认
+            "imageleft",       // 图片左浮动
+            "imagecenter",     // 图片居中
+            "imageright",      // 图片右浮动
+            "insertimage",     // 插入图片
             "formula",
             // "justifyleft",    // 居左对齐
             // "justifycenter",  // 居中对齐
             // "justifyright",   // 居右对齐
             // "justifyjustify", // 两端对齐
-            // "textindent",  // 首行缩进
             // "rowspacingtop",     // 段前距
             // "rowspacingbottom",  // 段后距
-            // "outpadding",        // 两侧距离
             // "lineheight",           // 行间距
-            // "letterspacing" ,    // 字间距
             // "insertorderedlist",    // 有序列表
             // "insertunorderedlist",  // 无序列表
             // "superscript",    // 上标
@@ -451,6 +485,10 @@
             // "touppercase",    // 字母大写
             // "tolowercase"     // 字母小写
         ]
+        // 动态选项配置，该值可以通过后端配置接口动态返回，动态控制shortcutMenu的功能
+        , shortcutMenuShows: {
+            // "ai": false,
+        }
 
         // 是否启用元素路径，默认是显示
         , elementPathEnabled: true
@@ -478,21 +516,21 @@
         , maxInputCount: 1
 
         // 是否自动长高,默认true
-        //, autoHeightEnabled: true
+        , autoHeightEnabled: true
 
-        //scaleEnabled
-        //是否可以拉伸长高,默认true(当开启时，自动长高失效)
+        // 是否可以拉伸长高，默认true(当开启时，自动长高失效)
         //,scaleEnabled:false
         //,minFrameWidth:800    //编辑器拖动时最小宽度,默认800
-        //,minFrameHeight:220  //编辑器拖动时最小高度,默认220
 
-        //autoFloatEnabled
-        //是否保持toolbar的位置不动,默认true
-        //,autoFloatEnabled:true
-        //浮动时工具栏距离浏览器顶部的高度，用于某些具有固定头部的页面
-        , topOffset: 180
-        //编辑器底部距离工具栏高度(如果参数大于等于编辑器高度，则设置无效)
-        //,toolbarTopOffset:400
+        // 编辑器最小高度,默认220
+        , minFrameHeight: 220
+
+        // 是否保持toolbar的位置不动,默认true
+        , autoFloatEnabled: true
+        // 浮动时工具栏距离浏览器顶部的高度，用于某些具有固定头部的页面
+        , topOffset: 0
+        // 编辑器底部距离工具栏高度(如果参数大于等于编辑器高度，则设置无效)
+        , toolbarTopOffset: 0
 
         //设置远程图片是否抓取到本地保存
         , catchRemoteImageEnable: true //设置是否抓取远程图片
@@ -557,12 +595,82 @@
         //allowLinkProtocol 允许的链接地址，有这些前缀的链接地址不会自动添加http
         //, allowLinkProtocols: ['http:', 'https:', '#', '/', 'ftp:', 'mailto:', 'tel:', 'git:', 'svn:']
 
+        // AI智能相关配置
+        , ai: {
+            // 大模型驱动 OpenAi ModStart
+            driver: 'OpenAi',
+            // 大模型对接配置
+            driverConfig: {
+                // 模型API地址，留空使用默认
+                url: '',
+                // 大模型平台Key
+                key: '',
+                // 大模型平台模型
+                model: '',
+            },
+            // 自定义接入
+            // driverRequest: function (option) {
+            //     var texts = []
+            //     var mock = function () {
+            //         var text = '测试' + (i++)
+            //         texts.push(text)
+            //         if (texts.length >= 10) {
+            //             // 调用 onFinish 方法表示结束
+            //             option.onFinish({code: 0, msg: 'ok', data: {text: texts.join("")}})
+            //             return
+            //         }
+            //         // 调用 onStream 方法模拟流式返回
+            //         option.onStream({code: 0, msg: 'ok', data: {text: text}})
+            //         setTimeout(mock, 50);
+            //     };
+            //     mock();
+            // },
+        }
+        , aiFunctions: [
+            {
+                text: '<i class="edui-iconfont edui-icon-translate"></i> 翻译',
+                prompt: "{selectText}\n\n请帮我翻译一下这段内容，并直接返回优化后的结果。\n注意：你应该先判断一下这句话是中文还是英文，如果是中文，请给我返回英文，如果是英文，请给我返回中文内容，只需要返回内容即可，不需要告知我是中文还是英文。",
+                enable: function (param) {
+                    return !!param.selectText
+                }
+            },
+            {
+                text: '<i class="edui-iconfont edui-icon-continue-write"></i> 续写',
+                prompt: "{selectText}\n\n请帮我续写一下这段内容，并直接返回续写后的结果。",
+                enable: function (param) {
+                    return !!param.selectText
+                }
+            },
+            {
+                text: '<i class="edui-iconfont edui-icon-text-shrink"></i> 简化内容',
+                prompt: "{selectText}\n\n请帮我简化一下这段内容，并直接返回简化后的结果。",
+                enable: function (param) {
+                    return !!param.selectText
+                }
+            },
+            {
+                text: '<i class="edui-iconfont edui-icon-text-extend"></i> 丰富内容',
+                prompt: "{selectText}\n\n请帮我丰富一下这段内容，并直接返回丰富后的结果。",
+                enable: function (param) {
+                    return !!param.selectText
+                }
+            }
+        ]
+
         //默认过滤规则相关配置项目
         //,disabledTableInTable:true  //禁止表格嵌套
         // 允许进入编辑器的 div 标签自动变成 p 标签
         , allowDivTransToP: true
         // 默认产出的数据中的color自动从rgb格式变成16进制格式
-        , rgb2Hex: true
+        , rgb2Hex: true,
+
+        tipError: function (msg, param) {
+            if (window && window.MS && window.MS.dialog) {
+                window.MS.dialog.tipError(msg);
+            } else {
+                alert(msg);
+            }
+        }
     };
 
     function getUEBasePath(docUrl, confUrl) {
