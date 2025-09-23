@@ -46,7 +46,7 @@ public sealed class LinksController : BaseController
             return ResultData(null, false, "添加失败！链接非法！");
         }
 
-        if (link.Url.Contains(new[] { "?", "&", "=" }))
+        if (link.Url.Contains(["?", "&", "="]))
         {
             return ResultData(null, false, "添加失败！请移除链接中的查询字符串后再试！如遇特殊情况，请联系站长进行处理。");
         }
@@ -82,7 +82,7 @@ public sealed class LinksController : BaseController
             }
 
             using var httpContent = res.Content;
-            var s = httpContent.ReadAsStringAsync().Result;
+            var s = httpContent.ReadAsStringAsync(cancellationToken).Result;
             if (!s.Contains(Request.Host.Host))
             {
                 return ResultData(null, false, $"添加失败！检测到您的网站上未将本站设置成友情链接，请先将本站主域名：{Request.Host}在您的网站设置为友情链接，并且能够展示后，再次尝试添加即可！");
@@ -90,7 +90,7 @@ public sealed class LinksController : BaseController
 
             var b = LinksService.AddEntitySaved(link) != null;
             return ResultData(null, b, b ? "添加成功！这可能有一定的延迟，如果没有看到您的链接，请稍等几分钟后刷新页面即可，如有疑问，请联系站长。" : "添加失败！这可能是由于网站服务器内部发生了错误，如有疑问，请联系站长。");
-        });
+        }, cancellationToken);
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ public sealed class LinksController : BaseController
             using var httpContent = res.Content;
             var s = httpContent.ReadAsStringAsync().Result;
             return s.Contains(CommonHelper.SystemSettings["Domain"].Split("|")) ? ResultData(null, true, "友情链接正常！") : ResultData(null, false, link + " 对方似乎没有本站的友情链接！");
-        });
+        }, cts.Token);
     }
 
     /// <summary>

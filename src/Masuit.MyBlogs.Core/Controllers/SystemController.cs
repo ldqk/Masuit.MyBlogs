@@ -174,6 +174,7 @@ public sealed class SystemController : AdminController
     /// <param name="pwd"></param>
     /// <param name="port"></param>
     /// <param name="to"></param>
+    /// <param name="ssl"></param>
     /// <returns></returns>
     public ActionResult MailTest([FromBodyOrDefault] string smtp, [FromBodyOrDefault] string user, [FromBodyOrDefault] string pwd, [FromBodyOrDefault] int port, [FromBodyOrDefault] string to, [FromBodyOrDefault] bool ssl)
     {

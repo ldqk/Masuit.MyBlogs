@@ -139,7 +139,7 @@ public sealed class PostController : BaseController
     /// <param name="page"></param>
     /// <param name="size"></param>
     /// <returns></returns>
-    [Route("{id:int}/history"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "page", "size" }, VaryByHeader = "Cookie")]
+    [Route("{id:int}/history"), ResponseCache(Duration = 600, VaryByQueryKeys = ["id", "page", "size"], VaryByHeader = "Cookie")]
     public async Task<ActionResult> History(int id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
@@ -161,7 +161,7 @@ public sealed class PostController : BaseController
     /// <param name="id"></param>
     /// <param name="hid"></param>
     /// <returns></returns>
-    [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "hid" }, VaryByHeader = "Cookie")]
+    [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["id", "hid"], VaryByHeader = "Cookie")]
     public async Task<ActionResult> HistoryVersion(int id, int hid)
     {
         var history = await PostHistoryVersionService.GetAsync(v => v.Id == hid && (v.Post.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
@@ -188,7 +188,7 @@ public sealed class PostController : BaseController
     /// <param name="v1"></param>
     /// <param name="v2"></param>
     /// <returns></returns>
-    [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id", "v1", "v2" }, VaryByHeader = "Cookie")]
+    [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["id", "v1", "v2"], VaryByHeader = "Cookie")]
     public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
     {
         var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
@@ -294,7 +294,7 @@ public sealed class PostController : BaseController
 
         post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
         post.Status = Status.Pending;
-        post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.HtmlSanitizerStandard().ClearImgAttributes(), cancellationToken);
+        post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.HtmlSanitizerStandard().ClearImgAttributes(cancellationToken: cancellationToken), cancellationToken);
         Post p = post.ToPost();
         p.IP = ClientIP.ToString();
         p.Modifier = p.Author;
@@ -689,7 +689,7 @@ public sealed class PostController : BaseController
     [HttpPost, MyAuthorize, DistributedLockFilter]
     public async Task<ActionResult> Edit([FromBodyOrDefault] PostCommand cmd, CancellationToken cancellationToken = default)
     {
-        cmd.Content = await ImagebedClient.ReplaceImgSrc(await cmd.Content.Trim().ClearImgAttributes(), cancellationToken);
+        cmd.Content = await ImagebedClient.ReplaceImgSrc(await cmd.Content.Trim().ClearImgAttributes(cancellationToken: cancellationToken), cancellationToken);
         if (!ValidatePost(cmd, out var resultData))
         {
             return resultData;
@@ -769,7 +769,7 @@ public sealed class PostController : BaseController
     [MyAuthorize, HttpPost, DistributedLockFilter]
     public async Task<ActionResult> Write([FromBodyOrDefault] PostCommand cmd, [FromBodyOrDefault] DateTime? timespan, [FromBodyOrDefault] bool schedule = false, CancellationToken cancellationToken = default)
     {
-        cmd.Content = await ImagebedClient.ReplaceImgSrc(await cmd.Content.Trim().ClearImgAttributes(), cancellationToken);
+        cmd.Content = await ImagebedClient.ReplaceImgSrc(await cmd.Content.Trim().ClearImgAttributes(cancellationToken: cancellationToken), cancellationToken);
         if (!ValidatePost(cmd, out var resultData))
         {
             return resultData;
@@ -1085,14 +1085,14 @@ public sealed class PostController : BaseController
     public async Task<IActionResult> Statistic(CancellationToken cancellationToken = default)
     {
         Response.ContentType = "text/event-stream";
-        Response.Headers.Add("X-Accel-Buffering", "no");
+        Response.Headers.Append("X-Accel-Buffering", "no");
         while (true)
         {
             if (cancellationToken.IsCancellationRequested)
             {
                 break;
             }
-            await Response.WriteAsync($"event: message\n", cancellationToken);
+            await Response.WriteAsync("event: message\n", cancellationToken);
             var keys = await RedisHelper.KeysAsync(nameof(PostOnline) + ":*");
             var sets = keys.Select(s => (Id: s.Split(':')[1].ToInt32(), Clients: RedisHelper.SMembers(s))).ToArray();
             var ids = sets.OrderByDescending(t => t.Clients.Length).Take(10).Select(t => t.Id).ToArray();
@@ -1104,7 +1104,7 @@ public sealed class PostController : BaseController
                 }
 
                 return t.Result.OrderByDescending(p => p.ViewCount);
-            });
+            }, cancellationToken);
             var postsQuery = PostService.GetQuery(p => p.Status == Status.Published);
             var mostView = await postsQuery.OrderByDescending(p => p.TotalViewCount).Take(10).Select(p => new PostModelBase()
             {
@@ -1133,7 +1133,7 @@ public sealed class PostController : BaseController
                 mostAverage,
                 trending,
                 readCount
-            }.ToJsonString() + "\r\r");
+            }.ToJsonString() + "\r\r", cancellationToken: cancellationToken);
             await Response.Body.FlushAsync(cancellationToken);
             await Task.Delay(5000, cancellationToken);
         }
@@ -1148,6 +1148,7 @@ public sealed class PostController : BaseController
     /// <param name="id"></param>
     /// <param name="page"></param>
     /// <param name="size"></param>
+    /// <param name="kw"></param>
     /// <returns></returns>
     [HttpGet("/{id}/records"), MyAuthorize]
     [ProducesResponseType(typeof(PagedList<PostVisitRecordViewModel>), (int)HttpStatusCode.OK)]

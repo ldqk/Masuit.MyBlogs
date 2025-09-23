@@ -24,12 +24,8 @@ public class EFCoreCacheProvider(IRedisClient redisClient) : IEFCacheServiceProv
         };
 
         var keyHash = cacheKey.KeyHash;
-        foreach (var rootCacheKey in cacheKey.CacheDependencies)
+        foreach (var rootCacheKey in cacheKey.CacheDependencies.Where(rootCacheKey => !string.IsNullOrWhiteSpace(rootCacheKey)))
         {
-            if (string.IsNullOrWhiteSpace(rootCacheKey))
-            {
-                continue;
-            }
             redisClient.SAdd(rootCacheKey, keyHash);
             redisClient.Expire(rootCacheKey, 3600);
         }
@@ -80,13 +76,8 @@ public class EFCoreCacheProvider(IRedisClient redisClient) : IEFCacheServiceProv
             throw new ArgumentNullException(nameof(cacheKey));
         }
 
-        foreach (var rootKey in cacheKey.CacheDependencies)
+        foreach (var rootKey in cacheKey.CacheDependencies.Where(rootKey => !string.IsNullOrWhiteSpace(rootKey)))
         {
-            if (string.IsNullOrWhiteSpace(rootKey))
-            {
-                continue;
-            }
-
             if (redisClient.SMembers(rootKey) is { Length: > 0 } keys)
             {
                 redisClient.Del(keys);

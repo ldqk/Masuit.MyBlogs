@@ -150,10 +150,10 @@ public sealed class UploadController : Controller
             }),
             "uploadscrawl" => new UploadHandler(HttpContext, new UploadConfig()
             {
-                AllowExtensions = new[]
-                {
-                    ".png"
-                },
+                AllowExtensions =
+                [
+                    ".png",".jpg",".jpeg",".gif",".bmp",".webp"
+                ],
                 PathFormat = "/" + CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\') + UeditorConfig.GetString("scrawlPathFormat"),
                 SizeLimit = UeditorConfig.GetInt("scrawlMaxSize"),
                 UploadFieldName = UeditorConfig.GetString("scrawlFieldName"),

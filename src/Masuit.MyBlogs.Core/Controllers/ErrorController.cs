@@ -179,7 +179,7 @@ public sealed class ErrorController : Controller
     /// <param name="userInfoService"></param>
     /// <param name="email"></param>
     /// <returns></returns>
-    [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 100, VaryByQueryKeys = new[] { "email" }), DistributedLockFilter]
+    [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, ResponseCache(Duration = 100, VaryByQueryKeys = ["email"]), DistributedLockFilter]
     public ActionResult GetViewToken([FromServices] IUserInfoService userInfoService, string email)
     {
         var validator = new IsEmailAttribute();
