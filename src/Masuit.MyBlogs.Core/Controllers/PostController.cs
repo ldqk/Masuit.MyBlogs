@@ -270,11 +270,13 @@ public sealed class PostController : BaseController
     [HttpPost, ValidateAntiForgeryToken, DistributedLockFilter]
     public async Task<ActionResult> Publish([FromBodyOrDefault] PostCommand post, [Required(ErrorMessage = "验证码不能为空"), FromBodyOrDefault] string code, CancellationToken cancellationToken)
     {
+#if !DEBUG
         if (await RedisHelper.GetAsync("code:" + post.Email) != code)
         {
             return ResultData(null, false, "验证码错误！");
         }
 
+#endif
         if (PostService.Any(p => p.Status == Status.Forbidden && p.Email == post.Email))
         {
             return ResultData(null, false, "由于您曾经恶意投稿，该邮箱已经被标记为黑名单，无法进行投稿，如有疑问，请联系网站管理员进行处理。");
@@ -433,10 +435,12 @@ public sealed class PostController : BaseController
     [HttpPost("{id}/pushmerge"), DistributedLockFilter]
     public async Task<ActionResult> PushMerge([FromServices] IInternalMessageService messageService, [FromServices] IPostMergeRequestService postMergeRequestService, [FromBodyOrDefault] PostMergeRequestCommand dto)
     {
+#if !DEBUG
         if (await RedisHelper.GetAsync("code:" + dto.ModifierEmail) != dto.Code)
         {
             return ResultData(null, false, "验证码错误！");
         }
+#endif
 
         var post = await PostService.GetAsync(p => p.Id == dto.PostId && p.Status == Status.Published && !p.Locked) ?? throw new NotFoundException("文章未找到");
         if (post.Title.Equals(dto.Title) && post.Content.HammingDistance(dto.Content) <= 1)
