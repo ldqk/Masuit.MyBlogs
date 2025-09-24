@@ -1,6 +1,5 @@
 ﻿@model string
 @using Masuit.MyBlogs.Core.Models.DTO
-
 @{
     ViewBag.Title = "网站打赏";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -12,10 +11,11 @@
         height: 50vh;
         max-height: 400px;
         position: relative;
-        background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
-        background-size:cover;
+        background: url(/Content/images/@(r.Next(1, 9)).jpg) no-repeat center;
+        background-size: cover;
         background-attachment: fixed;
     }
+
     .flex-box {
         display: flex;
         flex-wrap: wrap;
@@ -23,22 +23,25 @@
         width: 100%;
         height: 100%;
     }
-    .flex-box>div{
-        margin: 0 15px;
-        width: 18%;
-    }
+
+        .flex-box > div {
+            margin: 0 15px;
+            width: 18%;
+        }
+
     @@media only screen and (max-width: 1080px) {
-        .flex-box>div{
+        .flex-box > div {
             width: 29.8%;
         }
     }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.7/angular.min.js"></script>
-<script src="~/Scripts/tm.pagination.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ng-table/1.0.0/ng-table.js"></script>
 <ol class="cd-breadcrumb triangle">
-    <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-    <li class="current"><em>@ViewBag.Title</em></li>
+    <li>
+        <a asp-action="Index" asp-controller="Home">首页</a>
+    </li>
+    <li class="current">
+        <em>@ViewBag.Title</em>
+    </li>
 </ol>
 <div class="bg-title">
     <div class="header-content text-center">
@@ -52,37 +55,33 @@
     </div>
 </div>
 @Html.Raw(Model)
-<div class="container-fluid" ng-app="myApp" ng-controller="home as list">
-    <div class="page-header margin-clear">
-        <h2 class="size24">
+<div class="container-fluid" id="donateApp" ng-controller="home as list">
+    <div class="margin-clear page-header">
+        <h2 class="size24" style="display: inline">
             打赏名单(排名不分先后)：
         </h2>
     </div>
-    <table ng-cloak ng-table="list.tableParams" class="table table-bordered table-hover table-condensed margin-clear" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker" style="margin: 0">
-        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'打赏时间'" sortable="'DonateTime'">
-                {{row.DonateTime|date:'yyyy-MM-dd'}}
-            </td>
-            <td title="'昵称'" sortable="'NickName'">
-                {{row.NickName}}
-            </td>
-            <td title="'邮箱'" sortable="'Email'">
-                {{row.Email}}
-            </td>
-            <td title="'QQ或微信'" sortable="'QQorWechat'">
-                {{row.QQorWechat}}
-            </td>
-            <td title="'金额'" sortable="'Amount'">
-                {{row.Amount}}
-            </td>
-        </tr>
-    </table>
-    <tm-pagination conf="paginationConf"></tm-pagination>
+    <vxe-table :data="tableData" :loading="loading" border stripe>
+        <!-- 打赏时间列 -->
+        <vxe-column field="DonateTime" formatter="formatDate" title="打赏时间" width="160"></vxe-column>
+        <!-- 昵称列 -->
+        <vxe-column field="NickName" min-width="140" title="昵称"></vxe-column>
+        <!-- 金额列 -->
+        <vxe-column field="Amount" title="金额" width="110"></vxe-column>
+        <!-- 打赏方式列 -->
+        <vxe-column field="Via" title="打赏方式" width="140"></vxe-column>
+        <!-- Email列 -->
+        <vxe-column field="Email" min-width="200" title="Email"></vxe-column>
+        <!-- QQ或微信列 -->
+        <vxe-column field="QQorWechat" title="QQ或微信" width="160"></vxe-column>
+    </vxe-table>
+    <!-- 分页组件 -->
+    <vxe-pager :current-page="pageConfig.page" :page-size="pageConfig.size" :total="pageConfig.total" @@page-change="pageChange" />
 </div>
 @if (ads.Count == 2)
 {
     <div class="container-fluid">
-        <div class="page-header margin-clear">
+        <div class="margin-clear page-header">
             <h2 class="size24" style="display: inline">
                 推广支持：
             </h2>
@@ -101,48 +100,59 @@
         </div>
     </div>
 }
+<link href="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.25/lib/style.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/style.min.css" rel="stylesheet">
+<script src="https://unpkg.com/vue"></script>
+<!-- 引入vxe-table的JS文件 -->
+<script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.25/lib/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@6/dist/echarts.min.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs/dayjs.min.js"></script>
 <script>
-    var app = angular.module('myApp', ["ngTable", "tm.pagination"]);
-    app.config(["$httpProvider", function ($httpProvider) {
-        $httpProvider.defaults.transformRequest = function (obj) {
-            var str = [];
-            for (var p in obj) {
-                if (obj.hasOwnProperty(p)) {
-                    str.push(window.encodeURIComponent(p) + "=" + window.encodeURIComponent(obj[p]));
-                }
-            }
-            return str.join("&");
-        };
+    VxeUI.formats.add('formatDate', {
+      cellFormatMethod:function (data, format) {
+        return dayjs(data.cellValue).format(format || 'YYYY-MM-DD')
+      }
+    })
+    const { createApp, ref, onMounted, watch, computed } = Vue;
+    createApp({
+        setup() {
+            // 表格数据
+            const tableData = ref([]);
 
-        $httpProvider.defaults.headers.post = {
-            'Content-Type': 'application/x-www-form-urlencoded; charser=UTF-8'
+            // 分页配置
+            const pageConfig = ref({
+                page: 1,
+                size: 10,
+                total: 0
+            });
+
+            // 加载状态
+            const loading = ref(false);
+            return {
+                tableData,
+                pageConfig,
+                loading
+            };
+        },
+        methods: {
+          pageChange({ pageSize, currentPage }) {
+              this.pageConfig.page = currentPage;
+              this.pageConfig.size = pageSize;
+              this.loadData();
+          },
+          async loadData(){
+            this.loading = true;
+            const data = await axios.post(`/DonateList?page=${this.pageConfig.page}&size=${this.pageConfig.size}`).then(res=>res.data);
+            this.tableData = data.Data;
+            this.pageConfig.total = data.TotalCount;
+            this.loading = false;
+          }},
+        created() {
+            this.loadData();
         }
-    }]);
-    app.controller("home", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
-        var self = this;
-        $scope.paginationConf = {
-            currentPage: 1,
-            itemsPerPage: 10,
-            pagesLength: 15,
-            perPageOptions: [10, 15, 20, 30, 50, 100],
-            rememberPerPage: 'perPageItems',
-            onChange: function () {
-                window.loading();
-                $http.post("/DonateList", {
-                    page: $scope.paginationConf.currentPage,
-                    size: $scope.paginationConf.itemsPerPage
-                }).then(function (res) {
-                    $scope.paginationConf.totalItems = res.data.TotalCount;
-                    $("div[ng-table-pagination]").remove();
-                    self.tableParams = new NgTableParams({
-                        count: 50000
-                    }, {
-                        filterDelay: 0,
-                        dataset: res.data.Data
-                    });
-                    window.loadingDone();
-                });
-            }
-        };
-    }]);
+    }).use(VxeUI).use(VXETable).mount('#donateApp');
+
 </script>

@@ -1,208 +1,199 @@
 ﻿@model Masuit.MyBlogs.Core.Models.ViewModel.AdvertisementViewModel
-
 @{
-    Layout = null;
+  Layout = null;
 }
-
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>广告《@Model.Title》洞察分析</title>
-    <meta content="webkit" name="renderer">
-    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
-    <link href="/Assets/layui/css/layui.min.css" media="all" rel="stylesheet">
-    <style>
+  <meta charset="utf-8">
+  <title>广告《@Model.Title》洞察分析</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <style>
         .mp-results.mp-bottomleft {
             top: unset !important;
             bottom: 0;
         }
     </style>
 </head>
-<body style="overflow-x: hidden">
-    <h3 align="center">广告《@Model.Title》洞察分析</h3>
-    <div class="searchTable">
-        <div class="layui-inline">
-            <input class="layui-input" name="kw" id="kw">
-        </div>
-        <button class="layui-btn" data-type="reload">搜索</button>
-        <a class="layui-btn" asp-controller="Advertisement" asp-action="ExportClickRecords" asp-route-id="@Model.Id">导出</a>
-    </div>
-    <table class="layui-hide" id="table" lay-filter="tableEvent"></table>
-    <form class="layui-form">
-        <label class="layui-form-label">对比最近</label>
-        <div class="layui-input-inline">
-            <select id="period" name="period" lay-filter="period">
-                <option value="0">不对比</option>
-                <option value="7">一周</option>
-                <option value="15">15天</option>
-                <option value="30" selected="selected">一个月</option>
-                <option value="60">两个月</option>
-                <option value="90">三个月</option>
-            </select>
-        </div>
-    </form>
-    <div id="chart" style="height: 500px"></div>
-    <mini-profiler max-traces="5" />
+<body id="app" style="overflow-x: hidden">
+<h3 align="center">广告《@Model.Title》洞察分析</h3>
+<vxe-toolbar>
+  <template #tools>
+    <vxe-input @@search-click="loadData" placeholder="搜索" type="search" v-model="kw"></vxe-input>
+    <a asp-action="ExportClickRecords" asp-controller="Advertisement" asp-route-id="@Model.Id" class="theme--primary type--button vxe-button">导出</a>
+  </template>
+</vxe-toolbar>
+<!-- 主表格 -->
+<vxe-table :data="tableData" :loading="loading" border class="limited-row-height" ref="tableRef" stripe>
+  <vxe-column field="IP" fixed="left" min-width="200" title="IP">
+    <template #default="{ row }">
+      <a :href="`/tools/ip/${row.IP}`" class="text-primary" target="_blank"> {{ row.IP }} </a>
+    </template>
+  </vxe-column>
+  <vxe-column field="Location" min-width="180" title="地理位置"></vxe-column>
+  <vxe-column field="Referer" min-width="250" title="请求来源"></vxe-column>
+  <vxe-column field="Time" min-width="250" title="访问时间"></vxe-column>
+</vxe-table>
+<!-- 分页组件 -->
+<div class="">
+  <vxe-pager :current-page.sync="pageConfig.page" :page-size.sync="pageConfig.size" :total="pageConfig.total" @@page-change="pageChange">
+  </vxe-pager>
+</div>
+<vxe-toolbar>
+  <template #tools>
+    <span>对比最近：</span>
+    <vxe-select @@change="showCharts" v-model="period">
+      <vxe-option :key="num" :label="`${num}天`" :value="num" v-for="num in [7,15,30,60,90,180,365]"></vxe-option>
+    </vxe-select>
+  </template>
+</vxe-toolbar>
+<div id="chart" style="height: 500px"></div>
+<mini-profiler max-traces="5"/>
 </body>
 </html>
-
-<script src="/Assets/layui/layui.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js" type="text/javascript"></script>
+<!-- 引入vxe-table样式 -->
+<link href="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.25/lib/style.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/style.min.css" rel="stylesheet">
+<script src="https://unpkg.com/vue"></script>
+<!-- 引入vxe-table的JS文件 -->
+<script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.25/lib/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@6/dist/echarts.min.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    layui.use('table', function() {
-        var table = layui.table;
-        table.render({
-            elem: '#table',
-            url: '/partner/@Model.Id/records',
-            cellMinWidth: 80, //全局定义常规单元格的最小宽度，layui 2.2.1 新增
-            cols: [
-                [
-                    { field: 'IP', title: 'IP', align: 'center', event: 'tool-ip', width:320 },
-                    { field: 'Location', title: '位置和网络', align: 'center'},
-                    { field: 'Referer', title: '页面来源', align: 'center', event: 'visit' },
-                    { field: 'Time', title: '访问时间', align: 'center',width:180 }
-                ]
-            ],
-            page: true,
-            limit:20,
-            request: {
-                limitName: 'size' //每页数据量的参数名，默认：limit
-            },
-            parseData: function(res) { //res 即为原始返回的数据
-                return {
-                    "code": res.TotalCount > 0 ? 0 : 1, //解析接口状态
-                    "msg": "暂无数据", //解析提示文本
-                    "count": res.TotalCount, //解析数据长度
-                    "data": res.Data //解析数据列表
-                };
-            }
-        });
-        table.on('tool(tableEvent)', function(obj){
-            var data = obj.data;
-            if(obj.event === 'tool-ip'){
-                window.open("/tools/ip/"+data.IP);
-            }
-            if(obj.event === 'visit'){
-                window.open(data.Referer);
-            }
-        });
-
-        var $ = layui.$;
-        $('.searchTable .layui-btn').on('click', function () {
-            table.reload('table', {
-                page: {
-                    curr: 1
-                },
-                where: {
-                    kw: $('#kw').val()
-                }
+    const { createApp, ref, onMounted, watch, computed } = Vue;
+    createApp({
+        setup() {
+            // 表格数据
+            const tableData = ref([]);
+            const kw = ref('');
+            const period = ref(30);
+            // 分页配置
+            const pageConfig = ref({
+                page: 1,
+                size: 10,
+                total: 0
             });
-        });
-    });
-    layui.use("form", function () {
-        var form = layui.form;
-        form.on("select(period)", function (data) {
-            var chartDom = document.getElementById('chart');
-            echarts.init(chartDom).dispose();
-            showCharts();
-        });
-    });
-    showCharts();
-    function showCharts() {
-        var period = document.getElementById("period").value;
-        window.fetch(`/partner/@Model.Id/records-chart?compare=${period > 0}&period=${period}`, {
-            credentials: 'include',
-            method: 'GET',
-            mode: 'cors'
-        }).then(function (response) {
-            return response.json();
-        }).then(function (res) {
-            var xSeries = [];
-            var ySeries = [];
-            for (let series of res) {
+
+            // 加载状态
+            const loading = ref(false);
+            return {
+              kw,
+                tableData,
+                pageConfig,
+                loading,
+                period
+            };
+        },
+        methods: {
+          pageChange({ pageSize, currentPage }) {
+            this.pageConfig.page = currentPage;
+            this.pageConfig.size = pageSize;
+            this.loadData();
+          },
+          async loadData(){
+            this.loading = true;
+            const data = await axios.get(`/partner/@Model.Id/records?kw=${this.kw}&page=${this.pageConfig.page}&size=${this.pageConfig.size}`).then(function(response) {
+              return response.data;
+            });
+            this.tableData = data.Data;
+            this.pageConfig.total = data.TotalCount;
+            this.loading = false;
+          },
+          showCharts() {
+            axios.get(`/partner/@Model.Id/records-chart?compare=${this.period > 0}&period=${this.period}`).then(function(response) {
+              const res = response.data;
+              var xSeries = [];
+              var ySeries = [];
+              for (let series of res) {
                 var x = [];
                 var y = [];
                 for (let item of series) {
-                    x.push(new Date(Date.parse(item.Date)).toLocaleDateString());
-                    y.push(item.Count);
+                  x.push(new Date(Date.parse(item.Date)).toLocaleDateString());
+                  y.push(item.Count);
                 }
                 xSeries.push(x);
                 ySeries.push(y);
-            }
-            var chartDom = document.getElementById('chart');
-            var myChart = echarts.init(chartDom);
-            const colors = ['#009688', '#ccc'];
-            var option = {
+              }
+              var chartDom = document.getElementById('chart');
+              var myChart = echarts.init(chartDom);
+              const colors = ['#009688', '#ccc'];
+              var option = {
                 color: colors,
                 tooltip: {
-                    trigger: 'none',
-                    axisPointer: {
-                        type: 'cross'
-                    }
+                  trigger: 'none',
+                  axisPointer: {
+                    type: 'cross'
+                  }
                 },
                 legend: {},
                 grid: {
-                    top: 70,
-                    bottom: 50
+                  top: 70,
+                  bottom: 50
                 },
                 title: {
-                    left: 'center',
-                    text: '广告《@Model.Title》最近访问趋势'
+                  left: 'center',
+                  text: '广告《@Model.Title》最近访问趋势'
                 },
-                xAxis: xSeries.map(function (item, index) {
-                    return {
-                        type: 'category',
-                        axisTick: {
-                            alignWithLabel: true
-                        },
-                        axisLine: {
-                            onZero: false,
-                            lineStyle: {
-                                color: colors[index]
-                            }
-                        },
-                        axisPointer: {
-                            label: {
-                                formatter: function (params) {
-                                    return params.value + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
-                                }
-                            }
-                        },
-                        data: item
-                    }
+                xAxis: xSeries.map(function(item, index) {
+                  return {
+                    type: 'category',
+                    axisTick: {
+                      alignWithLabel: true
+                    },
+                    axisLine: {
+                      onZero: false,
+                      lineStyle: {
+                        color: colors[index]
+                      }
+                    },
+                    axisPointer: {
+                      label: {
+                        formatter: function(params) {
+                          return params.value + (params.seriesData.length ? '：' + params.seriesData[0].data : '');
+                        }
+                      }
+                    },
+                    data: item
+                  }
                 }),
                 yAxis: [
-                    {
-                        type: 'value'
-                    }
+                  {
+                    type: 'value'
+                  }
                 ],
-                series: ySeries.map(function (item, index) {
-                    return {
-                        type: 'line',
-                        symbol: 'none',
-                        xAxisIndex: index,
-                        areaStyle: {},
-                        data: item,
-                        lineStyle: {
-                            type: index === 1 ? 'dashed' : ""
-                        },
-                        markPoint: {
-                            data: [
-                                { type: 'max', name: '最大值' },
-                                { type: 'min', name: '最小值' }
-                            ]
-                        },
-                        markLine: {
-                            data: [
-                                { type: 'average', name: '平均值' }
-                            ]
-                        }
+                series: ySeries.map(function(item, index) {
+                  return {
+                    type: 'line',
+                    symbol: 'none',
+                    xAxisIndex: index,
+                    areaStyle: {},
+                    data: item,
+                    lineStyle: {
+                        type: index === 1 ? 'dashed' : ""
+                    },
+                    markPoint: {
+                        data: [
+                            { type: 'max', name: '最大值' },
+                            { type: 'min', name: '最小值' }
+                        ]
+                    },
+                    markLine: {
+                        data: [
+                            { type: 'average', name: '平均值' }
+                        ]
                     }
+                  }
                 })
-            };
-            myChart.setOption(option);
-        });
+              };
+              myChart.setOption(option);
+            });
+          }
+        },
+    created() {
+        this.loadData();
+        this.showCharts();
     }
+    }).use(VxeUI).use(VXETable).mount('#app');
 </script>

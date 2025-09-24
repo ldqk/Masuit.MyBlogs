@@ -1,11 +1,10 @@
 ﻿@model string
 @using Masuit.MyBlogs.Core.Models.DTO
-
 @{
-    ViewBag.Title = "网站打赏";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    Random r = new Random();
-    List<AdvertisementDto> ads = ViewBag.Ads;
+  ViewBag.Title = "网站打赏";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  Random r = new Random();
+  List<AdvertisementDto> ads = ViewBag.Ads;
 }
 <style>
     .bg-title {
@@ -33,226 +32,229 @@
         }
     }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.7/angular.min.js"></script>
-<script src="~/Scripts/tm.pagination.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ng-table/1.0.0/ng-table.js"></script>
 <ol class="cd-breadcrumb triangle">
-    <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-    <li class="current">
-        <em>@ViewBag.Title</em>
-    </li>
+  <li>
+    <a asp-action="Index" asp-controller="Home">首页</a>
+  </li>
+  <li class="current">
+    <em>@ViewBag.Title</em>
+  </li>
 </ol>
 <div class="bg-title">
-    <div class="header-content text-center">
-        <h2 class="size48">
-            喜欢我的作品和文章？
-        </h2>
-        <div class="divider"></div>
-        <p class="size24">
-            您的捐助就是给我最大的鼓励
-        </p>
-    </div>
+  <div class="header-content text-center">
+    <h2 class="size48">
+      喜欢我的作品和文章？
+    </h2>
+    <div class="divider"></div>
+    <p class="size24">
+      您的捐助就是给我最大的鼓励
+    </p>
+  </div>
 </div>
 @Html.Raw(Model)
-<div class="container-fluid" ng-app="myApp" ng-controller="home as list">
-    <div class="page-header margin-clear">
-        <h2 class="size24" style="display: inline">
-            打赏名单(排名不分先后)：
-        </h2>
-        <button class="btn btn-info pull-right" ng-click="save()">添加打赏</button>
-    </div>
-    <table ng-table="list.tableParams" class="table table-bordered table-hover table-condensed margin-clear" ng-form="list.tableForm" disable-filter="list.isAdding" tracked-table="list.tableTracker">
-        <tr ng-repeat="row in $data" ng-form="rowForm" tracked-table-row="row">
-            <td title="'打赏时间'">
-                {{row.DonateTime|date:'yyyy-MM-dd'}}
-            </td>
-            <td title="'昵称'">
-                {{row.NickName}}
-            </td>
-            <td title="'金额'">
-                {{row.Amount}}
-            </td>
-            <td title="'打赏方式'">
-                {{row.Via}}
-            </td>
-            <td title="'Email'">
-                {{row.Email}}
-            </td>
-            <td title="'QQ或微信'">
-                {{row.QQorWechat}}
-            </td>
-            <td title="'操作'">
-                <button class="btn btn-default btn-sm" ng-click="save(row)">编辑</button>
-                <button class="btn btn-danger btn-sm" ng-click="list.del(row)">删除</button>
-            </td>
-        </tr>
-    </table>
-    <tm-pagination conf="paginationConf"></tm-pagination>
+<div class="container-fluid" id="donateApp" ng-controller="home as list">
+  <div class="margin-clear page-header">
+    <h2 class="size24" style="display: inline">
+      打赏名单(排名不分先后)：
+    </h2>
+  </div>
+  <vxe-toolbar>
+    <template #tools>
+      <vxe-button @@click="add">添加打赏</vxe-button>
+    </template>
+  </vxe-toolbar>
+  <vxe-table :data="tableData" :edit-config="{ trigger: 'manual', mode: 'row' }" :loading="loading" border ref="tableRef" show-header-overflow show-overflow stripe>
+    <!-- 打赏时间列 -->
+    <vxe-column :edit-render="{ name: 'VxeInput', props: { type: 'date' } }" field="DonateTime" fixed="left" formatter="formatDate" title="打赏时间" width="160"></vxe-column>
+    <!-- 昵称列 -->
+    <vxe-column :edit-render="{ name: 'VxeInput' }" field="NickName" min-width="140" title="昵称"></vxe-column>
+    <!-- 金额列 -->
+    <vxe-column :edit-render="{ name: 'VxeInput' }" field="Amount" title="金额" width="110"></vxe-column>
+    <!-- 打赏方式列 -->
+    <vxe-column :edit-render="{ name: 'VxeInput' }" field="Via" title="打赏方式" width="140"></vxe-column>
+    <!-- Email列 -->
+    <vxe-column :edit-render="{ name: 'VxeInput', props: { type: 'email' } }" field="Email" min-width="200" title="Email"></vxe-column>
+    <!-- QQ或微信列 -->
+    <vxe-column :edit-render="{ name: 'VxeInput' }" field="QQorWechat" title="QQ或微信" width="160"></vxe-column>
+    <!-- 操作列 -->
+    <vxe-column align="center" fixed="right" title="操作" width="130">
+      <template #default="{ row, $table }">
+        <div class="q-gutter-xs">
+          <template v-if="$table.isEditByRow(row)">
+            <vxe-button @@click="saveRow(row, $table)" icon="vxe-icon-check"></vxe-button>
+            <vxe-button @@click="cancelEdit(row, $table)" icon="vxe-icon-close"> </vxe-button>
+          </template>
+          <template v-else>
+            <vxe-button @@click="$table.setEditRow(row)" color="info" icon="vxe-icon-edit"></vxe-button>
+            <vxe-button :disable="row.Id === 0 || row.Id == null" @@click="deleteRecord(row.Id)" icon="vxe-icon-delete"></vxe-button>
+          </template>
+        </div>
+      </template>
+    </vxe-column>
+  </vxe-table>
+  <!-- 分页组件 -->
+  <vxe-pager :current-page="pageConfig.page" :page-size="pageConfig.size" :total="pageConfig.total" @@page-change="pageChange"/>
 </div>
-@if (ads.Count == 2)
-{
-    <div class="container-fluid">
-        <div class="page-header margin-clear">
-            <h2 class="size24" style="display: inline">
-                推广支持：
-            </h2>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                @{
-                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[0]);
-                }
-            </div>
-            <div class="col-md-6">
-                @{
-                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[1]);
-                }
-            </div>
-        </div>
+@if (ads.Count == 2) {
+  <div class="container-fluid">
+    <div class="margin-clear page-header">
+      <h2 class="size24" style="display: inline">
+        推广支持：
+      </h2>
     </div>
+    <div class="row">
+      <div class="col-md-6">
+        @{
+          await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[0]);
+        }
+      </div>
+      <div class="col-md-6">
+        @{
+          await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[1]);
+        }
+      </div>
+    </div>
+  </div>
 }
+<link href="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.25/lib/style.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/style.min.css" rel="stylesheet">
+<script src="https://unpkg.com/vue"></script>
+<!-- 引入vxe-table的JS文件 -->
+<script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.25/lib/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@6/dist/echarts.min.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs/dayjs.min.js"></script>
 <script>
-    var app = angular.module('myApp', ["ngTable", "tm.pagination"]);
-    app.config(["$httpProvider", function ($httpProvider) {
-        $httpProvider.defaults.transformRequest = function (obj) {
-            var str = [];
-            for (var p in obj) {
-                if (obj.hasOwnProperty(p)) {
-                    str.push(window.encodeURIComponent(p) + "=" + window.encodeURIComponent(obj[p]));
-                }
-            }
-            return str.join("&");
-        };
+    VxeUI.formats.add('formatDate', {
+      cellFormatMethod:function (data, format) {
+        return dayjs(data.cellValue).format(format || 'YYYY-MM-DD')
+      }
+    })
+    const { createApp, ref, onMounted, watch, computed } = Vue;
+    createApp({
+        setup() {
+            // 表格数据
+            const tableData = ref([]);
+            const tableRef = ref(null)
+            const originalMap = ref(new Map())
 
-        $httpProvider.defaults.headers.post = {
-            'Content-Type': 'application/x-www-form-urlencoded; charser=UTF-8'
-        }
-    }]);
-    app.controller("home", ["$scope", "$http", "NgTableParams", function ($scope, $http, NgTableParams) {
-        var self = this;
-        $scope.paginationConf = {
-            currentPage: 1,
-            itemsPerPage: 10,
-            pagesLength: 15,
-            perPageOptions: [10, 15, 20, 30, 50, 100],
-            rememberPerPage: 'perPageItems',
-            onChange: function () {
-                window.loading();
-                $http.post("/donate/getpagedata", {
-                    page: $scope.paginationConf.currentPage,
-                    size: $scope.paginationConf.itemsPerPage
-                }).then(function (res) {
-                    $scope.paginationConf.totalItems = res.data.TotalCount;
-                    $("div[ng-table-pagination]").remove();
-                    self.tableParams = new NgTableParams({
-                        count: 50000
-                    }, {
-                        filterDelay: 0,
-                        dataset: res.data.Data
-                    });
-                    window.loadingDone();
-                });
-            }
-        };
-        self.del = function (row) {
-            swal({
-                title: "确认删除这条打赏记录吗？",
-                text: row.NickName,
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                showLoaderOnConfirm: true,
-                animation: true,
-                allowOutsideClick: false
-            }).then(function () {
-                $http.post("/donate/delete/"+row.Id).then(function (res) {
-                    window.notie.alert({
-                        type: 1,
-                        text: res.data.Message,
-                        time: 4
-                    });
-                    _.remove(self.tableParams.settings().dataset, function (item) {
-                        return row === item;
-                    });
-                    self.tableParams.reload().then(function (data) {
-                        if (data.length === 0 && self.tableParams.total() > 0) {
-                            self.tableParams.page(self.tableParams.page() - 1);
-                            self.tableParams.reload();
-                        }
-                    });
-                });
-            }, function () {
+            // 分页配置
+            const pageConfig = ref({
+                page: 1,
+                size: 10,
+                total: 0
             });
-        }
-        $scope.save = function (row) {
-            if (row == null) {
-                row = {
-                    NickName: "",
-                    DonateTime: "",
-                    Amount: "",
-                    Email: "",
-                    QQorWechat: "",
-                    Via: ""
-                };
-            }
-            swal({
-                title: '添加打赏记录',
-                html:
-                    '<div class="input-group"><span class="input-group-addon">昵称： </span><input type="text" id="name" class="form-control input-lg" placeholder="请输入昵称" value="' + row.NickName + '"></div>' +
-                    '<div class="input-group"><span class="input-group-addon">打赏时间： </span><input id="date" type="text" class="form-control input-lg date datainp dateicon" readonly placeholder="请输入打赏时间" value="' + row.DonateTime + '"></div>	' +
-                    '<div class="input-group"><span class="input-group-addon">打赏金额： </span><input id="amount" type="text" class="form-control input-lg" placeholder="请输入金额" value="' + row.Amount + '"></div>' +
-                    '<div class="input-group"><span class="input-group-addon">打赏方式： </span><input id="via" type="text" class="form-control input-lg" placeholder="请输入打赏方式" value="' + row.Via + '"></div>' +
-                    '<div class="input-group"><span class="input-group-addon">Email： </span><input type="email" id="email" class="form-control input-lg" placeholder="请输入Email" value="' + row.Email + '"></div>' +
-                    '<div class="input-group"><span class="input-group-addon">QQ或微信： </span><input type="text" id="qq" class="form-control input-lg" placeholder="请输入QQ或微信" value="' + row.QQorWechat + '"></div>',
-                showCloseButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                showLoaderOnConfirm: true,
-                animation: true,
-                allowOutsideClick: false,
-                preConfirm: function () {
-                    return new Promise(function (resolve, reject) {
-                        row.NickName = $("#name").val();
-                        row.DonateTime = $("#date").val();
-                        row.Amount = $("#amount").val();
-                        row.Via = $("#via").val();
-                        row.Email = $("#email").val();
-                        row.QQorWechat = $("#qq").val();
-                        $http.post("/donate/save", row).then(function (res) {
-                            if (res.data.Success) {
-                                resolve(res.data);
-                            } else {
-                                reject(res.data.Message);
-                            }
-                        }, function (error) {
-                            reject("服务请求失败！");
-                        });
-                    });
-                }
-            }).then(function (result) {
-                if (result) {
-                    if (result.Success) {
-                        swal(result.Message, "", "success");
-                        self.GetPageData($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-                    } else {
-                        swal(result.Message, "", "error");
-                    }
-                }
-            }).catch(swal.noop);
-            layui.use('laydate', function(){
-              var laydate = layui.laydate;
-              laydate.render({
-                elem: '.date',
-                calendar: true,
-                done: function(value, date, endDate) {
-                    $scope.partner.ExpireTime=value;
-                    $("#date").val(value);
-                }
+
+            // 加载状态
+            const loading = ref(false);
+            return {
+                tableData,
+                pageConfig,
+                loading,
+                originalMap,
+                tableRef
+            };
+        },
+        methods: {
+          pageChange({ pageSize, currentPage }) {
+              this.pageConfig.page = currentPage;
+              this.pageConfig.size = pageSize;
+              this.loadData();
+          },
+          async loadData(){
+            this.loading = true;
+            const data = await axios.post("/donate/getpagedata", {
+                page: this.pageConfig.page,
+                size: this.pageConfig.size
+            }).then(res=>res.data);
+            this.tableData = data.Data;
+            this.pageConfig.total = data.TotalCount;
+            this.loading = false;
+          },
+
+          async add(){
+              const $table = this.tableRef
+              if (!$table) return
+              // 防止已有编辑行
+              if ($table.getEditRecords && $table.getEditRecords().length > 0) {
+                  VxeUI.modal.notification({
+                      content: '请先保存或取消当前编辑行',
+                      status: 'error'
+                  });
+                  return
+              }
+              // 在首行插入
+              const record = {
+                  Id: 0,
+                  NickName: '',
+                  DonateTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                  Amount: '',
+                  Via: '',
+                  Email: '',
+                  QQorWechat: ''
+              }
+              const { row } = await $table.insertAt(record, 0)
+              $table.setEditRow(row)
+              this.originalMap.set(0, { ...record, Id: 0 })
+          },
+          
+          async saveRow(row, table){
+            if (!row.NickName || !row.Amount || !row.Via) {
+              VxeUI.modal.notification({
+                  content: '请填写必填字段：昵称/金额/打赏方式',
+                  status: 'warning'
               });
-            });
+              return
+            }
+            const resp = await axios.post('/donate/save', row).then(res=>res.data)
+            if (resp?.Success) {
+              VxeUI.modal.notification({
+                  content: resp.Message || '保存成功',
+                  status: 'success'
+              });
+              table.clearEdit()
+              await this.loadData()
+            } else {
+              VxeUI.modal.notification({
+                  content: resp?.Message || '保存失败',
+                  status: 'error'
+              });
+            }
+          },
+          cancelEdit(row, table){
+            if (row.Id == null) {
+              // 新增未保存直接移除
+              const idx = this.tableData.indexOf(row)
+              if (idx > -1) this.tableData.splice(idx, 1)
+            } else {
+              const origin = this.originalMap.get(row.Id)
+              if (origin) Object.assign(row, origin)
+            }
+            table.clearEdit()
+          },
+
+          async deleteRecord(id){
+            if (!id) return
+              const data = await axios.post(`/donate/delete/${id}`).then(res=>res.data)
+              if (data?.Success !== false) {
+                VxeUI.modal.notification({
+                    content: data?.Message || '删除成功',
+                    status: 'success'
+                });
+                await this.loadData()
+              } else {
+                VxeUI.modal.notification({
+                    content: data?.Message || '删除失败',
+                    status: 'error'
+                });
+              }
+          }
+        },
+        created() {
+            this.loadData();
         }
-    }]);
+    }).use(VxeUI).use(VXETable).mount('#donateApp');
+
 </script>

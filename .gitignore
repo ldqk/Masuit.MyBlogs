@@ -277,3 +277,4 @@ Test
 /src/Masuit.MyBlogs.Core/App_Data/OneDrive.db
 /src/Masuit.MyBlogs.Core/.config
 static
+/front/public/test.html

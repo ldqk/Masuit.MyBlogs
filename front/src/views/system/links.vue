@@ -32,7 +32,7 @@
         <div class="text-body2 q-mt-sm">点击上方"添加链接"按钮添加第一个友情链接</div>
       </div>
       <!-- 友情链接表格 -->
-      <vxe-table v-else ref="tableRef" :data="paginatedLinks" stripe border show-header-overflow show-overflow :loading="loading" :edit-config="{ trigger: 'click', mode: 'row' }">
+      <vxe-table v-else ref="tableRef" :data="paginatedLinks" stripe border show-header-overflow show-overflow :loading="loading" :edit-config="{ trigger: 'manual', mode: 'row' }">
         <!-- 名称列 -->
         <vxe-column field="Name" title="名称" width="150" sortable :edit-render="{}">
           <template #default="{ row }">
@@ -138,27 +138,6 @@
       </div>
     </q-card-section>
   </q-card>
-  <!-- 添加链接对话框 -->
-  <q-dialog v-model="showDialog" persistent>
-    <q-card style="min-width: 500px;">
-      <q-card-section class="row items-center q-pb-none">
-        <div class="text-h6">添加友情链接</div>
-        <q-space />
-        <q-btn icon="close" flat round dense @click="closeDialog" />
-      </q-card-section>
-      <q-card-section>
-        <div class="q-gutter-md">
-          <q-input v-model="newLink.Name" label="链接名称" placeholder="请输入链接名称" dense outlined required :rules="[val => !!val || '请输入链接名称']" />
-          <q-input v-model="newLink.Url" label="链接地址" placeholder="请输入完整的链接地址" dense outlined required :rules="[val => !!val || '请输入链接地址']" />
-          <q-input v-model="newLink.UrlBase" label="主页地址" placeholder="请输入主页地址" dense outlined required :rules="[val => !!val || '请输入主页地址']" />
-        </div>
-      </q-card-section>
-      <q-card-actions align="right">
-        <q-btn flat label="取消" @click="closeDialog" />
-        <q-btn color="primary" label="添加" @click="addLink" :loading="adding" :disable="!newLink.Name || !newLink.Url || !newLink.UrlBase" />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
 </div>
 </template>
 <script setup lang="ts">
@@ -189,28 +168,11 @@ interface ApiResponse {
 // 响应式数据
 const links = ref<LinkItem[]>([])
 const loading = ref(false)
-const adding = ref(false)
 
 // 分页相关数据
 const currentPage = ref(1)
 const pageSize = ref(15)
 const searchTerm = ref('')
-
-// 对话框状态
-const showDialog = ref(false)
-
-// 新建链接数据
-const newLink = ref<LinkItem>({
-  Id: 0,
-  Name: '',
-  Url: '',
-  UrlBase: '',
-  Loopbacks: 0,
-  UpdateTime: '',
-  Except: false,
-  Recommend: false,
-  Status: 0
-})
 
 // 表格引用
 const tableRef = ref()
@@ -257,54 +219,31 @@ const loadLinks = async () => {
 }
 
 // 显示添加对话框
-const showAddDialog = () => {
-  newLink.value = {
-    Name: '',
-    Url: '',
-    UrlBase: '',
-    Id: 0,
-    Loopbacks: 0,
-    UpdateTime: '',
-    Except: false,
-    Recommend: false,
-    Status: 0
-  }
-  showDialog.value = true
-}
-
-// 关闭对话框
-const closeDialog = () => {
-  showDialog.value = false
-}
-
-// 添加友情链接
-const addLink = async () => {
-  if (!newLink.value.Name || !newLink.value.Url || !newLink.value.UrlBase) {
-    toast.warning('请填写完整的链接信息', { autoClose: 2000, position: 'top-center' })
-    return
-  }
-
-  adding.value = true
-  try {
-    const response = await api.post('/links/save', newLink.value) as ApiResponse
-
-    if (response?.Success) {
-      toast.success(response.Message || '保存成功', { autoClose: 2000, position: 'top-center' })
-      closeDialog()
-      loadLinks()
-    } else {
-      toast.error(response?.Message || '保存失败', { autoClose: 2000, position: 'top-center' })
+const showAddDialog = async () => {
+  const $table = tableRef.value
+  if ($table) {
+    const record = {
+      Name: '',
+      Url: '',
+      UrlBase: '',
+      Id: 0,
+      Loopbacks: 0,
+      UpdateTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+      Except: false,
+      Recommend: false,
+      Status: 0
     }
-  } catch (error) {
-    toast.error('保存失败', { autoClose: 2000, position: 'top-center' })
-    console.error('Error adding link:', error)
-  } finally {
-    adding.value = false
+    const { row: newRow } = await $table.insert(record)
+    $table.setEditCell(newRow, 'Name')
   }
 }
 
 // 保存编辑
 const saveLink = async (row: LinkItem, table: any) => {
+  if (!row.Name || !row.Url || !row.UrlBase) {
+    toast.warning('请填写完整的链接信息', { autoClose: 2000, position: 'top-center' })
+    return
+  }
   const response = await api.post('/links/save', row) as ApiResponse
 
   if (response?.Success) {
