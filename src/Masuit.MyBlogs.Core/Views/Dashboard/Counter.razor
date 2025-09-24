@@ -16,312 +16,296 @@
 @inject IRedisClient CacheManager;
 @attribute [StreamRendering]
 @implements IDisposable
-
 <h3 class="text-center">
-    服务器系统信息概览
+  服务器系统信息概览
 </h3>
-<table class="table table-inner table-vmiddle table-bordered">
-    <tbody>
-        <tr>
-            <td>网站开机时长</td>
-            <th>@_runningTime</th>
-            <td>服务器开机时长</td>
-            <th>@_bootTime</th>
-            <td>操作系统</td>
-            <th>@Environment.OSVersion.VersionString</th>
-        </tr>
-        <tr>
-            <td>CPU型号</td>
-            <th>@_cpu.Type</th>
-            <td>CPU基础频率</td>
-            <th>@_cpu.CurrentClockSpeed MHz</th>
-            <td>CPU睿频</td>
-            <th>@_cpu.MaxClockSpeed MHz</th>
-        </tr>
-        <tr>
-            <td>CPU个数</td>
-            <th>@SystemInfo.GetCpuInfo().Count 插槽</th>
-            <td>CPU核心数</td>
-            <th>@_cpu.NumberOfCores 核心</th>
-            <td>CPU线程数</td>
-            <th>@_cpu.NumberOfLogicalProcessors 线程</th>
-        </tr>
-        <tr>
-            <td>物理总内存</td>
-            <th>@((_memory.PhysicalMemory / 1048576).ToDecimal(2)) MB(@((_memory.PhysicalMemory / 1073741824).ToDecimal(2)) GB)</th>
-            <td>物理内存已使用</td>
-            <th>@((_memory.PhysicalMemory * _memory.MemoryUsage / 104857600).ToDecimal(2)) MB(@((_memory.PhysicalMemory * _memory.MemoryUsage / 107374182400).ToDecimal(2)) GB)</th>
-            <td>物理内存剩余</td>
-            <th>@((_memory.PhysicalMemory * (100 - _memory.MemoryUsage) / 104857600).ToDecimal(2)) MB(@((_memory.PhysicalMemory * (100 - _memory.MemoryUsage) / 107374182400).ToDecimal(2)) GB)</th>
-        </tr>
-        <tr>
-            <td>虚拟内存总数</td>
-            <th>@((_memory.TotalPageFile / 1048576).ToDecimal(2)) MB</th>
-            <td>虚拟内存已使用</td>
-            <th>@(((_memory.TotalPageFile - _memory.AvailablePageFile) / 1048576).ToDecimal(2)) MB</th>
-            <td>虚拟内存可用</td>
-            <th>@((_memory.AvailablePageFile / 1048576).ToDecimal(2)) MB</th>
-        </tr>
-        <tr>
-            <td>磁盘总空间</td>
-            <th>@_driveInfos.Select(kv => kv.Name + " " + (kv.TotalSize * 1.0 / 1073741824).ToDecimal(2) + "GB").Join(" | ")</th>
-            <td>磁盘剩余空间</td>
-            <th>@_driveInfos.Select(kv => kv.Name + " " + (kv.TotalFreeSpace * 1.0 / 1073741824).ToDecimal(2) + "GB").Join(" | ")</th>
-            <td>磁盘可用率</td>
-            <th>@_driveInfos.Select(kv => kv.Name + " " + (kv.AvailableFreeSpace * 1m / kv.TotalSize).ToString("P")).Join(" | ")</th>
-        </tr>
-        <tr>
-            <td>内存占用</td>
-            <th>GC Heap：@(GC.GetTotalMemory(false) / 1048576)MB，工作集：@((SystemInfo.CurrentProcessMemory / 1048576).ToString("N"))MB</th>
-            <td>线程数</td>
-            <th>@_process.Threads.Count</th>
-            <td>句柄数</td>
-            <th>@_process.HandleCount</th>
-        </tr>
-        <tr>
-            <td>整机进程数</td>
-            <th>@_processes.Length</th>
-            <td>整机线程数</td>
-            <th>@_processes.Sum(p => p.Threads.Count)</th>
-            <td>整机句柄数</td>
-            <th>@_processes.Sum(p => p.HandleCount)</th>
-        </tr>
-        <tr>
-            <td>Redis版本</td>
-            <th>@CacheManager.Info("server").Split("\r\n").Select(s => s.Split(':')).FirstOrDefault(s => s[0] == "redis_version")![1]</th>
-            <td>Redis内存使用</td>
-            <th>@_cacheMemoryUsed.ToString("F")MB</th>
-            <td>Redis缓存命中率</td>
-            <th>@_cacheHits.ToString("P")</th>
-        </tr>
-        <tr>
-            <td>Redis执行命令数</td>
-            <th>@_redisStats["total_commands_processed"]</th>
-            <td>网站CPU使用率</td>
-            <th>@(GetCurrentPerformanceCounter().ProcessCpuLoad.ToDecimal(2))%</th>
-            <td>网站内存使用</td>
-            <th>@(GetCurrentPerformanceCounter().ProcessMemoryUsage.ToDecimal(2)) MB</th>
-        </tr>
-        <tr>
-            <td>MAC地址</td>
-            <th>@_macs.Join(" , ")</th>
-            <td>IP地址</td>
-            <th>@_ips.Join(" , ")</th>
-            <td>在线人数</td>
-            <th>@CacheManager.SCard("GlobalOnline") 人</th>
-        </tr>
-    </tbody>
+<table class="table table-bordered table-inner table-vmiddle">
+  <tbody>
+  <tr>
+    <td>网站开机时长</td>
+    <th>@_runningTime</th>
+    <td>服务器开机时长</td>
+    <th>@_bootTime</th>
+    <td>操作系统</td>
+    <th>@Environment.OSVersion.VersionString</th>
+  </tr>
+  <tr>
+    <td>CPU型号</td>
+    <th>@_cpu.Type</th>
+    <td>CPU基础频率</td>
+    <th>@_cpu.CurrentClockSpeed MHz</th>
+    <td>CPU睿频</td>
+    <th>@_cpu.MaxClockSpeed MHz</th>
+  </tr>
+  <tr>
+    <td>CPU个数</td>
+    <th>@SystemInfo.GetCpuInfo().Count 插槽</th>
+    <td>CPU核心数</td>
+    <th>@_cpu.NumberOfCores 核心</th>
+    <td>CPU线程数</td>
+    <th>@_cpu.NumberOfLogicalProcessors 线程</th>
+  </tr>
+  <tr>
+    <td>物理总内存</td>
+    <th>@((_memory.PhysicalMemory / 1048576).ToDecimal(2)) MB(@((_memory.PhysicalMemory / 1073741824).ToDecimal(2)) GB)</th>
+    <td>物理内存已使用</td>
+    <th>@((_memory.PhysicalMemory * _memory.MemoryUsage / 104857600).ToDecimal(2)) MB(@((_memory.PhysicalMemory * _memory.MemoryUsage / 107374182400).ToDecimal(2)) GB)</th>
+    <td>物理内存剩余</td>
+    <th>@((_memory.PhysicalMemory * (100 - _memory.MemoryUsage) / 104857600).ToDecimal(2)) MB(@((_memory.PhysicalMemory * (100 - _memory.MemoryUsage) / 107374182400).ToDecimal(2)) GB)</th>
+  </tr>
+  <tr>
+    <td>虚拟内存总数</td>
+    <th>@((_memory.TotalPageFile / 1048576).ToDecimal(2)) MB</th>
+    <td>虚拟内存已使用</td>
+    <th>@(((_memory.TotalPageFile - _memory.AvailablePageFile) / 1048576).ToDecimal(2)) MB</th>
+    <td>虚拟内存可用</td>
+    <th>@((_memory.AvailablePageFile / 1048576).ToDecimal(2)) MB</th>
+  </tr>
+  <tr>
+    <td>磁盘总空间</td>
+    <th>@_driveInfos.Select(kv => kv.Name + " " + (kv.TotalSize * 1.0 / 1073741824).ToDecimal(2) + "GB").Join(" | ")</th>
+    <td>磁盘剩余空间</td>
+    <th>@_driveInfos.Select(kv => kv.Name + " " + (kv.TotalFreeSpace * 1.0 / 1073741824).ToDecimal(2) + "GB").Join(" | ")</th>
+    <td>磁盘可用率</td>
+    <th>@_driveInfos.Select(kv => kv.Name + " " + (kv.AvailableFreeSpace * 1m / kv.TotalSize).ToString("P")).Join(" | ")</th>
+  </tr>
+  <tr>
+    <td>内存占用</td>
+    <th>GC Heap：@(GC.GetTotalMemory(false) / 1048576)MB，工作集：@((SystemInfo.CurrentProcessMemory / 1048576).ToString("N"))MB</th>
+    <td>线程数</td>
+    <th>@_process.Threads.Count</th>
+    <td>句柄数</td>
+    <th>@_process.HandleCount</th>
+  </tr>
+  <tr>
+    <td>整机进程数</td>
+    <th>@_processes.Length</th>
+    <td>整机线程数</td>
+    <th>@_processes.Sum(p => p.Threads.Count)</th>
+    <td>整机句柄数</td>
+    <th>@_processes.Sum(p => p.HandleCount)</th>
+  </tr>
+  <tr>
+    <td>Redis版本</td>
+    <th>@CacheManager.Info("server").Split("\r\n").Select(s => s.Split(':')).FirstOrDefault(s => s[0] == "redis_version")![1]</th>
+    <td>Redis内存使用</td>
+    <th>@_cacheMemoryUsed.ToString("F")MB</th>
+    <td>Redis缓存命中率</td>
+    <th>@_cacheHits.ToString("P")</th>
+  </tr>
+  <tr>
+    <td>Redis执行命令数</td>
+    <th>@_redisStats["total_commands_processed"]</th>
+    <td>网站CPU使用率</td>
+    <th>@(GetCurrentPerformanceCounter().ProcessCpuLoad.ToDecimal(2))%</th>
+    <td>网站内存使用</td>
+    <th>@(GetCurrentPerformanceCounter().ProcessMemoryUsage.ToDecimal(2)) MB</th>
+  </tr>
+  <tr>
+    <td>MAC地址</td>
+    <th>@_macs.Join(" , ")</th>
+    <td>IP地址</td>
+    <th>@_ips.Join(" , ")</th>
+    <td>在线人数</td>
+    <th>@CacheManager.SCard("GlobalOnline") 人</th>
+  </tr>
+  </tbody>
 </table>
-
 <h3 class="text-center">
-    硬件占用百分位统计
+  硬件占用百分位统计
 </h3>
-<table class="table table-inner table-vmiddle table-bordered">
-    <thead>
-        <tr>
-            <th></th>
-            <th>第 50 个百分位</th>
-            <th>第 75 个百分位</th>
-            <th>第 90 个百分位</th>
-            <th>第 99 个百分位</th>
-            <th>第 99.9 个百分位</th>
-            <th>均值</th>
-            <th>标准差</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var (key, value) in GetCounterPercent())
-        {
-            <tr>
-                <th>@key</th>
-                <td>@value.p50</td>
-                <td>@value.p75</td>
-                <td>@value.p90</td>
-                <td>@value.p99</td>
-                <td>@value.p999</td>
-                <td>@value.average</td>
-                <td>@value.stdev</td>
-            </tr>
-        }
-    </tbody>
+<table class="table table-bordered table-inner table-vmiddle">
+  <thead>
+  <tr>
+    <th></th>
+    <th>第 50 个百分位</th>
+    <th>第 75 个百分位</th>
+    <th>第 90 个百分位</th>
+    <th>第 99 个百分位</th>
+    <th>第 99.9 个百分位</th>
+    <th>均值</th>
+    <th>标准差</th>
+  </tr>
+  </thead>
+  <tbody>
+  @foreach (var (key, value) in GetCounterPercent()) {
+    <tr>
+      <th>@key</th>
+      <td>@value.p50</td>
+      <td>@value.p75</td>
+      <td>@value.p90</td>
+      <td>@value.p99</td>
+      <td>@value.p999</td>
+      <td>@value.average</td>
+      <td>@value.stdev</td>
+    </tr>
+  }
+  </tbody>
 </table>
 <button class="btn btn-success" @onclick="ClearMemory">整理内存</button>
 <button class="btn btn-success" @onclick="RefreshMemory">刷新GC配置</button>
 <div>
-    <div class="page-header">
-        <h3 class="text-center">性能实时监控</h3>
-    </div>
-    <div class="row">
-        <div id="servers" style="width: 200px"></div>
-    </div>
-    <div class="row">
-        <div id="container" class="col-md-3" style="height: 400px;"></div>
-        <div id="container-cpu" class="col-md-5" style="height: 400px;"></div>
-        <div id="container-io" class="col-md-4" style="height: 400px;"></div>
-    </div>
+  <div class="page-header">
+    <h3 class="text-center">性能实时监控</h3>
+  </div>
+  <div class="row">
+    <vxe-toolbar>
+      <template #buttons>
+        <span>选择服务器：</span>
+        <vxe-select v-model="server">
+          <vxe-option :key="ip" :label="ip" :value="ip" v-for="ip in servers"></vxe-option>
+        </vxe-select>
+      </template>
+    </vxe-toolbar>
+  </div>
+  <div class="row">
+    <div class="col-md-3" id="container" style="height: 400px;"></div>
+    <div class="col-md-5" id="container-cpu" style="height: 400px;"></div>
+    <div class="col-md-4" id="container-io" style="height: 400px;"></div>
+  </div>
 </div>
 
 @code {
-    private readonly Process _process=Process.GetCurrentProcess();
-    private readonly Process[] _processes = Process.GetProcesses();
-    private string _bootTime;
-    private readonly string _ip=SystemInfo.GetLocalUsedIP(AddressFamily.InterNetwork).ToString();
-    private string _runningTime;
-    private readonly CpuInfo _cpu = SystemInfo.GetCpuInfo()[0];
-    private readonly RamInfo _memory = SystemInfo.GetRamInfo();
-    private readonly List<PhysicalAddress> _macs = SystemInfo.GetMacAddress().ToList();
-    private readonly IList<string> _ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToList();
-    private readonly DriveInfo[] _driveInfos = DriveInfo.GetDrives().Where(d => d.IsReady).ToArray();
-    private decimal _cacheHits;
-    private decimal _cacheMemoryUsed;
-    private IDictionary<string,decimal> _redisStats;
+  private readonly Process _process = Process.GetCurrentProcess();
+  private readonly Process[] _processes = Process.GetProcesses();
+  private string _bootTime;
+  private readonly string _ip = SystemInfo.GetLocalUsedIP(AddressFamily.InterNetwork).ToString();
+  private string _runningTime;
+  private readonly CpuInfo _cpu = SystemInfo.GetCpuInfo()[0];
+  private readonly RamInfo _memory = SystemInfo.GetRamInfo();
+  private readonly List<PhysicalAddress> _macs = SystemInfo.GetMacAddress().ToList();
+  private readonly IList<string> _ips = SystemInfo.GetLocalIPs().OrderBy(u => u.Address.AddressFamily != AddressFamily.InterNetwork).Select(a => a.Address.ToString()).ToList();
+  private readonly DriveInfo[] _driveInfos = DriveInfo.GetDrives().Where(d => d.IsReady).ToArray();
+  private decimal _cacheHits;
+  private decimal _cacheMemoryUsed;
+  private IDictionary<string, decimal> _redisStats;
 
-    protected override void OnInitialized()
-    {
-        _redisStats = CacheManager.Info("stats").Split("\r\n", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Split(':')).Where(s => s.Length == 2).ToFrozenDictionary(s => s[0], s => s[1].ToDecimal());
-        _cacheHits = _redisStats["keyspace_hits"] / (_redisStats["keyspace_hits"] + _redisStats["keyspace_misses"]);
-        _cacheMemoryUsed = CacheManager.Info("memory").Split("\r\n", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Split(':')).FirstOrDefault(s => s[0] == "used_memory")![1].ToDecimal()/1048576;
-        var boot = DateTime.Now - SystemInfo.BootTime();
-        var span = DateTime.Now - IPerfCounter.StartTime;
-        _runningTime = $"{span.Days}天{span.Hours}小时{span.Minutes}分钟";
-        _bootTime = $"{boot.Days}天{boot.Hours}小时{boot.Minutes}分钟";
-    }
+  protected override void OnInitialized() {
+    _redisStats = CacheManager.Info("stats").Split("\r\n", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Split(':')).Where(s => s.Length == 2).ToFrozenDictionary(s => s[0], s => s[1].ToDecimal());
+    _cacheHits = _redisStats["keyspace_hits"] / (_redisStats["keyspace_hits"] + _redisStats["keyspace_misses"]);
+    _cacheMemoryUsed = CacheManager.Info("memory").Split("\r\n", StringSplitOptions.RemoveEmptyEntries).Select(s => s.Split(':')).FirstOrDefault(s => s[0] == "used_memory")![1].ToDecimal() / 1048576;
+    var boot = DateTime.Now - SystemInfo.BootTime();
+    var span = DateTime.Now - IPerfCounter.StartTime;
+    _runningTime = $"{span.Days}天{span.Hours}小时{span.Minutes}分钟";
+    _bootTime = $"{boot.Days}天{boot.Hours}小时{boot.Minutes}分钟";
+  }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await JavaScript.InvokeVoidAsync("getServers");
-        await JavaScript.InvokeVoidAsync("showLine",_ip);
+  [JSInvokable]
+  public static Common.PerformanceCounter GetCurrentPerformanceCounter() {
+    try {
+      return IPerfCounter.List.LastOrDefault() ?? IPerfCounter.GetCurrentPerformanceCounter();
     }
+    catch (Exception e) {
+      LogManager.Error(e.Demystify());
+      return new Common.PerformanceCounter();
+    }
+  }
 
-    [JSInvokable]
-    public static Common.PerformanceCounter GetCurrentPerformanceCounter()
-    {
-        try {
-            return IPerfCounter.List.LastOrDefault()??IPerfCounter.GetCurrentPerformanceCounter();
-        }
-        catch (Exception e) {
-            LogManager.Error(e.Demystify());
-            return new Common.PerformanceCounter();
-        }
-    }
+  [JSInvokable]
+  public static long GetTotalMemory() {
+    return SystemInfo.PhysicalMemory / 1048576;
+  }
 
-    [JSInvokable]
-    public static long GetTotalMemory()
-    {
-        return SystemInfo.PhysicalMemory/1048576;
-    }
+  public void ClearMemory() {
+    Windows.ClearMemorySilent();
+    JavaScript.InvokeVoidAsync("showSuccess");
+  }
 
-    public void ClearMemory()
-    {
-        Windows.ClearMemorySilent();
-        JavaScript.InvokeVoidAsync("showSuccess");
-    }
+  public void RefreshMemory() {
+    GC.RefreshMemoryLimit();
+    JavaScript.InvokeVoidAsync("showSuccess");
+  }
 
-    public void RefreshMemory()
-    {
-        GC.RefreshMemoryLimit();
-        JavaScript.InvokeVoidAsync("showSuccess");
-    }
+  public Dictionary<string, dynamic> GetCounterPercent() {
+    var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP == _ip).OrderByRandom().Take(15000).ToList();
+    var cpuLoads = counters.Select(c => c.CpuLoad).ToList();
+    var processCpuLoads = counters.Select(c => c.ProcessCpuLoad).ToList();
+    var memUse = counters.Select(c => c.MemoryUsage).ToList();
+    var processMemUse = counters.Select(c => c.ProcessMemoryUsage).ToList();
+    var reads = counters.Select(c => c.DiskRead).ToList();
+    var writes = counters.Select(c => c.DiskWrite).ToList();
+    var downloads = counters.Select(c => c.Download).ToList();
+    var uploads = counters.Select(c => c.Upload).ToList();
+    return new Dictionary<string, dynamic> {
+      ["CPU使用率(%)"] = new {
+        p50 = cpuLoads.Percentile(50).ToDecimal(2),
+        p75 = cpuLoads.Percentile(75).ToDecimal(2),
+        p90 = cpuLoads.Percentile(90).ToDecimal(2),
+        p99 = cpuLoads.Percentile(99).ToDecimal(2),
+        p999 = cpuLoads.Percentile(99.9).ToDecimal(2),
+        average = counters.Average(c => c.CpuLoad).ToDecimal(2),
+        stdev = cpuLoads.StandardDeviation().ToDecimal(2),
+      },
+      ["内存使用量(MB)"] = new {
+        p50 = memUse.Percentile(50).ToDecimal(2),
+        p75 = memUse.Percentile(75).ToDecimal(2),
+        p90 = memUse.Percentile(90).ToDecimal(2),
+        p99 = memUse.Percentile(99).ToDecimal(2),
+        p999 = memUse.Percentile(99.9).ToDecimal(2),
+        average = counters.Average(c => c.MemoryUsage).ToDecimal(2),
+        stdev = memUse.StandardDeviation().ToDecimal(2),
+      },
+      ["网站CPU使用率(%)"] = new {
+        p50 = processCpuLoads.Percentile(50).ToDecimal(2),
+        p75 = processCpuLoads.Percentile(75).ToDecimal(2),
+        p90 = processCpuLoads.Percentile(90).ToDecimal(2),
+        p99 = processCpuLoads.Percentile(99).ToDecimal(2),
+        p999 = processCpuLoads.Percentile(99.9).ToDecimal(2),
+        average = counters.Average(c => c.ProcessCpuLoad).ToDecimal(2),
+        stdev = processCpuLoads.StandardDeviation().ToDecimal(2),
+      },
+      ["网站内存使用量(MB)"] = new {
+        p50 = processMemUse.Percentile(50).ToDecimal(2),
+        p75 = processMemUse.Percentile(75).ToDecimal(2),
+        p90 = processMemUse.Percentile(90).ToDecimal(2),
+        p99 = processMemUse.Percentile(99).ToDecimal(2),
+        p999 = processMemUse.Percentile(99.9).ToDecimal(2),
+        average = counters.Average(c => c.ProcessMemoryUsage).ToDecimal(2),
+        stdev = processMemUse.StandardDeviation().ToDecimal(2),
+      },
+      ["磁盘读(KBps)"] = new {
+        p50 = reads.Percentile(50).ToDecimal(2),
+        p75 = reads.Percentile(75).ToDecimal(2),
+        p90 = reads.Percentile(90).ToDecimal(2),
+        p99 = reads.Percentile(99).ToDecimal(2),
+        p999 = reads.Percentile(99.9).ToDecimal(2),
+        average = counters.Average(c => c.DiskRead).ToDecimal(2),
+        stdev = reads.StandardDeviation().ToDecimal(2),
+      },
+      ["磁盘写(KBps)"] = new {
+        p50 = writes.Percentile(50).ToDecimal(2),
+        p75 = writes.Percentile(75).ToDecimal(2),
+        p90 = writes.Percentile(90).ToDecimal(2),
+        p99 = writes.Percentile(99).ToDecimal(2),
+        p999 = writes.Percentile(99.9).ToDecimal(2),
+        average = counters.Average(c => c.DiskWrite).ToDecimal(2),
+        stdev = writes.StandardDeviation().ToDecimal(2)
+      },
+      ["网络下载(KBps)"] = new {
+        p50 = downloads.Percentile(50).ToDecimal(2),
+        p75 = downloads.Percentile(75).ToDecimal(2),
+        p90 = downloads.Percentile(90).ToDecimal(2),
+        p99 = downloads.Percentile(99).ToDecimal(2),
+        p999 = downloads.Percentile(99.9).ToDecimal(2),
+        average = counters.Average(c => c.Download).ToDecimal(2),
+        stdev = downloads.StandardDeviation().ToDecimal(2)
+      },
+      ["网络上行(KBps)"] = new {
+        p50 = uploads.Percentile(50).ToDecimal(2),
+        p75 = uploads.Percentile(75).ToDecimal(2),
+        p90 = uploads.Percentile(90).ToDecimal(2),
+        p99 = uploads.Percentile(99).ToDecimal(2),
+        p999 = uploads.Percentile(99.9).ToDecimal(2),
+        average = counters.Average(c => c.Upload).ToDecimal(2),
+        stdev = uploads.StandardDeviation().ToDecimal(2)
+      }
+    };
+  }
 
-    public Dictionary<string, dynamic> GetCounterPercent()
-    {
-        var counters = PerfCounter.CreateDataSource().Where(c => c.ServerIP==_ip).OrderByRandom().Take(15000).ToList();
-        var cpuLoads = counters.Select(c => c.CpuLoad).ToList();
-        var processCpuLoads = counters.Select(c => c.ProcessCpuLoad).ToList();
-        var memUse = counters.Select(c => c.MemoryUsage).ToList();
-        var processMemUse = counters.Select(c => c.ProcessMemoryUsage).ToList();
-        var reads = counters.Select(c => c.DiskRead).ToList();
-        var writes = counters.Select(c => c.DiskWrite).ToList();
-        var downloads = counters.Select(c => c.Download).ToList();
-        var uploads = counters.Select(c => c.Upload).ToList();
-        return new Dictionary<string, dynamic> {
-            ["CPU使用率(%)"] = new
-            {
-                p50 = cpuLoads.Percentile(50).ToDecimal(2),
-                p75 = cpuLoads.Percentile(75).ToDecimal(2),
-                p90 = cpuLoads.Percentile(90).ToDecimal(2),
-                p99 = cpuLoads.Percentile(99).ToDecimal(2),
-                p999 = cpuLoads.Percentile(99.9).ToDecimal(2),
-                average = counters.Average(c => c.CpuLoad).ToDecimal(2),
-                stdev = cpuLoads.StandardDeviation().ToDecimal(2),
-            },
-            ["内存使用量(MB)"] = new
-            {
-                p50 = memUse.Percentile(50).ToDecimal(2),
-                p75 = memUse.Percentile(75).ToDecimal(2),
-                p90 = memUse.Percentile(90).ToDecimal(2),
-                p99 = memUse.Percentile(99).ToDecimal(2),
-                p999 = memUse.Percentile(99.9).ToDecimal(2),
-                average = counters.Average(c => c.MemoryUsage).ToDecimal(2),
-                stdev = memUse.StandardDeviation().ToDecimal(2),
-            },
-            ["网站CPU使用率(%)"] = new
-            {
-                p50 = processCpuLoads.Percentile(50).ToDecimal(2),
-                p75 = processCpuLoads.Percentile(75).ToDecimal(2),
-                p90 = processCpuLoads.Percentile(90).ToDecimal(2),
-                p99 = processCpuLoads.Percentile(99).ToDecimal(2),
-                p999 = processCpuLoads.Percentile(99.9).ToDecimal(2),
-                average = counters.Average(c => c.ProcessCpuLoad).ToDecimal(2),
-                stdev = processCpuLoads.StandardDeviation().ToDecimal(2),
-            },
-            ["网站内存使用量(MB)"] = new
-            {
-                p50 = processMemUse.Percentile(50).ToDecimal(2),
-                p75 = processMemUse.Percentile(75).ToDecimal(2),
-                p90 = processMemUse.Percentile(90).ToDecimal(2),
-                p99 = processMemUse.Percentile(99).ToDecimal(2),
-                p999 = processMemUse.Percentile(99.9).ToDecimal(2),
-                average = counters.Average(c => c.ProcessMemoryUsage).ToDecimal(2),
-                stdev = processMemUse.StandardDeviation().ToDecimal(2),
-            },
-            ["磁盘读(KBps)"] = new
-            {
-                p50 = reads.Percentile(50).ToDecimal(2),
-                p75 = reads.Percentile(75).ToDecimal(2),
-                p90 = reads.Percentile(90).ToDecimal(2),
-                p99 = reads.Percentile(99).ToDecimal(2),
-                p999 = reads.Percentile(99.9).ToDecimal(2),
-                average = counters.Average(c => c.DiskRead).ToDecimal(2),
-                stdev = reads.StandardDeviation().ToDecimal(2),
-            },
-            ["磁盘写(KBps)"] = new
-            {
-                p50 = writes.Percentile(50).ToDecimal(2),
-                p75 = writes.Percentile(75).ToDecimal(2),
-                p90 = writes.Percentile(90).ToDecimal(2),
-                p99 = writes.Percentile(99).ToDecimal(2),
-                p999 = writes.Percentile(99.9).ToDecimal(2),
-                average = counters.Average(c => c.DiskWrite).ToDecimal(2),
-                stdev = writes.StandardDeviation().ToDecimal(2)
-            },
-            ["网络下载(KBps)"] = new
-            {
-                p50 = downloads.Percentile(50).ToDecimal(2),
-                p75 = downloads.Percentile(75).ToDecimal(2),
-                p90 = downloads.Percentile(90).ToDecimal(2),
-                p99 = downloads.Percentile(99).ToDecimal(2),
-                p999 = downloads.Percentile(99.9).ToDecimal(2),
-                average = counters.Average(c => c.Download).ToDecimal(2),
-                stdev = downloads.StandardDeviation().ToDecimal(2)
-            },
-            ["网络上行(KBps)"] = new
-            {
-                p50 = uploads.Percentile(50).ToDecimal(2),
-                p75 = uploads.Percentile(75).ToDecimal(2),
-                p90 = uploads.Percentile(90).ToDecimal(2),
-                p99 = uploads.Percentile(99).ToDecimal(2),
-                p999 = uploads.Percentile(99.9).ToDecimal(2),
-                average = counters.Average(c => c.Upload).ToDecimal(2),
-                stdev = uploads.StandardDeviation().ToDecimal(2)
-            }
-        };
-    }
+  /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+  public void Dispose() {
+    _process.Dispose();
+    _processes.ForEach(p => p.Dispose());
+  }
 
-    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
-    public void Dispose()
-    {
-        _process.Dispose();
-        _processes.ForEach(p => p.Dispose());
-    }
 }
