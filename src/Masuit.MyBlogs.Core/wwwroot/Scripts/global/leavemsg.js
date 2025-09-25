@@ -1,314 +1,425 @@
-﻿$(function() {
-	layui.use('layedit', function() {
-		layui.layedit.build('layedit', {
-			tool: ["strong", "italic", 'link', "unlink", "face"],
-			height: 150
-		});
-	});
-	$("#OperatingSystem").val(DeviceInfo.OS.toString());
-	$("#Browser").val(DeviceInfo.browserInfo.Name+" "+DeviceInfo.browserInfo.Version);
-	window.getmsgs();
-	
-	//异步提交留言表单开始
-	$("#msg-form").on("submit", function(e) {
-		e.preventDefault();
-		layui.layedit.sync(1);
-		if ($("#name").val().trim().length <= 0 || $("#name").val().trim().length > 24) {
-			window.notie.alert({
-				type: 3,
-				text: '昵称要求2-24个字符！',
-				time: 4
-			});
-			loadingDone();
-			return;
-		}
-		if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($("#email").val().trim())) {
-			window.notie.alert({
-				type: 3,
-				text: '请输入正确的邮箱格式！',
-				time: 4
-			});
-			loadingDone();
-			return;
-		}
-		if($("#email").val().indexOf("163")>1||$("#email").val().indexOf("126")>1) {
-			var _this=this;
-			swal({
-				title: '邮箱确认',
-				text: "检测到您输入的邮箱是网易邮箱，本站的邮件服务器可能会因为您的反垃圾设置而无法将邮件正常发送到您的邮箱，建议使用您的其他邮箱，或者检查反垃圾设置后，再点击确定按钮继续！",
-				showCancelButton: true,
-				confirmButtonColor: '#3085d6',
-				cancelButtonColor: '#d33',
-				confirmButtonText: '确定',
-				cancelButtonText: '换个邮箱',
-				confirmButtonClass: 'btn btn-success btn-lg',
-				cancelButtonClass: 'btn btn-danger btn-lg',
-				buttonsStyling: false
-			}).then(function(isConfirm) {
-				if (isConfirm === true) {
-					submitComment(_this);
-				}
-			});
-			return;
-		}
-		if ($("#layedit").val().trim().length <= 2 || $("#layedit").val().trim().length > 1000) {
-			window.notie.alert({
-				type: 3,
-				text: '内容过短或者超长，请输入有效的留言内容！',
-				time: 4
-			});
-			loadingDone();
-			return;
-		}
-		submitComment(this);
-	});
-	//异步提交留言表单结束
-	
-	//表单取消按钮
-	$(".btn-cancel").click(function() {
-		$(':input', '#reply-form').not(':button,:submit,:reset,:hidden').val('').removeAttr('checked').removeAttr('checked'); //评论成功清空表单
-		//Custombox.close();
-		layer.closeAll();
-		setTimeout(function() {
-			$("#reply").css("display", "none");
-		}, 500);
-	});
-
-	//回复表单的提交
-	$("#reply-form").on("submit", function(e) {
-		e.preventDefault();
-		layui.layedit.sync(window.currentEditor);
-		if ($("#name2").val().trim().length <= 0 || $("#name").val().trim().length > 24) {
-			window.notie.alert({
-				type: 3,
-				text: "昵称要求2-24个字符！",
-				time: 4
-			});
-			loadingDone();
-			return;
-		}
-		if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($("#email2").val().trim())) {
-			window.notie.alert({
-				type: 3,
-				text: "请输入正确的邮箱格式！",
-				time: 4
-			});
-			loadingDone();
-			return;
-		}
-		window.post("/Msg/submit", $(this).serializeObject(), (data) => {
-			loadingDone();
-			if (data && data.Success) {
-				window.notie.alert({
-					type: 1,
-					text: data.Message,
-					time: 4
-				});
-				layer.closeAll();
-					setTimeout(function() {
-					window.getmsgs();
-					$("#reply").css("display", "none");
-					$("[id^=LAY_layedit]").contents().find('body').html('');
-				}, 500);
-			} else {
-				window.notie.alert({
-					type: 3,
-					text: data.Message,
-					time: 4
-				});
-			}
-		});
-	});
-	
-	$("#getcode").on("click", function (e) {
-		e.preventDefault();
-		layer.tips('正在发送验证码，请稍候...', '#getcode', {
-			tips: [1, '#3595CC'],
-			time: 30000
-		});
-		$("#getcode").attr('disabled', true);
-		$.post("/validate/sendcode", {
-			__RequestVerificationToken: $("[name=__RequestVerificationToken]").val(),
-			email: $("#email").val()
-		}, function (data) {
-			if (data.Success) {
-				layer.tips('验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！', '#getcode', {
-					tips: [1, '#3595CC'],
-					time: 5000
-				});
-				var count = 0;
-				var timer = setInterval(function () {
-					count++;
-					$("#getcode").text('重新发送(' + (120 - count) + ')');
-					if (count > 120) {
-						clearInterval(timer);
-						$("#getcode").attr('disabled', false);
-						$("#getcode").text('重新发送');
-					}
-				}, 1000);
-			} else {
-				layer.tips(data.Message, '#getcode', {
-					tips: [1, '#3595CC'],
-					time: 5000
-				});
-				$("#getcode").attr('disabled', false);
-			}
-		});
-	});
-	$("#getcode-reply").on("click", function (e) {
-		e.preventDefault();
-		layer.tips('正在发送验证码，请稍候...', '#getcode-reply', {
-			tips: [1, '#3595CC'],
-			time: 30000
-		});
-		$("#getcode-reply").attr('disabled', true);
-		$.post("/validate/sendcode", {
-			__RequestVerificationToken: $("[name=__RequestVerificationToken]").val(),
-			email: $("#email2").val()
-		}, function (data) {
-			if (data.Success) {
-				layer.tips('验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！', '#getcode-reply', {
-					tips: [1, '#3595CC'],
-					time: 5000
-				});
-				$("#getcode-reply").attr('disabled', true);
-				var count = 0;
-				var timer = setInterval(function () {
-					count++;
-					$("#getcode-reply").text('重新发送(' + (120 - count) + ')');
-					if (count > 120) {
-						clearInterval(timer);
-						$("#getcode-reply").attr('disabled', false);
-						$("#getcode-reply").text('重新发送');
-					}
-				}, 1000);
-			} else {
-				layer.tips(data.Message, '#getcode-reply', {
-					tips: [1, '#3595CC'],
-					time: 5000
-				});
-				$("#getcode-reply").attr('disabled', false);
-			}
-		});
-	});
-
+﻿
+const { createApp, ref, onMounted, watch, computed, defineComponent, nextTick } = Vue;
+const { createDiscreteApi } = naive;
+const MessageReplies = defineComponent({
+  name: 'MessageReplies',
+  props: {
+    msg: { type: Array, required: true },
+    depth: { type: Number, default: 0 },
+    isAdmin: { type: Boolean, default: false }
+  },
+  emits: ['pass', 'del', 'bounce-email', 'reply-msg'],
+  methods: {
+    pass(id) { this.$emit('pass', id); },
+    del(id) { this.$emit('del', id); },
+    bounceEmail(email) { this.$emit('bounce-email', email); },
+    replyMsg(item) { this.$emit('reply-msg', item); },
+    GetOperatingSystem(os) { return window.GetOperatingSystem(os); },
+    GetBrowser(browser) { return window.GetBrowser(browser); },
+    getColor(depth) {
+      const colors = ['info', 'success', 'primary', 'warning', 'danger'];
+      return colors[(depth + 1) % 5];
+    }
+  },
+  computed: {
+    sortedMsg() {
+      return this.msg.slice().sort((x, y) => x.Id - y.Id);
+    }
+  },
+  template: `
+    <div>
+      <article v-for="(item, idx) in sortedMsg" :key="item.Id" class="panel" :class="'panel-' + getColor(depth)">
+        <div class="panel-heading">
+          {{depth + 1}}-{{idx + 1}}# 
+          <i v-if="item.IsMaster" class="icon icon-user"></i>
+          {{item.NickName}}
+          <span v-if="item.IsMaster">(管理员)</span> | {{item.PostDate}}
+          <span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">
+            <span v-if="isAdmin">
+              <a v-if="item.Status==4" class="label label-success" @click="pass(item.Id)">通过</a> |
+              <a class="label label-danger" @click="del(item.Id)">删除</a> |
+            </span>
+            <span class="hidden-sm hidden-xs" v-html="GetOperatingSystem(item.OperatingSystem) + ' | ' + GetBrowser(item.Browser)"></span>
+          </span>
+        </div>
+        <div class="panel-body line-height24">
+          <div v-html="item.Content"></div>
+          <a class="reply" :class="'label label-' + getColor(depth)" @click="replyMsg(item)">
+            <i class="icon-comment"></i>
+          </a>
+          <div v-if="isAdmin">
+            <div class="margin-top10"></div>
+            <div class="pull-left">
+              <span class="label label-success">{{item.IP}}</span>
+              <span class="label label-primary">{{item.Location}}</span>
+            </div>
+            <div class="pull-right">
+              <span class="label label-success" @click="bounceEmail(item.Email)">{{item.Email}}</span>
+            </div>
+          </div>
+          <br/>
+          <message-replies v-if="item.Children && item.Children.length"
+            :msg="item.Children"
+            :depth="depth + 1"
+            :is-admin="isAdmin"
+            @bounce-email="bounceEmail"
+            @reply-msg="replyMsg"
+            @pass="$emit('pass', $event)"
+            @del="$emit('del', $event)">
+          </message-replies>
+        </div>
+      </article>
+    </div>
+  `
 });
-/**
- * 提交留言
- * @returns {} 
- */
-function submitComment(_this) {
-	loading();
-	window.post("/Msg/submit", $(_this).serializeObject(), (data) => {
-		loadingDone();
-		if (data && data.Success) {
-			window.notie.alert({
-				type: 1,
-				text:data.Message,
-				time: 4
-			});
-			setTimeout(function() {
-				getmsgs();
-				$("[id^=LAY_layedit]").contents().find('body').html('');
-			},100);
-		} else {
-			window.notie.alert({
-				type: 3,
-				text: data.Message,
-				time: 4
-			});
-		}
-	});
-}
 
-//评论回复按钮事件
-function bindReplyBtn() {
-	$(".msg-list article .panel-body a.reply").on("click", function (e) {
-		e.preventDefault();
-		loadingDone();
-		var href = $(this).attr("href");
-		var uid = href.substring(href.indexOf("uid") + 4);
-		$("#uid").val(uid);
-		$("#OperatingSystem2").val(DeviceInfo.OS.toString());
-		$("#Browser2").val(DeviceInfo.browserInfo.Name+" "+DeviceInfo.browserInfo.Version);
-		layui.use("layer", function() {
-			var layer = layui.layer;
-			layer.open({
-				type: 1,
-				zIndex:20,
-				title: '回复留言',
-				area: (window.screen.width > 540 ? 540 : window.screen.width) + 'px',// '340px'], //宽高
-				content: $("#reply"),
-				end: function() {
-					$("#reply").css("display", "none");
-				}
-			});
-		});
-		$(".layui-layer").insertBefore($(".layui-layer-shade"));
-		window.currentEditor = layui.layedit.build('layedit2', {
-			tool: ["strong", "italic", 'link', "unlink", "face"],
-			height: 100
-		});
-	});
-}
+const ParentMessages = defineComponent({
+  name: 'ParentMessages',
+  props: { data: Object, isAdmin: { type: Boolean, default: false } },
+  components: { MessageReplies },
+  emits: ['reply-msg', 'getmsgs'],
+  computed: {
+    startfloor() {
+      if (!this.data) return 1;
+      const page = Math.min(Math.max(this.data.page, 1), Math.ceil(this.data.total / this.data.size));
+      return this.data.parentTotal - (page - 1) * this.data.size;
+    }
+  },
+  methods: {
+    pass(id) {
+      axios.post("/msg/pass/" + id).then((res) => {
+        window.message.info(res.data.Message);
+        this.$emit('getmsgs');
+      });
+    },
+    del(id) {
+      dialog.warning({
+        title: '删除留言',
+        content: '确认删除这条留言吗？',
+        positiveText: '确定',
+        negativeText: '取消',
+        draggable: true,
+        onPositiveClick: () => {
+          axios.post("/msg/delete/" + id).then((res) => {
+            message.success(res.data.Message);
+            this.$emit('getmsgs', null);
+          });
+        }
+      })
+    },
+    replyMsg(item) { this.$emit('reply-msg', item); },
+    bounceEmail(email) {
+      dialog.warning({
+        title: '添加邮箱黑名单',
+        content: '确认将此邮箱添加到黑名单吗？',
+        positiveText: '确定',
+        negativeText: '取消',
+        draggable: true,
+        onPositiveClick: () => {
+          axios.post("/system/BounceEmail", { email: email }).then(() => {
+            message.success('邮箱添加到黑名单成功');
+          }).catch(() => {
+            message.error('操作失败，请稍候再试');
+          });
+        }
+      })
+    },
+    GetOperatingSystem(os) { return window.GetOperatingSystem(os); },
+    GetBrowser(browser) { return window.GetBrowser(browser); }
+  },
+  template: `
+    <ul v-if="data && data.rows" class="animated fadeInRight media-list wow">
+      <li v-for="(row, idx) in data.rows" :key="row.Id" class="msg-list media animated fadeInRight" :id="row.Id">
+        <div class="media-body">
+          <article class="panel panel-info">
+            <header class="panel-heading">
+              {{startfloor - idx}}# 
+              <i v-if="row.IsMaster" class="icon icon-user"></i>
+              {{row.NickName}}<span v-if="row.IsMaster">(管理员)</span>
+              | {{row.PostDate}}
+              <span class="pull-right" style="font-size: 10px;">
+                <span v-if="isAdmin">
+                  <a v-if="row.Status==4" class="label label-success" @click="pass(row.Id)">通过</a> |
+                  <a class="label label-danger" @click="del(row.Id)">删除</a> |
+                </span>
+                <span class="hidden-sm hidden-xs" v-html="GetOperatingSystem(row.OperatingSystem) + ' | ' + GetBrowser(row.Browser)"></span>
+              </span>
+            </header>
+            <div class="panel-body line-height24">
+              <div v-html="row.Content"></div>
+              <a class="reply label label-info" @click="replyMsg(row)">
+                <i class="icon-comment"></i>
+              </a>
+              <div v-if="isAdmin">
+                <div class="margin-top10"></div>
+                <div class="pull-left">
+                  <span class="label label-success">{{row.IP}}</span>
+                  <span class="label label-primary">{{row.Location}}</span>
+                </div>
+                <div class="pull-right">
+                  <span class="label label-success" @click="bounceEmail(row.Email)">{{row.Email}}</span>
+                </div>
+                <br/>
+              </div>
+              <message-replies
+                v-if="row.Children && row.Children.length"
+                :msg="row.Children"
+                :depth="0"
+                :is-admin="isAdmin"
+                @pass="pass"
+                @bounce-email="bounceEmail"
+                @reply-msg="replyMsg"
+                @del="del"></message-replies>
+            </div>
+          </article>
+        </div>
+      </li>
+    </ul>
+  `
+});
 
-//递归加载留言
-//加载父楼层
-function loadParentMsgs(data) {
-	loading();
-	var html = '';
-	if (data) {
-		var rows = data.rows;
-		var page = data.page;
-		var size = data.size;
-		var maxPage = Math.ceil(data.total / size);
-		page = page > maxPage ? maxPage : page;
-		page = page < 1 ? 1 : page;
-		var startfloor = data.parentTotal - (page - 1) * size;
-		for (let i = 0; i < rows.length; i++) {
-			html += `<li class="msg-list media animated fadeInRight" id='${rows[i].Id}'>
-						   <div class="media-body">
-								<article class="panel panel-info">
-									<header class="panel-heading">${startfloor--}# ${rows[i].IsMaster? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows  [i].IsMaster ? `(管理员)` : ""} | ${rows[i].PostDate}
-										<span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span>
-									</header>
-									<div class="panel-body line-height24">
-										${rows[i].Content}
-										<a class="reply label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
-										${loadMsgs(rows[i].Children)}
-									</div>
-								</article>
-							</div>
-						</li>`;
-		}
-	}
-	loadingDone();
-	return html;
-}
-
-//加载子楼层
-function loadMsgs(msg, depth = 0) {
-	msg.sort(function(x, y) {
-		return x.Id - y.Id;
-	});
-
-	var colors = ["info", "success", "primary", "warning", "danger"];
-	var floor = 1;
-	depth++;
-	var html = '';
-	for (let item of msg) {
-		var color = colors[depth % 5];
-		html += `<article id="${item.Id}" class="panel panel-${color}">
-						<div class="panel-heading">
-							${depth}-${floor++}# ${item.IsMaster ? `<i class="icon icon-user"></i>` : ""}${item.NickName}${item.IsMaster ? `(管理员)` : ""} | ${item.PostDate}<span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}
-							</span>
-						</div>
-						<div class="panel-body line-height24">
-							${item.Content}
-							<a class="reply label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
-							${loadMsgs(item.Children, depth)}
-						</div>
-					</article>`;
-	}
-	return html;
-}
+createApp({
+  components: { ParentMessages },
+  setup() {
+    const user = window.defaultUser ? window.defaultUser() : { NickName: '', Email: '', Agree: false };
+    const msg = ref({
+      Content: '',
+      Id: 0,
+      NickName: user.NickName,
+      Email: user.Email,
+      ParentId: null,
+      Agree: user.Agree,
+      OperatingSystem: DeviceInfo.OS.toString(),
+      Browser: DeviceInfo.browserInfo.Name + " " + DeviceInfo.browserInfo.Version
+    });
+    const reply = ref({
+      for: null,
+      Content: '',
+      Id: 0,
+      NickName: user.NickName,
+      Email: user.Email,
+      ParentId: null,
+      Agree: user.Agree,
+      OperatingSystem: DeviceInfo.OS.toString(),
+      Browser: DeviceInfo.browserInfo.Name + " " + DeviceInfo.browserInfo.Version
+    });
+    const disableGetcode = ref(false);
+    const codeMsg = ref("获取验证码");
+    const list = ref([]);
+    const cid = new URLSearchParams(window.location.search).get("cid") || 0;
+    const pageConfig = ref({
+      page: 1,
+      size: 10,
+      total: 0
+    });
+    return {
+      msg,
+      reply,
+      disableGetcode,
+      codeMsg,
+      list,
+      cid,
+      pageConfig
+    };
+  },
+  data() {
+    return {
+      showPopup: false,
+      showModel: false
+    };
+  },
+  methods: {
+    submit(item) {
+      if (item.NickName.trim().length <= 0 || item.NickName.trim().length > 24) {
+        message.error('昵称要求2-24个字符！');
+        loadingDone();
+        return;
+      }
+      if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(item.Email.trim())) {
+        message.error('请输入正确的邮箱格式！');
+        loadingDone();
+        return;
+      }
+      if (item.Content.trim().length <= 2 || item.Content.trim().length > 1000) {
+        message.error('内容过短或者超长，请输入有效的留言内容！');
+        loadingDone();
+        return;
+      }
+      if (item.Email.indexOf("163") > 1 || item.Email.indexOf("126") > 1) {
+        dialog.warning({
+          title: '邮箱确认',
+          content: '检测到您输入的邮箱是网易邮箱，本站的邮件服务器可能会因为您的反垃圾设置而无法将邮件正常发送到您的邮箱，建议使用您的其他邮箱，或者检查反垃圾设置后，再点击确定按钮继续！',
+          positiveText: '确定',
+          negativeText: '取消',
+          draggable: true,
+          onPositiveClick: () => {
+            this.postMessage(item);
+          }
+        });
+        return;
+      }
+      this.postMessage(item);
+    },
+    postMessage(item) {
+      axios.create({
+        headers: {
+          'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+      }).post("/Msg/submit", item).then((response) => {
+        loadingDone();
+        const data = response.data;
+        if (data && data.Success) {
+          window.notie.alert({
+            type: 1,
+            text: data.Message,
+            time: 4
+          });
+          this.getmsgs();
+        } else {
+          window.notie.alert({
+            type: 3,
+            text: data.Message,
+            time: 4
+          });
+        }
+      });
+    },
+    getmsgs() {
+      axios.get(`/msg/getmsgs?page=${this.pageConfig.page}&size=${this.pageConfig.size}&cid=${this.cid}`).then((response) => {
+        this.list = response.data.Data;
+        this.pageConfig.total = this.list.total;
+      });
+    },
+    async getcode(email) {
+      message.info('正在发送验证码，请稍候...');
+      const data = await axios.create({
+        headers: {
+          'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+      }).post("/validate/sendcode", {
+        //__RequestVerificationToken: document.querySelector('input[name="__RequestVerificationToken"]').value,
+        email: email
+      }).then(res => res.data);
+      if (data.Success) {
+        this.disableGetcode = true;
+        message.success('验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！');
+        localStorage.setItem("user", JSON.stringify({ NickName: this.reply.NickName || this.msg.NickName, Email: this.reply.Email || this.msg.Email }));
+        var count = 0;
+        var timer = setInterval(() => {
+          count++;
+          this.codeMsg = '重新发送(' + (120 - count) + ')';
+          if (count > 120) {
+            clearInterval(timer);
+            this.disableGetcode = false;
+            this.codeMsg = '重新发送';
+          }
+        }, 1000);
+      } else {
+        message.error(data.Message);
+        this.disableGetcode = false;
+      }
+    },
+    replyMsg(item) {
+      this.reply.ParentId = item.Id;
+      this.reply.for = item;
+      this.showPopup = true;
+    }
+  },
+  watch: {
+    'pageConfig.page'(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.getmsgs();
+      }
+    },
+    'pageConfig.size'(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.getmsgs();
+      }
+    },
+    showPopup(newVal) {
+      if (newVal) {
+        nextTick(() => {
+          window.ue2 = UE.getEditor('editor2', {
+            //这里可以选择自己需要的工具按钮名称,此处仅选择如下五个
+            toolbars: [['source', //源代码
+              'removeformat', //清除格式
+              'bold', //加粗
+              'italic', //斜体
+              'underline', //下划线
+              'strikethrough', //删除线
+              'blockquote', //引用
+              'pasteplain', //纯文本粘贴模式
+              'fontsize', //字号
+              'paragraph', //段落格式
+              'forecolor', //字体颜色
+              'backcolor', //背景色
+              'insertcode', //代码语言
+              'horizontal', //分隔线
+              'justifyleft', //居左对齐
+              'justifyright', //居右对齐
+              'justifycenter', //居中对齐
+              'link', //超链接
+              'unlink', //取消链接
+              'emotion', //表情
+              'simpleupload', //单图上传
+              'insertorderedlist', //有序列表
+              'insertunorderedlist', //无序列表
+            ]],
+            initialFrameWidth: null,
+            //默认的编辑区域高度
+            initialFrameHeight: 200
+          });
+          ue2.addListener('contentChange', () => {
+            this.reply.Content = ue2.getContent();
+          });
+        });
+      } else {
+        if (window.ue2) {
+          window.ue2.destroy();
+        }
+      }
+    }
+  },
+  mounted() {
+    const { message, dialog } = createDiscreteApi(["message", "dialog"]);
+    message.info('欢迎使用留言板，期待你的留言！');
+    window.message = message;
+    window.dialog = dialog;
+    this.getmsgs();
+    if (window.UE) {
+      window.ue = UE.getEditor('editor', {
+        //这里可以选择自己需要的工具按钮名称,此处仅选择如下五个
+        toolbars: [['source', //源代码
+          'removeformat', //清除格式
+          'bold', //加粗
+          'italic', //斜体
+          'underline', //下划线
+          'strikethrough', //删除线
+          'blockquote', //引用
+          'pasteplain', //纯文本粘贴模式
+          'fontsize', //字号
+          'paragraph', //段落格式
+          'forecolor', //字体颜色
+          'backcolor', //背景色
+          'insertcode', //代码语言
+          'horizontal', //分隔线
+          'justifyleft', //居左对齐
+          'justifyright', //居右对齐
+          'justifycenter', //居中对齐
+          'link', //超链接
+          'unlink', //取消链接
+          'emotion', //表情
+          'simpleupload', //单图上传
+          'insertorderedlist', //有序列表
+          'insertunorderedlist', //无序列表
+        ]],
+        initialFrameWidth: null,
+        //默认的编辑区域高度
+        initialFrameHeight: 200
+      });
+      ue.addListener('contentChange', () => {
+        this.msg.Content = ue.getContent();
+      });
+    }
+  }
+}).use(naive).mount('#msgApp');

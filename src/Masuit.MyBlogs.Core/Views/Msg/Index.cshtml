@@ -1,163 +1,137 @@
 ﻿@model string
 @{
-    ViewBag.Title = "留言板";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    var cid = Context.Request.RouteValues["cid"]??Context.Request.Query["cid"];
-    string hidden = string.IsNullOrEmpty(Context.Request.Cookies["ValidateKey"]) ? "" : "hidden";
+  ViewBag.Title = "留言板";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  string hidden = string.IsNullOrEmpty(Context.Request.Cookies["ValidateKey"]) ? "" : "hidden";
 }
-<link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
-<script src="~/Assets/layui/layui.all.js"></script>
-<div class="container min-height610">
-    <ol class="cd-breadcrumb triangle">
-        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-        <li class="current">
-            <em>@ViewBag.Title</em>
-        </li>
-    </ol>
-    <h3 class="size24">
-        留言须知：
-    </h3>
-    @Html.Raw(Model)
-    <p>　</p>
-    <form class="form-horizontal animated pulse" id="msg-form" method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="OperatingSystem" id="OperatingSystem" />
-        <input type="hidden" name="Browser" id="Browser" />
-        @if(hidden==nameof(hidden)) {
-            <p>@Context.Request.Cookies["NickName"] 您好！</p>
-        }
-        <div class="row @hidden">
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <label for="name">昵称：</label>
-                    </span>
-                    <input type="text" class="form-control" name="NickName" id="name" required placeholder="昵称" value="@Context.Request.Cookies["NickName"]">
-                </div>
-            </div>
-            <div class="col-md-5">
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <label for="email">邮箱：</label>
-                    </span>
-                    <input type="email" class="form-control" name="Email" id="email" required placeholder="留下您的真实邮箱，以方便接收回复" value="@Context.Request.Cookies["Email"]">
-                    <span class="input-group-btn">
-                        <button type="button" id="getcode" class="btn btn-danger">
-                            获取验证码
-                        </button>
-                    </span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="input-group">
-                    <span class="input-group-addon">验证码：</span>
-                    <input type="text" class="form-control" name="Code" placeholder="验证码">
-                </div>
-            </div>
-        </div>
-        <div class="form-group overlay animated fadeInDown" style="margin-bottom: 0px !important;">
-            <textarea class="layui-textarea" id="layedit" name="Content" style="height: 200px"></textarea>
-        </div>
-        <label><input type="checkbox" name="Agree" value="true" required/>我已阅读<a asp-controller="Misc" asp-action="agreement" target="_blank">《留言须知》</a></label>
-        <div class="form-group">
-            <div class="col-xs-12">
-                <button type="submit" class="btn btn-info btn-lg">
-                    发表留言
-                </button>
-                <a class="text-red">留言框可粘贴网络图片</a>
-            </div>
-        </div>
-    </form>
-    <ul class="wow media-list"></ul>
-    <div class="row">
-        <div class="col-md-12 text-center">
-            <div id="pageToolbar"></div>
-        </div>
-    </div>
-</div>
-<div style="position: fixed; left: -20000px; bottom: -20000px;">
-    <div id="reply" class="container-fluid">
-        <form class="form-horizontal" id="reply-form" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="OperatingSystem" id="OperatingSystem2" />
-            <input type="hidden" name="Browser" id="Browser2" />
-            @if(hidden==nameof(hidden)) {
-                <p>@Context.Request.Cookies["NickName"] 您好！</p>
-            }
-            <div class="@hidden">
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <label for="name">昵称：</label>
-                    </span>
-                    <input type="text" class="form-control" name="NickName" id="name2" required placeholder="昵称" value="@Context.Request.Cookies["NickName"]">
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon">
-                        <label for="email">邮箱：</label>
-                    </span>
-                    <input type="email" class="form-control" name="Email" id="email2" required placeholder="留下您的真实邮箱，以方便接收回复" value="@Context.Request.Cookies["Email"]">
-                    <span class="input-group-btn">
-                        <button type="button" id="getcode-reply" class="btn btn-danger">
-                            获取验证码
-                        </button>
-                    </span>
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon">验证码：</span>
-                    <input type="text" class="form-control" name="Code" placeholder="验证码">
-                </div>
-            </div>
-            <input type="hidden" value="" id="uid" name="ParentId" />
-            <div class="form-group overlay">
-                <textarea class="layui-textarea" id="layedit2" name="Content" style="height: 80px"></textarea>
-            </div>
-            <label><input type="checkbox" name="Agree" value="true" required/>我已阅读<a asp-controller="Misc" asp-action="agreement" target="_blank">《留言须知》</a></label>
-            <div class="form-group">
-                <div class="col-xs-12">
-                    <div class="btn-group">
-                        <button type="submit" class="btn btn-info">
-                            提交
-                        </button>
-                        <button type="button" class="btn-cancel btn btn-danger">
-                            取消
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-<script src="~/Scripts/global/leavemsg.js"></script>
-<script>
-    window.onload = function() {
-        loading();
-        $('#pageToolbar').Paging({ //异步加载评论
-            pagesize: 10,
-            count: @ViewBag.TotalCount,
-            toolbar: true,
-            callback: function(page, size, count) {
-                $.get("/msg/getmsgs?page="+page+"&size="+size, function (data){
-                    data = data.Data;
-                    if (data) {
-                        document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
-                        bindReplyBtn();
-                    }
-                });
-            }
-        });
-        loadingDone();
-    };
-
-    /**
-   * 获取留言
-   */
-    function getmsgs() {
-        $.get("/msg/getmsgs?page=1&size=10&cid=@cid", function(data){
-            data = data.Data;
-            if (data) {
-                document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
-                bindReplyBtn();
-            }
-        });
+<div class="container min-height610" id="msgApp">
+  <ol class="cd-breadcrumb triangle">
+    <li>
+      <a asp-action="Index" asp-controller="Home">首页</a>
+    </li>
+    <li class="current">
+      <em>@ViewBag.Title</em>
+    </li>
+  </ol>
+  <h3 class="size24">
+    留言须知：
+  </h3>
+  @Html.Raw(Model)
+  <p>　</p>
+  <div class="animated form-horizontal pulse">
+    @Html.AntiForgeryToken()
+    @if (hidden == nameof(hidden)) {
+      <p>@Context.Request.Cookies["NickName"] 您好！</p>
     }
+    <div class="row @hidden">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-addon">
+            <label for="name">昵称：</label>
+          </span>
+          <input class="form-control" placeholder="昵称" required type="text" v-model="msg.NickName">
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="input-group">
+          <span class="input-group-addon">
+            <label for="email">邮箱：</label>
+          </span>
+          <input class="form-control" id="email" placeholder="留下您的真实邮箱，以方便接收回复" required type="email" v-model="msg.Email">
+          <span class="input-group-btn">
+            <button :disabled="disableGetcode" @@click="getcode(msg.Email)" class="btn btn-danger" type="button">
+              {{codeMsg}}
+            </button>
+          </span>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="input-group">
+          <span class="input-group-addon">验证码：</span>
+          <input class="form-control" placeholder="验证码" type="text" v-model="msg.Code">
+        </div>
+      </div>
+    </div>
+    <div class="animated fadeInDown form-group overlay" style="margin-bottom: 0px !important;">
+      <div class="ueditor" id="editor"></div>
+    </div>
+    <label>
+      <input required type="checkbox" v-model="msg.Agree" value="true"/>我已阅读
+      <a asp-action="agreement" asp-controller="Misc" target="_blank">《留言须知》</a>
+    </label>
+    <div class="form-group">
+      <div class="col-xs-12">
+        <button class="btn btn-info btn-lg" type="submit">
+          发表留言
+        </button>
+        <a class="text-red">留言框可粘贴网络图片</a>
+      </div>
+    </div>
+  </div>
+  <parent-messages :data="list" :is-admin="false" @@getmsgs="getmsgs" @@reply-msg="replyMsg"></parent-messages>
+  <div class="row">
+    <div class="col-md-12 text-center">
+      <n-pagination :page-count="Math.ceil(pageConfig.total / pageConfig.size)" :page-sizes="[10, 20, 30, 50]" show-size-picker v-model:page="pageConfig.page" v-model:page-size="pageConfig.size"/>
+    </div>
+  </div>
+  <n-modal :mask-closable="false" :style="{ width: '50vw' }" :title="`回复：${reply.for?.NickName}`" @@negative-click="onNegativeClick" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复留言" preset="dialog" v-model:show="showPopup">
+    <form class="form-horizontal" id="reply-form" method="post">
+      @Html.AntiForgeryToken()
+      @if (hidden == nameof(hidden)) {
+        <p>@Context.Request.Cookies["NickName"] 您好！</p>
+      }
+      <div class="row @hidden">
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-addon">
+              <label for="name">昵称：</label>
+            </span>
+            <input class="form-control" placeholder="昵称" required type="text" v-model="reply.NickName">
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="input-group">
+            <span class="input-group-addon">
+              <label for="email">邮箱：</label>
+            </span>
+            <input class="form-control" placeholder="留下您的真实邮箱，以方便接收回复" required type="email" v-model="reply.Email">
+            <span class="input-group-btn">
+              <button :disabled="disableGetcode" @@click="getcode(reply.Email)" class="btn btn-danger" type="button">
+                {{codeMsg}}
+              </button>
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="input-group">
+            <span class="input-group-addon">验证码：</span>
+            <input class="form-control" placeholder="验证码" type="text" v-model="reply.Code">
+          </div>
+        </div>
+      </div>
+      <div class="form-group overlay">
+        <div class="ueditor" id="editor2"></div>
+      </div>
+      <label>
+        <input required type="checkbox" v-model="reply.Agree" value="true"/>我已阅读
+        <a asp-action="agreement" asp-controller="Misc" target="_blank">《留言须知》</a>
+      </label>
+    </form>
+  </n-modal>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.5.16/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/naive-ui"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="~/UEditorPlus/ueditor.config.front.js"></script>
+<script charset="utf-8" src="~/UEditorPlus/ueditor.all.js" type="text/javascript"></script>
+<script>
+window.defaultUser=function(){
+  return {
+    NickName: `@Context.Request.Cookies["NickName"]`,
+    Email: `@Context.Request.Cookies["Email"]`,
+    Agree:true,
+    IsAdmin:true
+  };
+}
 </script>
+<script src="~/Scripts/global/leavemsg.js"></script>

@@ -2,223 +2,59 @@
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
 @{
-    ViewBag.Title = "留言板";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo);
-    var cid = Context.Request.RouteValues["cid"]?? Context.Request.Query["cid"];
+  ViewBag.Title = "留言板";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 }
-<link href="~/Assets/layui/css/layui.min.css" rel="stylesheet" />
-<script src="~/Assets/layui/layui.all.js"></script>
-<div class="container min-height610">
-    <ol class="cd-breadcrumb triangle">
-        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-        <li class="current"><em>@ViewBag.Title</em></li>
-    </ol>
-    <form class="form-horizontal animated pulse" id="msg-form" method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="OperatingSystem" id="OperatingSystem" />
-        <input type="hidden" name="Browser" id="Browser" />
-        <input type="hidden" class="form-control" value="@user.NickName" name="NickName" id="name">
-        <input type="hidden" class="form-control" value="@user.Email" name="Email" id="email">
-        <div class="form-group overlay animated fadeInDown" style="margin-bottom: 0px !important;">
-            <textarea class="layui-textarea" id="layedit" name="Content" style="height: 200px"></textarea>
-        </div>
-        <input type="hidden" name="Agree" value="true" />
-        <div class="form-group">
-            <div class="col-xs-12">
-                <button type="submit" class="btn btn-info btn-lg">
-                    发表留言
-                </button>
-                <a class="text-red">留言框可粘贴网络图片</a>
-            </div>
-        </div>
+<div class="container min-height610" id="msgApp">
+  <ol class="cd-breadcrumb triangle">
+    <li>
+      <a asp-action="Index" asp-controller="Home">首页</a>
+    </li>
+    <li class="current">
+      <em>@ViewBag.Title</em>
+    </li>
+  </ol>
+  <div class="animated form-group form-horizontal">
+    @Html.AntiForgeryToken()
+    <div class="animated form-group overlay">
+      <div class="ueditor" id="editor"></div>
+    </div>
+    <div class="form-group">
+      <div class="col-xs-12">
+        <button :disabled="!msg.Content" @@click="submit(msg)" class="btn btn-info btn-lg">
+          发表留言
+        </button>
+        <a class="text-red">留言框可粘贴网络图片</a>
+      </div>
+    </div>
+  </div>
+  <parent-messages :data="list" :is-admin="true" @@getmsgs="getmsgs" @@reply-msg="replyMsg"></parent-messages>
+  <div class="row">
+    <div class="col-md-12 text-center">
+      <n-pagination :page-count="Math.ceil(pageConfig.total / pageConfig.size)" :page-sizes="[10, 20, 30, 50]" show-size-picker v-model:page="pageConfig.page" v-model:page-size="pageConfig.size"/>
+    </div>
+  </div>
+  <n-modal :mask-closable="false" :style="{ width: '50vw' }" :title="`回复：${reply.for?.NickName}`" @@negative-click="onNegativeClick" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复留言" preset="dialog" v-model:show="showPopup">
+    <form class="form-horizontal" id="reply-form" method="post">
+      @Html.AntiForgeryToken()
+      <div class="ueditor" id="editor2"></div>
     </form>
-    <ul class="wow media-list animated fadeInRight"></ul>
-    <div class="row">
-        <div class="col-md-12 text-center">
-            <div id="pageToolbar"></div>
-        </div>
-    </div>
+  </n-modal>
 </div>
-<div style="position: fixed; left: -20000px; bottom: -20000px; display: none">
-    <div id="reply" class="container-fluid">
-        <form class="form-horizontal" id="reply-form" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="OperatingSystem" id="OperatingSystem2" />
-            <input type="hidden" name="Browser" id="Browser2" />
-            <input type="hidden" class="form-control" value="@user.NickName" name="NickName" id="name2">
-            <input type="hidden" class="form-control" value="@user.Email" name="Email" id="email2">
-            <input type="hidden" value="" id="uid" name="ParentId" />
-            <div class="form-group overlay animated fadeInDown">
-                <textarea class="layui-textarea" id="layedit2" name="Content" style="height: 80px"></textarea>
-            </div>
-            <input type="hidden" name="Agree" value="true" />
-            <div class="form-group">
-                <div class="col-xs-12">
-                    <div class="btn-group">
-                        <button type="submit" class="btn btn-info btn-lg">
-                            提交回复
-                        </button>
-                        <button type="button" class="btn-cancel btn btn-danger btn-lg">
-                            取消回复
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-<script src="~/Scripts/global/leavemsg.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.5.16/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/naive-ui"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="~/UEditorPlus/ueditor.config.front.js"></script>
+<script charset="utf-8" src="~/UEditorPlus/ueditor.all.js" type="text/javascript"></script>
 <script>
-    window.onload = function () {
-        loading();
-        $('#pageToolbar').Paging({ //异步加载评论
-            pagesize: 10,
-            count: @ViewBag.TotalCount ,
-            toolbar: true,
-            callback: function(page, size, count) {
-                $.get("/msg/getmsgs?page=" + page + "&size=" + size, function (data) {
-                    data = data.Data;
-                    if (data) {
-                        document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
-                        bindReplyBtn();
-                    }
-                });
-            }
-        });
-        loadingDone();
-    };
-
-    //递归加载留言
-    //加载父楼层
-    function loadParentMsgs(data) {
-        loading();
-        var html = '';
-        if (data) {
-            var rows = data.rows;
-            var page = data.page;
-            var size = data.size;
-            var maxPage = Math.ceil(data.total / size);
-            page = page > maxPage ? maxPage : page;
-            page = page < 1 ? 1 : page;
-            var startfloor = data.parentTotal - (page - 1) * size;
-            for (let i = 0; i < rows.length; i++) {
-                html += `<li class="msg-list media animated fadeInRight" id='${rows[i].Id}'>
-                            <div class="media-body">
-                                <article class="panel panel-info">
-                                    <header class="panel-heading">${startfloor--}# ${rows[i].IsMaster ? `<i class="icon icon-user"></i>` : ""}${rows[i].NickName}${rows[i].IsMaster ? `(管理员)` : ""} | ${rows[i].PostDate}
-                                        <span class="pull-right" style="font-size: 10px;">${rows[i].Status == 4 ? `<a class="label label-success" onclick="pass(${rows[i].Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${rows[i].Id})">删除</a><span class="hidden-sm hidden-xs"> | ${GetOperatingSystem(rows[i].OperatingSystem) + " | " + GetBrowser(rows[i].Browser)}</span></span>
-                                    </header>
-                                    <div class="panel-body line-height24">
-                                        ${rows[i].Content} <a class="reply label label-info" href="?uid=${rows[i].Id}"><i class="icon-comment"></i></a>
-                                        <div class="margin-top10"></div>
-                                        <div class="pull-left">
-                                            <span class="label label-success">${rows[i].IP}</span>
-                                            <span class="label label-primary">${rows[i].Location}</span>
-                                        </div>
-                                        <div class="pull-right">
-                                            <span class="label label-success" onclick="bounceEmail('${rows[i].Email}')">${rows[i].Email}</span>
-                                        </div><br/>
-                                        ${loadMsgs(rows[i].Children)}
-                                    </div>
-                                </article>
-                            </div>
-                        </li>`;
-            }
-        }
-        loadingDone();
-        return html;
-    }
-
-    //加载子楼层
-    function loadMsgs(msg, depth = 0) {
-        msg.sort(function (x, y) {
-            return x.Id - y.Id
-        });
-
-        var colors = ["info", "success", "primary", "warning", "danger"];
-        var floor = 1;
-        depth++;
-        var html = '';
-        for (let item of msg) {
-            var color = colors[depth % 5];
-            html += `<article id="${item.Id}" class="panel panel-${color}">
-                        <div class="panel-heading">
-                            ${depth}-${floor++}# ${item.IsMaster ? `<i class="icon icon-user"></i>` : ""}${item.NickName}${item.IsMaster ? `(管理员)` : ""} | ${item.PostDate}
-                            <span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">${item.Status == 4 ? `<a class="label label-success" onclick="pass(${item.Id})">通过</a> |` : ""} <a class="label label-danger" onclick="del(${item.Id})">删除</a> | ${GetOperatingSystem(item.OperatingSystem) + " | " + GetBrowser(item.Browser)}</span>
-                        </div>
-                        <div class="panel-body line-height24">
-                            ${item.Content}
-                            <a class="reply label label-${color}" href="?uid=${item.Id}"><i class="icon-comment"></i></a>
-                            <div class="margin-top10"></div>
-                            <div class="pull-left">
-                                <span class="label label-success">${item.IP}</span>
-                                <span class="label label-primary">${item.Location}</span>
-                            </div>
-                            <div class="pull-right">
-                                <span class="label label-success" onclick="bounceEmail('${item.Email}')">${item.Email}</span>
-                            </div><br/>
-                            ${loadMsgs(item.Children, depth)}
-                        </div>
-                    </article>`;
-        }
-        return html;
-    }
-
-    function pass(id) {
-        $.post("/msg/pass", {
-            id: id
-        }, function(res) {
-            swal(res.Message, "", res.Success ? "success" : "error");
-            getmsgs();
-        });
-    }
-
-    function bounceEmail(email) {
-        swal({
-            title: "确定将这个邮箱添加到黑名单吗？",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            showLoaderOnConfirm: true,
-            animation: true,
-            allowOutsideClick: false
-        }).then(function () {
-            window.post("/system/BounceEmail", { email: email }, function () {
-                swal("邮箱添加到黑名单成功", "", "success");
-            }, (e) => {
-                swal("操作失败，请稍候再试", "", "error");
-            });
-        }, function () { });
-    }
-
-    function del(id) {
-        swal({
-            title: "确认删除这条留言吗？",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            showLoaderOnConfirm: true,
-            animation: true,
-            allowOutsideClick: false
-        }).then(function () {
-            $.post("/msg/delete/"+id, function(res) {
-                swal(res.Message, "", res.Success ? "success" : "error");
-                getmsgs();
-            });
-        }, function () {});
-    }
-
-    /**
-   * 获取留言
-   */
-    function getmsgs() {
-        $.get("/msg/getmsgs?page=1&size=10&cid=@cid", (data) => {
-            data = data.Data;
-            document.querySelector(".media-list").innerHTML = loadParentMsgs(data);
-            bindReplyBtn();
-        });
-    }
+window.defaultUser=function(){
+  return {
+    NickName: `@user.NickName`,
+    Email: `@user.Email`,
+    Agree:true,
+    IsAdmin:true
+  };
+}
 </script>
+<script src="~/Scripts/global/leavemsg.js"></script>

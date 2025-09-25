@@ -124,6 +124,7 @@ public sealed class MsgController : BaseController
             LogManager.Info($"提交内容：{cmd.NickName}/{cmd.Content}，敏感词：{match.Value}");
             return ResultData(null, false, "您提交的内容包含敏感词，被禁止发表，请检查您的内容后尝试重新提交！");
         }
+#if !DEBUG
 
         var error = await ValidateEmailCode(blocklistService, cmd.Email, cmd.Code);
         if (!string.IsNullOrEmpty(error))
@@ -131,6 +132,7 @@ public sealed class MsgController : BaseController
             return ResultData(null, false, error);
         }
 
+#endif
         if (cmd.ParentId > 0 && DateTime.Now - LeaveMessageService[cmd.ParentId.Value, m => m.PostDate] > TimeSpan.FromDays(180))
         {
             return ResultData(null, false, "当前留言过于久远，不再允许回复！");
