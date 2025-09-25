@@ -212,30 +212,33 @@ createApp({
 
   },
   created() {
-		if (window.UE) {
-			window.ue = UE.getEditor('editor', {
-				initialFrameWidth: null,
+        if (window.UE) {
+            window.ue = UE.getEditor('editor', {
+                initialFrameWidth: null,
         initialFrameHeight:document.body.offsetHeight-160
-			});
+            });
       
       ue.addListener('ready',() => {
         ue.setContent(this.post.Content);
       });
-		}
-		@if (Model.Post.DisableCopy) {
-      <text>
-		CopyrightProtect();
-		CopyrightProtect4Editor();
-			</text>
-    }
+            ue.addListener('contentChange', () => {
+                this.post.Content = ue.getContent();
+            });
+        }
+        @if (Model.Post.DisableCopy) {
+          <text>
+        CopyrightProtect();
+        CopyrightProtect4Editor();
+            </text>
+        }
     var user = JSON.parse(localStorage.getItem("user"));
-		if (user) {
-			this.post.Modifier=user.NickName;
-			this.post.ModifierEmail=user.Email;
-		}
+        if (user) {
+            this.post.Modifier=user.NickName;
+            this.post.ModifierEmail=user.Email;
+        }
 
-		//检查草稿
-		if (localStorage.getItem("merge-post-draft-" +@Model.Id)) {
+        //检查草稿
+        if (localStorage.getItem("merge-post-draft-" +@Model.Id)) {
       VxeUI.modal.confirm({
         title: '草稿箱',
         content: '检查到上次有未提交的草稿，是否加载？',
@@ -246,22 +249,19 @@ createApp({
           this.post = JSON.parse(localStorage.getItem("merge-post-draft-" +@Model.Id));
           ue.setContent(this.post.Content);
           window.interval = setInterval(() => {
-            this.post.Content = ue.getContent();
             localStorage.setItem("merge-post-draft-" +@Model.Id, JSON.stringify(this.post));
           }, 5000);
         } else {
           window.interval = setInterval(() => {
-            this.post.Content = ue.getContent();
             localStorage.setItem("merge-post-draft-" +@Model.Id, JSON.stringify(this.post));
           }, 5000);
         }
       });
-		} else {  
-			window.interval = setInterval(() => {
-        this.post.Content = ue.getContent();
+        } else {  
+            window.interval = setInterval(() => {
         localStorage.setItem("merge-post-draft-" +@Model.Id, JSON.stringify(this.post));
       }, 5000);
-		}
+        }
   }
 }).mount('#mergeApp');
 </script>

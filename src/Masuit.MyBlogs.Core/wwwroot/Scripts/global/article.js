@@ -1,11 +1,18 @@
 ﻿$(function () {
-    $("#toc").show();
-    var toc = $("#toc").tocify({
-        selectors: ".ibox-content h3,.ibox-content h4,.ibox-content h5"
-    }).data("toc-tocify");
-    $(".tocify>.close").on("click", function (e) {
-        $(this).parent().hide();
-    });
+    let left = document.querySelector('.ibox-content').offsetLeft;
+    new AutoToc({
+        contentSelector: '.ibox-content',
+        minLevel: 2,
+        maxLevel: 6,
+        scrollOffset: 96,
+        observe: true,
+        position: 'left', // 可选: left | right | top | custom
+        float: true,
+        offset: { top: 156, left: left - Math.min(left - 5, 600) },
+        width: Math.max(Math.min(left - 7, 600), 220),
+        closeButton: true,
+        draggable: true
+    }).build();
     $('article p>img').click(function () {
         window.open($(this).attr("src"));
     });

@@ -93,9 +93,9 @@ public static class MiddlewareExtension
                 .Include("/ng-views/filemanager/css/animations.css")
                 .Include("/ng-views/filemanager/css/dialogs.css")
                 .Include("/ng-views/filemanager/css/main.css")
-                .Include("/Content/common/loading.min.css");
+                .Include("/Content/common/loading.css");
             bundles.AddCss("/article.css")
-                .Include("/Assets/jquery.tocify/jquery.tocify.css")
+                .Include("/Assets/auto-toc/auto-toc.css")
                 .Include("/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css")
                 .Include("/Assets/highlight/css/highlight.css");
 
@@ -125,7 +125,7 @@ public static class MiddlewareExtension
                 .Include("/ng-views/filemanager/js/controllers/selector-controller.js");
             bundles.AddJs("/article.js")
                 .Include("/UEditorPlus/third-party/SyntaxHighlighter/shCore.js")
-                .Include("/Assets/jquery.tocify/jquery.tocify.js")
+                .Include("/Assets/auto-toc/auto-toc.js")
                 .Include("/Scripts/global/article.js");
         });
         return app;

@@ -11,10 +11,10 @@
 	AdvertisementDto ad = ViewBag.Ads;
 }
 <environment names="Development">
-	<link href="~/Assets/jquery.tocify/jquery.tocify.css" rel="stylesheet" />
 	<link href="~/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet" />
 	<script src="/UEditorPlus/third-party/SyntaxHighlighter/shCore.js"></script>
-	<script src="/Assets/jquery.tocify/jquery.tocify.js"></script>
+	<link href="~/Assets/auto-toc/auto-toc.css" rel="stylesheet" />
+	<script src="/Assets/auto-toc/auto-toc.js"></script>
 	<script src="/Scripts/global/article.js"></script>
 </environment>
 <environment names="Stage,Production">
@@ -139,15 +139,6 @@
 </div>
 <script>
 	$(function() {
-		$("#toc").show();
-		var toc = $("#toc").tocify({
-			selectors: ".ibox-content h3,.ibox-content h4,.ibox-content h5"
-		}).data("toc-tocify");
-		$(".tocify>.close").on("click", function(e) {
-			$(this).parent().hide();
-		});
-		SyntaxHighlighter.all();
-		SyntaxHighlighter.defaults['toolbar'] = false;
 		$("#del").on("click", function (e) {
 			swal({
 				title: "确认删除这个版本吗？",
