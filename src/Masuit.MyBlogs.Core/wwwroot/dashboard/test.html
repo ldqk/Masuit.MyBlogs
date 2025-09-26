@@ -1,0 +1,450 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue3 Mixin 示例</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(90deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .counter-value {
+            font-size: 2.5rem;
+            margin: 0 20px;
+            min-width: 80px;
+            text-align: center;
+            font-weight: bold;
+            color: #2c3e50;
+            background: #ecf0f1;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .user-info {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .user-info p {
+            margin: 8px 0;
+        }
+        .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .mixin-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .mixin-info h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .mixin-info ul {
+            padding-left: 20px;
+        }
+        .mixin-info li {
+            margin: 5px 0;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-button.active {
+            background: white;
+            border-bottom: 3px solid #3498db;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <div class="container">
+        <header>
+          <h1>Vue3 Mixin 示例</h1>
+          <p class="subtitle">展示如何在多个组件中复用代码逻辑</p>
+        </header>
+        <div class="tab-buttons">
+          <button class="tab-button" :class="{active: activeTab === 'demo'}" @click="activeTab = 'demo'">功能演示</button>
+          <button class="tab-button" :class="{active: activeTab === 'code'}" @click="activeTab = 'code'">代码示例</button>
+          <button class="tab-button" :class="{active: activeTab === 'explain'}" @click="activeTab = 'explain'">Mixin说明</button>
+        </div>
+        <div class="content">
+          <!-- 功能演示 -->
+          <div class="tab-content" :class="{active: activeTab === 'demo'}">
+            <div class="card">
+              <h3>计数器组件</h3>
+              <p>这个组件使用了计数器Mixin</p>
+              <div class="counter">
+                <button @click="decrement">-</button>
+                <div class="counter-value">{{ counter1 }}</div>
+                <button @click="increment">+</button>
+              </div>
+              <button @click="resetCounter">重置</button>
+              <p>计数器值: <span class="highlight">{{ counter1 }}</span></p>
+              <p>计数器平方: <span class="highlight">{{ counter1 * counter1 }}</span></p>
+            </div>
+            <div class="card">
+              <h3>用户信息组件</h3>
+              <p>这个组件同时使用了计数器Mixin和用户信息Mixin</p>
+              <div class="user-info">
+                <p>用户名: <span class="highlight">{{ userName }}</span></p>
+                <p>用户ID: <span class="highlight">{{ userId }}</span></p>
+                <p>注册时间: <span class="highlight">{{ registrationDate }}</span></p>
+              </div>
+              <div class="counter">
+                <button @click="decrement">-</button>
+                <div class="counter-value">{{ counter2 }}</div>
+                <button @click="increment">+</button>
+              </div>
+              <button @click="updateUserInfo">更新用户信息</button>
+            </div>
+          </div>
+          <!-- 代码示例 -->
+          <div class="tab-content" :class="{active: activeTab === 'code'}">
+            <div class="card">
+              <h3>计数器 Mixin</h3>
+              <pre><code>const counterMixin = {
+  data() {
+    return {
+      counter: 0
+    }
+  },
+  methods: {
+    increment() {
+      this.counter++;
+    },
+    decrement() {
+      this.counter--;
+    },
+    resetCounter() {
+      this.counter = 0;
+    }
+  },
+  mounted() {
+    console.log('计数器Mixin已加载');
+  }
+};</code></pre>
+            </div>
+            <div class="card">
+              <h3>用户信息 Mixin</h3>
+              <pre><code>const userMixin = {
+  data() {
+    return {
+      userName: '默认用户',
+      userId: Math.floor(Math.random() * 1000),
+      registrationDate: new Date().toLocaleDateString()
+    }
+  },
+  methods: {
+    updateUserInfo() {
+      this.userName = '用户' + Math.floor(Math.random() * 1000);
+      this.userId = Math.floor(Math.random() * 1000);
+      this.registrationDate = new Date().toLocaleDateString();
+    }
+  },
+  mounted() {
+    console.log('用户信息Mixin已加载');
+  }
+};</code></pre>
+            </div>
+          </div>
+          <!-- Mixin说明 -->
+          <div class="tab-content" :class="{active: activeTab === 'explain'}">
+            <div class="card">
+              <h3>什么是Mixin？</h3>
+              <p>Mixin是一种在Vue组件中复用功能的方式。它允许你将一组组件选项（如数据、方法、生命周期钩子等）提取到可重用的对象中。</p>
+              <div class="mixin-info">
+                <h4>Mixin的优势：</h4>
+                <ul>
+                  <li><strong>代码复用</strong>：避免在不同组件中重复编写相同的代码</li>
+                  <li><strong>逻辑分离</strong>：将相关功能组织在一起，提高代码可维护性</li>
+                  <li><strong>灵活性</strong>：可以轻松地在多个组件中应用相同的功能</li>
+                </ul>
+              </div>
+              <div class="mixin-info">
+                <h4>Mixin的合并策略：</h4>
+                <ul>
+                  <li><strong>数据对象</strong>：会进行浅合并，组件数据优先</li>
+                  <li><strong>方法</strong>：同名方法会被合并，组件方法覆盖Mixin方法</li>
+                  <li><strong>生命周期钩子</strong>：都会被调用，Mixin钩子先于组件钩子</li>
+                </ul>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Mixin使用场景</h3>
+              <p>Mixin特别适合以下场景：</p>
+              <div class="mixin-info">
+                <ul>
+                  <li>多个组件需要共享相同的方法或计算属性</li>
+                  <li>需要在多个组件中执行相同的生命周期操作</li>
+                  <li>封装通用的UI交互逻辑（如模态框、下拉菜单等）</li>
+                  <li>实现横切关注点（如日志记录、权限检查等）</li>
+                </ul>
+              </div>
+              <div class="mixin-info">
+                <h4>注意事项：</h4>
+                <ul>
+                  <li>避免过度使用Mixin，以免造成代码难以理解</li>
+                  <li>注意命名冲突，特别是在大型项目中</li>
+                  <li>考虑使用Composition API作为Mixin的替代方案</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer>
+          <p>Vue3 Mixin 示例 &copy; 2023 - 使用Vue版本: {{ vueVersion }}</p>
+        </footer>
+      </div>
+    </div>
+    <script>
+      // 定义计数器Mixin
+      const counterMixin = {
+        data() {
+          return {
+            counter: 0
+          }
+        },
+        methods: {
+          increment() {
+            this.counter++;
+          },
+          decrement() {
+            this.counter--;
+          },
+          resetCounter() {
+            this.counter = 0;
+          }
+        },
+        mounted() {
+          console.log('计数器Mixin已加载');
+        }
+      };
+
+      // 定义用户信息Mixin
+      const userMixin = {
+        data() {
+          return {
+            userName: '默认用户',
+            userId: Math.floor(Math.random() * 1000),
+            registrationDate: new Date().toLocaleDateString()
+          }
+        },
+        methods: {
+          updateUserInfo() {
+            this.userName = '用户' + Math.floor(Math.random() * 1000);
+            this.userId = Math.floor(Math.random() * 1000);
+            this.registrationDate = new Date().toLocaleDateString();
+          }
+        },
+        mounted() {
+          console.log('用户信息Mixin已加载');
+        }
+      };
+
+      // 创建Vue应用
+      const { createApp } = Vue;
+
+      const app = createApp({
+        data() {
+          return {
+            activeTab: 'demo',
+            vueVersion: Vue.version,
+            // 为演示两个独立的计数器
+            counter1: 0,
+            counter2: 0
+          }
+        },
+        // 应用Mixin
+        mixins: [counterMixin, userMixin],
+        methods: {
+          // 重写increment和decrement方法，使其操作不同的计数器
+          increment() {
+            if (this.activeTab === 'demo') {
+              this.counter1++;
+            } else {
+              this.counter2++;
+            }
+          },
+          decrement() {
+            if (this.activeTab === 'demo') {
+              this.counter1--;
+            } else {
+              this.counter2--;
+            }
+          },
+          resetCounter() {
+            if (this.activeTab === 'demo') {
+              this.counter1 = 0;
+            } else {
+              this.counter2 = 0;
+            }
+          }
+        },
+        mounted() {
+          console.log('Vue应用已加载');
+        }
+      });
+
+      app.mount('#app');
+      const app2 = createApp({
+        data() {
+          return {
+            activeTab: 'demo',
+            vueVersion: Vue.version,
+            // 为演示两个独立的计数器
+            counter1: 0,
+            counter2: 0
+          }
+        },
+        // 应用Mixin
+        mixins: [counterMixin, userMixin],
+        methods: {
+          // 重写increment和decrement方法，使其操作不同的计数器
+          increment() {
+            if (this.activeTab === 'demo') {
+              this.counter1++;
+            } else {
+              this.counter2++;
+            }
+          },
+          decrement() {
+            if (this.activeTab === 'demo') {
+              this.counter1--;
+            } else {
+              this.counter2--;
+            }
+          },
+          resetCounter() {
+            if (this.activeTab === 'demo') {
+              this.counter1 = 0;
+            } else {
+              this.counter2 = 0;
+            }
+          }
+        },
+        mounted() {
+          console.log('Vue应用已加载');
+        }
+      });
+
+      app2.mount('#app');
+    </script>
+  </body>
+
+</html>
