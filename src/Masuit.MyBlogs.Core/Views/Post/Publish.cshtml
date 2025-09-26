@@ -2,19 +2,9 @@
   ViewBag.Title = "投稿";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<!-- Use style -->
-<link href="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.24/lib/style.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/style.min.css" rel="stylesheet">
-<!-- Use vue -->
-<script src="https://cdn.jsdelivr.net/npm/vue@3.5.16/dist/vue.global.prod.js"></script>
-<!-- Use vxe -->
-<script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.24/lib/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/index.umd.min.js"></script>
 <script src="~/UEditorPlus/ueditor.config.front.js"></script>
 <script charset="utf-8" src="~/UEditorPlus/ueditor.all.js" type="text/javascript"></script>
 <script charset="utf-8" src="~/UEditorPlus/lang/zh-cn/zh-cn.js" type="text/javascript"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <div class="container" id="publishApp">
   <ol class="cd-breadcrumb triangle">
     <li>
@@ -41,9 +31,9 @@
       </span>
       <input class="form-control input-lg" id="article" placeholder="请输入文章标题" required type="text" v-model="post.Title">
       <span class="input-group-btn">
-        <button class="btn btn-info btn-lg" id="search" type="button">
+        <a :href="`/s/${post.Title}`" class="btn btn-info btn-lg" target="_blank">
           检索同类资源
-        </button>
+        </a>
       </span>
     </div>
     <!-- 加载编辑器的容器 -->
@@ -54,11 +44,7 @@
       <div class="col-md-6 col-sm-6">
         <div class="input-group">
           <span class="input-group-addon">分类：</span>
-          <vxe-select clearable filterable placement="top" style="width: 100%;" v-model="post.CategoryId">
-            <template #prefix>
-            </template>
-            <vxe-option :label="category.Name" :value="category.Id" v-for="category in categories"></vxe-option>
-          </vxe-select>
+          <n-select :options="categories" label-field="Name" style="width: auto" v-model:value="post.CategoryId" value-field="Id"/>
         </div>
       </div>
       <div class="col-md-6 col-sm-6">
@@ -91,7 +77,7 @@
           </span>
           <input class="form-control" id="Code" placeholder="验证码" required type="text" v-model="post.Code">
           <span class="input-group-btn">
-            <button @@click="submit" class="btn btn-info" type="submit">
+            <button :disabled="submitting||!post.Content" @@click="submit" class="btn btn-info" type="submit">
               <i class="icon-rocket2"></i>
               马上投递
             </button>

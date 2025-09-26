@@ -232,17 +232,14 @@ createApp({
     submit(item) {
       if (item.NickName.trim().length <= 0 || item.NickName.trim().length > 24) {
         message.error('昵称要求2-24个字符！');
-        loadingDone();
         return;
       }
       if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(item.Email.trim())) {
         message.error('请输入正确的邮箱格式！');
-        loadingDone();
         return;
       }
       if (item.Content.trim().length <= 2 || item.Content.trim().length > 1000) {
         message.error('内容过短或者超长，请输入有效的留言内容！');
-        loadingDone();
         return;
       }
       if (item.Email.indexOf("163") > 1 || item.Email.indexOf("126") > 1) {
@@ -266,21 +263,16 @@ createApp({
           'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
         }
       }).post("/Msg/submit", item).then((response) => {
-        loadingDone();
         const data = response.data;
         if (data && data.Success) {
-          window.notie.alert({
-            type: 1,
-            text: data.Message,
-            time: 4
-          });
+          message.success(data.Message);
+          this.msg.Content = '';
+          this.reply.Content = '';
+          ue.setContent('');
+          window.ue2 && window.ue2.setContent('');
           this.getmsgs();
         } else {
-          window.notie.alert({
-            type: 3,
-            text: data.Message,
-            time: 4
-          });
+          message.error(data.Message);
         }
       });
     },
@@ -367,7 +359,8 @@ createApp({
             ]],
             initialFrameWidth: null,
             //默认的编辑区域高度
-            initialFrameHeight: 200
+            initialFrameHeight: 200,
+            maximumWords: 500
           });
           ue2.addListener('contentChange', () => {
             this.reply.Content = ue2.getContent();
@@ -415,7 +408,8 @@ createApp({
         ]],
         initialFrameWidth: null,
         //默认的编辑区域高度
-        initialFrameHeight: 200
+        initialFrameHeight: 200,
+        maximumWords: 500
       });
       ue.addListener('contentChange', () => {
         this.msg.Content = ue.getContent();

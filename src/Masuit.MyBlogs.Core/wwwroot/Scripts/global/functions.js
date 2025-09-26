@@ -1,310 +1,316 @@
-﻿//全局加载动画
-function loading() {
-    $(".loading1").show();
-}
-
-function loadingDone() {
-    $(".loading1").hide();
-}
-
+﻿// 清除选中
 var clearSelect = "getSelection" in window ? function () {
-    window.getSelection().removeAllRanges();
+  window.getSelection().removeAllRanges();
 } : function () {
+  if (document.selection) {
     document.selection.empty();
+  }
 };
 
+// 复制剪贴板 hack
 function hackClip() {
-    let transfer = document.createElement('input');
-    document.body.appendChild(transfer);
-    transfer.value = '1';
-    transfer.select();
-    if (document.execCommand('copy')) {
-        document.execCommand('copy');
+  let transfer = document.createElement('input');
+  document.body.appendChild(transfer);
+  transfer.value = '1';
+  transfer.select();
+  try {
+    document.execCommand('copy');
+  } catch (e) {
+    // execCommand 已弃用，现代浏览器建议使用 Clipboard API
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText('1').catch(function () { });
     }
-    document.body.removeChild(transfer);
+  }
+  document.body.removeChild(transfer);
 }
 
-/**禁止复制 */
+// 键盘判断工具
+function getKey(e) {
+  if (typeof e.code === "string") {
+    return e.code;
+  }
+  if (typeof e.key === "string") {
+    return e.key;
+  }
+  return e.keyCode;
+}
+
+// 反调试，频繁触发debugger
+function antiDebug() {
+  setInterval(function () {
+    // 触发debugger
+    (function () { }["constructor"]("debugger")());
+    // 通过控制台检测（如有需要可拓展）
+    if (window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100) {
+      (function () { }["constructor"]("debugger")());
+    }
+  }, 500);
+}
+
+/**禁止复制（增加反调试） */
 function CopyrightProtect() {
-    setInterval(function () {
-        try {
-            (function () { }["constructor"]("debugger")());
-            $(".article-content").on("keydown", function (e) {
-                var currKey = 0, evt = e || window.event;
-                currKey = evt.keyCode || evt.which || evt.charCode;
-                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85)) { //禁止F12，Ctrl+C，Ctrl+U
-                    clearSelect();
-                    evt.cancelBubble = true;
-                    evt.returnValue = false;
-                    return true;
-                }
-            });
-            document.onkeydown = function (e) {
-                var currKey = 0, evt = e || window.event;
-                currKey = evt.keyCode || evt.which || evt.charCode;
-                if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
-                    clearSelect();
-                    evt.cancelBubble = true;
-                    evt.returnValue = false;
-                    return false;
-                }
-                return true;
-            }
-            document.ondragstart = function (e) {
-                e.returnValue = false;
-                hackClip();
-                return false;
-            }
-            $(".article-content").on("copy", function (e) {
-                e.returnValue = false;
-                hackClip();
-                return false;
-            });
-            document.oncontextmenu = function (e) {
-                e.returnValue = false;
-                hackClip();
-                return false;
-            }
-        } catch (ex) {
-            console.error(ex);
+  antiDebug(); // 启动反调试
+  setInterval(function () {
+    try {
+      document.querySelectorAll('.article-content').forEach(function (el) {
+        el.addEventListener('keydown', function (e) {
+          const key = getKey(e);
+          if (
+            key === "F12" ||
+            ((e.ctrlKey && (key === "KeyC" || key === "c" || key === "C")) ||
+              (e.ctrlKey && (key === "KeyS" || key === "s" || key === "S")) ||
+              (e.ctrlKey && (key === "KeyU" || key === "u" || key === "U")))
+          ) {
+            clearSelect();
+            e.stopPropagation();
+            e.preventDefault();
+            return true;
+          }
+        });
+        el.addEventListener('copy', function (e) {
+          e.preventDefault();
+          hackClip();
+          return false;
+        });
+      });
+
+      document.onkeydown = function (e) {
+        const key = getKey(e);
+        if (
+          key === "F12" ||
+          ((e.ctrlKey && (key === "KeyA" || key === "a" || key === "A")) ||
+            (e.ctrlKey && (key === "KeyS" || key === "s" || key === "S")) ||
+            (e.ctrlKey && (key === "KeyU" || key === "u" || key === "U")) ||
+            (e.ctrlKey && e.shiftKey) ||
+            e.altKey)
+        ) {
+          clearSelect();
+          e.stopPropagation();
+          e.preventDefault();
+          return false;
         }
-    }, 500);
+        return true;
+      };
+      document.ondragstart = function (e) {
+        e.preventDefault();
+        hackClip();
+        return false;
+      };
+      document.oncontextmenu = function (e) {
+        e.preventDefault();
+        hackClip();
+        return false;
+      };
+    } catch (ex) {
+      console.error(ex);
+    }
+  }, 500);
 }
 
 /**禁止编辑器内复制 */
 function CopyrightProtect4Editor() {
-    setInterval(function () {
-        try {
-            (function () { }["constructor"]("debugger")());
-            document.getElementById("ueditor_0").contentWindow.document.body.onkeydown = function (e) {
-                var currKey = 0, evt = e || window.event;
-                currKey = evt.keyCode || evt.which || evt.charCode;
-                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && currKey == 88) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
-                    clearSelect();
-                    evt.cancelBubble = true;
-                    evt.returnValue = false;
-                    return false;
-                }
-                return true;
-            }
-            document.getElementById("ueditor_0").contentWindow.document.body.ondragstart = function (e) {
-                e.returnValue = false;
-                hackClip();
-                return false;
-            }
-            document.getElementById("ueditor_0").contentWindow.document.body.oncopy = function (e) {
-                e.returnValue = false;
-                hackClip();
-                return false;
-            }
-        } catch (ex) {
-            console.error(ex);
+  antiDebug(); // 启动反调试
+  setInterval(function () {
+    try {
+      var editorFrame = document.getElementById("ueditor_0");
+      if (!editorFrame || !editorFrame.contentWindow || !editorFrame.contentWindow.document.body) return;
+      var body = editorFrame.contentWindow.document.body;
+      body.onkeydown = function (e) {
+        const key = getKey(e);
+        if (
+          key === "F12" ||
+          ((e.ctrlKey && (key === "KeyC" || key === "c" || key === "C")) ||
+            (e.ctrlKey && (key === "KeyS" || key === "s" || key === "S")) ||
+            (e.ctrlKey && (key === "KeyU" || key === "u" || key === "U")) ||
+            (e.ctrlKey && (key === "KeyX" || key === "x" || key === "X")) ||
+            (e.ctrlKey && e.shiftKey) ||
+            e.altKey)
+        ) {
+          clearSelect();
+          e.stopPropagation();
+          e.preventDefault();
+          return false;
         }
-    }, 500);
+        return true;
+      };
+      body.ondragstart = function (e) {
+        e.preventDefault();
+        hackClip();
+        return false;
+      };
+      body.oncopy = function (e) {
+        e.preventDefault();
+        hackClip();
+        return false;
+      };
+    } catch (ex) {
+      console.error(ex);
+    }
+  }, 500);
 }
 
 /**禁止全局复制 */
 function GlobalCopyrightProtect() {
-    setInterval(function () {
-        try {
-            (function () { }["constructor"]("debugger")());
-            $(".article-content").on("keydown", function (e) {
-                var currKey = 0, evt = e || window.event;
-                currKey = evt.keyCode || evt.which || evt.charCode;
-                if (currKey == 123 || (evt.ctrlKey && currKey == 67) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85)) { //禁止F12，Ctrl+C，Ctrl+U
-                    evt.cancelBubble = true;
-                    evt.returnValue = false;
-                    clearSelect();
-                    return false;
-                }
-                return true;
-            });
-            document.onkeydown = function (e) {
-                var currKey = 0, evt = e || window.event;
-                currKey = evt.keyCode || evt.which || evt.charCode;
-                if (currKey == 123 || (evt.ctrlKey && currKey == 65) || (evt.ctrlKey && currKey == 83) || (evt.ctrlKey && currKey == 85) || (evt.ctrlKey && evt.shiftKey) || evt.altKey) {
-                    evt.cancelBubble = true;
-                    evt.returnValue = false;
-                    clearSelect();
-                    return false;
-                }
-                return true;
-            }
-            document.ondragstart = function (e) {
-                e.returnValue = false;
-                hackClip();
-                return false;
-            }
-            $(".article-content").on("copy", function (e) {
-                e.returnValue = false;
-                hackClip();
-                return false;
-            });
-            document.oncontextmenu = function () {
-                event.returnValue = false;
-                hackClip();
-                return false;
-            }
-        } catch (ex) {
-            console.error(ex);
+  antiDebug(); // 启动反调试
+  setInterval(function () {
+    try {
+      document.querySelectorAll('.article-content').forEach(function (el) {
+        el.addEventListener('keydown', function (e) {
+          const key = getKey(e);
+          if (
+            key === "F12" ||
+            ((e.ctrlKey && (key === "KeyC" || key === "c" || key === "C")) ||
+              (e.ctrlKey && (key === "KeyS" || key === "s" || key === "S")) ||
+              (e.ctrlKey && (key === "KeyU" || key === "u" || key === "U")))
+          ) {
+            clearSelect();
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
+          }
+          return true;
+        });
+        el.addEventListener('copy', function (e) {
+          e.preventDefault();
+          hackClip();
+          return false;
+        });
+      });
+      document.onkeydown = function (e) {
+        const key = getKey(e);
+        if (
+          key === "F12" ||
+          ((e.ctrlKey && (key === "KeyA" || key === "a" || key === "A")) ||
+            (e.ctrlKey && (key === "KeyS" || key === "s" || key === "S")) ||
+            (e.ctrlKey && (key === "KeyU" || key === "u" || key === "U")) ||
+            (e.ctrlKey && e.shiftKey) ||
+            e.altKey)
+        ) {
+          clearSelect();
+          e.stopPropagation();
+          e.preventDefault();
+          return false;
         }
-    }, 500);
+        return true;
+      };
+      document.ondragstart = function (e) {
+        e.preventDefault();
+        hackClip();
+        return false;
+      };
+      document.oncontextmenu = function (e) {
+        e.preventDefault();
+        hackClip();
+        return false;
+      };
+    } catch (ex) {
+      console.error(ex);
+    }
+  }, 500);
 }
 
 function GetOperatingSystem(os) {
-    if (os) {
-        if (os.indexOf("Windows") >= 0) {
-            return '<i class="icon-windows8"></i>' + os;
-        } else if (os.indexOf("Mac") >= 0) {
-            return '<i class="icon-apple"></i>' + os;
-        } else if (os.indexOf("Chrome") >= 0) {
-            return '<i class="icon-chrome"></i>' + os;
-        } else if (os.indexOf("Android") >= 0) {
-            return '<i class="icon-android"></i>' + os;
-        } else {
-            return '<i class="icon-stats"></i>' + os;
-        }
+  if (os) {
+    if (os.indexOf("Windows") >= 0) {
+      return '<i class="icon-windows8"></i>' + os;
+    } else if (os.indexOf("Mac") >= 0) {
+      return '<i class="icon-apple"></i>' + os;
+    } else if (os.indexOf("Chrome") >= 0) {
+      return '<i class="icon-chrome"></i>' + os;
+    } else if (os.indexOf("Android") >= 0) {
+      return '<i class="icon-android"></i>' + os;
     } else {
-        return '<i class="icon-stats"></i>未知操作系统';
+      return '<i class="icon-stats"></i>' + os;
     }
+  } else {
+    return '<i class="icon-stats"></i>未知操作系统';
+  }
 }
 
 function GetBrowser(browser) {
-    if (browser) {
-        if (browser.indexOf("Chrome") >= 0) {
-            return '<i class="icon-chrome"></i>' + browser;
-        } else if (browser.indexOf("Firefox") >= 0) {
-            return '<i class="icon-firefox"></i>' + browser;
-        } else if (browser.indexOf("IE") >= 0) {
-            return '<i class="icon-IE"></i>' + browser;
-        } else if (browser.indexOf("Edge") >= 0) {
-            return '<i class="icon-edge"></i>' + browser;
-        } else if (browser.indexOf("Opera") >= 0) {
-            return '<i class="icon-opera"></i>' + browser;
-        } else if (browser.indexOf("Safari") >= 0) {
-            return '<i class="icon-safari"></i>' + browser;
-        } else {
-            return '<i class="icon-browser2"></i>' + browser;
-        }
+  if (browser) {
+    if (browser.indexOf("Chrome") >= 0) {
+      return '<i class="icon-chrome"></i>' + browser;
+    } else if (browser.indexOf("Firefox") >= 0) {
+      return '<i class="icon-firefox"></i>' + browser;
+    } else if (browser.indexOf("IE") >= 0) {
+      return '<i class="icon-IE"></i>' + browser;
+    } else if (browser.indexOf("Edge") >= 0) {
+      return '<i class="icon-edge"></i>' + browser;
+    } else if (browser.indexOf("Opera") >= 0) {
+      return '<i class="icon-opera"></i>' + browser;
+    } else if (browser.indexOf("Safari") >= 0) {
+      return '<i class="icon-safari"></i>' + browser;
     } else {
-        return '<i class="icon-browser2"></i>未知浏览器';
+      return '<i class="icon-browser2"></i>' + browser;
     }
-}
-
-function getFile(obj, inputName) {
-    $("input[name='" + inputName + "']").val($(obj).val());
-}
-
-function post(url, params, callback, error) {
-    window.fetch(url, {
-        credentials: 'include',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json', // 设置请求头，告诉服务器发送的是 JSON 数据
-            'RequestVerificationToken': params ? params["__RequestVerificationToken"] : null
-        },
-        mode: 'cors',
-        body: JSON.stringify(params)
-    }).then(function (response) {
-        return response.json();
-    }).then(function (data) {
-        callback(data);
-    }).catch(function (e) {
-        loadingDone();
-        if (error) {
-            error(e);
-        }
-    });
-}
-
-function get(url, callback, error) {
-    window.fetch(url, {
-        credentials: 'include',
-        method: 'GET',
-        mode: 'cors'
-    }).then(function (response) {
-        return response.json();
-    }).then(function (data) {
-        callback(data);
-    }).catch(function (e) {
-        loadingDone();
-        if (error) {
-            error(e);
-        }
-    });
+  } else {
+    return '<i class="icon-browser2"></i>未知浏览器';
+  }
 }
 
 async function blockCategory(id, name) {
-    let value = Cookies.get("HideCategories") || "0";
-    if (value.split(",").indexOf(id + "") > -1) {
-        await swal({
-            title: "确认移除屏蔽【" + name + "】吗？",
-            text: "移除屏蔽之后可能会出现一些引起不适的内容，请谨慎操作，确认关闭吗？",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            showLoaderOnConfirm: true,
-            animation: true,
-            allowOutsideClick: false
-        }).then(async function () {
-            Cookies.set("HideCategories", value.split(",").filter(function (item) { return item != id }).join(","), { expires: 365 });
-            swal({
-                text: "取消屏蔽成功",
-                type: "success",
-                showConfirmButton: false,
-                timer: 1500
-            }).catch(swal.noop);
-        }, function () { }).catch(swal.noop);
-    } else {
-        await swal({
-            title: "确认屏蔽【" + name + "】吗？",
-            text: "屏蔽之后将不再收到该分类的相关推送！若需要取消屏蔽，清除本站的浏览器缓存即可。",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            showLoaderOnConfirm: true,
-            animation: true,
-            allowOutsideClick: false
-        }).then(async function () {
-            Cookies.set("HideCategories", id + "," + value, { expires: 365 });
-            swal({
-                text: "屏蔽成功",
-                type: "success",
-                showConfirmButton: false,
-                timer: 1500
-            }).catch(swal.noop);
-        }, function () { }).catch(swal.noop);
-    }
+  let value = Cookies.get("HideCategories") || "0";
+  if (value.split(",").indexOf(id + "") > -1) {
+    window.dialog.info({
+      title: "确认移除屏蔽【" + name + "】吗？",
+      content: '移除屏蔽之后可能会出现一些引起不适的内容，请谨慎操作，确认关闭吗？',
+      positiveText: '确定',
+      negativeText: '取消',
+      onPositiveClick: async () => {
+        Cookies.set("HideCategories", value.split(",").filter(function (item) { return item != id }).join(","), { expires: 365 });
+        window.message.success("取消屏蔽成功");
+      }
+    });
+  } else {
+    window.dialog.info({
+      title: "确认屏蔽【" + name + "】吗？",
+      content: '屏蔽之后将不再收到该分类的相关推送！若需要取消屏蔽，清除本站的浏览器缓存即可。',
+      positiveText: '确定',
+      negativeText: '取消',
+      onPositiveClick: async () => {
+        Cookies.set("HideCategories", id + "," + value, { expires: 365 });
+        window.message.success("屏蔽成功");
+      }
+    });
+  }
 }
 
 async function disableSafemode() {
-    await swal({
-        title: "确认关闭安全模式吗？",
-        text: "关闭安全模式后可能会出现一些引起不适的内容，请谨慎操作，确认关闭吗？",
-        showCancelButton: true,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        showLoaderOnConfirm: true,
-        animation: true,
-        allowOutsideClick: false
-    }).then(async function () {
-        Cookies.set("Nsfw", 0, { expires: 3650 });
-        location.reload();
-    }, function () { }).catch(swal.noop);
+  window.dialog.warning({
+    title: "确认关闭安全模式吗？",
+    content: "关闭安全模式后可能会出现一些引起不适的内容，请谨慎操作，确认关闭吗？",
+    positiveText: "确定",
+    negativeText: "取消",
+    onPositiveClick: async () => {
+      Cookies.set("Nsfw", 0, { expires: 3650 });
+      location.reload();
+    }
+  });
 }
 
 async function enableSafemode() {
-    Cookies.set("Nsfw", 1, { expires: 3650 });
-    alert("已开启安全模式");
-    location.reload();
+  Cookies.set("Nsfw", 1, { expires: 3650 });
+  window.message.success("已开启安全模式");
+  location.reload();
 }
 
 /*默认安全模式*/
-; $(function () {
-    if (Cookies.get("Nsfw") != "0") {
-        $("body").append("<a style='position:fixed;left:0;bottom:0;color:black;z-index:10;text-shadow: 0px 0px 1px #000;' onclick='disableSafemode()'>安全模式</a>");
-    }
+document.addEventListener('DOMContentLoaded', function () {
+  const { createDiscreteApi } = naive;
+  const { message, dialog } = createDiscreteApi(["message", "dialog"]);
+  window.message = message;
+  window.dialog = dialog;
+  if (Cookies.get("Nsfw") != "0") {
+    let safeModeBtn = document.createElement('a');
+    safeModeBtn.style.position = 'fixed';
+    safeModeBtn.style.left = '0';
+    safeModeBtn.style.bottom = '0';
+    safeModeBtn.style.color = 'black';
+    safeModeBtn.style.zIndex = '10';
+    safeModeBtn.style.textShadow = '0px 0px 1px #000';
+    safeModeBtn.innerText = '安全模式';
+    safeModeBtn.onclick = disableSafemode;
+    document.body.appendChild(safeModeBtn);
+  }
 });

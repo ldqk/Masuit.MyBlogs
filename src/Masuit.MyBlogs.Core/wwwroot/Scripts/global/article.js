@@ -1,5 +1,4 @@
-﻿
-const { createApp, ref, onMounted, watch, computed, defineComponent, nextTick } = Vue;
+﻿const { createApp, ref, onMounted, watch, computed, defineComponent, nextTick } = Vue;
 const { createDiscreteApi } = naive;
 const MessageReplies = defineComponent({
   name: 'MessageReplies',
@@ -31,10 +30,10 @@ const MessageReplies = defineComponent({
     <div>
       <article v-for="(item, idx) in sortedMsg" :key="item.Id" class="panel" :class="'panel-' + getColor(depth)">
         <div class="panel-heading">
-          {{depth + 1}}-{{idx + 1}}# 
+          {{depth + 1}}-{{idx + 1}}#
           <i v-if="item.IsMaster" class="icon icon-user"></i>
           {{item.NickName}}
-          <span v-if="item.IsMaster">(管理员)</span> | {{item.PostDate}}
+          <span v-if="item.IsMaster">(管理员)</span> | {{item.CommentDate}}
           <span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">
             <span v-if="isAdmin">
               <a v-if="item.Status==4" class="label label-success" @click="pass(item.Id)">通过</a> |
@@ -149,10 +148,10 @@ const ParentMessages = defineComponent({
         <div class="media-body">
           <article class="panel panel-info">
             <header class="panel-heading">
-              {{startfloor - idx}}# 
+              {{startfloor - idx}}#
               <i v-if="row.IsMaster" class="icon icon-user"></i>
               {{row.NickName}}<span v-if="row.IsMaster">(管理员)</span>
-              | {{row.PostDate}}
+              | {{row.CommentDate}}
               <span class="pull-right" style="font-size: 10px;">
                 <span v-if="isAdmin">
                   <a v-if="row.Status==4" class="label label-success" @click="pass(row.Id)">通过</a> |
@@ -238,12 +237,16 @@ createApp({
       total: 0
     });
     const viewToken = ref({ email: user.Email, token: "" });
+    const online = ref(0);
+    const eventSource = ref(null);
     return {
       msg,
       reply,
       disableGetcode,
       codeMsg,
       viewToken,
+      online,
+      eventSource,
       list,
       cid,
       id,
@@ -264,17 +267,14 @@ createApp({
     submit(item) {
       if (item.NickName.trim().length <= 0 || item.NickName.trim().length > 24) {
         message.error('昵称要求2-24个字符！');
-        loadingDone();
         return;
       }
       if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(item.Email.trim())) {
         message.error('请输入正确的邮箱格式！');
-        loadingDone();
         return;
       }
       if (item.Content.trim().length <= 2 || item.Content.trim().length > 1000) {
         message.error('内容过短或者超长，请输入有效的留言内容！');
-        loadingDone();
         return;
       }
       if (item.Email.indexOf("163") > 1 || item.Email.indexOf("126") > 1) {
@@ -298,28 +298,25 @@ createApp({
           'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
         }
       }).post("/comment/submit", item).then((response) => {
-        loadingDone();
         const data = response.data;
         if (data && data.Success) {
-          window.notie.alert({
-            type: 1,
-            text: data.Message,
-            time: 4
-          });
+          message.success(data.Message);
+          item.Content = '';
+          item.ParentId = null;
+          ue.setContent('');
+          window.ue2 && window.ue2.setContent('');
           this.getcomments();
         } else {
-          window.notie.alert({
-            type: 3,
-            text: data.Message,
-            time: 4
-          });
+          message.error(data.Message);
         }
       });
     },
     getcomments() {
       axios.get(`/comment/getcomments?id=${this.id}&page=${this.pageConfig.page}&size=${this.pageConfig.size}&cid=${this.cid}`).then((response) => {
-        this.list = response.data.Data;
-        this.pageConfig.total = this.list.total;
+        if (response.data && response.data.Success) {
+          this.list = response.data.Data;
+          this.pageConfig.total = this.list.total;
+        }
       });
     },
     async getcode(email) {
@@ -433,6 +430,90 @@ createApp({
         window.location.reload();
       });
     },
+    deleteVersion(id, postId) {
+      dialog.warning({
+        title: '删除版本',
+        content: '确认删除这个版本吗？',
+        positiveText: '确定',
+        negativeText: '取消',
+        draggable: true,
+        onPositiveClick: () => {
+          axios.post("/post/DeleteHistory", {
+            id: id
+          }).then(function (data) {
+            message.success(data.data.Message);
+            location.href = "/" + postId + "/history";
+          });
+        }
+      });
+    },
+    revertVersion(id, postId) {
+      dialog.warning({
+        title: '还原版本',
+        content: '确认还原到这个版本吗？',
+        positiveText: '确定',
+        negativeText: '取消',
+        draggable: true,
+        onPositiveClick: () => {
+          axios.post("/post/revert", {
+            id: id
+          }).then(function (data) {
+            message.success(data.data.Message);
+            location.href = "/" + postId;
+          });
+        }
+      });
+    },
+    // 初始化EventSource监听统计数据
+    initEventSource() {
+      // 如果页面不可见，不初始化连接
+      if (document.hidden) {
+        return
+      }
+
+      this.eventSource = new EventSource(`${this.id}/online`)
+      this.eventSource.onmessage = (event) => {
+        try {
+          this.online = event.data
+        } catch (error) {
+          console.error('解析服务器发送的数据时出错:', error)
+        }
+      }
+
+      this.eventSource.onerror = (error) => {
+        console.error('EventSource 连接错误！', error)
+      }
+    },
+
+    // 关闭 EventSource 连接
+    closeEventSources() {
+      if (this.eventSource) {
+        this.eventSource.close()
+        this.eventSource = null
+      }
+    },
+    handleVisibilityChange() {
+      if (document.hidden) {
+        // 页面变为不可见，断开连接
+        this.closeEventSources()
+      } else {
+        // 页面变为可见，恢复连接
+        this.initEventSource()
+      }
+    },
+    showViewer() {
+      var html = "";
+      axios.get("/" + this.id + "/online-viewer").then((res) => {
+        const data = res.data;
+        for (let item of data) {
+          html += `${item.Key}：${item.Value}`;
+        }
+        dialog.success({
+          title: '在看列表',
+          content: html
+        })
+      });
+    }
   },
   watch: {
     'pageConfig.page'(newVal, oldVal) {
@@ -476,7 +557,8 @@ createApp({
             ]],
             initialFrameWidth: null,
             //默认的编辑区域高度
-            initialFrameHeight: 200
+            initialFrameHeight: 200,
+            maximumWords: 500
           });
           ue2.addListener('contentChange', () => {
             this.reply.Content = ue2.getContent();
@@ -490,26 +572,18 @@ createApp({
     }
   },
   mounted() {
-    console.log('组件被加载');
+    // 添加页面可见性变化监听
+    document.addEventListener('visibilitychange', this.handleVisibilityChange)
+    this.initEventSource();
     const { message, dialog } = createDiscreteApi(["message", "dialog"]);
     window.message = message;
     window.dialog = dialog;
-    let left = document.querySelector('.ibox-content').offsetLeft;
-    new AutoToc({
-      contentSelector: '.ibox-content',
-      minLevel: 2,
-      maxLevel: 6,
-      scrollOffset: 96,
-      observe: true,
-      position: 'left', // 可选: left | right | top | custom
-      float: true,
-      offset: { top: 156, left: left - Math.min(left - 5, 600) },
-      width: Math.max(Math.min(left - 7, 600), 220),
-      closeButton: true,
-      draggable: true
-    }).build();
-    $('article p>img').click(function () {
-      window.open($(this).attr("src"));
+    document.querySelectorAll('article p > img').forEach(function (img) {
+      // 为每个图片添加点击事件监听器
+      img.addEventListener('click', function () {
+        // 打开图片的 src 地址
+        window.open(this.getAttribute('src'));
+      });
     });
 
     SyntaxHighlighter.all();
@@ -544,11 +618,35 @@ createApp({
         ]],
         initialFrameWidth: null,
         //默认的编辑区域高度
-        initialFrameHeight: 200
+        initialFrameHeight: 200,
+        maximumWords: 500
       });
       ue.addListener('contentChange', () => {
         this.msg.Content = ue.getContent();
       });
     }
-  }
+    setTimeout(() => {
+      let left = document.querySelector('.ibox-content').offsetLeft;
+      new AutoToc({
+        contentSelector: '.ibox-content',
+        minLevel: 2,
+        maxLevel: 6,
+        scrollOffset: 96,
+        observe: true,
+        position: 'left', // 可选: left | right | top | custom
+        float: true,
+        offset: { top: 156, left: left - Math.min(left - 5, 600) },
+        width: Math.max(Math.min(left - 7, 600), 220),
+        closeButton: true,
+        draggable: true
+      }).build();
+    }, 500);
+  },
+  beforeUnmount() {
+    // 移除页面可见性变化监听
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
+    if (this.eventSource) {
+      this.eventSource.close()
+    }
+  },
 }).use(naive).mount('#postApp');

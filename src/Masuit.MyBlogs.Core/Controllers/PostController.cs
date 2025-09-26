@@ -1,5 +1,6 @@
-﻿using System.Collections.Frozen;
-using Dispose.Scope;
+﻿using Dispose.Scope;
+using EFCoreSecondLevelCacheInterceptor;
+using FreeRedis;
 using Hangfire;
 using Masuit.LuceneEFCore.SearchEngine;
 using Masuit.LuceneEFCore.SearchEngine.Interfaces;
@@ -8,24 +9,24 @@ using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
+using Masuit.MyBlogs.Core.Models;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
+using Masuit.Tools.Core;
 using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Excel;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
+using Masuit.Tools.Mime;
+using Masuit.Tools.TextDiff;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Net.Http.Headers;
+using System.Collections.Frozen;
 using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using EFCoreSecondLevelCacheInterceptor;
-using FreeRedis;
-using Masuit.MyBlogs.Core.Models;
-using Masuit.Tools.Core;
-using Masuit.Tools.Mime;
-using Masuit.Tools.TextDiff;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -516,6 +517,58 @@ public sealed class PostController : BaseController
     }
 
     /// <summary>
+    /// 在读统计
+    /// </summary>
+    /// <returns></returns>
+    [Route("{id:int}/online")]
+    public async Task<ActionResult> Online(int id, CancellationToken cancellationToken)
+    {
+        Response.ContentType = "text/event-stream";
+        Response.Headers.Add("X-Accel-Buffering", "no");
+        Response.Headers.Add("Cache-Control", "no-cache");
+        Response.Headers.Add("Connection", "keep-alive");
+        var key = $"PostOnline:{id}";
+        await RedisHelper.SAddAsync(key, ClientIP.ToString());
+        await RedisHelper.ExpireAsync(key, TimeSpan.FromMinutes(60));
+        while (true)
+        {
+            try
+            {
+                if (HttpContext.RequestAborted.IsCancellationRequested)
+                {
+                    await RedisHelper.SRemAsync(key, ClientIP.ToString());
+                    break;
+                }
+
+                var online = await RedisHelper.SCardAsync(key);
+                await Response.WriteAsync("data:" + online + "\r\r", cancellationToken: HttpContext.RequestAborted);
+                await Response.Body.FlushAsync(HttpContext.RequestAborted);
+                await Task.Delay(5000, HttpContext.RequestAborted);
+            }
+            catch (OperationCanceledException e)
+            {
+                await RedisHelper.SRemAsync(key, ClientIP.ToString());
+                break;
+            }
+        }
+
+        await RedisHelper.SRemAsync(key, ClientIP.ToString());
+        Response.Body.Close();
+        return Ok();
+    }
+
+    /// <summary>
+    /// 在看列表
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("{id:int}/online-viewer"), MyAuthorize]
+    public async Task<ActionResult> GetOnlineViewer(int id)
+    {
+        return Ok((await RedisHelper.SMembersAsync("PostOnline:" + id)).Select(s => KeyValuePair.Create(s, s.GetIPLocation().ToString())).ToList());
+    }
+
+    /// <summary>
     /// 文章合并
     /// </summary>
     /// <param name="id"></param>
@@ -652,7 +705,7 @@ public sealed class PostController : BaseController
         {
             item.ModifyDate = item.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
             item.PostDate = item.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-            item.Online = (int)await cacheManager.SCardAsync(nameof(PostOnline) + ":" + item.Id);
+            item.Online = (int)await cacheManager.SCardAsync("PostOnline:" + item.Id);
         }
 
         return Ok(list);
@@ -1090,56 +1143,66 @@ public sealed class PostController : BaseController
     {
         Response.ContentType = "text/event-stream";
         Response.Headers.Append("X-Accel-Buffering", "no");
+        Response.Headers.Add("Cache-Control", "no-cache");
+        Response.Headers.Add("Connection", "keep-alive");
         while (true)
         {
-            if (cancellationToken.IsCancellationRequested)
+            try
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                await Response.WriteAsync("event: message\n", cancellationToken);
+                var keys = await RedisHelper.KeysAsync("PostOnline:*");
+                var sets = keys.Select(s => (Id: s.Split(':')[1].ToInt32(), Clients: RedisHelper.SMembers(s))).ToArray();
+                var ids = sets.OrderByDescending(t => t.Clients.Length).Take(10).Select(t => t.Id).ToArray();
+                var mostHots = await PostService.GetQuery(p => ids.Contains(p.Id)).ProjectModelBase().ToListWithNoLockAsync(cancellationToken).ContinueWith(t =>
+                {
+                    foreach (var item in t.Result)
+                    {
+                        item.ViewCount = sets.FirstOrDefault(x => x.Id == item.Id).Clients.Length;
+                    }
+
+                    return t.Result.OrderByDescending(p => p.ViewCount);
+                }, cancellationToken);
+                var postsQuery = PostService.GetQuery(p => p.Status == Status.Published);
+                var mostView = await postsQuery.OrderByDescending(p => p.TotalViewCount).Take(10).Select(p => new PostModelBase()
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    ViewCount = p.TotalViewCount
+                }).ToListWithNoLockAsync(cancellationToken);
+                var mostAverage = await postsQuery.OrderByDescending(p => p.AverageViewCount).Take(10).Select(p => new PostModelBase()
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    ViewCount = (int)p.AverageViewCount
+                }).ToListWithNoLockAsync(cancellationToken);
+                var yesterday = DateTime.Now.AddDays(-1);
+                var trending = await postsQuery.Select(p => new PostModelBase()
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    ViewCount = p.PostVisitRecords.Count(t => t.Time >= yesterday)
+                }).OrderByDescending(p => p.ViewCount).Take(10).ToListWithNoLockAsync(cancellationToken);
+                var readCount = PostVisitRecordService.Count(e => e.Time >= yesterday);
+                await Response.WriteAsync("data:" + new
+                {
+                    mostHots,
+                    mostView,
+                    mostAverage,
+                    trending,
+                    readCount
+                }.ToJsonString() + "\r\r", cancellationToken: cancellationToken);
+                await Response.Body.FlushAsync(cancellationToken);
+                await Task.Delay(5000, cancellationToken);
+            }
+            catch (OperationCanceledException)
             {
                 break;
             }
-            await Response.WriteAsync("event: message\n", cancellationToken);
-            var keys = await RedisHelper.KeysAsync(nameof(PostOnline) + ":*");
-            var sets = keys.Select(s => (Id: s.Split(':')[1].ToInt32(), Clients: RedisHelper.SMembers(s))).ToArray();
-            var ids = sets.OrderByDescending(t => t.Clients.Length).Take(10).Select(t => t.Id).ToArray();
-            var mostHots = await PostService.GetQuery(p => ids.Contains(p.Id)).ProjectModelBase().ToListWithNoLockAsync(cancellationToken).ContinueWith(t =>
-            {
-                foreach (var item in t.Result)
-                {
-                    item.ViewCount = sets.FirstOrDefault(x => x.Id == item.Id).Clients.Length;
-                }
-
-                return t.Result.OrderByDescending(p => p.ViewCount);
-            }, cancellationToken);
-            var postsQuery = PostService.GetQuery(p => p.Status == Status.Published);
-            var mostView = await postsQuery.OrderByDescending(p => p.TotalViewCount).Take(10).Select(p => new PostModelBase()
-            {
-                Id = p.Id,
-                Title = p.Title,
-                ViewCount = p.TotalViewCount
-            }).ToListWithNoLockAsync(cancellationToken);
-            var mostAverage = await postsQuery.OrderByDescending(p => p.AverageViewCount).Take(10).Select(p => new PostModelBase()
-            {
-                Id = p.Id,
-                Title = p.Title,
-                ViewCount = (int)p.AverageViewCount
-            }).ToListWithNoLockAsync(cancellationToken);
-            var yesterday = DateTime.Now.AddDays(-1);
-            var trending = await postsQuery.Select(p => new PostModelBase()
-            {
-                Id = p.Id,
-                Title = p.Title,
-                ViewCount = p.PostVisitRecords.Count(t => t.Time >= yesterday)
-            }).OrderByDescending(p => p.ViewCount).Take(10).ToListWithNoLockAsync(cancellationToken);
-            var readCount = PostVisitRecordService.Count(e => e.Time >= yesterday);
-            await Response.WriteAsync("data:" + new
-            {
-                mostHots,
-                mostView,
-                mostAverage,
-                trending,
-                readCount
-            }.ToJsonString() + "\r\r", cancellationToken: cancellationToken);
-            await Response.Body.FlushAsync(cancellationToken);
-            await Task.Delay(5000, cancellationToken);
         }
 
         Response.Body.Close();

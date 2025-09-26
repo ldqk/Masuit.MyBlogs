@@ -1,66 +1,61 @@
 ﻿@model Masuit.MyBlogs.Core.Models.Entity.Post
-
 @{
-    Layout = null;
+  Layout = null;
 }
-
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>文章《@Model.Title》洞察分析</title>
-    <meta content="webkit" name="renderer">
-    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+  <meta charset="utf-8">
+  <title>文章《@Model.Title》洞察分析</title>
+  <meta content="webkit" name="renderer">
+  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 </head>
-<body style="overflow-x: hidden" id="app">
-    <h3 align="center">文章《@Model.Title》洞察分析</h3>
-    <vxe-toolbar>
-        <template #tools>
-            <vxe-input @@search-click="loadData" placeholder="搜索" type="search" v-model="kw"></vxe-input>
-            <a asp-controller="Post" asp-action="ExportPostVisitRecords" asp-route-id="@Model.Id" class="theme--primary type--button vxe-button">导出</a>
-        </template>
-    </vxe-toolbar>
-    <!-- 主表格 -->
-    <vxe-table :data="tableData" :loading="loading" border class="limited-row-height" ref="tableRef" stripe>
-        <vxe-column field="IP" fixed="left" min-width="200" title="IP">
-            <template #default="{ row }">
-                <a :href="`/tools/ip/${row.IP}`" class="text-primary" target="_blank"> {{ row.IP }} </a>
-            </template>
-        </vxe-column>
-        <vxe-column field="RequestUrl" min-width="180" title="请求URL"></vxe-column>
-        <vxe-column field="Location" min-width="180" title="地理位置"></vxe-column>
-        <vxe-column field="Referer" min-width="250" title="请求来源"></vxe-column>
-        <vxe-column field="Time" min-width="250" title="访问时间"></vxe-column>
-    </vxe-table>
-    <!-- 分页组件 -->
-    <div class="">
-        <vxe-pager :current-page.sync="pageConfig.page" :page-size.sync="pageConfig.size" :total="pageConfig.total" @@page-change="pageChange">
-        </vxe-pager>
-    </div>
-    <vxe-toolbar>
-        <template #tools>
-            <span>对比最近：</span>
-            <vxe-select @@change="showCharts" v-model="period">
-                <vxe-option :key="num" :label="`${num}天`" :value="num" v-for="num in [7,15,30,60,90,180,365]"></vxe-option>
-            </vxe-select>
-        </template>
-    </vxe-toolbar>
-    <div id="chart" style="height: 500px"></div>
-    <mini-profiler max-traces="5" />
+<body id="app" style="overflow-x: hidden">
+<h3 align="center">文章《@Model.Title》洞察分析</h3>
+<vxe-toolbar>
+  <template #tools>
+    <vxe-input @@search-click="loadData" placeholder="搜索" type="search" v-model="kw"></vxe-input>
+    <a asp-action="ExportPostVisitRecords" asp-controller="Post" asp-route-id="@Model.Id" class="theme--primary type--button vxe-button">导出</a>
+  </template>
+</vxe-toolbar>
+<!-- 主表格 -->
+<vxe-table :data="tableData" :loading="loading" border class="limited-row-height" ref="tableRef" stripe>
+  <vxe-column field="IP" fixed="left" min-width="200" title="IP">
+    <template #default="{ row }">
+      <a :href="`/tools/ip/${row.IP}`" class="text-primary" target="_blank"> {{ row.IP }} </a>
+    </template>
+  </vxe-column>
+  <vxe-column field="RequestUrl" min-width="180" title="请求URL"></vxe-column>
+  <vxe-column field="Location" min-width="180" title="地理位置"></vxe-column>
+  <vxe-column field="Referer" min-width="250" title="请求来源"></vxe-column>
+  <vxe-column field="Time" min-width="250" title="访问时间"></vxe-column>
+</vxe-table>
+<!-- 分页组件 -->
+<div class="">
+  <vxe-pager :current-page.sync="pageConfig.page" :page-size.sync="pageConfig.size" :total="pageConfig.total" @@page-change="pageChange">
+  </vxe-pager>
+</div>
+<vxe-toolbar>
+  <template #tools>
+    <span>对比最近：</span>
+    <vxe-select @@change="showCharts" v-model="period">
+      <vxe-option :key="num" :label="`${num}天`" :value="num" v-for="num in [7,15,30,60,90,180,365]"></vxe-option>
+    </vxe-select>
+  </template>
+</vxe-toolbar>
+<div id="chart" style="height: 500px"></div>
+<mini-profiler max-traces="5"/>
 </body>
 </html>
-<!-- 引入vxe-table样式 -->
 <link href="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.25/lib/style.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/style.min.css" rel="stylesheet">
-<script src="https://unpkg.com/vue"></script>
-<!-- 引入vxe-table的JS文件 -->
+<script src="https://cdn.jsdelivr.net/npm/vue@3.5.16/dist/vue.global.prod.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.25/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@6/dist/echarts.min.js" type="text/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js" type="text/javascript"></script>
 <script>
     const { createApp, ref, onMounted, watch, computed } = Vue;
     createApp({

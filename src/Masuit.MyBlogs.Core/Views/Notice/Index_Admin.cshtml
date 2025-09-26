@@ -1,65 +1,60 @@
 ﻿@using Masuit.MyBlogs.Core.Models.DTO
 @model IList<Masuit.MyBlogs.Core.Models.DTO.NoticeDto>
 @{
-    ViewBag.Title = "网站公告栏";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "网站公告栏";
+  Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div class="container min-height610">
-    <ol class="cd-breadcrumb triangle">
-        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-        <li class="current"><em>@ViewBag.Title</em></li>
-    </ol>
-    <a href="/dashboard/notice/write" class="btn btn-info">发布新公告</a>
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-        @foreach (var n in Model)
-        {
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="heading-@n.Id">
-                    <h4 class="panel-title">
-                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse-@n.Id" aria-expanded="false" aria-controls="collapse-@n.Id">
-                            @n.ModifyDate.ToString("yyyy-MM-dd") @n.Title
-                        </a>
-                    </h4>
-                </div>
-                <div id="collapse-@n.Id" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-@n.Id">
-                    <div class="panel-body">
-                        <div class="btn-group">
-                            <a class="btn btn-info" onclick="del(@n.Id,'@n.Title')">删除</a>
-                            <a class="btn btn-danger" href="/dashboard/notice/write?id=@n.Id" target="_blank">修改</a>
-                        </div>
-                        @Html.Raw(n.Content)
-                    </div>
-                </div>
+  <ol class="cd-breadcrumb triangle">
+    <li>
+      <a asp-action="Index" asp-controller="Home">首页</a>
+    </li>
+    <li class="current">
+      <em>@ViewBag.Title</em>
+    </li>
+  </ol>
+  <a class="btn btn-info" href="/dashboard/notice/write">发布新公告</a>
+  <div aria-multiselectable="true" class="panel-group" id="accordion" role="tablist">
+    @foreach (var n in Model) {
+      <div class="panel panel-default">
+        <div class="panel-heading" id="heading-@n.Id" role="tab">
+          <h4 class="panel-title">
+            <a aria-controls="collapse-@n.Id" aria-expanded="false" class="collapsed" data-parent="#accordion" data-toggle="collapse" href="#collapse-@n.Id" role="button">
+              @n.ModifyDate.ToString("yyyy-MM-dd") @n.Title
+            </a>
+          </h4>
+        </div>
+        <div aria-labelledby="heading-@n.Id" class="collapse panel-collapse" id="collapse-@n.Id" role="tabpanel">
+          <div class="panel-body">
+            <div class="btn-group">
+              <a class="btn btn-info" onclick="del(@n.Id,'@n.Title')">删除</a>
+              <a class="btn btn-danger" href="/dashboard/notice/write?id=@n.Id" target="_blank">修改</a>
             </div>
-        }
-    </div>
-    @{
-        await Html.RenderPartialAsync("_Pagination", ViewData["page"]);
-        await Html.RenderPartialAsync("_ArticleListAdvertisement", (AdvertisementDto)ViewBag.Ads);
+            @Html.Raw(n.Content)
+          </div>
+        </div>
+      </div>
     }
+  </div>
+  @{
+    await Html.RenderPartialAsync("_Pagination", ViewData["page"]);
+    await Html.RenderPartialAsync("_ArticleListAdvertisement", (AdvertisementDto) ViewBag.Ads);
+  }
 </div>
 <script>
     function del(id, title) {
-        swal({
-            title: "确认删除这条公告吗？",
-            text: title,
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            showLoaderOnConfirm: true,
-            animation: true,
-            allowOutsideClick: false
-        }).then(function () {
-            $.post("/notice/delete/"+id, function (data) {
-                window.notie.alert({
-                    type: 1,
-                    text: data.Message,
-                    time: 4
-                });
-                window.location.reload();
-            });
-        }, function () {
-        });
+      dialog.warning({
+        title: "确认删除这条公告吗？",
+        content: title,
+        positiveText: '确定',
+        negativeText: '取消',
+        draggable: true,
+        onPositiveClick: () => {
+          axios.post("/notice/delete/"+id).then(res=>{
+            message.success('删除成功');
+            window.location.reload();
+          });
+        }
+      });
     }
 </script>

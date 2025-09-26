@@ -41,41 +41,51 @@ public sealed class DashboardController(IWebHostEnvironment env) : AdminControll
     {
         Response.ContentType = "text/event-stream";
         Response.Headers.Append("X-Accel-Buffering", "no");
+        Response.Headers.Add("Cache-Control", "no-cache");
+        Response.Headers.Add("Connection", "keep-alive");
         while (true)
         {
-            if (cancellationToken.IsCancellationRequested)
+            try
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                await Response.WriteAsync($"event: message\n", cancellationToken);
+                var post = postService.GetQuery(p => p.Status == Status.Pending).Select(p => new
+                {
+                    p.Id,
+                    p.Title,
+                    p.PostDate,
+                    p.Author
+                }).ToPooledListScope();
+                var msgs = leaveMessageService.GetQuery(m => m.Status == Status.Pending).Select(p => new
+                {
+                    p.Id,
+                    p.PostDate,
+                    p.NickName
+                }).ToPooledListScope();
+                var comments = commentService.GetQuery(c => c.Status == Status.Pending).Select(p => new
+                {
+                    p.Id,
+                    p.CommentDate,
+                    p.PostId,
+                    p.NickName
+                }).ToPooledListScope();
+                await Response.WriteAsync("data:" + new
+                {
+                    post,
+                    msgs,
+                    comments
+                }.ToJsonString() + "\r\r", cancellationToken: cancellationToken);
+                await Response.Body.FlushAsync(cancellationToken);
+                await Task.Delay(5000, cancellationToken);
+            }
+            catch (OperationCanceledException)
             {
                 break;
             }
-            await Response.WriteAsync($"event: message\n", cancellationToken);
-            var post = postService.GetQuery(p => p.Status == Status.Pending).Select(p => new
-            {
-                p.Id,
-                p.Title,
-                p.PostDate,
-                p.Author
-            }).ToPooledListScope();
-            var msgs = leaveMessageService.GetQuery(m => m.Status == Status.Pending).Select(p => new
-            {
-                p.Id,
-                p.PostDate,
-                p.NickName
-            }).ToPooledListScope();
-            var comments = commentService.GetQuery(c => c.Status == Status.Pending).Select(p => new
-            {
-                p.Id,
-                p.CommentDate,
-                p.PostId,
-                p.NickName
-            }).ToPooledListScope();
-            await Response.WriteAsync("data:" + new
-            {
-                post,
-                msgs,
-                comments
-            }.ToJsonString() + "\r\r", cancellationToken: cancellationToken);
-            await Response.Body.FlushAsync(cancellationToken);
-            await Task.Delay(5000, cancellationToken);
         }
 
         Response.Body.Close();

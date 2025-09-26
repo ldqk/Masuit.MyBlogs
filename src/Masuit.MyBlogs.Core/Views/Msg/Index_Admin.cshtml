@@ -15,9 +15,9 @@
       <em>@ViewBag.Title</em>
     </li>
   </ol>
-  <div class="animated form-group form-horizontal">
+  <div class="animated form-horizontal">
     @Html.AntiForgeryToken()
-    <div class="animated form-group overlay">
+    <div class="animated overlay">
       <div class="ueditor" id="editor"></div>
     </div>
     <div class="form-group">
@@ -35,16 +35,11 @@
       <n-pagination :page-count="Math.ceil(pageConfig.total / pageConfig.size)" :page-sizes="[10, 20, 30, 50]" show-size-picker v-model:page="pageConfig.page" v-model:page-size="pageConfig.size"/>
     </div>
   </div>
-  <n-modal :mask-closable="false" :style="{ width: '50vw' }" :title="`回复：${reply.for?.NickName}`" @@negative-click="onNegativeClick" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复留言" preset="dialog" v-model:show="showPopup">
-    <form class="form-horizontal" id="reply-form" method="post">
-      @Html.AntiForgeryToken()
-      <div class="ueditor" id="editor2"></div>
-    </form>
+  <n-modal :mask-closable="false" :style="{ width: '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复留言" preset="dialog" v-model:show="showPopup">
+    @Html.AntiForgeryToken()
+    <div class="ueditor" id="editor2"></div>
   </n-modal>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/vue@3.5.16/dist/vue.global.prod.js"></script>
-<script src="https://unpkg.com/naive-ui"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="~/UEditorPlus/ueditor.config.front.js"></script>
 <script charset="utf-8" src="~/UEditorPlus/ueditor.all.js" type="text/javascript"></script>
 <script>

@@ -56,14 +56,13 @@ public static class MiddlewareExtension
             options.EnableForHttps = true;
             options.Providers.Add<BrotliCompressionProvider>();
             options.Providers.Add<GzipCompressionProvider>();
-            options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
-            {
+            options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat([
                 "text/html; charset=utf-8",
                 "text/event-stream",
                 "application/xhtml+xml",
                 "application/atom+xml",
                 "image/svg+xml"
-            });
+            ]);
         });
         return services;
     }
@@ -79,9 +78,7 @@ public static class MiddlewareExtension
         {
             bundles.AddCss("/main.css")
                 .Include("/fonts/icomoon.css")
-                .Include("/Content/jquery.paging.css")
                 .Include("/Content/common/reset.css")
-                .Include("/Content/common/loading.css")
                 .Include("/Content/common/style.css")
                 .Include("/Content/common/articlestyle.css")
                 .Include("/Content/common/leaderboard.css")
@@ -92,16 +89,13 @@ public static class MiddlewareExtension
                 .Include("/fonts/icomoon.css")
                 .Include("/ng-views/filemanager/css/animations.css")
                 .Include("/ng-views/filemanager/css/dialogs.css")
-                .Include("/ng-views/filemanager/css/main.css")
-                .Include("/Content/common/loading.css");
+                .Include("/ng-views/filemanager/css/main.css");
             bundles.AddCss("/article.css")
                 .Include("/Assets/auto-toc/auto-toc.css")
                 .Include("/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css")
                 .Include("/Assets/highlight/css/highlight.css");
 
             bundles.AddJs("/main.js")
-                .Include("/Scripts/jquery.query.js")
-                .Include("/Scripts/jquery.paging.js")
                 .Include("/Scripts/ripplet.js")
                 .Include("/Scripts/global/functions.js")
                 .Include("/Scripts/global/scripts.js")

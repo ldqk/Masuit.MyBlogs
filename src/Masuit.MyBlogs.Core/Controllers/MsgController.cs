@@ -366,17 +366,27 @@ public sealed class MsgController : BaseController
     {
         Response.ContentType = "text/event-stream";
         Response.Headers.Add("X-Accel-Buffering", "no");
+        Response.Headers.Add("Cache-Control", "no-cache");
+        Response.Headers.Add("Connection", "keep-alive");
         while (true)
         {
-            if (cancellationToken.IsCancellationRequested)
+            try
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                await Response.WriteAsync($"event: message\n", cancellationToken);
+                var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).ToPooledListScope();
+                await Response.WriteAsync("data:" + msgs.ToJsonString() + "\r\r", cancellationToken: cancellationToken);
+                await Response.Body.FlushAsync(cancellationToken);
+                await Task.Delay(5000, cancellationToken);
+            }
+            catch (OperationCanceledException)
             {
                 break;
             }
-            await Response.WriteAsync($"event: message\n", cancellationToken);
-            var msgs = MessageService.GetQueryNoTracking(m => !m.Read, m => m.Time, false).ToPooledListScope();
-            await Response.WriteAsync("data:" + msgs.ToJsonString() + "\r\r", cancellationToken: cancellationToken);
-            await Response.Body.FlushAsync(cancellationToken);
-            await Task.Delay(5000, cancellationToken);
         }
 
         Response.Body.Close();

@@ -4,7 +4,6 @@
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.ViewModel
-@using Masuit.MyBlogs.Core.Views.Post
 @model Masuit.MyBlogs.Core.Models.Entity.Post
 @{
   ViewBag.Title = Model.Title;
@@ -21,9 +20,6 @@
   string hidden = string.IsNullOrEmpty(Context.Request.Cookies["ValidateKey"]) ? "" : "hidden";
   AdvertisementDto ad = ViewBag.Ads;
 }
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="https://unpkg.com/naive-ui"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="~/UEditorPlus/ueditor.config.front.js"></script>
 <script charset="utf-8" src="~/UEditorPlus/ueditor.all.js" type="text/javascript"></script>
 <script>
@@ -119,10 +115,8 @@
                   await Html.RenderPartialAsync("CategoryPath", Model.Category);
                 }
                 | 评论总数：
-                <span class="text-danger">@ViewBag.CommentsCount</span>条 | @(await Html.RenderComponentAsync<PostOnline>(RenderMode.ServerPrerendered, new {
-                                                                             Model.Id,
-                                                                             IP = Context.Connection.RemoteIpAddress.ToString()
-                                                                           }))
+                <span class="text-danger">@ViewBag.CommentsCount</span>条 |
+                <span @@click="showViewer(false)" class="text-red">{{online}}</span>人正在浏览本文
                 @if (Model.Seminar.Any()) {
                   <span> | 所属专题：</span>
                   var seminars = Model.Seminar;
@@ -284,7 +278,7 @@
                   </div>
                 </div>
               }
-              <div class="animated fadeInDown form-group overlay" style="margin-bottom: 0px !important;">
+              <div class="animated fadeInDown overlay" style="margin-bottom: 0px !important;">
                 <div class="ueditor" id="editor"></div>
               </div>
               <label>
@@ -356,7 +350,7 @@
         </div>
       </div>
     }
-    <div class="form-group overlay">
+    <div class="overlay">
       <div class="ueditor" id="editor2"></div>
     </div>
     <label>

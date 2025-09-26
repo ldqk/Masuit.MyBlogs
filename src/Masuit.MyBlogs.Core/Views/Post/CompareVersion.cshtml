@@ -7,10 +7,18 @@
 @using Masuit.Tools.Core.Net
 @model Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion[]
 @{
-	ViewBag.Title = Model[0].Title + "版本对比";
-	Layout = "~/Views/Shared/_Layout.cshtml";
-	string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
-	IList<AdvertisementDto> ads = ViewBag.Ads;
+  ViewBag.Title = Model[0].Title + "版本对比";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  string[] colors = {
+    "success",
+    "info",
+    "primary",
+    "warning",
+    "danger",
+    "default",
+    "primary"
+  };
+  IList<AdvertisementDto> ads = ViewBag.Ads;
 }
 <style>
 	ins {
@@ -23,173 +31,186 @@
 		background-color: #FEC8C8;
 	}
 </style>
-<link href="~/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet" />
+<link href="~/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet"/>
 <div class="container-fluid">
-	<ol class="cd-breadcrumb triangle">
-		<li><a asp-controller="Home" asp-action="Index">首页</a></li>
-		<li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
-		@if(Model[0].Category.ParentId>0) {
-		    if(Model[0].Category.Parent.ParentId>0) {
-			    <li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model[0].Category.Parent.ParentId">@Model[0].Category.Parent.Parent.Name</a></li>
-		    }
-			<li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model[0].Category.ParentId">@Model[0].Category.Parent.Name</a></li>
-		}
-		<li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model[0].CategoryId">@Model[0].Category.Name</a></li>
-		<li><a asp-controller="Post" asp-action="Details" asp-route-id="@Model[0].Id">@Model[0].Title</a></li>
-		<li><a asp-controller="Post" asp-action="History" asp-route-id="@Model[0].Id">历史版本</a></li>
-		<li class="current">
-			<em>版本对比</em>
-		</li>
-	</ol>
-	<div class="row history">
-		<div class="col-md-6">
-			<div class="wrapper-content article">
-				<div class="ibox">
-					<div class="ibox-content animated fadeIn">
-						<main>
-							<section class="article-content">
-								<header class="page-header">
-									<div class="text-center">
-										<a>
-											<h2 class="padding-bot10">
-												@Model[1].Title
-											</h2>
-										</a>
-									</div>
-									<div class="row">
-										<div class="col-sm-8">
-											<div class="padding-bot10">
-												<span class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Modifier</span>修改于<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@Model[1].ModifyDate.Year" asp-route-mm="@Model[1].ModifyDate.Month" asp-route-dd="@Model[1].ModifyDate.Day" asp-route-mode="@nameof(Post.ModifyDate)"><time class="text-success">@Model[1].ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone),"yyyy-MM-dd")</time></a> | 原分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model[1].CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Category.Name</a>
-												@if (Model[1].Seminar.Any())
-												{
-													<span> | 原所属专题：</span>
-													var seminars = Model[1].Seminar;
-													foreach (var s in seminars)
-													{
-														<a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.Id" class="label label-@colors[new Random().Next() % colors.Length]">@s.Title</a><text> </text>
-													}
-												}
-											</div>
-										</div>
-										@{
-											if (!string.IsNullOrEmpty(Model[1].Label))
-											{
-												<div class="pull-right margin-right20">
-													<div>
-														@foreach (string s in Model[1].Label.Split(',', '，', ' '))
-														{
-															if (!string.IsNullOrEmpty(s))
-															{
-																<a asp-controller="Home" asp-action="Tag" asp-route-tag="@s">
-																	<span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
-																</a>
-															}
-														}
-													</div>
-												</div>
-											}
-										}
-									</div>
-								</header>
-								<article class="article" id="article">
-									@if(!ViewBag.DisableCopy||Context.Request.IsRobot()) {
-										@Html.Raw(await Model[1].Content.ReplaceImgAttribute(Model[1].Title))
-									}
-									else {
-										@Html.Raw(Regex.Replace(await Model[1].Content.ReplaceImgAttribute(Model[1].Title), @"[\u4e00-\u9fa5]", m => HtmlEncoder.Default.Encode(m.Value)))
-									}
-								</article>
-							</section>
-							<hr class="margin-top10 marginbot10" />
-							@if (ads.Any())
-							{
-								await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[0]);
-							}
-						</main>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-6">
-			<div class="wrapper-content article">
-				<div class="ibox">
-					<div class="ibox-content animated fadeIn">
-						<main>
-							<section class="article-content">
-								<header class="page-header">
-									<div class="text-center">
-										<a>
-											<h2 class="padding-bot10">
-												@Model[2].Title
-											</h2>
-										</a>
-									</div>
-									<div class="row">
-										<div class="col-sm-8">
-											<div class="padding-bot10">
-												<span class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Modifier</span>修改于<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@Model[2].ModifyDate.Year" asp-route-mm="@Model[2].ModifyDate.Month" asp-route-dd="@Model[2].ModifyDate.Day" asp-route-mode="@nameof(Post.ModifyDate)"><time class="text-success">@Model[2].ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone),"yyyy-MM-dd")</time></a> | 原分类：<i class="icon-map-pin"></i><a asp-controller="Home" asp-action="Category" asp-route-id="@Model[2].CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Category.Name</a>
-												@if (Model[2].Seminar.Any())
-												{
-													<span> | 原所属专题：</span>
-													var seminars = Model[2].Seminar;
-													foreach (var s in seminars)
-													{
-														<a asp-controller="Seminar" asp-action="Index" asp-route-id="@s.Id" class="label label-@colors[new Random().Next() % colors.Length]">@s.Title</a><text> </text>
-													}
-												}
-											</div>
-										</div>
-										@{
-											if (!string.IsNullOrEmpty(Model[2].Label))
-											{
-												<div class="pull-right margin-right20">
-													<div>
-														@foreach (string s in Model[2].Label.Split(',', '，', ' '))
-														{
-															if (!string.IsNullOrEmpty(s))
-															{
-																<a asp-controller="Home" asp-action="Tag" asp-route-tag="@s">
-																	<span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
-																</a>
-															}
-														}
-													</div>
-												</div>
-											}
-										}
-									</div>
-								</header>
-								<article class="article" id="article">
-									@if(!ViewBag.DisableCopy||Context.Request.IsRobot()) {
-										@Html.Raw(await Model[2].Content.ReplaceImgAttribute(Model[2].Title))
-									}
-									else {
-										@Html.Raw(Regex.Replace(await Model[2].Content.ReplaceImgAttribute(Model[2].Title), @"[\u4e00-\u9fa5]", m => HtmlEncoder.Default.Encode(m.Value)))
-									}
-								</article>
-							</section>
-							<hr class="margin-top10 marginbot10" />
-							@if (ads.Count > 1)
-							{
-								await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[1]);
-							}
-						</main>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="cyReward" role="cylabs" data-use="reward"></div>
+  <ol class="cd-breadcrumb triangle">
+    <li>
+      <a asp-action="Index" asp-controller="Home">首页</a>
+    </li>
+    <li>
+      <a asp-action="Post" asp-controller="Home">文章列表</a>
+    </li>
+    @if (Model[0].Category.ParentId > 0) {
+      if (Model[0].Category.Parent.ParentId > 0) {
+        <li>
+          <a asp-action="Category" asp-controller="Home" asp-route-id="@Model[0].Category.Parent.ParentId">@Model[0].Category.Parent.Parent.Name</a>
+        </li>
+      }
+
+      <li>
+        <a asp-action="Category" asp-controller="Home" asp-route-id="@Model[0].Category.ParentId">@Model[0].Category.Parent.Name</a>
+      </li>
+    }
+    <li>
+      <a asp-action="Category" asp-controller="Home" asp-route-id="@Model[0].CategoryId">@Model[0].Category.Name</a>
+    </li>
+    <li>
+      <a asp-action="Details" asp-controller="Post" asp-route-id="@Model[0].Id">@Model[0].Title</a>
+    </li>
+    <li>
+      <a asp-action="History" asp-controller="Post" asp-route-id="@Model[0].Id">历史版本</a>
+    </li>
+    <li class="current">
+      <em>版本对比</em>
+    </li>
+  </ol>
+  <div class="history row">
+    <div class="col-md-6">
+      <div class="article wrapper-content">
+        <div class="ibox">
+          <div class="animated fadeIn ibox-content">
+            <main>
+              <section class="article-content">
+                <header class="page-header">
+                  <div class="text-center">
+                    <a>
+                      <h2 class="padding-bot10">
+                        @Model[1].Title
+                      </h2>
+                    </a>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-8">
+                      <div class="padding-bot10">
+                        <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Modifier</span>修改于
+                        <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model[1].ModifyDate.Day" asp-route-mm="@Model[1].ModifyDate.Month" asp-route-mode="@nameof(Post.ModifyDate)" asp-route-yyyy="@Model[1].ModifyDate.Year">
+                          <time class="text-success">@Model[1].ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone), "yyyy-MM-dd")</time>
+                        </a> | 原分类：
+                        <i class="icon-map-pin"></i>
+                        <a asp-action="Category" asp-controller="Home" asp-route-id="@Model[1].CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model[1].Category.Name</a>
+                        @if (Model[1].Seminar.Any()) {
+                          <span> | 原所属专题：</span>
+                          var seminars = Model[1].Seminar;
+                          foreach (var s in seminars) {
+                            <a asp-action="Index" asp-controller="Seminar" asp-route-id="@s.Id" class="label label-@colors[new Random().Next() % colors.Length]">@s.Title</a>
+                            <text> </text>
+                          }
+                        }
+                      </div>
+                    </div>
+                    @{
+                      if (!string.IsNullOrEmpty(Model[1].Label)) {
+                        <div class="margin-right20 pull-right">
+                          <div>
+                            @foreach (string s in Model[1].Label.Split(',', '，', ' ')) {
+                              if (!string.IsNullOrEmpty(s)) {
+                                <a asp-action="Tag" asp-controller="Home" asp-route-tag="@s">
+                                  <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
+                                </a>
+                              }
+                            }
+                          </div>
+                        </div>
+                      }
+                    }
+                  </div>
+                </header>
+                <article class="article" id="article">
+                  @if (!ViewBag.DisableCopy || Context.Request.IsRobot()) {
+                    @Html.Raw(await Model[1].Content.ReplaceImgAttribute(Model[1].Title))
+                  } else {
+                    @Html.Raw(Regex.Replace(await Model[1].Content.ReplaceImgAttribute(Model[1].Title), @"[\u4e00-\u9fa5]", m => HtmlEncoder.Default.Encode(m.Value)))
+                  }
+                </article>
+              </section>
+              <hr class="margin-top10 marginbot10"/>
+              @if (ads.Any()) {
+                await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[0]);
+              }
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="article wrapper-content">
+        <div class="ibox">
+          <div class="animated fadeIn ibox-content">
+            <main>
+              <section class="article-content">
+                <header class="page-header">
+                  <div class="text-center">
+                    <a>
+                      <h2 class="padding-bot10">
+                        @Model[2].Title
+                      </h2>
+                    </a>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-8">
+                      <div class="padding-bot10">
+                        <span class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Modifier</span>修改于
+                        <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model[2].ModifyDate.Day" asp-route-mm="@Model[2].ModifyDate.Month" asp-route-mode="@nameof(Post.ModifyDate)" asp-route-yyyy="@Model[2].ModifyDate.Year">
+                          <time class="text-success">@Model[2].ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone), "yyyy-MM-dd")</time>
+                        </a> | 原分类：
+                        <i class="icon-map-pin"></i>
+                        <a asp-action="Category" asp-controller="Home" asp-route-id="@Model[2].CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model[2].Category.Name</a>
+                        @if (Model[2].Seminar.Any()) {
+                          <span> | 原所属专题：</span>
+                          var seminars = Model[2].Seminar;
+                          foreach (var s in seminars) {
+                            <a asp-action="Index" asp-controller="Seminar" asp-route-id="@s.Id" class="label label-@colors[new Random().Next() % colors.Length]">@s.Title</a>
+                            <text> </text>
+                          }
+                        }
+                      </div>
+                    </div>
+                    @{
+                      if (!string.IsNullOrEmpty(Model[2].Label)) {
+                        <div class="margin-right20 pull-right">
+                          <div>
+                            @foreach (string s in Model[2].Label.Split(',', '，', ' ')) {
+                              if (!string.IsNullOrEmpty(s)) {
+                                <a asp-action="Tag" asp-controller="Home" asp-route-tag="@s">
+                                  <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
+                                </a>
+                              }
+                            }
+                          </div>
+                        </div>
+                      }
+                    }
+                  </div>
+                </header>
+                <article class="article" id="article">
+                  @if (!ViewBag.DisableCopy || Context.Request.IsRobot()) {
+                    @Html.Raw(await Model[2].Content.ReplaceImgAttribute(Model[2].Title))
+                  } else {
+                    @Html.Raw(Regex.Replace(await Model[2].Content.ReplaceImgAttribute(Model[2].Title), @"[\u4e00-\u9fa5]", m => HtmlEncoder.Default.Encode(m.Value)))
+                  }
+                </article>
+              </section>
+              <hr class="margin-top10 marginbot10"/>
+              @if (ads.Count > 1) {
+                await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[1]);
+              }
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div data-use="reward" id="cyReward" role="cylabs"></div>
 </div>
 <script src="~/UEditorPlus/third-party/SyntaxHighlighter/shCore.js"></script>
 <script>
-	$(function () {
-		SyntaxHighlighter.all();
-		SyntaxHighlighter.defaults['toolbar'] = false;
-	});
-	@if(ViewBag.DisableCopy) {
-		<text>
+window.onload=function() {
+  SyntaxHighlighter.all();
+  SyntaxHighlighter.defaults['toolbar'] = false;
+	@if (ViewBag.DisableCopy) {
+    <text>
 	GlobalCopyrightProtect();
 		</text>
-	}
+  }
+}
 </script>

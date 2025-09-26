@@ -3,7 +3,6 @@
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
-@using Masuit.MyBlogs.Core.Views.Post
 @using Masuit.Tools.Core.Net
 @using Masuit.Tools.Systems
 @model Masuit.MyBlogs.Core.Models.Entity.Post
@@ -22,9 +21,6 @@
   UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo);
   AdvertisementDto ad = ViewBag.Ads;
 }
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="https://unpkg.com/naive-ui"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="~/UEditorPlus/ueditor.config.front.js"></script>
 <script charset="utf-8" src="~/UEditorPlus/ueditor.all.js" type="text/javascript"></script>
 <script>
@@ -121,11 +117,8 @@
                   }
                   | 评论总数：
                   <span class="text-danger">@ViewBag.CommentsCount</span>条 | 热度：
-                  <span class="text-danger">@Model.TotalViewCount</span>℃ | @(await Html.RenderComponentAsync<PostOnline>(RenderMode.ServerPrerendered, new {
-                                                                              Model.Id,
-                                                                              IP = Context.Connection.RemoteIpAddress.ToString(),
-                                                                              IsAdmin = true
-                                                                            })) | 状态：@Model.Status.GetDisplay()
+                  <span class="text-danger">@Model.TotalViewCount</span>℃ |
+                  <span @@click="showViewer(true)" class="text-red">{{online}}</span>人正在浏览本文 | 状态：@Model.Status.GetDisplay()
                   @if (Model.Seminar.Any()) {
                     <span> | 所属专题：</span>
                     var seminars = Model.Seminar;
@@ -251,7 +244,7 @@
             <h3>评论区：</h3>
             <div class="animated form-horizontal pulse">
               @Html.AntiForgeryToken()
-              <div class="animated fadeInDown form-group overlay" style="margin-bottom: 0px !important;">
+              <div class="animated fadeInDown overlay" style="margin-bottom: 0px !important;">
                 <div class="ueditor" id="editor"></div>
               </div>
               <div class="form-group">
@@ -277,10 +270,8 @@
     </div>
   </div>
   <n-modal :mask-closable="false" :style="{ width: '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复评论" preset="dialog" v-model:show="showPopup">
-    <form class="form-horizontal" id="reply-form" method="post">
-      @Html.AntiForgeryToken()
-      <div class="ueditor" id="editor2"></div>
-    </form>
+    @Html.AntiForgeryToken()
+    <div class="ueditor" id="editor2"></div>
   </n-modal>
 </div>
 <environment names="Development">
@@ -294,15 +285,3 @@
   @await Styles.RenderAsync("/bundles/article.css")
   @await Scripts.RenderAsync("/bundles/article.js")
 </environment>
-<script>
-function showViewer(data) {
-    var html="";
-    for (let item of data) {
-        html+=`${item.key}：${item.value}`;
-    }
-    dialog.success({
-    title: '在看列表',
-    content: html
-  })
-}
-</script>

@@ -1,4 +1,8 @@
 ﻿const { createApp, ref, onMounted, watch, computed } = Vue;
+const { createDiscreteApi } = naive;
+const { message, dialog } = createDiscreteApi(["message", "dialog"]);
+window.message = message;
+window.dialog = dialog;
 createApp({
   setup() {
     const servers = ref([]);
@@ -10,17 +14,13 @@ createApp({
   },
   methods: {
     async getServers() {
-      this.servers = await window.fetch("/system/GetServers", {
-        credentials: 'include',
-        method: 'GET',
-        mode: 'cors'
-      }).then(function (response) {
-        return response.json();
+      this.servers = await axios.get("/system/GetServers").then(function (response) {
+        return response.data.map(item => { return { label: item, value: item }; });
       });
-      this.server = this.servers.length > 0 ? this.servers[0] : '';
+      this.server = this.servers.length > 0 ? this.servers[0].value : '';
     }
   },
-  created() {
+  mounted() {
     this.getServers();
     showLine(this.server);
   },
@@ -29,7 +29,7 @@ createApp({
       showLine(this.server);
     }
   },
-}).use(VxeUI).use(VXETable).mount('#app');
+}).use(naive).mount('#app');
 function showSpeed() {
   var myChart = echarts.init(document.getElementById("container"));
   myChart.setOption({
@@ -349,5 +349,5 @@ function showLine(ip) {
 }
 
 function showSuccess() {
-  swal({ type: 'success', html: "操作成功" });
+  message.success("操作成功");
 }

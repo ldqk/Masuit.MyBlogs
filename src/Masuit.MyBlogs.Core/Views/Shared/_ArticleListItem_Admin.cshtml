@@ -1,13 +1,12 @@
 ﻿@using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools.Html
 @using Masuit.Tools.Systems
-@using Masuit.MyBlogs.Core.Views.Post
 @using FreeRedis
 @inject IRedisClient CacheManager
 @model Masuit.MyBlogs.Core.Models.DTO.PostDto
 @{
 	string[] colors = { "success", "info", "primary", "warning", "danger", "default", "primary" };
-	var online = await CacheManager.SCardAsync(nameof(PostOnline) + ":" + Model.Id);
+	var online = await CacheManager.SCardAsync("PostOnline:" + Model.Id);
 }
 
 <div class="ibox wow fadeIn">

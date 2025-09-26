@@ -88,21 +88,20 @@
     </div>
   </div>
 </div>
-<!-- Use style -->
 <link href="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.24/lib/style.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/style.min.css" rel="stylesheet">
-<!-- Use vue -->
-<script src="https://cdn.jsdelivr.net/npm/vue@3.5.16/dist/vue.global.prod.js"></script>
-<!-- Use vxe -->
 <script src="https://cdn.jsdelivr.net/npm/xe-utils/dist/xe-utils.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.24/lib/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="~/UEditorPlus/ueditor.config.front.js"></script>
 <script charset="utf-8" src="~/UEditorPlus/ueditor.all.js" type="text/javascript"></script>
 <script charset="utf-8" src="~/UEditorPlus/lang/zh-cn/zh-cn.js" type="text/javascript"></script>
 <script>
 const { createApp, ref, onMounted, watch, computed } = Vue;
+const { createDiscreteApi } = naive;
+const { message, dialog } = createDiscreteApi(["message", "dialog"]);
+window.message = message;
+window.dialog = dialog;
 createApp({
   setup() {
     const post = ref({
@@ -121,10 +120,7 @@ createApp({
   },
   methods: {
     async getcode(email) {
-      VxeUI.modal.notification({
-        content: '正在发送验证码，请稍候...',
-        status: 'info',
-      });
+      message.info('正在发送验证码，请稍候...');
       const data = await axios.create({
         headers: {
           'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
@@ -134,10 +130,7 @@ createApp({
       }).then(res => res.data);
       if (data.Success) {
         this.disableGetcode = true;
-        VxeUI.modal.notification({
-          content: '验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！',
-          status: 'success',
-        });
+        message.success('验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！');
         localStorage.setItem("user", JSON.stringify({ NickName: this.post.Author, Email: this.post.Email }));
         var count = 0;
         var timer = setInterval(() => {
@@ -150,41 +143,25 @@ createApp({
           }
         }, 1000);
       } else {
-        VxeUI.modal.notification({
-          content: data.Message,
-          status: 'error',
-        });
+        message.error(data.Message);
         this.disableGetcode = false;
       }
     },
     submit() {
       if (this.post.Title.trim().length <= 2 || this.post.Title.trim().length > 128) {
-        VxeUI.modal.notification({
-          content: '文章标题必须在2到128个字符以内！',
-          status: 'error',
-        });
+        message.error('文章标题必须在2到128个字符以内！');
         return;
       }
       if (this.post.Modifier.trim().length <= 1 || this.post.Modifier.trim().length > 24) {
-        VxeUI.modal.notification({
-          content: '昵称不能少于2个字符或超过24个字符！',
-          status: 'error',
-        });
+        message.error('昵称不能少于2个字符或超过24个字符！');
         return;
       }
       if (!/^\w+([-+.]\w+)*@@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(this.post.ModifierEmail.trim())) {
-        VxeUI.modal.notification({
-          content: '请输入正确的邮箱格式！',
-          status: 'error',
-        });
+        message.error('请输入正确的邮箱格式！');
         return;
       }
       if (this.post.Content.length < 20 || this.post.Content.length > 1000000) {
-        VxeUI.modal.notification({
-          content: '文章内容过短或者超长，请修改后再提交！',
-          status: 'error',
-        });
-        loadingDone();
+        message.error('文章内容过短或者超长，请修改后再提交！');
         return;
       }
       axios.create({
@@ -194,22 +171,15 @@ createApp({
       }).post("/@Model.Id/pushmerge", this.post).then(res => {
         const data = res.data;
         if (data.Success) {
-          VxeUI.modal.notification({
-            content: data.Message,
-            status: 'success',
-          });
+          message.success(data.Message);
           clearInterval(window.interval);
           localStorage.removeItem("merge-post-draft-" +@Model.Id);
           window.location.href = "/" + this.post.PostId;
         } else {
-          VxeUI.modal.notification({
-            content: data.Message,
-            status: 'error',
-          });
+          message.error(data.Message);
         }
       });
     },
-
   },
   created() {
         if (window.UE) {
@@ -238,30 +208,32 @@ createApp({
         }
 
         //检查草稿
-        if (localStorage.getItem("merge-post-draft-" +@Model.Id)) {
-      VxeUI.modal.confirm({
-        title: '草稿箱',
-        content: '检查到上次有未提交的草稿，是否加载？',
-        mask: false,
-        lockView: false
-      }).then(type => {
-        if (type == 'confirm') {
-          this.post = JSON.parse(localStorage.getItem("merge-post-draft-" +@Model.Id));
-          ue.setContent(this.post.Content);
-          window.interval = setInterval(() => {
-            localStorage.setItem("merge-post-draft-" +@Model.Id, JSON.stringify(this.post));
-          }, 5000);
+        const post = JSON.parse(localStorage.getItem("merge-post-draft-" +@Model.Id));
+        if (post && post.Content) {
+          dialog.warning({
+            title: '草稿箱',
+            content: '检查到上次有未提交的草稿，是否加载？',
+            positiveText: '确定',
+            negativeText: '取消',
+            draggable: true,
+            onPositiveClick: () => {
+              this.post = post;
+              ue.setContent(this.post.Content);
+              window.interval = setInterval(() => {
+                localStorage.setItem("merge-post-draft-" +@Model.Id, JSON.stringify(this.post));
+              }, 5000);
+            },
+            onNegativeClick: () => {
+              window.interval = setInterval(() => {
+                localStorage.setItem("merge-post-draft-" +@Model.Id, JSON.stringify(this.post));
+              }, 5000);
+            }
+          });
         } else {
           window.interval = setInterval(() => {
             localStorage.setItem("merge-post-draft-" +@Model.Id, JSON.stringify(this.post));
           }, 5000);
         }
-      });
-        } else {  
-            window.interval = setInterval(() => {
-        localStorage.setItem("merge-post-draft-" +@Model.Id, JSON.stringify(this.post));
-      }, 5000);
-        }
   }
-}).mount('#mergeApp');
+}).use(naive).mount('#mergeApp');
 </script>

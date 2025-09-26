@@ -2,7 +2,7 @@
     constructor(options = {}) {
         const defaults = {
             contentSelector: '#content',
-            tocSelector: '', // 自动判断
+            tocSelector: '',
             minLevel: 2,
             maxLevel: 4,
             scrollOffset: 0,
@@ -15,12 +15,12 @@
             width: 260,
             closeButton: true,
             draggable: false,
-            tocTitle: '目录导航', // 新增：目录容器标题
+            tocTitle: '目录导航',
         };
         this.opts = Object.assign({}, defaults, options);
         this.contentEl = resolveEl(this.opts.contentSelector);
 
-        // ===== 自动创建 toc 容器（全局） =====
+        // 自动创建 toc 容器（全局）
         this.tocEl = resolveEl(this.opts.tocSelector);
         if (!this.tocEl) {
             this.tocEl = document.createElement('div');
@@ -36,7 +36,6 @@
         this._linkMap = new Map();
         this._observer = null;
         this._activeId = null;
-
         this._onClose = this._onClose.bind(this);
         this._onToggle = this._onToggle.bind(this);
         this._onClick = this._onClick.bind(this);
@@ -45,20 +44,19 @@
         this._onDragEnd = this._onDragEnd.bind(this);
         this._dragging = false;
         this._dragOffset = { x: 0, y: 0 };
-
         this._toggleBtn = null;
     }
 
     build() {
         this._headings = collectHeadings(this.contentEl, this.opts);
-        ensureIds(this._headings, this.opts.slugify);
+        ensureIncrementalIds(this._headings); // 使用自增id实现
         const tree = buildTree(this._headings, this.opts.minLevel, this.opts.maxLevel);
 
         this.tocEl.innerHTML = '';
         this.tocEl.classList.add('auto-toc-container');
         setTocPosition(this.tocEl, this.opts);
 
-        // ===== 目录标题 =====
+        // TOC标题
         const tocTitleDiv = document.createElement('div');
         tocTitleDiv.className = 'toc-title';
         tocTitleDiv.textContent = this.opts.tocTitle || '目录导航';
@@ -271,6 +269,19 @@ function resolveEl(selOrEl) {
     return null;
 }
 
+// 用自增id生成锚点id
+function ensureIncrementalIds(headings) {
+    let seq = 1;
+    headings.forEach((h) => {
+        if (h.el.id && typeof h.el.id === 'string' && h.el.id.trim()) {
+            h.id = h.el.id;
+        } else {
+            h.id = `toc-anchor-${seq++}`;
+            h.el.id = h.id;
+        }
+    });
+}
+
 function defaultSlugify(text) {
     const normalized = text.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
     const keepCJK = /[一-龥\u3400-\u9FFF\uF900-\uFAFF]/g;
@@ -298,30 +309,9 @@ function getHeadingText(el) {
     return (clone.textContent || '').trim();
 }
 
-function ensureIds(headings, slugify) {
-    const used = new Set();
-    headings.forEach((h) => {
-        let id = h.el.id || slugify(h.text);
-        id = dedupeId(id, used);
-        h.el.id = id;
-        h.id = id;
-    });
-}
-
-function dedupeId(base, used) {
-    let id = base;
-    let i = 2;
-    while (used.has(id)) {
-        id = `${base}-${i++}`;
-    }
-    used.add(id);
-    return id;
-}
-
 function buildTree(headings, minLevel, maxLevel) {
     const root = { children: [], level: minLevel - 1 };
     const stack = [root];
-
     headings.forEach((h) => {
         const node = { id: h.id, text: h.text, level: h.level, children: [] };
         while (stack.length && h.level <= stack[stack.length - 1].level) {
@@ -330,7 +320,6 @@ function buildTree(headings, minLevel, maxLevel) {
         stack[stack.length - 1].children.push(node);
         stack.push(node);
     });
-
     return root.children;
 }
 
@@ -373,7 +362,6 @@ function nearestAbove(headings, offset) {
     return best;
 }
 
-// 设置目录容器位置、浮动样式
 function setTocPosition(tocEl, opts) {
     tocEl.style.position = opts.float ? 'fixed' : 'sticky';
     tocEl.style.zIndex = opts.float ? 2 : '';
@@ -409,7 +397,6 @@ function setTocPosition(tocEl, opts) {
     }
 }
 
-// 设置 toggle 按钮位置，使其和 toc 容器重合
 function setToggleBtnPosition(toggleBtn, opts, tocEl) {
     toggleBtn.style.position = 'fixed';
     toggleBtn.style.width = opts.width + 'px';

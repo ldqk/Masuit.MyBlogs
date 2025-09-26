@@ -148,16 +148,10 @@
   <div class="page-header">
     <h3 class="text-center">性能实时监控</h3>
   </div>
-  <div class="row">
-    <vxe-toolbar>
-      <template #buttons>
-        <span>选择服务器：</span>
-        <vxe-select v-model="server">
-          <vxe-option :key="ip" :label="ip" :value="ip" v-for="ip in servers"></vxe-option>
-        </vxe-select>
-      </template>
-    </vxe-toolbar>
-  </div>
+    <div class="input-group">
+        <span class="input-group-addon">选择服务器：</span>
+        <n-select v-model:value="server" :options="servers" style="width: auto" />
+    </div>
   <div class="row">
     <div class="col-md-3" id="container" style="height: 400px;"></div>
     <div class="col-md-5" id="container-cpu" style="height: 400px;"></div>
