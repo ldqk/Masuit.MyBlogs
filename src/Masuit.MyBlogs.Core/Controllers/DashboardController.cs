@@ -137,4 +137,18 @@ public sealed class DashboardController(IWebHostEnvironment env) : AdminControll
     {
         return View();
     }
+
+    [HttpGet("refresh-memory")]
+    public ActionResult RefreshMemory()
+    {
+        GC.RefreshMemoryLimit();
+        return Ok();
+    }
+
+    [HttpGet("clear-memory")]
+    public ActionResult ClearMemory()
+    {
+        Tools.Win32.Windows.ClearMemorySilent();
+        return Ok();
+    }
 }

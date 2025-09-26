@@ -18,6 +18,14 @@ createApp({
         return response.data.map(item => { return { label: item, value: item }; });
       });
       this.server = this.servers.length > 0 ? this.servers[0].value : '';
+    },
+    async clearMemory() {
+      await axios.post("/dashboard/clear-memory");
+      message.success("操作成功");
+    },
+    async refreshMemory() {
+      await axios.post("/dashboard/refresh-memory");
+      message.success("操作成功");
     }
   },
   mounted() {
@@ -346,8 +354,4 @@ function showLine(ip) {
   }).catch(function (e) {
     console.error(e);
   });
-}
-
-function showSuccess() {
-  message.success("操作成功");
 }
