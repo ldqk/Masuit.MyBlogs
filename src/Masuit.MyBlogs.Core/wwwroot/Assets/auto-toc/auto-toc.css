@@ -120,6 +120,37 @@
         font-weight: 600;
     }
 
+    .toc .toc-fold-btn {
+        float: left;
+        appearance: none;
+        border: none;
+        background: none;
+        color: #888;
+        font-size: 18px;
+        cursor: pointer;
+        margin: 0 2px 0 -12px;
+        padding: 0 4px;
+        vertical-align: middle;
+        width: 22px;
+        height: 22px;
+        line-height: 22px;
+        display: inline-block;
+        text-align: center;
+    }
+
+        .toc .toc-fold-btn:hover {
+            background: #f3f4f6;
+            color: #0ea5e9;
+        }
+
+    .toc .folded > ul {
+        display: none;
+    }
+
+    .toc .folded > .toc-fold-btn {
+        color: #0ea5e9;
+    }
+    /* 美化滚动条 */
     .toc::-webkit-scrollbar {
         width: 8px;
     }

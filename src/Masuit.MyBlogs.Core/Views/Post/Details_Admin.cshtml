@@ -200,7 +200,7 @@
         </section>
         @if (ViewBag.HistoryCount > 0) {
           <section class="animated fadeIn margintop20 wow">
-            <h3>文章历史版本：</h3>
+            <h2>文章历史版本：</h2>
             <p>
               修改次数：@ViewBag.HistoryCount 次
               <a asp-action="History" asp-controller="Post" asp-route-id="@Model.Id">查看历史版本</a>
@@ -211,7 +211,7 @@
           var posts = (IDictionary<int, string>) ViewBag.Related;
           if (posts.Count > 1) {
             <section class="animated fadeIn margintop20 wow">
-              <h3>相关推荐：</h3>
+              <h2>相关推荐：</h2>
               <table class="size16 table table-condensed">
                 @for (int i = 1; i < posts.Count; i += 2) {
                   <tr>
@@ -228,7 +228,7 @@
           }
         }
         <section class="animated fadeIn padding-bot20 wow">
-          <h3>版权声明：</h3>
+          <h2>版权声明：</h2>
           <p class="size16 text-red">
             @if (Model.DisableCopy) {
               <text>🈲⚠本文为作者原创，仅用于本站访客学习、研究和交流目的，未经授权禁止转载。️⚠🈲</text>
@@ -241,7 +241,7 @@
         </section>
         <section class="animated fadeIn row wow">
           <div class="col-lg-12">
-            <h3>评论区：</h3>
+            <h2 id="comment">评论区：</h2>
             <div class="animated form-horizontal pulse">
               @Html.AntiForgeryToken()
               <div class="animated fadeInDown overlay" style="margin-bottom: 0px !important;">

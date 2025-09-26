@@ -102,7 +102,7 @@ const ParentMessages = defineComponent({
         onPositiveClick: () => {
           axios.post("/msg/delete/" + id).then((res) => {
             message.success(res.data.Message);
-            this.$emit('getmsgs', null);
+            this.$emit('getmsgs');
           });
         }
       })
@@ -360,7 +360,9 @@ createApp({
             initialFrameWidth: null,
             //默认的编辑区域高度
             initialFrameHeight: 200,
-            maximumWords: 500
+            maximumWords: 500,
+            paragraph: { 'p': '', 'h4': '', 'h5': '', 'h6': '' },
+            autoHeightEnabled: true
           });
           ue2.addListener('contentChange', () => {
             this.reply.Content = ue2.getContent();
@@ -409,7 +411,9 @@ createApp({
         initialFrameWidth: null,
         //默认的编辑区域高度
         initialFrameHeight: 200,
-        maximumWords: 500
+        maximumWords: 500,
+        paragraph: { 'p': '', 'h4': '', 'h5': '', 'h6': '' },
+        autoHeightEnabled: true
       });
       ue.addListener('contentChange', () => {
         this.msg.Content = ue.getContent();

@@ -42,6 +42,7 @@
         this._onDragStart = this._onDragStart.bind(this);
         this._onDragMove = this._onDragMove.bind(this);
         this._onDragEnd = this._onDragEnd.bind(this);
+        this._onFoldClick = this._onFoldClick.bind(this);
         this._dragging = false;
         this._dragOffset = { x: 0, y: 0 };
         this._toggleBtn = null;
@@ -85,11 +86,12 @@
 
         const nav = document.createElement('nav');
         nav.className = 'toc';
-        const ul = renderTree(tree, this._linkMap);
+        const ul = renderTreeWithFold(tree, this._linkMap);
         nav.appendChild(ul);
         this.tocEl.appendChild(nav);
 
         this.tocEl.addEventListener('click', this._onClick, false);
+        this.tocEl.addEventListener('click', this._onFoldClick, false);
 
         if (this.opts.float && this.opts.draggable) {
             this.tocEl.classList.add('draggable');
@@ -109,6 +111,7 @@
             this._observer = null;
         }
         this.tocEl.removeEventListener('click', this._onClick, false);
+        this.tocEl.removeEventListener('click', this._onFoldClick, false);
         this.tocEl.removeEventListener('mousedown', this._onDragStart, false);
         document.removeEventListener('mousemove', this._onDragMove, false);
         document.removeEventListener('mouseup', this._onDragEnd, false);
@@ -159,6 +162,10 @@
     }
 
     _onClick(e) {
+        // 折叠按钮不触发跳转
+        if (e.target.classList.contains('toc-fold-btn')) {
+            return;
+        }
         const a = e.target.closest('a');
         if (!a || !this.tocEl.contains(a)) return;
         const href = a.getAttribute('href') || '';
@@ -175,6 +182,26 @@
         );
         window.history.pushState(null, '', `#${encodeURIComponent(id)}`);
         window.scrollTo({ top, behavior: 'smooth' });
+
+        //setTimeout(() => {
+        //    location.hash = encodeURIComponent(id);
+        //}, 400);
+    }
+
+    _onFoldClick(e) {
+        if (!e.target.classList.contains('toc-fold-btn')) return;
+        const li = e.target.closest('li');
+        if (!li) return;
+        if (li.classList.contains('folded')) {
+            li.classList.remove('folded');
+            e.target.setAttribute('aria-label', '折叠');
+            e.target.innerHTML = '▾';
+        } else {
+            li.classList.add('folded');
+            e.target.setAttribute('aria-label', '展开');
+            e.target.innerHTML = '▸';
+        }
+        //e.stopPropagation();
     }
 
     _setupObserver() {
@@ -323,18 +350,30 @@ function buildTree(headings, minLevel, maxLevel) {
     return root.children;
 }
 
-function renderTree(tree, linkMap) {
+// 渲染带折叠按钮的目录树
+function renderTreeWithFold(tree, linkMap) {
     const ul = document.createElement('ul');
     ul.className = 'toc-list';
     tree.forEach((node) => {
-        ul.appendChild(renderNode(node, linkMap));
+        ul.appendChild(renderNodeWithFold(node, linkMap));
     });
     return ul;
 }
 
-function renderNode(node, linkMap) {
+function renderNodeWithFold(node, linkMap) {
     const li = document.createElement('li');
     li.className = `toc-item level-${node.level}`;
+
+    // 折叠按钮（仅有子节点才显示）
+    let foldBtn = null;
+    if (node.children && node.children.length) {
+        foldBtn = document.createElement('button');
+        foldBtn.className = 'toc-fold-btn';
+        foldBtn.setAttribute('aria-label', '折叠');
+        foldBtn.innerHTML = '▾';
+        li.appendChild(foldBtn);
+    }
+
     const a = document.createElement('a');
     a.href = `#${encodeURIComponent(node.id)}`;
     a.textContent = node.text || 'Untitled';
@@ -345,7 +384,7 @@ function renderNode(node, linkMap) {
     if (node.children && node.children.length) {
         const ul = document.createElement('ul');
         ul.className = 'toc-list';
-        node.children.forEach((child) => ul.appendChild(renderNode(child, linkMap)));
+        node.children.forEach((child) => ul.appendChild(renderNodeWithFold(child, linkMap)));
         li.appendChild(ul);
     }
     return li;

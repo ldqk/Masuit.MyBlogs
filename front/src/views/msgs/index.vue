@@ -234,25 +234,21 @@ const clearReadMessages = async () => {
 // 删除单条消息
 const deleteMessage = async (message) => {
   try {
-    if (result) {
-      const response = await api.post(`/msg/delete/${message.Id}`)
-      if (response.Success) {
-        // 从列表中移除
-        const index = messages.value.findIndex(m => m.Id === message.Id)
-        if (index > -1) {
-          messages.value.splice(index, 1)
-          pagination.total--
-        }
+    const response = await api.post(`/msg/deleteMsg/${message.Id}`)
+    if (response.Success) {
+      // 从列表中移除
+      const index = messages.value.findIndex(m => m.Id === message.Id)
+      if (index > -1) {
+        messages.value.splice(index, 1)
+        pagination.total--
+      }
 
-        toast.success('删除成功', { autoClose: 2000, position: 'top-center' })
+      toast.success('删除成功', { autoClose: 2000, position: 'top-center' })
 
-        // 如果当前页没有数据了，回到上一页
-        if (messages.value.length === 0 && pagination.page > 1) {
-          pagination.page--
-          await loadPageData()
-        }
-      } else {
-        toast.error(response.Message || '删除失败', { autoClose: 2000, position: 'top-center' })
+      // 如果当前页没有数据了，回到上一页
+      if (messages.value.length === 0 && pagination.page > 1) {
+        pagination.page--
+        await loadPageData()
       }
     }
   } catch (error) {

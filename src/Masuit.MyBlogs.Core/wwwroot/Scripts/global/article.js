@@ -103,7 +103,7 @@ const ParentMessages = defineComponent({
     },
     pass(id) {
       axios.post("/comment/pass/" + id).then((res) => {
-        window.message.info(res.data.Message);
+        window.message.success(res.data.Message);
         this.$emit('getmsgs');
       });
     },
@@ -198,7 +198,9 @@ const ParentMessages = defineComponent({
 createApp({
   components: { ParentMessages },
   setup() {
-    const id = window.location.pathname.split('/').pop();
+    const seg = window.location.pathname.substring(1).split('/');
+    const id = seg[0];
+    const cid = seg[2] || new URLSearchParams(window.location.search).get("cid") || 0;
     const user = window.defaultUser ? window.defaultUser() : { NickName: '', Email: '', Agree: false };
     const voteUpCount = ref(user.voteUpCount);
     const voteDownCount = ref(user.voteDownCount);
@@ -230,7 +232,6 @@ createApp({
     const disableGetcode = ref(false);
     const codeMsg = ref("获取验证码");
     const list = ref([]);
-    const cid = new URLSearchParams(window.location.search).get("cid") || 0;
     const pageConfig = ref({
       page: 1,
       size: 10,
@@ -309,6 +310,8 @@ createApp({
         } else {
           message.error(data.Message);
         }
+      }).catch(err => {
+        message.error(err.response?.data?.Message || '请求失败，请稍候再试！');
       });
     },
     getcomments() {
@@ -438,10 +441,8 @@ createApp({
         negativeText: '取消',
         draggable: true,
         onPositiveClick: () => {
-          axios.post("/post/DeleteHistory", {
-            id: id
-          }).then(function (data) {
-            message.success(data.data.Message);
+          axios.post("/post/DeleteHistory/" + id).then(function (res) {
+            message.success(res.data.Message);
             location.href = "/" + postId + "/history";
           });
         }
@@ -455,9 +456,7 @@ createApp({
         negativeText: '取消',
         draggable: true,
         onPositiveClick: () => {
-          axios.post("/post/revert", {
-            id: id
-          }).then(function (data) {
+          axios.post("/post/revert/" + id).then(function (data) {
             message.success(data.data.Message);
             location.href = "/" + postId;
           });
@@ -558,7 +557,9 @@ createApp({
             initialFrameWidth: null,
             //默认的编辑区域高度
             initialFrameHeight: 200,
-            maximumWords: 500
+            maximumWords: 500,
+            paragraph: { 'p': '', 'h4': '', 'h5': '', 'h6': '' },
+            autoHeightEnabled: true
           });
           ue2.addListener('contentChange', () => {
             this.reply.Content = ue2.getContent();
@@ -579,9 +580,7 @@ createApp({
     window.message = message;
     window.dialog = dialog;
     document.querySelectorAll('article p > img').forEach(function (img) {
-      // 为每个图片添加点击事件监听器
       img.addEventListener('click', function () {
-        // 打开图片的 src 地址
         window.open(this.getAttribute('src'));
       });
     });
@@ -619,7 +618,9 @@ createApp({
         initialFrameWidth: null,
         //默认的编辑区域高度
         initialFrameHeight: 200,
-        maximumWords: 500
+        maximumWords: 500,
+        paragraph: { 'p': '', 'h4': '', 'h5': '', 'h6': '' },
+        autoHeightEnabled: true
       });
       ue.addListener('contentChange', () => {
         this.msg.Content = ue.getContent();
@@ -631,7 +632,7 @@ createApp({
         contentSelector: '.ibox-content',
         minLevel: 2,
         maxLevel: 6,
-        scrollOffset: 96,
+        scrollOffset: 110,
         observe: true,
         position: 'left', // 可选: left | right | top | custom
         float: true,

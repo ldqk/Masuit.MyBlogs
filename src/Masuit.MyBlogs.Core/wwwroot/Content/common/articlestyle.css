@@ -2,6 +2,7 @@
 article img {
     max-width: 100%
 }
+
 article strong {
     font-weight: bold;
     font-size: 16px;
@@ -14,54 +15,70 @@ article table {
     border-collapse: collapse !important;
 }
 
-article table > thead > tr > th,
-article table > tbody > tr > th,
-article table > tfoot > tr > th,
-article table > thead > tr > td,
-article table > tbody > tr > td,
-article table > tfoot > tr > td {
-    padding: 8px;
-    line-height: 1.42857143;
-    vertical-align: top;
-    border-top: 1px solid #ddd;
+    article table > thead > tr > th,
+    article table > tbody > tr > th,
+    article table > tfoot > tr > th,
+    article table > thead > tr > td,
+    article table > tbody > tr > td,
+    article table > tfoot > tr > td {
+        padding: 8px;
+        line-height: 1.42857143;
+        vertical-align: top;
+        border-top: 1px solid #ddd;
+    }
+
+    article table > thead > tr > th {
+        vertical-align: bottom;
+        border-bottom: 2px solid #ddd;
+    }
+
+    article table > caption + thead > tr:first-child > th,
+    article table > colgroup + thead > tr:first-child > th,
+    article table > thead:first-child > tr:first-child > th,
+    article table > caption + thead > tr:first-child > td,
+    article table > colgroup + thead > tr:first-child > td,
+    article table > thead:first-child > tr:first-child > td {
+        border-top: 0;
+    }
+
+    article table > tbody + tbody {
+        border-top: 2px solid #ddd;
+    }
+
+    article table article table {
+        background-color: #fff;
+    }
+
+    article table > thead > tr > th,
+    article table > tbody > tr > th,
+    article table > tfoot > tr > th,
+    article table > thead > tr > td,
+    article table > tbody > tr > td,
+    article table > tfoot > tr > td {
+        padding: 5px;
+    }
+
+article table {
+    border: 1px solid #ddd;
 }
 
-article table > thead > tr > th {
-    vertical-align: bottom;
-    border-bottom: 2px solid #ddd;
-}
+    article table > thead > tr > th,
+    article table > tbody > tr > th,
+    article table > tfoot > tr > th,
+    article table > thead > tr > td,
+    article table > tbody > tr > td,
+    article table > tfoot > tr > td {
+        border: 1px solid #ddd;
+    }
 
-article table > caption + thead > tr:first-child > th,
-article table > colgroup + thead > tr:first-child > th,
-article table > thead:first-child > tr:first-child > th,
-article table > caption + thead > tr:first-child > td,
-article table > colgroup + thead > tr:first-child > td,
-article table > thead:first-child > tr:first-child > td { border-top: 0; }
-
-article table > tbody + tbody { border-top: 2px solid #ddd; }
-
-article table article table { background-color: #fff; }
-
-article table > thead > tr > th,
-article table > tbody > tr > th,
-article table > tfoot > tr > th,
-article table > thead > tr > td,
-article table > tbody > tr > td,
-article table > tfoot > tr > td { padding: 5px; }
-
-article table { border: 1px solid #ddd; }
-article table > thead > tr > th,
-article table > tbody > tr > th,
-article table > tfoot > tr > th,
-article table > thead > tr > td,
-article table > tbody > tr > td,
-article table > tfoot > tr > td { border: 1px solid #ddd; }
     article table > thead > tr > th,
     article table > thead > tr > td {
         border-bottom-width: 2px;
     }
 
-article table > tbody > tr:hover { background-color: #f5f5f5; }
+    article table > tbody > tr:hover {
+        background-color: #f5f5f5;
+    }
 
 table col[class*="col-"] {
     position: static;
@@ -87,13 +104,17 @@ article table > tbody > tr.active > td,
 article table > tfoot > tr.active > td,
 article table > thead > tr.active > th,
 article table > tbody > tr.active > th,
-article table > tfoot > tr.active > th { background-color: #f5f5f5; }
+article table > tfoot > tr.active > th {
+    background-color: #f5f5f5;
+}
 
-article table > tbody > tr > td.active:hover,
-article table > tbody > tr > th.active:hover,
-article table > tbody > tr.active:hover > td,
-article table > tbody > tr:hover > .active,
-article table > tbody > tr.active:hover > th { background-color: #e8e8e8; }
+    article table > tbody > tr > td.active:hover,
+    article table > tbody > tr > th.active:hover,
+    article table > tbody > tr.active:hover > td,
+    article table > tbody > tr:hover > .active,
+    article table > tbody > tr.active:hover > th {
+        background-color: #e8e8e8;
+    }
 
 article table > thead > tr > td.success,
 article table > tbody > tr > td.success,
@@ -106,13 +127,17 @@ article table > tbody > tr.success > td,
 article table > tfoot > tr.success > td,
 article table > thead > tr.success > th,
 article table > tbody > tr.success > th,
-article table > tfoot > tr.success > th { background-color: #dff0d8; }
+article table > tfoot > tr.success > th {
+    background-color: #dff0d8;
+}
 
-article table > tbody > tr > td.success:hover,
-article table > tbody > tr > th.success:hover,
-article table > tbody > tr.success:hover > td,
-article table > tbody > tr:hover > .success,
-article table > tbody > tr.success:hover > th { background-color: #d0e9c6; }
+    article table > tbody > tr > td.success:hover,
+    article table > tbody > tr > th.success:hover,
+    article table > tbody > tr.success:hover > td,
+    article table > tbody > tr:hover > .success,
+    article table > tbody > tr.success:hover > th {
+        background-color: #d0e9c6;
+    }
 
 article table > thead > tr > td.info,
 article table > tbody > tr > td.info,
@@ -125,13 +150,17 @@ article table > tbody > tr.info > td,
 article table > tfoot > tr.info > td,
 article table > thead > tr.info > th,
 article table > tbody > tr.info > th,
-article table > tfoot > tr.info > th { background-color: #d9edf7; }
+article table > tfoot > tr.info > th {
+    background-color: #d9edf7;
+}
 
-article table > tbody > tr > td.info:hover,
-article table > tbody > tr > th.info:hover,
-article table > tbody > tr.info:hover > td,
-article table > tbody > tr:hover > .info,
-article table > tbody > tr.info:hover > th { background-color: #c4e3f3; }
+    article table > tbody > tr > td.info:hover,
+    article table > tbody > tr > th.info:hover,
+    article table > tbody > tr.info:hover > td,
+    article table > tbody > tr:hover > .info,
+    article table > tbody > tr.info:hover > th {
+        background-color: #c4e3f3;
+    }
 
 article table > thead > tr > td.warning,
 article table > tbody > tr > td.warning,
@@ -144,13 +173,17 @@ article table > tbody > tr.warning > td,
 article table > tfoot > tr.warning > td,
 article table > thead > tr.warning > th,
 article table > tbody > tr.warning > th,
-article table > tfoot > tr.warning > th { background-color: #fcf8e3; }
+article table > tfoot > tr.warning > th {
+    background-color: #fcf8e3;
+}
 
-article table > tbody > tr > td.warning:hover,
-article table > tbody > tr > th.warning:hover,
-article table > tbody > tr.warning:hover > td,
-article table > tbody > tr:hover > .warning,
-article table > tbody > tr.warning:hover > th { background-color: #faf2cc; }
+    article table > tbody > tr > td.warning:hover,
+    article table > tbody > tr > th.warning:hover,
+    article table > tbody > tr.warning:hover > td,
+    article table > tbody > tr:hover > .warning,
+    article table > tbody > tr.warning:hover > th {
+        background-color: #faf2cc;
+    }
 
 article table > thead > tr > td.danger,
 article table > tbody > tr > td.danger,
@@ -163,19 +196,26 @@ article table > tbody > tr.danger > td,
 article table > tfoot > tr.danger > td,
 article table > thead > tr.danger > th,
 article table > tbody > tr.danger > th,
-article table > tfoot > tr.danger > th { background-color: #f2dede; }
+article table > tfoot > tr.danger > th {
+    background-color: #f2dede;
+}
 
-article table > tbody > tr > td.danger:hover,
-article table > tbody > tr > th.danger:hover,
-article table > tbody > tr.danger:hover > td,
-article table > tbody > tr:hover > .danger,
-article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
+    article table > tbody > tr > td.danger:hover,
+    article table > tbody > tr > th.danger:hover,
+    article table > tbody > tr.danger:hover > td,
+    article table > tbody > tr:hover > .danger,
+    article table > tbody > tr.danger:hover > th {
+        background-color: #ebcccc;
+    }
+
 #article li {
     margin-left: 20px;
 }
+
 .syntaxhighlighter table {
     margin-bottom: 0 !important;
 }
+
 .label a {
     color: white;
 }
@@ -188,7 +228,9 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     box-shadow: #f5deb3 0px 0px 3px inset;
 }
 
-.box-left.box-right { margin-top: 5px; }
+.box-left.box-right {
+    margin-top: 5px;
+}
 
 .box-left {
     border: #ccc 1.5px solid;
@@ -201,42 +243,59 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     padding-left: 10px;
 }
 
-.box-right .panel {
-    background-color: transparent;
-    margin-bottom: 5px;
-    /*border-radius: 8px;
+    .box-right .panel {
+        background-color: transparent;
+        margin-bottom: 5px;
+        /*border-radius: 8px;
     box-shadow: 0 0 3px;*/
+    }
+
+        .box-right .panel .panel-body {
+            padding: 2px;
+        }
+
+            .box-right .panel .panel-body .list-group {
+                margin-bottom: 0;
+            }
+
+            .box-right .panel .panel-body .list-group-item {
+                background-color: transparent;
+                padding: 2px;
+                font-size: 16px;
+            }
+
+.orderby {
+    z-index: 10;
 }
 
-.box-right .panel .panel-body { padding: 2px; }
-
-.box-right .panel .panel-body .list-group { margin-bottom: 0; }
-
-.box-right .panel .panel-body .list-group-item {
-    background-color: transparent;
-    padding: 2px;
-    font-size: 16px;
+.blog h2 {
+    font-weight: 700
 }
 
-.orderby { z-index: 10; }
+.blog .btn, .blog h5 {
+    margin: 0 0 5px
+}
 
-.blog h2 { font-weight: 700 }
+.wrapper-content {
+    padding: 10px 0;
+}
 
-.blog .btn, .blog h5 { margin: 0 0 5px }
-
-
-.wrapper-content { padding: 10px 0; }
-
-.ibox.ui-sortable-placeholder { margin: 0 0 23px !important }
+.ibox.ui-sortable-placeholder {
+    margin: 0 0 23px !important
+}
 
 .ibox-content.text-box {
     padding-bottom: 0;
     padding-top: 15px
 }
 
-.ui-draggable .ibox-title { cursor: move }
+.ui-draggable .ibox-title {
+    cursor: move
+}
 
-.history { background-image: url(https://bkssl.bdimg.com/static/wiki-lemma/history/img/watermark-transparent_5444b91.png); }
+.history {
+    background-image: url(https://bkssl.bdimg.com/static/wiki-lemma/history/img/watermark-transparent_5444b91.png);
+}
 
 .ibox {
     clear: both;
@@ -245,30 +304,40 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     padding: 0
 }
 
-.ibox-content > a[href] { text-decoration: none; }
-
-.ibox-content > a[href] h4 {
-    color: #3f3f3f;
-    margin: 0 0 15px 0;
-    letter-spacing: 1px;
-    font-weight: bold;
-    font-size: 20px;
-    transition: ease-in-out .25s;
+.ibox-content > a[href] {
+    text-decoration: none;
 }
 
-.ibox-content > a[href] > h1:hover, .ibox-content > a[href] > h2:hover, .ibox-content > a[href] > h3:hover, .ibox-content > a[href] > h4:hover, .ibox-content > a[href] > h5:hover, .ibox-content > a[href] > h6:hover {
-    color: cadetblue;
-    transform: scale(1.01, 1.1);
-    transition: ease-in-out .25s;
+    .ibox-content > a[href] h4 {
+        color: #3f3f3f;
+        margin: 0 0 15px 0;
+        letter-spacing: 1px;
+        font-weight: bold;
+        font-size: 20px;
+        transition: ease-in-out .25s;
+    }
+
+    .ibox-content > a[href] > h1:hover, .ibox-content > a[href] > h2:hover, .ibox-content > a[href] > h3:hover, .ibox-content > a[href] > h4:hover, .ibox-content > a[href] > h5:hover, .ibox-content > a[href] > h6:hover {
+        color: cadetblue;
+        transform: scale(1.01, 1.1);
+        transition: ease-in-out .25s;
+    }
+
+.ibox.collapsed .ibox-content {
+    display: none
 }
 
-.ibox.collapsed .ibox-content { display: none }
+.ibox.collapsed .fa.fa-chevron-up:before {
+    content: "\f078"
+}
 
-.ibox.collapsed .fa.fa-chevron-up:before { content: "\f078" }
+.ibox.collapsed .fa.fa-chevron-down:before {
+    content: "\f077"
+}
 
-.ibox.collapsed .fa.fa-chevron-down:before { content: "\f077" }
-
-.ibox:after, .ibox:before { display: table }
+.ibox:after, .ibox:before {
+    display: table
+}
 
 .ibox-title {
     -moz-border-bottom-colors: none;
@@ -305,23 +374,33 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     word-break: break-all;
 }
 
-.ibox-content p {
-    line-height: 24px;
-    word-break: break-all;
-}
+    .ibox-content p {
+        line-height: 24px;
+        word-break: break-all;
+    }
 
-.ibox-content pre {
-    overflow: hidden;
-    word-wrap: break-word;
-    word-break: break-all;
-    white-space: pre-line;
-}
+    .ibox-content pre {
+        overflow: hidden;
+        word-wrap: break-word;
+        word-break: break-all;
+        white-space: pre-line;
+    }
 
-.ibox-content div.col-sm-3 { text-align: center; }
-.ibox-content div.col-sm-2 { text-align: center; }
+    .ibox-content div.col-sm-3 {
+        text-align: center;
+    }
 
-.ibox-content div.col-md-3 { text-align: center; }
-.ibox-content div.col-md-2 { text-align: center; }
+    .ibox-content div.col-sm-2 {
+        text-align: center;
+    }
+
+    .ibox-content div.col-md-3 {
+        text-align: center;
+    }
+
+    .ibox-content div.col-md-2 {
+        text-align: center;
+    }
 
 .article > .ibox > .ibox-content > main header.page-header a h2 {
     font-size: 24px;
@@ -340,7 +419,7 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     overflow: hidden;
 }
 
-.ibox-content article.article h3, .ibox-content section h3, .ibox-content section.row h3 {
+.ibox-content article.article h3, .ibox-content section h2, .ibox-content section h3, .ibox-content section.row h3 {
     font-size: 24px;
     margin-top: 10px;
     margin-bottom: 6px;
@@ -408,10 +487,10 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     border-bottom: none
 }
 
-.ibox-heading h3 {
-    font-weight: 200;
-    font-size: 24px;
-}
+    .ibox-heading h3 {
+        font-weight: 200;
+        font-size: 24px;
+    }
 
 .ibox-title h5 {
     font-size: 14px;
@@ -433,27 +512,33 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     padding: 0
 }
 
-.ibox-tools a {
-    cursor: pointer;
-    margin-left: 5px;
-    color: #c4c4c4
-}
+    .ibox-tools a {
+        cursor: pointer;
+        margin-left: 5px;
+        color: #c4c4c4
+    }
 
-.ibox-tools a.btn-primary { color: #fff }
+        .ibox-tools a.btn-primary {
+            color: #fff
+        }
 
-.ibox-tools .dropdown-menu > li > a {
-    padding: 4px 10px;
-    font-size: 12px
-}
+    .ibox-tools .dropdown-menu > li > a {
+        padding: 4px 10px;
+        font-size: 12px
+    }
 
 .ibox .open > .dropdown-menu {
     left: auto;
     right: 0
 }
 
-.chat-view .ibox-content { padding: 0 }
+.chat-view .ibox-content {
+    padding: 0
+}
 
-.article .ibox-content { padding: 20px }
+.article .ibox-content {
+    padding: 20px
+}
 
 .fixtop {
     font-size: 24px;
@@ -465,11 +550,17 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     color: green;
 }
 
-.float-e-margins .btn { margin-bottom: 5px }
+.float-e-margins .btn {
+    margin-bottom: 5px
+}
 
-.search-form { margin-top: 10px }
+.search-form {
+    margin-top: 10px
+}
 
-.file-manager .hr-line-dashed { margin: 15px 0 }
+.file-manager .hr-line-dashed {
+    margin: 15px 0
+}
 
 .hr-line-dashed {
     border-top: 1px dashed #F5afA5;
@@ -484,7 +575,9 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     color: #1E0FBE
 }
 
-.search-result .search-link { color: #006621 }
+.search-result .search-link {
+    color: #006621
+}
 
 .search-result p {
     font-size: 12px;
@@ -497,10 +590,10 @@ article table > tbody > tr.danger:hover > th { background-color: #ebcccc; }
     text-align: center;
 }
 
-#cyReward #cy-reward-pop {
-    top: auto !important;
-    margin-top: -500px !important
-}
+    #cyReward #cy-reward-pop {
+        top: auto !important;
+        margin-top: -500px !important
+    }
 
 .protected-content {
     border: 1px dashed #F60;
