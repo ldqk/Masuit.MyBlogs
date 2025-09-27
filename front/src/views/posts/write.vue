@@ -78,19 +78,25 @@
               <q-item>
                 <q-item-section class="text-grey"> 没有找到匹配的专题 </q-item-section>
               </q-item>
+            </template><template v-slot:selected-item="scope">
+              <q-chip :style="{ backgroundColor: ['#FFB300', '#39B54A', '#00A1E9', '#F75000', '#8C6E63', '#E67E22'][scope.index % 6], color: 'white', fontSize: '11px' }" removable @remove="scope.removeAtIndex(scope.index)"> {{ scope.opt.Title }} </q-chip>
             </template>
           </q-select>
         </div>
         <div class="col">
-          <q-select dense v-model="post.Labels" :options="filteredTagOptions" label="标签" outlined multiple use-chips use-input new-value-mode="add-unique" input-debounce="0" @filter="filterTagOptions" @new-value="createNewTag" />
+          <q-select dense v-model="post.Labels" :options="filteredTagOptions" label="标签" outlined multiple use-chips use-input new-value-mode="add-unique" input-debounce="0" @filter="filterTagOptions" @new-value="createNewTag" clearable>
+            <template v-slot:selected-item="scope">
+              <q-chip :style="{ backgroundColor: ['#FFB300', '#39B54A', '#00A1E9', '#F75000', '#8C6E63', '#E67E22'][scope.index % 6], color: 'white', fontSize: '11px' }" removable @remove="scope.removeAtIndex(scope.index)"> {{ scope.opt }} </q-chip>
+            </template>
+          </q-select>
         </div>
         <div class="col">
-          <q-input autogrow dense v-model="post.Keyword" label="文章关键词" outlined hint="多个关键词用逗号分隔" />
+          <q-tag-input clearable dense autogrow v-model="keywords" label="文章关键词" outlined />
         </div>
       </div>
       <div class="row">
         <div class="col-3">
-          <q-input dense autogrow v-model="post.Redirect" label="跳转到第三方链接" placeholder="https://baidu.com 留空不跳转" outlined hint="当跳转第三方链接时，文章内容不宜过多" />
+          <q-input dense autogrow v-model="post.Redirect" label="跳转到第三方链接" placeholder="如：https://baidu.com 留空不跳转" outlined hint="当跳转第三方链接时，文章内容不宜过多" />
         </div>
         <div class="col-3">
           <q-input dense v-model="post.ExpireAt" label="过期时间" outlined readonly>
@@ -203,13 +209,15 @@
 </div>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { PostApi } from '@/api/PostApi'
 import type { PostData, Category, Tag, Seminar } from '@/api/PostApi'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 import { useUserStore } from '@/store/users'
+import QTagInput from '@/components/QTagInput.vue'
+
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -246,7 +254,17 @@ const post = reactive({
   ExceptRegions: '',
   Reserve: true,
 })
-
+const keywords = computed({
+  get() {
+    if (post.Keyword) {
+      return post.Keyword.split(',').filter(k => k.trim().length > 0)
+    }
+    return []
+  },
+  set(val: string[]) {
+    post.Keyword = val.join(',')
+  }
+});
 // UI 状态
 const loading = ref(false)
 const pageLoading = ref(true)

@@ -1,0 +1,93 @@
+
+.color-tag-input .q-field__control[data-v-1e8250a2] {
+  padding: 0 !important;
+}
+.tag-list[data-v-1e8250a2] {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  cursor: text;
+  /* ↓↓↓ 这里设置 dense 高度和间距 ↓↓↓ */
+  min-height: 24px !important;
+  padding: 0px 2px !important;
+}
+.color-tag-input--dense .tag-list[data-v-1e8250a2] {
+  min-height: 28px;
+  padding: 1px 4px;
+}
+.tag[data-v-1e8250a2] {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  margin: 1px 0;
+  border-radius: 14px;
+  color: #fff;
+  font-size: 13px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  white-space: nowrap;
+  transition: background 0.2s;
+  height: 24px;
+}
+.color-tag-input--dense .tag[data-v-1e8250a2] {
+  padding: 1px 6px;
+  font-size: 12px;
+  border-radius: 12px;
+  height: 20px;
+}
+.tag .remove-icon[data-v-1e8250a2] {
+  margin-left: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.tag-input[data-v-1e8250a2] {
+  background: transparent;
+  border: none;
+  outline: none;
+  min-width: 20px;
+  font-size: 13px;
+  margin: 1px;
+  padding: 0;
+  flex-grow: 1;
+  height: 24px;
+}
+.color-tag-input--dense .tag-input[data-v-1e8250a2] {
+  font-size: 12px;
+  height: 20px;
+  min-width: 30px;
+}
+.clear-icon[data-v-1e8250a2] {
+  font-size: 18px;
+  margin-left: 4px;
+  color: #999;
+  cursor: pointer;
+  align-self: center;
+  transition: color 0.2s;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  border-radius: 50%;
+  padding: 2px;
+  z-index: 1;
+}
+.input-wrapper[data-v-1e8250a2] {
+  position: relative;
+  flex: 1;
+}
+.input-wrapper .tag-input[data-v-1e8250a2] {
+  padding-right: 28px;
+}
+.clear-icon[data-v-1e8250a2]:hover {
+  color: #f44336;
+}
+
+
+.write-blog-container[data-v-ffcd5686] {
+  margin-top: 10px;
+}
+

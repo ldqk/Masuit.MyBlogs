@@ -1,449 +1,500 @@
-﻿<!DOCTYPE html>
-<html lang="zh-CN">
+﻿<!DOCTYPE html> <!-- 注意：务必添加此声明，以避免某些浏览器（如Safari）的兼容性问题:cite[3] -->
+<html lang="zh">
 
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vue3 Mixin 示例</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>我的Quasar应用</title>
+    <!-- 1. 引入字体和图标 (可选择需要的样式) -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" type="text/css">
+    <!-- 2. 引入Quasar的样式文件 -->
+    <link href="https://cdn.jsdelivr.net/npm/quasar@2.10.1/dist/quasar.prod.css" rel="stylesheet">
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
         }
+        
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+          font-family: 'Roboto', sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 20px;
         }
+        
         .container {
-            max-width: 1000px;
-            width: 100%;
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+          max-width: 800px;
+          width: 100%;
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          padding: 30px;
+          margin: 20px;
         }
-        header {
-            background: linear-gradient(90deg, #3498db 0%, #2c3e50 100%);
-            color: white;
-            padding: 25px;
-            text-align: center;
+        
+        .header {
+          text-align: center;
+          margin-bottom: 30px;
         }
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        
+        .header h1 {
+          color: #333;
+          font-size: 2.2rem;
+          margin-bottom: 10px;
         }
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
+        
+        .header p {
+          color: #666;
+          font-size: 1.1rem;
         }
-        .content {
-            padding: 30px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+        
+        .demo-section {
+          margin-bottom: 40px;
         }
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
+        
+        .section-title {
+          font-size: 1.4rem;
+          color: #444;
+          margin-bottom: 15px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #eee;
         }
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-left: 5px solid #3498db;
-            transition: transform 0.3s ease;
+        
+        .tags-input-wrapper {
+          position: relative;
         }
-        .card:hover {
-            transform: translateY(-5px);
+        
+        .tags-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          padding: 8px;
+          min-height: 56px;
+          align-items: center;
         }
-        .card h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #ecf0f1;
+        
+        .tag {
+          display: inline-flex;
+          align-items: center;
+          background: #1976d2;
+          color: white;
+          padding: 4px 12px;
+          border-radius: 16px;
+          font-size: 14px;
+          animation: fadeIn 0.3s;
+          max-width: 200px;
         }
-        button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            margin: 5px;
-            transition: background 0.3s;
+        
+        .tag .remove {
+          background: none;
+          border: none;
+          color: white;
+          margin-left: 6px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          font-size: 16px;
+          transition: background 0.2s;
         }
-        button:hover {
-            background: #2980b9;
+        
+        .tag .remove:hover {
+          background: rgba(255, 255, 255, 0.2);
         }
-        .counter {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px 0;
+        
+        .tag-input {
+          flex: 1;
+          min-width: 120px;
+          border: none;
+          outline: none;
+          padding: 8px 0;
+          font-size: 16px;
+          background: transparent;
         }
-        .counter-value {
-            font-size: 2.5rem;
-            margin: 0 20px;
-            min-width: 80px;
-            text-align: center;
-            font-weight: bold;
-            color: #2c3e50;
-            background: #ecf0f1;
-            padding: 10px;
-            border-radius: 5px;
+        
+        .hint {
+          margin-top: 8px;
+          font-size: 14px;
+          color: #666;
         }
-        .user-info {
-            margin: 15px 0;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
+        
+        .features {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 20px;
+          margin-top: 30px;
         }
-        .user-info p {
-            margin: 8px 0;
+        
+        .feature-card {
+          background: #f5f7fa;
+          border-radius: 10px;
+          padding: 20px;
+          transition: transform 0.3s;
         }
-        .highlight {
-            color: #e74c3c;
-            font-weight: bold;
+        
+        .feature-card:hover {
+          transform: translateY(-5px);
         }
-        .mixin-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
+        
+        .feature-icon {
+          font-size: 2rem;
+          color: #1976d2;
+          margin-bottom: 15px;
         }
-        .mixin-info h4 {
-            color: #2c3e50;
-            margin-bottom: 10px;
+        
+        .feature-card h3 {
+          margin-bottom: 10px;
+          color: #333;
         }
-        .mixin-info ul {
-            padding-left: 20px;
+        
+        .feature-card p {
+          color: #666;
+          line-height: 1.5;
         }
-        .mixin-info li {
-            margin: 5px 0;
+        
+        .variations {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px;
+          margin-top: 20px;
         }
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            color: #7f8c8d;
-            font-size: 0.9rem;
+        
+        .variation {
+          flex: 1;
+          min-width: 250px;
         }
-        .tab-buttons {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ecf0f1;
+        
+        .tag-success {
+          background: #4caf50;
         }
-        .tab-button {
-            padding: 10px 20px;
-            cursor: pointer;
-            background: #f8f9fa;
-            border: none;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
+        
+        .tag-warning {
+          background: #ff9800;
         }
-        .tab-button.active {
-            background: white;
-            border-bottom: 3px solid #3498db;
-            color: #3498db;
-            font-weight: bold;
+        
+        .tag-error {
+          background: #f44336;
         }
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s;
+        
+        .tag-info {
+          background: #2196f3;
         }
-        .tab-content.active {
-            display: block;
-        }
+        
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-    </style>
+        
+        .footer {
+          text-align: center;
+          margin-top: 40px;
+          color: #666;
+          font-size: 14px;
+        }
+        
+        .code-example {
+          background: #f5f7fa;
+          border-radius: 8px;
+          padding: 20px;
+          margin-top: 20px;
+          font-family: 'Courier New', monospace;
+          overflow-x: auto;
+        }
+        
+        @media (max-width: 600px) {
+          .container {
+            padding: 20px;
+          }
+          
+          .header h1 {
+            font-size: 1.8rem;
+          }
+          
+          .features {
+            grid-template-columns: 1fr;
+          }
+        }
+      </style>
   </head>
 
   <body>
-    <div id="app">
+    <!-- 3. 应用程序的挂载点 - 此id必须与Vue应用挂载的id匹配 -->
+    <div id="q-app">
       <div class="container">
-        <header>
-          <h1>Vue3 Mixin 示例</h1>
-          <p class="subtitle">展示如何在多个组件中复用代码逻辑</p>
-        </header>
-        <div class="tab-buttons">
-          <button class="tab-button" :class="{active: activeTab === 'demo'}" @click="activeTab = 'demo'">功能演示</button>
-          <button class="tab-button" :class="{active: activeTab === 'code'}" @click="activeTab = 'code'">代码示例</button>
-          <button class="tab-button" :class="{active: activeTab === 'explain'}" @click="activeTab = 'explain'">Mixin说明</button>
+        <div class="header">
+          <h1>基于QInput的Quasar标签输入框</h1>
+          <p>支持v-model双向绑定的功能完整标签输入组件</p>
         </div>
-        <div class="content">
-          <!-- 功能演示 -->
-          <div class="tab-content" :class="{active: activeTab === 'demo'}">
-            <div class="card">
-              <h3>计数器组件</h3>
-              <p>这个组件使用了计数器Mixin</p>
-              <div class="counter">
-                <button @click="decrement">-</button>
-                <div class="counter-value">{{ counter1 }}</div>
-                <button @click="increment">+</button>
-              </div>
-              <button @click="resetCounter">重置</button>
-              <p>计数器值: <span class="highlight">{{ counter1 }}</span></p>
-              <p>计数器平方: <span class="highlight">{{ counter1 * counter1 }}</span></p>
+        <div class="demo-section">
+          <h2 class="section-title">基础用法</h2>
+          <q-tags-input v-model="tags1" placeholder="输入标签后按回车、逗号或分号添加" :max-tags="10" @change="onTagsChange">
+          </q-tags-input>
+          <p class="hint">当前标签: {{ tags1.join(', ') }}</p>
+          <div class="code-example"> &lt;q-tags-input v-model="tags" placeholder="输入标签..." :max-tags="10" @change="onTagsChange"&gt; &lt;/q-tags-input&gt; </div>
+        </div>
+        <div class="demo-section">
+          <h2 class="section-title">不同样式变体</h2>
+          <div class="variations">
+            <div class="variation">
+              <h3>填充样式</h3>
+              <q-tags-input v-model="tags2" filled label="兴趣标签" placeholder="输入你的兴趣...">
+              </q-tags-input>
             </div>
-            <div class="card">
-              <h3>用户信息组件</h3>
-              <p>这个组件同时使用了计数器Mixin和用户信息Mixin</p>
-              <div class="user-info">
-                <p>用户名: <span class="highlight">{{ userName }}</span></p>
-                <p>用户ID: <span class="highlight">{{ userId }}</span></p>
-                <p>注册时间: <span class="highlight">{{ registrationDate }}</span></p>
-              </div>
-              <div class="counter">
-                <button @click="decrement">-</button>
-                <div class="counter-value">{{ counter2 }}</div>
-                <button @click="increment">+</button>
-              </div>
-              <button @click="updateUserInfo">更新用户信息</button>
-            </div>
-          </div>
-          <!-- 代码示例 -->
-          <div class="tab-content" :class="{active: activeTab === 'code'}">
-            <div class="card">
-              <h3>计数器 Mixin</h3>
-              <pre><code>const counterMixin = {
-  data() {
-    return {
-      counter: 0
-    }
-  },
-  methods: {
-    increment() {
-      this.counter++;
-    },
-    decrement() {
-      this.counter--;
-    },
-    resetCounter() {
-      this.counter = 0;
-    }
-  },
-  mounted() {
-    console.log('计数器Mixin已加载');
-  }
-};</code></pre>
-            </div>
-            <div class="card">
-              <h3>用户信息 Mixin</h3>
-              <pre><code>const userMixin = {
-  data() {
-    return {
-      userName: '默认用户',
-      userId: Math.floor(Math.random() * 1000),
-      registrationDate: new Date().toLocaleDateString()
-    }
-  },
-  methods: {
-    updateUserInfo() {
-      this.userName = '用户' + Math.floor(Math.random() * 1000);
-      this.userId = Math.floor(Math.random() * 1000);
-      this.registrationDate = new Date().toLocaleDateString();
-    }
-  },
-  mounted() {
-    console.log('用户信息Mixin已加载');
-  }
-};</code></pre>
-            </div>
-          </div>
-          <!-- Mixin说明 -->
-          <div class="tab-content" :class="{active: activeTab === 'explain'}">
-            <div class="card">
-              <h3>什么是Mixin？</h3>
-              <p>Mixin是一种在Vue组件中复用功能的方式。它允许你将一组组件选项（如数据、方法、生命周期钩子等）提取到可重用的对象中。</p>
-              <div class="mixin-info">
-                <h4>Mixin的优势：</h4>
-                <ul>
-                  <li><strong>代码复用</strong>：避免在不同组件中重复编写相同的代码</li>
-                  <li><strong>逻辑分离</strong>：将相关功能组织在一起，提高代码可维护性</li>
-                  <li><strong>灵活性</strong>：可以轻松地在多个组件中应用相同的功能</li>
-                </ul>
-              </div>
-              <div class="mixin-info">
-                <h4>Mixin的合并策略：</h4>
-                <ul>
-                  <li><strong>数据对象</strong>：会进行浅合并，组件数据优先</li>
-                  <li><strong>方法</strong>：同名方法会被合并，组件方法覆盖Mixin方法</li>
-                  <li><strong>生命周期钩子</strong>：都会被调用，Mixin钩子先于组件钩子</li>
-                </ul>
-              </div>
-            </div>
-            <div class="card">
-              <h3>Mixin使用场景</h3>
-              <p>Mixin特别适合以下场景：</p>
-              <div class="mixin-info">
-                <ul>
-                  <li>多个组件需要共享相同的方法或计算属性</li>
-                  <li>需要在多个组件中执行相同的生命周期操作</li>
-                  <li>封装通用的UI交互逻辑（如模态框、下拉菜单等）</li>
-                  <li>实现横切关注点（如日志记录、权限检查等）</li>
-                </ul>
-              </div>
-              <div class="mixin-info">
-                <h4>注意事项：</h4>
-                <ul>
-                  <li>避免过度使用Mixin，以免造成代码难以理解</li>
-                  <li>注意命名冲突，特别是在大型项目中</li>
-                  <li>考虑使用Composition API作为Mixin的替代方案</li>
-                </ul>
-              </div>
+            <div class="variation">
+              <h3>轮廓样式</h3>
+              <q-tags-input v-model="tags3" outlined label="技能标签" placeholder="输入你的技能...">
+              </q-tags-input>
             </div>
           </div>
         </div>
-        <footer>
-          <p>Vue3 Mixin 示例 &copy; 2023 - 使用Vue版本: {{ vueVersion }}</p>
-        </footer>
+        <div class="demo-section">
+          <h2 class="section-title">彩色标签</h2>
+          <q-tags-input dense outlined v-model="tags4" placeholder="输入优先级标签" :tag-colors="['#4caf50', '#ff9800', '#f44336', '#2196f3']">
+          </q-tags-input>
+          <p class="hint">标签将循环使用定义的颜色</p>
+        </div>
+        <div class="demo-section">
+          <h2 class="section-title">禁用状态</h2>
+          <q-tags-input v-model="tags5" placeholder="此输入框已被禁用" disabled>
+          </q-tags-input>
+          <q-btn @click="toggleDisabled" color="primary" class="q-mt-md" :label="tags5Disabled ? '启用输入框' : '禁用输入框'">
+          </q-btn>
+        </div>
+        <div class="features">
+          <div class="feature-card">
+            <div class="feature-icon">🏷️</div>
+            <h3>v-model支持</h3>
+            <p>完全支持Vue的v-model双向绑定，与标准表单元素行为一致。</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>基于QInput</h3>
+            <p>基于Quasar的QInput组件，继承其所有特性和样式一致性。</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>多种样式</h3>
+            <p>支持QInput的所有样式变体，如填充、轮廓、下划线等。</p>
+          </div>
+        </div>
+        <div class="footer">
+          <p>基于QInput的Quasar标签输入框组件 | 设计灵感来自 Quasar Framework</p>
+        </div>
       </div>
     </div>
+    <!-- 4. 在body末尾引入必要的脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quasar@2.10.1/dist/quasar.umd.prod.js"></script>
     <script>
-      // 定义计数器Mixin
-      const counterMixin = {
-        data() {
-          return {
-            counter: 0
-          }
-        },
-        methods: {
-          increment() {
-            this.counter++;
-          },
-          decrement() {
-            this.counter--;
-          },
-          resetCounter() {
-            this.counter = 0;
-          }
-        },
-        mounted() {
-          console.log('计数器Mixin已加载');
-        }
-      };
+      const { createApp } = Vue;
 
-      // 定义用户信息Mixin
-      const userMixin = {
+      // 定义QTagsInput组件
+      const QTagsInput = {
+        name: 'QTagsInput',
+        props: {
+          modelValue: {
+            type: Array,
+            default: () => []
+          },
+          placeholder: {
+            type: String,
+            default: '输入标签...'
+          },
+          label: {
+            type: String,
+            default: ''
+          },
+          maxTags: {
+            type: Number,
+            default: Infinity
+          },
+          allowDuplicates: {
+            type: Boolean,
+            default: false
+          },
+          disabled: {
+            type: Boolean,
+            default: false
+          },
+          filled: {
+            type: Boolean,
+            default: false
+          },
+          outlined: {
+            type: Boolean,
+            default: false
+          },
+          dense: {
+            type: Boolean,
+            default: false
+          },
+          tagColors: {
+            type: Array,
+            default: () => []
+          }
+        },
+        emits: ['update:modelValue', 'change'],
         data() {
           return {
-            userName: '默认用户',
-            userId: Math.floor(Math.random() * 1000),
-            registrationDate: new Date().toLocaleDateString()
+            inputValue: '',
+            isFocused: false
+          };
+        },
+        computed: {
+          tags: {
+            get() {
+              return this.modelValue;
+            },
+            set(value) {
+              this.$emit('update:modelValue', value);
+              this.$emit('change', value);
+            }
+          },
+          inputClasses() {
+            return {
+              'q-field--filled': this.filled,
+              'q-field--outlined': this.outlined,
+              'q-field--disabled': this.disabled,
+              'q-field--focused': this.isFocused
+            };
           }
         },
         methods: {
-          updateUserInfo() {
-            this.userName = '用户' + Math.floor(Math.random() * 1000);
-            this.userId = Math.floor(Math.random() * 1000);
-            this.registrationDate = new Date().toLocaleDateString();
+          addTag(text) {
+            if (!text || text.trim() === '') return;
+
+            const tag = text.trim();
+
+            // 检查重复
+            if (!this.allowDuplicates && this.tags.includes(tag)) {
+              this.showDuplicateWarning();
+              return;
+            }
+
+            // 检查最大标签数
+            if (this.tags.length >= this.maxTags) {
+              this.showMaxTagsWarning();
+              return;
+            }
+
+            this.tags = [...this.tags, tag];
+            this.inputValue = '';
+          },
+
+          removeTag(index) {
+            this.tags = this.tags.filter((_, i) => i !== index);
+          },
+
+          handleKeydown(e) {
+            if (this.disabled) return;
+
+            if (e.key === 'Enter' || e.key === ',' || e.key === ';') {
+              e.preventDefault();
+              this.addTag(this.inputValue);
+            } else if (e.key === 'Backspace' && this.inputValue === '' && this.tags.length > 0) {
+              this.removeTag(this.tags.length - 1);
+            }
+          },
+
+          handleBlur() {
+            this.isFocused = false;
+            if (this.inputValue.trim() !== '') {
+              this.addTag(this.inputValue);
+            }
+          },
+
+          handleFocus() {
+            this.isFocused = true;
+          },
+
+          showDuplicateWarning() {
+            // 在实际Quasar应用中可以使用Notify
+            console.warn('标签已存在，不能重复添加');
+          },
+
+          showMaxTagsWarning() {
+            // 在实际Quasar应用中可以使用Notify
+            console.warn(`最多只能添加${this.maxTags}个标签`);
+          },
+
+          getTagColor(index) {
+            if (this.tagColors.length === 0) return '';
+            return this.tagColors[index % this.tagColors.length];
           }
         },
-        mounted() {
-          console.log('用户信息Mixin已加载');
-        }
+        template: `
+        <div class="q-field" :class="inputClasses">
+          <div class="q-field__inner">
+            <div v-if="label" class="q-field__label">{{ label }}</div>
+            <div class="q-field__control">
+              <div class="tags-input-wrapper">
+                <div class="tags-container">
+                  <span 
+                    v-for="(tag, index) in tags" 
+                    :key="index" 
+                    class="tag"
+                    :style="{ background: getTagColor(index) }">
+                    {{ tag }}
+                    <button 
+                      v-if="!disabled"
+                      class="remove" 
+                      @click="removeTag(index)"
+                      type="button">×</button>
+                  </span>
+                  <input
+                    v-model="inputValue"
+                    @keydown="handleKeydown"
+                    @blur="handleBlur"
+                    @focus="handleFocus"
+                    :placeholder="tags.length === 0 ? placeholder : ''"
+                    :disabled="disabled"
+                    :dense="dense"
+                    class="tag-input"
+                    type="text">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `
       };
 
       // 创建Vue应用
-      const { createApp } = Vue;
-
       const app = createApp({
+        components: {
+          QTagsInput
+        },
         data() {
           return {
-            activeTab: 'demo',
-            vueVersion: Vue.version,
-            // 为演示两个独立的计数器
-            counter1: 0,
-            counter2: 0
-          }
+            tags1: ['前端', 'Vue.js', 'Quasar'],
+            tags2: ['阅读', '音乐', '旅行'],
+            tags3: ['JavaScript', 'CSS', 'HTML'],
+            tags4: ['高优先级', '中优先级'],
+            tags5: ['固定标签1', '固定标签2'],
+            tags5Disabled: true
+          };
         },
-        // 应用Mixin
-        mixins: [counterMixin, userMixin],
         methods: {
-          // 重写increment和decrement方法，使其操作不同的计数器
-          increment() {
-            if (this.activeTab === 'demo') {
-              this.counter1++;
-            } else {
-              this.counter2++;
-            }
+          onTagsChange(tags) {
+            console.log('标签发生变化:', tags);
           },
-          decrement() {
-            if (this.activeTab === 'demo') {
-              this.counter1--;
-            } else {
-              this.counter2--;
-            }
-          },
-          resetCounter() {
-            if (this.activeTab === 'demo') {
-              this.counter1 = 0;
-            } else {
-              this.counter2 = 0;
-            }
+          toggleDisabled() {
+            this.tags5Disabled = !this.tags5Disabled;
           }
-        },
-        mounted() {
-          console.log('Vue应用已加载');
         }
       });
 
-      app.mount('#app');
-      const app2 = createApp({
-        data() {
-          return {
-            activeTab: 'demo',
-            vueVersion: Vue.version,
-            // 为演示两个独立的计数器
-            counter1: 0,
-            counter2: 0
-          }
-        },
-        // 应用Mixin
-        mixins: [counterMixin, userMixin],
-        methods: {
-          // 重写increment和decrement方法，使其操作不同的计数器
-          increment() {
-            if (this.activeTab === 'demo') {
-              this.counter1++;
-            } else {
-              this.counter2++;
-            }
-          },
-          decrement() {
-            if (this.activeTab === 'demo') {
-              this.counter1--;
-            } else {
-              this.counter2--;
-            }
-          },
-          resetCounter() {
-            if (this.activeTab === 'demo') {
-              this.counter1 = 0;
-            } else {
-              this.counter2 = 0;
-            }
-          }
-        },
-        mounted() {
-          console.log('Vue应用已加载');
-        }
-      });
-
-      app2.mount('#app');
+      // 使用Quasar
+      app.use(Quasar)
+      // 将应用挂载到DOM上
+      app.mount('#q-app')
     </script>
   </body>
 
