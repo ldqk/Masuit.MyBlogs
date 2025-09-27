@@ -22,7 +22,7 @@
   AdvertisementDto ad = ViewBag.Ads;
 }
 <div class="container" id="postApp">
-  <ol class="cd-breadcrumb triangle">
+  <ol class="breadcrumb">
     <li>
       <a asp-action="Index" asp-controller="Home">首页</a>
     </li>
@@ -158,15 +158,15 @@
   </div>
 </div>
 <environment names="Development">
-    <link href="~/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet" />
-    <script src="/UEditorPlus/third-party/SyntaxHighlighter/shCore.js"></script>
-    <link href="~/Assets/auto-toc/auto-toc.css" rel="stylesheet" />
-    <script src="/Assets/auto-toc/auto-toc.js"></script>
-    <script src="/Scripts/global/article.js"></script>
+  <link href="~/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet"/>
+  <script src="/UEditorPlus/third-party/SyntaxHighlighter/shCore.js"></script>
+  <link href="~/Assets/auto-toc/auto-toc.css" rel="stylesheet"/>
+  <script src="/Assets/auto-toc/auto-toc.js"></script>
+  <script src="/Scripts/global/article.js"></script>
 </environment>
 <environment names="Stage,Production">
-    @await Styles.RenderAsync("/bundles/article.css")
-    @await Scripts.RenderAsync("/bundles/article.js")
+  @await Styles.RenderAsync("/bundles/article.css")
+  @await Scripts.RenderAsync("/bundles/article.js")
 </environment>
 <script>
 window.onload=function() {

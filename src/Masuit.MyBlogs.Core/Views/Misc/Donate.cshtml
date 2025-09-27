@@ -1,10 +1,10 @@
 ﻿@model string
 @using Masuit.MyBlogs.Core.Models.DTO
 @{
-    ViewBag.Title = "网站打赏";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    Random r = new Random();
-    List<AdvertisementDto> ads = ViewBag.Ads;
+  ViewBag.Title = "网站打赏";
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  Random r = new Random();
+  List<AdvertisementDto> ads = ViewBag.Ads;
 }
 <style>
     .bg-title {
@@ -35,70 +35,69 @@
         }
     }
 </style>
-<ol class="cd-breadcrumb triangle">
-    <li>
-        <a asp-action="Index" asp-controller="Home">首页</a>
-    </li>
-    <li class="current">
-        <em>@ViewBag.Title</em>
-    </li>
+<ol class="breadcrumb">
+  <li>
+    <a asp-action="Index" asp-controller="Home">首页</a>
+  </li>
+  <li class="current">
+    <em>@ViewBag.Title</em>
+  </li>
 </ol>
 <div class="bg-title">
-    <div class="header-content text-center">
-        <h2 class="size48">
-            喜欢我的作品和文章？
-        </h2>
-        <div class="divider"></div>
-        <p class="size24">
-            您的捐助就是给我最大的鼓励
-        </p>
-    </div>
+  <div class="header-content text-center">
+    <h2 class="size48">
+      喜欢我的作品和文章？
+    </h2>
+    <div class="divider"></div>
+    <p class="size24">
+      您的捐助就是给我最大的鼓励
+    </p>
+  </div>
 </div>
 @Html.Raw(Model)
 <div class="container-fluid" id="donateApp" ng-controller="home as list">
-    <div class="margin-clear page-header">
-        <h2 class="size24" style="display: inline">
-            打赏名单(排名不分先后)：
-        </h2>
-    </div>
-    <vxe-table :data="tableData" :loading="loading" border stripe>
-        <!-- 打赏时间列 -->
-        <vxe-column field="DonateTime" formatter="formatDate" title="打赏时间" width="160"></vxe-column>
-        <!-- 昵称列 -->
-        <vxe-column field="NickName" min-width="140" title="昵称"></vxe-column>
-        <!-- 金额列 -->
-        <vxe-column field="Amount" title="金额" width="110"></vxe-column>
-        <!-- 打赏方式列 -->
-        <vxe-column field="Via" title="打赏方式" width="140"></vxe-column>
-        <!-- Email列 -->
-        <vxe-column field="Email" min-width="200" title="Email"></vxe-column>
-        <!-- QQ或微信列 -->
-        <vxe-column field="QQorWechat" title="QQ或微信" width="160"></vxe-column>
-    </vxe-table>
-    <!-- 分页组件 -->
-    <vxe-pager :current-page="pageConfig.page" :page-size="pageConfig.size" :total="pageConfig.total" @@page-change="pageChange" />
+  <div class="margin-clear page-header">
+    <h2 class="size24" style="display: inline">
+      打赏名单(排名不分先后)：
+    </h2>
+  </div>
+  <vxe-table :data="tableData" :loading="loading" border stripe>
+    <!-- 打赏时间列 -->
+    <vxe-column field="DonateTime" formatter="formatDate" title="打赏时间" width="160"></vxe-column>
+    <!-- 昵称列 -->
+    <vxe-column field="NickName" min-width="140" title="昵称"></vxe-column>
+    <!-- 金额列 -->
+    <vxe-column field="Amount" title="金额" width="110"></vxe-column>
+    <!-- 打赏方式列 -->
+    <vxe-column field="Via" title="打赏方式" width="140"></vxe-column>
+    <!-- Email列 -->
+    <vxe-column field="Email" min-width="200" title="Email"></vxe-column>
+    <!-- QQ或微信列 -->
+    <vxe-column field="QQorWechat" title="QQ或微信" width="160"></vxe-column>
+  </vxe-table>
+  <!-- 分页组件 -->
+  <vxe-pager :current-page="pageConfig.page" :page-size="pageConfig.size" :total="pageConfig.total" @@page-change="pageChange"/>
 </div>
-@if (ads.Count == 2)
-{
-    <div class="container-fluid">
-        <div class="margin-clear page-header">
-            <h2 class="size24" style="display: inline">
-                推广支持：
-            </h2>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                @{
-                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[0]);
-                }
-            </div>
-            <div class="col-md-6">
-                @{
-                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[1]);
-                }
-            </div>
-        </div>
+@if (ads.Count == 2) {
+  <div class="container-fluid">
+    <div class="margin-clear page-header">
+      <h2 class="size24" style="display: inline">
+        推广支持：
+      </h2>
     </div>
+    <div class="row">
+      <div class="col-md-6">
+        @{
+          await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[0]);
+        }
+      </div>
+      <div class="col-md-6">
+        @{
+          await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[1]);
+        }
+      </div>
+    </div>
+  </div>
 }
 <link href="https://cdn.jsdelivr.net/npm/vxe-pc-ui@4.9.25/lib/style.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/vxe-table@4.16.11/lib/style.min.css" rel="stylesheet">

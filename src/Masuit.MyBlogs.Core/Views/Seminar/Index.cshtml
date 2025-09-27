@@ -9,18 +9,18 @@
 @using Markdig
 @model Masuit.Tools.Models.PagedList<Masuit.MyBlogs.Core.Models.DTO.PostDto>
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    Random r = new Random();
-    UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-    AdvertisementDto ad = ViewBag.Ads;
-    Pagination page = ViewData["page"] as Pagination;
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  Random r = new Random();
+  UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
+  AdvertisementDto ad = ViewBag.Ads;
+  Pagination page = ViewData["page"] as Pagination;
 }
 <style>
     .bg-title {
         height: 50vh;
         max-height: 400px;
         position: relative;
-        background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
+        background: url(/Content/images/@(r.Next(1, 9)).jpg) no-repeat center;
         background-size:cover;
         background-attachment: fixed;
             margin-bottom: 10px;
@@ -39,96 +39,98 @@
     }
 </style>
 <div class="container">
-    <ol class="cd-breadcrumb triangle">
-        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-        <li class="current"><em>专题_@ViewBag.Title</em></li>
-    </ol>
+  <ol class="breadcrumb">
+    <li>
+      <a asp-action="Index" asp-controller="Home">首页</a>
+    </li>
+    <li class="current">
+      <em>专题_@ViewBag.Title</em>
+    </li>
+  </ol>
 </div>
 <div class="bg-title">
-    <div class="header-content text-center">
-        <h2 class="size48">
-            @ViewBag.Title
-            @if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") == "true") {
-                <a class="btn btn-lg btn-danger" asp-controller="Subscribe" asp-action="SeminarRss" asp-route-id="@ViewBag.Id" target="_blank">
-                    <i class="icon-rss4"></i>
-                </a>
-            }
-        </h2>
-        <div class="divider"></div>
-        <p class="size24">
-            @Html.Raw(ViewBag.SubTitle)
-        </p>
-    </div>
+  <div class="header-content text-center">
+    <h2 class="size48">
+      @ViewBag.Title
+      @if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") == "true") {
+        <a asp-action="SeminarRss" asp-controller="Subscribe" asp-route-id="@ViewBag.Id" class="btn btn-danger btn-lg" target="_blank">
+          <i class="icon-rss4"></i>
+        </a>
+      }
+    </h2>
+    <div class="divider"></div>
+    <p class="size24">
+      @Html.Raw(ViewBag.SubTitle)
+    </p>
+  </div>
 </div>
 <div class="container">
-    <div class="ibox">
-        <div class="ibox-content">
-            <div>
-                <h3 class="size20">
-                    专题描述：
-                </h3>
-            </div>
-            <p>
-                @Html.Raw(Markdown.ToHtml(ViewBag.Desc))
-            </p>
-        </div>
+  <div class="ibox">
+    <div class="ibox-content">
+      <div>
+        <h3 class="size20">
+          专题描述：
+        </h3>
+      </div>
+      <p>
+        @Html.Raw(Markdown.ToHtml(ViewBag.Desc))
+      </p>
     </div>
-    <div class="wrapper-content  animated bounceInUp blog">
-        @if (Model.Data.Any())
-        {
-            var rnd = new Random().Next(Model.CurrentCount > 2 ? 2 : 0, Model.CurrentCount);
-            for (var i = 0; i < Model.CurrentCount; i++)
-            {
-                if (rnd > 2 && rnd == i && ad != null)
-                {
-                    await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
-                }
+  </div>
+  <div class="animated blog bounceInUp wrapper-content">
+    @if (Model.Data.Any()) {
+      var rnd = new Random().Next(Model.CurrentCount > 2 ? 2 : 0, Model.CurrentCount);
+      for (var i = 0; i < Model.CurrentCount; i++) {
+        if (rnd > 2 && rnd == i && ad != null) {
+          await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
+        }
 
-                var post = Model.Data[i];
-                await Html.RenderPartialAsync(user.IsAdmin ? "_ArticleListItem_Admin" : "_ArticleListItem", post);
-            }
-        }
-        else
-        {
-            <h3>Oops！抱歉~本专题没有收录相关的文章或资源！如果您有相关的结果，您可以 <a asp-controller="Post" asp-action="Publish" class="btn btn-info btn-lg">点击这里</a> 投稿哦！</h3>
-        }
-        <div class="row">
-            <div class="col-sm-8 col-xs-12">
-                @{ await Html.RenderPartialAsync("_Pagination", page); }
-            </div>
-            <div class="col-sm-4 col-xs-12 text-right">
-                <div class="btn-group dropup">
-                    <a asp-controller="Post" asp-action="All" class="btn btn-info">所有专题</a>
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @(page.OrderBy?.GetDescription()??"排序方式")
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="">最后修改日期</a>
-                        </li>
-                        <li>
-                            <a asp-route-orderby="@OrderBy.PostDate">最后发表日期</a>
-                        </li>
-                        <li>
-                            <a asp-route-orderby="@OrderBy.Trending">今日热榜</a>
-                        </li>
-                        <li role="separator" class="divider"></li>
-                        <li>
-                            <a asp-route-orderby="@OrderBy.CommentCount">评论最多</a>
-                        </li>
-                        <li>
-                            <a asp-route-orderby="@OrderBy.TotalViewCount">访问量最多</a>
-                        </li>
-                        <li>
-                            <a asp-route-orderby="@OrderBy.VoteUpCount">支持最多</a>
-                        </li>
-                        <li>
-                            <a asp-route-orderby="@OrderBy.AverageViewCount">最热门</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+        var post = Model.Data[i];
+        await Html.RenderPartialAsync(user.IsAdmin ? "_ArticleListItem_Admin" : "_ArticleListItem", post);
+      }
+    } else {
+      <h3>
+        Oops！抱歉~本专题没有收录相关的文章或资源！如果您有相关的结果，您可以
+        <a asp-action="Publish" asp-controller="Post" class="btn btn-info btn-lg">点击这里</a> 投稿哦！
+      </h3>
+    }
+    <div class="row">
+      <div class="col-sm-8 col-xs-12">
+        @{ await Html.RenderPartialAsync("_Pagination", page); }
+      </div>
+      <div class="col-sm-4 col-xs-12 text-right">
+        <div class="btn-group dropup">
+          <a asp-action="All" asp-controller="Post" class="btn btn-info">所有专题</a>
+          <button aria-expanded="false" aria-haspopup="true" class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+            @(page.OrderBy?.GetDescription() ?? "排序方式")
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="">最后修改日期</a>
+            </li>
+            <li>
+              <a asp-route-orderby="@OrderBy.PostDate">最后发表日期</a>
+            </li>
+            <li>
+              <a asp-route-orderby="@OrderBy.Trending">今日热榜</a>
+            </li>
+            <li class="divider" role="separator"></li>
+            <li>
+              <a asp-route-orderby="@OrderBy.CommentCount">评论最多</a>
+            </li>
+            <li>
+              <a asp-route-orderby="@OrderBy.TotalViewCount">访问量最多</a>
+            </li>
+            <li>
+              <a asp-route-orderby="@OrderBy.VoteUpCount">支持最多</a>
+            </li>
+            <li>
+              <a asp-route-orderby="@OrderBy.AverageViewCount">最热门</a>
+            </li>
+          </ul>
         </div>
+      </div>
     </div>
+  </div>
 </div>

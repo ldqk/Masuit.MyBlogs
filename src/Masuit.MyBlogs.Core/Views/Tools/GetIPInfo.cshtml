@@ -1,7 +1,7 @@
 ﻿@model Masuit.MyBlogs.Core.Models.ViewModel.IpInfo
 @{
-    ViewBag.Title = "获取IP机房和路由信息";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "获取IP机房和路由信息";
+  Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <style>
     #allmap {
@@ -10,72 +10,75 @@
     }
 </style>
 <div class="container">
-    <ol class="cd-breadcrumb triangle">
-        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-        <li class="current">
-            <em>@ViewBag.Title</em>
-        </li>
-    </ol>
-    <ul class="list-group">
-        <li class="list-group-item">
-            <p class="size24">
-                如果你觉得这个工具有用，请 <a asp-controller="Misc" asp-action="Donate">点击这里</a> 支持一下博主！
-            </p>
-        </li>
-        <li class="list-group-item">
-            <p class="text-red">
-                特别提示：由于IP地址存在多变性，本工具查询结果仅供参考，无法保证100%的准确性和精确性，请根据自己的实际情况酌情使用！
-            </p>
-        </li>
-    </ul>
-    <form method="get" asp-action="GetIpInfo">
-        <div class="input-group">
-            <input class="form-control" name="ip" value="@ViewBag.IP" placeholder="请输入有效的IPv4地址" />
-            <span class="input-group-btn">
-                <button class="btn btn-info" type="submit">查询</button>
-            </span>
-        </div>
-    </form>
-    <table class="table table-bordered table-condensed table-hover">
-        <tr>
-            <td>IP路由信息：</td>
-            <td>@Model.Network.Router</td>
-        </tr>
-        <tr>
-            <td>IP机房信息：</td>
-            <td>@Model.Network.Organization</td>
-        </tr>
-        <tr>
-            <td>IP机房信息2：</td>
-            <td>@Model.Network2</td>
-        </tr>
-        <tr>
-            <td>ASN：</td>
-            <td>@Model.Network.Asn</td>
-        </tr>
-        <tr>
-            <td>参考地理位置1：</td>
-            <td>@Model.Address</td>
-        </tr>
-        <tr>
-            <td>参考地理位置2：</td>
-            <td>@Model.Address2</td>
-        </tr>
-        <tr>
-            <td>时区：</td>
-            <td>@Model.TimeZone</td>
-        </tr>
-        <tr>
-            <td>经纬度：</td>
-            <td>(经度：@(Model.Location.Longitude),纬度：@(Model.Location.Latitude))</td>
-        </tr>
-        <tr>
-            <td>代理或任播节点：</td>
-            <td>@Model.IsProxy</td>
-        </tr>
-        <tr>
-            <td>域名解析：</td>
-            <td>@Model.Domain</td>
-        </tr>
-    </table>
+  <ol class="breadcrumb">
+    <li>
+      <a asp-action="Index" asp-controller="Home">首页</a>
+    </li>
+    <li class="current">
+      <em>@ViewBag.Title</em>
+    </li>
+  </ol>
+  <ul class="list-group">
+    <li class="list-group-item">
+      <p class="size24">
+        如果你觉得这个工具有用，请
+        <a asp-action="Donate" asp-controller="Misc">点击这里</a> 支持一下博主！
+      </p>
+    </li>
+    <li class="list-group-item">
+      <p class="text-red">
+        特别提示：由于IP地址存在多变性，本工具查询结果仅供参考，无法保证100%的准确性和精确性，请根据自己的实际情况酌情使用！
+      </p>
+    </li>
+  </ul>
+  <form asp-action="GetIpInfo" method="get">
+    <div class="input-group">
+      <input class="form-control" name="ip" placeholder="请输入有效的IPv4地址" value="@ViewBag.IP"/>
+      <span class="input-group-btn">
+        <button class="btn btn-info" type="submit">查询</button>
+      </span>
+    </div>
+  </form>
+  <table class="table table-bordered table-condensed table-hover">
+    <tr>
+      <td>IP路由信息：</td>
+      <td>@Model.Network.Router</td>
+    </tr>
+    <tr>
+      <td>IP机房信息：</td>
+      <td>@Model.Network.Organization</td>
+    </tr>
+    <tr>
+      <td>IP机房信息2：</td>
+      <td>@Model.Network2</td>
+    </tr>
+    <tr>
+      <td>ASN：</td>
+      <td>@Model.Network.Asn</td>
+    </tr>
+    <tr>
+      <td>参考地理位置1：</td>
+      <td>@Model.Address</td>
+    </tr>
+    <tr>
+      <td>参考地理位置2：</td>
+      <td>@Model.Address2</td>
+    </tr>
+    <tr>
+      <td>时区：</td>
+      <td>@Model.TimeZone</td>
+    </tr>
+    <tr>
+      <td>经纬度：</td>
+      <td>(经度：@(Model.Location.Longitude),纬度：@(Model.Location.Latitude))</td>
+    </tr>
+    <tr>
+      <td>代理或任播节点：</td>
+      <td>@Model.IsProxy</td>
+    </tr>
+    <tr>
+      <td>域名解析：</td>
+      <td>@Model.Domain</td>
+    </tr>
+  </table>
 </div>

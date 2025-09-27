@@ -1,86 +1,104 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model Masuit.MyBlogs.Core.Models.Entity.Post
-
 @{
-    ViewBag.Title = Model.Title;
-    Layout = null;
-    var summary = await Model.Content.GetSummary();
+  ViewBag.Title = Model.Title;
+  Layout = null;
+  var summary = await Model.Content.GetSummary();
 }
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv='content-language' content='zh-CN'>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])</title>
-    <meta name="keywords" content="@(CommonHelper.SystemSettings["Keyword"]+","+Model.Keyword)" />
-    <meta name="description" content="@summary" />
-    <meta name="format-detection" content="telephone=no">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="twitter:card" content="summary">
-    <meta property="og:title" content="@(Model.Title + "_" + CommonHelper.SystemSettings["Title"])">
-    <meta property="og:description" content="@summary">
-    <meta property="og:type" content="website">
-    <meta property="og:image:alt" content="@summary" />
-    <meta property="og:locale" content="zh_CN">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta content='zh-CN' http-equiv='content-language'>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <title>@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])</title>
+  <meta content="@(CommonHelper.SystemSettings["Keyword"] + "," + Model.Keyword)" name="keywords"/>
+  <meta content="@summary" name="description"/>
+  <meta content="telephone=no" name="format-detection">
+  <meta content="#ffffff" name="theme-color">
+  <meta content="summary" name="twitter:card">
+  <meta content="@(Model.Title + "_" + CommonHelper.SystemSettings["Title"])" property="og:title">
+  <meta content="@summary" property="og:description">
+  <meta content="website" property="og:type">
+  <meta content="@summary" property="og:image:alt"/>
+  <meta content="zh_CN" property="og:locale">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="page-header">
-            <h2><a asp-controller="Home" asp-action="Index">@CommonHelper.SystemSettings["Title"]</a></h2>
-        </div>
-        <ol class="breadcrumb triangle">
-            <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-            <li><a asp-controller="Home" asp-action="Post">文章列表</a></li>
-            @if (Model.Category.ParentId > 0)
-            {
-                if (Model.Category.Parent.ParentId > 0)
-                {
-                    <li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.Category.Parent.ParentId">@Model.Category.Parent.Parent.Name</a></li>
-                }
-                <li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.Category.ParentId">@Model.Category.Parent.Name</a></li>
-            }
-            <li><a asp-controller="Home" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.Category.Name</a></li>
-            <li class="current"><em>@Model.Title</em></li>
-        </ol>
-        <div class="page-header">
-            <h2>@Model.Title</h2>
-        </div>
-        <div class="row">
-            <div class="col-sm-8">
-                <div class="padding-bot10">
-                    <span class="label label-info">
-                        <a asp-controller="Home" asp-action="Author" asp-route-author="@Model.Author">@Model.Author</a>
-                    </span>发表于<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@Model.PostDate.Year" asp-route-mm="@Model.PostDate.Month" asp-route-dd="@Model.PostDate.Day" asp-route-mode="@nameof(Model.PostDate)"><time class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</time></a> |
-                    <span class="label label-info">
-                        <a asp-controller="Home" asp-action="Author" asp-route-author="@Model.Modifier">@Model.Modifier</a>
-                    </span>最后修改于<a asp-controller="Home" asp-action="Archieve" asp-route-yyyy="@Model.ModifyDate.Year" asp-route-mm="@Model.ModifyDate.Month" asp-route-dd="@Model.ModifyDate.Day" asp-route-mode="@nameof(Model.ModifyDate)"><time class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm")</time></a>
-                </div>
-            </div>
-            @{
-                if (!string.IsNullOrEmpty(Model.Label))
-                {
-                    <div class="pull-right margin-right20">
-                        <div>
-                            @foreach (string s in Model.Label.Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries))
-                            {
-                                <a asp-controller="Home" asp-action="Tag" asp-route-tag="@s">
-                                    <span class="label label-primary">@s</span>
-                                </a>
-                            }
-                        </div>
-                    </div>
-                }
-            }
-        </div>
+<div class="container">
+  <div class="page-header">
+    <h2>
+      <a asp-action="Index" asp-controller="Home">@CommonHelper.SystemSettings["Title"]</a>
+    </h2>
+  </div>
+  <ol class="breadcrumb">
+    <li>
+      <a asp-action="Index" asp-controller="Home">首页</a>
+    </li>
+    <li>
+      <a asp-action="Post" asp-controller="Home">文章列表</a>
+    </li>
+    @if (Model.Category.ParentId > 0) {
+      if (Model.Category.Parent.ParentId > 0) {
+        <li>
+          <a asp-action="Category" asp-controller="Home" asp-route-id="@Model.Category.Parent.ParentId">@Model.Category.Parent.Parent.Name</a>
+        </li>
+      }
 
-        <article class="article" id="article">
-            @Html.Raw(Model.Content)
-            @Html.Raw(Model.ProtectContent)
-        </article>
+      <li>
+        <a asp-action="Category" asp-controller="Home" asp-route-id="@Model.Category.ParentId">@Model.Category.Parent.Name</a>
+      </li>
+    }
+    <li>
+      <a asp-action="Category" asp-controller="Home" asp-route-id="@Model.CategoryId">@Model.Category.Name</a>
+    </li>
+    <li class="current">
+      <em>@Model.Title</em>
+    </li>
+  </ol>
+  <div class="page-header">
+    <h2>@Model.Title</h2>
+  </div>
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="padding-bot10">
+        <span class="label label-info">
+          <a asp-action="Author" asp-controller="Home" asp-route-author="@Model.Author">@Model.Author</a>
+        </span>发表于
+        <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model.PostDate.Day" asp-route-mm="@Model.PostDate.Month" asp-route-mode="@nameof(Model.PostDate)" asp-route-yyyy="@Model.PostDate.Year">
+          <time class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</time>
+        </a> |
+        <span class="label label-info">
+          <a asp-action="Author" asp-controller="Home" asp-route-author="@Model.Modifier">@Model.Modifier</a>
+        </span>最后修改于
+        <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model.ModifyDate.Day" asp-route-mm="@Model.ModifyDate.Month" asp-route-mode="@nameof(Model.ModifyDate)" asp-route-yyyy="@Model.ModifyDate.Year">
+          <time class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm")</time>
+        </a>
+      </div>
     </div>
+    @{
+      if (!string.IsNullOrEmpty(Model.Label)) {
+        <div class="margin-right20 pull-right">
+          <div>
+            @foreach (string s in Model.Label.Split(new[] {
+                        ',',
+                        '，'
+                      }, StringSplitOptions.RemoveEmptyEntries)) {
+              <a asp-action="Tag" asp-controller="Home" asp-route-tag="@s">
+                <span class="label label-primary">@s</span>
+              </a>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+  <article class="article" id="article">
+    @Html.Raw(Model.Content)
+    @Html.Raw(Model.ProtectContent)
+  </article>
+</div>
 </body>
 </html>

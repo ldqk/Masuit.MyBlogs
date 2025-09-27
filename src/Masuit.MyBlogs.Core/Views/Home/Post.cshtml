@@ -1,19 +1,25 @@
 ﻿
 @{
-    ViewBag.Title = "文章列表页";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+  ViewBag.Title = "文章列表页";
+  Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
 @model HomePageViewModel
 <div class="container">
-    <ol class="cd-breadcrumb triangle">
-        <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-        <li class="current"><em>@ViewBag.Title</em></li>
+  <div class="row">
+    <ol class="breadcrumb">
+      <li>
+        <a asp-action="Index" asp-controller="Home">首页</a>
+      </li>
+      <li class="current">
+        <em>@ViewBag.Title</em>
+      </li>
     </ol>
+  </div>
 </div>
 @{
-    UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-    await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
+  UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
+  await Html.RenderPartialAsync(user.IsAdmin ? "_MainContainer_Admin" : "_MainContainer", Model);
 }

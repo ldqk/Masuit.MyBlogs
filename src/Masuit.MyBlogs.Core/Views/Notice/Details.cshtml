@@ -4,9 +4,9 @@
 @using Masuit.Tools.Core.Net
 @model Masuit.MyBlogs.Core.Models.Entity.Notice
 @{
-    ViewBag.Title = Model.Title;
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    Random r = new Random();
+  ViewBag.Title = Model.Title;
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  Random r = new Random();
 }
 <style>
     .bg-title {
@@ -29,50 +29,57 @@
         border-top: 3px solid rebeccapurple;
     }
 </style>
-<ol class="cd-breadcrumb triangle">
-    <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-    <li><a asp-controller="Notice" asp-action="Index">公告列表</a></li>
-    <li class="current"><em>@ViewBag.Title</em></li>
+<ol class="breadcrumb">
+  <li>
+    <a asp-action="Index" asp-controller="Home">首页</a>
+  </li>
+  <li>
+    <a asp-action="Index" asp-controller="Notice">公告列表</a>
+  </li>
+  <li class="current">
+    <em>@ViewBag.Title</em>
+  </li>
 </ol>
 <div class="bg-title">
-    <div class="header-content text-center">
-        <h2 class="size48">
-            @Model.Title
-        </h2>
-        <div class="divider"></div>
-        <p class="size24">
-            发布于：<time>@Model.PostDate.ToString("yyyy-MM-dd")</time> | 修改于：<time>@Model.ModifyDate.ToString("yyyy-MM-dd")</time> | 浏览人数：@Model.ViewCount
-        </p>
-    </div>
+  <div class="header-content text-center">
+    <h2 class="size48">
+      @Model.Title
+    </h2>
+    <div class="divider"></div>
+    <p class="size24">
+      发布于：
+      <time>@Model.PostDate.ToString("yyyy-MM-dd")</time> | 修改于：
+      <time>@Model.ModifyDate.ToString("yyyy-MM-dd")</time> | 浏览人数：@Model.ViewCount
+    </p>
+  </div>
 </div>
 <div class="container">
-    <div class="wrapper-content article">
-        <div class="ibox">
-            <div class="ibox-content">
-                <section class="wow fadeInUp">
-                    <div class="btn-group">
-                        <a asp-controller="Notice" asp-action="Index">&lt;&lt;返回公告列表页</a>
-                        @{
-                            var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-                            if (user.IsAdmin)
-                            {
-                                <a class="btn btn-primary" href="/dashboard/notice/write?id =@Model.Id" target="_blank">修改</a>
-                            }
-                        }
-                    </div>
-                </section>
-                <hr class="margin-top10 marginbot10" />
-                <main>
-                    <section>
-                        <article class="article" id="article">
-                            @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
-                        </article>
-                    </section>
-                </main>
-            </div>
-        </div>
+  <div class="article wrapper-content">
+    <div class="ibox">
+      <div class="ibox-content">
+        <section class="fadeInUp wow">
+          <div class="btn-group">
+            <a asp-action="Index" asp-controller="Notice">&lt;&lt;返回公告列表页</a>
+            @{
+              var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
+              if (user.IsAdmin) {
+                <a class="btn btn-primary" href="/dashboard/notice/write?id =@Model.Id" target="_blank">修改</a>
+              }
+            }
+          </div>
+        </section>
+        <hr class="margin-top10 marginbot10"/>
+        <main>
+          <section>
+            <article class="article" id="article">
+              @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
+            </article>
+          </section>
+        </main>
+      </div>
     </div>
-    @{
-        await Html.RenderPartialAsync("_ArticleListAdvertisement", (AdvertisementDto)ViewBag.Ads);
-    }
+  </div>
+  @{
+    await Html.RenderPartialAsync("_ArticleListAdvertisement", (AdvertisementDto) ViewBag.Ads);
+  }
 </div>

@@ -636,7 +636,7 @@ createApp({
         observe: true,
         position: 'left', // 可选: left | right | top | custom
         float: true,
-        offset: { top: 156, left: left - Math.min(left - 5, 600) },
+        offset: { top: 138, left: left - Math.min(left - 5, 600) },
         width: Math.max(Math.min(left - 7, 600), 220),
         closeButton: true,
         draggable: true

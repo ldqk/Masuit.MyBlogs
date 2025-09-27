@@ -1,17 +1,17 @@
 ﻿@using Masuit.MyBlogs.Core.Common
 @model Masuit.MyBlogs.Core.Models.Entity.Misc
 @{
-    ViewBag.Title = Model.Title;
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    Random r = new Random();
+  ViewBag.Title = Model.Title;
+  Layout = "~/Views/Shared/_Layout.cshtml";
+  Random r = new Random();
 }
-<link href="~/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet" />
+<link href="~/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet"/>
 <style>
     .bg-title {
         height: 50vh;
         max-height: 400px;
         position: relative;
-        background: url(/Content/images/@(r.Next(1,9)).jpg) no-repeat center;
+        background: url(/Content/images/@(r.Next(1, 9)).jpg) no-repeat center;
         background-size:cover;
         background-attachment: fixed;
     }
@@ -36,24 +36,26 @@
         font-size: 24px;
     }
 </style>
-<ol class="cd-breadcrumb triangle">
-    <li><a asp-controller="Home" asp-action="Index">首页</a></li>
-    <li class="current">
-        <em>@ViewBag.Title</em>
-    </li>
+<ol class="breadcrumb">
+  <li>
+    <a asp-action="Index" asp-controller="Home">首页</a>
+  </li>
+  <li class="current">
+    <em>@ViewBag.Title</em>
+  </li>
 </ol>
 <div class="bg-title">
-    <div class="header-content text-center">
-        <h2 class="size48">
-            @Model.Title
-        </h2>
-        <div class="divider"></div>
-    </div>
+  <div class="header-content text-center">
+    <h2 class="size48">
+      @Model.Title
+    </h2>
+    <div class="divider"></div>
+  </div>
 </div>
 <div class="container">
-    <article class="content">
-        @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
-    </article>
+  <article class="content">
+    @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
+  </article>
 </div>
 <script src="~/UEditorPlus/third-party/SyntaxHighlighter/shCore.js"></script>
 <script>
