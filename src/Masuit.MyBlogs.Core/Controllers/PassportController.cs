@@ -11,6 +11,7 @@ using Dispose.Scope;
 using FreeRedis;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models;
+using Masuit.Tools.AspNetCore.ModelBinder;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -121,7 +122,7 @@ public sealed class PassportController : Controller
     /// <param name="remem"></param>
     /// <returns></returns>
     [HttpPost, ValidateAntiForgeryToken, DistributedLockFilter]
-    public ActionResult Login([FromServices] IRedisClient cacheManager, string username, string password, string valid, string remem)
+    public ActionResult Login([FromServices] IRedisClient cacheManager, [FromBodyOrDefault, Required] string username, [FromBodyOrDefault, Required] string password, [FromBodyOrDefault, Required] string valid, [FromBodyOrDefault, Required] string remem)
     {
         string validSession = HttpContext.GetRedisSession<string>("valid") ?? string.Empty; //将验证码从Session中取出来，用于登录验证比较
         if (string.IsNullOrEmpty(validSession) || !valid.Trim().Equals(validSession, StringComparison.InvariantCultureIgnoreCase))

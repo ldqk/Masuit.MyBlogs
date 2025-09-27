@@ -1,191 +1,261 @@
 ﻿@{
-    ViewBag.Title = "统一登录";
-    Layout = null;
+  Layout = null;
 }
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-    <title>@ViewBag.Title</title>
-    <link href="~/Content/login/style.css" rel="stylesheet" />
-    <link href="~/Content/jquery-labelauty.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-placeholder/2.3.1/jquery.placeholder.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.complexify.js/0.5.1/jquery.complexify.js"></script>
-    <script src="~/Scripts/supersized.3.2.7.min.js"></script>
-    <script src="~/Scripts/supersized-init.js"></script>
-    <script src="~/Scripts/jquery-labelauty.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-rc.1/jsencrypt.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+  <meta charset="UTF-8">
+  <meta content="width=device-width,initial-scale=1.0" name="viewport">
+  <title>用户登录</title>
+  <style>
+    body {
+      /* 背景由js动态设置 */
+      font-family: 'Roboto', Arial, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.6s;
+    }
+    .login-container {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(44,62,80,0.12);
+      padding: 48px 40px;
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      animation: fadeIn 1s;
+    }
+    @@keyframes fadeIn {
+      from { opacity: 0; transform: translateY(40px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .login-title {
+      text-align: center;
+      font-weight: 700;
+      font-size: 2rem;
+      color: #2575fc;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-size: 1rem;
+      color: #444;
+      font-weight: 500;
+    }
+    input[type="text"], input[type="password"] {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+    input:focus {
+      border: 1.5px solid #2575fc;
+      background: #f5f9ff;
+    }
+    .captcha-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .captcha-img {
+      width: 100px;
+      height: 38px;
+      background: #eee;
+      border-radius: 6px;
+      cursor: pointer;
+      object-fit: cover;
+      border: 1px solid #e0e0e0;
+    }
+    .login-btn {
+      width: 100%;
+      margin-top: 10px;
+      background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 14px 0;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+    }
+    .login-btn:hover {
+      box-shadow: 0 6px 20px rgba(44,62,80,0.18);
+    }
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+    .form-footer a {
+      color: #2575fc;
+      text-decoration: none;
+      font-weight: 500;
+      transition: text-decoration 0.2s;
+    }
+    .form-footer a:hover {
+      text-decoration: underline;
+    }
+    .options-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: -6px;
+      font-size: 0.98rem;
+    }
+    .remember-checkbox {
+      accent-color: #2575fc;
+      width: 18px;
+      height: 18px;
+    }
+    .error-message {
+      color: #e74c3c;
+      background: #ffeaea;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 0.98rem;
+      margin-bottom: -12px;
+      display: none;
+    }
+    .error-message.show {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <div class="login-box">
-        <div class="box-con tran">
-            <form id="login-form" action="" method="POST" onsubmit="return false">
-                <div class="login-con f-l">
-                    <div class="form-group">
-                        <header>
-                            <h1>用户认证中心登录</h1>
-                        </header>
-                    </div>
-                    @Html.AntiForgeryToken()
-                    <div class="form-group">
-                        <input type="text" id="username" name="username" placeholder="用户名/邮箱" />
-                        <span class="error-notic">用户名/邮箱不正确</span>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" name="password" id="password" placeholder="您的密码">
-                        <span class="error-notic">用户名或密码不正确</span>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" placeholder="请输入6位验证码(点击图片刷新验证码)" id="validcode" name="valid" class="valid" maxlength="6" onkeyup="showLoginBtn()">
-                        <img class="validcode1" src="/Passport/ValidateCode" style="display: inline">
-                        <span class="error-notic">验证码不正确</span>
-                    </div>
-                    <ul class="dowebok">
-                        <li>
-                            <input type="checkbox" name="remem" id="rememberMe" checked data-labelauty="自动登录">
-                        </li>
-                    </ul>
-                    <div class="form-group" id="btnlogin" style="display: none">
-                        <button type="button" class="tran pr" onclick="login()">
-                            <a class="tran">登录</a>
-                            <img class="loading" id="status" src="~/Content/images/loading.gif" style="display: none">
-                        </button>
-                        <span id="loginStatus" class="error-notic">登录失败，请检查表单完整性！</span>
-                    </div>
-                </div>
-            </form>
-            <!-- 登录 -->
+<div id="app">
+  <div class="login-container">
+    <div class="login-title">用户登录</div>
+    @Html.AntiForgeryToken()
+    <div class="login-form">
+      <div :class="{show:errorMessage}" class="error-message">{{ errorMessage }}</div>
+      <div class="input-group">
+        <label for="username">用户名</label>
+        <input id="username" maxlength="20" placeholder="请输入用户名" required type="text" v-model="username">
+      </div>
+      <div class="input-group">
+        <label for="password">密码</label>
+        <input id="password" maxlength="20" placeholder="请输入密码" required type="password" v-model="password">
+      </div>
+      <div class="input-group">
+        <label for="captcha">验证码</label>
+        <div class="captcha-group">
+          <input autocomplete="off" id="captcha" maxlength="6" placeholder="请输入验证码" required type="text" v-model="captchaInput">
+          <img :src="captchaImgUrl" @@click="refreshCaptcha" alt="验证码" class="captcha-img" title="点击刷新">
         </div>
+      </div>
+      <div class="options-row">
+        <input class="remember-checkbox" id="remember" type="checkbox" v-model="remember">
+        <label for="remember">记住密码</label>
+      </div>
+      <button @@click="handleLogin" class="login-btn" type="submit" v-if="captchaInput.length === 6 && password.length>6 && username.length>2">登录</button>
     </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.5.16/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.5.4/jsencrypt.min.js"></script>
+<script>
+      // 生成随机颜色
+      function randomColor() {
+        const r = Math.floor(Math.random() * 200 + 30); // 保证较鲜明
+        const g = Math.floor(Math.random() * 200 + 30);
+        const b = Math.floor(Math.random() * 200 + 30);
+        return `rgb(${r},${g},${b})`;
+      }
+      // 设置随机渐变背景
+      function setRandomBg() {
+        const color1 = randomColor();
+        const color2 = randomColor();
+        document.body.style.background = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
+      }
+      setRandomBg();
+
+      const { createApp } = Vue;
+      createApp({
+        data() {
+          return {
+            username: '',
+            password: '',
+            captchaInput: '',
+            ramdom: Date.now(),
+            remember: false,
+            errorMessage: '',
+          }
+        },
+        computed: {
+          captchaImgUrl() {
+            return `/Passport/ValidateCode?t=${this.ramdom || Date.now()}`;
+          }
+        },
+        methods: {
+          refreshCaptcha() {
+            this.ramdom = Date.now();
+          },
+          async handleLogin() {
+            this.errorMessage = '';
+            if (this.username.trim().length < 3) {
+              this.errorMessage = "用户名长度需≥3位";
+              return;
+            }
+            if (this.password.length < 6) {
+              this.errorMessage = "密码长度需≥6位";
+              return;
+            }
+            if (this.captchaInput.trim().length < 4) {
+              this.errorMessage = "请输入4位验证码";
+              return;
+            }
+            const cookie = await cookieStore.get("PublicKey");
+            var encrypt = new JSEncrypt();
+            encrypt.setPublicKey(decodeURIComponent(cookie.value));
+            console.log(encrypt.encrypt(this.password));
+            axios.create({
+        headers: {
+          'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+      }).post('/Passport/Login', {
+              username: this.username.trim(),
+              password: encrypt.encrypt(this.password),
+              valid: this.captchaInput.trim(),
+              remem: this.remember
+            }).then(res => {
+              if (res.data.Success) {
+                window.location.href = new URLSearchParams(window.location.search).get("redirect") || "/Home/Index";
+              } else {
+                this.errorMessage = res.data.Message || '登录失败，请重试';
+                this.refreshCaptcha();
+                this.captchaInput = '';
+              }
+            }).catch(() => {
+              this.errorMessage = '网络异常，请稍后重试';
+              this.refreshCaptcha();
+              this.captchaInput = '';
+            });
+          }
+        },
+        mounted() {
+          this.refreshCaptcha();
+        }
+      }).mount('#app')
+    </script>
 </body>
 </html>
-<script type="text/javascript">
-    $(function () {
-        $(':input').labelauty(); //单选复选框美化插件初始化
-        $("#loginbtn").click(login); //登录按钮事件
-        $(".validcode1").click(flushcode); //刷新验证码
-
-        //绑定各表单事件
-        $("#validcode").on("keyup", function (e) {
-            if (e.keyCode == 13) {
-                //判断回车键
-                login();
-            }
-        }); //验证码
-        $("#myPassword").on("change", function (e) {
-            document.querySelector("#myPassword2").value = "";
-        }); //密码框1内容改变事件
-
-        //表单事件
-        $(".signup-form input").on("focus", function () {
-            $(this).parent().addClass("border");
-        });
-        $(".signup-form input").on("blur", function () {
-            $(this).parent().removeClass("border");
-        });
-    });
-
-    //登录过程
-    function login() {
-        $(".tran").attr({ "disabled": "disabled" });
-        $("#status").fadeIn(100);
-        $("#status").parents("button").parents(".form-group").find(".error-notic").fadeOut(100);
-        var encrypt = new JSEncrypt();
-        encrypt.setPublicKey($.cookie("PublicKey"));
-        let form = $("#login-form").serialize();
-        form = form.replace(encodeURIComponent(getFormParam("password")), encodeURIComponent(encrypt.encrypt(getFormParam("password"))));
-        $.post("/Passport/Login", form, function (data) {
-            if (data.Success) {
-                location.href = data.Message || "/Home/Index"; //否则直接跳转
-                return;
-            } else {
-                $("#status").parents("button").parents(".form-group").find(".error-notic").html(data.Message);
-                $("#status").parents("button").parents(".form-group").find(".error-notic").fadeIn(100);
-                $("#status").fadeOut(200);
-                $(".tran").removeAttr("disabled");
-                flushcode();
-            }
-        }).fail(function (data) {
-            $("#status").parents("button").parents(".form-group").find(".error-notic").html(data.Message);
-            $("#status").parents("button").parents(".form-group").find(".error-notic").fadeIn(100);
-            $("#status").fadeOut(200);
-        });
-    }
-
-    function getFormParam(name) {
-        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
-        var r = $("#login-form").serialize().match(reg);
-        return unescape(r[2]);
-    }
-
-    //刷新验证码
-    function flushcode() {
-        var code = "/Passport/ValidateCode?" + newGuid();
-        $(".validcode1").attr("src", code);
-    }
-
-    //创建一个guid值
-    function newGuid() {
-        var guid = "";
-        for (var i = 1; i <= 32; i++) {
-            var n = Math.floor(Math.random() * 16.0).toString(16);
-            guid += n;
-            if ((i == 8) || (i == 12) || (i == 16) || (i == 20)) {
-                guid += "-";
-            }
-        }
-        return guid;
-    }
-
-    //检查验证码
-    function CheckValidCode(_this) {
-        var code = $(_this).val();
-        $.post("/Passport/CheckValidateCode", {
-            "code": code
-        }, function (data) {
-            if (data.Success) {
-                hideNotic(_this);
-            } else {
-                $(_this).parents(".form-group").find(".error-notic").fadeIn(100);
-            }
-        });
-    }
-
-    var _handle = ''; //储存电话是否填写正确
-
-    //表单验证
-    function showNotic(_this) {
-        $(_this).parents(".form-group").find(".error-notic").fadeIn(100);
-        $(_this).focus();
-    } //错误提示显示
-
-    function hideNotic(_this) {
-        $(_this).parents(".form-group").find(".error-notic").fadeOut(100);
-    } //错误提示隐藏
-
-    var verify = {
-        VerifyCount: function (_this) {
-            var _count = "123456";
-            var _value = $(_this).val();
-            console.log(_value);
-            if (_value != _count) {
-                showNotic(_this);
-            } else {
-                hideNotic(_this);
-            }
-        }, //验证验证码
-
-    }
-
-    //显示登录按钮
-    function showLoginBtn() {
-        if ($(".valid").val().length >= 3) {
-            $("#btnlogin").fadeIn(1000);
-        } else {
-            $("#btnlogin").fadeOut(1000);
-        }
-    }
-</script>
