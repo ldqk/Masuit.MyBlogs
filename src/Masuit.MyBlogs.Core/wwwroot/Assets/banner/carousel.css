@@ -1,0 +1,175 @@
+﻿.carousel {
+  width: 100vw;
+  height: 100vh;
+  max-height: 80vh;
+  /* 可自定义最大高度，例如800px，也可以vh、rem等单位 */
+  position: relative;
+  background: #222;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-slide {
+  width: 100vw;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.carousel-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 2;
+  position: relative;
+}
+
+.carousel-slide img {
+  width: 100vw;
+  height: 100%;
+  object-fit: cover;
+  box-shadow: 0 4vw 8vw rgba(0, 0, 0, 0.2);
+  display: block;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4vw;
+  height: 8vw;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  font-size: 3vw;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 1vw;
+  transition: background 0.2s;
+  user-select: none;
+}
+
+.carousel-btn:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.carousel-btn.left {
+  left: 2vw;
+}
+
+.carousel-btn.right {
+  right: 2vw;
+}
+
+.fade-in {
+  animation: fadeIn 1s;
+}
+
+.slide-in-left {
+  animation: slideInLeft 1s;
+}
+
+.slide-in-right {
+  animation: slideInRight 1s;
+}
+
+.zoom-in {
+  animation: zoomIn 1s;
+}
+
+.rotate-in {
+  animation: rotateIn 1s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100vw);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100vw);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rotateIn {
+  from {
+    transform: rotate(-180deg) scale(0.5);
+    opacity: 0;
+  }
+
+  to {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.carousel-indicator {
+  position: absolute;
+  bottom: 4vw;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1vw;
+  z-index: 10;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel-indicator span {
+  display: block;
+  width: 1vw;
+  height: 1vw;
+  background: #aaa;
+  border-radius: 50%;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+
+.carousel-indicator .active {
+  background: #fff;
+}
