@@ -39,56 +39,36 @@
 }
 <br/>
 @if (Model.Notices.Any()) {
-  <div class="container notice">
-    <a asp-action="Details" asp-controller="Notice" asp-route-id="@(Model.Notices[0].Id)">
-      <h3 class="size18 text-center text-red">网站最新公告</h3>
-    </a>
-    @Html.Raw(Model.Notices[0].Content.Replace("img src=", $"img class='lazyload' title='{CommonHelper.SystemSettings["Title"]}' alt='{CommonHelper.SystemSettings["Title"]}' decoding='async' loading='lazy' data-src="))
+  <div class="list-container">
+    <div class="site-announcement-bar">
+      <div class="announcement-container">
+        <div class="announcement-header">
+          <span class="announcement-title">【公告】@Model.Notices[0].Title</span>
+          <span class="announcement-time">@Model.Notices[0].ModifyDate.ToString("yyyy-MM-dd")</span>
+        </div>
+        <div class="announcement-content">
+          @Html.Raw(Model.Notices[0].Content.Replace("img src=", $"img class='lazyload' title='{CommonHelper.SystemSettings["Title"]}' alt='{CommonHelper.SystemSettings["Title"]}' decoding='async' loading='lazy' data-src="))
+        </div>
+      </div>
+    </div>
   </div>
 }
 @if (shares.Any()) {
-  <div class="container padding-clear">
-    <div class="panel panel-info">
-      <div class="panel-heading">⚡小撇步Tips⚡</div>
-      <div class="padding-clear panel-body">
-        <table class="margin-clear table table-bordered">
-          @for (int i = 1; i < shares.Count + 1; i += 2) {
-            if (i < shares.Count) {
-              <tr>
-                @if (string.IsNullOrEmpty(shares[i - 1].Link)) {
-                  <td style="width: 50%">▸ @shares[i - 1].Title</td>
-                } else {
-                  <td style="width: 50%">
-                    ▸
-                    <a href="@shares[i - 1].Link" target="_blank">@shares[i - 1].Title</a>
-                  </td>
-                }
-                @if (string.IsNullOrEmpty(shares[i].Link)) {
-                  <td style="width: 50%">▸ @shares[i].Title</td>
-                } else {
-                  <td style="width: 50%">
-                    ▸
-                    <a href="@shares[i].Link" target="_blank">@shares[i].Title</a>
-                  </td>
-                }
-              </tr>
+  <div class="list-container">
+    <div class="site-tips-bar">
+      <div class="site-tips-title">⚡小撇步Tips⚡</div>
+      <ul class="site-tips-list">
+        @foreach (var share in shares) {
+          <li class="site-tip-item">
+            @if (!string.IsNullOrEmpty(share.Link)) {
+              <a href="@share.Link" target="_blank">▸ @share.Title</a>
+              <a href="@share.Link" target="_blank">🔗</a>
             } else {
-              if (string.IsNullOrEmpty(shares[i - 1].Link)) {
-                <tr>
-                  <td colspan="2">▸ @shares[i - 1].Title</td>
-                </tr>
-              } else {
-                <tr>
-                  <td colspan="2">
-                    ▸
-                    <a href="@shares[i - 1].Link" target="_blank">@shares[i - 1].Title</a>
-                  </td>
-                </tr>
-              }
+              <text>▸ @share.Title</text>
             }
-          }
-        </table>
-      </div>
+          </li>
+        }
+      </ul>
     </div>
   </div>
 }

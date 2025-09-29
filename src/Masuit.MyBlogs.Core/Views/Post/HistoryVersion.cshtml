@@ -55,106 +55,107 @@
       <em>@(Model.Title.Length > 35 ? Model.Title.Substring(0, 35) + "..." : Model.Title)</em>
     </li>
   </ol>
-  <div class="article wrapper-content">
-    <div class="ibox">
-      <div class="animated fadeIn ibox-content">
-        <main>
-          <section class="article-content history">
-            <header class="page-header">
-              <div class="text-center">
-                <a>
-                  <h2 class="padding-bot10">
-                    @Model.Title
-                  </h2>
-                </a>
-              </div>
-              <div class="row">
-                <div class="col-sm-7">
-                  <div class="padding-bot10">
-                    <span class="label label-@colors[new Random().Next() % colors.Length]">@Model.Modifier</span>修改于
-                    <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model.ModifyDate.Day" asp-route-mm="@Model.ModifyDate.Month" asp-route-mode="@nameof(Model.ModifyDate)" asp-route-yyyy="@Model.ModifyDate.Year">
-                      <time class="text-success">@Model.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone), "yyyy-MM-dd")</time>
-                    </a> |
-                    原分类：
-                    <i class="icon-map-pin"></i>
-                    <a asp-action="Category" asp-controller="Home" asp-route-id="@Model.CategoryId" class="label label-@colors[new Random().Next() % colors.Length]">@Model.Category.Name</a>
-                    @if (Model.Seminar.Any()) {
-                      <span> | 原所属专题：</span>
-                      var seminars = Model.Seminar;
-                      foreach (var s in seminars) {
-                        <a asp-action="Index" asp-controller="Seminar" asp-route-id="@s.Id" class="label label-@colors[new Random().Next() % colors.Length]">@s.Title</a>
-                        <text> </text>
-                      }
-                    }
-                  </div>
-                </div>
-                @{
-                  if (!string.IsNullOrEmpty(Model.Label)) {
-                    <div class="margin-right20 pull-right">
-                      <div>
-                        @foreach (string s in Model.Label.Split(',', '，', ' ')) {
-                          if (!string.IsNullOrEmpty(s)) {
-                            <a asp-action="Tag" asp-controller="Home" asp-route-tag="@s">
-                              <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
-                            </a>
-                          }
-                        }
-                      </div>
-                    </div>
-                  }
-                }
-              </div>
-              <p class="text-center text-focus">
-                您目前正在查看该文章的历史版本，文章的历史版本可能无法为您提供最准确及时的资讯，不具备任何参考价值，
-                <a asp-action="Details" asp-controller="Post" asp-route-id="@Model.PostId">点击前往</a>该文章的最新版本。
-              </p>
-            </header>
-            <article class="article" id="article">
-              @if (!Model.Post.DisableCopy || Context.Request.IsRobot()) {
-                @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
-              } else {
-                @Html.Raw(Regex.Replace(await Model.Content.ReplaceImgAttribute(Model.Title), @"[\u4e00-\u9fa5]", m => HtmlEncoder.Default.Encode(m.Value)))
+  <div class="main-container">
+    <!-- 头部信息 -->
+    <section class="article-header">
+      <div class="article-title-row">
+        <h2 class="article-title">@Model.Title</h2>
+      </div>
+      <!-- 文章标签展示区，可放在文章信息区或内容区上方，支持多个标签 -->
+      <div class="article-meta-row">
+        <div>
+          <span class="modifier">
+            <a asp-action="Author" asp-controller="Home" asp-route-author="@Model.Modifier">@Model.Modifier</a>
+          </span>
+          <span>
+            修改于
+            <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model.ModifyDate.Day" asp-route-mm="@Model.ModifyDate.Month" asp-route-mode="@nameof(Model.ModifyDate)" asp-route-yyyy="@Model.ModifyDate.Year">
+              <time class="text-success">@Model.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone))</time>
+            </a>
+          </span>
+        </div>
+      </div>
+      <div class="article-meta-row">
+        <div class="article-tags-row">
+          <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">
+            原分类：
+            <i class="icon-map-pin"></i>
+            <span class="article-tag">
+              @{
+                await Html.RenderPartialAsync("CategoryPath", Model.Category);
               }
-              @if (!string.IsNullOrEmpty(Model.ProtectContent)) {
-                <div class="protected-content row" id="@SnowFlake.NewId">
-                  此处为加密内容，历史版本不可查看！
-                </div>
-              }
-            </article>
-            <div data-use="reward" id="cyReward" role="cylabs"></div>
-          </section>
-        </main>
-        <hr/>
-        <section class="fadeInUp row size16 wow">
-          <div class="col-xs-6">
-            前一版本：
+            </span>
+          </span>
+        </div>
+        @if (Model.Seminar.Any()) {
+          <div class="article-tags-row">
+            <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">原所属专题：</span>
             @{
-              PostHistoryVersion prev = ViewBag.Prev;
-              if (prev != null) {
-                <a asp-action="HistoryVersion" asp-controller="Post" asp-route-hid="@prev.Id" asp-route-id="@prev.PostId">@prev.Title</a>
-              } else {
-                <a>没有了</a>
+              var seminars = Model.Seminar;
+              foreach (var s in seminars) {
+                <span class="article-tag">
+                  <a asp-action="Index" asp-controller="Seminar" asp-route-id="@s.Id">@s.Title</a>
+                </span>
               }
             }
           </div>
-          <div class="col-xs-6 text-right">
-            下一版本：
-            @{
-              PostHistoryVersion next = ViewBag.Next;
-              if (next != null) {
-                <a asp-action="HistoryVersion" asp-controller="Post" asp-route-hid="@next.Id" asp-route-id="@next.PostId">@next.Title</a>
-              } else {
-                <a>没有了</a>
+        }
+        @{
+          if (!string.IsNullOrEmpty(Model.Label)) {
+            <div class="article-tags-row">
+              <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">标签：</span>
+              @foreach (string s in Model.Label.Split([',', '，'], StringSplitOptions.RemoveEmptyEntries)) {
+                <span class="article-tag">
+                  <a asp-action="Tag" asp-controller="Home" asp-route-tag="@s">
+                    @s
+                  </a>
+                </span>
               }
-            }
-          </div>
-        </section>
-        <hr class="margin-top10 marginbot10"/>
-        @if (ad != null) {
-          await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
+            </div>
+          }
         }
       </div>
-    </div>
+    </section>
+    <!-- 内容区 -->
+    <section class="article-content-card">
+      <div class="article-content">
+        <div class="old-card">
+          您目前正在查看该文章的历史版本，文章的历史版本可能无法为您提供最准确及时的资讯，不具备任何参考价值，
+          <a asp-action="Details" asp-controller="Post" asp-route-id="@Model.PostId">点击前往</a>该文章的最新版本。
+        </div>
+        @Html.Raw(Model.Content)
+      </div>
+      @{
+        await Html.RenderPartialAsync("/Views/Post/ProtectContent.cshtml", Model);
+      }
+      @if (ad != null) {
+        await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
+      }
+      <div class="article-footer-row">
+        <div class="nav-links">
+          前一版本：
+          @{
+            PostHistoryVersion prev = ViewBag.Prev;
+            if (prev != null) {
+              <a asp-action="HistoryVersion" asp-controller="Post" asp-route-hid="@prev.Id" asp-route-id="@prev.PostId" class="nav-link">@prev.Title</a>
+            } else {
+              <a>没有了</a>
+            }
+          }
+        </div>
+        <div class="nav-links">
+          下一版本：
+          @{
+            PostHistoryVersion next = ViewBag.Next;
+            if (next != null) {
+              <a asp-action="HistoryVersion" asp-controller="Post" asp-route-hid="@next.Id" asp-route-id="@next.PostId" class="nav-link">@next.Title</a>
+            } else {
+              <a>没有了</a>
+            }
+          }
+        </div>
+      </div>
+    </section>
   </div>
 </div>
 <environment names="Development">

@@ -9,15 +9,6 @@
 @{
   ViewBag.Title = Model.Title;
   Layout = "~/Views/Shared/_Layout.cshtml";
-  string[] colors = {
-    "success",
-    "info",
-    "primary",
-    "warning",
-    "danger",
-    "default",
-    "primary"
-  };
   UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo);
   AdvertisementDto ad = ViewBag.Ads;
 }
@@ -61,215 +52,211 @@
       <em>@ViewBag.Title</em>
     </li>
   </ol>
-  <div class="article wrapper-content">
-    <div class="ibox">
-      <div class="animated fadeIn ibox-content">
-        <main>
-          <section>
-            <header class="page-header">
-              <div class="text-center">
-                <a>
-                  <h2 class="padding-bot10">
-                    @Html.Raw(Model.Title)
-                  </h2>
-                </a>
-              </div>
-              <div class="row">
-                <div class="col-sm-8">
-                  <div class="padding-bot10">
-                    <span class="label label-info">
-                      <a asp-action="Author" asp-controller="Home" asp-route-author="@Model.Author">@Model.Author</a>
-                    </span>发表于
-                    <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model.PostDate.Day" asp-route-mm="@Model.PostDate.Month" asp-route-mode="@nameof(Model.PostDate)" asp-route-yyyy="@Model.PostDate.Year">
-                      <time class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</time>
-                    </a> |
-                    <span class="label label-info">
-                      <a asp-action="Author" asp-controller="Home" asp-route-author="@Model.Modifier">@Model.Modifier</a>
-                    </span>最后修改于
-                    <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model.ModifyDate.Day" asp-route-mm="@Model.ModifyDate.Month" asp-route-mode="@nameof(Model.ModifyDate)" asp-route-yyyy="@Model.ModifyDate.Year">
-                      <time class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm")</time>
-                    </a>
-                  </div>
-                </div>
-                @{
-                  if (!string.IsNullOrEmpty(Model.Label)) {
-                    <div class="margin-right20 pull-right">
-                      <div>
-                        @foreach (string s in Model.Label.Split(new[] {
-                                    ',',
-                                    '，'
-                                  }, StringSplitOptions.RemoveEmptyEntries)) {
-                          <a asp-action="Tag" asp-controller="Home" asp-route-tag="@s">
-                            <span class="label label-@colors[new Random().Next() % colors.Length]">@s</span>
-                          </a>
-                        }
-                      </div>
-                    </div>
-                  }
-                }
-              </div>
-              <div class="row">
-                <div class="col-md-12 line-height24">
-                  分类：
-                  <i class="icon-map-pin"></i>
-                  @{
-                    await Html.RenderPartialAsync("CategoryPath", Model.Category);
-                  }
-                  | 评论总数：
-                  <span class="text-danger">@ViewBag.CommentsCount</span>条 | 热度：
-                  <span class="text-danger">@Model.TotalViewCount</span>℃ |
-                  <span @@click="showViewer(true)" class="text-red">{{online}}</span>人正在浏览本文 | 状态：@Model.Status.GetDisplay()
-                  @if (Model.Seminar.Any()) {
-                    <span> | 所属专题：</span>
-                    var seminars = Model.Seminar;
-                    foreach (var s in seminars) {
-                      <a asp-action="Index" asp-controller="Seminar" asp-route-id="@s.Id" class="label label-info">@s.Title</a>
-                      <text> </text>
-                    }
-                  }
-                </div>
-                @if (Model.LimitMode > 0) {
-                  <div class="col-md-6 col-sm-12 margin-top10 text-red">
-                    本文 @Model.LimitMode.GetDescription(Model.Regions, Model.ExceptRegions)
-                  </div>
-                }
-                <div class="col-md-6 col-sm-12 pull-right">
-                  <div class="btn-group pull-right">
-                    <a asp-action="Refresh" asp-controller="Post" asp-route-id="@Model.Id" class="btn btn-info">刷新</a>
-                    @if (Model.IsFixedTop) {
-                      <button @@click="fixtop" class="btn btn-success">取消置顶</button>
-                    } else {
-                      <button @@click="fixtop" class="btn btn-success">置顶</button>
-                    }
-                    @if (Model.Status == Status.Pending) {
-                      <button @@click="postPass" class="btn btn-primary">通过</button>
-                    }
-                    <a class="btn btn-primary" href="/dashboard/posts/write?id=@Model.Id" target="_blank">修改</a>
-                    <a class="btn btn-info" href="/dashboard/posts/write?refer=@Model.Id" target="_blank">复制</a>
-                    <button @@click="takedown" class="btn btn-danger">下架</button>
-                    <a asp-action="PostVisitRecordInsight" asp-controller="Post" asp-route-id="@Model.Id" class="btn btn-primary" target="_blank">洞察</a>
-                  </div>
-                </div>
-              </div>
-            </header>
-            <article class="article" id="article">
-              @if (DateTime.Now - Model.ModifyDate > TimeSpan.FromDays(365)) {
-                <p class="text-center text-focus">该文章已经超过1年未更新，可能无法为您提供及时准确的资讯，请根据当下实际情况，酌情参考本文内容。</p>
+  <div class="main-container">
+    <!-- 头部信息 -->
+    <section class="article-header">
+      <div class="article-title-row">
+        <h2 class="article-title">@Html.Raw(Model.Title)</h2>
+        <span class="article-status">@Model.Status.GetDisplay()</span>
+      </div>
+      <!-- 文章标签展示区，可放在文章信息区或内容区上方，支持多个标签 -->
+      <div class="article-meta-row">
+        <div>
+          <span class="author">
+            <a asp-action="Author" asp-controller="Home" asp-route-author="@Model.Author">@Model.Author</a>
+          </span>
+          <span>
+            发布于
+            <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model.PostDate.Day" asp-route-mm="@Model.PostDate.Month" asp-route-mode="@nameof(Model.PostDate)" asp-route-yyyy="@Model.PostDate.Year">
+              <time class="text-info">@Model.PostDate.ToString("yyyy-MM-dd HH:mm:ss")</time>
+            </a>
+          </span>
+        </div>
+        <div>
+          <span class="modifier">
+            <a asp-action="Author" asp-controller="Home" asp-route-author="@Model.Modifier">@Model.Modifier</a>
+          </span>
+          <span>
+            修改于
+            <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model.ModifyDate.Day" asp-route-mm="@Model.ModifyDate.Month" asp-route-mode="@nameof(Model.ModifyDate)" asp-route-yyyy="@Model.ModifyDate.Year">
+              <time class="text-success">@Model.ModifyDate.ToString("yyyy-MM-dd HH:mm")</time>
+            </a>
+          </span>
+        </div>
+        <span>评论数：@ViewBag.CommentsCount</span>
+        <span>访问量：@Model.TotalViewCount</span>
+        <span>
+          正在浏览：
+          <span @@click="showViewer(true)" class="text-red">{{online}}人</span>
+        </span>
+      </div>
+      <div class="article-meta-row">
+        <div class="article-tags-row">
+          <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">
+            分类：
+            <i class="icon-map-pin"></i>
+            <span class="article-tag">
+              @{
+                await Html.RenderPartialAsync("CategoryPath", Model.Category);
               }
-              @Html.Raw(Model.Content)
-              @Html.Raw(Model.ProtectContent)
-            </article>
-          </section>
-        </main>
-        <hr class="margin-top10 marginbot10"/>
-        @if (ad != null) {
-          await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
-        }
-        <section class="fadeIn padding-bot20 padding-top40 row wow">
-          <div class="col-xs-6">
-            <div class="btn-group">
-              <button :disabled="disableVoteUp" @@click="voteUp" class="btn btn-lg btn-success" type="button">
-                <i class="icon-thumbsup"></i>
-                <span>{{voteUpCount}}</span>
-              </button>
-              <button :disabled="disableVoteDown" @@click="voteDown" class="btn btn-danger btn-lg" type="button">
-                <i class="icon-thumbsdown"></i>
-                <span>{{voteDownCount}}</span>
-              </button>
-            </div>
+            </span>
+          </span>
+        </div>
+        @if (Model.Seminar.Any()) {
+          <div class="article-tags-row">
+            <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">所属专题：</span>
+            @{
+              var seminars = Model.Seminar;
+              foreach (var s in seminars) {
+                <span class="article-tag">
+                  <a asp-action="Index" asp-controller="Seminar" asp-route-id="@s.Id">@s.Title</a>
+                </span>
+              }
+            }
           </div>
-        </section>
-        <section class="animated fadeIn row size16 wow">
-          @{
-            PostModelBase prev = ViewBag.Prev;
-            if (prev != null) {
-              <div class="col-xs-6">
-                上一篇：
-                <a asp-action="Details" asp-controller="Post" asp-route-id="@prev.Id">@prev.Title</a>
-              </div>
-            }
-
-            PostModelBase next = ViewBag.Next;
-            if (next != null) {
-              <div class="col-xs-6 text-right">
-                下一篇：
-                <a asp-action="Details" asp-controller="Post" asp-route-id="@next.Id">@next.Title</a>
-              </div>
-            }
-          }
-        </section>
-        @if (ViewBag.HistoryCount > 0) {
-          <section class="animated fadeIn margintop20 wow">
-            <h2>文章历史版本：</h2>
-            <p>
-              修改次数：@ViewBag.HistoryCount 次
-              <a asp-action="History" asp-controller="Post" asp-route-id="@Model.Id">查看历史版本</a>
-            </p>
-          </section>
         }
         @{
-          var posts = (IDictionary<int, string>) ViewBag.Related;
-          if (posts.Count > 1) {
-            <section class="animated fadeIn margintop20 wow">
-              <h2>相关推荐：</h2>
-              <table class="size16 table table-condensed">
-                @for (int i = 1; i < posts.Count; i += 2) {
-                  <tr>
-                    <td style="width: 50%">
-                      <a asp-action="Details" asp-controller="Post" asp-route-id="@posts.ElementAt(i - 1).Key">@posts.ElementAt(i - 1).Value</a>
-                    </td>
-                    <td>
-                      <a asp-action="Details" asp-controller="Post" asp-route-id="@posts.ElementAt(i).Key">@posts.ElementAt(i).Value</a>
-                    </td>
-                  </tr>
-                }
-              </table>
-            </section>
+          if (!string.IsNullOrEmpty(Model.Label)) {
+            <div class="article-tags-row">
+              <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">标签：</span>
+              @foreach (string s in Model.Label.Split([',', '，'], StringSplitOptions.RemoveEmptyEntries)) {
+                <span class="article-tag">
+                  <a asp-action="Tag" asp-controller="Home" asp-route-tag="@s">
+                    @s
+                  </a>
+                </span>
+              }
+            </div>
           }
         }
-        <section class="animated fadeIn padding-bot20 wow">
-          <h2>版权声明：</h2>
-          <p class="size16 text-red">
-            @if (Model.DisableCopy) {
-              <text>🈲⚠本文为作者原创，仅用于本站访客学习、研究和交流目的，未经授权禁止转载。️⚠🈲</text>
-            } else {
-              <text>本文仅用于学习、研究和交流目的，欢迎非商业性质转载。本文链接：
-                <a asp-action="Details" asp-controller="Post" asp-route-id="@Model.Id">@HttpUtility.UrlDecode(Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path)</a>。</text>
-              @Html.Raw(CommonHelper.SystemSettings["Disclaimer"])
-            }
-          </p>
-        </section>
-        <section class="animated fadeIn row wow">
-          <div class="col-lg-12">
-            <h2 id="comment">评论区：</h2>
-            <div class="animated form-horizontal pulse">
-              @Html.AntiForgeryToken()
-              <div class="animated fadeInDown overlay" style="margin-bottom: 0px !important;">
-                <div class="ueditor" id="editor"></div>
-              </div>
-              <div class="form-group">
-                <div class="col-xs-12">
-                  <button :disabled="!msg.Content" @@click="submit(msg)" class="btn btn-info btn-lg">提交</button>
-                  <a class="text-red">评论框可粘贴网络图片</a>
-                </div>
-              </div>
-            </div>
-            @if (ViewBag.CommentsCount > 0) {
-              <parent-messages :data="list" :is-admin="true" @@getmsgs="getcomments" @@reply-msg="replyMsg"></parent-messages>
-              <div class="row">
-                <div class="col-md-12 text-center">
-                  <n-pagination :page-count="Math.ceil(pageConfig.total / pageConfig.size)" :page-sizes="[10, 20, 30, 50]" show-size-picker v-model:page="pageConfig.page" v-model:page-size="pageConfig.size"/>
-                </div>
-              </div>
-            } else {
-              <h4>还没有评论哦，赶紧来写评论吧</h4>
-            }
-          </div>
-        </section>
       </div>
-    </div>
+      <div class="article-meta-row">
+        <span class="limit-tip">访问限制： @Model.LimitMode.GetDescription(Model.Regions, Model.ExceptRegions)</span>
+        <div class="article-ops-row">
+          <a asp-action="Refresh" asp-controller="Post" asp-route-id="@Model.Id">
+            <button class="article-op-btn">刷新</button>
+          </a>
+          @if (Model.IsFixedTop) {
+            <button @@click="fixtop" class="article-op-btn">取消置顶</button>
+          } else {
+            <button @@click="fixtop" class="article-op-btn">置顶</button>
+          }
+          @if (Model.Status == Status.Pending) {
+            <button @@click="postPass" class="article-op-btn">通过</button>
+          }
+          <a href="/dashboard/posts/write?id=@Model.Id" target="_blank">
+            <button class="article-op-btn">修改</button>
+          </a>
+          <a href="/dashboard/posts/write?refer=@Model.Id" target="_blank">
+            <button class="article-op-btn">复制</button>
+          </a>
+          <button @@click="takedown" class="article-op-btn">下架</button>
+          <a asp-action="PostVisitRecordInsight" asp-controller="Post" asp-route-id="@Model.Id" class="article-op-btn" target="_blank">洞察</a>
+        </div>
+      </div>
+    </section>
+    <!-- 内容区 -->
+    <section class="article-content-card">
+      <div class="article-content">
+        @if (DateTime.Now - Model.ModifyDate > TimeSpan.FromDays(365)) {
+          <div class="old-card">
+            该文章已经超过1年未更新，可能无法为您提供及时准确的资讯，请根据当下实际情况，酌情参考本文内容。
+          </div>
+        }
+        @Html.Raw(Model.Content)
+        @Html.Raw(Model.ProtectContent)
+      </div>
+      @if (ad != null) {
+        await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
+      }
+      <!-- 文章内容区 点赞+点踩按钮、历史版本次数显示示例 -->
+      <div class="article-footer-row">
+        <div class="like-btn-group">
+          <button :disabled="disableVoteUp" @@click="voteUp" class="like-btn"> 👍赞 </button>
+          <span class="like-count">{{voteUpCount}}</span>
+          <button :disabled="disableVoteDown" @@click="voteDown" class="dislike-btn"> 👎踩 </button>
+          <span class="dislike-count">{{voteDownCount}}</span>
+        </div>
+        @if (Model.Rss) {
+          <a asp-action="PostRss" asp-controller="Subscribe" asp-route-id="@Model.Id" target="_blank">
+            <button class="subscribe-btn" type="button">
+              &#128233; 订阅本文章更新
+            </button>
+          </a>
+        }
+        @if (ViewBag.HistoryCount > 0) {
+          <a asp-action="History" asp-controller="Post" asp-route-id="@Model.Id" class="history-link">
+            文章历史版本
+            <span style="background:#eaf6ff;color:#1566b6;border-radius:6px;padding:2px 10px;font-size:.98rem;margin-left:4px;">修改 @ViewBag.HistoryCount 次</span>
+          </a>
+        }
+      </div>
+      <div class="nav-links">
+        @{
+          PostModelBase prev = ViewBag.Prev;
+          if (prev != null) {
+            <a asp-action="Details" asp-controller="Post" asp-route-id="@prev.Id" class="nav-link">上一篇：@prev.Title</a>
+          }
+
+          PostModelBase next = ViewBag.Next;
+          if (next != null) {
+            <a asp-action="Details" asp-controller="Post" asp-route-id="@next.Id" class="nav-link">下一篇：@next.Title</a>
+          }
+        }
+      </div>
+      @{
+        var posts = (IDictionary<int, string>) ViewBag.Related;
+        if (posts.Count > 1) {
+          <div class="recommend-card">
+            <h2 class="recommend-title" id="recommend">相关推荐</h2>
+            <ul class="recommend-list">
+              @foreach (var item in posts) {
+                <li class="recommend-item">
+                  <a asp-action="Details" asp-controller="Post" asp-route-id="@item.Key">@item.Value</a>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      }
+      <div class="copyright-card">
+        <h2 class="recommend-title" id="copyright">版权声明</h2>
+        @if (Model.DisableCopy) {
+          <text>🈲⚠本文为作者原创，仅用于本站访客学习、研究和交流目的，未经授权禁止转载。️⚠🈲</text>
+        } else {
+          <text>
+            本文仅用于学习、研究和交流目的，欢迎非商业性质转载。本文链接：
+            <a asp-action="Details" asp-controller="Post" asp-route-id="@Model.Id">@HttpUtility.UrlDecode(Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path)</a>。
+          </text>
+          @Html.Raw(CommonHelper.SystemSettings["Disclaimer"])
+        }
+      </div>
+    </section>
+    <section class="comment-section">
+      <div class="comment-form">
+        <h2 class="comment-list-title" id="comment">评论区</h2>
+        @Html.AntiForgeryToken()
+        <div class="comment-form-row" style="width:100%;margin-top:12px;">
+          <div class="ueditor" id="editor"></div>
+        </div>
+        <div class="comment-form-row" style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:18px;">
+          <button :disabled="!msg.Content" @@click="submit(msg)" class="comment-form-btn">提交评论</button>
+        </div>
+      </div>
+      <!-- 评论列表：将评论人IP/地理信息和邮箱放在点赞和回复按钮的下方，一行显示 -->
+      @if (ViewBag.CommentsCount > 0) {
+        <parent-messages :data="list" :is-admin="true" @@getmsgs="getcomments" @@reply-msg="replyMsg"></parent-messages>
+        <div class="row">
+          <div class="col-md-12 text-center">
+            <n-pagination :page-count="Math.ceil(pageConfig.total / pageConfig.size)" :page-sizes="[10, 20, 30, 50]" show-size-picker v-model:page="pageConfig.page" v-model:page-size="pageConfig.size"/>
+          </div>
+        </div>
+      } else {
+        <h4>还没有评论哦，赶紧来写评论吧</h4>
+      }
+    </section>
   </div>
-  <n-modal :mask-closable="false" :style="{ width: '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复评论" preset="dialog" v-model:show="showPopup">
+  <n-modal :mask-closable="false" :style="{ 'min-width': '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复评论" preset="dialog" style="min-width:400px" v-model:show="showPopup">
     @Html.AntiForgeryToken()
     <div class="ueditor" id="editor2"></div>
   </n-modal>

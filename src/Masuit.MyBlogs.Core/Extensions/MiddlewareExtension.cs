@@ -80,9 +80,6 @@ public static class MiddlewareExtension
                 .Include("/fonts/icomoon.css")
                 .Include("/Content/common/reset.css")
                 .Include("/Content/common/style.css")
-                .Include("/Content/common/articlestyle.css")
-                .Include("/Content/common/leaderboard.css")
-                .Include("/Assets/breadcrumb/style.css")
                 .Include("/Assets/nav/css/style.css");
             bundles.AddCss("/filemanager.css")
                 .Include("/Content/bootswatch.min.css")
@@ -92,8 +89,7 @@ public static class MiddlewareExtension
                 .Include("/ng-views/filemanager/css/main.css");
             bundles.AddCss("/article.css")
                 .Include("/Assets/auto-toc/auto-toc.css")
-                .Include("/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css")
-                .Include("/Assets/highlight/css/highlight.css");
+                .Include("/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css");
 
             bundles.AddJs("/main.js")
                 .Include("/Scripts/ripplet.js")

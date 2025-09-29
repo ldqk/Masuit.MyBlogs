@@ -6,74 +6,31 @@
 @using Masuit.Tools.Core.AspNetCore
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 @inject IPostService PostService
+<div class="animated article-list fadeIn">
+  @if (Model.Posts.Data.Any()) {
+    var rnd = new Random().Next(Model.Posts.CurrentCount > 2 ? 2 : 0, Model.Posts.CurrentCount);
+    for (var index = 0; index < Model.Posts.CurrentCount; index++) {
+      if (rnd == index && Model.ListAdvertisement != null) {
+        await Html.RenderPartialAsync("_ArticleListAdvertisement", Model.ListAdvertisement);
+      }
 
-<div class="col-md-9 padding-clear">
-    <div class="animated fadeIn blog">
-        @if (Model.Posts.Data.Any())
-        {
-            var rnd = new Random().Next(Model.Posts.CurrentCount > 2 ? 2 : 0, Model.Posts.CurrentCount);
-            for (var index = 0; index < Model.Posts.CurrentCount; index++)
-            {
-                if (rnd == index && Model.ListAdvertisement != null)
-                {
-                    await Html.RenderPartialAsync("_ArticleListAdvertisement", Model.ListAdvertisement);
-                }
-
-                var post = Model.Posts.Data[index];
-                await Html.RenderPartialAsync("_ArticleListItem_Admin", post);
-            }
-        }
-        else
-        {
-            var list = Model.PostsQueryable.OrderByRandom().Take(5).ToList();
-            if (list.Any())
-            {
-                <div class="page-header">
-                    <h3>Oops！抱歉~没有找到相关的文章或资源！如果您有相关的结果，您可以 <a asp-controller="Post" asp-action="Publish" class="btn btn-info btn-lg">点击这里</a> 投稿哦！以下是一些随机推荐：</h3>
-                </div>
-                PostService.SolvePostsCategory(list);
-                foreach (PostDto post in list)
-                {
-                    await Html.RenderPartialAsync("_ArticleListItem_Admin", post);
-                }
-            }
-        }
-        <div class="row">
-            <div class="col-sm-9 col-xs-12">
-                @{ await Html.RenderPartialAsync("_Pagination", Model.PageParams); }
-            </div>
-            <div class="col-sm-3 col-xs-12 text-right">
-                <div class="btn-group dropup">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @(Model.PageParams.OrderBy?.GetDescription()??"排序方式")
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="">最后修改日期</a>
-                        </li>
-                        <li>
-                            <a href="@($"{Context.Request.Path}?orderby={OrderBy.PostDate}".TrimQuery())">最后发表日期</a>
-                        </li>
-                        <li>
-                            <a href="@($"{Context.Request.Path}?orderby={OrderBy.Trending}".TrimQuery())">今日热榜</a>
-                        </li>
-                        <li role="separator" class="divider"></li>
-                        <li>
-                            <a href="@($"{Context.Request.Path}?orderby={OrderBy.CommentCount}".TrimQuery())">评论最多</a>
-                        </li>
-                        <li>
-                            <a href="@($"{Context.Request.Path}?orderby={OrderBy.TotalViewCount}".TrimQuery())">访问量最多</a>
-                        </li>
-                        <li>
-                            <a href="@($"{Context.Request.Path}?orderby={OrderBy.VoteUpCount}".TrimQuery())">支持最多</a>
-                        </li>
-                        <li>
-                            <a href="@($"{Context.Request.Path}?orderby={OrderBy.AverageViewCount}".TrimQuery())">最热门</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+      var post = Model.Posts.Data[index];
+      await Html.RenderPartialAsync("_ArticleListItem_Admin", post);
+    }
+  } else {
+    var list = Model.PostsQueryable.OrderByRandom().Take(5).ToList();
+    if (list.Any()) {
+      <div class="page-header">
+        <h3>
+          Oops！抱歉~没有找到相关的文章或资源！如果您有相关的结果，您可以
+          <a asp-action="Publish" asp-controller="Post" class="btn btn-info btn-lg">点击这里</a> 投稿哦！以下是一些随机推荐：
+        </h3>
+      </div>
+      PostService.SolvePostsCategory(list);
+      foreach (PostDto post in list) {
+        await Html.RenderPartialAsync("_ArticleListItem_Admin", post);
+      }
+    }
+  }
+  @{ await Html.RenderPartialAsync("_Pagination", Model.PageParams); }
 </div>

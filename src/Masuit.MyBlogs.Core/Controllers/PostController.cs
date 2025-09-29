@@ -354,7 +354,7 @@ public sealed class PostController : BaseController
     /// <param name="token"></param>
     /// <returns></returns>
     [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, DistributedLockFilter]
-    public ActionResult CheckViewToken(string email, string token)
+    public ActionResult CheckViewToken([FromBodyOrDefault] string email, [FromBodyOrDefault] string token)
     {
         if (string.IsNullOrEmpty(token))
         {

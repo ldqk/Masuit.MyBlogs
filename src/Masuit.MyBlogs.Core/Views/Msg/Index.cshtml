@@ -4,7 +4,7 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
   string hidden = string.IsNullOrEmpty(Context.Request.Cookies["ValidateKey"]) ? "" : "hidden";
 }
-<div class="container min-height610" id="msgApp">
+<div class="main-container min-height610" id="msgApp">
   <ol class="breadcrumb">
     <li>
       <a asp-action="Index" asp-controller="Home">首页</a>
@@ -13,59 +13,37 @@
       <em>@ViewBag.Title</em>
     </li>
   </ol>
-  <h3 class="size24">
-    留言须知：
-  </h3>
-  @Html.Raw(Model)
+  <div class="copyright-card">
+    <h2 class="recommend-title" id="copyright">留言须知：</h2>
+    @Html.Raw(Model)
+  </div>
   <p>　</p>
-  <div class="animated form-horizontal pulse">
+  <div class="comment-form">
     @Html.AntiForgeryToken()
     @if (hidden == nameof(hidden)) {
       <p>@Context.Request.Cookies["NickName"] 您好！</p>
+    } else {
+      <div class="comment-form-row @hidden" style="display:flex;gap:12px;flex-wrap:wrap;">
+        <input name="nickname" placeholder="用户昵称" required style="flex:1 1 140px;min-width:120px;" type="text" v-model="msg.NickName">
+        <div style="position:relative;flex:1 1 240px;min-width:180px;display:flex;">
+          <input name="email" placeholder="用户邮箱" required style="flex:1 1 auto;min-width:120px;padding-right:110px;" type="email" v-model="msg.Email">
+          <button :disabled="disableGetcode" @@click="getcode(msg.Email)" class="comment-form-btn" id="getEmailCodeBtn" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);min-width:96px;height:36px;padding:0 8px;font-size:.97rem;z-index:2;" type="button"> {{codeMsg}} </button>
+        </div>
+        <input name="emailcode" placeholder="验证码" required style="flex:1 1 110px;min-width:80px;" type="text" v-model="msg.Code">
+      </div>
     }
-    <div class="row @hidden">
-      <div class="col-md-4">
-        <div class="input-group">
-          <span class="input-group-addon">
-            <label for="name">昵称：</label>
-          </span>
-          <input class="form-control" placeholder="昵称" required type="text" v-model="msg.NickName">
-        </div>
-      </div>
-      <div class="col-md-5">
-        <div class="input-group">
-          <span class="input-group-addon">
-            <label for="email">邮箱：</label>
-          </span>
-          <input class="form-control" id="email" placeholder="留下您的真实邮箱，以方便接收回复" required type="email" v-model="msg.Email">
-          <span class="input-group-btn">
-            <button :disabled="disableGetcode" @@click="getcode(msg.Email)" class="btn btn-danger" type="button">
-              {{codeMsg}}
-            </button>
-          </span>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="input-group">
-          <span class="input-group-addon">验证码：</span>
-          <input class="form-control" placeholder="验证码" type="text" v-model="msg.Code">
-        </div>
-      </div>
-    </div>
-    <div class="animated fadeInDown overlay" style="margin-bottom: 0px !important;">
+    <!-- 第二行：评论内容框独占一行 -->
+    <div class="comment-form-row" style="width:100%;margin-top:12px;">
       <div class="ueditor" id="editor"></div>
     </div>
-    <label>
-      <input required type="checkbox" v-model="msg.Agree" value="true"/>我已阅读
-      <a asp-action="agreement" asp-controller="Misc" target="_blank">《留言须知》</a>
-    </label>
-    <div class="form-group">
-      <div class="col-xs-12">
-        <button :disabled="!msg.Content" @@click="submit(msg)" class="btn btn-info btn-lg">
-          发表留言
-        </button>
-        <a class="text-red">留言框可粘贴网络图片</a>
-      </div>
+    <!-- 第三行：协议勾选和提交按钮同一行，右侧提交按钮 -->
+    <div class="comment-form-row" style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:18px;">
+      <label style="display:flex;align-items:center;font-size:.98rem;color:#1566b6;gap:6px;">
+        <input name="agreement" required style="width:18px;height:18px;margin-right:4px;" type="checkbox" v-model="msg.Agree" value="true">
+        我已阅读并同意
+        <a asp-action="agreement" asp-controller="Misc" style="color:#1e90ff;text-decoration:underline;" target="_blank">《留言须知》</a>
+      </label>
+      <button @@click="submit(msg)" class="comment-form-btn">发表留言</button>
     </div>
   </div>
   <parent-messages :data="list" :is-admin="false" @@getmsgs="getmsgs" @@reply-msg="replyMsg"></parent-messages>
@@ -74,48 +52,33 @@
       <n-pagination :page-count="Math.ceil(pageConfig.total / pageConfig.size)" :page-sizes="[10, 20, 30, 50]" show-size-picker v-model:page="pageConfig.page" v-model:page-size="pageConfig.size"/>
     </div>
   </div>
-  <n-modal :mask-closable="false" :style="{ width: '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复留言" preset="dialog" v-model:show="showPopup">
-    <form class="form-horizontal" id="reply-form" method="post">
+  <n-modal :mask-closable="false" :style="{ width: '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复留言" preset="dialog" style="min-width:400px" v-model:show="showPopup">
+    <form class="comment-form">
       @Html.AntiForgeryToken()
       @if (hidden == nameof(hidden)) {
         <p>@Context.Request.Cookies["NickName"] 您好！</p>
+      } else {
+        <div class="comment-form-row @hidden" style="display:flex;gap:12px;flex-wrap:wrap;">
+          <input name="nickname" placeholder="用户昵称" required style="flex:1 1 140px;min-width:120px;" type="text" v-model="reply.NickName">
+          <div style="position:relative;flex:1 1 240px;min-width:180px;display:flex;">
+            <input name="email" placeholder="用户邮箱" required style="flex:1 1 auto;min-width:120px;padding-right:110px;" type="email" v-model="reply.Email">
+            <button :disabled="disableGetcode" @@click="getcode(reply.Email)" class="comment-form-btn" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);min-width:96px;height:36px;padding:0 8px;font-size:.97rem;z-index:2;" type="button"> {{codeMsg}} </button>
+          </div>
+          <input name="emailcode" placeholder="验证码" required style="flex:1 1 110px;min-width:80px;" type="text" v-model="reply.Code">
+        </div>
       }
-      <div class="row @hidden">
-        <div class="col-md-4">
-          <div class="input-group">
-            <span class="input-group-addon">
-              <label for="name">昵称：</label>
-            </span>
-            <input class="form-control" placeholder="昵称" required type="text" v-model="reply.NickName">
-          </div>
-        </div>
-        <div class="col-md-5">
-          <div class="input-group">
-            <span class="input-group-addon">
-              <label for="email">邮箱：</label>
-            </span>
-            <input class="form-control" placeholder="留下您的真实邮箱，以方便接收回复" required type="email" v-model="reply.Email">
-            <span class="input-group-btn">
-              <button :disabled="disableGetcode" @@click="getcode(reply.Email)" class="btn btn-danger" type="button">
-                {{codeMsg}}
-              </button>
-            </span>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="input-group">
-            <span class="input-group-addon">验证码：</span>
-            <input class="form-control" placeholder="验证码" type="text" v-model="reply.Code">
-          </div>
-        </div>
-      </div>
-      <div class="overlay">
+      <!-- 第二行：评论内容框独占一行 -->
+      <div class="comment-form-row" style="width:100%;margin-top:12px;">
         <div class="ueditor" id="editor2"></div>
       </div>
-      <label>
-        <input required type="checkbox" v-model="reply.Agree" value="true"/>我已阅读
-        <a asp-action="agreement" asp-controller="Misc" target="_blank">《留言须知》</a>
-      </label>
+      <!-- 第三行：协议勾选和提交按钮同一行，右侧提交按钮 -->
+      <div class="comment-form-row" style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:18px;">
+        <label style="display:flex;align-items:center;font-size:.98rem;color:#1566b6;gap:6px;">
+          <input name="agreement" required style="width:18px;height:18px;margin-right:4px;" type="checkbox" v-model="reply.Agree" value="true">
+          我已阅读并同意
+          <a asp-action="agreement" asp-controller="Misc" style="color:#1e90ff;text-decoration:underline;" target="_blank">《留言须知》</a>
+        </label>
+      </div>
     </form>
   </n-modal>
 </div>

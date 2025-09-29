@@ -5,7 +5,7 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <link href="~/Content/common/btnstyle.css" rel="stylesheet"/>
-<div class="container min-height610" id="linksApp">
+<div class="main-container min-height610" id="linksApp">
   <ol class="breadcrumb">
     <li>
       <a asp-action="Index" asp-controller="Home">首页</a>
@@ -17,9 +17,9 @@
   <header class="page-header text-center">
     <h2 class="size48">友情链接</h2>
   </header>
-  <article class="line-height28 size16">
+  <div class="copyright-card">
     @Html.Raw(ViewBag.Html)
-  </article>
+  </div>
   <section>
     <div class="button-effect">
       @foreach (var link in Model) {

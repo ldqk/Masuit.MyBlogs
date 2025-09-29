@@ -30,20 +30,18 @@
 		border-top: 3px solid rebeccapurple;
 	}
 </style>
-<div class="container">
-  <div class="row">
-    <ol class="breadcrumb">
-      <li>
-        <a asp-action="Index" asp-controller="Home">首页</a>
-      </li>
-      <li>
-        <a asp-action="Post" asp-controller="Home">文章列表</a>
-      </li>
-      <li class="current">
-        <em>@ViewBag.Title</em>
-      </li>
-    </ol>
-  </div>
+<div class="main-container">
+  <ol class="breadcrumb">
+    <li>
+      <a asp-action="Index" asp-controller="Home">首页</a>
+    </li>
+    <li>
+      <a asp-action="Post" asp-controller="Home">文章列表</a>
+    </li>
+    <li class="current">
+      <em>@ViewBag.Title</em>
+    </li>
+  </ol>
 </div>
 <div class="bg-title">
   <div class="header-content text-center">

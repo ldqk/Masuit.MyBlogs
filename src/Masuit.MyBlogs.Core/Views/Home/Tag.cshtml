@@ -6,20 +6,18 @@
   ViewBag.Title = "标签_" + ViewBag.Tag;
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="container">
-  <div class="row">
-    <ol class="breadcrumb">
-      <li>
-        <a asp-action="Index" asp-controller="Home">首页</a>
-      </li>
-      <li>
-        <a asp-action="Post" asp-controller="Home">文章列表</a>
-      </li>
-      <li class="current">
-        <em>@ViewBag.Title</em>
-      </li>
-    </ol>
-  </div>
+<div class="main-container">
+  <ol class="breadcrumb">
+    <li>
+      <a asp-action="Index" asp-controller="Home">首页</a>
+    </li>
+    <li>
+      <a asp-action="Post" asp-controller="Home">文章列表</a>
+    </li>
+    <li class="current">
+      <em>@ViewBag.Title</em>
+    </li>
+  </ol>
 </div>
 @{
   UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();

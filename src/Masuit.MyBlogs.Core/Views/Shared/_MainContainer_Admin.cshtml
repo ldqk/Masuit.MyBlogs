@@ -1,9 +1,7 @@
 ﻿@model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
-<div class="container">
-    <div class="row" id="list">
-        @{
-            await Html.RenderPartialAsync("_ArticleListPartial_Admin", Model);
-            await Html.RenderPartialAsync("_Aside", Model);
-        }
-    </div>
+<div class="list-container">
+  @{
+    await Html.RenderPartialAsync("_ArticleListPartial_Admin", Model);
+    await Html.RenderPartialAsync("_Aside", Model);
+  }
 </div>

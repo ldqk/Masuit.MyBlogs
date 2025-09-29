@@ -1015,6 +1015,7 @@ const removeAdvertisement = async (ad: Advertisement) => {
     if (response?.Success !== false) {
       toast.success(response?.Message || '删除成功', { autoClose: 2000, position: 'top-center' })
       loadPageData()
+      showDetailDialogFlag.value = false
     } else {
       toast.error(response?.Message || '删除失败', { autoClose: 2000, position: 'top-center' })
     }

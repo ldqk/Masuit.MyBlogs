@@ -57,9 +57,6 @@
     <link href="~/fonts/icomoon.css" rel="stylesheet"/>
     <link href="~/Content/common/reset.css" rel="stylesheet"/>
     <link href="~/Content/common/style.css" rel="stylesheet"/>
-    <link href="~/Content/common/articlestyle.css" rel="stylesheet"/>
-    <link href="~/Content/common/leaderboard.css" rel="stylesheet"/>
-    <link href="~/Assets/breadcrumb/style.css" rel="stylesheet"/>
     <link href="~/Assets/nav/css/style.css" rel="stylesheet"/>
   </environment>
   <environment names="Stage,Production">
@@ -294,10 +291,10 @@
   <main class="cd-main-content">
     @RenderBody()
     <div class="cd-overlay"></div>
-    <footer class="fadeIn footer wow">
-      <div class="container">
-        <section>
-          友情链接：
+    <footer class="site-footer">
+      <div class="footer-container">
+        <div class="footer-links">
+          <span class="footer-label">友情链接：</span>
           @{
             if (user.IsAdmin) {
               <a asp-action="FileManager" asp-controller="Dashboard" target="_blank">资源管理器</a>
@@ -312,11 +309,11 @@
             }
           }
           <a asp-action="Index" asp-controller="Links">更多链接>></a>
-        </section>
-        <section class="copy">
+        </div>
+        <div class="footer-copyright">
           @Html.Raw(CommonHelper.SystemSettings["Copyright"])
           @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Scripts", ""))
-        </section>
+        </div>
       </div>
       @(await Html.RenderComponentAsync<Ping>(RenderMode.ServerPrerendered, new {
         IP = Context.Connection.RemoteIpAddress.ToString()

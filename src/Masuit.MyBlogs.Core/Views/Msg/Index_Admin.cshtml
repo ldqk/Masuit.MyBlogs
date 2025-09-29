@@ -6,7 +6,7 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
   UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 }
-<div class="container min-height610" id="msgApp">
+<div class="main-container min-height610" id="msgApp">
   <ol class="breadcrumb">
     <li>
       <a asp-action="Index" asp-controller="Home">首页</a>
@@ -15,18 +15,14 @@
       <em>@ViewBag.Title</em>
     </li>
   </ol>
-  <div class="animated form-horizontal">
+  <div class="comment-form">
     @Html.AntiForgeryToken()
-    <div class="animated overlay">
+    <div class="comment-form-row" style="width:100%;margin-top:12px;">
       <div class="ueditor" id="editor"></div>
     </div>
-    <div class="form-group">
-      <div class="col-xs-12">
-        <button :disabled="!msg.Content" @@click="submit(msg)" class="btn btn-info btn-lg">
-          发表留言
-        </button>
-        <a class="text-red">留言框可粘贴网络图片</a>
-      </div>
+    <!-- 第三行：协议勾选和提交按钮同一行，右侧提交按钮 -->
+    <div class="comment-form-row" style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;gap:18px;">
+      <button @@click="submit(msg)" class="comment-form-btn">发表留言</button>
     </div>
   </div>
   <parent-messages :data="list" :is-admin="true" @@getmsgs="getmsgs" @@reply-msg="replyMsg"></parent-messages>
@@ -35,7 +31,7 @@
       <n-pagination :page-count="Math.ceil(pageConfig.total / pageConfig.size)" :page-sizes="[10, 20, 30, 50]" show-size-picker v-model:page="pageConfig.page" v-model:page-size="pageConfig.size"/>
     </div>
   </div>
-  <n-modal :mask-closable="false" :style="{ width: '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复留言" preset="dialog" v-model:show="showPopup">
+  <n-modal :mask-closable="false" :style="{ width: '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复留言" preset="dialog" style="min-width:400px" v-model:show="showPopup">
     @Html.AntiForgeryToken()
     <div class="ueditor" id="editor2"></div>
   </n-modal>

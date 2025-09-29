@@ -6,95 +6,75 @@
 @using Masuit.Tools.Systems
 @using System.Text.RegularExpressions
 @model Masuit.MyBlogs.Core.Models.Entity.Post
-
-@if (!string.IsNullOrEmpty(Model.ProtectContent)&&Model.ProtectContentMode==ProtectContentMode.AuthorizeVisiable)
-{
-    <div class="row protected-content" id="@SnowFlake.NewId">
-        @if (!string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")) || Context.Request.Cookies["Email"].MDString3(AppConfig.ConnString).Equals(Context.Request.Cookies["PostAccessToken"]))
-        {
-            <p class="text-red text-center size20">↓↓↓以下是文章加密部分↓↓↓</p>
-            @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
-        }
-        else
-        {
-            <p class="text-red text-center size24 margin-bot10">↓↓↓恭喜你发现镇站之宝，请注意，前方高能！非战斗人员请及时撤离，这不是演习！↓↓↓</p>
-            <div class="col-md-12">
-                <span class="text-red">以下内容已经隐藏，请输入验证码后查看</span>
-                <span class="text-green">【完全免费，不收一分钱】</span>
-                <form action="/" method="post" class="form-inline" id="code-token">
-                    @Html.AntiForgeryToken()
-                    <div class="input-group">
-                        <span class="input-group-addon">邮箱：</span>
-                        <input type="email" name="Email" id="email3" class="form-control" />
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-info getcode">获取验证码</button>
-                        </span>
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon">验证码：</span>
-                        <input type="text" name="token" id="token" class="form-control" />
-                        <span class="input-group-btn">
-                            <button type="submit" class="btn btn-info">查看文章</button>
-                        </span>
-                    </div>
-                </form>
-                <p class="text-green">温馨提示：<span class="text-red">获取密码后本站所有加密文章将永久开放！请确保您的邮箱已经通过站长的登记，如果您未使用邮箱登记，请先联系站长获取文章密码并登记邮箱即可！</span></p>
+@if (!string.IsNullOrEmpty(Model.ProtectContent) && Model.ProtectContentMode == ProtectContentMode.AuthorizeVisiable) {
+  <div class="encrypted-content" id="@SnowFlake.NewId">
+    @if (!string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")) || Context.Request.Cookies["Email"].MDString3(AppConfig.ConnString).Equals(Context.Request.Cookies["PostAccessToken"])) {
+      <p class="size20 text-center text-red">↓↓↓以下是文章加密部分↓↓↓</p>
+      @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
+    } else {
+      <div class="col-md-12">
+        <span class="text-red">以下内容已经隐藏，请输入验证码后查看</span>
+        <div class="comment-form">
+          <div class="comment-form-row" style="display:flex;gap:12px;flex-wrap:wrap;">
+            <div style="position:relative;flex:1 1 240px;min-width:180px;display:flex;">
+              <input name="email" placeholder="请输入邮箱" required style="flex:1 1 auto;min-width:120px;padding-right:110px;" type="email" v-model="viewToken.email">
+              <button :disabled="disableGetcode" @@click="getcode(viewToken.email)" class="comment-form-btn" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);min-width:96px;height:36px;padding:0 8px;font-size:.97rem;z-index:2;" type="button"> {{codeMsg}} </button>
             </div>
-        }
-    </div>
-    return;
-}
-@if (!string.IsNullOrEmpty(Model.ProtectContent)&&Model.ProtectContentMode==ProtectContentMode.CommentVisiable)
-{
-    <div class="row protected-content">
-        @if (string.IsNullOrEmpty(Context.Request.Cookies["Comment_" + Model.Id]))
-        {
-            <p class="text-red text-center size24 margin-bot10">此处内容已隐藏，评论回复后刷新页面可见</p>
-        }
-        else
-        {
-            @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
-        }
-    </div>
-    return;
-}
-@if (!string.IsNullOrEmpty(Model.ProtectContent)&&Model.ProtectContentMode==ProtectContentMode.Password)
-{
-    <div class="row protected-content">
-        @if (Context.Request.Query["password"]!=Model.ProtectPassword)
-        {
-            <p class="text-red text-center size24 margin-bot10">此处内容需要密码可见：</p>
-            <form method="get" enctype="multipart/form-data" class="form-inline">
-                <div class="input-group">
-                    <span class="input-group-addon">密码：</span>
-                    <input class="form-control" type="text" name="password">
-                    <input type="hidden" name="t" value="@SnowFlake.NewId">
-                    <span class="input-group-btn">
-                        <button class="btn btn-info" type="submit">确定</button>
-                    </span>
-                </div>
-            </form>
-        }
-        else
-        {
-            @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
-        }
-    </div>
-    return;
-}
-@if(Model.ProtectContentMode==ProtectContentMode.Regions) {
-    var loc = Context.Request.Location();
-    if (Model.ProtectContentLimitMode==RegionLimitMode.AllowRegion&&Regex.IsMatch(loc+loc.Coodinate,Model.ProtectContentRegions, RegexOptions.IgnoreCase)) {
-        @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
-        return;
+            <div style="position:relative;flex:1 1 240px;min-width:180px;display:flex;">
+              <input name="email" placeholder="验证码" required style="flex:1 1 auto;min-width:120px;padding-right:110px;" v-model="viewToken.token">
+              <button :disabled="!viewToken.token" @@click="validateViewToken" class="comment-form-btn" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);min-width:96px;height:36px;padding:0 8px;font-size:.97rem;z-index:2;" type="button"> 查看文章 </button>
+            </div>
+          </div>
+        </div>
+        <p class="text-green">
+          温馨提示：
+          <span class="text-red">获取密码后本站所有加密文章将永久开放！请确保您的邮箱已经通过站长的登记，如果您未使用邮箱登记，请先联系站长获取文章密码并登记邮箱即可！</span>
+        </p>
+      </div>
     }
-    if (Model.ProtectContentLimitMode == RegionLimitMode.ForbidRegion && !Regex.IsMatch(loc + loc.Coodinate, Model.ProtectContentRegions, RegexOptions.IgnoreCase))
-    {
-        @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
-        return;
-    }
+  </div>
+  return;
 }
-@if(Context.Request.IsRobot()&&Model.ProtectContentLimitMode==RegionLimitMode.OnlyForSearchEngine) {
+@if (!string.IsNullOrEmpty(Model.ProtectContent) && Model.ProtectContentMode == ProtectContentMode.CommentVisiable) {
+  <div class="encrypted-content">
+    @if (string.IsNullOrEmpty(Context.Request.Cookies["Comment_" + Model.Id])) {
+      <p class="margin-bot10 size24 text-center text-red">此处内容已隐藏，评论回复后刷新页面可见</p>
+    } else {
+      @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
+    }
+  </div>
+  return;
+}
+@if (!string.IsNullOrEmpty(Model.ProtectContent) && Model.ProtectContentMode == ProtectContentMode.Password) {
+  <div class="encrypted-content">
+    @if (Context.Request.Query["password"] != Model.ProtectPassword) {
+      <p class="margin-bot10 size24 text-center text-red">此处内容需要密码可见：</p>
+      <form class="comment-form" method="get">
+        <div style="position:relative;max-width:240px;">
+          <input id="password" name="password" placeholder="请输入密码" required style="flex:1 1 auto;min-width:120px;padding-right:110px;" type="text">
+          <input name="t" type="hidden" value="@SnowFlake.NewId">
+          <button class="comment-form-btn" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);min-width:96px;height:36px;padding:0 8px;font-size:.97rem;z-index:2;" type="submit"> 确定 </button>
+        </div>
+      </form>
+    } else {
+      @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
+    }
+  </div>
+  return;
+}
+@if (Model.ProtectContentMode == ProtectContentMode.Regions) {
+  var loc = Context.Request.Location();
+  if (Model.ProtectContentLimitMode == RegionLimitMode.AllowRegion && Regex.IsMatch(loc + loc.Coodinate, Model.ProtectContentRegions, RegexOptions.IgnoreCase)) {
     @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
     return;
+  }
+
+  if (Model.ProtectContentLimitMode == RegionLimitMode.ForbidRegion && !Regex.IsMatch(loc + loc.Coodinate, Model.ProtectContentRegions, RegexOptions.IgnoreCase)) {
+    @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
+    return;
+  }
+}
+@if (Context.Request.IsRobot() && Model.ProtectContentLimitMode == RegionLimitMode.OnlyForSearchEngine) {
+  @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
+  return;
 }

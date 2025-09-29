@@ -7,8 +7,7 @@
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
 @model HomePageViewModel
-<div class="container">
-  <div class="row">
+<div class="list-container">
     <ol class="breadcrumb">
       <li>
         <a asp-action="Index" asp-controller="Home">首页</a>
@@ -17,7 +16,6 @@
         <em>@ViewBag.Title</em>
       </li>
     </ol>
-  </div>
 </div>
 @{
   UserInfoDto user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();

@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using EFCoreSecondLevelCacheInterceptor;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Configuration = AngleSharp.Configuration;
 
 namespace Masuit.MyBlogs.Core.Controllers;
@@ -42,7 +43,7 @@ public sealed class HomeController : BaseController
     public async Task<ActionResult> Index([FromServices] IFastShareService fastShareService)
     {
         var postsQuery = PostService.GetQuery(PostBaseWhere()); //准备文章的查询
-        var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ProjectDto().ToPagedListAsync(1, 15);
+        var posts = await postsQuery.Where(p => !p.IsFixedTop).OrderBy(OrderBy.ModifyDate.GetDisplay() + " desc").ProjectDto().ToPagedListAsync(1, 20);
         posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).ProjectDto().Cacheable().ToPooledListScope().OrderByRandom());
         if (Request.IsRobot())
         {
@@ -50,7 +51,7 @@ public sealed class HomeController : BaseController
         }
         var viewModel = GetIndexPageViewModel();
         viewModel.Posts = posts;
-        viewModel.PageParams = new Pagination(1, 15, posts.TotalCount, OrderBy.ModifyDate);
+        viewModel.PageParams = new Pagination(1, 20, posts.TotalCount, OrderBy.ModifyDate);
         var banners = AdsService.GetsByWeightedPrice(8, AdvertiseType.Banner, Request.Location()).OrderByRandom().ToPooledListScope();
         var fastShares = fastShareService.GetAllFromCache(s => s.Sort);
         viewModel.Banner = banners;
@@ -74,7 +75,7 @@ public sealed class HomeController : BaseController
     /// <param name="orderBy"></param>
     /// <returns></returns>
     [Route("posts"), Route("p", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie))]
-    public async Task<ActionResult> Post([Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+    public async Task<ActionResult> Post([Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         page = Math.Max(1, page);
         var viewModel = GetIndexPageViewModel();
@@ -116,8 +117,8 @@ public sealed class HomeController : BaseController
     /// <param name="size"></param>
     /// <param name="orderBy"></param>
     /// <returns></returns>
-    [Route("tag/{tag}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie))]
-    public async Task<ActionResult> Tag(string tag, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+    [Route("tag/{tag}"), Route("tags"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie))]
+    public async Task<ActionResult> Tag([FromBodyOrDefault] string tag, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         page = Math.Max(1, page);
         if (string.IsNullOrWhiteSpace(tag))
@@ -164,7 +165,7 @@ public sealed class HomeController : BaseController
     /// <param name="orderBy"></param>
     /// <returns></returns>
     [Route("{yyyy:int}/{mm:int}/{dd:int}/{mode}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie))]
-    public async Task<ActionResult> Archieve([Range(2010, 2099)] int yyyy, [Range(1, 12)] int mm, [Range(1, 31)] int dd, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string mode = nameof(Models.Entity.Post.ModifyDate))
+    public async Task<ActionResult> Archieve([Range(2010, 2099)] int yyyy, [Range(1, 12)] int mm, [Range(1, 31)] int dd, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20, string mode = nameof(Models.Entity.Post.ModifyDate))
     {
         page = Math.Max(1, page);
         if (!DateTime.TryParse(yyyy + "-" + mm + "-" + dd, out var date))
@@ -212,7 +213,7 @@ public sealed class HomeController : BaseController
     /// <param name="orderBy"></param>
     /// <returns></returns>
     [Route("author/{author}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie))]
-    public async Task<ActionResult> Author(string author, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+    public async Task<ActionResult> Author(string author, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         page = Math.Max(1, page);
         Expression<Func<Post, bool>> where = PostBaseWhere().And(p => p.Author.Equals(author) || p.Modifier.Equals(author) || p.Email.Equals(author) || p.PostHistoryVersion.Any(v => v.Modifier.Equals(author) || v.ModifierEmail.Equals(author)));
@@ -251,7 +252,7 @@ public sealed class HomeController : BaseController
     /// <param name="orderBy"></param>
     /// <returns></returns>
     [Route("cat/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie))]
-    public async Task<ActionResult> Category(int id, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+    public async Task<ActionResult> Category(int id, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         page = Math.Max(1, page);
         var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
@@ -353,10 +354,10 @@ public sealed class HomeController : BaseController
             2 => nameof(OrderBy.AverageViewCount),
             _ => nameof(OrderBy.TotalViewCount)
         } + " desc").Skip(0).Take(5).ProjectDto().Cacheable().ToPooledListScope(); //热门文章
-        var tagdic = PostService.GetTags().OrderByRandom().Take(20).ToFrozenDictionary(x => x.Key, x => Math.Min(x.Value + 12, 32)); //统计标签
+        var tagdic = PostService.GetTags().OrderByRandom().Take(30).ToFrozenDictionary(x => x.Key, x => x.Value); //统计标签
         return new HomePageViewModel
         {
-            Categories = cats.ToTree(c => c.Id, c => c.ParentId).Flatten().ToDto_P(),
+            Categories = cats.ToTree(c => c.Id, c => c.ParentId),
             HotSearch = hotSearches,
             Notices = notices.Data,
             Tags = tagdic,

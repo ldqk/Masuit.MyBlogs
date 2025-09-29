@@ -29,7 +29,7 @@ public sealed class NoticeController : BaseController
     public ActionResult Index([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
     {
         var list = NoticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false).ProjectDto().ToCachedPagedList(page, size);
-        ViewData["page"] = new Pagination(page, size, list.TotalCount);
+        ViewData["page"] = new Pagination(page, size, list.TotalCount) { ShowOrder = false };
         foreach (var n in list.Data)
         {
             n.ModifyDate = n.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));

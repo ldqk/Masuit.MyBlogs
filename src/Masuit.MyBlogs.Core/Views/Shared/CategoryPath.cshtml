@@ -1,6 +1,6 @@
 ﻿@model Masuit.MyBlogs.Core.Models.DTO.CategoryDto_P
-@if(Model.Parent!=null) {
-    await Html.RenderPartialAsync("CategoryPath", Model.Parent);
-    <text>/</text>
+@if (Model.Parent != null) {
+  await Html.RenderPartialAsync("CategoryPath", Model.Parent);
+  <text> / </text>
 }
-<a asp-controller="Home" asp-action="Category" asp-route-id="@Model.Id" class="label label-info">@Model.Name</a>
+<a asp-action="Category" asp-controller="Home" asp-route-id="@Model.Id">@Model.Name</a>

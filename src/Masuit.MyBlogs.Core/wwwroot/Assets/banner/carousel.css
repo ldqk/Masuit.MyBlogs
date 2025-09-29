@@ -1,14 +1,15 @@
 ﻿.carousel {
   width: 100vw;
-  height: 100vh;
+  /* height: 100vh; */
   max-height: 80vh;
   /* 可自定义最大高度，例如800px，也可以vh、rem等单位 */
   position: relative;
-  background: #222;
+  background: transparent;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
 }
 
 .carousel-slide {

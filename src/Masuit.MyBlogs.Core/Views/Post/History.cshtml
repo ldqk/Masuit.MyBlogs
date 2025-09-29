@@ -8,7 +8,7 @@
   Layout = "~/Views/Shared/_Layout.cshtml";
   AdvertisementDto ad = ViewBag.Ads;
 }
-<div class="container" id="historyApp" style="min-height: 70vh">
+<div class="main-container" id="historyApp" style="min-height: 70vh">
   <ol class="breadcrumb">
     <li>
       <a asp-action="Index" asp-controller="Home">首页</a>
@@ -39,63 +39,68 @@
       <em>历史版本</em>
     </li>
   </ol>
-  <table class="table table-bordered table-condensed table-responsive">
-    <thead>
-    <tr>
-      <th style="text-align: center">
-        <button :disabled="vers.length!=2" @@click="compare" class="btn btn-info btn-sm">版本对比</button>
-      </th>
-      <th>标题</th>
-      <th>原分类</th>
-      <th>修改时间</th>
-      <th>修改人</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-      <td style="text-align: center">
-        <input type="checkbox" v-model="vers" value="0"/>
-      </td>
-      <td>
-        <a asp-action="Details" asp-controller="Post" asp-route-id="@post.Id">@post.Title</a>
-        <span class="text-red">(最新版本)</span>
-      </td>
-      <td>
-        <a asp-action="Category" asp-controller="Home" asp-route-id="@post.CategoryId">@post.Category.Name</a>
-      </td>
-      <td>
-        <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@post.ModifyDate.Day" asp-route-mm="@post.ModifyDate.Month" asp-route-mode="@nameof(post.ModifyDate)" asp-route-yyyy="@post.ModifyDate.Year">
-          <time>@post.ModifyDate.ToString("yyyy-MM-dd")</time>
-        </a>
-      </td>
-      <td>@post.Modifier</td>
-    </tr>
-    @foreach (var p in Model.Data) {
-      <tr>
-        <td style="text-align: center">
-          <input type="checkbox" v-model="vers" value="@p.Id"/>
-        </td>
-        <td>
-          <a asp-action="HistoryVersion" asp-controller="Post" asp-route-hid="@p.Id" asp-route-id="@p.PostId">@p.Title</a>
-        </td>
-        <td>
-          <a asp-action="Category" asp-controller="Home" asp-route-id="@post.CategoryId">@p.Category.Name</a>
-        </td>
-        <td>
-          <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@p.ModifyDate.Day" asp-route-mm="@p.ModifyDate.Month" asp-route-mode="@nameof(p.ModifyDate)" asp-route-yyyy="@p.ModifyDate.Year">
-            <time>@p.ModifyDate.ToString("yyyy-MM-dd")</time>
-          </a>
-        </td>
-        <td>@p.Modifier</td>
-      </tr>
-    }
-    </tbody>
-  </table>
-  <div class="col-md-12 text-center">
-    @{
-      await Html.RenderPartialAsync("_Pagination", new Pagination(Model.CurrentPage, Model.PageSize, Model.TotalCount));
-    }
+  <div class="history-table-card">
+    <div class="history-title">历史版本列表</div>
+    <div id="version-compare-form">
+      <table class="history-table">
+        <thead>
+        <tr>
+          <th style="width:140px;">
+            <button :disabled="vers.length!=2" @@click="compare" class="compare-btn">版本对比</button>
+          </th>
+          <th>标题</th>
+          <th style="width:140px;">原分类</th>
+          <th style="width:140px;">修改时间</th>
+          <th style="width:140px;">修改人</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td style="text-align: center">
+            <input class="version-checkbox" type="checkbox" v-model="vers" value="0"/>
+          </td>
+          <td>
+            <a asp-action="Details" asp-controller="Post" asp-route-id="@post.Id" class="history-link">@post.Title</a>
+            <span class="text-red">(最新版本)</span>
+          </td>
+          <td>
+            <a asp-action="Category" asp-controller="Home" asp-route-id="@post.CategoryId" class="category-link">@post.Category.Name</a>
+          </td>
+          <td>
+            <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@post.ModifyDate.Day" asp-route-mm="@post.ModifyDate.Month" asp-route-mode="@nameof(post.ModifyDate)" asp-route-yyyy="@post.ModifyDate.Year" class="history-link">
+              <time>@post.ModifyDate.ToString("yyyy-MM-dd")</time>
+            </a>
+          </td>
+          <td>@post.Modifier</td>
+        </tr>
+        @foreach (var p in Model.Data) {
+          <tr>
+            <td style="text-align: center">
+              <input class="version-checkbox" type="checkbox" v-model="vers" value="@p.Id"/>
+            </td>
+            <td>
+              <a asp-action="HistoryVersion" asp-controller="Post" asp-route-hid="@p.Id" asp-route-id="@p.PostId" class="history-link">@p.Title</a>
+            </td>
+            <td>
+              <a asp-action="Category" asp-controller="Home" asp-route-id="@p.CategoryId" class="category-link">@p.Category.Name</a>
+            </td>
+            <td>
+              <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@p.ModifyDate.Day" asp-route-mm="@p.ModifyDate.Month" asp-route-mode="@nameof(p.ModifyDate)" asp-route-yyyy="@p.ModifyDate.Year" class="history-link">
+                <time>@p.ModifyDate.ToString("yyyy-MM-dd")</time>
+              </a>
+            </td>
+            <td>@p.Modifier</td>
+          </tr>
+        }
+        </tbody>
+      </table>
+    </div>
   </div>
+  @{
+    await Html.RenderPartialAsync("_Pagination", new Pagination(Model.CurrentPage, Model.PageSize, Model.TotalCount) {
+      ShowOrder = false
+    });
+  }
   @if (ad != null) {
     await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);
   }

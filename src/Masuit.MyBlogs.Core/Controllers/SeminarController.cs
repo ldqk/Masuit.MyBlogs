@@ -31,7 +31,7 @@ public sealed class SeminarController : BaseController
     /// <param name="orderBy"></param>
     /// <returns></returns>
     [Route("special/{id:int}"), Route("c/{id:int}", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "page", "size", "orderBy" }, VaryByHeader = "Cookie")]
-    public async Task<ActionResult> Index(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+    public async Task<ActionResult> Index(int id, [Optional] OrderBy? orderBy, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         var s = await SeminarService.GetByIdAsync(id) ?? throw new NotFoundException("专题未找到");
         var h24 = DateTime.Today.AddDays(-1);
@@ -119,7 +119,7 @@ public sealed class SeminarController : BaseController
     /// <param name="size"></param>
     /// <returns></returns>
     [MyAuthorize]
-    public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+    public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         var list = SeminarService.GetQuery(s => true, s => s.Id, false).ProjectDto().ToPagedListNoLock(page, size);
         return Ok(list);

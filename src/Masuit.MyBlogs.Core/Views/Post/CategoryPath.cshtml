@@ -3,4 +3,4 @@
     await Html.RenderPartialAsync("CategoryPath", Model.Parent);
     <text>/</text>
 }
-<a asp-controller="Home" asp-action="Category" asp-route-id="@Model.Id" class="label label-info">@Model.Name</a>
+<a asp-controller="Home" asp-action="Category" asp-route-id="@Model.Id">@Model.Name</a>

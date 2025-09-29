@@ -2,26 +2,18 @@
 @using Markdig
 
 @model Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto
-@if(Model!=null) {
-<div class="ibox wow fadeIn" id="@Stopwatch.GetTimestamp()">
-    <div class="ibox-content" id="@Stopwatch.GetTimestamp()">
-        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
-            <h4>
-                <i class="text-red size18">[荐]</i>@Model.Title
-            </h4>
-        </a>
-        <a asp-controller="Advertisement" asp-action="Redirect" asp-route-id="@Model.Id" target="_blank" id="@Stopwatch.GetTimestamp()">
-            <div class="row padding-bot10">
-                <div class="col-sm-2 hidden-xs paddingright-clear">
-                    <img class="img-thumbnail img-responsive thumb" src="@(Model.ThumbImgUrl+"?width=180&format=webp&quality=50")" alt="@Model.Title" title="@Model.Title" decoding="async">
-                </div>
-                <div class="col-sm-10 col-xs-12">
-                    <p>
-                        @Html.Raw(Markdown.ToHtml(Model.Description))
-                    </p>
-                </div>
-            </div>
-        </a>
+@if (Model != null) {
+  <div class="ad-card">
+    <div class="cover">
+      <img alt="@Model.Title" class="thumb" decoding="async" src="@(Model.ThumbImgUrl + "?width=280&format=webp&quality=50")" title="@Model.Title">
     </div>
-</div>
+    <div class="ad-content">
+      <div class="ad-title">
+        <a href="@Model.Url" target="_blank">
+          <i class="size18 text-red">[荐]</i>@Model.Title
+        </a>
+      </div>
+      <div class="ad-summary">@Html.Raw(Markdown.ToHtml(Model.Description))</div>
+    </div>
+  </div>
 }

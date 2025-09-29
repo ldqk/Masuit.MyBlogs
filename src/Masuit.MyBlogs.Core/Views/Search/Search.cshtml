@@ -57,30 +57,28 @@
             }
 
             var p = Model.Results[i];
-            <div class="ibox">
-              <div class="ibox-content">
-                <a asp-action="Details" asp-controller="Post" asp-route-id="@p.Id" asp-route-kw="@ViewBag.Keyword" target="_blank">
-                  <h2 class="margin-bot10 size20">
-                    @Html.Raw(p.Title)
-                  </h2>
+            <div class="article-card" style="margin-top: 15px;">
+              <div class="article-content">
+                <a asp-action="Details" asp-controller="Post" asp-route-id="@p.Id" class="article-title" target="_blank">
+                  @Html.Raw(p.Title)
                 </a>
-                <div>
-                  作者：
-                  <label class="label label-info">@Html.Raw(p.Author)</label> | 发表时间：
-                  <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@p.ModifyDate.Day" asp-route-mm="@p.ModifyDate.Month" asp-route-mode="@nameof(p.ModifyDate)" asp-route-yyyy="@p.ModifyDate.Year">
-                    <time>@(p.ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone)))</time>
-                  </a> | 分类：
-                  <i class="icon-map-pin"></i>
-                  @{
-                    await Html.RenderPartialAsync("CategoryPath", p.Category);
-                  }
+                <div class="meta-row">
+                  <span class="author">
+                    <a asp-action="Author" asp-controller="Home" asp-route-author="@(p.Modifier ?? p.Author)">@(p.Modifier ?? p.Author)</a>
+                  </span>
+                  <span>
+                    更新时间：
+                    <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@p.ModifyDate.Day" asp-route-mm="@p.ModifyDate.Month" asp-route-mode="@nameof(p.ModifyDate)" asp-route-yyyy="@p.ModifyDate.Year">
+                      <time>@p.ModifyDate.ToString("yyyy-MM-dd")</time>
+                    </a>
+                  </span>
+                  <span class="category">
+                    @{
+                      await Html.RenderPartialAsync("CategoryPath", p.Category);
+                    }
+                  </span>
                 </div>
-                <p class="size14">@Html.Raw(p.Content)</p>
-                <div class="row">
-                  <div class="col-md-6">
-                    <a asp-action="Details" asp-controller="Post" asp-route-id="@p.Id" class="search-link" target="_blank">@(Context.Request.Scheme + "://" + Context.Request.Host + "/" + p.Id)</a>
-                  </div>
-                </div>
+                <div class="summary"> @Html.Raw(p.Content) </div>
               </div>
             </div>
           }

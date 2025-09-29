@@ -38,7 +38,7 @@
         border-top: 3px solid rebeccapurple;
     }
 </style>
-<div class="container">
+<div class="main-container">
   <ol class="breadcrumb">
     <li>
       <a asp-action="Index" asp-controller="Home">首页</a>
@@ -64,20 +64,12 @@
     </p>
   </div>
 </div>
-<div class="container">
-  <div class="ibox">
-    <div class="ibox-content">
-      <div>
-        <h3 class="size20">
-          专题描述：
-        </h3>
-      </div>
-      <p>
-        @Html.Raw(Markdown.ToHtml(ViewBag.Desc))
-      </p>
-    </div>
+<div class="main-container">
+  <div class="recommend-card" style="margin-bottom: 12px;">
+    <h2 class="recommend-title" id="recommend">专题描述：</h2>
+    @Html.Raw(Markdown.ToHtml(ViewBag.Desc))
   </div>
-  <div class="animated blog bounceInUp wrapper-content">
+  <div class="animated article-list blog bounceInUp wrapper-content">
     @if (Model.Data.Any()) {
       var rnd = new Random().Next(Model.CurrentCount > 2 ? 2 : 0, Model.CurrentCount);
       for (var i = 0; i < Model.CurrentCount; i++) {
@@ -94,43 +86,6 @@
         <a asp-action="Publish" asp-controller="Post" class="btn btn-info btn-lg">点击这里</a> 投稿哦！
       </h3>
     }
-    <div class="row">
-      <div class="col-sm-8 col-xs-12">
-        @{ await Html.RenderPartialAsync("_Pagination", page); }
-      </div>
-      <div class="col-sm-4 col-xs-12 text-right">
-        <div class="btn-group dropup">
-          <a asp-action="All" asp-controller="Post" class="btn btn-info">所有专题</a>
-          <button aria-expanded="false" aria-haspopup="true" class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
-            @(page.OrderBy?.GetDescription() ?? "排序方式")
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu">
-            <li>
-              <a href="">最后修改日期</a>
-            </li>
-            <li>
-              <a asp-route-orderby="@OrderBy.PostDate">最后发表日期</a>
-            </li>
-            <li>
-              <a asp-route-orderby="@OrderBy.Trending">今日热榜</a>
-            </li>
-            <li class="divider" role="separator"></li>
-            <li>
-              <a asp-route-orderby="@OrderBy.CommentCount">评论最多</a>
-            </li>
-            <li>
-              <a asp-route-orderby="@OrderBy.TotalViewCount">访问量最多</a>
-            </li>
-            <li>
-              <a asp-route-orderby="@OrderBy.VoteUpCount">支持最多</a>
-            </li>
-            <li>
-              <a asp-route-orderby="@OrderBy.AverageViewCount">最热门</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    @{ await Html.RenderPartialAsync("_Pagination", page); }
   </div>
 </div>

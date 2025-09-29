@@ -21,57 +21,47 @@ const MessageReplies = defineComponent({
       return colors[(depth + 1) % 5];
     }
   },
-  computed: {
-    sortedMsg() {
-      return this.msg.slice().sort((x, y) => x.Id - y.Id);
-    }
-  },
   template: `
-    <div>
-      <article v-for="(item, idx) in sortedMsg" :key="item.Id" class="panel" :class="'panel-' + getColor(depth)">
-        <div class="panel-heading">
-          {{depth + 1}}-{{idx + 1}}#
-          <i v-if="item.IsMaster" class="icon icon-user"></i>
-          {{item.NickName}}
-          <span v-if="item.IsMaster">(管理员)</span> | {{item.CommentDate}}
-          <span class="pull-right hidden-sm hidden-xs" style="font-size: 10px;">
-            <span v-if="isAdmin">
-              <a v-if="item.Status==4" class="label label-success" @click="pass(item.Id)">通过</a> |
-              <a class="label label-danger" @click="del(item.Id)">删除</a> |
-            </span>
-            <span class="hidden-sm hidden-xs" v-html="GetOperatingSystem(item.OperatingSystem) + ' | ' + GetBrowser(item.Browser)"></span>
-          </span>
+  <hr/>
+  <ul class="comment-list" :data-depth="depth">
+    <li v-for="(row, idx) in msg" :key="row.Id" class="comment-item" :data-depth="depth">
+      <div class="comment-meta-row">
+        <div>
+          <span class="comment-floor">{{depth}}-{{idx + 1}}#</span>
+          <span class="comment-author-admin" v-if="row.IsMaster">{{row.NickName}}(管理员)</span>
+          <span class="comment-author" v-else>{{row.NickName}}</span>
+          <span class="comment-time">{{ row.CommentDate }}</span>
         </div>
-        <div class="panel-body line-height24">
-          <div v-html="item.Content"></div>
-          <span class="cmvote label label-info" @click="voteComment(item)"><i class="icon-thumbsup"></i>(<span class="count">{{item.VoteCount}}</span>)</span>
-          <a class="reply" :class="'label label-' + getColor(depth)" @click="replyMsg(item)">
-            <i class="icon-comment"></i>
-          </a>
-          <div v-if="isAdmin">
-            <div class="margin-top10"></div>
-            <div class="pull-left">
-              <span class="label label-success">{{item.IP}}</span>
-              <span class="label label-primary">{{item.Location}}</span>
-            </div>
-            <div class="pull-right">
-              <span class="label label-success" @click="bounceEmail(item.Email)">{{item.Email}}</span>
-            </div>
-          </div>
-          <br/>
-          <message-replies v-if="item.Children && item.Children.length"
-            :msg="item.Children"
-            :depth="depth + 1"
-            :is-admin="isAdmin"
-            @bounce-email="bounceEmail"
-            @reply-msg="replyMsg"
-            @vote-comment="voteComment"
-            @pass="$emit('pass', $event)"
-            @del="$emit('del', $event)">
-          </message-replies>
+        <div>
+          <span class="comment-btn" @click="del(row.Id)" v-if="isAdmin">删除</span>
+          <span class="comment-btn" @click="pass(row.Id)" v-if="row.Status==4&&isAdmin">通过</span>
+          <span class="comment-opinfo" v-html="GetOperatingSystem(row.OperatingSystem)"></span>
+          <span class="comment-opinfo" v-html="GetBrowser(row.Browser)"></span>
         </div>
-      </article>
-    </div>
+      </div>
+      <div class="comment-content" v-html="row.Content"></div>
+      <div class="comment-actions-row">
+        <button class="comment-like-btn" @click="voteComment(row)">👍{{row.VoteCount}}</button>
+        <button class="comment-reply-btn" @click="replyMsg(row)">回复</button>
+      </div>
+      <div class="comment-info-row" style="margin-top:4px;display:flex;flex-wrap:wrap;gap:16px;font-size:.97rem;color:#888;" v-if="isAdmin">
+        <span class="comment-email" style="color:#1566b6;" @click="bounceEmail(row.Email)">邮箱：{{row.Email}}</span>
+        <span class="comment-ipinfo" style="color:#1e90ff;">
+          IP/地区：{{row.IP}} / {{row.Location}}
+        </span>
+      </div>
+      <message-replies v-if="row.Children && row.Children.length"
+        :msg="row.Children"
+        :depth="depth + 1"
+        :is-admin="isAdmin"
+        @bounce-email="bounceEmail"
+        @reply-msg="replyMsg"
+        @vote-comment="voteComment"
+        @pass="$emit('pass', $event)"
+        @del="$emit('del', $event)">
+      </message-replies>
+    </li>
+  </ul>
   `
 });
 
@@ -143,55 +133,45 @@ const ParentMessages = defineComponent({
     GetBrowser(browser) { return window.GetBrowser(browser); }
   },
   template: `
-    <ul v-if="data && data.rows" class="animated fadeInRight media-list wow">
-      <li v-for="(row, idx) in data.rows" :key="row.Id" class="msg-list media animated fadeInRight" :id="row.Id">
-        <div class="media-body">
-          <article class="panel panel-info">
-            <header class="panel-heading">
-              {{startfloor - idx}}#
-              <i v-if="row.IsMaster" class="icon icon-user"></i>
-              {{row.NickName}}<span v-if="row.IsMaster">(管理员)</span>
-              | {{row.CommentDate}}
-              <span class="pull-right" style="font-size: 10px;">
-                <span v-if="isAdmin">
-                  <a v-if="row.Status==4" class="label label-success" @click="pass(row.Id)">通过</a> |
-                  <a class="label label-danger" @click="del(row.Id)">删除</a> |
-                </span>
-                <span class="hidden-sm hidden-xs" v-html="GetOperatingSystem(row.OperatingSystem) + ' | ' + GetBrowser(row.Browser)"></span>
-              </span>
-            </header>
-            <div class="panel-body line-height24">
-              <div v-html="row.Content"></div>
-              <span class="cmvote label label-info" @click="voteComment(row)"><i class="icon-thumbsup"></i>(<span class="count">{{row.VoteCount}}</span>)</span>
-              <a class="reply label label-info" @click="replyMsg(row)">
-                <i class="icon-comment"></i>
-              </a>
-              <div v-if="isAdmin">
-                <div class="margin-top10"></div>
-                <div class="pull-left">
-                  <span class="label label-success">{{row.IP}}</span>
-                  <span class="label label-primary">{{row.Location}}</span>
-                </div>
-                <div class="pull-right">
-                  <span class="label label-success" @click="bounceEmail(row.Email)">{{row.Email}}</span>
-                </div>
-                <br/>
-              </div>
-              <message-replies
-                v-if="row.Children && row.Children.length"
-                :msg="row.Children"
-                :depth="0"
-                :is-admin="isAdmin"
-                @pass="pass"
-                @vote-comment="voteComment"
-                @bounce-email="bounceEmail"
-                @reply-msg="replyMsg"
-                @del="del"></message-replies>
-            </div>
-          </article>
+  <ul v-if="data && data.rows" class="comment-list">
+    <li v-for="(row, idx) in data.rows" :key="row.Id" class="comment-item">
+      <div class="comment-meta-row">
+        <div>
+          <span class="comment-floor">{{ startfloor - idx }}# </span>
+          <span class="comment-author-admin" v-if="row.IsMaster">{{row.NickName}}(管理员)</span>
+          <span class="comment-author" v-else>{{row.NickName}}</span>
+          <span class="comment-time">{{ row.CommentDate }}</span>
         </div>
-      </li>
-    </ul>
+        <div>
+          <span class="comment-btn" @click="del(row.Id)" v-if="isAdmin">删除</span>
+          <span class="comment-btn" @click="pass(row.Id)" v-if="row.Status==4&&isAdmin">通过</span>
+          <span class="comment-opinfo" v-html="GetOperatingSystem(row.OperatingSystem)"></span>
+          <span class="comment-opinfo" v-html="GetBrowser(row.Browser)"></span>
+        </div>
+      </div>
+      <div class="comment-content" v-html="row.Content"></div>
+      <div class="comment-actions-row">
+        <button class="comment-like-btn" @click="voteComment(row)">👍{{row.VoteCount}}</button>
+        <button class="comment-reply-btn" @click="replyMsg(row)">回复</button>
+      </div>
+      <div class="comment-info-row" style="margin-top:4px;display:flex;flex-wrap:wrap;gap:16px;font-size:.97rem;color:#888;" v-if="isAdmin">
+        <span class="comment-email" style="color:#1566b6;" @click="bounceEmail(row.Email)">邮箱：{{row.Email}}</span>
+        <span class="comment-ipinfo" style="color:#1e90ff;">
+          IP/地区：{{row.IP}} / {{row.Location}}
+        </span>
+      </div>
+      <message-replies
+        v-if="row.Children && row.Children.length"
+        :msg="row.Children"
+        :depth="1"
+        :is-admin="isAdmin"
+        @pass="pass"
+        @vote-comment="voteComment"
+        @bounce-email="bounceEmail"
+        @reply-msg="replyMsg"
+        @del="del"></message-replies>
+    </li>
+  </ul>
   `
 });
 
@@ -304,13 +284,18 @@ createApp({
           message.success(data.Message);
           item.Content = '';
           item.ParentId = null;
-          ue.setContent('');
-          window.ue2 && window.ue2.setContent('');
+          try {
+            window.ue.hasContents() && window.ue.setContent('');
+            window.ue2 && window.ue2.hasContents() && window.ue2.setContent('');
+          } catch (e) {
+            console.error(e);
+          }
           this.getcomments();
         } else {
           message.error(data.Message);
         }
       }).catch(err => {
+        console.log(err);
         message.error(err.response?.data?.Message || '请求失败，请稍候再试！');
       });
     },
@@ -356,7 +341,7 @@ createApp({
       this.reply.for = item;
       this.showPopup = true;
     },
-    viewToken() {
+    validateViewToken() {
       axios.create({
         headers: {
           'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
@@ -579,7 +564,7 @@ createApp({
     const { message, dialog } = createDiscreteApi(["message", "dialog"]);
     window.message = message;
     window.dialog = dialog;
-    document.querySelectorAll('article p > img').forEach(function (img) {
+    document.querySelectorAll('.article-content-card p > img').forEach(function (img) {
       img.addEventListener('click', function () {
         window.open(this.getAttribute('src'));
       });
@@ -627,9 +612,9 @@ createApp({
       });
     }
     setTimeout(() => {
-      let left = document.querySelector('.ibox-content').offsetLeft;
+      let left = document.querySelector('.main-container').offsetLeft;
       new AutoToc({
-        contentSelector: '.ibox-content',
+        contentSelector: '.main-container',
         minLevel: 2,
         maxLevel: 6,
         scrollOffset: 110,

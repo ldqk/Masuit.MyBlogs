@@ -29,17 +29,19 @@
         border-top: 3px solid rebeccapurple;
     }
 </style>
-<ol class="breadcrumb">
-  <li>
-    <a asp-action="Index" asp-controller="Home">首页</a>
-  </li>
-  <li>
-    <a asp-action="Index" asp-controller="Notice">公告列表</a>
-  </li>
-  <li class="current">
-    <em>@ViewBag.Title</em>
-  </li>
-</ol>
+<div class="main-container">
+  <ol class="breadcrumb">
+    <li>
+      <a asp-action="Index" asp-controller="Home">首页</a>
+    </li>
+    <li>
+      <a asp-action="Index" asp-controller="Notice">公告列表</a>
+    </li>
+    <li class="current">
+      <em>@ViewBag.Title</em>
+    </li>
+  </ol>
+</div>
 <div class="bg-title">
   <div class="header-content text-center">
     <h2 class="size48">
@@ -53,33 +55,24 @@
     </p>
   </div>
 </div>
-<div class="container">
-  <div class="article wrapper-content">
-    <div class="ibox">
-      <div class="ibox-content">
-        <section class="fadeInUp wow">
-          <div class="btn-group">
-            <a asp-action="Index" asp-controller="Notice">&lt;&lt;返回公告列表页</a>
-            @{
-              var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
-              if (user.IsAdmin) {
-                <a class="btn btn-primary" href="/dashboard/notice/write?id =@Model.Id" target="_blank">修改</a>
-              }
+<div class="main-container">
+  <section class="article-content-card">
+    <div class="article-content">
+      <div class="old-card">
+        <div class="btn-group">
+          <a asp-action="Index" asp-controller="Notice">&lt;&lt;返回公告列表页</a>
+          @{
+            var user = Context.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
+            if (user.IsAdmin) {
+              <a class="btn btn-primary" href="/dashboard/notice/write?id =@Model.Id" target="_blank">修改</a>
             }
-          </div>
-        </section>
-        <hr class="margin-top10 marginbot10"/>
-        <main>
-          <section>
-            <article class="article" id="article">
-              @Html.Raw(await Model.Content.ReplaceImgAttribute(Model.Title))
-            </article>
-          </section>
-        </main>
+          }
+        </div>
       </div>
+      @Html.Raw(Model.Content)
     </div>
-  </div>
-  @{
-    await Html.RenderPartialAsync("_ArticleListAdvertisement", (AdvertisementDto) ViewBag.Ads);
-  }
+    @{
+      await Html.RenderPartialAsync("_ArticleListAdvertisement", (AdvertisementDto) ViewBag.Ads);
+    }
+  </section>
 </div>

@@ -2,109 +2,92 @@
 @using Masuit.Tools
 @using Masuit.MyBlogs.Core.Common
 @{
-    int pages = Math.Ceiling(Model.TotalCount / (Model.Size > 0 ? Model.Size : 15.0)).ToInt32();
-    int current = Model.Page > 0 ? Model.Page : 1;
-    int pageStart = current - 3 > 0 ? current - 3 : 1;
-    int pageEnd = current + 3 >= pages ? pages : current + 3;
-    current = current > pages ? pages : current;
-    current = current < 1 ? 1 : current;
-    if (pageEnd - pageStart < 7)
-    {
-        if (pageStart == 1)
-        {
-            pageEnd = pageStart + 6 >= pages ? pages : pageStart + 6;
-        }
-        else
-        {
-            pageStart = pageEnd - 6 > 0 ? pageEnd - 6 : 1;
-        }
+  int pages = Math.Ceiling(Model.TotalCount / (Model.Size > 0 ? Model.Size : 15.0)).ToInt32();
+  int current = Model.Page > 0 ? Model.Page : 1;
+  int pageStart = current - 3 > 0 ? current - 3 : 1;
+  int pageEnd = current + 3 >= pages ? pages : current + 3;
+  current = current > pages ? pages : current;
+  current = current < 1 ? 1 : current;
+  if (pageEnd - pageStart < 7) {
+    if (pageStart == 1) {
+      pageEnd = pageStart + 6 >= pages ? pages : pageStart + 6;
+    } else {
+      pageStart = pageEnd - 6 > 0 ? pageEnd - 6 : 1;
     }
+  }
 }
-@if (pages > 1)
-{
-    <ul class="pagination" style="margin: 0">
-        @if (current == 1)
-        {
-            <li class="disabled">
-                <a>
-                    首页
-                </a>
-            </li>
-            <li class="disabled">
-                <a aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-        }
-        else
-        {
-            <li>
-                <a href="@(Context.Request.Path+$"?orderby={Model.OrderBy}".TrimQuery())" aria-label="Previous">
-                    首页
-                </a>
+@if (pages > 1) {
+  <div class="article-list-footer">
+    @if (Model.ShowOrder) {
+      <div class="sort-box">
+        <span class="sort-label">排序方式:</span>
+        <div class="sort-dropdown" id="sortDropdown">
+          <button class="sort-selected" id="sortSelectedBtn" type="button">@(Model.OrderBy?.GetDescription() ?? "排序方式")</button>
+          <ul class="sort-options" id="sortOptions">
+            <li class="selected">
+              <a href="">最后修改日期</a>
             </li>
             <li>
-                <a href="@($"{Context.Request.Path}?page={(Model.Page - 1 <= 0 ? 1 : Model.Page - 1)}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-        }
-        @if (pageStart > 1)
-        {
-            <li class="disabled">
-                <a aria-label="Previous">
-                    <span aria-hidden="true">...</span>
-                </a>
-            </li>
-        }
-        @for (int i = pageStart; i <= pageEnd; i++)
-        {
-            if (i == current)
-            {
-                <li class="disabled">
-                    <a>@i</a>
-                </li>
-            }
-            else
-            {
-                <li>
-                    <a href="@($"{Context.Request.Path}?page={i}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())">@i</a>
-                </li>
-            }
-        }
-        @if (pageEnd < pages)
-        {
-            <li class="disabled">
-                <a aria-label="Previous">
-                    <span aria-hidden="true">...</span>
-                </a>
-            </li>
-        }
-        @if (current == pages)
-        {
-            <li class="disabled">
-                <a>
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-            <li class="disabled">
-                <a>
-                    末页
-                </a>
-            </li>
-        }
-        else
-        {
-            <li>
-                <a href="@($"{Context.Request.Path}?page={current + 1}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
+              <a href="@($"{Context.Request.Path}?orderby={OrderBy.PostDate}".TrimQuery())">最后发表日期</a>
             </li>
             <li>
-                <a href="@($"{Context.Request.Path}?page={pages}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())" aria-label="Next">
-                    末页
-                </a>
+              <a href="@($"{Context.Request.Path}?orderby={OrderBy.Trending}".TrimQuery())">今日热榜</a>
             </li>
+            <li class="divider" role="separator"></li>
+            <li>
+              <a href="@($"{Context.Request.Path}?orderby={OrderBy.CommentCount}".TrimQuery())">评论最多</a>
+            </li>
+            <li>
+              <a href="@($"{Context.Request.Path}?orderby={OrderBy.TotalViewCount}".TrimQuery())">访问量最多</a>
+            </li>
+            <li>
+              <a href="@($"{Context.Request.Path}?orderby={OrderBy.VoteUpCount}".TrimQuery())">支持最多</a>
+            </li>
+            <li>
+              <a href="@($"{Context.Request.Path}?orderby={OrderBy.AverageViewCount}".TrimQuery())">最热门</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    }
+    <div class="pagination">
+      @if (current == 1) {
+        <button class="disabled page-btn" disabled="disabled">上一页</button>
+        @* <button class="active page-btn">1</button> *@
+      } else {
+        <a href="@($"{Context.Request.Path}?page={(Model.Page - 1 <= 0 ? 1 : Model.Page - 1)}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())">
+          <button class="page-btn">上一页</button>
+        </a>
+        <a href="@($"{Context.Request.Path}?page=1&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())">
+          <button class="page-btn">首页</button>
+        </a>
+      }
+      @if (pageStart > 1) {
+        <span class="ellipsis">...</span>
+      }
+      @for (int i = pageStart; i <= pageEnd; i++) {
+        if (i == current) {
+          <button class="active page-btn">@i</button>
+        } else {
+          <a href="@($"{Context.Request.Path}?page={i}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())">
+            <button class="page-btn">@i</button>
+          </a>
         }
-    </ul>
+      }
+      @if (pageEnd < pages) {
+        <span class="ellipsis">...</span>
+      }
+      @if (current == pages) {
+        @* <button class="disabled page-btn" disabled="disabled"> @pages</button> *@
+        <button class="disabled page-btn" disabled="disabled">下一页</button>
+      } else {
+        <a href="@($"{Context.Request.Path}?page={pages}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())">
+          <button class="page-btn">最后一页</button>
+        </a>
+        <a href="@($"{Context.Request.Path}?page={current + 1}&size={Model.Size}&orderby={Model.OrderBy}".TrimQuery())">
+          <button class="page-btn">下一页</button>
+        </a>
+      }
+    </div>
+  </div>
 }

@@ -5,17 +5,22 @@
 @using Masuit.Tools
 @using Microsoft.AspNetCore.Hosting
 @using Polly
-
 @{
-    string[] colors = { "success", "info", "primary", "warning", "danger" };
-    Layout = null;
-    var advertisement = Policy<AdvertisementDto>.Handle<Exception>().Fallback(() => new AdvertisementDto()).Execute(() => AdsService.GetByWeightedPrice(AdvertiseType.InPage, Context.Request.Location()));
+  string[] colors = {
+    "success",
+    "info",
+    "primary",
+    "warning",
+    "danger"
+  };
+  Layout = null;
+  var advertisement = Policy<AdvertisementDto>.Handle<Exception>().Fallback(() => new AdvertisementDto()).Execute(() => AdsService.GetByWeightedPrice(AdvertiseType.InPage, Context.Request.Location()));
 }
 <!DOCTYPE html>
 <html>
 <head>
-    <title>503-服务器开小差啦！</title>
-    <style type="text/css">
+  <title>503-服务器开小差啦！</title>
+  <style type="text/css">
         .link, .texts {
             margin: 0 auto 15px;
             color: #505050;
@@ -79,64 +84,67 @@
             height: auto !important;
         }
     </style>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="~/content/common/articlestyle.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.ripples/0.5.3/jquery.ripples.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.24.1/phaser.min.js"></script>
-    <script src="~/Assets/catchcat/catch-the-cat.js"></script>
+  <meta charset="utf-8">
+  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="~/content/common/style.css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.ripples/0.5.3/jquery.ripples.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.24.1/phaser.min.js"></script>
+  <script src="~/Assets/catchcat/catch-the-cat.js"></script>
 </head>
 <body>
-    <div class="container">
-        <header id="header" class="page-header text-center">
-            <h1><a href="/">Oops!</a></h1>
-        </header>
-        <div id="container">
-            @{
-                Random r = new Random();
-                string imgPath = $"/Assets/images/503/503{r.StrictNext(Directory.GetFiles(_hostEnvironment.WebRootPath + "/Assets/images/503").Length) + 1}.jpg";
-            }
-            <img class="img img-responsive img-thumbnail" width="100%" src="@imgPath" alt="@ViewBag.Keywords"/>
-            <h3 class="margintop20">
-                <em>
-                    <span class="STYLE1">503 Service Unavailable&nbsp;</span>
-                </em>:所访问的页面出了点小问题,可能您输错了网址!
-            </h3>
-            <a class="btn btn-info btn-lg" href="/"><i class="icon-reply">返回首页</i></a>
-            <dl class="texts">
-                <dt class="h2">正在联系火星总部网络中心.请返回等待信息......</dt>
-                <dd>
-                    <ul>
-                        <li class="h2">不要返回吗?</li>
-                        <li class="h3">确定不要返回吗?</li>
-                        <li class="h4">真的真的确定不要返回吗?</li>
-                        <li class="h5">好吧.还是随便你要不要真的确定返回吧</li>
-                        <li class="h6">要是真的不愿意返回就玩个游戏吧，机会很难得哦——</li>
-                        <li>将猫困在一个深色圆点围成的圈子里面就算成功了！</li>
-                    </ul>
-                </dd>
-                <div id="games"></div>
-            </dl>
-        </div>
-        <hr class="margin-top10 marginbot10" />
-        @{
-            await Html.RenderPartialAsync("_ArticleListAdvertisement", advertisement);
-        }
-    </div>
-    <div class="layer animated fadeIn">
-        <div class="loadEffect">
-            @for (int i = 0; i < 7; i++)
-            {
-                <div>
-                    <span class="bg-@colors[new Random().StrictNext() % 5]"></span>
-                </div>
-            }
-        </div>
-    </div>
+<div class="container">
+  <header class="page-header text-center" id="header">
+    <h1>
+      <a href="/">Oops!</a>
+    </h1>
+  </header>
+  <div id="container">
+    @{
+      Random r = new Random();
+      string imgPath = $"/Assets/images/503/503{r.StrictNext(Directory.GetFiles(_hostEnvironment.WebRootPath + "/Assets/images/503").Length) + 1}.jpg";
+    }
+    <img alt="@ViewBag.Keywords" class="img img-responsive img-thumbnail" src="@imgPath" width="100%"/>
+    <h3 class="margintop20">
+      <em>
+        <span class="STYLE1">503 Service Unavailable&nbsp;</span>
+      </em>:所访问的页面出了点小问题,可能您输错了网址!
+    </h3>
+    <a class="btn btn-info btn-lg" href="/">
+      <i class="icon-reply">返回首页</i>
+    </a>
+    <dl class="texts">
+      <dt class="h2">正在联系火星总部网络中心.请返回等待信息......</dt>
+      <dd>
+        <ul>
+          <li class="h2">不要返回吗?</li>
+          <li class="h3">确定不要返回吗?</li>
+          <li class="h4">真的真的确定不要返回吗?</li>
+          <li class="h5">好吧.还是随便你要不要真的确定返回吧</li>
+          <li class="h6">要是真的不愿意返回就玩个游戏吧，机会很难得哦——</li>
+          <li>将猫困在一个深色圆点围成的圈子里面就算成功了！</li>
+        </ul>
+      </dd>
+      <div id="games"></div>
+    </dl>
+  </div>
+  <hr class="margin-top10 marginbot10"/>
+  @{
+    await Html.RenderPartialAsync("_ArticleListAdvertisement", advertisement);
+  }
+</div>
+<div class="animated fadeIn layer">
+  <div class="loadEffect">
+    @for (int i = 0; i < 7; i++) {
+      <div>
+        <span class="bg-@colors[new Random().StrictNext() % 5]"></span>
+      </div>
+    }
+  </div>
+</div>
 </body>
 </html>
 <script>
