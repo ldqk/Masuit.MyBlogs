@@ -41,8 +41,7 @@ public sealed class DashboardController(IWebHostEnvironment env) : AdminControll
     {
         Response.ContentType = "text/event-stream";
         Response.Headers.Append("X-Accel-Buffering", "no");
-        Response.Headers.Add("Cache-Control", "no-cache");
-        Response.Headers.Add("Connection", "keep-alive");
+        Response.Headers.Append("Cache-Control", "no-cache");
         while (true)
         {
             try

@@ -87,13 +87,40 @@ $(function () {
   }).catch(function (e) {
     console.log("Oops, error");
   });
+  initEventSource();
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // 页面变为不可见，断开连接
+      closeEventSources()
+    } else {
+      // 页面变为可见，恢复连接
+      initEventSource()
+    }
+  });
 
-  setInterval(function () {
-    let timestamp = new Date().getTime();
-    DotNet.invokeMethodAsync('Masuit.MyBlogs.Core', 'Latency').then(data => {
-      $("#ping").text(new Date().getTime() - timestamp);
-    });
-  }, 2000);
+  function initEventSource() {
+    // 如果页面不可见，不初始化连接
+    if (document.hidden) {
+      return
+    }
+
+    window.eventSource = new EventSource(`/ping`)
+    window.eventSource.onmessage = (event) => {
+      $("#ping").text((Date.now() - event.data) / 2);
+    }
+
+    window.eventSource.onerror = (error) => {
+      console.error('EventSource 连接错误！', error)
+    }
+  }
+
+  // 关闭 EventSource 连接
+  function closeEventSources() {
+    if (window.eventSource) {
+      window.eventSource.close()
+      window.eventSource = null
+    }
+  }
 
   // 自动重试加载图片
   $('img').on("error", function () {

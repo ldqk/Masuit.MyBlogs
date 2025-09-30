@@ -365,9 +365,8 @@ public sealed class MsgController : BaseController
     public async Task<ActionResult> GetUnreadMsgs(CancellationToken cancellationToken)
     {
         Response.ContentType = "text/event-stream";
-        Response.Headers.Add("X-Accel-Buffering", "no");
-        Response.Headers.Add("Cache-Control", "no-cache");
-        Response.Headers.Add("Connection", "keep-alive");
+        Response.Headers.Append("X-Accel-Buffering", "no");
+        Response.Headers.Append("Cache-Control", "no-cache");
         while (true)
         {
             try

@@ -3807,3 +3807,11 @@ button:disabled:hover,
   background: linear-gradient(90deg, #2990f8 40%, #1e90ff 100%);
   color: #fff;
 }
+
+.fixtop {
+  color: red;
+}
+
+.new {
+  color: green;
+}

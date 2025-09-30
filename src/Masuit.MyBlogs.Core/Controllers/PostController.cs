@@ -20,7 +20,6 @@ using Masuit.Tools.Logging;
 using Masuit.Tools.Mime;
 using Masuit.Tools.TextDiff;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Net.Http.Headers;
 using System.Collections.Frozen;
 using System.Linq.Dynamic.Core;
@@ -524,9 +523,8 @@ public sealed class PostController : BaseController
     public async Task<ActionResult> Online(int id, CancellationToken cancellationToken)
     {
         Response.ContentType = "text/event-stream";
-        Response.Headers.Add("X-Accel-Buffering", "no");
-        Response.Headers.Add("Cache-Control", "no-cache");
-        Response.Headers.Add("Connection", "keep-alive");
+        Response.Headers.Append("X-Accel-Buffering", "no");
+        Response.Headers.Append("Cache-Control", "no-cache");
         var key = $"PostOnline:{id}";
         await RedisHelper.SAddAsync(key, ClientIP.ToString());
         await RedisHelper.ExpireAsync(key, TimeSpan.FromMinutes(60));
@@ -1143,8 +1141,7 @@ public sealed class PostController : BaseController
     {
         Response.ContentType = "text/event-stream";
         Response.Headers.Append("X-Accel-Buffering", "no");
-        Response.Headers.Add("Cache-Control", "no-cache");
-        Response.Headers.Add("Connection", "keep-alive");
+        Response.Headers.Append("Cache-Control", "no-cache");
         while (true)
         {
             try

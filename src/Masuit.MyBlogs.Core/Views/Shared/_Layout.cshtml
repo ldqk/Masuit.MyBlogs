@@ -6,7 +6,6 @@
 @using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.MyBlogs.Core.Models.ViewModel
-@using Masuit.MyBlogs.Core.Views.Shared
 @using Masuit.Tools
 @using Masuit.Tools.Core.Net
 @using Microsoft.AspNetCore.Http.Extensions
@@ -315,9 +314,9 @@
           @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Scripts", ""))
         </div>
       </div>
-      @(await Html.RenderComponentAsync<Ping>(RenderMode.ServerPrerendered, new {
-        IP = Context.Connection.RemoteIpAddress.ToString()
-      }))
+      <p style="display: table;margin-left:70px">
+            Ping:<span id="ping">50</span>ms
+        </p>
     </footer>
   </main>
 </div>
@@ -328,7 +327,6 @@
 </div>
 <button class="btn btn-info btn-sm canvas-close" style="position: fixed;right: 0;bottom: 0;z-index: 200;display: none" type="button">不再显示canvas背景</button>
 <script color="0,104,183" count="100" opacity='1' src="~/Scripts/line.js" type="text/javascript" zIndex="-1"></script>
-<script src="/_framework/blazor.server.js"></script>
 </body>
 </html>
 @if (Context.Request.Headers["User-Agent"].ToString().Contains(new[] {
