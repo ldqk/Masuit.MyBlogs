@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>毛玻璃效果网页背景示例</title>
+    <style>
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      /* 设置背景图片，可根据需要更换 */
+      background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1500&q=80') no-repeat center center fixed;
+      background-size: cover;
+      /* 兼容性设置 */
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .frosted-glass {
+      width: 400px;
+      padding: 2.5rem 2rem;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.25); /* 半透明白色 */
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #222;
+      text-align: center;
+    }
+    .frosted-glass h1 {
+      margin: 0 0 1.2rem 0;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .frosted-glass p {
+      margin: 0;
+      line-height: 1.6;
+      font-size: 1.1rem;
+    }
+    @media (max-width: 480px) {
+      .frosted-glass {
+        width: 90vw;
+        padding: 1.5rem 1rem;
+      }
+    }
+  </style>
+  </head>
+
+  <body>
+    <div class="frosted-glass">
+      <h1>毛玻璃效果</h1>
+      <p> 这是一个带有毛玻璃（Frosted Glass）效果的网页背景。<br>
+      你可以自由更换背景图片、透明度和模糊参数，打造属于你的网站风格！ </p>
+    </div>
+  </body>
+
+</html>

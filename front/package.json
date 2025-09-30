@@ -17,12 +17,12 @@
     "monaco-editor": "^0.53.0",
     "pinia": "^3.0.3",
     "quasar": "^2.18.5",
-    "vue": "^3.5.21",
+    "vue": "^3.5.22",
     "vue-router": "^4.5.1",
     "vue-ueditor-wrap": "^3.0.8",
     "vue3-toastify": "^0.2.8",
-    "vxe-pc-ui": "^4.9.34",
-    "vxe-table": "^4.16.18"
+    "vxe-pc-ui": "^4.9.41",
+    "vxe-table": "^4.16.20"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.4",

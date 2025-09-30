@@ -83,7 +83,4 @@ app
   .use(VxeUITable)
   .mount("#app");
 
-// 输出环境配置信息
-logApiConfig();
-
 export default app;

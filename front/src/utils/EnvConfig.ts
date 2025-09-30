@@ -16,17 +16,3 @@ export function getApiBaseUrl(): string {
 export function getCurrentEnv(): string {
   return process.env.VUE_APP_ENV || process.env.NODE_ENV || 'unknown'
 }
-
-export function logApiConfig(): void {
-  console.log('=== API配置 ===')
-  console.log('当前环境:', getCurrentEnv())
-  console.log('API基础URL:', getApiBaseUrl())
-  
-  if (getCurrentEnv() === 'development') {
-    console.log('开发环境: API请求将通过代理转发到 https://127.0.0.1:5001/')
-    console.log('实际请求路径: /api/* -> https://127.0.0.1:5001/*')
-  } else if (getCurrentEnv() === 'production') {
-    console.log('生产环境: API请求使用相对路径，与前端同域')
-    console.log('实际请求路径: /* -> 当前域名/*')
-  }
-}
