@@ -307,6 +307,7 @@ createApp({
     'pageConfig.page'(newVal, oldVal) {
       if (newVal !== oldVal) {
         this.getmsgs();
+        document.querySelector('.comment-form-btn').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     },
     'pageConfig.size'(newVal, oldVal) {

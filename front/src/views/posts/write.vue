@@ -9,7 +9,7 @@
   <div class="text-h6" v-if="route.query.refer">复制来源ID：{{ route.query.refer }}</div>
   <!-- 文章标题 -->
   <div class="row">
-    <q-input autogrow class="col" v-model="post.Title" label="文章标题" outlined required :rules="[val => !!val || '请输入文章标题', val => val.length >= 2 || '标题至少2个字符', val => val.length <= 128 || '标题最多128个字符']">
+    <q-input autogrow class="col" v-model="post.Title" label="文章标题" outlined required :rules="[val => !!val || '请输入文章标题', val => val.length >= 2 || '标题至少2个字符', val => val.length <= 128 || '标题最多128个字符']" style="font-size: 23px;">
       <template v-slot:append>
         <q-btn dense size="lg" color="info" label="上传Word文档" @click="showWordUpload" class="full-width" icon="upload" no-caps />
       </template>
@@ -27,12 +27,12 @@
       <div class="row items-center">
         <q-select dense v-model="post.ProtectContentMode" :options="protectModeOptions" label="加密模式" outlined style="min-width: 200px;" map-options emit-value>
           <template v-slot:before>
-            <div class="text-h6">文章加密</div>
+            <div class="text-h6">文章加密内容</div>
           </template>
         </q-select>
         <!-- 地区可见配置 -->
         <div v-if="post.ProtectContentMode === 2" class="row items-center">
-          <q-input autogrow dense v-model="post.ProtectContentRegions" label="可见地区" placeholder="竖线分隔，支持国家、地区、城市、运营商、ASN" style="width: 450px;" outlined>
+          <q-input autogrow dense v-model="post.ProtectContentRegions" label="可见地区" shadow-text="竖线分隔，支持国家、地区、城市、运营商、ASN" style="width: 450px;" outlined>
             <template v-slot:append>
               <q-select dense borderless v-model="post.ProtectContentLimitMode" :options="[{ label: '以内', value: 1 }, { label: '以外', value: 2 }]" emit-value map-options />
             </template>
@@ -96,7 +96,7 @@
       </div>
       <div class="row">
         <div class="col-3">
-          <q-input dense autogrow v-model="post.Redirect" label="跳转到第三方链接" placeholder="如：https://baidu.com 留空不跳转" outlined hint="当跳转第三方链接时，文章内容不宜过多" />
+          <q-input dense autogrow v-model="post.Redirect" label="跳转到第三方链接" shadow-text="如：https://baidu.com 留空不跳转" outlined hint="当跳转第三方链接时，文章内容不宜过多" />
         </div>
         <div class="col-3">
           <q-input dense v-model="post.ExpireAt" label="过期时间" outlined readonly>
@@ -141,15 +141,9 @@
           </q-input>
         </div>
       </div>
-    </q-card-section>
-  </q-card>
-  <!-- 地区投放设置 -->
-  <q-card flat bordered class="q-mb-md">
-    <q-card-section>
-      <div class="text-h6">按地区投放</div>
       <div class="row q-gutter-md">
         <div class="col">
-          <q-select dense v-model="post.LimitMode" :options="limitModeOptions" label="投放模式" outlined map-options emit-value />
+          <q-select dense v-model="post.LimitMode" :options="limitModeOptions" label="文章地区投放" outlined map-options emit-value></q-select>
         </div>
         <div v-if="post.LimitMode > 0 && post.LimitMode < 5" class="col">
           <q-select dense v-model="post.Regions" :options="filteredRegions" :label="post.LimitMode % 2 === 1 ? '可见地区' : '不可见地区'" :label-color="post.LimitMode % 2 === 1 ? '' : 'red'" outlined use-input new-value-mode="add-unique" input-debounce="0" @filter="filterRegions" @new-value="createNewRegion" hint="竖线分隔，如：江苏|苏州|移动|AS2333|DMIT，支持地区、运营商、ASN、机房名称">

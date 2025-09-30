@@ -286,13 +286,13 @@ createApp({
           message.success(data.Message);
           item.Content = '';
           item.ParentId = null;
+          this.getcomments();
           try {
             window.ue.hasContents() && window.ue.setContent('');
             window.ue2 && window.ue2.hasContents() && window.ue2.setContent('');
           } catch (e) {
             console.error(e);
           }
-          this.getcomments();
         } else {
           message.error(data.Message);
         }
@@ -505,6 +505,7 @@ createApp({
     'pageConfig.page'(newVal, oldVal) {
       if (newVal !== oldVal) {
         this.getcomments();
+        document.querySelector('.comment-form-btn').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     },
     'pageConfig.size'(newVal, oldVal) {

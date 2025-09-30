@@ -18,7 +18,7 @@
               </template>
             </q-input>
             <!-- 分类选择 -->
-            <q-select class="col" v-model="selectedCategory" :options="filteredCategoryOptions" option-value="Id" option-label="Name" label="分类" outlined dense style="min-width: 200px" map-options use-input input-debounce="300" @filter="filterCategoryOptions" clearable>
+            <q-select class="col" v-model="selectedCategory" :options="filteredCategoryOptions" option-value="Id" option-label="Name" label="分类" outlined dense style="min-width: 200px" map-options use-input input-debounce="300" @filter="filterCategoryOptions" clearable @update:model-value="loadPageData">
               <template v-slot:no-option>
                 <q-item>
                   <q-item-section class="text-grey"> 没有找到匹配的分类 </q-item-section>
@@ -26,7 +26,7 @@
               </template>
             </q-select>
             <!-- 排序方式选择 -->
-            <q-select class="col" v-model="orderBy" :options="sortOptions" option-value="value" option-label="name" label="排序方式" outlined dense style="min-width: 220px" map-options emit-value>
+            <q-select class="col search-btn" v-model="orderBy" :options="sortOptions" option-value="value" option-label="name" label="排序方式" outlined dense style="min-width: 220px" map-options emit-value @update:model-value="loadPageData">
               <template #after>
                 <q-btn color="primary" icon="refresh" :loading="loading" @click="loadPageData"> 搜索 </q-btn>
               </template>
@@ -883,6 +883,7 @@ onMounted(async () => {
   initEventSource()
   initChart()
   showColumns.value = (localStorage.getItem('showColumns') || 'PostDate').split(',')
+  document.querySelector('.search-btn').scrollIntoView({ behavior: 'smooth', block: 'center' })
 })
 
 onBeforeUnmount(() => {

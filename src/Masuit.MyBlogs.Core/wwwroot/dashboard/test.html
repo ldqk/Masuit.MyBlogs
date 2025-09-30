@@ -1,501 +1,200 @@
-﻿<!DOCTYPE html> <!-- 注意：务必添加此声明，以避免某些浏览器（如Safari）的兼容性问题:cite[3] -->
-<html lang="zh">
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
 
   <head>
     <meta charset="UTF-8">
+    <title>历史版本列表 - Masuit.MyBlogs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的Quasar应用</title>
-    <!-- 1. 引入字体和图标 (可选择需要的样式) -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" type="text/css">
-    <!-- 2. 引入Quasar的样式文件 -->
-    <link href="https://cdn.jsdelivr.net/npm/quasar@2.10.1/dist/quasar.prod.css" rel="stylesheet">
+    <!-- 继承主站UI风格，蓝色渐变、圆角、阴影、响应式 -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Segoe+UI:400,500,700&display=swap">
     <style>
-        * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-        }
-        
-        body {
-          font-family: 'Roboto', sans-serif;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          min-height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 20px;
-        }
-        
-        .container {
-          max-width: 800px;
-          width: 100%;
-          background: white;
-          border-radius: 16px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-          padding: 30px;
-          margin: 20px;
-        }
-        
-        .header {
-          text-align: center;
-          margin-bottom: 30px;
-        }
-        
-        .header h1 {
-          color: #333;
-          font-size: 2.2rem;
-          margin-bottom: 10px;
-        }
-        
-        .header p {
-          color: #666;
-          font-size: 1.1rem;
-        }
-        
-        .demo-section {
-          margin-bottom: 40px;
-        }
-        
-        .section-title {
-          font-size: 1.4rem;
-          color: #444;
-          margin-bottom: 15px;
-          padding-bottom: 10px;
-          border-bottom: 1px solid #eee;
-        }
-        
-        .tags-input-wrapper {
-          position: relative;
-        }
-        
-        .tags-container {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          padding: 8px;
-          min-height: 56px;
-          align-items: center;
-        }
-        
-        .tag {
-          display: inline-flex;
-          align-items: center;
-          background: #1976d2;
-          color: white;
-          padding: 4px 12px;
-          border-radius: 16px;
-          font-size: 14px;
-          animation: fadeIn 0.3s;
-          max-width: 200px;
-        }
-        
-        .tag .remove {
-          background: none;
-          border: none;
-          color: white;
-          margin-left: 6px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 50%;
-          width: 18px;
-          height: 18px;
-          font-size: 16px;
-          transition: background 0.2s;
-        }
-        
-        .tag .remove:hover {
-          background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .tag-input {
-          flex: 1;
-          min-width: 120px;
-          border: none;
-          outline: none;
-          padding: 8px 0;
-          font-size: 16px;
-          background: transparent;
-        }
-        
-        .hint {
-          margin-top: 8px;
-          font-size: 14px;
-          color: #666;
-        }
-        
-        .features {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 20px;
-          margin-top: 30px;
-        }
-        
-        .feature-card {
-          background: #f5f7fa;
-          border-radius: 10px;
-          padding: 20px;
-          transition: transform 0.3s;
-        }
-        
-        .feature-card:hover {
-          transform: translateY(-5px);
-        }
-        
-        .feature-icon {
-          font-size: 2rem;
-          color: #1976d2;
-          margin-bottom: 15px;
-        }
-        
-        .feature-card h3 {
-          margin-bottom: 10px;
-          color: #333;
-        }
-        
-        .feature-card p {
-          color: #666;
-          line-height: 1.5;
-        }
-        
-        .variations {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 20px;
-          margin-top: 20px;
-        }
-        
-        .variation {
-          flex: 1;
-          min-width: 250px;
-        }
-        
-        .tag-success {
-          background: #4caf50;
-        }
-        
-        .tag-warning {
-          background: #ff9800;
-        }
-        
-        .tag-error {
-          background: #f44336;
-        }
-        
-        .tag-info {
-          background: #2196f3;
-        }
-        
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .footer {
-          text-align: center;
-          margin-top: 40px;
-          color: #666;
-          font-size: 14px;
-        }
-        
-        .code-example {
-          background: #f5f7fa;
-          border-radius: 8px;
-          padding: 20px;
-          margin-top: 20px;
-          font-family: 'Courier New', monospace;
-          overflow-x: auto;
-        }
-        
-        @media (max-width: 600px) {
-          .container {
-            padding: 20px;
-          }
-          
-          .header h1 {
-            font-size: 1.8rem;
-          }
-          
-          .features {
-            grid-template-columns: 1fr;
-          }
-        }
-      </style>
+    body {
+      background: #f7f9fb;
+      font-family: 'Segoe UI', 'PingFang SC', 'Arial', sans-serif;
+      margin: 0; padding: 0;
+    }
+    .container {
+      max-width: 1080px;
+      margin: 40px auto 0 auto;
+      padding: 0 8px;
+    }
+    .history-table-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(60,60,120,0.08);
+      padding: 32px 28px;
+    }
+    .history-title {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #1566b6;
+      margin-bottom: 26px;
+      letter-spacing: .5px;
+    }
+    table.history-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 1px 8px rgba(30,144,255,0.04);
+      overflow: hidden;
+    }
+    table.history-table th, table.history-table td {
+      padding: 12px 10px;
+      text-align: left;
+      font-size: 1.05rem;
+      border-bottom: 1.5px solid #eaf6ff;
+      vertical-align: middle;
+    }
+    table.history-table th {
+      background: linear-gradient(90deg, #eaf6ff 0%, #f7fcff 100%);
+      color: #1566b6;
+      font-weight: 600;
+      border-bottom: 2.5px solid #1e90ff;
+      letter-spacing: .4px;
+    }
+    table.history-table tr:last-child td {
+      border-bottom: none;
+    }
+    .version-checkbox {
+      accent-color: #1e90ff;
+      width: 22px; height: 22px;
+      cursor: pointer;
+    }
+    .history-link {
+      color: #1e90ff;
+      text-decoration: underline;
+      border-radius: 7px;
+      padding: 2px 7px;
+      transition: background 0.13s, color 0.13s;
+    }
+    .history-link:hover {
+      background: #eaf6ff;
+      color: #1566b6;
+      text-decoration: none;
+    }
+    .category-link {
+      color: #2990f8;
+      background: #eaf6ff;
+      border-radius: 6px;
+      padding: 2px 9px;
+      font-size: 1.01rem;
+      font-weight: 500;
+      text-decoration: none;
+      margin-right: 2px;
+      transition: background 0.13s, color 0.13s;
+    }
+    .category-link:hover {
+      background: #d2eaff;
+      color: #1566b6;
+      text-decoration: underline;
+    }
+    .modifier-cell {
+      color: #1566b6;
+      font-weight: 600;
+    }
+    @media (max-width: 900px) {
+      .history-table-card {
+        padding: 13px 4px;
+      }
+      table.history-table th, table.history-table td {
+        padding: 8px 4px;
+        font-size: .97rem;
+      }
+      .history-title {
+        font-size: 1.19rem;
+        margin-bottom: 13px;
+      }
+    }
+  /* 新增/修改表头透明样式 */
+  table.history-table th {
+    background: rgba(255,255,255,0.65); /* 半透明 */
+    color: #1566b6;
+    font-weight: 600;
+    border-bottom: 2.5px solid #1e90ff;
+    letter-spacing: .4px;
+    backdrop-filter: blur(2px); /* 轻微磨砂 */
+  }
+
+  /* 表头透明样式 */
+  table.history-table th {
+    background: rgba(255,255,255,0.65);
+    color: #1566b6;
+    font-weight: 600;
+    border-bottom: 2.5px solid #1e90ff;
+    letter-spacing: .4px;
+    backdrop-filter: blur(2px);
+    position: relative;
+  }
+  /* 版本对比按钮样式 */
+  .compare-btn {
+    display: inline-block;
+    background: linear-gradient(90deg, #1e90ff 40%, #56CCF2 100%);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-size: 1.01rem;
+    font-weight: 600;
+    padding: 6px 16px;
+    margin: 0 2px;
+    cursor: pointer;
+    box-shadow: 0 1px 8px rgba(30,144,255,0.09);
+    transition: background 0.18s, color 0.18s;
+  }
+  .compare-btn:hover {
+    background: linear-gradient(90deg, #2990f8 40%, #1e90ff 100%);
+    color: #fff;
+  }
+  </style>
   </head>
 
   <body>
-    <!-- 3. 应用程序的挂载点 - 此id必须与Vue应用挂载的id匹配 -->
-    <div id="q-app">
-      <div class="container">
-        <div class="header">
-          <h1>基于QInput的Quasar标签输入框</h1>
-          <p>支持v-model双向绑定的功能完整标签输入组件</p>
-        </div>
-        <div class="demo-section">
-          <h2 class="section-title">基础用法</h2>
-          <q-tags-input v-model="tags1" placeholder="输入标签后按回车、逗号或分号添加" :max-tags="10" @change="onTagsChange">
-          </q-tags-input>
-          <p class="hint">当前标签: {{ tags1.join(', ') }}</p>
-          <div class="code-example"> &lt;q-tags-input v-model="tags" placeholder="输入标签..." :max-tags="10" @change="onTagsChange"&gt; &lt;/q-tags-input&gt; </div>
-        </div>
-        <div class="demo-section">
-          <h2 class="section-title">不同样式变体</h2>
-          <div class="variations">
-            <div class="variation">
-              <h3>填充样式</h3>
-              <q-tags-input v-model="tags2" filled label="兴趣标签" placeholder="输入你的兴趣...">
-              </q-tags-input>
-            </div>
-            <div class="variation">
-              <h3>轮廓样式</h3>
-              <q-tags-input v-model="tags3" outlined label="技能标签" placeholder="输入你的技能...">
-              </q-tags-input>
-            </div>
-          </div>
-        </div>
-        <div class="demo-section">
-          <h2 class="section-title">彩色标签</h2>
-          <q-tags-input dense outlined v-model="tags4" placeholder="输入优先级标签" :tag-colors="['#4caf50', '#ff9800', '#f44336', '#2196f3']">
-          </q-tags-input>
-          <p class="hint">标签将循环使用定义的颜色</p>
-        </div>
-        <div class="demo-section">
-          <h2 class="section-title">禁用状态</h2>
-          <q-tags-input v-model="tags5" placeholder="此输入框已被禁用" disabled>
-          </q-tags-input>
-          <q-btn @click="toggleDisabled" color="primary" class="q-mt-md" :label="tags5Disabled ? '启用输入框' : '禁用输入框'">
-          </q-btn>
-        </div>
-        <div class="features">
-          <div class="feature-card">
-            <div class="feature-icon">🏷️</div>
-            <h3>v-model支持</h3>
-            <p>完全支持Vue的v-model双向绑定，与标准表单元素行为一致。</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">⚡</div>
-            <h3>基于QInput</h3>
-            <p>基于Quasar的QInput组件，继承其所有特性和样式一致性。</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">🎨</div>
-            <h3>多种样式</h3>
-            <p>支持QInput的所有样式变体，如填充、轮廓、下划线等。</p>
-          </div>
-        </div>
-        <div class="footer">
-          <p>基于QInput的Quasar标签输入框组件 | 设计灵感来自 Quasar Framework</p>
-        </div>
+    <div class="container">
+      <div class="history-table-card">
+        <div class="history-title">历史版本列表</div>
+        <form id="version-compare-form">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th style="width:120px;">
+                  <button type="button" class="compare-btn" onclick="compareSelectedVersions()">版本对比</button>
+                </th>
+                <th>标题</th>
+                <th>原分类</th>
+                <th>修改时间</th>
+                <th>修改人</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="version-checkbox" name="compare" value="v1"></td>
+                <td><a href="/article/101/v1" class="history-link">Go并发模型详解（v1）</a></td>
+                <td><a href="/category/backend" class="category-link">后端开发</a></td>
+                <td><a href="/history/101/v1" class="history-link">2025-09-10 15:32</a></td>
+                <td class="modifier-cell">王五</td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="version-checkbox" name="compare" value="v2"></td>
+                <td><a href="/article/101/v2" class="history-link">Go并发模型优化（v2）</a></td>
+                <td><a href="/category/backend" class="category-link">后端开发</a></td>
+                <td><a href="/history/101/v2" class="history-link">2025-09-12 08:07</a></td>
+                <td class="modifier-cell">李四</td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="version-checkbox" name="compare" value="v3"></td>
+                <td><a href="/article/101/v3" class="history-link">Go并发与性能（v3）</a></td>
+                <td><a href="/category/backend" class="category-link">后端开发</a></td>
+                <td><a href="/history/101/v3" class="history-link">2025-09-15 10:08</a></td>
+                <td class="modifier-cell">王五</td>
+              </tr>
+              <!-- 更多版本... -->
+            </tbody>
+          </table>
+          <!-- 可在表单下方加“对比选中版本”按钮等自定义操作 -->
+        </form>
       </div>
     </div>
-    <!-- 4. 在body末尾引入必要的脚本 -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/quasar@2.10.1/dist/quasar.umd.prod.js"></script>
-    <script>
-      const { createApp } = Vue;
-
-      // 定义QTagsInput组件
-      const QTagsInput = {
-        name: 'QTagsInput',
-        props: {
-          modelValue: {
-            type: Array,
-            default: () => []
-          },
-          placeholder: {
-            type: String,
-            default: '输入标签...'
-          },
-          label: {
-            type: String,
-            default: ''
-          },
-          maxTags: {
-            type: Number,
-            default: Infinity
-          },
-          allowDuplicates: {
-            type: Boolean,
-            default: false
-          },
-          disabled: {
-            type: Boolean,
-            default: false
-          },
-          filled: {
-            type: Boolean,
-            default: false
-          },
-          outlined: {
-            type: Boolean,
-            default: false
-          },
-          dense: {
-            type: Boolean,
-            default: false
-          },
-          tagColors: {
-            type: Array,
-            default: () => []
-          }
-        },
-        emits: ['update:modelValue', 'change'],
-        data() {
-          return {
-            inputValue: '',
-            isFocused: false
-          };
-        },
-        computed: {
-          tags: {
-            get() {
-              return this.modelValue;
-            },
-            set(value) {
-              this.$emit('update:modelValue', value);
-              this.$emit('change', value);
-            }
-          },
-          inputClasses() {
-            return {
-              'q-field--filled': this.filled,
-              'q-field--outlined': this.outlined,
-              'q-field--disabled': this.disabled,
-              'q-field--focused': this.isFocused
-            };
-          }
-        },
-        methods: {
-          addTag(text) {
-            if (!text || text.trim() === '') return;
-
-            const tag = text.trim();
-
-            // 检查重复
-            if (!this.allowDuplicates && this.tags.includes(tag)) {
-              this.showDuplicateWarning();
-              return;
-            }
-
-            // 检查最大标签数
-            if (this.tags.length >= this.maxTags) {
-              this.showMaxTagsWarning();
-              return;
-            }
-
-            this.tags = [...this.tags, tag];
-            this.inputValue = '';
-          },
-
-          removeTag(index) {
-            this.tags = this.tags.filter((_, i) => i !== index);
-          },
-
-          handleKeydown(e) {
-            if (this.disabled) return;
-
-            if (e.key === 'Enter' || e.key === ',' || e.key === ';') {
-              e.preventDefault();
-              this.addTag(this.inputValue);
-            } else if (e.key === 'Backspace' && this.inputValue === '' && this.tags.length > 0) {
-              this.removeTag(this.tags.length - 1);
-            }
-          },
-
-          handleBlur() {
-            this.isFocused = false;
-            if (this.inputValue.trim() !== '') {
-              this.addTag(this.inputValue);
-            }
-          },
-
-          handleFocus() {
-            this.isFocused = true;
-          },
-
-          showDuplicateWarning() {
-            // 在实际Quasar应用中可以使用Notify
-            console.warn('标签已存在，不能重复添加');
-          },
-
-          showMaxTagsWarning() {
-            // 在实际Quasar应用中可以使用Notify
-            console.warn(`最多只能添加${this.maxTags}个标签`);
-          },
-
-          getTagColor(index) {
-            if (this.tagColors.length === 0) return '';
-            return this.tagColors[index % this.tagColors.length];
-          }
-        },
-        template: `
-        <div class="q-field" :class="inputClasses">
-          <div class="q-field__inner">
-            <div v-if="label" class="q-field__label">{{ label }}</div>
-            <div class="q-field__control">
-              <div class="tags-input-wrapper">
-                <div class="tags-container">
-                  <span 
-                    v-for="(tag, index) in tags" 
-                    :key="index" 
-                    class="tag"
-                    :style="{ background: getTagColor(index) }">
-                    {{ tag }}
-                    <button 
-                      v-if="!disabled"
-                      class="remove" 
-                      @click="removeTag(index)"
-                      type="button">×</button>
-                  </span>
-                  <input
-                    v-model="inputValue"
-                    @keydown="handleKeydown"
-                    @blur="handleBlur"
-                    @focus="handleFocus"
-                    :placeholder="tags.length === 0 ? placeholder : ''"
-                    :disabled="disabled"
-                    :dense="dense"
-                    class="tag-input"
-                    type="text">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `
-      };
-
-      // 创建Vue应用
-      const app = createApp({
-        components: {
-          QTagsInput
-        },
-        data() {
-          return {
-            tags1: ['前端', 'Vue.js', 'Quasar'],
-            tags2: ['阅读', '音乐', '旅行'],
-            tags3: ['JavaScript', 'CSS', 'HTML'],
-            tags4: ['高优先级', '中优先级'],
-            tags5: ['固定标签1', '固定标签2'],
-            tags5Disabled: true
-          };
-        },
-        methods: {
-          onTagsChange(tags) {
-            console.log('标签发生变化:', tags);
-          },
-          toggleDisabled() {
-            this.tags5Disabled = !this.tags5Disabled;
-          }
-        }
-      });
-
-      // 使用Quasar
-      app.use(Quasar)
-      // 将应用挂载到DOM上
-      app.mount('#q-app')
-    </script>
   </body>
 
 </html>
