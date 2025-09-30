@@ -437,13 +437,7 @@ const loadPageData = async () => {
     if (data) {
       tableData.value = data?.Data || []
       pagination.value.total = data?.TotalCount || 0
-
-      // 保存参数到本地存储
-      const paramsToSave = {
-        ...params,
-        page: pagination.value.page
-      }
-      localStorage.setItem('postlist-params', JSON.stringify(paramsToSave))
+      localStorage.setItem('postlist-params', JSON.stringify(params))
     }
   } catch (error) {
     toast.error('加载数据失败', { autoClose: 2000, position: 'top-center' })
@@ -859,6 +853,7 @@ const restoreParams = () => {
     try {
       const params = JSON.parse(savedParams)
       searchKeyword.value = params.kw || ''
+      useRegex.value = params.useRegex || false
       orderBy.value = params.orderby || 1
       pagination.value.page = params.page || 1
       if (params.cid) {

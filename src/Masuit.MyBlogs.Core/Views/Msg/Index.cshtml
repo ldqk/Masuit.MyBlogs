@@ -47,12 +47,19 @@
     </div>
   </div>
   <parent-messages :data="list" :is-admin="false" @@getmsgs="getmsgs" @@reply-msg="replyMsg"></parent-messages>
-  <div class="row">
-    <div class="col-md-12 text-center">
-      <n-pagination :page-count="Math.ceil(pageConfig.total / pageConfig.size)" :page-sizes="[10, 20, 30, 50]" show-size-picker v-model:page="pageConfig.page" v-model:page-size="pageConfig.size"/>
-    </div>
+  <div>
+    <n-pagination :page-count="Math.ceil(pageConfig.total / pageConfig.size)" :page-sizes="[10, 20, 30, 50]" show-size-picker v-model:page="pageConfig.page" v-model:page-size="pageConfig.size"/>
   </div>
   <n-modal :mask-closable="false" :style="{ width: '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复留言" preset="dialog" style="min-width:400px" v-model:show="showPopup">
+    <div class="comment-item">
+      <div class="comment-meta-row">
+        <div>
+          <span class="comment-author">{{reply.for?.NickName}}</span>
+          <span class="comment-time">{{ reply.for?.PostDate }}</span>
+        </div>
+      </div>
+      <div class="comment-content" v-html="reply.for?.Content"></div>
+    </div>
     <form class="comment-form">
       @Html.AntiForgeryToken()
       @if (hidden == nameof(hidden)) {
@@ -84,6 +91,7 @@
 </div>
 <script src="~/UEditorPlus/ueditor.config.front.js"></script>
 <script charset="utf-8" src="~/UEditorPlus/ueditor.all.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs/dayjs.min.js"></script>
 <script>
 window.defaultUser=function(){
   return {

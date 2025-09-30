@@ -1,6 +1,4 @@
-﻿@using System.Text.Encodings.Web
-@using System.Text.RegularExpressions
-@using System.Web
+﻿@using System.Web
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.ViewModel
@@ -8,20 +6,12 @@
 @{
   ViewBag.Title = Model.Title;
   Layout = "~/Views/Shared/_Layout.cshtml";
-  string[] colors = {
-    "success",
-    "info",
-    "primary",
-    "warning",
-    "danger",
-    "default",
-    "primary"
-  };
   string hidden = string.IsNullOrEmpty(Context.Request.Cookies["ValidateKey"]) ? "" : "hidden";
   AdvertisementDto ad = ViewBag.Ads;
 }
 <script src="~/UEditorPlus/ueditor.config.front.js"></script>
 <script charset="utf-8" src="~/UEditorPlus/ueditor.all.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs/dayjs.min.js"></script>
 <script>
   window.defaultUser=function(){
     return {
@@ -69,7 +59,6 @@
           <button class="article-op-btn">我要参与编辑</button>
         </a>
       </div>
-      <!-- 文章标签展示区，可放在文章信息区或内容区上方，支持多个标签 -->
       <div class="article-meta-row">
         <div>
           <span class="author">
@@ -102,8 +91,7 @@
       <div class="article-meta-row">
         <div class="article-tags-row">
           <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">
-            分类：
-            <i class="icon-map-pin"></i>
+            <i class="icon-map-pin"></i>分类：
             <span class="article-tag">
               @{
                 await Html.RenderPartialAsync("CategoryPath", Model.Category);
@@ -249,20 +237,21 @@
           <button @@click="submit(msg)" class="comment-form-btn">提交评论</button>
         </div>
       </div>
-      <!-- 评论列表：将评论人IP/地理信息和邮箱放在点赞和回复按钮的下方，一行显示 -->
-      @if (ViewBag.CommentsCount > 0) {
-        <parent-messages :data="list" :is-admin="false" @@getmsgs="getcomments" @@reply-msg="replyMsg"></parent-messages>
-        <div class="row">
-          <div class="col-md-12 text-center">
-            <n-pagination :page-count="Math.ceil(pageConfig.total / pageConfig.size)" :page-sizes="[10, 20, 30, 50]" show-size-picker v-model:page="pageConfig.page" v-model:page-size="pageConfig.size"/>
-          </div>
-        </div>
-      } else {
-        <h4>还没有评论哦，赶紧来写评论吧</h4>
-      }
+      <parent-messages :data="list" :is-admin="false" @@getmsgs="getcomments" @@reply-msg="replyMsg"></parent-messages>
+      <n-pagination :page-count="Math.ceil(pageConfig.total / pageConfig.size)" :page-sizes="[10, 20, 30, 50]" show-size-picker v-if="pageConfig.total > 0" v-model:page="pageConfig.page" v-model:page-size="pageConfig.size"/>
+      <h4 v-if="pageConfig.total == 0">还没有评论哦，赶紧来写评论吧</h4>
     </section>
   </div>
-  <n-modal :mask-closable="false" :style="{ 'min-width': '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复评论" preset="dialog" style="min-width:400px" v-model:show="showPopup">
+  <n-modal :mask-closable="false" :style="{ 'width': '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复评论" preset="dialog" style="min-width:400px" v-model:show="showPopup">
+    <div class="comment-item">
+      <div class="comment-meta-row">
+        <div>
+          <span class="comment-author">{{reply.for?.NickName}}</span>
+          <span class="comment-time">{{ reply.for?.CommentDate }}</span>
+        </div>
+      </div>
+      <div class="comment-content" v-html="reply.for?.Content"></div>
+    </div>
     <form class="comment-form">
       @Html.AntiForgeryToken()
       @if (hidden == nameof(hidden)) {

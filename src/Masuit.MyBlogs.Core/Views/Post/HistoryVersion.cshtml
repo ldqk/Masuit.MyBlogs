@@ -78,8 +78,7 @@
       <div class="article-meta-row">
         <div class="article-tags-row">
           <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">
-            原分类：
-            <i class="icon-map-pin"></i>
+            <i class="icon-map-pin"></i>原分类：
             <span class="article-tag">
               @{
                 await Html.RenderPartialAsync("CategoryPath", Model.Category);
@@ -126,7 +125,8 @@
         @Html.Raw(Model.Content)
       </div>
       @{
-        await Html.RenderPartialAsync("/Views/Post/ProtectContent.cshtml", Model);
+        Model.Post.ProtectContent = Model.ProtectContent;
+        await Html.RenderPartialAsync("/Views/Post/ProtectContent.cshtml", Model.Post);
       }
       @if (ad != null) {
         await Html.RenderPartialAsync("_ArticleListAdvertisement", ad);

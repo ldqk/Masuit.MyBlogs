@@ -19,7 +19,7 @@
         </div>
       </div>
       <!-- 主表格 -->
-      <div style="height: calc(100vh - 240px);">
+      <div style="height: calc(100vh - 270px);">
         <vxe-table ref="tableRef" :data="tableData" :loading="loading" stripe border height="100%" class="limited-row-height">
           <!-- 标题列 -->
           <vxe-column field="Title" title="标题" min-width="200" fixed="left">
@@ -235,7 +235,7 @@ onMounted(() => {
 }
 
 .notice-content {
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
   word-wrap: break-word;
   word-break: break-word;
@@ -283,15 +283,15 @@ onMounted(() => {
 .limited-row-height {
   :deep(.vxe-table--body-wrapper) {
     .vxe-body--row {
-      max-height: 300px;
+      max-height: 350px;
     }
 
     .vxe-body--column {
-      max-height: 300px;
+      max-height: 350px;
       overflow: hidden;
 
       .vxe-cell {
-        max-height: 300px;
+        max-height: 350px;
         overflow-y: auto;
       }
     }

@@ -259,7 +259,7 @@ public sealed class SubscribeController : Controller
 
         string scheme = Request.Scheme;
         var host = Request.Host;
-        var post = await PostService.GetAsync(p => p.ModifyDate >= StartTime && p.ModifyDate <= EndTime && p.Rss && p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章未找到");
+        var post = await PostService.GetAsync(p => p.Rss && p.Status == Status.Published && p.Id == id) ?? throw new NotFoundException("文章未找到");
         CheckPermission(post);
         var summary = await post.Content.GetSummary(300, 50);
         var item = new Item()

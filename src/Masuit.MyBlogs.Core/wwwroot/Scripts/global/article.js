@@ -16,9 +16,8 @@ const MessageReplies = defineComponent({
     replyMsg(item) { this.$emit('reply-msg', item); },
     GetOperatingSystem(os) { return window.GetOperatingSystem(os); },
     GetBrowser(browser) { return window.GetBrowser(browser); },
-    getColor(depth) {
-      const colors = ['info', 'success', 'primary', 'warning', 'danger'];
-      return colors[(depth + 1) % 5];
+    diffDateFromNow(date) {
+      return dayjs().diff(dayjs(date), 'day')
     }
   },
   template: `
@@ -42,7 +41,7 @@ const MessageReplies = defineComponent({
       <div class="comment-content" v-html="row.Content"></div>
       <div class="comment-actions-row">
         <button class="comment-like-btn" @click="voteComment(row)">👍{{row.VoteCount}}</button>
-        <button class="comment-reply-btn" @click="replyMsg(row)">回复</button>
+        <button class="comment-reply-btn" @click="replyMsg(row)" v-if="diffDateFromNow(row.CommentDate) < 180">回复</button>
       </div>
       <div class="comment-info-row" style="margin-top:4px;display:flex;flex-wrap:wrap;gap:16px;font-size:.97rem;color:#888;" v-if="isAdmin">
         <span class="comment-email" style="color:#1566b6;" @click="bounceEmail(row.Email)">邮箱：{{row.Email}}</span>
@@ -130,7 +129,10 @@ const ParentMessages = defineComponent({
       })
     },
     GetOperatingSystem(os) { return window.GetOperatingSystem(os); },
-    GetBrowser(browser) { return window.GetBrowser(browser); }
+    GetBrowser(browser) { return window.GetBrowser(browser); },
+    diffDateFromNow(date) {
+      return dayjs().diff(dayjs(date), 'day')
+    }
   },
   template: `
   <ul v-if="data && data.rows" class="comment-list">
@@ -152,7 +154,7 @@ const ParentMessages = defineComponent({
       <div class="comment-content" v-html="row.Content"></div>
       <div class="comment-actions-row">
         <button class="comment-like-btn" @click="voteComment(row)">👍{{row.VoteCount}}</button>
-        <button class="comment-reply-btn" @click="replyMsg(row)">回复</button>
+        <button class="comment-reply-btn" @click="replyMsg(row)" v-if="diffDateFromNow(row.CommentDate) < 180">回复</button>
       </div>
       <div class="comment-info-row" style="margin-top:4px;display:flex;flex-wrap:wrap;gap:16px;font-size:.97rem;color:#888;" v-if="isAdmin">
         <span class="comment-email" style="color:#1566b6;" @click="bounceEmail(row.Email)">邮箱：{{row.Email}}</span>
