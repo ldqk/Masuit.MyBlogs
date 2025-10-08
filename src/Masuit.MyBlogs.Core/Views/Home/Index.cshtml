@@ -15,27 +15,32 @@
   Context.Request.Path = new PathString("/posts");
 }
 <link href="~/Assets/banner/carousel.css" rel="stylesheet"/>
-@if (Model.Banner.Any()) {
-  <div class="carousel" id="@SnowFlake.NewId">
-    @for (int i = 0; i < Model.Banner.Count; i++) {
-      if (i == 0) {
-        <div class="active carousel-slide fade-in">
-          <a href="@Model.Banner[i].Url" target="_blank" title="@Model.Banner[i].Title">
-            <img alt="@(i + 1)" src="@Model.Banner[i].ImageUrl">
-          </a>
+
+@if (Model.Banner.Any())
+{
+    <div class="carousel" id="@SnowFlake.NewId" aria-roledescription="carousel">
+        <button class="nav prev" aria-label="上一张" data-dir="prev">‹</button>
+
+        <div class="slides">
+            @for (int i = 0; i < Model.Banner.Count; i++)
+            {
+                if (i == 0)
+                {
+                    <a class="slide is-active" href="@Model.Banner[i].Url" target="_blank" rel="noopener" aria-label="@Model.Banner[i].Title" title="@Model.Banner[i].Title">
+                        <img src="@Model.Banner[i].ImageUrl" alt="@Model.Banner[i].Title" />
+                    </a>
+                }
+                else
+                {
+                    <a class="slide" href="@Model.Banner[i].Url" target="_blank" rel="noopener" aria-label="@Model.Banner[i].Title" title="@Model.Banner[i].Title">
+                        <img src="@Model.Banner[i].ImageUrl" alt="@Model.Banner[i].Title" />
+                    </a>
+                }
+            }
         </div>
-      } else {
-        <div class="carousel-slide">
-          <a href="@Model.Banner[i].Url" target="_blank" title="@Model.Banner[i].Title">
-            <img alt="@(i + 1)" src="@Model.Banner[i].ImageUrl">
-          </a>
-        </div>
-      }
-    }
-    <button class="carousel-btn left">&#9664;</button>
-    <button class="carousel-btn right">&#9654;</button>
-    <div class="carousel-indicator"></div>
-  </div>
+        <div class="indicators" id="carousel-indicators" role="tablist" aria-label="轮播分页指示器"></div>
+        <button class="nav next" aria-label="下一张" data-dir="next">›</button>
+    </div>
 }
 <br/>
 @if (Model.Notices.Any()) {

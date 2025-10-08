@@ -318,7 +318,7 @@ const handleIframeLoad = () => {
   // 由于跨域限制，我们无法访问iframe内容
   // 设置一个固定高度或通过postMessage与iframe通信
   if (insightFrame.value) {
-    insightFrame.value.style.height = '85vh'
+    insightFrame.value.style.height = 'calc(100vh - 50px)'
   }
 }
 

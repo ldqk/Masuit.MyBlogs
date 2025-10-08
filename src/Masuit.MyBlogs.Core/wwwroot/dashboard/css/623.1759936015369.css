@@ -1,22 +1,22 @@
 
-.post-list-container[data-v-08b223d5] {
+.post-list-container[data-v-765bf6be] {
   padding: 16px;
 }
-.controls-row[data-v-08b223d5] {
+.controls-row[data-v-765bf6be] {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
 }
-[data-v-08b223d5] .warning-row {
+[data-v-765bf6be] .warning-row {
   background-color: #fff3cd !important;
 }
-.text-red[data-v-08b223d5] {
+.text-red[data-v-765bf6be] {
   color: #f56565 !important;
 }
 @media (max-width: 768px) {
-.controls-row[data-v-08b223d5] {
+.controls-row[data-v-765bf6be] {
     flex-direction: column;
     align-items: stretch;
 }

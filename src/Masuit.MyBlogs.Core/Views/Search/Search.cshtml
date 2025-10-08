@@ -59,7 +59,7 @@
             var p = Model.Results[i];
             <div class="article-card" style="margin-top: 15px;">
               <div class="article-content">
-                <a asp-action="Details" asp-controller="Post" asp-route-id="@p.Id" class="article-title" target="_blank">
+                <a asp-action="Details" asp-controller="Post" asp-route-id="@p.Id" asp-route-kw="@ViewBag.Keyword" class="article-title" target="_blank">
                   @Html.Raw(p.Title)
                 </a>
                 <div class="meta-row">
