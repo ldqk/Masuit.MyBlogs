@@ -329,30 +329,4 @@
 <script color="0,104,183" count="100" opacity='1' src="~/Scripts/line.js" type="text/javascript" zIndex="-1"></script>
 </body>
 </html>
-@if (Context.Request.Headers["User-Agent"].ToString().Contains(new[] {
-       "IE",
-       "InternetExplorer"
-     })) {
-  <script type="text/javascript">
-        var b = localStorage.getItem("browser");
-        if (!b) {
-            layer.open({
-                title: '浏览器版本提示',
-                area: '400px;',
-                closeBtn: false,
-                content: '亲爱的访客，我们检测到您正在使用IE浏览器，本网站的某些功能或特性可能不会完美地支持IE浏览器，但您可以继续浏览，不过为了更好的体验效果，建议您使用Chrome、Firefox等相同或类似的更高级浏览器访问本网站。珍惜生命，远离IE！',
-                btn: ['知道了', '哦'],
-                btn1: function (layero) {
-                    layer.closeAll();
-                    layer.msg('为消灭IE做一点贡献，就是为世界上所有广大的互联网开发者们少加一点儿班做善事！<br/>IE：只要不升级，我还会回来的，我就是这么倔强！', {
-                        icon: 5
-                    });
-                    window.localStorage.setItem("browser", true);
-                },
-                btn2: function (index) {
-                }
-            });
-        }
-    </script>
-}
 <mini-profiler max-traces="5"/>

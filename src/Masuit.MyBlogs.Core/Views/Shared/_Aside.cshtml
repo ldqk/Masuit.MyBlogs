@@ -1,19 +1,6 @@
-﻿@using System.Diagnostics
-@using Masuit.MyBlogs.Core.Common
+﻿@using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
-@using Masuit.Tools.Models
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
-@{
-  string[] colors = {
-    "success",
-    "info",
-    "primary",
-    "warning",
-    "danger",
-    "default",
-    "primary"
-  };
-}
 <aside class="sidebar">
   <!-- 公告列表卡片 -->
   <section class="announcement-card">
@@ -104,7 +91,7 @@
   </nav>
   <!-- 侧边栏广告卡片 -->
   @foreach (var ad in Model.SidebarAds) {
-    <a href="@ad.Url" target="_blank">
+    <a asp-action="Redirect" asp-controller="Advertisement" asp-route-id="@ad.Id" target="_blank">
       <div class="sidebar-ad-card">
         <div class="sidebar-ad-cover">
           <img alt="@ad.Title" decoding="async" src="@(ad.ThumbImgUrl + "?width=300&format=webp&quality=50")" title="@ad.Title"/>

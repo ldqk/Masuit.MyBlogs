@@ -71,7 +71,12 @@ public class Startup
         {
             options.AddPolicy("AllowAny", builder =>
             {
-                builder.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+                builder.SetIsOriginAllowed(_ => true).AllowAnyMethod().AllowAnyHeader().AllowCredentials().WithExposedHeaders(
+                    "X-MiniProfiler-Ids",           // 主要的MiniProfiler头
+                    "x-miniprofiler-ids",           // 小写版本
+                    "X-MINIPROFILER-IDS",           // 大写版本
+                    "miniprofiler-ids"              // 备用名称
+                ); ;
             });
         });
         services.AddEFSecondLevelCache(options => options.UseCustomCacheProvider<EFCoreCacheProvider>(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(15)).SkipCacheInvalidationCommands(s => Regex.IsMatch(s, "ViewCount|DisplayCount|LinkLoopback|LoginRecord|ClickRecord|VisitRecord|SearchDetails")).UseCacheKeyPrefix("EFCache:"));

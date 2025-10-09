@@ -1,19 +1,16 @@
-﻿@using System.Diagnostics
-@using Markdig
+﻿@using Markdig
 
 @model Masuit.MyBlogs.Core.Models.DTO.AdvertisementDto
 @if (Model != null) {
-  <div class="ad-card">
+  <div class="article-card">
     <div class="cover">
-      <img alt="@Model.Title" class="thumb" decoding="async" src="@(Model.ThumbImgUrl + "?width=280&format=webp&quality=50")" title="@Model.Title">
+      <img alt="@Model.Title" class="lazyload thumb" decoding="async" loading="lazy" src="@(Model.ThumbImgUrl + "?width=280&format=webp&quality=50")" title="@Model.Title">
     </div>
-    <div class="ad-content">
-      <div class="ad-title">
-        <a href="@Model.Url" target="_blank">
-          <i class="size18 text-red">[荐]</i>@Model.Title
-        </a>
-      </div>
-      <div class="ad-summary">@Html.Raw(Markdown.ToHtml(Model.Description))</div>
+    <div class="article-content">
+      <a asp-action="Redirect" asp-controller="Advertisement" asp-route-id="@Model.Id" class="article-title" target="_blank">
+        <i class="size18 text-red">[荐]</i>@Model.Title
+      </a>
+      <div class="summary"> @Html.Raw(Markdown.ToHtml(Model.Description)) </div>
     </div>
   </div>
 }
