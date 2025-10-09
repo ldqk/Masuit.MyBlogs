@@ -24,7 +24,7 @@ public sealed class DashboardController(IWebHostEnvironment env) : AdminControll
             Expires = DateTime.Now.AddYears(1),
         });
         var html = System.IO.File.ReadAllText(Path.Combine(env.WebRootPath, "dashboard", "index.html"));
-        return Content(html, ContentType.Html);
+        return View("Index", html);
     }
 
     [Route("counter")]

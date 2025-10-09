@@ -824,6 +824,7 @@ const initEventSource = () => {
 
   eventSource.onerror = (error) => {
     toast.error('EventSource 连接错误！', { autoClose: 2000, position: 'top-center' })
+    eventSource.close()
   }
 }
 
