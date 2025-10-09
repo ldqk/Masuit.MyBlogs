@@ -3,7 +3,7 @@
   <!-- 顶部操作栏 -->
   <div class="row">
     <div class="col text-right">
-      <q-btn color="primary" size="lg" icon="save" label="保存配置" @click="saveSettings" :loading="saving" />
+      <q-btn id="save" color="primary" size="lg" icon="save" label="保存配置" @click="saveSettings" :loading="saving" />
     </div>
   </div>
   <!-- 基础配置 -->
@@ -452,6 +452,7 @@ const initEditors = () => {
 
 // 生命周期钩子
 onMounted(async () => {
+  document.querySelector('#save').scrollIntoView({ behavior: 'smooth', block: 'center' })
   await loadSettings()
   // 延迟初始化编辑器，确保DOM已渲染
   setTimeout(initEditors, 100)

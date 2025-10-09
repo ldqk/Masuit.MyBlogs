@@ -1,7 +1,7 @@
 ﻿<template>
 <div class="advertisement-page">
   <!-- 顶部操作栏 -->
-  <div class="text-h6"> 广告推广管理 </div>
+  <div class="text-h6" id="title"> 广告推广管理 </div>
   <div class="row q-mb-md">
     <div class="col-6">
       <q-select multiple v-model="showColumns" :options="columnOptions" outlined dense map-options emit-value use-chips @update:model-value="saveShowColumns">
@@ -1267,6 +1267,7 @@ const showInsight = (ad: Advertisement) => {
 
 // 生命周期钩子
 onMounted(async () => {
+  document.querySelector('#title').scrollIntoView({ behavior: 'smooth', block: 'center' })
   // 初始化显示列配置
   const savedColumns = localStorage.getItem('advertisement-showColumns')
   if (savedColumns) {

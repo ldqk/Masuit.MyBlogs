@@ -48,7 +48,7 @@
         <q-btn icon="close" flat round dense @click="closeLogDialog" />
       </q-card-section>
       <q-card-section class="q-pt-none">
-        <q-scroll-area style="height: 70vh">
+        <q-scroll-area style="height: calc(100vh - 70px)">
           <pre class="log-content">{{ logContent }}</pre>
         </q-scroll-area>
       </q-card-section>

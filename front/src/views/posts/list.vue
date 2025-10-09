@@ -36,7 +36,7 @@
       </div>
       <!-- 主表格 -->
       <div style="height: calc(100vh - 240px);margin-top: 10px;">
-        <vxe-table ref="tableRef" :data="tableData" :loading="loading" resizable border height="auto" :row-config="{ isCurrent: true, isHover: true }" :row-class-name="getRowClassName">
+        <vxe-table ref="tableRef" :data="tableData" :loading="loading" border height="auto" :row-config="{ isCurrent: true, isHover: true }" :row-class-name="getRowClassName">
           <!-- 标题列 -->
           <vxe-column field="Title" title="标题" min-width="240" fixed="left">
             <template #default="{ row }">
@@ -304,7 +304,7 @@
 </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { toast } from 'vue3-toastify'
 import dayjs from 'dayjs'
 import * as echarts from 'echarts'
@@ -438,6 +438,10 @@ const loadPageData = async () => {
       tableData.value = data?.Data || []
       pagination.value.total = data?.TotalCount || 0
       localStorage.setItem('postlist-params', JSON.stringify(params))
+      setTimeout(() => {
+        document.querySelector('.vxe-table--body').scrollIntoView({ behavior: 'smooth', block: 'start' })
+        document.querySelector('.search-btn').scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 20)
     }
   } catch (error) {
     toast.error('加载数据失败', { autoClose: 2000, position: 'top-center' })
