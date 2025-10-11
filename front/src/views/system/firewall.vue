@@ -310,11 +310,8 @@ import { ref, onMounted, onUnmounted, nextTick, computed } from "vue";
 import { toast } from "vue3-toastify";
 import api from "@/axios/AxiosConfig";
 import dayjs from "dayjs";
-// Monaco Editor 配置
-import "@/utils/MonacoConfig";
-// @ts-ignore
-import * as monaco from "monaco-editor";
 import { VxeColumnPropTypes } from "vxe-table";
+import loadCodeMirror from "../../utils/codeMirrorLoader";
 
 // 定义接口类型
 interface Settings {
@@ -401,8 +398,29 @@ const currentHeaders = ref("");
 // 编辑器引用
 const accessDenyTipsEditor = ref();
 const userAgentBlockedMsgEditor = ref();
-let accessDenyTipsMonacoEditor: any = null;
-let userAgentBlockedMsgMonacoEditor: any = null;
+let accessDenyTipsCodeMirrorEditor: any = null;
+let userAgentBlockedMsgCodeMirrorEditor: any = null;
+
+const destroyEditors = () => {
+  const disposeEditor = (editorRef: any, containerRef: any) => {
+    if (editorRef) {
+      const wrapper = editorRef.getWrapperElement?.();
+      if (wrapper && wrapper.parentNode) {
+        wrapper.parentNode.removeChild(wrapper);
+      }
+    }
+
+    if (containerRef?.value) {
+      containerRef.value.innerHTML = '';
+    }
+  };
+
+  disposeEditor(accessDenyTipsCodeMirrorEditor, accessDenyTipsEditor);
+  disposeEditor(userAgentBlockedMsgCodeMirrorEditor, userAgentBlockedMsgEditor);
+
+  accessDenyTipsCodeMirrorEditor = null;
+  userAgentBlockedMsgCodeMirrorEditor = null;
+};
 
 // 选项配置
 const challengeModeOptions = [
@@ -474,11 +492,11 @@ const loadSettings = async () => {
 
       // 初始化编辑器内容
       await nextTick();
-      if (accessDenyTipsMonacoEditor) {
-        accessDenyTipsMonacoEditor.setValue(settings.value.AccessDenyTips || "");
+      if (accessDenyTipsCodeMirrorEditor) {
+        accessDenyTipsCodeMirrorEditor.setValue(settings.value.AccessDenyTips || "");
       }
-      if (userAgentBlockedMsgMonacoEditor) {
-        userAgentBlockedMsgMonacoEditor.setValue(
+      if (userAgentBlockedMsgCodeMirrorEditor) {
+        userAgentBlockedMsgCodeMirrorEditor.setValue(
           settings.value.UserAgentBlockedMsg || ""
         );
       }
@@ -545,11 +563,11 @@ const saveSettings = async () => {
   saving.value = true;
   try {
     // 获取编辑器内容
-    if (accessDenyTipsMonacoEditor) {
-      settings.value.AccessDenyTips = accessDenyTipsMonacoEditor.getValue();
+    if (accessDenyTipsCodeMirrorEditor) {
+      settings.value.AccessDenyTips = accessDenyTipsCodeMirrorEditor.getValue();
     }
-    if (userAgentBlockedMsgMonacoEditor) {
-      settings.value.UserAgentBlockedMsg = userAgentBlockedMsgMonacoEditor.getValue();
+    if (userAgentBlockedMsgCodeMirrorEditor) {
+      settings.value.UserAgentBlockedMsg = userAgentBlockedMsgCodeMirrorEditor.getValue();
     }
 
     const response = (await api.post(
@@ -702,33 +720,31 @@ const formatDateTime = (dateStr: string): string => {
   return dayjs(dateStr).format("YYYY-MM-DD HH:mm:ss");
 };
 
-// 初始化Monaco编辑器
+// 初始化CodeMirror编辑器
 const initEditors = async () => {
   await nextTick();
 
+  const CodeMirror = (window as any).CodeMirror;
+  if (!CodeMirror) {
+    return;
+  }
+
+  destroyEditors();
+
   if (accessDenyTipsEditor.value) {
-    accessDenyTipsMonacoEditor = monaco.editor.create(accessDenyTipsEditor.value, {
+    accessDenyTipsCodeMirrorEditor = CodeMirror(accessDenyTipsEditor.value, {
       value: settings.value.AccessDenyTips || "",
-      language: "html",
-      theme: "vs",
-      minimap: { enabled: false },
-      scrollBeyondLastLine: false,
-      wordWrap: "on",
+      lineNumbers: true,
+      mode: 'htmlmixed'
     });
   }
 
   if (userAgentBlockedMsgEditor.value) {
-    userAgentBlockedMsgMonacoEditor = monaco.editor.create(
-      userAgentBlockedMsgEditor.value,
-      {
-        value: settings.value.UserAgentBlockedMsg || "",
-        language: "html",
-        theme: "vs",
-        minimap: { enabled: false },
-        scrollBeyondLastLine: false,
-        wordWrap: "on",
-      }
-    );
+    userAgentBlockedMsgCodeMirrorEditor = CodeMirror(userAgentBlockedMsgEditor.value, {
+      value: settings.value.UserAgentBlockedMsg || "",
+      lineNumbers: true,
+      mode: 'htmlmixed'
+    });
   }
 };
 
@@ -736,17 +752,20 @@ const initEditors = async () => {
 onMounted(async () => {
   await loadSettings();
   await loadInterceptLogs();
-  // 延迟初始化编辑器
-  setTimeout(initEditors, 100);
+  try {
+    await loadCodeMirror();
+    // 延迟初始化编辑器
+    setTimeout(() => {
+      initEditors();
+    }, 100);
+  } catch (error) {
+    toast.error("编辑器初始化失败", { autoClose: 2000, position: "top-center" });
+    console.error("Error loading CodeMirror assets:", error);
+  }
 });
 
 onUnmounted(() => {
-  if (accessDenyTipsMonacoEditor) {
-    accessDenyTipsMonacoEditor.dispose();
-  }
-  if (userAgentBlockedMsgMonacoEditor) {
-    userAgentBlockedMsgMonacoEditor.dispose();
-  }
+  destroyEditors();
 });
 </script>
 <style scoped lang="scss">
@@ -757,6 +776,14 @@ onUnmounted(() => {
 .editor-container {
   border: 1px solid #ddd;
   border-radius: 4px;
+}
+
+:deep(.CodeMirror) {
+  height: 100%;
+}
+
+:deep(.CodeMirror-scroll) {
+  height: 100%;
 }
 
 .headers-content {

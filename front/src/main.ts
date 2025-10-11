@@ -10,14 +10,8 @@ import router from "./router/permission";
 // 后端返回动态路由
 // import router from './router/permissionWithDynamicRouter'
 
-// Monaco Editor 配置（全局加载）
-import "./utils/MonacoConfig";
-
 // 系统全局配置
 import { globalConfig } from "./config";
-
-// 环境配置验证
-import { logApiConfig } from "./utils/EnvConfig";
 
 // 第三方组件
 import "animate.css";

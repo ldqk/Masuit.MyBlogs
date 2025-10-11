@@ -1069,7 +1069,7 @@ const updateChart = async () => {
     }
     console.log(xSeries, ySeries);
     const colors = ['#0091ee', '#ccc']
-    var option = {
+    const option = {
       color: colors,
       tooltip: {
         trigger: 'none',

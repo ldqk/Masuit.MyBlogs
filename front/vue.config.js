@@ -158,19 +158,17 @@ module.exports = {
     // 生产环境配置CDN外部依赖
     if (process.env.NODE_ENV === 'production') {
       config.externals({
-        'vue': 'Vue',
+        vue: 'Vue',
         'vue-router': 'VueRouter',
-        'axios': 'axios',
-        'echarts': 'echarts',
-        'dayjs': 'dayjs',
-        'pinia': 'Pinia',
-        'quasar': 'Quasar',
+        axios: 'axios',
+        echarts: 'echarts',
+        dayjs: 'dayjs',
+        pinia: 'Pinia',
+        quasar: 'Quasar',
         // vxe-table 和 vxe-pc-ui 暂时不使用 CDN，保持打包到 bundle 中
         // 'vxe-table': 'VxeTable',
         // 'vxe-pc-ui': 'VxeTable',
         'xe-utils': 'XEUtils',
-        // monaco-editor 使用特殊的 AMD 加载方式，不适合作为 external
-        // 'monaco-editor': 'monaco',
         'lottie-web': 'lottie'
       })
     }

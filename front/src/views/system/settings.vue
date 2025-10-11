@@ -199,14 +199,11 @@
 </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { toast } from 'vue3-toastify'
 import api from '@/axios/AxiosConfig'
-// Monaco Editor 配置
-import '@/utils/MonacoConfig'
-// @ts-ignore
-import * as monaco from 'monaco-editor'
 import globalConfig from '@/config'
+import loadCodeMirror from '../../utils/codeMirrorLoader'
 
 // 定义接口类型
 interface Settings {
@@ -259,8 +256,29 @@ const currentImageProperty = ref('')
 // 编辑器引用
 const stylesEditor = ref()
 const scriptsEditor = ref()
-let styleMonacoEditor: any = null
-let scriptMonacoEditor: any = null
+let styleCodeMirrorEditor: any = null
+let scriptCodeMirrorEditor: any = null
+
+const destroyEditors = () => {
+  const disposeEditor = (editorRef: any, containerRef: any) => {
+    if (editorRef) {
+      const wrapper = editorRef.getWrapperElement?.()
+      if (wrapper && wrapper.parentNode) {
+        wrapper.parentNode.removeChild(wrapper)
+      }
+    }
+
+    if (containerRef?.value) {
+      containerRef.value.innerHTML = ''
+    }
+  }
+
+  disposeEditor(styleCodeMirrorEditor, stylesEditor)
+  disposeEditor(scriptCodeMirrorEditor, scriptsEditor)
+
+  styleCodeMirrorEditor = null
+  scriptCodeMirrorEditor = null
+}
 
 // 水印选项
 const watermarkOptions = [
@@ -306,11 +324,11 @@ const loadSettings = async () => {
     settings.value = settingsObj
 
     // 初始化编辑器内容
-    if (styleMonacoEditor) {
-      styleMonacoEditor.setValue(settings.value.Styles || '')
+    if (styleCodeMirrorEditor) {
+      styleCodeMirrorEditor.setValue(settings.value.Styles || '')
     }
-    if (scriptMonacoEditor) {
-      scriptMonacoEditor.setValue(settings.value.Scripts || '')
+    if (scriptCodeMirrorEditor) {
+      scriptCodeMirrorEditor.setValue(settings.value.Scripts || '')
     }
   } else {
     toast.error('获取系统设置失败', { autoClose: 2000, position: 'top-center' })
@@ -321,11 +339,11 @@ const loadSettings = async () => {
 const saveSettings = async () => {
   saving.value = true
   // 更新编辑器内容到设置
-  if (styleMonacoEditor) {
-    settings.value.Styles = styleMonacoEditor.getValue()
+  if (styleCodeMirrorEditor) {
+    settings.value.Styles = styleCodeMirrorEditor.getValue()
   }
-  if (scriptMonacoEditor) {
-    settings.value.Scripts = scriptMonacoEditor.getValue()
+  if (scriptCodeMirrorEditor) {
+    settings.value.Scripts = scriptCodeMirrorEditor.getValue()
   }
 
   const response = await api.post('/system/save', Object.keys(settings.value).map(key => {
@@ -427,25 +445,28 @@ const uploadImage = async () => {
   }
 }
 
-// 初始化Monaco编辑器
+// 初始化CodeMirror编辑器
 const initEditors = () => {
+  const CodeMirror = (window as any).CodeMirror
+  if (!CodeMirror) {
+    return
+  }
+
+  destroyEditors()
+
   if (stylesEditor.value) {
-    styleMonacoEditor = monaco.editor.create(stylesEditor.value, {
+    styleCodeMirrorEditor = CodeMirror(stylesEditor.value, {
       value: settings.value.Styles || '',
-      language: 'css',
-      theme: 'vs',
-      minimap: { enabled: false },
-      scrollBeyondLastLine: false
+      lineNumbers: true,
+      mode: 'css'
     })
   }
 
   if (scriptsEditor.value) {
-    scriptMonacoEditor = monaco.editor.create(scriptsEditor.value, {
+    scriptCodeMirrorEditor = CodeMirror(scriptsEditor.value, {
       value: settings.value.Scripts || '',
-      language: 'javascript',
-      theme: 'vs',
-      minimap: { enabled: false },
-      scrollBeyondLastLine: false
+      lineNumbers: true,
+      mode: 'javascript'
     })
   }
 }
@@ -454,17 +475,19 @@ const initEditors = () => {
 onMounted(async () => {
   document.querySelector('#save').scrollIntoView({ behavior: 'smooth', block: 'center' })
   await loadSettings()
-  // 延迟初始化编辑器，确保DOM已渲染
-  setTimeout(initEditors, 100)
+  try {
+    await loadCodeMirror()
+    await nextTick()
+    // 延迟初始化编辑器，确保DOM已渲染
+    setTimeout(initEditors, 100)
+  } catch (error) {
+    toast.error('编辑器初始化失败', { autoClose: 2000, position: 'top-center' })
+    console.error('Error loading CodeMirror assets:', error)
+  }
 })
 
 onUnmounted(() => {
-  if (styleMonacoEditor) {
-    styleMonacoEditor.dispose()
-  }
-  if (scriptMonacoEditor) {
-    scriptMonacoEditor.dispose()
-  }
+  destroyEditors()
 })
 </script>
 <style scoped lang="scss">
@@ -476,6 +499,14 @@ onUnmounted(() => {
 .editor-container {
   border: 1px solid #ddd;
   border-radius: 4px;
+}
+
+:deep(.CodeMirror) {
+  height: 100%;
+}
+
+:deep(.CodeMirror-scroll) {
+  height: 100%;
 }
 
 .logo-preview {

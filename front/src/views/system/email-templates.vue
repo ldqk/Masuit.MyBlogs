@@ -51,10 +51,7 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { toast } from 'vue3-toastify'
 import api from '../../axios/AxiosConfig'
-// Monaco Editor 配置
-import '../../utils/MonacoConfig'
-// @ts-ignore
-import * as monaco from 'monaco-editor'
+import loadCodeMirror from '../../utils/codeMirrorLoader'
 
 // 定义接口类型
 interface FileInfo {
@@ -81,7 +78,21 @@ const loading = ref(false)
 
 // 编辑器引用
 const templateEditor = ref()
-let monacoEditor: any = null
+let codeMirrorEditor: any = null
+
+const destroyEditor = () => {
+  if (codeMirrorEditor) {
+    const wrapper = codeMirrorEditor.getWrapperElement?.()
+    if (wrapper && wrapper.parentNode) {
+      wrapper.parentNode.removeChild(wrapper)
+    }
+    codeMirrorEditor = null
+  }
+
+  if (templateEditor.value) {
+    templateEditor.value.innerHTML = ''
+  }
+}
 
 // 获取邮件模板文件列表
 const getTemplateFiles = async () => {
@@ -124,43 +135,54 @@ const viewTemplate = async (filepath: string) => {
 
 // 切换编辑模式
 const toggleEditMode = async () => {
-  isEditing.value = !isEditing.value
-
   if (isEditing.value) {
-    // 切换到编辑模式，初始化编辑器
+    if (codeMirrorEditor) {
+      templateContent.value = codeMirrorEditor.getValue()
+    }
+    isEditing.value = false
+    destroyEditor()
+    return
+  }
+
+  try {
+    await loadCodeMirror()
+    isEditing.value = true
     await nextTick()
     initEditor()
-  } else {
-    // 切换到预览模式，获取编辑器内容
-    if (monacoEditor) {
-      templateContent.value = monacoEditor.getValue()
-    }
+  } catch (error) {
+    toast.error('编辑器初始化失败', { autoClose: 2000, position: 'top-center' })
+    console.error('Error loading CodeMirror assets:', error)
   }
 }
 
-// 初始化Monaco编辑器
+// 初始化CodeMirror编辑器
 const initEditor = () => {
-  if (templateEditor.value && !monacoEditor) {
-    monacoEditor = monaco.editor.create(templateEditor.value, {
-      value: templateContent.value,
-      language: 'html',
-      theme: 'vs',
-      minimap: { enabled: false },
-      scrollBeyondLastLine: false,
-      wordWrap: 'on'
-    })
-  } else if (monacoEditor) {
-    monacoEditor.setValue(templateContent.value)
+  if (!templateEditor.value) {
+    return
   }
+
+  destroyEditor()
+
+  const CodeMirror = (window as any).CodeMirror
+  if (!CodeMirror) {
+    return
+  }
+
+  codeMirrorEditor = CodeMirror(templateEditor.value, {
+    value: templateContent.value,
+    lineNumbers: true,
+    mode: 'htmlmixed'
+  })
+
 }
 
 // 保存邮件模板
 const saveTemplate = async () => {
-  if (!monacoEditor) return
+  if (!codeMirrorEditor) return
 
   saving.value = true
   try {
-    const content = monacoEditor.getValue()
+    const content = codeMirrorEditor.getValue()
     const response = await api.post('/file/save', {
       filename: currentTemplatePath.value,
       content
@@ -189,10 +211,7 @@ const closeTemplateDialog = () => {
   templateContent.value = ''
   isEditing.value = false
 
-  if (monacoEditor) {
-    monacoEditor.dispose()
-    monacoEditor = null
-  }
+  destroyEditor()
 }
 
 // 生命周期钩子
@@ -201,9 +220,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (monacoEditor) {
-    monacoEditor.dispose()
-  }
+  destroyEditor()
 })
 </script>
 <style scoped lang="scss">
@@ -242,6 +259,10 @@ onUnmounted(() => {
   height: 70vh;
   border: 1px solid #ddd;
   border-radius: 4px;
+}
+
+:deep(.CodeMirror-scroll) {
+  height: 70vh;
 }
 
 .template-preview {
