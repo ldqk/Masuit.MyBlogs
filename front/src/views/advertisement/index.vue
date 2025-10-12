@@ -60,13 +60,26 @@
               <a :href="row.Url" target="_blank" class="text-primary">{{ row.Url }}</a>
             </template>
           </vxe-column>
-          <!-- 当前竞价列 -->
           <vxe-column v-if="showColumns.includes('Price')" field="Price" title="当前竞价" width="80">
             <template #default="{ row }"> ¥{{ row.Price || 0 }} </template>
-          </vxe-column><!-- 分类列 -->
-          <vxe-column v-if="showColumns.includes('CategoryIds')" field="CategoryIds" title="分类" width="260" show-overflow>
+          </vxe-column>
+          <vxe-column v-if="showColumns.includes('CategoryIds')" field="CategoryIds" title="分类" width="260">
             <template #default="{ row }">
-              <q-select use-chips outlined :model-value="getCategoryIdsArray(row.CategoryIds)" @update:model-value="(val) => changeAdvertisementCategory(row, val)" :options="categoryOptions" option-value="value" option-label="label" multiple dense borderless map-options emit-value placeholder="选择分类" />
+              <q-select use-chips outlined :model-value="getCategoryIdsArray(row.CategoryIds)" @update:model-value="(val) => changeAdvertisementCategory(row, val)" :options="categoryOptions" option-value="value" option-label="label" multiple dense map-options emit-value :label="getCategoryIdsArray(row.CategoryIds).length === 0 ? '未选择分类' : undefined" :label-slot="false">
+                <template v-slot:selected-item="scope">
+                  <q-chip :style="{ backgroundColor: ['#FFB300', '#39B54A', '#00A1E9', '#F75000', '#8C6E63', '#E67E22'][scope.index % 6], color: 'white', fontSize: '11px' }" removable @remove="scope.removeAtIndex(scope.index)"> {{ scope.opt.label }} </q-chip>
+                </template>
+                <template v-slot:option="{ itemProps, opt, selected, toggleOption }">
+                  <q-item v-bind="itemProps">
+                    <q-item-section>
+                      <q-item-label>{{ opt.label }}</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-toggle :model-value="selected" @update:model-value="toggleOption(opt)" />
+                    </q-item-section>
+                  </q-item>
+                </template>
+              </q-select>
             </template>
           </vxe-column>
           <!-- 当月曝光量列 -->
@@ -1067,7 +1080,7 @@ const updateChart = async () => {
       xSeries.push(x)
       ySeries.push(y)
     }
-    console.log(xSeries, ySeries);
+
     const colors = ['#0091ee', '#ccc']
     const option = {
       color: colors,
@@ -1479,7 +1492,7 @@ onBeforeUnmount(() => {
 .advertisement-page {
   .show-columns-selector {
     .q-chip {
-      max-width: 120px;
+      //max-width: 120px;
       font-size: 11px;
 
       .q-chip__content {
@@ -1537,7 +1550,7 @@ onBeforeUnmount(() => {
     }
 
     .q-chip {
-      max-width: 120px;
+      //max-width: 120px;
       font-size: 11px;
 
       .q-chip__content {

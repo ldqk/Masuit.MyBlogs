@@ -333,7 +333,7 @@
         //,emotionLocalization:false
 
         // 粘贴只保留标签，去除标签所有属性
-        //,retainOnlyLabelPasted: false
+        , retainOnlyLabelPasted: true
 
         // 是否默认为纯文本粘贴。false为不使用纯文本粘贴，true为使用纯文本粘贴
         //,pasteplain:false

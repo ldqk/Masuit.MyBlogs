@@ -30,7 +30,7 @@
         <label for="article">文章标题：</label>
       </span>
       <input class="form-control input-lg" id="article" placeholder="请输入文章标题" required type="text" v-model="post.Title">
-      <span class="input-group-btn">
+      <span class="input-group-btn" v-if="post.Title">
         <a :href="`/s/${post.Title}`" class="btn btn-info btn-lg" target="_blank">
           检索同类资源
         </a>
@@ -64,7 +64,7 @@
           </span>
           <input class="form-control" id="Email" placeholder="您的电子邮箱(非常重要)" required type="email" v-model="post.Email">
           <span class="input-group-btn">
-            <button :disabled="disableGetcode" @@click="getcode(post.Email)" class="btn btn-danger" type="button">
+            <button :disabled="disableGetcode||!post.Email" @@click="getcode(post.Email)" class="btn btn-danger" type="button">
               {{codeMsg}}
             </button>
           </span>

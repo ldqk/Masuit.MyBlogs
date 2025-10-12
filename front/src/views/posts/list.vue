@@ -12,7 +12,7 @@
         </div>
         <div class="text-right">
           <div class="row q-gutter-md">
-            <q-input class="col" v-model="searchKeyword" placeholder="全局搜索" outlined dense style="min-width: 200px" clearable @update:model-value="loadPageData" debounce="1000">
+            <q-input class="col" v-model="searchKeyword" shadow-text="全局搜索" outlined dense style="min-width: 200px" clearable @update:model-value="loadPageData" debounce="1000">
               <template v-slot:append>
                 <span style="font-size: 12px;"><q-checkbox size="sm" v-model="useRegex" label="正则" @update:model-value="loadPageData" dense /></span>
               </template>
@@ -44,15 +44,13 @@
               <a :href="`/${row.Id}`" target="_blank" :class="{ 'text-grey text-bold': row.AverageViewCount < 1 && row.IsNsfw === false && row.LimitDesc === '无限制' }"> {{ row.Title }} </a>
             </template>
           </vxe-column>
-          <!-- 作者列 -->
           <vxe-column field="Author" title="作者" width="120">
             <template #default="{ row }">
               <q-tooltip class="bg-grey" v-if="row.AverageViewCount < 1 && row.IsNsfw === false && row.LimitDesc === '无限制'">日均浏览量低于1</q-tooltip>
               <a :href="`/author/${row.Author}`" target="_blank" :class="{ 'text-grey text-bold': row.AverageViewCount < 1 && row.IsNsfw === false && row.LimitDesc === '无限制' }">{{ row.Author }}</a>
             </template>
           </vxe-column>
-          <!-- 作者邮箱列 -->
-          <vxe-column field="Email" title="作者邮箱" width="180" /><!-- 分类列 -->
+          <vxe-column field="Email" title="作者邮箱" width="180" v-if="showColumns.includes('Email')" />
           <vxe-column field="CategoryId" title="分类" width="200">
             <template #default="{ row }">
               <q-select outlined v-model="row.CategoryId" :options="filteredCategoryOptions" option-value="Id" option-label="Name" map-options emit-value dense borderless @update:model-value="(val) => changeCategory(row.Id, val)" use-input input-debounce="300" @filter="filterCategoryOptions" />
@@ -61,7 +59,11 @@
           <!-- 专题列 -->
           <vxe-column field="Seminars" title="专题" width="270">
             <template #default="{ row }">
-              <q-select use-chips outlined v-model="row.Seminars" :options="filteredSeminarOptions" option-value="Id" option-label="Title" multiple dense borderless @update:model-value="(val) => changeSeminar(row.Id, val)" map-options use-input input-debounce="300" @filter="filterSeminarOptions" />
+              <q-select use-chips outlined v-model="row.Seminars" :options="filteredSeminarOptions" option-value="Id" option-label="Title" multiple dense borderless :placeholder="!row.Seminars || row.Seminars.length === 0 ? '未选择专题' : ''" @update:model-value="(val) => changeSeminar(row.Id, val)" map-options use-input input-debounce="300" @filter="filterSeminarOptions">
+                <template v-slot:selected-item="scope">
+                  <q-chip :style="{ backgroundColor: ['#FFB300', '#39B54A', '#00A1E9', '#F75000', '#8C6E63', '#E67E22'][scope.index % 6], color: 'white', fontSize: '11px' }" removable @remove="scope.removeAtIndex(scope.index)"> {{ scope.opt.Title }} </q-chip>
+                </template>
+              </q-select>
             </template>
           </vxe-column>
           <!-- 阅读量列-->
@@ -304,7 +306,7 @@
 </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { toast } from 'vue3-toastify'
 import dayjs from 'dayjs'
 import * as echarts from 'echarts'
@@ -326,7 +328,7 @@ const handleIframeLoad = () => {
 const loading = ref(false)
 const tableData = ref([])
 const searchKeyword = ref('')
-const useRegex = ref(false)
+const useRegex = ref(true)
 const selectedCategory = ref(null)
 const orderBy = ref(1)
 const showInsightDialog = ref(false);
@@ -358,6 +360,7 @@ let eventSource = null
 
 const showColumns = ref([]);
 const columnOptions = [
+  { label: "作者邮箱", value: 'Email' },
   { label: "阅读量", value: 'ViewCount' },
   { label: "在看数", value: 'Online' },
   { label: "发表时间", value: 'PostDate' },

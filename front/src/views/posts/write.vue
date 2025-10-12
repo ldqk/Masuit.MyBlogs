@@ -78,7 +78,8 @@
               <q-item>
                 <q-item-section class="text-grey"> 没有找到匹配的专题 </q-item-section>
               </q-item>
-            </template><template v-slot:selected-item="scope">
+            </template>
+            <template v-slot:selected-item="scope">
               <q-chip :style="{ backgroundColor: ['#FFB300', '#39B54A', '#00A1E9', '#F75000', '#8C6E63', '#E67E22'][scope.index % 6], color: 'white', fontSize: '11px' }" removable @remove="scope.removeAtIndex(scope.index)"> {{ scope.opt.Title }} </q-chip>
             </template>
           </q-select>

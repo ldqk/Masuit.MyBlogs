@@ -17,7 +17,7 @@
         <div class="comment-form-row" style="display:flex;gap:12px;flex-wrap:wrap;">
           <div style="position:relative;flex:1 1 240px;min-width:180px;display:flex;">
             <input name="email" placeholder="请输入邮箱" required style="flex:1 1 auto;min-width:120px;padding-right:110px;" type="email" v-model="viewToken.email">
-            <button :disabled="disableGetcode" @@click="getcode(viewToken.email)" class="comment-form-btn" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);min-width:96px;height:36px;padding:0 8px;font-size:.97rem;z-index:2;" type="button"> {{codeMsg}} </button>
+            <button :disabled="disableGetcode||!viewToken.email" @@click="getcode(viewToken.email)" class="comment-form-btn" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);min-width:96px;height:36px;padding:0 8px;font-size:.97rem;z-index:2;" type="button"> {{codeMsg}} </button>
           </div>
           <div style="position:relative;flex:1 1 240px;min-width:180px;display:flex;">
             <input name="email" placeholder="验证码" required style="flex:1 1 auto;min-width:120px;padding-right:110px;" v-model="viewToken.token">

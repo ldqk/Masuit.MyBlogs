@@ -63,7 +63,7 @@
           </span>
           <input class="form-control" id="ModifierEmail" name="ModifierEmail" placeholder="您的电子邮箱(非常重要)" required type="email" v-model="post.ModifierEmail">
           <span class="input-group-btn">
-            <button :disabled="disableGetcode" @@click="getcode(post.ModifierEmail)" class="btn btn-danger" type="button">
+            <button :disabled="disableGetcode||!post.ModifierEmail" @@click="getcode(post.ModifierEmail)" class="btn btn-danger" type="button">
               {{codeMsg}}
             </button>
           </span>

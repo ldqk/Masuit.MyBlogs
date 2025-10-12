@@ -24,10 +24,10 @@
       <p>@Context.Request.Cookies["NickName"] 您好！</p>
     } else {
       <div class="comment-form-row @hidden" style="display:flex;gap:12px;flex-wrap:wrap;">
-        <input name="nickname" placeholder="用户昵称" required style="flex:1 1 140px;min-width:120px;" type="text" v-model="msg.NickName">
+        <input name="nickname" placeholder="您的称呼" required style="flex:1 1 140px;min-width:120px;" type="text" v-model="msg.NickName">
         <div style="position:relative;flex:1 1 240px;min-width:180px;display:flex;">
-          <input name="email" placeholder="用户邮箱" required style="flex:1 1 auto;min-width:120px;padding-right:110px;" type="email" v-model="msg.Email">
-          <button :disabled="disableGetcode" @@click="getcode(msg.Email)" class="comment-form-btn" id="getEmailCodeBtn" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);min-width:96px;height:36px;padding:0 8px;font-size:.97rem;z-index:2;" type="button"> {{codeMsg}} </button>
+          <input name="email" placeholder="您的邮箱" required style="flex:1 1 auto;min-width:120px;padding-right:110px;" type="email" v-model="msg.Email">
+          <button :disabled="disableGetcode||!msg.Email" @@click="getcode(msg.Email)" class="comment-form-btn" id="getEmailCodeBtn" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);min-width:96px;height:36px;padding:0 8px;font-size:.97rem;z-index:2;" type="button"> {{codeMsg}} </button>
         </div>
         <input name="emailcode" placeholder="验证码" required style="flex:1 1 110px;min-width:80px;" type="text" v-model="msg.Code">
       </div>
@@ -66,10 +66,10 @@
         <p>@Context.Request.Cookies["NickName"] 您好！</p>
       } else {
         <div class="comment-form-row @hidden" style="display:flex;gap:12px;flex-wrap:wrap;">
-          <input name="nickname" placeholder="用户昵称" required style="flex:1 1 140px;min-width:120px;" type="text" v-model="reply.NickName">
+          <input name="nickname" placeholder="您的称呼" required style="flex:1 1 140px;min-width:120px;" type="text" v-model="reply.NickName">
           <div style="position:relative;flex:1 1 240px;min-width:180px;display:flex;">
-            <input name="email" placeholder="用户邮箱" required style="flex:1 1 auto;min-width:120px;padding-right:110px;" type="email" v-model="reply.Email">
-            <button :disabled="disableGetcode" @@click="getcode(reply.Email)" class="comment-form-btn" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);min-width:96px;height:36px;padding:0 8px;font-size:.97rem;z-index:2;" type="button"> {{codeMsg}} </button>
+            <input name="email" placeholder="您的邮箱" required style="flex:1 1 auto;min-width:120px;padding-right:110px;" type="email" v-model="reply.Email">
+            <button :disabled="disableGetcode||!reply.Email" @@click="getcode(reply.Email)" class="comment-form-btn" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);min-width:96px;height:36px;padding:0 8px;font-size:.97rem;z-index:2;" type="button"> {{codeMsg}} </button>
           </div>
           <input name="emailcode" placeholder="验证码" required style="flex:1 1 110px;min-width:80px;" type="text" v-model="reply.Code">
         </div>
