@@ -18,8 +18,6 @@
 ## Star趋势  
 <img src="https://starchart.cc/ldqk/Masuit.MyBlogs.svg">    
 
-### 前端请求支援
-目前网站前端页面的代码比较零乱，到处都是，大家想吐槽的尽管吐槽吧，也想找个人帮忙设计下整体的前端页面，有兴趣愿意贡献代码的的小伙伴，欢迎Pull Request吧！😂😂
 ### 项目主要技术栈
 .NET 9  
 ASP.NET Core MVC + vue3 + Blazor Server  
@@ -68,12 +66,12 @@ Redis：Redis 8.x
 - 分类管理：对文章的分类进行增删查改和文章的移动等操作，与文章的关系：一对多。
 - 专题管理：对文章的专题进行管理，与文章的关系：多对多。
 - 快速分享：首页快速分享栏目的管理。
-![image](https://user-images.githubusercontent.com/20254980/127089680-c8f57334-2b7e-4ca2-a2a2-01a50d58e61b.png)
-![image](https://user-images.githubusercontent.com/20254980/127088470-15fabe44-c45f-4801-b2fb-8fc034a593dd.png)
-![image](https://user-images.githubusercontent.com/20254980/127089714-d85a3f8b-bb8e-4a0a-b6c1-0e4aead194e2.png)
-![image](https://user-images.githubusercontent.com/20254980/127089725-25a5fa87-2c70-49bd-ada9-e65a8c71797d.png)
-![image](https://user-images.githubusercontent.com/20254980/127089745-70ec7ac2-b80f-4059-abae-7ba362f02b60.png)
-![image](https://user-images.githubusercontent.com/20254980/127089763-57457c59-cfdf-4b7d-a31b-8123dc944c88.png)
+<img width="1918" height="1878" alt="image" src="https://github.com/user-attachments/assets/8ade4235-5caa-4317-982e-cf0e725e1685" />
+<img width="1906" height="2001" alt="image" src="https://github.com/user-attachments/assets/869c22a7-bb1a-4946-9e82-45175c27debf" />
+<img width="1781" height="1851" alt="image" src="https://github.com/user-attachments/assets/c4d73160-89b9-4dfe-a12b-fbde98991c70" />
+<img width="1923" height="1114" alt="image" src="https://github.com/user-attachments/assets/aa072465-52d8-462b-8f52-8d4f2c8ce4d8" />
+<img width="1781" height="1851" alt="image" src="https://github.com/user-attachments/assets/7a4b33e3-926b-4afc-9a6a-a2eaaf33638d" />
+<img width="1921" height="1453" alt="image" src="https://github.com/user-attachments/assets/9dd9790b-9b4a-42a4-b24c-b737e308dd46" />
 
 #### 评论和留言管理
 对前台用户提交的留言和评论进行审核，当前台用户提交的内容可能包含有敏感词时，会进入人工审核，审核成功才会在前台页中展示。
@@ -81,35 +79,36 @@ Redis：Redis 8.x
 站内消息包含评论、留言、投稿、文章合并等通知。
 #### 公告管理
 对网站的公告进行增删查改管理。支持定时上下架发布。
-![image](https://user-images.githubusercontent.com/20254980/127088599-9d9d6b8b-9253-4f3d-8b9a-80965c002422.png)
+<img width="1781" height="1851" alt="image" src="https://github.com/user-attachments/assets/2830e082-0b9a-446c-ae34-c05953ab0921" />
 
 #### 杂项页管理
 一些通用的页面管理，可自由灵活的创建静态页面。
-![image](https://user-images.githubusercontent.com/20254980/127088620-3ea1e808-7ce2-4ede-9a62-765609cfda94.png)
+<img width="1921" height="944" alt="image" src="https://github.com/user-attachments/assets/ffd0c02f-97c6-46df-80b1-55fa0315441f" />
 
 #### 系统设置
 - 包含系统的全局设置、防火墙管理、网站运行日志记录、友链管理、邮件模板的管理。
 - 全局设置：网站的一些基本配置和SEO相关操作等；
 - 防火墙：对网站的所有请求进行全局流量的拦截，让规则内的请求阻止掉，支持黑名单、白名单、IP地址段、国家或地区、关键词审查等规则；
 - 模板变量：针对文章内容的通用内容生成，变量只能添加不能删除。
-![image](https://user-images.githubusercontent.com/20254980/127088748-13d56e4a-f5e0-4c59-9135-0af935d70976.png)
-![image](https://user-images.githubusercontent.com/20254980/127088776-b95f8e8d-5f07-4937-8a9f-6a975ed29e31.png)
-![image](https://user-images.githubusercontent.com/20254980/127089076-2599c484-9323-4d1a-82e5-61ef833ed4e3.png)
-![image](https://user-images.githubusercontent.com/20254980/127089090-5b0dedcb-6be7-46ce-82e7-b4fcb50ea032.png)
-![image](https://user-images.githubusercontent.com/20254980/127089200-cca28f8a-87bb-4a8b-b581-91c0572714c9.png)
+<img width="1781" height="1851" alt="image" src="https://github.com/user-attachments/assets/ee8f7458-38e4-4006-9257-99774570c9f9" />
+<img width="1781" height="1851" alt="image" src="https://github.com/user-attachments/assets/f44852ef-7f78-425a-a76d-ce8a7263e0c5" />
+<img width="1923" height="1999" alt="image" src="https://github.com/user-attachments/assets/a25755e6-d0e5-4e47-a641-cdfab763a9e1" />
+<img width="1921" height="1162" alt="image" src="https://github.com/user-attachments/assets/277654e9-54e1-4c5e-9e9d-8e881cfffd60" />
+<img width="1916" height="1143" alt="image" src="https://github.com/user-attachments/assets/f16c70fb-97f7-4ad4-af94-08225935213b" />
+<img width="1923" height="1482" alt="image" src="https://github.com/user-attachments/assets/46ac35cb-2758-4fad-8da1-524766b77dc7" />
 
 #### 广告管理
 主动式的广告投放管理，支持竞价排名，支持在banner、边栏、页内、列表内的广告展示，竞价或权重的高低决定广告出现的概率。支持按地区进行投放。
-![image](https://user-images.githubusercontent.com/20254980/127089325-27b5bf4d-49ea-41ea-aae6-8829924bcc92.png)
-![image](https://user-images.githubusercontent.com/20254980/127089358-7bab075c-5bb7-41ea-8900-29a2eecb71de.png)
+<img width="1924" height="1726" alt="image" src="https://github.com/user-attachments/assets/697f185f-230f-455d-bcc2-8676095fc97b" />
+<img width="1923" height="1735" alt="image" src="https://github.com/user-attachments/assets/02332ff1-b441-4974-8920-c405daccf8e3" />
 
 #### 赞助管理
 对网站打赏进行增删查改操作，自动掩码。
-![image](https://user-images.githubusercontent.com/20254980/127089429-beb5baf0-c1d3-4880-85c0-9f897fb0de75.png)
+<img width="1924" height="1023" alt="image" src="https://github.com/user-attachments/assets/878e9149-e3cd-4fcc-8119-4c5bd62353c9" />
 
 #### 搜索统计
 当前台用户每Session周期内的关键词搜索，不重复的关键词将会被记录，用于热词统计，仅记录最近一个月内的所有搜索关键词，用于统计当月、7天以及当天的搜索热词。
-![image](https://user-images.githubusercontent.com/20254980/127089504-2c32288d-aa0d-4331-a3a2-90e97ba9f7a2.png)
+<img width="1912" height="1985" alt="image" src="https://github.com/user-attachments/assets/aa189d4c-06fd-4cc3-8974-2b8349176366" />
 
 #### 任务管理
 hangfire的可视化管理页面
@@ -120,7 +119,7 @@ hangfire的可视化管理页面
 ### 项目架构
 - 项目采用单体架构，方便部署和配置，传统的MVC模式，ASP.NET Core MVC+EF Core的简单架构。  
 - Controller→Service→Repository→DbContext  
-![image](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbcc714c3db.jpg)  
+
 ### 项目文件夹定义：
 App_Data：存放网站的一些常规数据，以文本的形式存在，这类数据不需要频繁更新的。  
 ┠─cert文件夹：存放https证书  
@@ -132,12 +131,11 @@ App_Data：存放网站的一些常规数据，以文本的形式存在，这类
 ┠─ip2region.db：ip2region地址库  
 ┠─mod.txt：审查词库  
 ┠─whitelist.txt：IP地址白名单  
-Common：之前老项目的Common项目；  
+Common：基础公共帮助类；  
 Configs：项目的一些配置对象  
 Controllers：控制器  
 Extensions：一些扩展类或一些项目的扩展功能，比如hangfire、ueditor、中间件、拦截器等；  
 Infrastructure：数据访问基础设施，包含Repository和Services，相当于老项目的DAL和BLL；  
-Migrations：数据库CodeFirst模式的迁移文件；  
 Models：存放一些实体类或DTO；  
 Views：razor视图  
 wwwroot：项目的所有静态资源；  
