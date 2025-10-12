@@ -145,7 +145,7 @@ wwwroot：项目的所有静态资源；
 静态映射：Riok.Mapperly 4.x；  
 缓存体系：FreeRedis 管理热点数据，EFCoreSecondLevelCacheInterceptor 提供 EF Core 二级缓存；  
 定时任务：Hangfire 1.8 统一调度友链回链、文章定时发布、访客统计、索引刷新等任务；  
-实时通信：Blazor Server + SignalR WebSocket 推送服务器健康状态；  
+实时通信：Blazor Server + Server-Sent Events推送服务器健康状态；  
 硬件检测：Masuit.Tools 封装的硬件检测能力；  
 协议支持：Kestrel + HTTP/3 (QUIC) + 自动 HTTPS/反向代理（YARP）；  
 全文检索：Masuit.LuceneEFCore.SearchEngine 基于 Lucene.NET 4.8 实现全文检索；  
