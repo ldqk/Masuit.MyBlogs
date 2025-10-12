@@ -21,24 +21,27 @@
 ### 前端请求支援
 目前网站前端页面的代码比较零乱，到处都是，大家想吐槽的尽管吐槽吧，也想找个人帮忙设计下整体的前端页面，有兴趣愿意贡献代码的的小伙伴，欢迎Pull Request吧！😂😂
 ### 项目主要技术栈
-.NET8  
-ASP.NET Core MVC  
-Blazor  
-Entity Framework Core  
+.NET 9  
+ASP.NET Core MVC + vue3 + Blazor Server  
+Entity Framework Core 9 (Npgsql Provider)  
 Masuit.Tools  
 Masuit.LuceneEFCore.SearchEngine  
 Hangfire  
+FreeRedis + EFCoreSecondLevelCacheInterceptor  
+YARP Reverse Proxy  
+Vue 3 + Quasar + Pinia + Vue Router 4  
 ### 开发环境
-操作系统：Windows 11 23h2  
-IDE：Visual Studio 2022 v17.8  
+操作系统：Windows 11 24H2  
+IDE：Visual Studio 2022 v17.14 (或更高版本)  
 数据库：PostgreSQL 16.x  
-Redis：redis-server-windows 7.x  
-运行时：必须是.NET 8 
+Redis：Redis 8.x (Windows 版或兼容发行版)  
+Node.js：20.x LTS (前端构建)  
+运行时：必须是 .NET 9 
 ### 当前运行环境
 操作系统：Windows Server 2019  
-数据库：PostgreSQL 16.x  
-Redis：redis-server-windows 7.x  
-运行时：.NET 8  
+数据库：PostgreSQL 18.x  
+Redis：Redis 8.x  
+运行时：.NET 9 + HTTP/3 (QUIC)  
 服务器配置：4核+8GB+6Gbps  
 承载流量：单日请求量平均600w左右，单日带宽1TB左右  
 `请勿使用阿里云、百度云等活动超卖机运行本程序，否则卡出翔！！！`  
@@ -140,39 +143,34 @@ Views：razor视图
 wwwroot：项目的所有静态资源；  
 ### 核心功能点技术实现
 #### 后端技术栈：
-依赖注入容器：.NET Core自带的+Autofac，autofac主要负责批量注入和属性注入；  
-实体映射框架：automapper 9.0；  
-缓存框架：CacheManager统一管理网站的热数据，如Session、内存缓存，EFCoreSecondLevelCacheInterceptor负责管理EF Core的二级缓存；  
-定时任务：hangfire统一管理定时任务，包含友链回链检查、文章定时发布、访客统计、搜索热词统计、Lucene库刷新等任务；  
-Websocket：Blazor进行流推送实现服务器硬件健康状态的实时监控；  
-硬件检测：Masuit.Tools封装的硬件检测功能；  
-全文检索：Masuit.LuceneEFCore.SearchEngine基于Lucene.Net 4.8实现的全文检索中间件；  
-中文分词：结巴分词结合本地词库实现中文分词；  
-断点下载：Masuit.Tools封装的断点续传功能；  
-Redis：CSRedis负责Redis的读写操作；  
-文件压缩：Masuit.Tools封装的zip文件压缩功能；  
-Html字符串操作：htmldiff.net-core实现文章版本的内容对比，HtmlAgilityPack实现html字符串的“DOM”操作，主要是用于提取img标签，HtmlSanitizer实现表单的html代码的仿XSS处理；  
-图床：支持多个图床的上传：gitee、github、gitlab；  
-拦截器：授权拦截器、请求拦截器负责网站全局流量的拦截和清洗、防火墙拦截器负责拦截网站自带防火墙规则的请求流量、异常拦截器、url重定向重写拦截器，主要用于将http的请求重定向到https；  
-请求IP来源检查：maxmind+IP2Region+本地数据库实现请求IP的来源检查；  
-RSS：WilderMinds.RssSyndication实现网站的RSS源；  
-EF扩展功能：zzzproject相关nuget包  
-Word文档转换：OpenXml实现浏览器端上传Word文档转换为html字符串。  
-在线文件管理：angular-filemanager+文件管理代码实现服务器文件的在线管理  
+依赖注入容器：.NET 内置容器 + Autofac（批量注入与属性注入）；  
+静态映射：Riok.Mapperly 4.x；  
+缓存体系：FreeRedis 管理热点数据，EFCoreSecondLevelCacheInterceptor 提供 EF Core 二级缓存；  
+定时任务：Hangfire 1.8 统一调度友链回链、文章定时发布、访客统计、索引刷新等任务；  
+实时通信：Blazor Server + SignalR WebSocket 推送服务器健康状态；  
+硬件检测：Masuit.Tools 封装的硬件检测能力；  
+协议支持：Kestrel + HTTP/3 (QUIC) + 自动 HTTPS/反向代理（YARP）；  
+全文检索：Masuit.LuceneEFCore.SearchEngine 基于 Lucene.NET 4.8 实现全文检索；  
+中文分词：结巴分词结合本地词库实现精准分词；  
+断点续传与压缩：Masuit.Tools 提供 resumable download、7z/zip 压缩能力；  
+Html 字符串操作：htmldiff.net-core 用于版本对比，HtmlAgilityPack 提取 DOM，HtmlSanitizer 提供表单防 XSS；  
+图床：支持 gitee、github、gitlab 多图床上传及本地/外部存储切换；  
+拦截器：授权、请求、异常、URL 重写、防火墙等中间件构建纵深防护体系；  
+请求来源审计：MaxMind + IP2Region + 本地数据库联合判定来访地区；  
+RSS：WilderMinds.RssSyndication 输出站点 RSS；  
+EF 批量扩展：Z.EntityFramework.Plus 提供高性能批处理；  
+文档转换：OpenXml + Mammoth 将上传的 Word 文档转换为 HTML；  
+在线文件管理：Angular FileManager + 定制 API 支持在线管理服务器文件。  
 
 #### 前端技术栈
-##### 前台页面：
-基于bootstrap3布局  
-ueditor+layedit富文本编辑器  
-notie提示栏+sweetyalert弹窗+layui组件  
-angularjs  
-
-##### 后台管理页：
-- angularjs单一页面应用程序  
-- material布局风格  
-- echart图表组件  
-- ng-table表格插件  
-- material风格angular-filemanager文件管理器  
+- Vue 3 + TypeScript + Quasar 2 搭建后台管理界面与前台公共组件；  
+- Pinia 3 负责全局状态管理，Vue Router 4 实现权限路由；  
+- Axios + 自定义拦截器统一请求入口，支持代理与鉴权；  
+- VXE Table / VXE UI 提供高性能表格、表单与数据可视化组件；  
+- dayjs 进行国际化时间处理，内置相对时间与时区扩展；  
+- @kangc/v-md-editor + vue-ueditor-wrap 提供 Markdown/富文本编辑体验；  
+- animate.css、lottie-web、Quasar Notify 等组件丰富交互与动效；  
+- 构建工具链基于 Vue CLI 5 + webpack，支持按需加载与 gzip/zip 产物清理。  
 #### 性能和安全相关
 - hangfire实现分布式任务调度；
 - Z.EntityFramework.Plus实现数据访问层的高性能数据库批量操作；
@@ -185,9 +183,10 @@ angularjs
 ### 项目部署
 以Windows系统为例，Linux系统请自行折腾。
 #### 1.安装基础设施：
-1. 安装.net6运行时：[https://dotnet.microsoft.com/zh-cn/download](https://dotnet.microsoft.com/zh-cn/download)
-2. 安装mysql：[mysql 8 绿色版](https://masuit.org/1567),或pgsql：[pgsql 14 绿色版](https://masuit.org/2160)
-3. 安装redis：[redis for windows绿色版](https://masuit.org/130)
+1. 安装 .NET 9 SDK/运行时：[https://dotnet.microsoft.com/zh-cn/download](https://dotnet.microsoft.com/zh-cn/download)
+2. 安装pgsql：[pgsql 绿色版](https://masuit.org/2160)
+3. 安装 Redis 8.x（Windows 版或兼容发行版）：[redis for windows绿色版](https://masuit.org/130)
+4. （可选）安装 Node.js 20.x LTS，用于前端项目构建与调试
 #### 2.生成网站应用
 #### 方式一：编译源代码：
 编译需要将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目也一起clone下来，和本项目平级目录存放，才能正常编译，否则，将[Masuit.Tools](https://github.com/ldqk/Masuit.Tools)项目和[Masuit.LuceneEFCore.SearchEngine](https://github.com/ldqk/Masuit.LuceneEFCore.SearchEngine)项目移除，通过nuget安装也是可以的。  
@@ -195,16 +194,23 @@ angularjs
 #### 方式二：下载编译好的现成的二进制文件
 前往[Release](https://github.com/ldqk/Masuit.MyBlogs/releases)下载最新的压缩包解压即可。
 #### 3.还原数据库脚本
-创建数据库，名称随意，如：myblogs，然后前往[Release](https://github.com/ldqk/Masuit.MyBlogs/releases)或[https://github.com/ldqk/Masuit.MyBlogs/tree/master/database/mysql](https://github.com/ldqk/Masuit.MyBlogs/tree/master/database/mysql)下载最新的数据库文件,还原到新建的数据库。   
-如果没有你目标数据库类型的还原文件，你可以先还原到mysql或pgsql中，然后使用[Full Convert](https://masuit.org/2163)转换成你需要的目标数据库类型即可。
+创建数据库，名称随意，如：myblogs，然后前往[Release](https://github.com/ldqk/Masuit.MyBlogs/releases)或仓库目录 [`database/postgres`](database/postgres) 下载最新的 PostgreSQL 脚本/备份文件，执行 `psql -U postgres -d myblogs -f xxx.sql` 还原。   
+如需迁移到其他数据库，可先还原到 PostgreSQL，再使用 [Full Convert](https://masuit.org/2163) 或自定义脚本迁移到目标数据库类型。
 #### 4.修改配置文件：
 主要需要配置的是以下内容，其他配置均为可选项，不配置则表示不启用；
 ![image](https://user-images.githubusercontent.com/20254980/169738528-ba0cc1a4-cb19-4e9d-b6cd-2f146a633c35.png)  
 如果你使用了CDN，需要配置TrueClientIPHeader选项为真实IP请求转发头，如cloudflare的叫CF-Connecting-IP。
 如果Redis不在本机，需要在配置文件中的Redis节下配置，固定为Redis，值的格式：127.0.0.1:6379,allowadmin=true，若未正确配置，将按默认值“127.0.0.1:6379,allowadmin=true,abortConnect=false”。  
+如需为 HttpClient 添加代理或反向代理转发，请根据环境调整 `HttpClientProxy` 与 `ReverseProxy` 节点。  
 其他配置请参考appsettings.json的注释按需配置即可。  
 #### 5.启动网站
 配置好环境和配置文件后，可直接通过dotnet Masuit.MyBlogs.Core.dll命令或直接双击Masuit.MyBlogs.Core.exe运行，也可以通过nssm挂在为Windows服务运行，或者你也可以尝试在Linux下部署。  
+#### 6.前端管理界面构建
+1. 进入前端目录：`cd front`
+2. 安装依赖：`npm install`（可按需使用 `pnpm`/`yarn`）
+3. 开发模式：`npm run dev`，默认端口 `http://localhost:8868`
+4. 生产构建：`npm run build`，产物会自动输出到 `src/Masuit.MyBlogs.Core/wwwroot/dashboard`
+
 #### 其他方式部署
 IIS：部署时必须将应用程序池的标识设置为LocalSystem，否则无法监控服务器硬件，同时需要安装.NET Core Hosting运行时环境，IIS程序池改为无托管代码。  
 ![](https://git.imweb.io/ldqk/imgbed/raw/master/5ccbf30b6a083.jpg)  
