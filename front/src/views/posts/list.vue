@@ -12,7 +12,7 @@
         </div>
         <div class="text-right">
           <div class="row q-gutter-md">
-            <q-input class="col" v-model="searchKeyword" shadow-text="全局搜索" outlined dense style="min-width: 200px" clearable @update:model-value="loadPageData" debounce="1000">
+            <q-input class="col" v-model="searchKeyword" placeholder="全局搜索" outlined dense style="min-width: 200px" clearable @update:model-value="loadPageData" debounce="1000">
               <template v-slot:append>
                 <span style="font-size: 12px;"><q-checkbox size="sm" v-model="useRegex" label="正则" @update:model-value="loadPageData" dense /></span>
               </template>

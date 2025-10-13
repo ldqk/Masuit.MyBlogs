@@ -1,0 +1,24 @@
+
+.post-list-container[data-v-d1c966a8] {
+  padding: 16px;
+}
+.controls-row[data-v-d1c966a8] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+[data-v-d1c966a8] .warning-row {
+  background-color: #fff3cd !important;
+}
+.text-red[data-v-d1c966a8] {
+  color: #f56565 !important;
+}
+@media (max-width: 768px) {
+.controls-row[data-v-d1c966a8] {
+    flex-direction: column;
+    align-items: stretch;
+}
+}
+

@@ -1,5 +1,5 @@
 ﻿<template>
-<div class="share-page">
+<div>
   <q-card>
     <q-card-section>
       <!-- 顶部控制栏 -->
@@ -10,7 +10,7 @@
         </q-btn-group>
       </div>
       <!-- 主表格 -->
-      <vxe-table ref="tableRef" :data="tableData" :loading="loading" stripe border height="600" class="limited-row-height">
+      <vxe-table ref="tableRef" :data="tableData" :loading="loading" stripe border class="limited-row-height">
         <!-- 标题列 -->
         <vxe-column field="Title" title="标题"></vxe-column>
         <!-- 链接列 -->
@@ -196,10 +196,6 @@ onMounted(() => {
 })
 </script>
 <style scoped lang="scss">
-.share-page {
-  padding: 20px;
-}
-
 .text-truncate {
   overflow: hidden;
   white-space: nowrap;
