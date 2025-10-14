@@ -34,6 +34,8 @@ public static partial class PostMapper
     [MapProperty("Category", nameof(PostDto.CategoryName))]
     public static partial PostDto ToPostDto(this PostHistoryVersion cmd);
 
+    public static partial Post ToPost(this PostHistoryVersion history);
+
     public static partial IQueryable<PostDto> ProjectDto(this IQueryable<Post> q);
 
     [MapProperty("PostHistoryVersion", nameof(PostDataModel.ModifyCount))]

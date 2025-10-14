@@ -192,10 +192,10 @@ public sealed class PostController : BaseController
     public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
     {
         var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
-        var main = post.ToHistoryVersion() ?? throw new NotFoundException("文章未找到");
+        var main = post ?? throw new NotFoundException("文章未找到");
         CheckPermission(post);
-        var right = v1 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到");
-        var left = v2 <= 0 ? main : await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到");
+        var right = v1 <= 0 ? main : (await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到")).ToPost();
+        var left = v2 <= 0 ? main : (await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到")).ToPost();
         main.Id = id;
         var (html1, html2) = left.Content.HtmlDiff(right.Content);
         left.Content = await ReplaceVariables(html1).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint(ClientIP.ToString()));
@@ -204,7 +204,7 @@ public sealed class PostController : BaseController
         right.ModifyDate = right.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
         ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location(), main.CategoryId, main.Label);
         ViewBag.DisableCopy = post.DisableCopy;
-        return View(new[] { main, left, right });
+        return View(new[] { main, left, right }.OrderByDescending(v => v.ModifyDate).ToArray());
     }
 
     /// <summary>

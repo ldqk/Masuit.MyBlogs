@@ -1,35 +1,23 @@
-﻿@using System.Text.Encodings.Web
-@using System.Text.RegularExpressions
-@using Masuit.MyBlogs.Core.Common
+﻿@using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
-@using Masuit.MyBlogs.Core.Models.Entity
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
-@model Masuit.MyBlogs.Core.Models.Entity.PostHistoryVersion[]
+@model Masuit.MyBlogs.Core.Models.Entity.Post[]
 @{
   ViewBag.Title = Model[0].Title + "版本对比";
   Layout = "~/Views/Shared/_Layout.cshtml";
-  string[] colors = {
-    "success",
-    "info",
-    "primary",
-    "warning",
-    "danger",
-    "default",
-    "primary"
-  };
   IList<AdvertisementDto> ads = ViewBag.Ads;
 }
 <style>
-	ins {
-		background-color: #cfc;
-		text-decoration: none;
-	}
+    ins {
+        background-color: #cfc;
+        text-decoration: none;
+    }
 
-	del {
-		color: #999;
-		background-color: #FEC8C8;
-	}
+    del {
+        color: #999;
+        background-color: #FEC8C8;
+    }
 </style>
 <link href="~/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet"/>
 <div class="container-fluid">
@@ -65,82 +53,6 @@
     </li>
   </ol>
   <div class="flex-container">
-    <div class="flex-item">
-      <!-- 头部信息 -->
-      <section class="article-header">
-        <div class="article-title-row">
-          <h2 class="article-title">@Model[0].Title</h2>
-        </div>
-        <!-- 文章标签展示区，可放在文章信息区或内容区上方，支持多个标签 -->
-        <div class="article-meta-row">
-          <div>
-            <span class="modifier">
-              <a asp-action="Author" asp-controller="Home" asp-route-author="@Model[0].Modifier">@Model[0].Modifier</a>
-            </span>
-            <span>
-              修改于
-              <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model[0].ModifyDate.Day" asp-route-mm="@Model[0].ModifyDate.Month" asp-route-mode="ModifyDate" asp-route-yyyy="@Model[0].ModifyDate.Year">
-                <time class="text-success">@Model[0].ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone))</time>
-              </a>
-            </span>
-          </div>
-        </div>
-        <div class="article-meta-row">
-          <div class="article-tags-row">
-            <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">
-              原分类：
-              <i class="icon-map-pin"></i>
-              <span class="article-tag">
-                @{
-                  await Html.RenderPartialAsync("CategoryPath", Model[0].Category);
-                }
-              </span>
-            </span>
-          </div>
-          @if (Model[0].Seminar.Any()) {
-            <div class="article-tags-row">
-              <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">原所属专题：</span>
-              @{
-                var seminars = Model[0].Seminar;
-                foreach (var s in seminars) {
-                  <span class="article-tag">
-                    <a asp-action="Index" asp-controller="Seminar" asp-route-id="@s.Id">@s.Title</a>
-                  </span>
-                }
-              }
-            </div>
-          }
-          @{
-            if (!string.IsNullOrEmpty(Model[0].Label)) {
-              <div class="article-tags-row">
-                <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">标签：</span>
-                @foreach (string s in Model[0].Label.Split([',', '，'], StringSplitOptions.RemoveEmptyEntries)) {
-                  <span class="article-tag">
-                    <a asp-action="Tag" asp-controller="Home" asp-route-tag="@s">
-                      @s
-                    </a>
-                  </span>
-                }
-              </div>
-            }
-          }
-        </div>
-      </section>
-      <!-- 内容区 -->
-      <section class="article-content-card">
-        <div class="article-content">
-          <div class="old-card">
-            您目前正在查看该文章的历史版本，文章的历史版本可能无法为您提供最准确及时的资讯，不具备任何参考价值，
-            <a asp-action="Details" asp-controller="Post" asp-route-id="@Model[0].PostId">点击前往</a>该文章的最新版本。
-          </div>
-          @Html.Raw(Model[0].Content)
-        </div>
-        <div class="encrypted-content"> @Html.Raw(Model[0].ProtectContent)</div>
-        @if (ads.Any()) {
-          await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[0]);
-        }
-      </section>
-    </div>
     <div class="flex-item">
       <!-- 头部信息 -->
       <section class="article-header">
@@ -205,13 +117,85 @@
       <!-- 内容区 -->
       <section class="article-content-card">
         <div class="article-content">
-          <div class="old-card">
-            您目前正在查看该文章的历史版本，文章的历史版本可能无法为您提供最准确及时的资讯，不具备任何参考价值，
-            <a asp-action="Details" asp-controller="Post" asp-route-id="@Model[1].PostId">点击前往</a>该文章的最新版本。
-          </div>
           @Html.Raw(Model[1].Content)
         </div>
-        <div class="encrypted-content"> @Html.Raw(Model[1].ProtectContent)</div>
+        @{
+            await Html.RenderPartialAsync("/Views/Post/ProtectContent.cshtml", Model[1]);
+        }
+        @if (ads.Any()) {
+          await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[0]);
+        }
+      </section>
+    </div>
+    <div class="flex-item">
+      <!-- 头部信息 -->
+      <section class="article-header">
+        <div class="article-title-row">
+          <h2 class="article-title">@Model[2].Title</h2>
+        </div>
+        <!-- 文章标签展示区，可放在文章信息区或内容区上方，支持多个标签 -->
+        <div class="article-meta-row">
+          <div>
+            <span class="modifier">
+              <a asp-action="Author" asp-controller="Home" asp-route-author="@Model[2].Modifier">@Model[2].Modifier</a>
+            </span>
+            <span>
+              修改于
+              <a asp-action="Archieve" asp-controller="Home" asp-route-dd="@Model[2].ModifyDate.Day" asp-route-mm="@Model[2].ModifyDate.Month" asp-route-mode="ModifyDate" asp-route-yyyy="@Model[2].ModifyDate.Year">
+                <time class="text-success">@Model[2].ModifyDate.ToTimeZoneF(Context.Session.Get<string>(SessionKey.TimeZone))</time>
+              </a>
+            </span>
+          </div>
+        </div>
+        <div class="article-meta-row">
+          <div class="article-tags-row">
+            <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">
+              原分类：
+              <i class="icon-map-pin"></i>
+              <span class="article-tag">
+                @{
+                  await Html.RenderPartialAsync("CategoryPath", Model[2].Category);
+                }
+              </span>
+            </span>
+          </div>
+          @if (Model[2].Seminar.Any()) {
+            <div class="article-tags-row">
+              <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">原所属专题：</span>
+              @{
+                var seminars = Model[2].Seminar;
+                foreach (var s in seminars) {
+                  <span class="article-tag">
+                    <a asp-action="Index" asp-controller="Seminar" asp-route-id="@s.Id">@s.Title</a>
+                  </span>
+                }
+              }
+            </div>
+          }
+          @{
+            if (!string.IsNullOrEmpty(Model[2].Label)) {
+              <div class="article-tags-row">
+                <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">标签：</span>
+                @foreach (string s in Model[2].Label.Split([',', '，'], StringSplitOptions.RemoveEmptyEntries)) {
+                  <span class="article-tag">
+                    <a asp-action="Tag" asp-controller="Home" asp-route-tag="@s">
+                      @s
+                    </a>
+                  </span>
+                }
+              </div>
+            }
+          }
+        </div>
+      </section>
+      <!-- 内容区 -->
+      <section class="article-content-card">
+        <div class="article-content">
+          @Html.Raw(Model[2].Content)
+        </div>
+        @{
+            await Html.RenderPartialAsync("/Views/Post/ProtectContent.cshtml", Model[2]);
+        }
         @if (ads.Count > 1) {
           await Html.RenderPartialAsync("_ArticleListAdvertisement", ads[1]);
         }
@@ -224,10 +208,10 @@
 window.onload=function() {
   SyntaxHighlighter.all();
   SyntaxHighlighter.defaults['toolbar'] = false;
-	@if (ViewBag.DisableCopy) {
+    @if (ViewBag.DisableCopy) {
     <text>
-	GlobalCopyrightProtect();
-		</text>
+    GlobalCopyrightProtect();
+        </text>
   }
 }
 </script>
