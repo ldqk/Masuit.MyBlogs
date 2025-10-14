@@ -2483,6 +2483,7 @@ Custom bottom spacer
 }
 
 .encrypted-content {
+  line-height: 1.84;
   background: #f9f6ff;
   border: 1.5px dashed #b7971e;
   color: #b7971e;

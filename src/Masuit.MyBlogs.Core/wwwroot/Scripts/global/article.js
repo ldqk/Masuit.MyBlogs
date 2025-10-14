@@ -338,6 +338,34 @@ createApp({
         this.disableGetcode = false;
       }
     },
+    async getToken(email) {
+      message.info('正在发送验证码，请稍候...');
+      const data = await axios.create({
+        headers: {
+          'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        }
+      }).post("/post/GetViewToken", {
+        email: email
+      }).then(res => res.data);
+      if (data.Success) {
+        this.disableGetcode = true;
+        message.success('验证码发送成功，请注意查收邮件，若未收到，请检查你的邮箱地址或邮件垃圾箱！');
+        localStorage.setItem("user", JSON.stringify({ NickName: this.reply.NickName || this.msg.NickName, Email: this.reply.Email || this.msg.Email }));
+        var count = 0;
+        var timer = setInterval(() => {
+          count++;
+          this.codeMsg = '重新发送(' + (120 - count) + ')';
+          if (count > 120) {
+            clearInterval(timer);
+            this.disableGetcode = false;
+            this.codeMsg = '重新发送';
+          }
+        }, 1000);
+      } else {
+        message.error(data.Message);
+        this.disableGetcode = false;
+      }
+    },
     replyMsg(item) {
       this.reply.ParentId = item.Id;
       this.reply.for = item;

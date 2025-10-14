@@ -204,6 +204,8 @@ public sealed class PostController : BaseController
         right.ModifyDate = right.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
         ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location(), main.CategoryId, main.Label);
         ViewBag.DisableCopy = post.DisableCopy;
+        left.Id = main.Id;
+        right.Id = main.Id;
         return View(new[] { main, left, right }.OrderByDescending(v => v.ModifyDate).ToArray());
     }
 
@@ -386,7 +388,7 @@ public sealed class PostController : BaseController
     /// <param name="email"></param>
     /// <returns></returns>
     [HttpPost, ValidateAntiForgeryToken, AllowAccessFirewall, DistributedLockFilter]
-    public ActionResult GetViewToken(string email)
+    public ActionResult GetViewToken([FromBodyOrDefault] string email)
     {
         var validator = new IsEmailAttribute();
         if (!validator.IsValid(email))
