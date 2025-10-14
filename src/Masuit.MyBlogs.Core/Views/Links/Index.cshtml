@@ -32,7 +32,7 @@
   @{
     await Html.RenderPartialAsync("_ArticleListAdvertisement", (AdvertisementDto) ViewBag.Ads);
   }
-  <n-modal :mask-closable="false" :style="{ width: '30vw' }" @@positive-click="submit(link)" negative-text="取消" positive-text="提交" preset="dialog" title="申请友情链接" v-model:show="showModal">
+  <n-modal :mask-closable="false" :style="{ width: '50vw' }" @@positive-click="submit(link)" negative-text="取消" positive-text="提交" preset="dialog" style="min-width:400px" title="申请友情链接" v-model:show="showModal">
     <div class="input-group">
       <span class="input-group-addon">网站名称</span>
       <input autofocus class="form-control" placeholder="您的网站名称" v-model="link.Name">

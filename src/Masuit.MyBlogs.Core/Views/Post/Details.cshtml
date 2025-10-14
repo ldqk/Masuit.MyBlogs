@@ -55,9 +55,11 @@
     <section class="article-header">
       <div class="article-title-row">
         <h2 class="article-title">@Html.Raw(Model.Title)</h2>
-        <a asp-action="PushMerge" asp-controller="Post" asp-route-id="@Model.Id">
-          <button class="article-op-btn">我要参与编辑</button>
-        </a>
+        @if (!Model.Locked) {
+          <a asp-action="PushMerge" asp-controller="Post" asp-route-id="@Model.Id">
+            <button class="article-op-btn">我要参与编辑</button>
+          </a>
+        }
       </div>
       <div class="article-meta-row">
         <div>
@@ -242,7 +244,7 @@
       <h4 v-if="pageConfig.total == 0">还没有评论哦，赶紧来写评论吧</h4>
     </section>
   </div>
-  <n-modal :mask-closable="false" :style="{ 'width': '50vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复评论" preset="dialog" style="min-width:400px" v-model:show="showPopup">
+  <n-modal :mask-closable="false" :style="{ 'width': '70vw' }" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复评论" preset="dialog" style="min-width:400px" v-model:show="showPopup">
     <div class="comment-item">
       <div class="comment-meta-row">
         <div>

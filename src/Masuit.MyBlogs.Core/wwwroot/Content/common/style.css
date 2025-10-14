@@ -868,7 +868,7 @@ Custom bottom spacer
   display: flex;
   align-items: center;
   justify-content: center;
-  max-height: 240px;
+  /* max-height: 240px; */
 }
 
 .cover img {

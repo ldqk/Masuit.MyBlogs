@@ -1,343 +1,353 @@
 ﻿/* 轮播容器：宽度 100vw；高度由 JS 根据图片与 --max-height 动态设置 */
 .carousel {
-    --max-height: 70vh; /* 默认最大高度，可被行内或其它 CSS 覆写 */
+  --max-height: 70vh;
+  /* 默认最大高度，可被行内或其它 CSS 覆写 */
 
-    position: relative;
-    width: 100vw;
-    margin: 0 auto;
-    overflow: hidden;
-    border: none;
-    /* 初始占位（避免首屏抖动），会被 JS 覆盖为精确高度 */
-    height: 40vh;
-    /* 双保险：限制容器的 CSS max-height，但真正的高度逻辑由 JS 控制 */
-    max-height: var(--max-height);
-    transition: height 320ms ease;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: pan-y; /* 纵向滚动正常，横向由脚本拦截 */
+  position: relative;
+  width: 100vw;
+  margin: 0 auto;
+  overflow: hidden;
+  border: none;
+  /* 初始占位（避免首屏抖动），会被 JS 覆盖为精确高度 */
+  /* height: 40vh; */
+  /* 双保险：限制容器的 CSS max-height，但真正的高度逻辑由 JS 控制 */
+  max-height: var(--max-height);
+  transition: height 320ms ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  /* 纵向滚动正常，横向由脚本拦截 */
 }
 
 /* 幻灯片容器 */
 .slides {
-    position: relative;
-    width: 100%;
-    height: 100%;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 /* 单张幻灯片（可点击） */
 .slide {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center; /* 当不裁剪时，图片会在容器内居中 */
-    opacity: 0;
-    pointer-events: none;
-    z-index: 0;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  /* 当不裁剪时，图片会在容器内居中 */
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
 }
 
-    .slide.is-active {
-        opacity: 1;
-        pointer-events: auto;
-        z-index: 1;
-    }
+.slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 1;
+}
 
-    /* 默认：不裁剪，保持等比，容器高度跟随图片（受最大高度限制） */
-    .slide img {
-        width: 100%;
-        height: auto;
-        object-fit: contain;
-        object-position: center center;
-        display: block;
-        backface-visibility: hidden;
-        -webkit-font-smoothing: antialiased;
-    }
+/* 默认：不裁剪，保持等比，容器高度跟随图片（受最大高度限制） */
+.slide img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center center;
+  display: block;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
 
-    /* 当图片等比高度超过最大高度时，激活页切换为“居中裁剪”显示 */
-    .slide.is-active img.crop {
-        width: 100%;
-        max-height: 70vh;
-        object-fit: cover;
-        object-position: center center;
-    }
+/* 当图片等比高度超过最大高度时，激活页切换为“居中裁剪”显示 */
+.slide.is-active img.crop {
+  width: 100%;
+  max-height: 70vh;
+  object-fit: cover;
+  object-position: center center;
+}
 
 /* 导航按钮：更透明一些 */
 .nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 4;
-    width: 44px;
-    height: 64px;
-    border: none;
-    outline: none;
-    background: rgba(0,0,0,0.22);
-    color: #fff;
-    font-size: 40px;
-    line-height: 64px;
-    text-align: center;
-    cursor: pointer;
-    opacity: 0.35;
-    border-radius: 8px;
-    transition: opacity 200ms ease, background 200ms ease, transform 150ms ease;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  width: 44px;
+  height: 64px;
+  border: none;
+  outline: none;
+  background: rgba(0, 0, 0, 0.22);
+  color: #fff;
+  font-size: 40px;
+  line-height: 64px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0.35;
+  border-radius: 8px;
+  transition: opacity 200ms ease, background 200ms ease, transform 150ms ease;
 }
 
-    .nav:hover, .nav:focus-visible {
-        opacity: 0.85;
-        background: rgba(0,0,0,0.32);
-    }
+.nav:hover,
+.nav:focus-visible {
+  opacity: 0.85;
+  background: rgba(0, 0, 0, 0.32);
+}
 
-    .nav:active {
-        transform: translateY(-50%) scale(0.98);
-    }
+.nav:active {
+  transform: translateY(-50%) scale(0.98);
+}
 
-    .nav.prev {
-        left: 10px;
-    }
+.nav.prev {
+  left: 10px;
+}
 
-    .nav.next {
-        right: 10px;
-    }
+.nav.next {
+  right: 10px;
+}
 
 /* 移动端更大触控区域且更透明 */
 @media (hover: none) and (pointer: coarse) {
-    .nav {
-        width: 56px;
-        height: 72px;
-        font-size: 44px;
-        line-height: 72px;
-        opacity: 0.28;
-    }
+  .nav {
+    width: 56px;
+    height: 72px;
+    font-size: 44px;
+    line-height: 72px;
+    opacity: 0.28;
+  }
 }
 
 /* 指示器（圆点） */
 .indicators {
-    position: absolute;
-    left: 50%;
-    bottom: 12px;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    z-index: 3;
-    padding: 6px 10px;
-    border-radius: 16px;
-    background: rgba(0,0,0,0.15);
-    backdrop-filter: saturate(120%) blur(2px);
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 3;
+  padding: 6px 10px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: saturate(120%) blur(2px);
 }
 
-    .indicators .indicator {
-        appearance: none;
-        -webkit-appearance: none;
-        border: none;
-        padding: 0;
-        width: 10px;
-        height: 10px;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.6);
-        opacity: 0.6;
-        cursor: pointer;
-        transition: opacity 180ms ease, transform 180ms ease, background 180ms ease, width 180ms ease;
-    }
+.indicators .indicator {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  padding: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 180ms ease, transform 180ms ease, background 180ms ease, width 180ms ease;
+}
 
-        .indicators .indicator:hover,
-        .indicators .indicator:focus-visible {
-            opacity: 0.95;
-            outline: none;
-            transform: scale(1.08);
-        }
+.indicators .indicator:hover,
+.indicators .indicator:focus-visible {
+  opacity: 0.95;
+  outline: none;
+  transform: scale(1.08);
+}
 
-        .indicators .indicator.is-active {
-            opacity: 1;
-            background: #fff;
-            width: 24px; /* 活动态胶囊效果 */
-        }
+.indicators .indicator.is-active {
+  opacity: 1;
+  background: #fff;
+  width: 24px;
+  /* 活动态胶囊效果 */
+}
 
 /* 小屏优化 */
 @media (hover: none) and (pointer: coarse) {
-    .indicators {
-        gap: 10px;
-        bottom: 10px;
-        padding: 8px 12px;
-    }
+  .indicators {
+    gap: 10px;
+    bottom: 10px;
+    padding: 8px 12px;
+  }
 
-        .indicators .indicator {
-            width: 12px;
-            height: 12px;
-        }
+  .indicators .indicator {
+    width: 12px;
+    height: 12px;
+  }
 
-            .indicators .indicator.is-active {
-                width: 28px;
-            }
+  .indicators .indicator.is-active {
+    width: 28px;
+  }
 }
 
 /* 动画集合 */
 @keyframes fadeIn {
-    from {
-        opacity: 0
-    }
+  from {
+    opacity: 0
+  }
 
-    to {
-        opacity: 1
-    }
+  to {
+    opacity: 1
+  }
 }
 
 @keyframes fadeOut {
-    from {
-        opacity: 1
-    }
+  from {
+    opacity: 1
+  }
 
-    to {
-        opacity: 0
-    }
+  to {
+    opacity: 0
+  }
 }
 
 @keyframes slideInLeft {
-    from {
-        transform: translateX(-12%);
-        opacity: .2
-    }
+  from {
+    transform: translateX(-12%);
+    opacity: .2
+  }
 
-    to {
-        transform: translateX(0);
-        opacity: 1
-    }
+  to {
+    transform: translateX(0);
+    opacity: 1
+  }
 }
 
 @keyframes slideOutLeft {
-    from {
-        transform: translateX(0);
-        opacity: 1
-    }
+  from {
+    transform: translateX(0);
+    opacity: 1
+  }
 
-    to {
-        transform: translateX(-12%);
-        opacity: .2
-    }
+  to {
+    transform: translateX(-12%);
+    opacity: .2
+  }
 }
 
 @keyframes slideInRight {
-    from {
-        transform: translateX(12%);
-        opacity: .2
-    }
+  from {
+    transform: translateX(12%);
+    opacity: .2
+  }
 
-    to {
-        transform: translateX(0);
-        opacity: 1
-    }
+  to {
+    transform: translateX(0);
+    opacity: 1
+  }
 }
 
 @keyframes slideOutRight {
-    from {
-        transform: translateX(0);
-        opacity: 1
-    }
+  from {
+    transform: translateX(0);
+    opacity: 1
+  }
 
-    to {
-        transform: translateX(12%);
-        opacity: .2
-    }
+  to {
+    transform: translateX(12%);
+    opacity: .2
+  }
 }
 
 @keyframes zoomIn {
-    from {
-        transform: scale(0.92);
-        opacity: .2
-    }
+  from {
+    transform: scale(0.92);
+    opacity: .2
+  }
 
-    to {
-        transform: scale(1);
-        opacity: 1
-    }
+  to {
+    transform: scale(1);
+    opacity: 1
+  }
 }
 
 @keyframes zoomOut {
-    from {
-        transform: scale(1);
-        opacity: 1
-    }
+  from {
+    transform: scale(1);
+    opacity: 1
+  }
 
-    to {
-        transform: scale(0.92);
-        opacity: .2
-    }
+  to {
+    transform: scale(0.92);
+    opacity: .2
+  }
 }
 
 @keyframes flipIn {
-    from {
-        transform: rotateY(-40deg);
-        opacity: .0
-    }
+  from {
+    transform: rotateY(-40deg);
+    opacity: .0
+  }
 
-    to {
-        transform: rotateY(0);
-        opacity: 1
-    }
+  to {
+    transform: rotateY(0);
+    opacity: 1
+  }
 }
 
 @keyframes flipOut {
-    from {
-        transform: rotateY(0);
-        opacity: 1
-    }
+  from {
+    transform: rotateY(0);
+    opacity: 1
+  }
 
-    to {
-        transform: rotateY(40deg);
-        opacity: .0
-    }
+  to {
+    transform: rotateY(40deg);
+    opacity: .0
+  }
 }
 
 /* 统一动画类 */
 .anim-in-fade {
-    animation: fadeIn 600ms ease both;
+  animation: fadeIn 600ms ease both;
 }
 
 .anim-out-fade {
-    animation: fadeOut 600ms ease both;
+  animation: fadeOut 600ms ease both;
 }
 
 .anim-in-slide-left {
-    animation: slideInLeft 600ms ease both;
+  animation: slideInLeft 600ms ease both;
 }
 
 .anim-out-slide-left {
-    animation: slideOutLeft 600ms ease both;
+  animation: slideOutLeft 600ms ease both;
 }
 
 .anim-in-slide-right {
-    animation: slideInRight 600ms ease both;
+  animation: slideInRight 600ms ease both;
 }
 
 .anim-out-slide-right {
-    animation: slideOutRight 600ms ease both;
+  animation: slideOutRight 600ms ease both;
 }
 
 .anim-in-zoom {
-    animation: zoomIn 600ms ease both;
+  animation: zoomIn 600ms ease both;
 }
 
 .anim-out-zoom {
-    animation: zoomOut 600ms ease both;
+  animation: zoomOut 600ms ease both;
 }
 
 .anim-in-flip {
-    animation: flipIn 650ms cubic-bezier(.2,.7,.1,1) both;
+  animation: flipIn 650ms cubic-bezier(.2, .7, .1, 1) both;
 }
 
 .anim-out-flip {
-    animation: flipOut 650ms cubic-bezier(.2,.7,.1,1) both;
+  animation: flipOut 650ms cubic-bezier(.2, .7, .1, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .carousel {
-        transition: none;
-    }
+  .carousel {
+    transition: none;
+  }
 
-    .anim-in-fade, .anim-out-fade,
-    .anim-in-slide-left, .anim-out-slide-left,
-    .anim-in-slide-right, .anim-out-slide-right,
-    .anim-in-zoom, .anim-out-zoom,
-    .anim-in-flip, .anim-out-flip {
-        animation: none !important;
-    }
+  .anim-in-fade,
+  .anim-out-fade,
+  .anim-in-slide-left,
+  .anim-out-slide-left,
+  .anim-in-slide-right,
+  .anim-out-slide-right,
+  .anim-in-zoom,
+  .anim-out-zoom,
+  .anim-in-flip,
+  .anim-out-flip {
+    animation: none !important;
+  }
 }
