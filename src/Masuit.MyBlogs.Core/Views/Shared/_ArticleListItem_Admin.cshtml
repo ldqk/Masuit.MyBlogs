@@ -44,38 +44,38 @@
         }
       </span>
     </div>
-    <div class="summary"> @Html.Raw(await Model.Content.GetSummary(150, 50)) </div>
-    @if (!string.IsNullOrEmpty(Model.Label)) {
+    <div class="summary"> @Html.Raw(await Model.Content.GetSummary(250, 50)) </div>
+    <div class="bottom-row">
       <div class="tags">
-        @{
+        @if (!string.IsNullOrEmpty(Model.Label)) {
           var tags = Model.Label.Split(',', '，');
-          @for (var i = 0; i < tags.Length; i++) {
+          @foreach (var t in tags) {
             <span class="tag">
-              <a asp-action="Tag" asp-controller="Home" asp-route-tag="@tags[i]">
-                @tags[i]
+              <a asp-action="Tag" asp-controller="Home" asp-route-tag="@t">
+                @t
               </a>
             </span>
           }
         }
       </div>
-    }
-    <div class="stat-row">
-      <span>
-        <span class="icon">👁️</span>
-        @Model.TotalViewCount
-      </span>
-      <span>
-        <span class="icon">💬</span> @Model.CommentCount
-      </span>
-      <span>
-        <span class="icon">👍</span> @Model.VoteUpCount
-      </span>
-      <span>
-        <span class="icon">👁️</span> @online
-      </span>
-      <span>
-        <span class="icon">🗑️</span>@Model.Status.GetDisplay()
-      </span>
+      <div class="stat-row">
+        <span>
+          <span class="icon">👁️</span>
+          @Model.TotalViewCount
+        </span>
+        <span>
+          <span class="icon">💬</span> @Model.CommentCount
+        </span>
+        <span>
+          <span class="icon">👍</span> @Model.VoteUpCount
+        </span>
+        <span>
+          <span class="icon">👁️</span> @online
+        </span>
+        <span>
+          <span class="icon">🗑️</span>@Model.Status.GetDisplay()
+        </span>
+      </div>
     </div>
   </div>
 </div>
