@@ -1,7 +1,11 @@
-﻿@using Masuit.MyBlogs.Core.Common
+﻿@using FreeRedis
+@using Masuit.MyBlogs.Core.Common
 @using Masuit.Tools.Html
+@inject IRedisClient CacheManager
 @model Masuit.MyBlogs.Core.Models.DTO.PostDto
-
+@{
+    var online = await CacheManager.SCardAsync("PostOnline:" + Model.Id);
+}
 <div class="article-card">
   @{
     //取第一张图片
@@ -56,7 +60,7 @@
       <div class="stat-row">
         <span>
           <span class="icon">👁️</span>
-          @Model.TotalViewCount
+          @online
         </span>
         <span>
           <span class="icon">💬</span> @Model.CommentCount
