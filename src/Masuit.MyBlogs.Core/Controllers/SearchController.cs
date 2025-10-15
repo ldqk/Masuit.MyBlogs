@@ -40,7 +40,6 @@ public sealed class SearchController : BaseController
                 ViewBag.Ads = AdsService.GetByWeightedPrice(AdvertiseType.ListItem, Request.Location(), keywords: wd);
             }
 
-            ViewBag.hotSearches = new List<KeywordsRank>();
             if (posts.Total > size)
             {
                 ViewBag.RelateKeywords = SearchDetailsService.GetQuery(s => s.Keywords.Contains(wd) && s.Keywords != wd).Select(s => s.Keywords).GroupBy(s => s).OrderByDescending(g => g.Count()).Select(g => g.Key).Take(10).Cacheable(CacheExpirationMode.Absolute, TimeSpan.FromHours(1)).ToPooledListScope();
@@ -65,6 +64,11 @@ public sealed class SearchController : BaseController
                 return RedirectToAction("Details", "Post", new { id = posts.Results[0].Id, kw = wd });
             }
 
+            ViewBag.hotSearches = new List<KeywordsRank>();
+            if (posts.Total == 0)
+            {
+                ViewBag.hotSearches = RedisHelper.Get<List<KeywordsRank>>("SearchRank:Week").Take(10).ToList();
+            }
             return View(posts);
         }
 

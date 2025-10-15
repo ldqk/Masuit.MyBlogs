@@ -13,29 +13,29 @@
       <em>@ViewBag.Title</em>
     </li>
   </ol>
-  <a class="btn btn-info" href="/dashboard/notice/write">发布新公告</a>
-  <div aria-multiselectable="true" class="panel-group" id="accordion" role="tablist">
-    @foreach (var n in Model) {
-      <div class="panel panel-default">
-        <div class="panel-heading" id="heading-@n.Id" role="tab">
-          <h4 class="panel-title">
-            <a aria-controls="collapse-@n.Id" aria-expanded="false" class="collapsed" data-parent="#accordion" data-toggle="collapse" href="#collapse-@n.Id" role="button">
-              @n.ModifyDate.ToString("yyyy-MM-dd") @n.Title
-            </a>
-          </h4>
-        </div>
-        <div aria-labelledby="heading-@n.Id" class="collapse panel-collapse" id="collapse-@n.Id" role="tabpanel">
-          <div class="panel-body">
-            <div class="btn-group">
-              <a class="btn btn-info" onclick="del(@n.Id,'@n.Title')">删除</a>
-              <a class="btn btn-danger" href="/dashboard/notice/write?id=@n.Id" target="_blank">修改</a>
+  <a class="like-btn" href="/dashboard/notice/write">发布新公告</a>
+    <div class="main-container">
+        @foreach (var n in Model)
+        {
+            <div class="site-announcement-bar" style="margin:10px 0">
+            <div class="announcement-container">
+                <div class="announcement-header">
+                    <span class="announcement-title">@n.Title</span>
+                    <span class="announcement-time">@n.ModifyDate.ToString("yyyy-MM-dd")</span>
+                </div>
+                <div class="article-ops-row">
+                    <a class="article-op-btn" onclick="del(@n.Id,'@n.Title')">删除</a>
+                    <a class="article-op-btn" href="/dashboard/notice/write?id=@n.Id" target="_blank">修改</a>
+                </div>
+                <div class="announcement-content">
+                    @Html.Raw(n.Content.Replace("img src=", $"img class='lazyload' title='{CommonHelper.SystemSettings["Title"]}' alt='{CommonHelper.SystemSettings["Title"]}' decoding='async' loading='lazy' data-src="))
+                </div>
             </div>
-            @Html.Raw(n.Content)
-          </div>
         </div>
-      </div>
-    }
-  </div>
+        }
+        
+    </div>
+
   @{
     await Html.RenderPartialAsync("_Pagination", ViewData["page"]);
     await Html.RenderPartialAsync("_ArticleListAdvertisement", (AdvertisementDto) ViewBag.Ads);

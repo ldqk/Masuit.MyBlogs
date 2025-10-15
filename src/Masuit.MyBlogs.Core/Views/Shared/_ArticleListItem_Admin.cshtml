@@ -14,7 +14,7 @@
     if (!string.IsNullOrEmpty(imgSrc)) {
       imgSrc += "?width=240&format=webp&quality=50";
       <div class="cover">
-        <img alt="@CommonHelper.SystemSettings["Title"]" class="lazyload thumb" data-src="@imgSrc?width=240&format=webp&quality=50" decoding="async" loading="lazy" title="@CommonHelper.SystemSettings["Title"] ">
+        <img alt="@Model.Title" class="lazyload thumb" data-src="@imgSrc?width=240&format=webp&quality=50" decoding="async" loading="lazy" title="@Model.Title">
       </div>
     }
   }
