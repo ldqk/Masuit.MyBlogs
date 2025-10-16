@@ -308,7 +308,7 @@ public sealed class PostController : BaseController
         PostTagService.AddOrUpdate(t => t.Name, p.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
         {
             Name = s,
-            Count = PostService.Count(t => t.Label.Contains(s))
+            Count = PostService.Count(t => t.Label.Contains(s) && t.Status == Status.Published)
         }));
         p = PostService.AddEntitySaved(p);
         if (p == null)
@@ -800,7 +800,7 @@ public sealed class PostController : BaseController
         PostTagService.AddOrUpdate(t => t.Name, post.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
         {
             Name = s,
-            Count = PostService.Count(t => t.Label.Contains(s))
+            Count = PostService.Count(t => t.Label.Contains(s) && t.Status == Status.Published)
         }));
         bool b = await SearchEngine.SaveChangesAsync() > 0;
         if (!b)
@@ -862,7 +862,7 @@ public sealed class PostController : BaseController
         PostTagService.AddOrUpdate(t => t.Name, post.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
         {
             Name = s,
-            Count = PostService.Count(t => t.Label.Contains(s))
+            Count = PostService.Count(t => t.Label.Contains(s) && t.Status == Status.Published)
         }));
         bool b = await SearchEngine.SaveChangesAsync() > 0;
         if (!b)
