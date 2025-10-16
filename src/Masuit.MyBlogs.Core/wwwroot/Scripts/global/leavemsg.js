@@ -1,5 +1,4 @@
-﻿
-const { createApp, ref, onMounted, watch, computed, defineComponent, nextTick } = Vue;
+﻿const { createApp, ref, onMounted, watch, computed, defineComponent, nextTick } = Vue;
 const { createDiscreteApi } = naive;
 const MessageReplies = defineComponent({
   name: 'MessageReplies',
@@ -351,8 +350,15 @@ createApp({
             paragraph: { 'p': '', 'h4': '', 'h5': '', 'h6': '' },
             autoHeightEnabled: true
           });
-          ue2.addListener('contentChange', () => {
-            this.reply.Content = ue2.getContent();
+          window.ue2.addListener('contentChange', () => {
+            this.reply.Content = window.ue2.getContent();
+            const links = window.ue2.body.querySelectorAll('a');
+            for (let i = 0; i < links.length; i++) {
+              // 如果链接没有设置target属性，则设置为 _blank
+              if (!links[i].getAttribute('target')) {
+                links[i].setAttribute('target', '_blank');
+              }
+            }
           });
         });
       } else {
@@ -402,8 +408,15 @@ createApp({
         paragraph: { 'p': '', 'h4': '', 'h5': '', 'h6': '' },
         autoHeightEnabled: true
       });
-      ue.addListener('contentChange', () => {
-        this.msg.Content = ue.getContent();
+      window.ue.addListener('contentChange', () => {
+        this.msg.Content = window.ue.getContent();
+        const links = window.ue.body.querySelectorAll('a');
+        for (let i = 0; i < links.length; i++) {
+          // 如果链接没有设置target属性，则设置为 _blank
+          if (!links[i].getAttribute('target')) {
+            links[i].setAttribute('target', '_blank');
+          }
+        }
       });
     }
   }
