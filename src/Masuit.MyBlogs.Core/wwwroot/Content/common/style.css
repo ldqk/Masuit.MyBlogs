@@ -3353,6 +3353,18 @@ Custom bottom spacer
   justify-content: space-between;
 }
 
+.article-content ol,
+.encrypted-content ol {
+  list-style-type: decimal;
+  margin-left: 20px;
+}
+
+.article-content ul,
+.encrypted-content ul {
+  list-style-type: disc;
+  margin-left: 20px;
+}
+
 .article-content h3,
 .encrypted-content h3 {
   font-size: 1.45rem;

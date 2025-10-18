@@ -196,17 +196,17 @@ public sealed class PostController : BaseController
         CheckPermission(post);
         var right = v1 <= 0 ? main : (await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到")).ToPost();
         var left = v2 <= 0 ? main : (await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到")).ToPost();
-        main.Id = id;
-        var (html1, html2) = left.Content.HtmlDiff(right.Content);
-        left.Content = await ReplaceVariables(html1).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint(ClientIP.ToString()));
-        left.ModifyDate = left.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-        right.Content = await ReplaceVariables(html2).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint(ClientIP.ToString()));
-        right.ModifyDate = right.ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
-        ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location(), main.CategoryId, main.Label);
-        ViewBag.DisableCopy = post.DisableCopy;
         left.Id = main.Id;
         right.Id = main.Id;
-        return View(new[] { main, left, right }.OrderByDescending(v => v.ModifyDate).ToArray());
+        var posts = new[] { main, left, right }.OrderByDescending(v => v.ModifyDate).ToArray();
+        var (html2, html1) = posts[2].Content.HtmlDiff(posts[1].Content);
+        posts[2].Content = await ReplaceVariables(html2).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint(ClientIP.ToString()));
+        posts[2].ModifyDate = posts[2].ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+        posts[1].Content = await ReplaceVariables(html1).Next(s => CurrentUser.IsAdmin || Request.IsRobot() ? Task.FromResult(s) : s.InjectFingerprint(ClientIP.ToString()));
+        posts[1].ModifyDate = posts[1].ModifyDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
+        ViewBag.Ads = AdsService.GetsByWeightedPrice(2, AdvertiseType.InPage, Request.Location(), main.CategoryId, main.Label);
+        ViewBag.DisableCopy = post.DisableCopy;
+        return View(posts);
     }
 
     /// <summary>
