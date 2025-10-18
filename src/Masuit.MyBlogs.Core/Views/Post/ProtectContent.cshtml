@@ -7,7 +7,7 @@
 @using System.Text.RegularExpressions
 @model Masuit.MyBlogs.Core.Models.Entity.Post
 @* 管理员模式直接看 *@
-@if (Context.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin==true) {
+@if (!string.IsNullOrEmpty(Model.ProtectContent) && Context.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin==true) {
   <div class="encrypted-content">
       <p class="size20 text-center text-red">↓↓↓以下是文章加密部分↓↓↓</p>
       @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
