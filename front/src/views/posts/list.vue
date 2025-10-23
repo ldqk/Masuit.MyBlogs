@@ -864,6 +864,7 @@ const restoreParams = () => {
       useRegex.value = params.useRegex || false
       orderBy.value = params.orderby || 1
       pagination.value.page = params.page || 1
+      pagination.value.rowsPerPage = params.size || 15
       if (params.cid) {
         const category = categoryOptions.value.find(c => c.Id === params.cid)
         if (category) {
