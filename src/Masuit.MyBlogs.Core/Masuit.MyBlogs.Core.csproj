@@ -52,7 +52,7 @@
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.2" />
         <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.9.1" />
         <PackageReference Include="Mammoth.Core" Version="1.0.1" />
-        <PackageReference Include="Markdig" Version="0.42.0" />
+        <PackageReference Include="Markdig" Version="0.43.0" />
         <PackageReference Include="MaxMind.GeoIP2" Version="5.3.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.10" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.10" />
@@ -62,13 +62,13 @@
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.5.4" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
-        <PackageReference Include="Riok.Mapperly" Version="4.2.1" />
+        <PackageReference Include="Riok.Mapperly" Version="4.3.0" />
         <PackageReference Include="SixLabors.ImageSharp.Web" Version="3.2.0" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.9" />
         <PackageReference Include="System.Net.Http" Version="4.3.4" />
         <PackageReference Include="System.Text.Encodings.Web" Version="9.0.10" />
         <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-        <PackageReference Include="TimeZoneConverter" Version="7.0.0" />
+        <PackageReference Include="TimeZoneConverter" Version="7.2.0" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.1" />
         <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
     </ItemGroup>

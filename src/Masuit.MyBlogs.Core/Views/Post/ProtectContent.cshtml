@@ -79,21 +79,25 @@
 }
 
 @*地区可见*@
-@if (Model.ProtectContentMode == ProtectContentMode.Regions) {
+@if (!string.IsNullOrEmpty(Model.ProtectContent) && Model.ProtectContentMode == ProtectContentMode.Regions) {
   var loc = Context.Request.Location();
   if (Model.ProtectContentLimitMode == RegionLimitMode.AllowRegion && Regex.IsMatch(loc + loc.Coodinate, Model.ProtectContentRegions, RegexOptions.IgnoreCase)) {
+      <div class="encrypted-content">
     @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
+  </div>
     return;
   }
 
   if (Model.ProtectContentLimitMode == RegionLimitMode.ForbidRegion && !Regex.IsMatch(loc + loc.Coodinate, Model.ProtectContentRegions, RegexOptions.IgnoreCase)) {
+    <div class="encrypted-content">
     @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
+  </div>
     return;
   }
 }
 
 @*仅搜索引擎可见*@
-@if (Context.Request.IsRobot() && Model.ProtectContentLimitMode == RegionLimitMode.OnlyForSearchEngine) {
+@if (!string.IsNullOrEmpty(Model.ProtectContent) && Context.Request.IsRobot() && Model.ProtectContentLimitMode == RegionLimitMode.OnlyForSearchEngine) {
   @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
   return;
 }
