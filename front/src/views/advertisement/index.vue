@@ -52,7 +52,7 @@
           <vxe-column field="Id" title="ID" width="80" />
           <vxe-column field="Title" title="标题" min-width="300">
             <template #default="{ row }">
-              <q-btn flat dense color="primary" :label="row.Title" @click="showDetailDialog(row)" />
+              <q-btn flat dense color="primary" :label="row.Title" @click="showDetailDialog(row)" no-caps />
             </template>
           </vxe-column>
           <vxe-column field="Url" title="推广地址" min-width="200">
@@ -295,7 +295,7 @@
                 <!-- 主广告图片 -->
                 <div>
                   <div class="text-body2 text-grey-7 q-mb-sm">Banner图片</div>
-                  <q-input v-model="currentAd.ImageUrl" label="图片地址" outlined readonly>
+                  <q-input v-model="currentAd.ImageUrl" label="图片地址" outlined>
                     <template #append>
                       <q-btn icon="upload" dense flat color="primary" @click="uploadImage('ImageUrl')" />
                       <q-btn v-if="currentAd.ImageUrl" icon="clear" dense flat color="negative" @click="clearImage('ImageUrl')" />
@@ -309,7 +309,7 @@
                 <!-- 缩略图 -->
                 <div>
                   <div class="text-body2 text-grey-7 q-mb-sm">卡片图</div>
-                  <q-input v-model="currentAd.ThumbImgUrl" label="卡片图地址" outlined readonly>
+                  <q-input v-model="currentAd.ThumbImgUrl" label="卡片图地址" outlined>
                     <template #append>
                       <q-btn icon="upload" dense flat color="primary" @click="uploadImage('ThumbImgUrl')" />
                       <q-btn v-if="currentAd.ThumbImgUrl" icon="clear" dense flat color="negative" @click="clearImage('ThumbImgUrl')" />
