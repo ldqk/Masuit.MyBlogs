@@ -26,13 +26,15 @@ import '@quasar/extras/material-icons-outlined/material-icons-outlined.css'
 import '@quasar/extras/material-icons-round/material-icons-round.css'
 import '@quasar/extras/material-icons-sharp/material-icons-sharp.css'
 import '@quasar/extras/fontawesome-v6/fontawesome-v6.css'
+import zhCN from 'quasar/lang/zh-CN'
 
 /**
  * Quasar 配置接口
  */
 interface QuasarConfig {
   config: Record<string, any>
-  plugins: QuasarPlugins
+  plugins: QuasarPlugins,
+  lang: any
 }
 
 /**
@@ -40,6 +42,7 @@ interface QuasarConfig {
  */
 const quasarUserOptions: QuasarConfig = {
   config: {},
+  lang: zhCN,
   plugins: {
     LoadingBar,
     Dialog,

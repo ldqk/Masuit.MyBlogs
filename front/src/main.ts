@@ -66,6 +66,7 @@ VxeUIAll.formats.add('formatDate', {
     return XEUtils.toDateString(cellValue, format || 'yyyy-MM-dd HH:mm:ss')
   }
 })
+
 // 注册全局组件
 app
   .use(Quasar, quasarUserOptions)
