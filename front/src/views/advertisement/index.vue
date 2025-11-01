@@ -267,11 +267,11 @@
                     </q-input>
                   </div>
                 </div>
-                <q-input v-model="currentAd.ExpireTime" label="有效期至" outlined readonly>
+                <q-input v-bind:model-value="dayjs(currentAd.ExpireTime).format('YYYY-MM-DD')" label="有效期至" outlined readonly>
                   <template #append>
                     <q-icon name="event" class="cursor-pointer">
                       <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                        <q-date v-model="currentAd.ExpireTime" mask="YYYY-MM-DD HH:mm:ss">
+                        <q-date v-model="currentAd.ExpireTime" mask="YYYY-MM-DD">
                           <div class="row items-center justify-end">
                             <q-btn v-close-popup label="确定" color="primary" flat />
                           </div>
@@ -550,7 +550,7 @@
             <template #append>
               <q-icon name="event" class="cursor-pointer">
                 <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                  <q-date v-model="currentAd.ExpireTime" mask="YYYY-MM-DD HH:mm:ss">
+                  <q-date v-model="currentAd.ExpireTime" mask="YYYY-MM-DD">
                     <div class="row items-center justify-end">
                       <q-btn v-close-popup label="确定" color="primary" flat />
                     </div>
@@ -732,14 +732,15 @@ const currentAd = ref<Advertisement>({
   CategoryIds: '',
   RegionMode: 0,
   Regions: '',
-  ExpireTime: '2049-12-31 23:59:59',
+  ExpireTime: '2049-12-31',
   Status: 1,
   DisplayCount: 0,
   ViewCount: 0,
   AverageViewCount: 0,
   ClickRate: 0,
   CreateTime: '',
-  UpdateTime: ''
+  UpdateTime: '',
+  Merchant: ''
 })
 
 const currentDetailAd = ref<Advertisement | null>(null)
@@ -962,14 +963,15 @@ const showAddDialog = () => {
     CategoryIds: '',
     RegionMode: 0,
     Regions: '',
-    ExpireTime: '2049-12-31 23:59:59',
+    ExpireTime: '2049-12-31',
     Status: 1,
     DisplayCount: 0,
     ViewCount: 0,
     AverageViewCount: 0,
     ClickRate: 0,
     CreateTime: '',
-    UpdateTime: ''
+    UpdateTime: '',
+    Merchant: ''
   }
   selectedTypes.value = []
   selectedCategories.value = []
@@ -1202,7 +1204,7 @@ const removeFromDetail = () => {
 // 显示延期对话框
 const showDelayDialog = (ad: Advertisement) => {
   currentAd.value = { ...ad }
-  currentAd.value.ExpireTime = dayjs(ad.ExpireTime).format('YYYY-MM-DD HH:mm:ss')
+  currentAd.value.ExpireTime = dayjs(ad.ExpireTime).format('YYYY-MM-DD')
   showDelayDialogFlag.value = true
 }
 
