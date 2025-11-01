@@ -634,6 +634,11 @@ public sealed class PostController : BaseController
         post.Status = Status.Takedown;
         bool b = await PostService.SaveChangesAsync(true) > 0;
         SearchEngine.LuceneIndexer.Delete(post);
+        PostTagService.AddOrUpdate(t => t.Name, post.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
+        {
+            Name = s,
+            Count = PostService.Count(t => t.Label.Contains(s) && t.Status == Status.Published)
+        }));
         return ResultData(null, b, b ? $"文章《{post.Title}》已下架！" : "下架失败！");
     }
 
@@ -649,6 +654,11 @@ public sealed class PostController : BaseController
         post.Status = Status.Published;
         bool b = await PostService.SaveChangesAsync() > 0;
         SearchEngine.LuceneIndexer.Add(post);
+        PostTagService.AddOrUpdate(t => t.Name, post.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
+        {
+            Name = s,
+            Count = PostService.Count(t => t.Label.Contains(s) && t.Status == Status.Published)
+        }));
         return ResultData(null, b, b ? "上架成功！" : "上架失败！");
     }
 

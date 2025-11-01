@@ -203,6 +203,11 @@
                 </div>
               </q-card-section>
               <q-card-section>
+                <q-input autogrow dense v-model="currentAd.Merchant" label="广告商" outlined required :rules="[val => !!val || '请输入广告商']">
+                  <template #prepend>
+                    <q-icon name="business" />
+                  </template>
+                </q-input>
                 <q-input autogrow dense v-model="currentAd.Title" label="广告标题" outlined required :rules="[val => !!val || '请输入广告标题']">
                   <template #prepend>
                     <q-icon name="title" />
@@ -289,7 +294,7 @@
               <q-card-section class="q-gutter-lg">
                 <!-- 主广告图片 -->
                 <div>
-                  <div class="text-body2 text-grey-7 q-mb-sm">主广告图片</div>
+                  <div class="text-body2 text-grey-7 q-mb-sm">Banner图片</div>
                   <q-input v-model="currentAd.ImageUrl" label="图片地址" outlined readonly>
                     <template #append>
                       <q-btn icon="upload" dense flat color="primary" @click="uploadImage('ImageUrl')" />
@@ -297,21 +302,21 @@
                     </template>
                   </q-input>
                   <div v-if="currentAd.ImageUrl" class="q-mt-md text-center">
-                    <q-img :src="currentAd.ImageUrl?.startsWith('http') ? currentAd.ImageUrl : globalConfig.baseURL + currentAd.ImageUrl" :ratio="16 / 9" style="max-width: 300px; cursor: pointer;" class="shadow-3" @click="previewImage(currentAd.ImageUrl)" />
+                    <q-img :src="currentAd.ImageUrl?.startsWith('http') ? currentAd.ImageUrl : globalConfig.baseURL + currentAd.ImageUrl" :ratio="16 / 9" style="cursor: pointer;" class="shadow-3" @click="previewImage(currentAd.ImageUrl)" />
                   </div>
                 </div>
                 <q-separator />
                 <!-- 缩略图 -->
                 <div>
-                  <div class="text-body2 text-grey-7 q-mb-sm">缩略图</div>
-                  <q-input v-model="currentAd.ThumbImgUrl" label="缩略图地址" outlined readonly>
+                  <div class="text-body2 text-grey-7 q-mb-sm">卡片图</div>
+                  <q-input v-model="currentAd.ThumbImgUrl" label="卡片图地址" outlined readonly>
                     <template #append>
                       <q-btn icon="upload" dense flat color="primary" @click="uploadImage('ThumbImgUrl')" />
                       <q-btn v-if="currentAd.ThumbImgUrl" icon="clear" dense flat color="negative" @click="clearImage('ThumbImgUrl')" />
                     </template>
                   </q-input>
                   <div v-if="currentAd.ThumbImgUrl" class="q-mt-md text-center">
-                    <q-img :src="currentAd.ThumbImgUrl?.startsWith('http') ? currentAd.ThumbImgUrl : globalConfig.baseURL + currentAd.ThumbImgUrl" :ratio="1" style="width: 150px; cursor: pointer;" class="shadow-3" @click="previewImage(currentAd.ThumbImgUrl)" />
+                    <q-img :src="currentAd.ThumbImgUrl?.startsWith('http') ? currentAd.ThumbImgUrl : globalConfig.baseURL + currentAd.ThumbImgUrl" :ratio="1" style="max-width: 300px; cursor: pointer;" class="shadow-3" @click="previewImage(currentAd.ThumbImgUrl)" />
                   </div>
                 </div>
               </q-card-section>
@@ -350,6 +355,9 @@
                   <q-icon name="tag" class="q-mr-sm text-grey-6" />
                   <span class="text-body2 text-grey-7 q-mr-sm">ID:</span>
                   <q-chip size="sm" color="blue-grey-2" text-color="dark"> {{ currentDetailAd.Id }} </q-chip>
+                </div>
+                <div class="row">
+                  <span class="text-body2 text-grey-7 q-mb-xs"><q-icon name="business" class="q-mt-sm text-grey-6" /> 广告商：{{ currentDetailAd.Merchant }}</span>
                 </div>
                 <div class="row">
                   <span class="text-body2 text-grey-7 q-mb-xs"><q-icon name="title" class="q-mt-sm text-grey-6" /> 广告标题：{{ currentDetailAd.Title }}</span>
@@ -420,7 +428,7 @@
                 <!-- 主广告图片 -->
                 <div>
                   <div class="text-body2 text-grey-7 q-mb-sm">
-                    <q-icon name="wallpaper" class="q-mr-xs" /> 主广告图片
+                    <q-icon name="wallpaper" class="q-mr-xs" /> Banner图片
                   </div>
                   <div v-if="currentDetailAd.ImageUrl" class="image-preview-container">
                     <q-img :src="currentDetailAd.ImageUrl?.startsWith('http') ? currentDetailAd.ImageUrl : globalConfig.baseURL + currentDetailAd.ImageUrl" :ratio="16 / 9" class="preview-image shadow-3" @click="previewImage(currentDetailAd.ImageUrl)">
@@ -453,10 +461,10 @@
                 <!-- 缩略图 -->
                 <div>
                   <div class="text-body2 text-grey-7 q-mb-sm">
-                    <q-icon name="crop_original" class="q-mr-xs" /> 缩略图
+                    <q-icon name="crop_original" class="q-mr-xs" /> 卡片图
                   </div>
                   <div v-if="currentDetailAd.ThumbImgUrl" class="text-center">
-                    <q-img :src="currentDetailAd.ThumbImgUrl?.startsWith('http') ? currentDetailAd.ThumbImgUrl : globalConfig.baseURL + currentDetailAd.ThumbImgUrl" :ratio="1" style="width: 120px; margin: 0 auto;" class="preview-image shadow-3" @click="previewImage(currentDetailAd.ThumbImgUrl)">
+                    <q-img :src="currentDetailAd.ThumbImgUrl?.startsWith('http') ? currentDetailAd.ThumbImgUrl : globalConfig.baseURL + currentDetailAd.ThumbImgUrl" :ratio="1" style="max-width: 300px; margin: 0 auto;" class="preview-image shadow-3" @click="previewImage(currentDetailAd.ThumbImgUrl)">
                       <template v-slot:error>
                         <div class="absolute-full flex flex-center bg-negative text-white">
                           <div class="text-center">
@@ -653,6 +661,7 @@ interface Advertisement {
   ClickRate: number
   CreateTime: string
   UpdateTime: string
+  Merchant: string
 }
 
 interface ApiResponse {
