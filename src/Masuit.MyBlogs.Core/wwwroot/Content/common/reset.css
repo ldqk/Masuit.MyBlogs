@@ -148,3 +148,9 @@ img {
   max-width: 100%;
   height: auto;
 }
+
+pre {
+  white-space: break-spaces;
+  word-wrap: break-word;
+  word-break: break-all;
+}

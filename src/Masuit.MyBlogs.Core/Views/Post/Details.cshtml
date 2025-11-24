@@ -245,7 +245,7 @@
     </section>
   </div>
   <n-modal :mask-closable="false" :title="`回复：${reply.for?.NickName}`" @@positive-click="submit(reply)" negative-text="取消回复" positive-text="回复评论" preset="dialog" style="width:70vw;min-width:400px" v-model:show="showPopup">
-    <div class="comment-item">
+    <div class="comment-item" style="max-height: 50vh;overflow-y: scroll;">
       <div class="comment-meta-row">
         <div>
           <span class="comment-author">{{reply.for?.NickName}}</span>

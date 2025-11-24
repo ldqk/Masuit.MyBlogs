@@ -87,7 +87,6 @@ public sealed class DashboardController(IWebHostEnvironment env) : AdminControll
             }
         }
 
-        Response.Body.Close();
         return Ok();
     }
 

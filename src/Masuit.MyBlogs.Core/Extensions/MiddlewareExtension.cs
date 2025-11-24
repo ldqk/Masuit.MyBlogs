@@ -24,7 +24,9 @@ public static class MiddlewareExtension
         {
             options.ReturnHttpNotAcceptable = true;
             options.Filters.Add<ExceptionFilter>();
+#if DEBUG
             options.Filters.Add<PerfCounterFilterAttribute>();
+#endif
         }).AddNewtonsoftJson(options =>
         {
             options.SerializerSettings.ContractResolver = new DefaultContractResolver();

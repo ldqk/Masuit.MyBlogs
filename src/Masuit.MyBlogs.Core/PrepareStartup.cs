@@ -142,7 +142,7 @@ namespace Masuit.MyBlogs.Core
                 options.ForwardLimit = null;
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
                 options.ForwardedForHeaderName = AppConfig.TrueClientIPHeader;
-                options.KnownNetworks.Clear();
+                options.KnownIPNetworks.Clear();
                 options.KnownProxies.Clear();
             });
             services.Configure<StaticFileOptions>(options =>

@@ -388,7 +388,6 @@ public sealed class MsgController : BaseController
             }
         }
 
-        Response.Body.Close();
         return Ok();
     }
 

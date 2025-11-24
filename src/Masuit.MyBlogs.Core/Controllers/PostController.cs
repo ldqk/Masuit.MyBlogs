@@ -545,7 +545,7 @@ public sealed class PostController : BaseController
                 await Response.Body.FlushAsync(HttpContext.RequestAborted);
                 await Task.Delay(5000, HttpContext.RequestAborted);
             }
-            catch (OperationCanceledException e)
+            catch (OperationCanceledException)
             {
                 await RedisHelper.SRemAsync(key, ClientIP.ToString());
                 break;
@@ -553,7 +553,7 @@ public sealed class PostController : BaseController
         }
 
         await RedisHelper.SRemAsync(key, ClientIP.ToString());
-        Response.Body.Close();
+
         return Ok();
     }
 
@@ -1215,7 +1215,7 @@ public sealed class PostController : BaseController
         }
 
         Response.Body.Close();
-        return Ok();
+        return new EmptyResult();
     }
 
     /// <summary>
