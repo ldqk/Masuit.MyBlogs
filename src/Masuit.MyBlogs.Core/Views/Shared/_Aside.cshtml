@@ -3,19 +3,24 @@
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
 <aside class="sidebar">
   <!-- 公告列表卡片 -->
-  <section class="announcement-card">
-    <div class="announcement-header">
-      <div class="announcement-title">近期公告</div>
-      <a asp-action="Index" asp-controller="Notice" class="all-announcement-btn">所有公告</a>
-    </div>
-    <ul class="announcement-list">
-      @foreach (NoticeDto notice in Model.Notices) {
-        <li class="announcement-item">
-          <a asp-action="Details" asp-controller="Notice" asp-route-id="@notice.Id">@await notice.Content.GetSummary(45, 2)</a>
-        </li>
-      }
-    </ul>
-  </section>
+@if (Model.Notices.Count>0)
+{
+    <section class="announcement-card">
+        <div class="announcement-header">
+            <div class="announcement-title">近期公告</div>
+            <a asp-action="Index" asp-controller="Notice" class="all-announcement-btn">所有公告</a>
+        </div>
+        <ul class="announcement-list">
+            @foreach (NoticeDto notice in Model.Notices)
+            {
+                <li class="announcement-item">
+                    <a asp-action="Details" asp-controller="Notice" asp-route-id="@notice.Id">@await notice.Content.GetSummary(45, 2)</a>
+                </li>
+            }
+        </ul>
+    </section>
+}
+  
   <div class="sidebar-header">
     <h2 class="sidebar-title">文章分类</h2>
     <a asp-action="All" asp-controller="Post" class="all-category-btn">所有分类</a>

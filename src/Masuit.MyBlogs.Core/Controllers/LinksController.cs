@@ -39,7 +39,7 @@ public sealed class LinksController : BaseController
     /// <param name="link"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<ActionResult> Apply(Links link, CancellationToken cancellationToken)
+    public async Task<ActionResult> Apply([FromBody] Links link, CancellationToken cancellationToken)
     {
         if (!link.Url.MatchUrl() || link.Url.Contains(Request.Host.Host))
         {
