@@ -170,7 +170,8 @@ function showIO(data) {
     }
     ],
     legend: {
-      data: ['磁盘读(KBps)', '磁盘写(KBps)', "网络上行(KBps)", "网络下行(KBps)"]
+      data: ['磁盘读(KBps)', '磁盘写(KBps)', "网络上行(KBps)", "网络下行(KBps)"],
+      top: 0
     },
     series: [{
       name: '磁盘读(KBps)',
@@ -257,7 +258,8 @@ function showLine(ip) {
         max: 100
       },
       legend: {
-        data: ['CPU使用率', '网站CPU使用率', '内存使用率', '网站内存使用率']
+        data: ['CPU使用率', '网站CPU使用率', '内存使用率', '网站内存使用率'],
+        top: 0
       },
       series: [{
         name: 'CPU使用率',
