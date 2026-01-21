@@ -1,6 +1,6 @@
 /*!
  * UEditorPlus parse
- * version: 2.0.0
+ * version: 4.5.0
 */
 (function(){
 

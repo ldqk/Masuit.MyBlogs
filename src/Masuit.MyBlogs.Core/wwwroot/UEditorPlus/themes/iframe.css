@@ -1,147 +1,63 @@
-﻿/*! UEditorPlus v2.0.0*/
-
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     font-size: 14px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
-    box-sizing: border-box
+    box-sizing: border-box;
 }
 
 a {
     color: #09f;
-    text-decoration: none
+    text-decoration: none;
 }
 
-    a:hover,
-    a:focus {
-        color: #09f;
-        text-decoration: none
-    }
+a:hover,
+a:focus {
+    color: #09f;
+    text-decoration: none;
+}
 
 blockquote {
     padding: 0 0 0 15px;
     margin: 0 0 18px;
-    border-left: 5px solid #EEE
+    border-left: 5px solid #EEE;
 }
 
 img + br {
     display: block;
     padding: 4px 0;
-    content: ' '
+    content: ' ';
 }
 
 body p {
-    margin-bottom: 1em
+    margin-bottom: 1em;
 }
 
 iframe {
-    border: 0;
-    width: 100% !important;
-    min-height: 800px;
+    border: none;
 }
 
 img {
-    max-width: 100%
+    max-width: 100%;
 }
 
-    img[data-word-image] {
-        cursor: pointer
-    }
+img[data-word-image] {
+    cursor: pointer;
+}
 
 pre {
     margin: .5em 0;
     padding: .4em .6em;
     border-radius: 8px;
     background: #f8f8f8;
-    line-height: 1.5
+    line-height: 1.5;
 }
 
+/*交互操作*/
 img {
-    cursor: pointer
+    cursor: pointer;
 }
 
 .edui-quick-operate-active {
-    background: #E6ECFF
-}
-
-h1 {
-    font-size: 2rem;
-    color: #1566b6;
-    font-weight: 700;
-    margin: 10px 0 10px 0;
-    padding-left: 10px;
-    border-left: 4px solid #1e90ff;
-    background: linear-gradient(90deg, #eaf6ff 0%, #f7fcff 100%);
-    border-radius: 7px;
-    box-shadow: 0 1px 8px rgba(30, 144, 255, 0.08);
-    letter-spacing: .7px;
-}
-
-h2 {
-    font-size: 1.65rem;
-    color: #1566b6;
-    font-weight: 700;
-    margin: 10px 0 10px 0;
-    padding-left: 10px;
-    border-left: 4px solid #1e90ff;
-    background: linear-gradient(90deg, #eaf6ff 0%, #f7fcff 100%);
-    border-radius: 7px;
-    box-shadow: 0 1px 8px rgba(30, 144, 255, 0.08);
-    letter-spacing: .7px;
-}
-
-h3 {
-    font-size: 1.45rem;
-    color: #1566b6;
-    font-weight: 700;
-    margin: 10px 0 10px 0;
-    padding-left: 10px;
-    border-left: 4px solid #1e90ff;
-    background: linear-gradient(90deg, #eaf6ff 0%, #f7fcff 100%);
-    border-radius: 7px;
-    box-shadow: 0 1px 8px rgba(30, 144, 255, 0.08);
-    letter-spacing: .7px;
-}
-
-/* h4标题样式 */
-h4 {
-    font-size: 1.3rem;
-    color: #2990f8;
-    font-weight: 600;
-    margin: 8px 0 8px 0;
-    padding-left: 8px;
-    border-left: 3px solid #2990f8;
-    background: linear-gradient(90deg, #f7fcff 0%, #eaf6ff 100%);
-    border-radius: 6px;
-    box-shadow: 0 1px 6px rgba(41, 144, 248, 0.07);
-    letter-spacing: .5px;
-}
-
-/* h5标题样式 */
-h5 {
-    font-size: 1.15rem;
-    color: #43e97b;
-    font-weight: 600;
-    margin: 8px 0 8px 0;
-    padding-left: 6px;
-    border-left: 2px solid #43e97b;
-    background: linear-gradient(90deg, #e0ffe0 0%, #f7fcff 100%);
-    border-radius: 5px;
-    box-shadow: 0 1px 4px rgba(67, 233, 123, 0.07);
-    letter-spacing: .3px;
-}
-
-/* h6标题样式 */
-h6 {
-    font-size: 1.05rem;
-    color: #fa5252;
-    font-weight: 500;
-    margin: 6px 0 6px 0;
-    padding-left: 4px;
-    border-left: 2px dashed #fa5252;
-    background: linear-gradient(90deg, #fff0f0 0%, #f7fcff 100%);
-    border-radius: 4px;
-    box-shadow: 0 1px 2px rgba(250, 82, 82, 0.06);
-    letter-spacing: .2px;
+    background: #E6ECFF;
 }
