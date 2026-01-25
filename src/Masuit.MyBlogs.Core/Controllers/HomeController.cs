@@ -255,7 +255,7 @@ public sealed class HomeController : BaseController
     public async Task<ActionResult> Category(int id, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         page = Math.Max(1, page);
-        var cat = await CategoryService.GetByIdAsync(id) ?? throw new NotFoundException("文章分类未找到");
+        var cat = await CategoryService.GetAsync(c => c.Id == id && c.Post.Count > 0) ?? throw new NotFoundException("文章分类未找到");
         var cids = CategoryService.GetQuery(c => c.Status == Status.Available && c.Path.StartsWith(cat.Path + ",")).Select(c => c.Id).Cacheable().AsEnumerable().Append(id).ToArray();
         var h24 = DateTime.Today.AddDays(-1);
         var posts = orderBy switch
