@@ -3809,3 +3809,6 @@ button:disabled:hover,
 .new {
   color: green;
 }
+.n-modal-container {
+    z-index: 200 !important;
+}
