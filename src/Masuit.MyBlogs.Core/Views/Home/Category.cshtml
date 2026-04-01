@@ -3,12 +3,8 @@
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
 @using Masuit.MyBlogs.Core.Common
-@using Masuit.MyBlogs.Core.Infrastructure.Services.Interface
-@using Masuit.MyBlogs.Core.Models.Enum
 @using Masuit.Tools.Models
-@using EFCoreSecondLevelCacheInterceptor
 @model Masuit.MyBlogs.Core.Models.ViewModel.HomePageViewModel
-@inject ICategoryService CategoryService
 @{
     var all = Model.Categories.Flatten().ToList();
     var alllist = Model.Categories;
@@ -102,7 +98,7 @@
     </h2>
     <div class="divider"></div>
     <p class="size24">
-      @cat.Description
+      @ViewBag.Category.Description
     </p>
   </div>
 </div>
