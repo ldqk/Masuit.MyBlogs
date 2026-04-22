@@ -94,13 +94,13 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
     /// <param name="url"></param>
     public void RecordPostVisit(int pid, string ip, string refer, string url)
     {
-        var lastQuarter = DateTime.Now.AddMonths(-6);
-        var last3Year = DateTime.Now.AddYears(-3);
+        var last2Years = DateTime.Now.AddYears(-2);
+        var last10Year = DateTime.Now.AddYears(-10);
         var recordService = _serviceScope.ServiceProvider.GetRequiredService<IPostVisitRecordService>();
         var recordStatsService = _serviceScope.ServiceProvider.GetRequiredService<IPostVisitRecordStatsService>();
         var postService = _serviceScope.ServiceProvider.GetRequiredService<IPostService>();
-        recordService.GetQuery(b => b.Time < lastQuarter).ExecuteDelete();
-        recordStatsService.GetQuery(b => b.Date < last3Year).ExecuteDelete();
+        recordService.GetQuery(b => b.Time < last2Years).ExecuteDelete();
+        recordStatsService.GetQuery(b => b.Date < last10Year).ExecuteDelete();
         var post = postService.GetById(pid);
         if (post == null)
         {

@@ -38,7 +38,7 @@ public sealed class AdvertisementController : BaseController
                 AdvertisementId = id
             });
             await ClickRecordService.SaveChangesAsync();
-            var start = DateTime.Today.AddYears(-1);
+            var start = DateTime.Today.AddYears(-2);
             await ClickRecordService.GetQuery(a => a.Time < start).ExecuteDeleteAsync();
         }
 
