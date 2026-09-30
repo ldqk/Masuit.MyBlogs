@@ -104,7 +104,9 @@
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
                 <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                  <q-date v-model="post.ExpireAt" :options="dateOptions" mask="YYYY-MM-DD" today-btn v-close-popup></q-date>
+                  <q-date v-model="post.ExpireAt" :options="dateOptions" mask="YYYY-MM-DD" today-btn>
+                    <q-btn label="确定" color="primary" flat v-close-popup />
+                  </q-date>
                 </q-popup-proxy>
               </q-icon>
               <q-btn round flat icon="clear" @click="post.ExpireAt = ''" v-if="post.ExpireAt" />
