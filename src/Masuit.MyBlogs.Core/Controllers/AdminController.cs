@@ -45,6 +45,11 @@ public class AdminController : Controller
     {
         base.OnActionExecuting(context);
         var user = context.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
+        if (user?.IsAdmin == true)
+        {
+            return;
+        }
+
 #if DEBUG
         user = UserInfoService.GetByUsername("masuit").ToDto();
         context.HttpContext.Session.Set(SessionKey.UserInfo, user);
@@ -54,7 +59,7 @@ public class AdminController : Controller
             string name = Request.Cookies["username"];
             string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.ConnString);
             var userInfo = UserInfoService.Login(name, pwd);
-            if (userInfo != null)
+            if (userInfo?.IsAdmin == true)
             {
                 Response.Cookies.Append("username", name, new CookieOptions
                 {
