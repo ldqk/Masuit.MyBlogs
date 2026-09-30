@@ -87,7 +87,7 @@ public sealed class PassportController : Controller
             string name = Request.Cookies["username"];
             string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.ConnString);
             var userInfo = UserInfoService.Login(name, pwd);
-            if (userInfo != null)
+            if (userInfo?.IsAdmin==true)
             {
                 Response.Cookies.Append("username", name, new CookieOptions()
                 {
