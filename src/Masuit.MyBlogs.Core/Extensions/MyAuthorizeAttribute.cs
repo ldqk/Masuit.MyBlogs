@@ -31,7 +31,7 @@ public sealed class MyAuthorizeAttribute : ActionFilterAttribute
             string name = filterContext.HttpContext.Request.Cookies["username"] ?? "";
             string pwd = filterContext.HttpContext.Request.Cookies["password"]?.DesDecrypt(AppConfig.ConnString) ?? "";
             var userInfo = filterContext.HttpContext.RequestServices.GetRequiredService<IUserInfoService>().Login(name, pwd);
-            if (userInfo != null)
+            if (userInfo?.IsAdmin == true)
             {
                 filterContext.HttpContext.Response.Cookies.Append("username", name, new CookieOptions()
                 {

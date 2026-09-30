@@ -355,6 +355,7 @@ public sealed class AdvertisementController : BaseController
     /// <param name="cids"></param>
     /// <returns></returns>
     /// <exception cref="NotFoundException"></exception>
+    [MyAuthorize]
     [HttpPost("/partner/{id}/categories"), DistributedLockFilter]
     public async Task<ActionResult> SetCategories(int id, [FromBodyOrDefault] string cids)
     {

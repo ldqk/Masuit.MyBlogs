@@ -1,15 +1,17 @@
 ﻿using AngleSharp;
+using Mammoth;
+using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.UEditor;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
+using Masuit.Tools.Mime;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Masuit.Tools.Mime;
 using Configuration = AngleSharp.Configuration;
-using Mammoth;
-using Masuit.MyBlogs.Core.Extensions;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -121,10 +123,15 @@ public sealed class UploadController : Controller
     public ActionResult Download([FromServices] IMimeMapper mimeMapper, [Required] string path)
     {
         if (string.IsNullOrEmpty(path)) return Content("null");
-        var file = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), path.Trim('.', '/', '\\'));
-        if (System.IO.File.Exists(file))
+        var uploadRoot = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'));
+        if (Directory.Exists(uploadRoot))
         {
-            return this.ResumePhysicalFile(file, mimeMapper.GetMimeFromPath(file), Path.GetFileName(file));
+            using var uploadFiles = new PhysicalFileProvider(uploadRoot, ExclusionFilters.None);
+            var file = uploadFiles.GetFileInfo(path.Trim('.', '/', '\\'));
+            if (file.Exists && !file.IsDirectory)
+            {
+                return this.ResumePhysicalFile(file.PhysicalPath, mimeMapper.GetMimeFromPath(file.PhysicalPath), Path.GetFileName(file.PhysicalPath));
+            }
         }
 
         return Content("null");

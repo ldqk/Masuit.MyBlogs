@@ -1062,6 +1062,7 @@ public sealed class PostController : BaseController
     /// <param name="id"></param>
     /// <param name="cid"></param>
     /// <returns></returns>
+    [MyAuthorize]
     [HttpPost("post/{id}/ChangeCategory/{cid}"), DistributedLockFilter]
     public async Task<ActionResult> ChangeCategory(int id, int cid)
     {
@@ -1075,6 +1076,7 @@ public sealed class PostController : BaseController
     /// <param name="id"></param>
     /// <param name="sids"></param>
     /// <returns></returns>
+    [MyAuthorize]
     [HttpPost("post/{id}/ChangeSeminar"), DistributedLockFilter]
     public async Task<ActionResult> ChangeSeminar(int id, string sids)
     {
