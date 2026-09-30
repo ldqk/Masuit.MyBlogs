@@ -93,6 +93,7 @@ public class AdvertisementViewModel : BaseEntity
     /// 广告商
     /// </summary>
     public string Merchant { get; set; }
+    public string Color { get; set; }
 }
 
 public class AdvertisementClickRecordViewModel

@@ -48,8 +48,12 @@
       </div>
       <!-- 广告表格 -->
       <div v-else>
-        <vxe-table ref="tableRef" :data="advertisements" :loading="loading" border stripe :scroll-y="{ enabled: true }" :sort-config="{ remote: true }">
-          <vxe-column field="Id" title="ID" width="80" />
+        <vxe-table ref="tableRef" :data="advertisements" :loading="loading" border :scroll-y="{ enabled: true }" :row-config="{ isCurrent: true, isHover: true }" :sort-config="{ remote: true }" :row-class-name="getRowClassName">
+          <vxe-column field="Id" title="ID" width="80">
+            <template #default="{ row }"> {{ row.Id }} <q-tooltip v-if="row.Color === 'yellow'">广告链接可能404</q-tooltip>
+              <q-tooltip v-if="row.Color === 'red'">广告链接可能访问超时</q-tooltip>
+            </template>
+          </vxe-column>
           <vxe-column field="Title" title="标题" min-width="300">
             <template #default="{ row }">
               <q-btn flat dense color="primary" :label="row.Title" @click="showDetailDialog(row)" no-caps />
@@ -1316,6 +1320,10 @@ onBeforeUnmount(() => {
     chartInstance = null
   }
 })
+
+const getRowClassName = ({ row }) => {
+  return row.Color;
+}
 </script>
 <style scoped lang="scss">
 .advertisement-page {
@@ -1617,5 +1625,13 @@ onBeforeUnmount(() => {
   .q-spinner {
     margin-bottom: 16px;
   }
+}
+
+:deep(.vxe-body--row.red) {
+  background-color: lightcoral;
+}
+
+:deep(.vxe-body--row.yellow) {
+  background-color: lightyellow;
 }
 </style>
