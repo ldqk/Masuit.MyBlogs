@@ -66,6 +66,9 @@ api.interceptors.response.use(
         case 400:
           toast.error("请求错误:" + (error.response.data as any).Message || "(400)", { autoClose: 3000, position: "top-center" });
           break;
+        case 401:
+          location.href = "/";
+          break;
         case 403:
           toast.error("拒绝访问(403)", { autoClose: 3000, position: "top-center", });
           break;
