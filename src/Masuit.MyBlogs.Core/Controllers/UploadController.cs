@@ -115,29 +115,6 @@ public sealed class UploadController : Controller
     #endregion Word上传转码
 
     /// <summary>
-    /// 文件下载
-    /// </summary>
-    /// <param name="path"></param>
-    /// <returns></returns>
-    [HttpGet("download/{**path}")]
-    public ActionResult Download([FromServices] IMimeMapper mimeMapper, [Required] string path)
-    {
-        if (string.IsNullOrEmpty(path)) return Content("null");
-        var uploadRoot = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'));
-        if (Directory.Exists(uploadRoot))
-        {
-            using var uploadFiles = new PhysicalFileProvider(uploadRoot, ExclusionFilters.None);
-            var file = uploadFiles.GetFileInfo(path.Trim('.', '/', '\\'));
-            if (file.Exists && !file.IsDirectory)
-            {
-                return this.ResumePhysicalFile(file.PhysicalPath, mimeMapper.GetMimeFromPath(file.PhysicalPath), Path.GetFileName(file.PhysicalPath));
-            }
-        }
-
-        return Content("null");
-    }
-
-    /// <summary>
     /// UEditor文件上传处理
     /// </summary>
     /// <returns></returns>

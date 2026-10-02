@@ -25,7 +25,7 @@ public sealed class TranslateMiddleware
     public Task Invoke(HttpContext context, IProxyConfigProvider proxy)
     {
         var path = context.Request.Path.Value ?? "";
-        if (path.StartsWith("/_blazor") || path.StartsWith("/api") || path.StartsWith("/file") || path.StartsWith("/download") || context.Request.IsRobot())
+        if (path.StartsWith("/_blazor") || path.StartsWith("/api") || path.StartsWith("/file") || context.Request.IsRobot())
         {
             return _next(context);
         }
