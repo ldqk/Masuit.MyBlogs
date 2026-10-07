@@ -156,6 +156,7 @@ public class Startup
         {
             app.UseExceptionHandler("/ServiceUnavailable");
         }
+        app.UseResponseCompression();
         app.UseBundles();
         app.SetupHttpsRedirection(Configuration);
         app.UseDefaultFiles().UseStaticFiles();
@@ -167,7 +168,7 @@ public class Startup
         });
         app.UseWhen(c => !c.Request.Path.StartsWithSegments("/_blazor"), builder => builder.UseMiddleware<RequestInterceptMiddleware>()); //启用网站请求拦截
         app.SetupHangfire();
-        app.UseResponseCaching().UseResponseCompression(); //启动Response缓存
+        app.UseResponseCaching(); //启动Response缓存
         app.UseMiddleware<TranslateMiddleware>();
 #if DEBUG
         app.UseCors("AllowAny");

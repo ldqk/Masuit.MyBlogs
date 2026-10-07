@@ -1,4 +1,5 @@
 ﻿using DnsClient;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
 using Polly;
 
@@ -6,6 +7,10 @@ namespace Masuit.MyBlogs.Core.Common;
 
 public static class HttpContextExtension
 {
+
+    private static readonly IMemoryCache RobotCache = new MemoryCache(new MemoryCacheOptions());
+    private static readonly LookupClient LookupClient = new();
+
     /// <summary>
     /// 地理位置信息
     /// </summary>
@@ -17,7 +22,7 @@ public static class HttpContextExtension
         request.Headers.TryGetValue("cf-ipcity", out var city);
         request.Headers.TryGetValue("cf-region", out var region);
         request.Headers.TryGetValue("cf-ipcountry", out var country);
-        location.Address2 += $"{country},{region},{city}";
+        location.Address2 += $"({country},{region},{city})";
         return location;
     }
 
@@ -33,11 +38,13 @@ public static class HttpContextExtension
         "googlebot.com",
         "googleusercontent.com",
         "bing.com",
+        "bingbot.com",
         "search.msn.com",
         "sogou.com",
         "soso.com",
         "yandex.com",
-        "apple.com",
+        "yandex.net",
+        "applebot.apple.com",
         "sm.cn",
         "telegram.org",
         "twttr.com"
@@ -54,15 +61,18 @@ public static class HttpContextExtension
         {
             if (UserAgent.Parse(req.Headers[HeaderNames.UserAgent].ToString()).IsRobot || req.Location().Contains("Spider", "蜘蛛", "Google", "Microsoft", "Baidu", "Cloudflare", "Telegram"))
             {
-                var nslookup = new LookupClient();
-                var fallbackPolicy = Policy<bool>.Handle<Exception>().FallbackAsync(false);
-                var retryPolicy = Policy<bool>.Handle<Exception>().RetryAsync(3);
-                return Policy.WrapAsync(fallbackPolicy, retryPolicy).ExecuteAsync(async () =>
+                return RobotCache.GetOrCreate($"ip.robot:{req.HttpContext.Connection.RemoteIpAddress}", entry =>
                 {
-                    using var cts = new CancellationTokenSource(1000);
-                    var query = await nslookup.QueryReverseAsync(req.HttpContext.Connection.RemoteIpAddress, cts.Token);
-                    return query.Answers.Any(r => r.ToString().Trim('.').EndsWith(Spiders));
-                }).Result;
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60);
+                    var fallbackPolicy = Policy<bool>.Handle<Exception>().FallbackAsync(false);
+                    var retryPolicy = Policy<bool>.Handle<Exception>().RetryAsync(3);
+                    return Policy.WrapAsync(fallbackPolicy, retryPolicy).ExecuteAsync(async () =>
+                    {
+                        using var cts = new CancellationTokenSource(1000);
+                        var query = await LookupClient.QueryReverseAsync(req.HttpContext.Connection.RemoteIpAddress, cts.Token);
+                        return query.Answers.Any(r => r.ToString().Trim('.').EndsWith(Spiders));
+                    }).GetAwaiter().GetResult();
+                });
             }
 
             return false;
