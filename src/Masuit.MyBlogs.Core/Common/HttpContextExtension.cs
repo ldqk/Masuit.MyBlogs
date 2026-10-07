@@ -13,7 +13,12 @@ public static class HttpContextExtension
     /// <returns></returns>
     public static IPLocation Location(this HttpRequest request)
     {
-        return (IPLocation)request.HttpContext.Items.GetOrAdd("ip.location", request.HttpContext.Connection.RemoteIpAddress.GetIPLocation);
+        var location = (IPLocation)request.HttpContext.Items.GetOrAdd("ip.location", request.HttpContext.Connection.RemoteIpAddress.GetIPLocation);
+        request.Headers.TryGetValue("cf-ipcity", out var city);
+        request.Headers.TryGetValue("cf-region", out var region);
+        request.Headers.TryGetValue("cf-ipcountry", out var country);
+        location.Address2 += $"{country},{region},{city}";
+        return location;
     }
 
     public static int[] GetHideCategories(this HttpRequest request)

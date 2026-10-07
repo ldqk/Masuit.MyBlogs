@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using FreeRedis;
 using Hangfire;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
@@ -17,7 +16,6 @@ namespace Masuit.MyBlogs.Core.Extensions.Firewall;
 public class RequestInterceptMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly IRedisClient _redisClient;
     private readonly IRequestLogger _requestLogger;
     private readonly IFirewallService _firewallService;
 
@@ -26,13 +24,11 @@ public class RequestInterceptMiddleware
     /// </summary>
     /// <param name="next"></param>
     /// <param name="requestLogger"></param>
-    /// <param name="redisClient"></param>
     /// <param name="firewallService"></param>
-    public RequestInterceptMiddleware(RequestDelegate next, IRequestLogger requestLogger, IRedisClient redisClient, IFirewallService firewallService)
+    public RequestInterceptMiddleware(RequestDelegate next, IRequestLogger requestLogger, IFirewallService firewallService)
     {
         _next = next;
         _requestLogger = requestLogger;
-        _redisClient = redisClient;
         _firewallService = firewallService;
     }
 

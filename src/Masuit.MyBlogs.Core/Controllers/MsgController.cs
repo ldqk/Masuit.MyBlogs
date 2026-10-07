@@ -247,7 +247,7 @@ public sealed class MsgController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [HttpPost,MyAuthorize]
     public async Task<ActionResult> Pass(int id)
     {
         var msg = await LeaveMessageService.GetByIdAsync(id);
@@ -272,7 +272,7 @@ public sealed class MsgController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [HttpPost,MyAuthorize]
     public ActionResult Delete(int id)
     {
         var b = LeaveMessageService.DeleteById(id);
