@@ -136,17 +136,21 @@ public class BaseController : Controller
             var name = Request.Cookies["username"];
             var pwd = Request.Cookies["password"];
             var userInfo = UserInfoService.Login(name, pwd.DesDecrypt(AppConfig.ConnString));
-            if (userInfo != null)
+            if (userInfo?.IsAdmin == true)
             {
                 Response.Cookies.Append("username", name, new CookieOptions
                 {
                     Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax
+                    SameSite = SameSiteMode.Lax,
+                    HttpOnly = true,
+                    Secure = true
                 });
                 Response.Cookies.Append("password", pwd, new CookieOptions
                 {
                     Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax
+                    SameSite = SameSiteMode.Lax,
+                    HttpOnly = true,
+                    Secure = true
                 });
                 context.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
             }

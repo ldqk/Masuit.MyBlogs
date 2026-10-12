@@ -36,12 +36,16 @@ public sealed class MyAuthorizeAttribute : ActionFilterAttribute
                 filterContext.HttpContext.Response.Cookies.Append("username", name, new CookieOptions()
                 {
                     Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax
+                    SameSite = SameSiteMode.Lax,
+                    HttpOnly = true,
+                    Secure = true
                 });
                 filterContext.HttpContext.Response.Cookies.Append("password", filterContext.HttpContext.Request.Cookies["password"], new CookieOptions()
                 {
                     Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax
+                    SameSite = SameSiteMode.Lax,
+                    HttpOnly = true,
+                    Secure = true
                 });
                 filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
             }

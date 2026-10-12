@@ -64,12 +64,16 @@ public class AdminController : Controller
                 Response.Cookies.Append("username", name, new CookieOptions
                 {
                     Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax
+                    SameSite = SameSiteMode.Lax,
+                    HttpOnly = true,
+                    Secure = true
                 });
                 Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions
                 {
                     Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax
+                    SameSite = SameSiteMode.Lax,
+                    HttpOnly = true,
+                    Secure = true
                 });
                 context.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
             }

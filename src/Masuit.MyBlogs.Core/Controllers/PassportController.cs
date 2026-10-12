@@ -92,12 +92,16 @@ public sealed class PassportController : Controller
                 Response.Cookies.Append("username", name, new CookieOptions()
                 {
                     Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax
+                    SameSite = SameSiteMode.Lax,
+                    HttpOnly = true,
+                    Secure = true
                 });
                 Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions()
                 {
                     Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax
+                    SameSite = SameSiteMode.Lax,
+                    HttpOnly = true,
+                    Secure = true
                 });
                 HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
                 BackgroundJob.Enqueue<IHangfireBackJob>(job => job.LoginRecord(userInfo, ClientIP, LoginType.Default));
@@ -164,12 +168,16 @@ public sealed class PassportController : Controller
             Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()), new CookieOptions()
             {
                 Expires = DateTime.Now.AddYears(1),
-                SameSite = SameSiteMode.Lax
+                SameSite = SameSiteMode.Lax,
+                HttpOnly = true,
+                Secure = true
             });
             Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.ConnString), new CookieOptions()
             {
                 Expires = DateTime.Now.AddYears(1),
-                SameSite = SameSiteMode.Lax
+                SameSite = SameSiteMode.Lax,
+                HttpOnly = true,
+                Secure = true
             });
         }
 
