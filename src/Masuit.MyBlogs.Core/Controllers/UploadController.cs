@@ -191,7 +191,7 @@ public sealed class UploadController : Controller
     /// <param name="file"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    [HttpPost("upload"), ApiExplorerSettings(IgnoreApi = false), DistributedLockFilter]
+    [HttpPost("upload"), ApiExplorerSettings(IgnoreApi = false), DistributedLockFilter,MyAuthorize]
     public async Task<ActionResult> UploadFile([FromServices] ImagebedClient imagebedClient, IFormFile file, CancellationToken cancellationToken)
     {
         string path;

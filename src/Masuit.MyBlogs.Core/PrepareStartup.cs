@@ -143,6 +143,8 @@ namespace Masuit.MyBlogs.Core
                 {
                     context.Context.Response.Headers[HeaderNames.CacheControl] = "public,no-cache";
                     context.Context.Response.Headers[HeaderNames.Expires] = DateTime.Now.AddDays(7).ToString("R");
+                    context.Context.Response.Headers[HeaderNames.ContentSecurityPolicy] = "default-src 'self'";
+                    context.Context.Response.Headers[HeaderNames.XContentTypeOptions] = "nosniff";
                 };
                 options.ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes);
                 options.HttpsCompression = HttpsCompressionMode.Compress;
