@@ -34,7 +34,9 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
             Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.EncryptKey), new CookieOptions()
             {
                 SameSite = SameSiteMode.Lax,
-                Expires = DateTime.Now.AddDays(1)
+                Expires = DateTime.Now.AddDays(1),
+                HttpOnly = true,
+                Secure = true
             });
             return Ok();
         }
@@ -78,7 +80,9 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
             Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.EncryptKey), new CookieOptions()
             {
                 SameSite = SameSiteMode.Lax,
-                Expires = DateTime.Now.AddDays(1)
+                Expires = DateTime.Now.AddDays(1),
+                HttpOnly = true,
+                Secure = true
             });
         }
 
@@ -111,7 +115,9 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
                 Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.EncryptKey), new CookieOptions()
                 {
                     SameSite = SameSiteMode.Lax,
-                    Expires = DateTime.Now.AddDays(1)
+                    Expires = DateTime.Now.AddDays(1),
+                    HttpOnly = true,
+                    Secure = true
                 });
             }
         }

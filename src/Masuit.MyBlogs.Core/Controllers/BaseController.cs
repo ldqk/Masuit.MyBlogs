@@ -216,12 +216,16 @@ public class BaseController : Controller
         Response.Cookies.Append("Email", email, new CookieOptions()
         {
             Expires = DateTimeOffset.Now.AddYears(1),
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.Lax,
+            HttpOnly = true,
+            Secure = true
         });
         Response.Cookies.Append("ValidateKey", email.DesEncrypt(AppConfig.EncryptKey), new CookieOptions()
         {
             Expires = DateTimeOffset.Now.AddYears(1),
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.Lax,
+            HttpOnly = true,
+            Secure = true
         });
     }
 

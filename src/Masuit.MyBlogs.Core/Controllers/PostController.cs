@@ -370,12 +370,16 @@ public sealed class PostController : BaseController
             Response.Cookies.Append("Email", email, new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(1),
-                SameSite = SameSiteMode.Lax
+                SameSite = SameSiteMode.Lax,
+                HttpOnly = true,
+                Secure = true
             });
             Response.Cookies.Append("PostAccessToken", email.MDString3(AppConfig.EncryptKey), new CookieOptions
             {
                 Expires = DateTime.Now.AddYears(1),
-                SameSite = SameSiteMode.Lax
+                SameSite = SameSiteMode.Lax,
+                HttpOnly = true,
+                Secure = true
             });
             return ResultData(null);
         }

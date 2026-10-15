@@ -200,7 +200,9 @@ public sealed class MsgController : BaseController
         Response.Cookies.Append("NickName", msg.NickName, new CookieOptions()
         {
             Expires = DateTimeOffset.Now.AddYears(1),
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.Lax,
+            HttpOnly = true,
+            Secure = true
         });
         WriteEmailKeyCookie(cmd.Email);
         await RedisHelper.ExpireAsync("Comments:" + ip, TimeSpan.FromMinutes(1));

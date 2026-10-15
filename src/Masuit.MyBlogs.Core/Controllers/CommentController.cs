@@ -119,7 +119,9 @@ public sealed class CommentController : BaseController
         Response.Cookies.Append("NickName", comment.NickName, new CookieOptions()
         {
             Expires = DateTimeOffset.Now.AddYears(1),
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.Lax,
+            HttpOnly = true,
+            Secure = true
         });
         WriteEmailKeyCookie(cmd.Email);
         await RedisHelper.ExpireAsync("Comments:" + comment.IP, TimeSpan.FromMinutes(1));
