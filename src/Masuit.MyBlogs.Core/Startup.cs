@@ -54,6 +54,7 @@ public class Startup
             AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
             AppConfig.TrueClientIPHeader = configuration[nameof(AppConfig.TrueClientIPHeader)] ?? "CF-Connecting-IP";
             AppConfig.EnableIPDirect = bool.Parse(configuration[nameof(AppConfig.EnableIPDirect)] ?? "false");
+            AppConfig.EncryptKey = configuration[nameof(AppConfig.EncryptKey)]?? AppConfig.ConnString;
             configuration.Bind("Imgbed:Gitlabs", AppConfig.GitlabConfigs);
             configuration.AddToMasuitTools();
         }

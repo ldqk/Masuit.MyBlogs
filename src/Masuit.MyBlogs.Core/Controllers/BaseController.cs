@@ -135,7 +135,7 @@ public class BaseController : Controller
         {
             var name = Request.Cookies["username"];
             var pwd = Request.Cookies["password"];
-            var userInfo = UserInfoService.Login(name, pwd.DesDecrypt(AppConfig.ConnString));
+            var userInfo = UserInfoService.Login(name, pwd.DesDecrypt(AppConfig.EncryptKey));
             if (userInfo?.IsAdmin == true)
             {
                 Response.Cookies.Append("username", name, new CookieOptions
@@ -191,7 +191,7 @@ public class BaseController : Controller
                 return "验证码错误！";
             }
         }
-        else if (Request.Cookies["ValidateKey"].DesDecrypt(AppConfig.ConnString) != email)
+        else if (Request.Cookies["ValidateKey"].DesDecrypt(AppConfig.EncryptKey) != email)
         {
             Response.Cookies.Delete("Email");
             Response.Cookies.Delete("NickName");
@@ -218,7 +218,7 @@ public class BaseController : Controller
             Expires = DateTimeOffset.Now.AddYears(1),
             SameSite = SameSiteMode.Lax
         });
-        Response.Cookies.Append("ValidateKey", email.DesEncrypt(AppConfig.ConnString), new CookieOptions()
+        Response.Cookies.Append("ValidateKey", email.DesEncrypt(AppConfig.EncryptKey), new CookieOptions()
         {
             Expires = DateTimeOffset.Now.AddYears(1),
             SameSite = SameSiteMode.Lax

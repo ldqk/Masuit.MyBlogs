@@ -29,7 +29,7 @@ public sealed class MyAuthorizeAttribute : ActionFilterAttribute
         if (filterContext.HttpContext.Request.Cookies.Any(x => x.Key == "username" || x.Key == "password"))
         {
             string name = filterContext.HttpContext.Request.Cookies["username"] ?? "";
-            string pwd = filterContext.HttpContext.Request.Cookies["password"]?.DesDecrypt(AppConfig.ConnString) ?? "";
+            string pwd = filterContext.HttpContext.Request.Cookies["password"]?.DesDecrypt(AppConfig.EncryptKey) ?? "";
             var userInfo = filterContext.HttpContext.RequestServices.GetRequiredService<IUserInfoService>().Login(name, pwd);
             if (userInfo?.IsAdmin == true)
             {

@@ -143,7 +143,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
         try
         {
-            if (request.Cookies.TryGetValue(SessionKey.ChallengeBypass, out var time) && time.AESDecrypt(AppConfig.ConnString).ToDateTime() > DateTime.Now)
+            if (request.Cookies.TryGetValue(SessionKey.ChallengeBypass, out var time) && time.AESDecrypt(AppConfig.EncryptKey).ToDateTime() > DateTime.Now)
             {
                 context.HttpContext.Session.Set("js-challenge", 1);
                 await next();

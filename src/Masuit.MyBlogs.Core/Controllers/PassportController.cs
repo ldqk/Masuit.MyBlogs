@@ -85,7 +85,7 @@ public sealed class PassportController : Controller
         if (Request.Cookies.Count > 2)
         {
             string name = Request.Cookies["username"];
-            string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.ConnString);
+            string pwd = Request.Cookies["password"]?.DesDecrypt(AppConfig.EncryptKey);
             var userInfo = UserInfoService.Login(name, pwd);
             if (userInfo?.IsAdmin==true)
             {
@@ -172,7 +172,7 @@ public sealed class PassportController : Controller
                 HttpOnly = true,
                 Secure = true
             });
-            Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.ConnString), new CookieOptions()
+            Response.Cookies.Append("password", password.Trim().DesEncrypt(AppConfig.EncryptKey), new CookieOptions()
             {
                 Expires = DateTime.Now.AddYears(1),
                 SameSite = SameSiteMode.Lax,

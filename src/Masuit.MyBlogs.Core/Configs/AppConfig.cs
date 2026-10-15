@@ -29,4 +29,6 @@ public class AppConfig
     /// 是否允许IP直接访问
     /// </summary>
     public static bool EnableIPDirect { get; set; }
+
+    public static string EncryptKey { get; set; }
 }

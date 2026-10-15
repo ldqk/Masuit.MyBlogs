@@ -3,7 +3,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Masuit.Tools.Extension.Object;
 using Masuit.Tools.Files;
-using Masuit.Tools.Files.FileDetector;
+using Masuit.Tools.Media;
 using Polly;
 using SkiaSharp;
 
@@ -89,35 +89,35 @@ public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration con
             return this;
         }
 
-        var format = stream.DetectFiletype();
+        var format = stream.GetImageType();
         stream.Position = 0;
         if (format != null)
         {
-            ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), "." + format.Extension);
-            if (!Regex.IsMatch(format.Extension, "JPEG|PNG|Webp|GIF", RegexOptions.IgnoreCase))
+            using var codec = SKCodec.Create(stream);
+            using var bmp = SKBitmap.Decode(codec);
+            var image = SKImage.FromBitmap(bmp);
+            var skData = image.Encode(SKEncodedImageFormat.Jpeg, 100);
+            skData.SaveTo(stream);
+            ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), ".jpg");
+            var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
+            var (url, success) = await httpContext.RequestServices.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath, token);
+            if (success)
             {
-                using var codec = SKCodec.Create(stream);
-                using var bmp = SKBitmap.Decode(codec);
-                var image = SKImage.FromBitmap(bmp);
-                var skData = image.Encode(SKEncodedImageFormat.Jpeg, 100);
-                skData.SaveTo(stream);
-                ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), ".jpg");
+                ServerUrl = url;
             }
-        }
+            else
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+                await stream.SaveFileAsync(savePath);
+            }
 
-        var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
-        var (url, success) = await httpContext.RequestServices.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath, token);
-        if (success)
-        {
-            ServerUrl = url;
+            State = "SUCCESS";
         }
         else
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-            await stream.SaveFileAsync(savePath);
+            State = "不支持的文件格式";
         }
 
-        State = "SUCCESS";
         return this;
     }
 }
