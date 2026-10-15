@@ -115,6 +115,7 @@ public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration con
         }
         else
         {
+                ServerUrl = null;
             State = "不支持的文件格式";
         }
 
