@@ -203,9 +203,9 @@ public sealed class ErrorController : Controller
             return ResultData(null, false, "您目前没有权限访问这个链接，请联系站长开通访问权限！");
         }
 
-        var token = SnowFlake.GetInstance().GetUniqueShortId(6);
+        var token = ValidateCode.CreateValidateCode(6);
         RedisClient.Set("token:" + email, token, 86400);
-        BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(Request.Host + "博客访问验证码", $"{Request.Host}本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, HttpContext.Connection.RemoteIpAddress.ToString()));
+        BackgroundJob.Enqueue<IMailSender>(sender => sender.Send(Request.Host + "博客访问验证码", $"您本次验证码是：<span style='color:red'>{token}</span>，有效期为24h，请按时使用！", email, HttpContext.Connection.RemoteIpAddress.ToString()));
         RedisClient.Set("get:" + email, token, 120);
         return ResultData(null);
     }
