@@ -295,8 +295,7 @@ public sealed class HomeController : BaseController
         {
             Expires = DateTime.Now.AddYears(1),
         });
-        var referer = Request.Headers[HeaderNames.Referer].ToString();
-        return Redirect(string.IsNullOrEmpty(referer) ? "/" : referer);
+        return Redirect(string.IsNullOrEmpty(Request.Headers[HeaderNames.Referer]) ? "/" : new Uri(Request.Headers[HeaderNames.Referer]).AbsolutePath);
     }
 
     /// <summary>

@@ -224,8 +224,7 @@ public sealed class UploadController : Controller
                 break;
 
             default:
-                path = Path.Combine(HostEnvironment.WebRootPath, pathBase, "files", filename);
-                break;
+                return ResultData(null, false, "不支持的文件！");
         }
         try
         {

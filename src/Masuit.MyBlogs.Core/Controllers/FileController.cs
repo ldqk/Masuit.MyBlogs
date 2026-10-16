@@ -257,7 +257,7 @@ public sealed class FileController : AdminController
     {
         path = path?.TrimStart('\\', '/') ?? "";
         var token = Guid.NewGuid().ToString().MDString(Guid.NewGuid().ToString()).FromBaseBig(16).ToBase(62);
-        RedisClient.Set("FileManager:Token:" + token, "1");
+        RedisClient.Set("FileManager:Token:" + token, path);
         RedisClient.Expire("FileManager:Token:" + token, TimeSpan.FromDays(1));
         return RedirectToAction("Download", "File", new { path, items, toFilename, token });
     }
@@ -273,7 +273,8 @@ public sealed class FileController : AdminController
     [HttpGet("{**path}"), AllowAnonymous]
     public ActionResult Download(string path, string[] items, string toFilename, string token)
     {
-        if (RedisClient.Exists("FileManager:Token:" + token))
+        path = RedisClient.Get("FileManager:Token:" + token);
+        if (!string.IsNullOrWhiteSpace(path))
         {
             var root = CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/');
             if (items.Length > 0)

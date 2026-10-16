@@ -86,7 +86,7 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
             });
         }
 
-        return Redirect(Request.Headers[HeaderNames.Referer]);
+        return Redirect(new Uri(Request.Headers[HeaderNames.Referer]).AbsolutePath);
     }
 
     /// <summary>
