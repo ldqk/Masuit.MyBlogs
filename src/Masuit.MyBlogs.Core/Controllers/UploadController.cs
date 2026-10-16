@@ -6,6 +6,7 @@ using Masuit.MyBlogs.Core.Extensions.UEditor;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Html;
 using Masuit.Tools.Logging;
+using Masuit.Tools.Media;
 using Masuit.Tools.Mime;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
@@ -90,15 +91,22 @@ public sealed class UploadController : Controller
             var strs = attr.Split(",");
             var base64 = strs[1];
             var bytes = Convert.FromBase64String(base64);
-            var ext = strs[0].Split(";")[0].Split("/")[1];
             await using var image = new PooledMemoryStream(bytes);
-            var imgFile = $"{SnowFlake.NewId}.{ext}";
-            var path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "images", imgFile);
-            var dir = Path.GetDirectoryName(path);
-            Directory.CreateDirectory(dir);
-            await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            await image.CopyToAsync(fs);
-            img.Value = path[HostEnvironment.WebRootPath.Length..].Replace("\\", "/");
+            if (image.IsImage())
+            {
+                var ext = strs[0].Split(";")[0].Split("/")[1];
+                var imgFile = $"{SnowFlake.NewId}.{ext}";
+                var path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "images", imgFile);
+                var dir = Path.GetDirectoryName(path);
+                Directory.CreateDirectory(dir);
+                await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                await image.CopyToAsync(fs);
+                img.Value = path[HostEnvironment.WebRootPath.Length..].Replace("\\", "/");
+            }
+            else
+            {
+                img.Value = "/Assets/images/404/4043.jpg";
+            }
         }
 
         return body.InnerHtml.HtmlSanitizerCustom(attributes: ["dir", "lang"]);
