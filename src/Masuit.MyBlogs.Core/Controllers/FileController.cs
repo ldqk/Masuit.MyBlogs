@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Polly;
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -17,6 +18,8 @@ namespace Masuit.MyBlogs.Core.Controllers;
 [Route("[controller]/[action]")]
 public sealed class FileController : AdminController
 {
+    private sealed record DownloadManifest(string[] Paths, bool IsArchive, string FileName);
+
     public IWebHostEnvironment HostEnvironment { get; set; }
 
     /// <summary>
@@ -255,11 +258,33 @@ public sealed class FileController : AdminController
     [HttpGet]
     public ActionResult Handle(string path, string[] items, string toFilename)
     {
-        path = path?.TrimStart('\\', '/') ?? "";
+        var root = GetDownloadRoot();
+        var isArchive = items is { Length: > 0 };
+        var requestedPaths = isArchive ? items : [path];
+        if (requestedPaths.Any(string.IsNullOrWhiteSpace))
+        {
+            return BadRequest();
+        }
+
+        var fullPaths = new List<string>(requestedPaths.Length);
+        foreach (var requestedPath in requestedPaths)
+        {
+            if (!TryResolvePathWithinRoot(root, requestedPath, out var fullPath) || !System.IO.File.Exists(fullPath))
+            {
+                return NotFound();
+            }
+
+            fullPaths.Add(Path.GetRelativePath(root, fullPath));
+        }
+
+        var manifest = new DownloadManifest(
+            fullPaths.ToArray(),
+            isArchive,
+            isArchive ? Path.GetFileName(toFilename) : string.Empty);
         var token = Guid.NewGuid().ToString().MDString(Guid.NewGuid().ToString()).FromBaseBig(16).ToBase(62);
-        RedisClient.Set("FileManager:Token:" + token, path);
+        RedisClient.Set("FileManager:Token:" + token, JsonSerializer.Serialize(manifest));
         RedisClient.Expire("FileManager:Token:" + token, TimeSpan.FromDays(1));
-        return RedirectToAction("Download", "File", new { path, items, toFilename, token });
+        return RedirectToAction("Download", "File", new { token });
     }
 
     /// <summary>
@@ -273,24 +298,59 @@ public sealed class FileController : AdminController
     [HttpGet("{**path}"), AllowAnonymous]
     public ActionResult Download(string path, string[] items, string toFilename, string token)
     {
-        path = RedisClient.Get("FileManager:Token:" + token);
-        if (!string.IsNullOrWhiteSpace(path))
+        var tokenValue = RedisClient.Get("FileManager:Token:" + token);
+        if (!string.IsNullOrWhiteSpace(tokenValue))
         {
-            var root = CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/');
-            if (items.Length > 0)
+            DownloadManifest manifest;
+            try
             {
-                using var ms = SevenZipCompressor.ZipStream(items.Select(s => Path.Combine(HostEnvironment.ContentRootPath, root, s.TrimStart('\\', '/'))));
-                var buffer = ms.ToArray();
-                return this.ResumeFile(buffer, Path.GetFileName(toFilename));
+                manifest = JsonSerializer.Deserialize<DownloadManifest>(tokenValue) ?? throw new NotFoundException("文件未找到");
+            }
+            catch (JsonException)
+            {
+                throw new NotFoundException("文件未找到");
             }
 
-            var file = Path.Combine(HostEnvironment.ContentRootPath, root, path);
-            if (System.IO.File.Exists(file))
+            var root = GetDownloadRoot();
+            var fullPaths = new List<string>(manifest.Paths.Length);
+            foreach (var relativePath in manifest.Paths)
             {
-                return this.ResumePhysicalFile(file, Path.GetFileName(file));
+                if (!TryResolvePathWithinRoot(root, relativePath, out var fullPath) || !System.IO.File.Exists(fullPath))
+                {
+                    throw new NotFoundException("文件未找到");
+                }
+
+                fullPaths.Add(fullPath);
+            }
+
+            if (manifest.IsArchive && fullPaths.Count > 0)
+            {
+                using var ms = SevenZipCompressor.ZipStream(fullPaths);
+                var buffer = ms.ToArray();
+                return this.ResumeFile(buffer, manifest.FileName);
+            }
+
+            if (!manifest.IsArchive && fullPaths.Count == 1)
+            {
+                return this.ResumePhysicalFile(fullPaths[0], Path.GetFileName(fullPaths[0]));
             }
         }
 
         throw new NotFoundException("文件未找到");
+    }
+
+    private string GetDownloadRoot()
+    {
+        var configuredRoot = CommonHelper.SystemSettings["PathRoot"].TrimStart('\\', '/');
+        return Path.GetFullPath(Path.Combine(HostEnvironment.ContentRootPath, configuredRoot));
+    }
+
+    private static bool TryResolvePathWithinRoot(string root, string requestedPath, out string fullPath)
+    {
+        fullPath = Path.GetFullPath(Path.Combine(root, requestedPath.TrimStart('\\', '/')));
+        var relativePath = Path.GetRelativePath(root, fullPath);
+        return !Path.IsPathRooted(relativePath)
+            && relativePath != ".."
+            && !relativePath.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal);
     }
 }
