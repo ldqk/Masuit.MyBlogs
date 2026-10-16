@@ -438,9 +438,10 @@ public sealed class PostController : BaseController
     /// <param name="messageService"></param>
     /// <param name="postMergeRequestService"></param>
     /// <param name="dto"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost("{id}/pushmerge"), DistributedLockFilter]
-    public async Task<ActionResult> PushMerge([FromServices] IInternalMessageService messageService, [FromServices] IPostMergeRequestService postMergeRequestService, [FromBodyOrDefault] PostMergeRequestCommand dto)
+    public async Task<ActionResult> PushMerge([FromServices] IInternalMessageService messageService, [FromServices] IPostMergeRequestService postMergeRequestService, [FromBodyOrDefault] PostMergeRequestCommand dto, CancellationToken cancellationToken)
     {
 #if !DEBUG
         if (await RedisHelper.GetAsync("code:" + dto.ModifierEmail) != dto.Code)
@@ -450,6 +451,7 @@ public sealed class PostController : BaseController
 #endif
 
         var post = await PostService.GetAsync(p => p.Id == dto.PostId && p.Status == Status.Published && !p.Locked) ?? throw new NotFoundException("文章未找到");
+        dto.Content = await ImagebedClient.ReplaceImgSrc(await dto.Content.HtmlSanitizerStandard().ClearImgAttributes(cancellationToken: cancellationToken), cancellationToken);
         if (post.Title.Equals(dto.Title) && post.Content.HammingDistance(dto.Content) <= 1)
         {
             return ResultData(null, false, "内容未被修改或修改的内容过少(无意义修改)！");
