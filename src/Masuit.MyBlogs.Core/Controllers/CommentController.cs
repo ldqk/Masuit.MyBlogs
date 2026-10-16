@@ -221,8 +221,8 @@ public sealed class CommentController : BaseController
     {
         if (cid > 0)
         {
-            var comment = await CommentService.GetByIdAsync(cid.Value) ?? throw new NotFoundException("评论未找到");
-            var layer = CommentService.GetQueryNoTracking(c => c.GroupTag == comment.GroupTag).ToPooledListScope();
+            var comment = await CommentService.GetAsync(c => c.Id == cid.Value && (c.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("评论未找到");
+            var layer = CommentService.GetQueryNoTracking(c => c.GroupTag == comment.GroupTag && (c.Status == Status.Published || CurrentUser.IsAdmin)).ToPooledListScope();
             foreach (var c in layer)
             {
                 c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -252,7 +252,7 @@ public sealed class CommentController : BaseController
         }
         int total = parent.TotalCount; //总条数，用于前台分页
         var tags = parent.Data.Select(c => c.GroupTag).ToArray();
-        var comments = CommentService.GetQuery(c => tags.Contains(c.GroupTag)).Include(c => c.Post).AsNoTracking().ToPooledListScope();
+        var comments = CommentService.GetQuery(c => tags.Contains(c.GroupTag) && (c.Status == Status.Published || CurrentUser.IsAdmin)).Include(c => c.Post).AsNoTracking().ToPooledListScope();
         comments.ForEach(c =>
         {
             c.CommentDate = c.CommentDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
