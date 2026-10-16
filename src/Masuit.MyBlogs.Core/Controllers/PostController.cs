@@ -195,8 +195,8 @@ public sealed class PostController : BaseController
         var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
         var main = post ?? throw new NotFoundException("文章未找到");
         CheckPermission(post);
-        var right = v1 <= 0 ? main : (await PostHistoryVersionService.GetAsync(v => v.Id == v1) ?? throw new NotFoundException("文章未找到")).ToPost();
-        var left = v2 <= 0 ? main : (await PostHistoryVersionService.GetAsync(v => v.Id == v2) ?? throw new NotFoundException("文章未找到")).ToPost();
+        var right = v1 <= 0 ? main : (await PostHistoryVersionService.GetAsync(v => v.Id == v1&&v.PostId==id) ?? throw new NotFoundException("文章未找到")).ToPost();
+        var left = v2 <= 0 ? main : (await PostHistoryVersionService.GetAsync(v => v.Id == v2&&v.PostId==id) ?? throw new NotFoundException("文章未找到")).ToPost();
         left.Id = main.Id;
         right.Id = main.Id;
         var posts = new[] { main, left, right }.OrderByDescending(v => v.ModifyDate).ToArray();
@@ -300,12 +300,24 @@ public sealed class PostController : BaseController
         post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
         post.Status = Status.Pending;
         post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.HtmlSanitizerStandard().ClearImgAttributes(cancellationToken: cancellationToken), cancellationToken);
+        post.ProtectContent = "";
         Post p = post.ToPost();
         p.IP = ClientIP.ToString();
         p.Modifier = p.Author;
         p.ModifierEmail = p.Email;
         p.DisableCopy = true;
         p.Rss = true;
+        p.DisableComment = false;
+        p.DisableCopy = false;
+        p.IsNsfw = false;
+        p.LimitMode = null;
+        p.Regions = null;
+        p.Redirect = null;
+        p.ExceptRegions = null;
+        p.ProtectContentLimitMode = null;
+        p.ProtectContentRegions = null;
+        p.ProtectPassword = null;
+        p.ExpireAt = null;
         PostTagService.AddOrUpdate(t => t.Name, p.Label.AsNotNull().Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => new PostTag()
         {
             Name = s,

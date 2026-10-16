@@ -5,6 +5,7 @@ using Masuit.Tools.Logging;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Web;
+using Masuit.Tools.Media;
 
 namespace Masuit.MyBlogs.Core.Common;
 
@@ -157,6 +158,11 @@ public sealed class ImagebedClient
 
             var path = Path.Combine(AppContext.BaseDirectory + "wwwroot", src.Replace("/", @"\")[1..]);
             if (!File.Exists(path))
+            {
+                continue;
+            }
+
+            if (!new FileInfo(path).IsImage())
             {
                 continue;
             }
