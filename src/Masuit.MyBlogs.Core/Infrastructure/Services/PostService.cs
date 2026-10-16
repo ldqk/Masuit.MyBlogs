@@ -11,13 +11,12 @@ using PanGu.HighLight;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using EFCoreSecondLevelCacheInterceptor;
-using FreeRedis;
 using Masuit.MyBlogs.Core.Models;
 using Configuration = AngleSharp.Configuration;
 
 namespace Masuit.MyBlogs.Core.Infrastructure.Services;
 
-public sealed class PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, IRedisClient cacheManager, ICategoryRepository categoryRepository, IPostTagsRepository postTagsRepository) : BaseService<Post>(repository, searchEngine, searcher), IPostService
+public sealed class PostService(IPostRepository repository, ISearchEngine<DataContext> searchEngine, ILuceneIndexSearcher searcher, ICategoryRepository categoryRepository, IPostTagsRepository postTagsRepository) : BaseService<Post>(repository, searchEngine, searcher), IPostService
 {
     /// <summary>
     /// 文章高亮关键词处理
@@ -74,26 +73,22 @@ public sealed class PostService(IPostRepository repository, ISearchEngine<DataCo
 
     public SearchResult<PostDto> SearchPage(Expression<Func<Post, bool>> whereBase, int page, int size, string keyword)
     {
-        var cacheKey = $"search:{keyword}:{page}:{size}";
-        return cacheManager.GetOrAdd(cacheKey, () =>
+        var searchResult = SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
+        var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).DistinctBy(s => s.Entity.Id).ToList();
+        var ids = entities.Select(s => s.Entity.Id).ToArray();
+        var dic = GetQuery(whereBase.And(p => ids.Contains(p.Id) && p.LimitMode != RegionLimitMode.OnlyForSearchEngine)).ProjectDto().ToFrozenDictionary(p => p.Id);
+        var posts = entities.Where(s => dic.ContainsKey(s.Entity.Id)).Select(s => dic[s.Entity.Id]).ToList();
+        var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
+        var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
+        var keywords = Searcher.CutKeywords(keyword);
+        HighlightSegment(posts, keywords, highlighter);
+        SolvePostsCategory(posts);
+        return new SearchResult<PostDto>()
         {
-            var searchResult = SearchEngine.ScoredSearch<Post>(BuildSearchOptions(page, size, keyword));
-            var entities = searchResult.Results.Where(s => s.Entity.Status == Status.Published).DistinctBy(s => s.Entity.Id).ToList();
-            var ids = entities.Select(s => s.Entity.Id).ToArray();
-            var dic = GetQuery(whereBase.And(p => ids.Contains(p.Id) && p.LimitMode != RegionLimitMode.OnlyForSearchEngine)).ProjectDto().ToFrozenDictionary(p => p.Id);
-            var posts = entities.Where(s => dic.ContainsKey(s.Entity.Id)).Select(s => dic[s.Entity.Id]).ToList();
-            var simpleHtmlFormatter = new SimpleHTMLFormatter("<span style='color:red;background-color:yellow;font-size: 1.1em;font-weight:700;'>", "</span>");
-            var highlighter = new Highlighter(simpleHtmlFormatter, new Segment()) { FragmentSize = 200 };
-            var keywords = Searcher.CutKeywords(keyword);
-            HighlightSegment(posts, keywords, highlighter);
-            SolvePostsCategory(posts);
-            return new SearchResult<PostDto>()
-            {
-                Results = posts,
-                Elapsed = searchResult.Elapsed,
-                Total = searchResult.TotalHits
-            };
-        }, TimeSpan.FromMinutes(10));
+            Results = posts,
+            Elapsed = searchResult.Elapsed,
+            Total = searchResult.TotalHits
+        };
     }
 
     public void SolvePostsCategory(IList<PostDto> posts)
