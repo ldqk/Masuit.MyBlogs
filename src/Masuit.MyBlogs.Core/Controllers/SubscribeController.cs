@@ -110,7 +110,7 @@ public sealed class SubscribeController : Controller
                     FullHtmlContent = ad.Description,
                     Guid = SnowFlake.NewId,
                     PublishDate = DateTime.UtcNow,
-                    Link = new Uri(Url.ActionLink("Redirect", "Advertisement", new { id = ad.Id })),
+                    Link = new Uri(Url.ActionLink("Redirect", "Advertisement", new { id = ad.Id })!),
                     Permalink = Url.ActionLink("Redirect", "Advertisement", new { id = ad.Id })
                 });
             }
@@ -300,7 +300,7 @@ public sealed class SubscribeController : Controller
     private Expression<Func<Post, bool>> PostBaseWhere()
     {
         var ipLocation = Request.Location();
-        var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent] + "|" + Request.Headers.Where(x => x.Key.StartsWith("cf-")).Select(x => x.Value).Join("|"); ;
+        var location = ipLocation + ipLocation.Coodinate;
         return p => p.ModifyDate >= StartTime && p.ModifyDate <= EndTime
             && p.Status == Status.Published && p.LimitMode != RegionLimitMode.OnlyForSearchEngine
             && (p.LimitMode == null || p.LimitMode == RegionLimitMode.All ? true :
@@ -313,7 +313,7 @@ public sealed class SubscribeController : Controller
     private void CheckPermission(Post post)
     {
         var ipLocation = Request.Location();
-        var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent] + "|" + Request.Headers.Where(x => x.Key.StartsWith("cf-")).Select(x => x.Value).Join("|"); ;
+        var location = ipLocation + ipLocation.Coodinate;
         switch (post.LimitMode)
         {
             case RegionLimitMode.OnlyForSearchEngine:

@@ -245,7 +245,7 @@ public class BaseController : Controller
         }
 
         var ipLocation = Request.Location();
-        var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent] + "|" + Request.Headers.Where(x => x.Key.StartsWith("cf-")).Select(x => x.Value).Join("|");
+        var location = ipLocation + ipLocation.Coodinate;
         if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ip != rawip)
         {
             var s = rawip.Base64Decrypt();
@@ -270,7 +270,7 @@ public class BaseController : Controller
         }
 
         var ipLocation = Request.Location();
-        var location = ipLocation + ipLocation.Coodinate + "|" + Request.Headers[HeaderNames.Referer] + "|" + Request.Headers[HeaderNames.UserAgent] + "|" + Request.Headers.Where(x => x.Key.StartsWith("cf-")).Select(x => x.Value).Join("|");
+        var location = ipLocation + ipLocation.Coodinate;
         if (Request.Cookies.TryGetValue(SessionKey.RawIP, out var rawip) && ip != rawip)
         {
             var s = rawip.Base64Decrypt();
