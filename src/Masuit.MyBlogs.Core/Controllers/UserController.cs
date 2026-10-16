@@ -16,6 +16,7 @@ public sealed class UserController : AdminController
     /// <param name="id"></param>
     /// <param name="username"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<ActionResult> ChangeUsername([FromBodyOrDefault] int id, [FromBodyOrDefault] string username)
     {
         UserInfo userInfo = await UserInfoService.GetByIdAsync(id);
@@ -35,6 +36,7 @@ public sealed class UserController : AdminController
     /// <param name="id"></param>
     /// <param name="username"></param>
     /// <returns></returns>
+    [HttpPost]
     public async Task<ActionResult> ChangeNickName([FromBodyOrDefault] int id, [FromBodyOrDefault] string username)
     {
         UserInfo userInfo = await UserInfoService.GetByIdAsync(id);
@@ -51,6 +53,7 @@ public sealed class UserController : AdminController
     /// <param name="pwd"></param>
     /// <param name="pwd2"></param>
     /// <returns></returns>
+    [HttpPost]
     public ActionResult ChangePassword([FromBodyOrDefault] int id, [FromBodyOrDefault] string old, [FromBodyOrDefault] string pwd, [FromBodyOrDefault] string pwd2)
     {
         if (pwd.Equals(pwd2))
@@ -68,6 +71,7 @@ public sealed class UserController : AdminController
     /// <param name="name">用户名</param>
     /// <param name="pwd"></param>
     /// <returns></returns>
+    [HttpPost]
     public ActionResult ResetPassword([FromBodyOrDefault] string name, [FromBodyOrDefault] string pwd)
     {
         bool b = UserInfoService.ResetPassword(name, pwd);

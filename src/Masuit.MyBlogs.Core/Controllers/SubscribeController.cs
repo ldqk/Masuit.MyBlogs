@@ -21,8 +21,6 @@ public sealed class SubscribeController : Controller
 
     public IAdvertisementService AdvertisementService { get; set; }
 
-    public IRedisClient RedisClient { get; set; }
-
     public IFirewallService FirewallService { get; set; }
 
     private static DateTime StartTime => DateTime.Now.AddDays(CommonHelper.SystemSettings.GetOrAdd("RssStart", "-1").ToInt32());

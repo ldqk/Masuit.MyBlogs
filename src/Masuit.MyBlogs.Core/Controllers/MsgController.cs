@@ -304,7 +304,7 @@ public sealed class MsgController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public async Task<ActionResult> Read(int id)
     {
         await MessageService.GetQuery(m => m.Id == id).ExecuteUpdateAsync(s => s.SetProperty(m => m.Read, true));
@@ -316,7 +316,7 @@ public sealed class MsgController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public async Task<ActionResult> Unread(int id)
     {
         await MessageService.GetQuery(m => m.Id == id).ExecuteUpdateAsync(s => s.SetProperty(m => m.Read, false));
@@ -328,7 +328,7 @@ public sealed class MsgController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public async Task<ActionResult> MarkRead(int id)
     {
         await MessageService.GetQuery(m => m.Id <= id).ExecuteUpdateAsync(s => s.SetProperty(m => m.Read, true));
@@ -340,7 +340,7 @@ public sealed class MsgController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public async Task<ActionResult> DeleteMsg(int id)
     {
         bool b = await MessageService.DeleteByIdAsync(id) > 0;

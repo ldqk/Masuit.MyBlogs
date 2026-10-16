@@ -63,7 +63,7 @@ public sealed class SeminarController : BaseController
     /// </summary>
     /// <param name="seminar"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public ActionResult Save([FromBodyOrDefault] Seminar seminar)
     {
         if (seminar.Id > 0 ? SeminarService.Any(s => s.Id != seminar.Id && s.Title == seminar.Title) : SeminarService.Any(s => s.Title == seminar.Title))
@@ -93,7 +93,7 @@ public sealed class SeminarController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public async Task<ActionResult> Delete(int id)
     {
         bool b = await SeminarService.DeleteByIdAsync(id) > 0;
@@ -167,7 +167,7 @@ public sealed class SeminarController : BaseController
         //bool b = await seminarPostService.DeleteEntitySavedAsync(s => s.SeminarId == id && s.PostId == pid) > 0;
         seminar.Post.Remove(post);
         var b = await SeminarService.SaveChangesAsync() > 0;
-        return ResultData(null, b, b ? $"已成功将【{post.Title}】从专题【{seminar.Title}】移除" : "添加失败！");
+        return ResultData(null, b, b ? $"已成功将【{post.Title}】从专题【{seminar.Title}】移除" : "移除失败！");
     }
 
     #endregion 管理端

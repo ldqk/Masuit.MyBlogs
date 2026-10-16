@@ -284,7 +284,7 @@ public sealed class CommentController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize,HttpPost]
     public async Task<ActionResult> Pass(int id)
     {
         var comment = await CommentService.GetByIdAsync(id) ?? throw new NotFoundException("评论不存在！");
@@ -320,7 +320,7 @@ public sealed class CommentController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize,HttpPost]
     public ActionResult Delete(int id)
     {
         var b = CommentService.DeleteById(id);

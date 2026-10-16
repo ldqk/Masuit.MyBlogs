@@ -609,7 +609,7 @@ public sealed class PostController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public async Task<ActionResult> Fixtop(int id)
     {
         Post post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
@@ -623,7 +623,7 @@ public sealed class PostController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public async Task<ActionResult> Pass(int id)
     {
         var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
@@ -646,7 +646,7 @@ public sealed class PostController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public async Task<ActionResult> Takedown(int id)
     {
         var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
@@ -686,7 +686,7 @@ public sealed class PostController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public ActionResult Truncate(int id)
     {
         bool b = PostService - id;
@@ -1000,7 +1000,7 @@ public sealed class PostController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public async Task<ActionResult> DeleteHistory(int id)
     {
         bool b = await PostHistoryVersionService.DeleteByIdAsync(id) > 0;
@@ -1012,7 +1012,7 @@ public sealed class PostController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize, HttpPost]
     public async Task<ActionResult> Revert(int id)
     {
         var history = await PostHistoryVersionService.GetByIdAsync(id) ?? throw new NotFoundException("版本不存在");
