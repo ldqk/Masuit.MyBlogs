@@ -43,7 +43,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
         request.Headers.Values.Contains("");
         var ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
-        var tokenValid = request.Cookies.ContainsKey("FullAccessToken") && request.Cookies["Email"].MDString(AppConfig.ConnString).Equals(request.Cookies["FullAccessToken"]);
+        var tokenValid = request.Cookies.ContainsKey("FullAccessToken") && request.Cookies["Email"].MDString(AppConfig.EncryptKey).Equals(request.Cookies["FullAccessToken"]);
 
         //攻击重定向
         if (!string.IsNullOrWhiteSpace(CommonHelper.SystemSettings["AttackRedirects"]) && await FirewallService.ReportedAsync(ip))

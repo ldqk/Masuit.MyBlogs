@@ -18,7 +18,7 @@
 @* 授权可见 *@
 @if (!string.IsNullOrEmpty(Model.ProtectContent) && Model.ProtectContentMode == ProtectContentMode.AuthorizeVisiable) {
   <div class="encrypted-content" id="@SnowFlake.NewId">
-    @if (!string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")) || Context.Request.Cookies["Email"].MDString3(AppConfig.ConnString).Equals(Context.Request.Cookies["PostAccessToken"])) {
+    @if (!string.IsNullOrEmpty(Context.Session.Get<string>("AccessViewToken")) || Context.Request.Cookies["Email"].MDString3(AppConfig.EncryptKey).Equals(Context.Request.Cookies["PostAccessToken"])) {
       <p class="size20 text-center text-red">↓↓↓以下是文章加密部分↓↓↓</p>
       @Html.Raw(await Model.ProtectContent.ReplaceImgAttribute(Model.Title))
     } else {

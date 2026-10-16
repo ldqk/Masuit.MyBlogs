@@ -41,7 +41,7 @@ public class BaseController : Controller
     /// <summary>
     /// 普通访客是否token合法
     /// </summary>
-    private bool VisitorTokenValid => Request.Cookies.ContainsKey("FullAccessToken") && Request.Cookies["Email"].MDString(AppConfig.ConnString).Equals(Request.Cookies["FullAccessToken"]);
+    private bool VisitorTokenValid => Request.Cookies.ContainsKey("FullAccessToken") && Request.Cookies["Email"].MDString(AppConfig.EncryptKey).Equals(Request.Cookies["FullAccessToken"]);
 
     private int[] HideCategories => Request.GetHideCategories();
 
