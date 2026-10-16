@@ -54,8 +54,8 @@ public sealed class MsgController : BaseController
     {
         if (cid > 0)
         {
-            var message = await LeaveMessageService.GetByIdAsync(cid.Value) ?? throw new NotFoundException("留言未找到");
-            var layer = LeaveMessageService.GetQueryNoTracking(e => e.GroupTag == message.GroupTag).ToPooledListScope();
+            var message = await LeaveMessageService.GetAsync(e => e.Id == cid.Value && (e.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("留言未找到");
+            var layer = LeaveMessageService.GetQueryNoTracking(e => e.GroupTag == message.GroupTag && (e.Status == Status.Published || CurrentUser.IsAdmin)).ToPooledListScope();
             foreach (var m in layer)
             {
                 m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
@@ -84,7 +84,7 @@ public sealed class MsgController : BaseController
         }
         var total = parent.TotalCount;
         var tags = parent.Data.Select(c => c.GroupTag).ToArray();
-        var messages = LeaveMessageService.GetQueryNoTracking(c => tags.Contains(c.GroupTag)).ToPooledListScope();
+        var messages = LeaveMessageService.GetQueryNoTracking(c => tags.Contains(c.GroupTag) && (c.Status == Status.Published || CurrentUser.IsAdmin)).ToPooledListScope();
         messages.ForEach(m =>
         {
             m.PostDate = m.PostDate.ToTimeZone(HttpContext.Session.Get<string>(SessionKey.TimeZone));
