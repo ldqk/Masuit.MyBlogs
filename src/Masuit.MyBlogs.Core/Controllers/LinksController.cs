@@ -2,6 +2,7 @@
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.Tools.AspNetCore.ModelBinder;
 using System.Text;
+using System.Text.RegularExpressions;
 using Dispose.Scope;
 using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Models;
@@ -41,7 +42,7 @@ public sealed class LinksController : BaseController
     /// <returns></returns>
     public async Task<ActionResult> Apply([FromBody] Links link, CancellationToken cancellationToken)
     {
-        if (!link.Url.MatchUrl() || link.Url.Contains(Request.Host.Host))
+        if (!Uri.TryCreate(link.Url, UriKind.Absolute, out var linkUri) || linkUri.Scheme is not ("http" or "https") || !string.IsNullOrEmpty(linkUri.UserInfo) || linkUri.Host.Contains(Request.Host.Host, StringComparison.OrdinalIgnoreCase) || Regex.IsMatch(link.Url, CommonHelper.SystemSettings["Domain"]))
         {
             return ResultData(null, false, "添加失败！链接非法！");
         }
@@ -56,7 +57,7 @@ public sealed class LinksController : BaseController
             return ResultData(null, false, "站点主页和友链地址不匹配，请检查");
         }
 
-        var host = new Uri(link.Url).Host;
+        var host = linkUri.Host;
         if (LinksService.Any(l => l.Url.Contains(host)))
         {
             return ResultData(null, false, "添加失败！检测到您的网站已经是本站的友情链接了！");
@@ -111,15 +112,20 @@ public sealed class LinksController : BaseController
     /// <param name="link"></param>
     /// <returns></returns>
     [MyAuthorize]
-    public Task<ActionResult> Check([FromBodyOrDefault] string link)
+    public async Task<ActionResult> Check([FromBodyOrDefault] string link)
     {
+        if (!Uri.TryCreate(link, UriKind.Absolute, out var linkUri) || linkUri.Scheme is not ("http" or "https") || !string.IsNullOrEmpty(linkUri.UserInfo) || linkUri.Host.Contains(Request.Host.Host, StringComparison.OrdinalIgnoreCase) || Regex.IsMatch(link, CommonHelper.SystemSettings["Domain"]))
+        {
+            return ResultData(null, false, "添加失败！链接非法！");
+        }
+
         HttpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36 Edg/93.0.961.47");
         HttpClient.DefaultRequestHeaders.Add("X-Forwarded-For", "1.1.1.1");
         HttpClient.DefaultRequestHeaders.Add("X-Forwarded-Host", "1.1.1.1");
         HttpClient.DefaultRequestHeaders.Add("X-Real-IP", "1.1.1.1");
         HttpClient.DefaultRequestVersion = new Version(2, 0);
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        return HttpClient.GetAsync(Configuration["HttpClientProxy:UriPrefix"] + link, cts.Token).ContinueWith(t =>
+        return await HttpClient.GetAsync(Configuration["HttpClientProxy:UriPrefix"] + link, cts.Token).ContinueWith(t =>
         {
             if (t.IsFaulted || t.IsCanceled)
             {
