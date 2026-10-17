@@ -12,6 +12,13 @@ module.exports = {
   },
   devServer: {
     port: 8868,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        pathRewrite: { '^/api': '' }
+      }
+    }
   },
   pluginOptions: {
     quasar: {
