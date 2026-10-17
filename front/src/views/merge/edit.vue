@@ -6,7 +6,7 @@
   <!-- 文章内容 -->
   <div>
     <label class="text-subtitle2 q-mb-sm block">文章内容：</label>
-    <vue-ueditor-wrap ref="editor" v-model="post.Content" />
+    <vue-ueditor-wrap ref="editor" v-model="post.Content" :config="{ autoFloatEnabled: false }" @ready="setToolbarSticky" />
   </div>
   <!-- 操作按钮 -->
   <div class="q-mt-md">
@@ -18,12 +18,23 @@
 </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted } from 'vue'
 import { toast } from 'vue3-toastify'
 import { useRouter, useRoute } from 'vue-router'
 import api from '@/axios/AxiosConfig'
 
 const editor = ref(null);
+const setToolbarSticky = () => {
+  const toolbar = editor.value?.$el?.querySelector<HTMLElement>('.edui-editor-toolbarbox')
+  if (!toolbar) {
+    return
+  }
+
+  toolbar.style.setProperty('position', 'sticky', 'important')
+  toolbar.style.setProperty('top', '0px', 'important')
+  toolbar.style.setProperty('z-index', '1000', 'important')
+}
+
 // 类型定义
 interface ApiResponse {
   Data?: any
@@ -86,69 +97,8 @@ const onSubmit = async () => {
 // 生命周期钩子
 onMounted(async () => {
   await loadPostData()
-  // 添加滚动事件监听器
-  document.querySelector('.q-page-container').addEventListener('scroll', handleScroll)
 })
 
-// 组件卸载
-onBeforeUnmount(() => {
-  if (scrollDebounceTimer) {
-    clearTimeout(scrollDebounceTimer)
-  }
-  // 清理滚动事件监听器
-  document.querySelector('.q-page-container').removeEventListener('scroll', handleScroll)
-})
-
-let scrollDebounceTimer: any = null
-let editorToolbarFixed = false
-// 滚动事件处理
-const handleScroll = () => {
-  // 清除之前的防抖定时器
-  if (scrollDebounceTimer) {
-    clearTimeout(scrollDebounceTimer)
-  }
-
-  // 使用防抖，减少频繁执行
-  scrollDebounceTimer = setTimeout(() => {
-    handleScrollLogic()
-  }, 100)
-}
-
-// 实际的滚动处理逻辑
-const handleScrollLogic = () => {
-  if (editor.value?.$el == null) {
-    return;
-  }
-  const toolbar = editor.value.$el.querySelector('.edui-editor-toolbarbox');
-  if (toolbar) {
-    const editorRect = editor.value.$el.getBoundingClientRect()
-    const shouldFix = editorRect.top < 84 && editorRect.bottom > 300
-
-    // 只在状态真正改变时才操作DOM
-    if (shouldFix && !editorToolbarFixed) {
-      // 固定工具栏
-      const editorWidth = editor.value.$el.offsetWidth
-      toolbar.style.cssText = `
-          position: fixed !important;
-          top: 84px !important;
-          z-index: 1000 !important;
-          width: ${editorWidth}px !important;
-          transition: all 0.5s ease !important;
-        `
-      editorToolbarFixed = true
-    } else if (!shouldFix && editorToolbarFixed) {
-      // 取消固定
-      toolbar.style.cssText = `
-          position: static !important;
-          top: auto !important;
-          z-index: auto !important;
-          width: auto !important;
-          transition: all 0.5s ease !important;
-        `
-      editorToolbarFixed = false
-    }
-  }
-}
 </script>
 <style scoped>
 .merge-edit-container {

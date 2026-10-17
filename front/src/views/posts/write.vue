@@ -18,7 +18,7 @@
   <q-card flat bordered class="q-mb-md">
     <q-card-section>
       <div class="text-h6">文章内容：</div>
-      <vue-ueditor-wrap ref="editor" v-model="post.Content" :config="{ initialFrameHeight: 500 }" />
+      <vue-ueditor-wrap ref="editor" v-model="post.Content" :config="{ initialFrameHeight: 500, autoFloatEnabled: false }" @ready="setToolbarSticky('editor')" />
     </q-card-section>
   </q-card>
   <!-- 文章加密设置 -->
@@ -42,7 +42,7 @@
         <q-input autogrow dense v-if="post.ProtectContentMode === 4" v-model="post.ProtectPassword" label="访问密码" type="password" outlined />
       </div>
       <div v-if="post.ProtectContentMode > 0">
-        <vue-ueditor-wrap ref="protectContentEditor" v-model="post.ProtectContent" :config="{ initialFrameHeight: 300 }" />
+        <vue-ueditor-wrap ref="protectContentEditor" v-model="post.ProtectContent" :config="{ initialFrameHeight: 300, autoFloatEnabled: false }" @ready="setToolbarSticky('protectContentEditor')" />
       </div>
     </q-card-section>
   </q-card>
@@ -206,7 +206,7 @@
 </div>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { PostApi } from '@/api/PostApi'
 import type { PostData, Category, Tag, Seminar } from '@/api/PostApi'
@@ -682,7 +682,7 @@ onMounted(async () => {
   if (!showDraftDialog.value) {
     startDraftTimer()
   }
-  document.querySelector('.q-page-container').addEventListener('scroll', handleScroll)
+  window.addEventListener('resize', updateToolbarStickyOffset)
   pageLoading.value = false
 })
 
@@ -691,97 +691,79 @@ onUnmounted(() => {
   if (draftTimer) {
     clearInterval(draftTimer)
   }
-  if (scrollDebounceTimer) {
-    clearTimeout(scrollDebounceTimer)
-  }
-  // 清理滚动事件监听器
-  document.querySelector('.q-page-container')?.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', updateToolbarStickyOffset)
+  stopToolbarStickyObservers('editor')
+  stopToolbarStickyObservers('protectContentEditor')
 })
 
-let scrollDebounceTimer: any = null
-let editorToolbarFixed = false
-let protectEditorToolbarFixed = false
+type EditorName = 'editor' | 'protectContentEditor'
 
-// 滚动事件处理 - 优化版本，解决抖动问题
-const handleScroll = () => {
-  // 清除之前的防抖定时器
-  if (scrollDebounceTimer) {
-    clearTimeout(scrollDebounceTimer)
+const toolbarObservers = new Map<EditorName, {
+  mutationObserver: MutationObserver
+  resizeObserver: ResizeObserver
+}>()
+
+watch(() => post.ProtectContentMode, mode => {
+  if (mode > 0) {
+    setToolbarSticky('protectContentEditor')
+  } else {
+    stopToolbarStickyObservers('protectContentEditor')
+  }
+})
+
+const setToolbarSticky = (editorName: EditorName) => {
+  const editorComponent = editorName === 'editor' ? editor.value : protectContentEditor.value
+  const editorElement = editorComponent?.$el as HTMLElement | undefined
+  if (!editorElement) {
+    return
   }
 
-  // 使用防抖，减少频繁执行
-  scrollDebounceTimer = setTimeout(() => {
-    handleScrollLogic()
-  }, 100)
+  const applyToolbarSticky = () => {
+    const toolbar = editorElement.querySelector<HTMLElement>('.edui-editor-toolbarbox')
+    if (!toolbar) {
+      return
+    }
+
+    toolbar.style.setProperty('position', 'sticky', 'important')
+    toolbar.style.setProperty('top', '0px', 'important')
+    toolbar.style.setProperty('z-index', '1000', 'important')
+  }
+
+  applyToolbarSticky()
+  if (toolbarObservers.has(editorName)) {
+    return
+  }
+
+  const mutationObserver = new MutationObserver(applyToolbarSticky)
+  mutationObserver.observe(editorElement, { childList: true, subtree: true })
+
+  const resizeObserver = new ResizeObserver(applyToolbarSticky)
+  const editorRoot = editorElement.querySelector<HTMLElement>('.edui-editor')
+  if (editorRoot) {
+    resizeObserver.observe(editorRoot)
+    const iframeHolder = editorRoot.querySelector<HTMLElement>('.edui-editor-iframeholder')
+    if (iframeHolder) {
+      resizeObserver.observe(iframeHolder)
+    }
+  }
+
+  toolbarObservers.set(editorName, { mutationObserver, resizeObserver })
 }
 
-// 实际的滚动处理逻辑
-const handleScrollLogic = () => {
-  // 处理主编辑器工具栏
-  if (editor.value?.$el) {
-    const toolbar = editor.value.$el.querySelector('.edui-editor-toolbarbox')
-    if (toolbar) {
-      const editorRect = editor.value.$el.getBoundingClientRect()
-      const shouldFix = editorRect.top < 84 && editorRect.bottom > 300
-
-      // 只在状态真正改变时才操作DOM
-      if (shouldFix && !editorToolbarFixed) {
-        // 固定工具栏
-        const editorWidth = editor.value.$el.offsetWidth
-        toolbar.style.cssText = `
-          position: fixed !important;
-          top: 84px !important;
-          z-index: 1000 !important;
-          width: ${editorWidth}px !important;
-          transition: all 0.5s ease !important;
-        `
-        editorToolbarFixed = true
-      } else if (!shouldFix && editorToolbarFixed) {
-        // 取消固定
-        toolbar.style.cssText = `
-          position: static !important;
-          top: auto !important;
-          z-index: auto !important;
-          width: auto !important;
-          transition: all 0.5s ease !important;
-        `
-        editorToolbarFixed = false
-      }
-    }
+const stopToolbarStickyObservers = (editorName: EditorName) => {
+  const observers = toolbarObservers.get(editorName)
+  if (!observers) {
+    return
   }
 
-  // 处理保护内容编辑器工具栏
-  if (protectContentEditor.value?.$el) {
-    const toolbar2 = protectContentEditor.value.$el.querySelector('.edui-editor-toolbarbox')
-    if (toolbar2) {
-      const protectEditorRect = protectContentEditor.value.$el.getBoundingClientRect()
-      const shouldFix = protectEditorRect.top < 84 && protectEditorRect.bottom > 300
+  observers.mutationObserver.disconnect()
+  observers.resizeObserver.disconnect()
+  toolbarObservers.delete(editorName)
+}
 
-      // 只在状态真正改变时才操作DOM
-      if (shouldFix && !protectEditorToolbarFixed) {
-        // 固定工具栏
-        const protectEditorWidth = protectContentEditor.value.$el.offsetWidth
-        toolbar2.style.cssText = `
-          position: fixed !important;
-          top: 84px !important;
-          z-index: 1000 !important;
-          width: ${protectEditorWidth}px !important;
-          transition: all 0.2s ease !important;
-        `
-        protectEditorToolbarFixed = true
-      } else if (!shouldFix && protectEditorToolbarFixed) {
-        // 取消固定
-        toolbar2.style.cssText = `
-          position: static !important;
-          top: auto !important;
-          z-index: auto !important;
-          width: auto !important;
-          transition: all 0.2s ease !important;
-        `
-        protectEditorToolbarFixed = false
-      }
-    }
-  }
+const updateToolbarStickyOffset = () => {
+  setToolbarSticky('editor')
+  setToolbarSticky('protectContentEditor')
 }
 
 </script>

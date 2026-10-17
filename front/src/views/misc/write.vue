@@ -7,7 +7,7 @@
         <div class="text-h6">杂项标题</div>
         <q-input dense v-model="misc.Title" placeholder="请输入杂项标题" outlined required :rules="[val => !!val || '请输入杂项标题']" />
         <div class="text-h6">杂项内容</div>
-        <vue-ueditor-wrap ref="editorRef" v-model="misc.Content" />
+        <vue-ueditor-wrap ref="editorRef" v-model="misc.Content" :config="{ autoFloatEnabled: false }" @ready="setToolbarSticky" />
         <div class="row q-gutter-md justify-end">
           <q-btn type="submit" color="primary" icon="send" :loading="loading" :disable="!misc.Title || !misc.Content"> {{ misc.Id ? '更新杂项' : '发布杂项' }} </q-btn>
           <q-btn color="grey" icon="arrow_back" @click="goBack" outline> 返回列表 </q-btn>
@@ -18,7 +18,7 @@
 </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue3-toastify'
 import api from '@/axios/AxiosConfig'
@@ -41,6 +41,17 @@ const route = useRoute()
 const router = useRouter()
 const editorRef = ref()
 const loading = ref(false)
+
+const setToolbarSticky = () => {
+  const toolbar = editorRef.value?.$el?.querySelector<HTMLElement>('.edui-editor-toolbarbox')
+  if (!toolbar) {
+    return
+  }
+
+  toolbar.style.setProperty('position', 'sticky', 'important')
+  toolbar.style.setProperty('top', '0px', 'important')
+  toolbar.style.setProperty('z-index', '1000', 'important')
+}
 
 // 表单数据
 const misc = ref<Misc>({
@@ -97,73 +108,8 @@ onMounted(() => {
   if (id) {
     loadMisc(Number(id))
   }
-
-  // 添加滚动事件监听
-  const container = document.querySelector('.q-page-container')
-  if (container) {
-    container.addEventListener('scroll', handleScroll)
-  }
 })
 
-// 组件卸载
-onUnmounted(() => {
-  if (scrollDebounceTimer) {
-    clearTimeout(scrollDebounceTimer)
-  }
-  // 清理滚动事件监听器
-  document.querySelector('.q-page-container').removeEventListener('scroll', handleScroll)
-})
-
-let scrollDebounceTimer: any = null
-let editorToolbarFixed = false
-// 滚动事件处理
-const handleScroll = () => {
-  // 清除之前的防抖定时器
-  if (scrollDebounceTimer) {
-    clearTimeout(scrollDebounceTimer)
-  }
-
-  // 使用防抖，减少频繁执行
-  scrollDebounceTimer = setTimeout(() => {
-    handleScrollLogic()
-  }, 100)
-}
-
-// 实际的滚动处理逻辑
-const handleScrollLogic = () => {
-  if (editorRef.value?.$el == null) {
-    return;
-  }
-  const toolbar = editorRef.value.$el.querySelector('.edui-editor-toolbarbox');
-  if (toolbar) {
-    const editorRect = editorRef.value.$el.getBoundingClientRect()
-    const shouldFix = editorRect.top < 84 && editorRect.bottom > 300
-
-    // 只在状态真正改变时才操作DOM
-    if (shouldFix && !editorToolbarFixed) {
-      // 固定工具栏
-      const editorWidth = editorRef.value.$el.offsetWidth
-      toolbar.style.cssText = `
-          position: fixed !important;
-          top: 84px !important;
-          z-index: 1000 !important;
-          width: ${editorWidth}px !important;
-          transition: all 0.5s ease !important;
-        `
-      editorToolbarFixed = true
-    } else if (!shouldFix && editorToolbarFixed) {
-      // 取消固定
-      toolbar.style.cssText = `
-          position: static !important;
-          top: auto !important;
-          z-index: auto !important;
-          width: auto !important;
-          transition: all 0.5s ease !important;
-        `
-      editorToolbarFixed = false
-    }
-  }
-}
 </script>
 <style scoped lang="scss">
 .misc-write-page {
