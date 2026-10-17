@@ -1,4 +1,5 @@
-﻿using DnsClient;
+﻿using AngleSharp.Text;
+using DnsClient;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
 using Polly;
@@ -19,10 +20,14 @@ public static class HttpContextExtension
     public static IPLocation Location(this HttpRequest request)
     {
         var location = (IPLocation)request.HttpContext.Items.GetOrAdd("ip.location", request.HttpContext.Connection.RemoteIpAddress.GetIPLocation);
-        request.Headers.TryGetValue("cf-ipcity", out var city);
-        request.Headers.TryGetValue("cf-region", out var region);
-        request.Headers.TryGetValue("cf-ipcountry", out var country);
-        location.Address2 += $"({country},{region},{city})";
+        if (request.HttpContext.RequestServices.GetRequiredService<IConfiguration>()["UseCloudflare"]?.ToBoolean() ?? false)
+        {
+            request.Headers.TryGetValue("cf-ipcity", out var city);
+            request.Headers.TryGetValue("cf-region", out var region);
+            request.Headers.TryGetValue("cf-ipcountry", out var country);
+            location.Address2 += $"({country},{region},{city})";
+        }
+
         return location;
     }
 
