@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Dispose.Scope;
 using EFCoreSecondLevelCacheInterceptor;
 using Masuit.MyBlogs.Core.Models;
+using Masuit.Tools.Mime;
 
 namespace Masuit.MyBlogs.Core.Controllers;
 
@@ -57,6 +58,11 @@ public sealed class LinksController : BaseController
             return ResultData(null, false, "站点主页和友链地址不匹配，请检查");
         }
 
+        if (!linkUri.IsExternalAddress())
+        {
+            return ResultData(null, false, "添加失败！检测到您的网站疑似非公网地址");
+        }
+
         var host = linkUri.Host;
         if (LinksService.Any(l => l.Url.Contains(host)))
         {
@@ -83,14 +89,19 @@ public sealed class LinksController : BaseController
             }
 
             using var httpContent = res.Content;
-            var s = httpContent.ReadAsStringAsync(cancellationToken).Result;
-            if (!s.Contains(Request.Host.Host))
+            if (httpContent.Headers.ContentType?.MediaType==ContentType.Html)
             {
-                return ResultData(null, false, $"添加失败！检测到您的网站上未将本站设置成友情链接，请先将本站主域名：{Request.Host}在您的网站设置为友情链接，并且能够展示后，再次尝试添加即可！");
+                var s = httpContent.ReadAsStringAsync(cancellationToken).Result;
+                if (!s.Contains(Request.Host.Host))
+                {
+                    return ResultData(null, false, $"添加失败！检测到您的网站上未将本站设置成友情链接，请先将本站主域名：{Request.Host}在您的网站设置为友情链接，并且能够展示后，再次尝试添加即可！");
+                }
+
+                var b = LinksService.AddEntitySaved(link) != null;
+                return ResultData(null, b, b ? "添加成功！这可能有一定的延迟，如果没有看到您的链接，请稍等几分钟后刷新页面即可，如有疑问，请联系站长。" : "添加失败！这可能是由于网站服务器内部发生了错误，如有疑问，请联系站长。");
             }
 
-            var b = LinksService.AddEntitySaved(link) != null;
-            return ResultData(null, b, b ? "添加成功！这可能有一定的延迟，如果没有看到您的链接，请稍等几分钟后刷新页面即可，如有疑问，请联系站长。" : "添加失败！这可能是由于网站服务器内部发生了错误，如有疑问，请联系站长。");
+            return ResultData(null, false, link + " 网站返回的内容不是HTML！");
         }, cancellationToken);
     }
 
@@ -137,10 +148,15 @@ public sealed class LinksController : BaseController
             {
                 return ResultData(null, false, link + " 对方网站返回错误的状态码！http响应码为：" + res.StatusCode);
             }
-
+            
             using var httpContent = res.Content;
-            var s = httpContent.ReadAsStringAsync().Result;
-            return s.Contains(CommonHelper.SystemSettings["Domain"].Split("|")) ? ResultData(null, true, "友情链接正常！") : ResultData(null, false, link + " 对方似乎没有本站的友情链接！");
+            if (httpContent.Headers.ContentType?.MediaType == ContentType.Html)
+            {
+                var s = httpContent.ReadAsStringAsync().Result;
+                return s.Contains(CommonHelper.SystemSettings["Domain"].Split("|")) ? ResultData(null, true, "友情链接正常！") : ResultData(null, false, link + " 对方似乎没有本站的友情链接！");
+            }
+
+            return ResultData(null, false, link + " 对方网站返回的内容不是HTML！");
         }, cts.Token);
     }
 

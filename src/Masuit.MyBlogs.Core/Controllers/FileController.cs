@@ -65,6 +65,7 @@ public sealed class FileController : AdminController
     /// <param name="filename"></param>
     /// <param name="content"></param>
     /// <returns></returns>
+    [HttpPost]
     public ActionResult Save([FromBodyOrDefault] string filename, [FromBodyOrDefault] string content)
     {
         try

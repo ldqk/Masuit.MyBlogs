@@ -969,7 +969,7 @@ public sealed class PostController : BaseController
     /// <param name="id"></param>
     /// <param name="sid"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize,HttpPost]
     public async Task<ActionResult> AddSeminar(int id, int sid)
     {
         var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");
@@ -985,7 +985,7 @@ public sealed class PostController : BaseController
     /// <param name="id"></param>
     /// <param name="sid"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize,HttpPost]
     public async Task<ActionResult> RemoveSeminar(int id, int sid)
     {
         var post = await PostService.GetByIdAsync(id) ?? throw new NotFoundException("文章未找到");

@@ -25,7 +25,7 @@ public sealed class NoticeController : BaseController
     /// <param name="page"></param>
     /// <param name="size"></param>
     /// <returns></returns>
-    [Route("notice"), AllowAccessFirewall, Route("n", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size"], VaryByHeader = "Cookie")]
+    [HttpGet("notice"), HttpGet("n", Order = 1), AllowAccessFirewall, ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size"], VaryByHeader = "Cookie")]
     public ActionResult Index([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
     {
         var list = NoticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal, n => n.ModifyDate, false).ProjectDto().ToCachedPagedList(page, size);
@@ -46,7 +46,7 @@ public sealed class NoticeController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [Route("notice/{id:int}"), AllowAccessFirewall, ResponseCache(Duration = 600, VaryByQueryKeys = new[] { "id" }, VaryByHeader = "Cookie")]
+    [HttpGet("notice/{id:int}"), AllowAccessFirewall, ResponseCache(Duration = 600, VaryByQueryKeys = ["id"], VaryByHeader = "Cookie")]
     public async Task<ActionResult> Details(int id)
     {
         var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("页面未找到");
@@ -69,7 +69,7 @@ public sealed class NoticeController : BaseController
     /// </summary>
     /// <param name="notice"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [HttpPost,MyAuthorize]
     public async Task<ActionResult> Write([FromBodyOrDefault] Notice notice, CancellationToken cancellationToken)
     {
         notice.Content = await ImagebedClient.ReplaceImgSrc(await notice.Content.ClearImgAttributes(), cancellationToken);
@@ -93,7 +93,7 @@ public sealed class NoticeController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [HttpPost,MyAuthorize]
     public async Task<ActionResult> Delete(int id)
     {
         bool b = await NoticeService.DeleteByIdAsync(id) > 0;
@@ -105,7 +105,7 @@ public sealed class NoticeController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [HttpPost,MyAuthorize]
     public async Task<ActionResult> ChangeState(int id)
     {
         var notice = await NoticeService.GetByIdAsync(id) ?? throw new NotFoundException("公告未找到");
@@ -118,8 +118,9 @@ public sealed class NoticeController : BaseController
     /// 编辑公告
     /// </summary>
     /// <param name="notice"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [HttpPost,MyAuthorize]
     public async Task<ActionResult> Edit([FromBodyOrDefault] NoticeDto notice, CancellationToken cancellationToken)
     {
         var entity = await NoticeService.GetByIdAsync(notice.Id) ?? throw new NotFoundException("公告已经被删除！");
@@ -150,6 +151,7 @@ public sealed class NoticeController : BaseController
     /// <param name="size"></param>
     /// <param name="keywords"></param>
     /// <returns></returns>
+    [HttpPost]
     public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string keywords = null)
     {
         Expression<Func<Notice, bool>> where = n => true;
@@ -169,7 +171,7 @@ public sealed class NoticeController : BaseController
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [HttpGet,MyAuthorize]
     public ActionResult Get(int id)
     {
         var notice = NoticeService.Get(n => n.Id == id).ToDto();
@@ -187,7 +189,7 @@ public sealed class NoticeController : BaseController
     /// 最近一条公告
     /// </summary>
     /// <returns></returns>
-    [ResponseCache(Duration = 600, VaryByHeader = "Cookie"), AllowAccessFirewall]
+    [HttpGet, ResponseCache(Duration = 600, VaryByHeader = "Cookie"), AllowAccessFirewall]
     public async Task<ActionResult> Last()
     {
         var notice = await NoticeService.GetQuery(n => n.NoticeStatus == NoticeStatus.Normal && n.StrongAlert, n => n.ModifyDate, false).ProjectDto().Cacheable().FirstOrDefaultWithNoLockAsync();

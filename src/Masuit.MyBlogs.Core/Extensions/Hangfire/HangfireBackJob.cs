@@ -4,6 +4,8 @@ using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.Tools.Core;
 using Masuit.Tools.Logging;
 using System.Net;
+using System.Net.Mime;
+using ContentType = Masuit.Tools.Mime.ContentType;
 
 namespace Masuit.MyBlogs.Core.Extensions.Hangfire;
 
@@ -189,17 +191,15 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
         client.DefaultRequestHeaders.Add("X-Real-IP", "114.114.114.114");
         client.DefaultRequestHeaders.Referrer = new Uri("https://baidu.com");
         client.Timeout = TimeSpan.FromSeconds(10);
-        var baseAddr = bool.Parse(_configuration["Https:Enabled"]) ? $"https://127.1:{_configuration["Https:Port"]}" : $"http://127.1:{_configuration["Port"]}";
         advertisementService.GetQuery(a => a.Status == Status.Available).AsParallel().ForAll(e =>
         {
-            var url = e.Url;
             if (e.Url.StartsWith('/'))
             {
-                url = baseAddr + e.Url;
+                return;
             }
 
             using var cts = new CancellationTokenSource(client.Timeout);
-            client.GetAsync(url, cts.Token).ContinueWith(t =>
+            client.GetAsync(e.Url, cts.Token).ContinueWith(t =>
             {
                 if (t.IsCanceled || t.IsFaulted)
                 {
@@ -212,7 +212,7 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
                     LogManager.Info($"广告【[{e.Id}] {e.Title}】因广告链接404被自动下架！");
                     e.Color = "yellow";
                 }
-            }).Wait();
+            }).Wait(cts.Token);
         });
         advertisementService.SaveChanges();
     }
@@ -234,7 +234,7 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
         {
             var prev = link.Status;
             using var cts = new CancellationTokenSource(client.Timeout);
-            client.GetStringAsync(_configuration["HttpClientProxy:UriPrefix"] + link.Url, cts.Token).ContinueWith(t =>
+            client.GetAsync(_configuration["HttpClientProxy:UriPrefix"] + link.Url, cts.Token).ContinueWith(t =>
             {
                 if (t.IsCanceled || t.IsFaulted)
                 {
@@ -242,14 +242,29 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
                 }
                 else
                 {
-                    link.Status = !t.Result.Contains(CommonHelper.SystemSettings["Domain"].Split("|")) ? Status.Unavailable : Status.Available;
+                    var res = t.Result;
+                    if (!res.IsSuccessStatusCode)
+                    {
+                        link.Status = Status.Unavailable;
+                        return;
+                    }
+
+                    using var httpContent = res.Content;
+                    if (httpContent.Headers.ContentType?.MediaType != ContentType.Html)
+                    {
+                        link.Status = Status.Unavailable;
+                        return;
+                    }
+
+                    var result = httpContent.ReadAsStringAsync().Result;
+                    link.Status = !result.Contains(CommonHelper.SystemSettings["Domain"].Split("|")) ? Status.Unavailable : Status.Available;
                 }
 
                 if (link.Status != prev)
                 {
                     link.UpdateTime = DateTime.Now;
                 }
-            }).Wait();
+            }).Wait(cts.Token);
         });
         linksService.SaveChanges();
     }
