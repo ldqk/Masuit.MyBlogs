@@ -36,15 +36,135 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="~/Scripts/layer/layer.js"></script>
     <script src="/Scripts/global/functions.js"></script>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+            color: #17243a;
+            background: #f3f6fb;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 28px 16px;
+            background: radial-gradient(ellipse at top left, #e7f0ff 0, transparent 48%), #f3f6fb;
+        }
+
+        .challenge-card {
+            width: min(100%, 440px);
+            padding: 40px;
+            border: 1px solid #e7ebf2;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 20px 60px rgba(31, 51, 83, .10);
+            text-align: center;
+        }
+
+        .challenge-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 20px;
+            display: grid;
+            place-items: center;
+            border-radius: 17px;
+            background: #edf4ff;
+            color: #2874d0;
+            font-size: 27px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 23px;
+            font-weight: 700;
+        }
+
+        .description {
+            margin: 12px 0 24px;
+            color: #6a778b;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .captcha-image {
+            display: block;
+            width: min(100%, 240px);
+            min-height: 70px;
+            margin: 0 auto 10px;
+            border: 1px solid #e5eaf1;
+            border-radius: 10px;
+            background: #f8fafc;
+            cursor: pointer;
+        }
+
+        .refresh-hint {
+            margin: 0 0 22px;
+            color: #8792a3;
+            font-size: 12px;
+        }
+
+        .code-input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #dce3ed;
+            border-radius: 10px;
+            outline: none;
+            color: #17243a;
+            font: inherit;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .code-input:focus {
+            border-color: #2874d0;
+            box-shadow: 0 0 0 3px rgba(40, 116, 208, .13);
+        }
+
+        .submit-button {
+            width: 100%;
+            margin-top: 14px;
+            padding: 12px 18px;
+            border: 0;
+            border-radius: 10px;
+            background: #2874d0;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .2s ease, transform .2s ease;
+        }
+
+        .submit-button:hover {
+            background: #1c61b4;
+            transform: translateY(-1px);
+        }
+
+        @@media (max-width: 520px) {
+            .challenge-card {
+                padding: 32px 22px;
+                border-radius: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h3>继续访问请输入验证码：</h3>
-    <img class="captcha" src="/challenge-captcha.jpg?@Stopwatch.GetTimestamp()" onclick="this.src='/challenge-captcha.jpg?'+new Date" />
-    <form asp-action="CaptchaChallenge" asp-controller="Firewall" method="post">
-        @Html.AntiForgeryToken()
-        <input type="text" name="code" placeholder="验证码" required="" />
-        <button type="submit">提交</button>
-    </form>
+    <main class="challenge-card">
+        <div class="challenge-icon" aria-hidden="true">✓</div>
+        <h1>安全验证</h1>
+        <p class="description">继续访问前，请输入图片中的验证码。</p>
+        <img class="captcha-image" src="/challenge-captcha.jpg?@Stopwatch.GetTimestamp()" alt="图形验证码，点击图片可刷新" title="点击刷新验证码" onclick="this.src='/challenge-captcha.jpg?'+new Date" />
+        <p class="refresh-hint">看不清？点击图片即可更换验证码</p>
+        <form asp-action="CaptchaChallenge" asp-controller="Firewall" method="post">
+            @Html.AntiForgeryToken()
+            <input class="code-input" type="text" name="code" placeholder="请输入验证码" aria-label="验证码" autocomplete="off" required="" />
+            <button class="submit-button" type="submit">确认并继续</button>
+        </form>
+    </main>
     @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Scripts", ""))
 </body>
 </html>
