@@ -33,7 +33,11 @@ public static class SessionExtension
         if (string.IsNullOrEmpty(sessionKey))
         {
             sessionKey = Guid.NewGuid().ToString();
-            context.Response.Cookies.Append("SessionID", sessionKey);
+            context.Response.Cookies.Append("SessionID", sessionKey,new CookieOptions()
+            {
+                HttpOnly = true,
+                SameSite = SameSiteMode.Lax
+            });
         }
 
         context.Session.Set(key, obj);

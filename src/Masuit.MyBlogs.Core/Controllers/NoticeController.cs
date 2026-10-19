@@ -151,7 +151,7 @@ public sealed class NoticeController : BaseController
     /// <param name="size"></param>
     /// <param name="keywords"></param>
     /// <returns></returns>
-    [HttpPost]
+    [HttpPost,MyAuthorize]
     public ActionResult GetPageData([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15, string keywords = null)
     {
         Expression<Func<Notice, bool>> where = n => true;
