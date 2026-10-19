@@ -91,7 +91,7 @@ public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration con
 
         var format = stream.GetImageType();
         stream.Position = 0;
-        if (format != null)
+        if (format is not (null or ImageFormat.Svg))
         {
             using var codec = SKCodec.Create(stream);
             using var bmp = SKBitmap.Decode(codec);
