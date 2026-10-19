@@ -92,7 +92,12 @@ public sealed class UploadController : Controller
             var base64 = strs[1];
             var bytes = Convert.FromBase64String(base64);
             await using var image = new PooledMemoryStream(bytes);
-            if (image.IsImage())
+            var imageType = image.GetImageType();
+            if (imageType is null or ImageFormat.Svg)
+            {
+                img.Value = "/Assets/images/404/4043.jpg";
+            }
+            else
             {
                 var ext = strs[0].Split(";")[0].Split("/")[1];
                 var imgFile = $"{SnowFlake.NewId}.{ext}";
@@ -102,10 +107,6 @@ public sealed class UploadController : Controller
                 await using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 await image.CopyToAsync(fs);
                 img.Value = path[HostEnvironment.WebRootPath.Length..].Replace("\\", "/");
-            }
-            else
-            {
-                img.Value = "/Assets/images/404/4043.jpg";
             }
         }
 

@@ -308,7 +308,7 @@ public sealed class HomeController : BaseController
     public async Task<ActionResult> Sitemap([FromServices] IWebHostEnvironment env, string ext)
     {
         var sitemap = Path.Combine(env.WebRootPath, "sitemap." + ext);
-        if (System.IO.File.Exists(sitemap))
+        if (System.IO.File.Exists(sitemap)&& MimeMapper.MimeTypes.ContainsKey("." + ext))
         {
             var fs = new FileInfo(sitemap).ShareReadWrite();
             switch (ext)
