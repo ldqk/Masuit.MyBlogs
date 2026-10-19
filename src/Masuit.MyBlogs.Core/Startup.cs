@@ -87,7 +87,11 @@ public class Startup
         {
             options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
         });
-        services.AddSession().AddAntiforgery(); //注入Session
+        services.AddSession(options =>
+        {
+            options.Cookie.SameSite = SameSiteMode.Lax;
+            options.Cookie.HttpOnly = true;
+        }).AddAntiforgery(); //注入Session
         services.AddResponseCache();
         services.AddHangfireServer().AddHangfire((serviceProvider, configuration) =>
         {
