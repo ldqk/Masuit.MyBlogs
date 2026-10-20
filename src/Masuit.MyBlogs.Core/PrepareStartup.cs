@@ -143,7 +143,7 @@ namespace Masuit.MyBlogs.Core
                 {
                     context.Context.Response.Headers[HeaderNames.CacheControl] = "public,no-cache";
                     context.Context.Response.Headers[HeaderNames.Expires] = DateTime.Now.AddDays(7).ToString("R");
-                    context.Context.Response.Headers[HeaderNames.ContentSecurityPolicy] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.bootcdn.net";
+                    //context.Context.Response.Headers[HeaderNames.ContentSecurityPolicy] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.bootcdn.net";
                     context.Context.Response.Headers[HeaderNames.XContentTypeOptions] = "nosniff";
                 };
                 options.ContentTypeProvider = new FileExtensionContentTypeProvider(MimeMapper.MimeTypes);
