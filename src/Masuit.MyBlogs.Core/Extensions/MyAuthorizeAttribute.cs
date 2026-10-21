@@ -26,7 +26,7 @@ public sealed class MyAuthorizeAttribute : ActionFilterAttribute
         }
 
         //先尝试自动登录
-        if (filterContext.HttpContext.Request.Cookies.Any(x => x.Key == "username" || x.Key == "password"))
+        if (filterContext.HttpContext.Request.Cookies.Any(x => x.Key is "username" or "password"))
         {
             string name = filterContext.HttpContext.Request.Cookies["username"] ?? "";
             string pwd = filterContext.HttpContext.Request.Cookies["password"]?.AESDecrypt(AppConfig.EncryptKey) ?? "";

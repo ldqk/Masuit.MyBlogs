@@ -55,7 +55,7 @@
             <div class="article-card" style="margin: 15px 0;">
               <div class="article-content">
                 <a asp-action="Details" asp-controller="Post" asp-route-id="@p.Id" asp-route-kw="@ViewBag.Keyword" class="article-title" target="_blank">
-                  @p.Title
+                  @Html.Raw(p.Title)
                 </a>
                 <div class="meta-row">
                   <span class="author">
