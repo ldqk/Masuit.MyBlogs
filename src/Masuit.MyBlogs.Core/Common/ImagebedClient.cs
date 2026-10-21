@@ -156,8 +156,11 @@ public sealed class ImagebedClient
                 continue;
             }
 
-            var path = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory + "wwwroot", src.Replace("/", @"\")[1..]));
-            if (!path.StartsWith(AppContext.BaseDirectory + "wwwroot"))
+            var webRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "wwwroot"));
+            var relativeSrc = src.TrimStart('/', '\\').Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+            var path = Path.GetFullPath(Path.Combine(webRoot, relativeSrc));
+            var relativePath = Path.GetRelativePath(webRoot, path);
+            if (Path.IsPathRooted(relativePath) || relativePath == ".." || relativePath.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
             {
                 continue;
             }
