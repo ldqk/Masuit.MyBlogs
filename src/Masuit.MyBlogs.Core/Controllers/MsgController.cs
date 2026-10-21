@@ -354,7 +354,7 @@ public sealed class MsgController : BaseController
     /// <param name="size"></param>
     /// <returns></returns>
     [MyAuthorize]
-    public ActionResult GetInternalMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
+    public async Task<ActionResult> GetInternalMsgs([Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 15)
     {
         var msgs = MessageService.GetPagesNoTracking(page, size, m => true, m => m.Time, false);
         return Ok(msgs);

@@ -1,12 +1,13 @@
 ﻿using Masuit.MyBlogs.Core.Models.Validation;
 using Masuit.Tools.Core.Validator;
+using System.Net;
 
 namespace Masuit.MyBlogs.Core.Models.DTO;
 
 /// <summary>
 /// 文章输入模型
 /// </summary>
-public class PostCommand : BaseEntity
+public class PostCommand : BaseEntity,IValidatableObject
 {
     public PostCommand()
     {
@@ -132,4 +133,13 @@ public class PostCommand : BaseEntity
     /// 是否是不安全内容
     /// </summary>
     public bool IsNsfw { get; set; }
+
+    /// <summary>Determines whether the specified object is valid.</summary>
+    /// <param name="validationContext">The validation context.</param>
+    /// <returns>A collection that holds failed-validation information.</returns>
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        Title = WebUtility.HtmlEncode(Title);
+        yield break;
+    }
 }

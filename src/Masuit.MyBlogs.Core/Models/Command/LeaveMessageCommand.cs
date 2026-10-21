@@ -1,6 +1,7 @@
 ﻿using Masuit.MyBlogs.Core.Models.Validation;
 using Masuit.Tools.Core.Validator;
 using Masuit.Tools.Html;
+using System.Net;
 
 namespace Masuit.MyBlogs.Core.Models.Command;
 
@@ -65,8 +66,8 @@ public class LeaveMessageCommand : BaseEntity,IValidatableObject
 	/// <returns>A collection that holds failed-validation information.</returns>
 	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
 	{
-		Browser = Browser?.HtmlSanitizerStandard();
-		OperatingSystem = OperatingSystem?.HtmlSanitizerStandard();
+		Browser = WebUtility.HtmlEncode(Browser + "");
+		OperatingSystem = WebUtility.HtmlEncode(OperatingSystem + "");
 		yield break;
 	}
 }

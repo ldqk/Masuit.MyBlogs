@@ -33,8 +33,8 @@ const MessageReplies = defineComponent({
         <div>
           <span class="comment-btn" @click="del(row.Id)" v-if="isAdmin">删除</span>
           <span class="comment-btn" @click="pass(row.Id)" v-if="row.Status==4&&isAdmin">通过</span>
-          <span class="comment-opinfo">{{GetOperatingSystem(row.OperatingSystem)}}</span>
-          <span class="comment-opinfo">{{GetBrowser(row.Browser)}}</span>
+          <span class="comment-opinfo" v-html="GetOperatingSystem(row.OperatingSystem)"></span>
+          <span class="comment-opinfo" v-html="GetBrowser(row.Browser)"></span>
         </div>
       </div>
       <div class="comment-content" v-html="row.Content"></div>
@@ -131,8 +131,8 @@ const ParentMessages = defineComponent({
         <div>
           <span class="comment-btn" @click="del(row.Id)" v-if="isAdmin">删除</span>
           <span class="comment-btn" @click="pass(row.Id)" v-if="row.Status==4&&isAdmin">通过</span>
-          <span class="comment-opinfo">{{GetOperatingSystem(row.OperatingSystem)}}</span>
-          <span class="comment-opinfo">{{GetBrowser(row.Browser)}}</span>
+          <span class="comment-opinfo" v-html="GetOperatingSystem(row.OperatingSystem)"></span>
+          <span class="comment-opinfo" v-html="GetBrowser(row.Browser)"></span>
         </div>
       </div>
       <div class="comment-content" v-html="row.Content"></div>
