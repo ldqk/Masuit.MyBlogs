@@ -41,7 +41,7 @@ public sealed class UploadController : Controller
     /// 上传Word转码
     /// </summary>
     /// <returns></returns>
-    [HttpPost, DistributedLockFilter]
+    [HttpPost, DistributedLockFilter,MyAuthorize]
     public async Task<ActionResult> UploadWord(CancellationToken cancellationToken)
     {
         var form = await Request.ReadFormAsync(cancellationToken);
