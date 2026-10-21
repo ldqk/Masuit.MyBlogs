@@ -90,6 +90,13 @@ public sealed class UploadController : Controller
             var attr = img.Value;
             var strs = attr.Split(",");
             var base64 = strs[1];
+            var ext = strs[0].Split(";")[0].Split("/")[1];
+            if (!"jpg;jpeg;bmp;png;gif;webp".Contains(ext,StringComparison.CurrentCultureIgnoreCase))
+            {
+                img.Value = "/Assets/images/404/4043.jpg";
+                continue;
+            }
+
             var bytes = Convert.FromBase64String(base64);
             await using var image = new PooledMemoryStream(bytes);
             var imageType = image.GetImageType();
@@ -99,7 +106,6 @@ public sealed class UploadController : Controller
             }
             else
             {
-                var ext = strs[0].Split(";")[0].Split("/")[1];
                 var imgFile = $"{SnowFlake.NewId}.{ext}";
                 var path = Path.Combine(HostEnvironment.WebRootPath, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload").Trim('/', '\\'), "images", imgFile);
                 var dir = Path.GetDirectoryName(path);

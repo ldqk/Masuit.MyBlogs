@@ -1,12 +1,13 @@
 ﻿using Masuit.MyBlogs.Core.Models.Validation;
 using Masuit.Tools.Core.Validator;
+using Masuit.Tools.Html;
 
 namespace Masuit.MyBlogs.Core.Models.Command;
 
 /// <summary>
 /// 留言板输入模型
 /// </summary>
-public class LeaveMessageCommand : BaseEntity
+public class LeaveMessageCommand : BaseEntity,IValidatableObject
 {
 	public LeaveMessageCommand()
 	{
@@ -58,4 +59,14 @@ public class LeaveMessageCommand : BaseEntity
 	/// 验证码
 	/// </summary>
 	public string Code { get; set; }
+
+	/// <summary>Determines whether the specified object is valid.</summary>
+	/// <param name="validationContext">The validation context.</param>
+	/// <returns>A collection that holds failed-validation information.</returns>
+	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+	{
+		Browser = Browser?.HtmlSanitizerStandard();
+		OperatingSystem = OperatingSystem?.HtmlSanitizerStandard();
+		yield break;
+	}
 }

@@ -91,7 +91,12 @@ public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration con
 
         var format = stream.GetImageType();
         stream.Position = 0;
-        if (format is not (null or ImageFormat.Svg))
+        if (format is null or ImageFormat.Svg)
+        {
+            ServerUrl = null;
+            State = "不支持的文件格式";
+        }
+        else
         {
             using var codec = SKCodec.Create(stream);
             using var bmp = SKBitmap.Decode(codec);
@@ -112,11 +117,6 @@ public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration con
             }
 
             State = "SUCCESS";
-        }
-        else
-        {
-                ServerUrl = null;
-            State = "不支持的文件格式";
         }
 
         return this;
