@@ -1,4 +1,5 @@
 ﻿@model Post
+@using System.Text.Json
 @using Masuit.MyBlogs.Core.Models.Entity
 @{
   ViewBag.Title = "正在编辑：" + Model.Title;
@@ -102,8 +103,8 @@ window.dialog = dialog;
 createApp({
   setup() {
     const post = ref({
-      Title: '@Model.Title',
-      Content: `@Html.Raw(Model.Content)`,
+      Title: @Html.Raw(JsonSerializer.Serialize(Model.Title)),
+      Content: @Html.Raw(JsonSerializer.Serialize(Model.Content)),
       PostId: '@Model.Id'
     });
     const disableGetcode = ref(false);

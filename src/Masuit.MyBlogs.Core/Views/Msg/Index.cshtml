@@ -1,4 +1,5 @@
-﻿@model string
+﻿@using System.Text.Json
+@model string
 @{
   ViewBag.Title = "留言板";
   Layout = "~/Views/Shared/_Layout.cshtml";
@@ -95,8 +96,8 @@
 <script>
 window.defaultUser=function(){
   return {
-    NickName: `@Context.Request.Cookies["NickName"]`,
-    Email: `@Context.Request.Cookies["Email"]`,
+    NickName: @Html.Raw(JsonSerializer.Serialize(Context.Request.Cookies["NickName"])),
+    Email: '@Context.Request.Cookies["Email"]',
     Agree:true,
     IsAdmin:true
   };

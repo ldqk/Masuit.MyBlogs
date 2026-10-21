@@ -1,4 +1,5 @@
 ﻿@model PostMergeRequest
+@using System.Text.Json
 @using Masuit.MyBlogs.Core.Models.Entity
 @{
   ViewBag.Title = "正在编辑：" + Model.Post.Title;
@@ -105,8 +106,8 @@ window.dialog = dialog;
 createApp({
   setup() {
     const post = ref({
-      Title: '@Model.Post.Title',
-      Content: `@Html.Raw(Model.Content)`,
+      Title: @Html.Raw(JsonSerializer.Serialize(Model.Title)),
+      Content: @Html.Raw(JsonSerializer.Serialize(Model.Content)),
       Id: '@Model.Id',
       PostId: '@Model.PostId'
     });

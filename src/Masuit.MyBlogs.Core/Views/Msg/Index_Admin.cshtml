@@ -1,4 +1,5 @@
-﻿@using Masuit.MyBlogs.Core.Models.DTO
+﻿@using System.Text.Json
+@using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.ViewModel
 @using Masuit.Tools.Core.Net
 @{
@@ -48,8 +49,8 @@
 <script>
 window.defaultUser=function(){
   return {
-    NickName: `@user.NickName`,
-    Email: `@user.Email`,
+    NickName: @Html.Raw(JsonSerializer.Serialize(user.NickName)),
+    Email: '@user.Email',
     Agree:true,
     IsAdmin:true
   };

@@ -156,7 +156,12 @@ public sealed class ImagebedClient
                 continue;
             }
 
-            var path = Path.Combine(AppContext.BaseDirectory + "wwwroot", src.Replace("/", @"\").Replace("..", "")[1..]);
+            var path = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory + "wwwroot", src.Replace("/", @"\")[1..]));
+            if (!path.StartsWith(AppContext.BaseDirectory + "wwwroot"))
+            {
+                continue;
+            }
+
             if (!File.Exists(path))
             {
                 continue;
