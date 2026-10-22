@@ -17,6 +17,4 @@ public abstract class Handler(HttpContext context)
     }
 
     public HttpRequest Request => context.Request;
-
-    public HttpContext Context => context;
 }

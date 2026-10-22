@@ -29,7 +29,7 @@ public class CrawlerHandler(HttpContext context) : Handler(context)
                 state = "SUCCESS",
                 list = await sources.SelectAsync(async s =>
                 {
-                    var crawler = new Crawler(s, _httpClient, _configuration, Context);
+                    var crawler = new Crawler(s, _httpClient, _configuration);
                     var fetch = await Policy<Crawler>.Handle<ObjectDisposedException>().RetryAsync(3).WrapAsync(Policy<Crawler>.Handle<ObjectDisposedException>().FallbackAsync(crawler)).ExecuteAsync(() => crawler.Fetch(cts.Token));
                     return new
                     {
@@ -48,7 +48,7 @@ public class CrawlerHandler(HttpContext context) : Handler(context)
     }
 }
 
-public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration configuration, HttpContext httpContext)
+public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration configuration)
 {
     public string SourceUrl { get; set; } = sourceUrl;
 

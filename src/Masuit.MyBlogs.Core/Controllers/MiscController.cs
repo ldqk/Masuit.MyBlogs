@@ -141,7 +141,7 @@ public sealed class MiscController : BaseController
     /// </summary>
     /// <param name="misc"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize,HttpPost]
     public async Task<ActionResult> Edit([FromBodyOrDefault] Misc misc, CancellationToken cancellationToken)
     {
         var entity = await MiscService.GetByIdAsync(misc.Id) ?? throw new NotFoundException("杂项页未找到");
@@ -158,7 +158,7 @@ public sealed class MiscController : BaseController
     /// <param name="page"></param>
     /// <param name="size"></param>
     /// <returns></returns>
-    [MyAuthorize]
+    [MyAuthorize,HttpGet]
     public ActionResult GetPageData(int page = 1, int size = 10)
     {
         var list = MiscService.GetPages(page, size, n => true, n => n.ModifyDate, false);
