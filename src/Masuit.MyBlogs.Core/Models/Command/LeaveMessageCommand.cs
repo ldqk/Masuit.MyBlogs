@@ -66,6 +66,7 @@ public class LeaveMessageCommand : BaseEntity,IValidatableObject
 	/// <returns>A collection that holds failed-validation information.</returns>
 	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
 	{
+		NickName = WebUtility.HtmlEncode(NickName + "");
 		Browser = WebUtility.HtmlEncode(Browser + "");
 		OperatingSystem = WebUtility.HtmlEncode(OperatingSystem + "");
 		yield break;

@@ -18,7 +18,7 @@ public class CommentCommand : BaseEntity,IValidatableObject
     /// <summary>
     /// 昵称
     /// </summary>
-    [Required(ErrorMessage = "昵称不能为空！"), MaxLength(36, ErrorMessage = "昵称最多只能24个字符！"), MinLength(2, ErrorMessage = "昵称至少2个字！")]
+    [Required(ErrorMessage = "昵称不能为空！"), MaxLength(24, ErrorMessage = "昵称最多只能24个字符！"), MinLength(2, ErrorMessage = "昵称至少2个字！")]
     public string NickName { get; set; }
 
     /// <summary>
@@ -71,6 +71,7 @@ public class CommentCommand : BaseEntity,IValidatableObject
     /// <returns>A collection that holds failed-validation information.</returns>
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
+        NickName = WebUtility.HtmlEncode(NickName+"");
         Browser = WebUtility.HtmlEncode(Browser+"");
         OperatingSystem = WebUtility.HtmlEncode(OperatingSystem+"");
         yield break;
