@@ -17,8 +17,6 @@ public sealed class MiscController : BaseController
 
     public IWebHostEnvironment HostEnvironment { get; set; }
 
-    public ImagebedClient ImagebedClient { get; set; }
-
     /// <summary>
     /// 杂项页
     /// </summary>
@@ -121,7 +119,7 @@ public sealed class MiscController : BaseController
     [MyAuthorize]
     public async Task<ActionResult> Write([FromBodyOrDefault] Misc model, CancellationToken cancellationToken)
     {
-        model.Content = await ImagebedClient.ReplaceImgSrc(await model.Content.Trim().ClearImgAttributes(), cancellationToken);
+        model.Content = await model.Content.Trim().ClearImgAttributes(cancellationToken);
         var e = MiscService.AddEntitySaved(model);
         return e != null ? ResultData(null, message: "发布成功") : ResultData(null, false, "发布失败");
     }
@@ -149,7 +147,7 @@ public sealed class MiscController : BaseController
         var entity = await MiscService.GetByIdAsync(misc.Id) ?? throw new NotFoundException("杂项页未找到");
         entity.ModifyDate = DateTime.Now;
         entity.Title = misc.Title;
-        entity.Content = await ImagebedClient.ReplaceImgSrc(await misc.Content.ClearImgAttributes(), cancellationToken);
+        entity.Content = await misc.Content.ClearImgAttributes(cancellationToken);
         bool b = await MiscService.SaveChangesAsync() > 0;
         return ResultData(null, b, b ? "修改成功" : "修改失败");
     }

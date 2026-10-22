@@ -207,7 +207,7 @@ public sealed class UploadController : Controller
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost("upload"), ApiExplorerSettings(IgnoreApi = false), DistributedLockFilter,MyAuthorize]
-    public async Task<ActionResult> UploadFile([FromServices] ImagebedClient imagebedClient, IFormFile file, CancellationToken cancellationToken)
+    public async Task<ActionResult> UploadFile(IFormFile file, CancellationToken cancellationToken)
     {
         string path;
         string filename = SnowFlake.GetInstance().GetUniqueId() + Path.GetExtension(file.FileName);
@@ -217,12 +217,6 @@ public sealed class UploadController : Controller
             case var _ when file.ContentType.StartsWith("image"):
                 {
                     await using var stream = file.OpenReadStream();
-                    var (url, success) = await imagebedClient.UploadImage(stream, file.FileName, cancellationToken);
-                    if (success)
-                    {
-                        return ResultData(url);
-                    }
-
                     path = Path.Combine(HostEnvironment.WebRootPath, pathBase, "images", filename);
                     var dir = Path.GetDirectoryName(path);
                     Directory.CreateDirectory(dir);

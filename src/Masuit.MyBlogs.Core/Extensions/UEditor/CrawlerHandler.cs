@@ -105,17 +105,7 @@ public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration con
             skData.SaveTo(stream);
             ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), ".jpg");
             var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
-            var (url, success) = await httpContext.RequestServices.GetRequiredService<ImagebedClient>().UploadImage(stream, savePath, token);
-            if (success)
-            {
-                ServerUrl = url;
-            }
-            else
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-                await stream.SaveFileAsync(savePath);
-            }
-
+            await stream.SaveFileAsync(savePath);
             State = "SUCCESS";
         }
 

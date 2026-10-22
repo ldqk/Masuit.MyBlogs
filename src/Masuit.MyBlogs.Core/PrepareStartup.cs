@@ -172,7 +172,6 @@ namespace Masuit.MyBlogs.Core
 
                 return handler;
             }); //注入HttpClient
-            services.AddHttpClient<ImagebedClient>().AddTransientHttpErrorPolicy(builder => builder.Or<TaskCanceledException>().Or<OperationCanceledException>().Or<TimeoutException>().OrResult(res => !res.IsSuccessStatusCode).RetryAsync(3)); //注入HttpClient
             return services;
         }
 

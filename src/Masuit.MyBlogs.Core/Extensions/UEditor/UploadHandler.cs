@@ -57,18 +57,8 @@ public class UploadHandler(HttpContext context, UploadConfig config) : Handler(c
                 }
 
                 var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
-                var (url, success) = await Context.RequestServices.GetRequiredService<ImagebedClient>().UploadImage(stream2, localPath, cts.Token);
-                if (success)
-                {
-                    Result.Url = url;
-                }
-                else
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(localPath));
-                    await stream2.SaveFileAsync(localPath);
-                    Result.Url = savePath;
-                }
-
+                await stream2.SaveFileAsync(localPath);
+                Result.Url = savePath;
                 Result.State = UploadState.Success;
             }
             catch (Exception e)

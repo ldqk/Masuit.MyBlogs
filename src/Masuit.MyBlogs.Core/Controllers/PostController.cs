@@ -48,8 +48,6 @@ public sealed class PostController : BaseController
 
     public ISearchEngine<DataContext> SearchEngine { get; set; }
 
-    public ImagebedClient ImagebedClient { get; set; }
-
     public IPostVisitRecordService PostVisitRecordService { get; set; }
 
     public ICommentService CommentService { get; set; }
@@ -299,7 +297,7 @@ public sealed class PostController : BaseController
 
         post.Label = string.IsNullOrEmpty(post.Label?.Trim()) ? null : post.Label.Replace("，", ",");
         post.Status = Status.Pending;
-        post.Content = await ImagebedClient.ReplaceImgSrc(await post.Content.HtmlSanitizerStandard().ClearImgAttributes(cancellationToken: cancellationToken), cancellationToken);
+        post.Content = await post.Content.HtmlSanitizerStandard().ClearImgAttributes(cancellationToken: cancellationToken);
         post.ProtectContent = "";
         Post p = post.ToPost();
         p.IP = ClientIP.ToString();
@@ -463,7 +461,7 @@ public sealed class PostController : BaseController
 #endif
 
         var post = await PostService.GetAsync(p => p.Id == dto.PostId && p.Status == Status.Published && !p.Locked) ?? throw new NotFoundException("文章未找到");
-        dto.Content = await ImagebedClient.ReplaceImgSrc(await dto.Content.HtmlSanitizerStandard().ClearImgAttributes(cancellationToken: cancellationToken), cancellationToken);
+        dto.Content = await dto.Content.HtmlSanitizerStandard().ClearImgAttributes(cancellationToken);
         if (post.Title.Equals(dto.Title) && post.Content.HammingDistance(dto.Content) <= 1)
         {
             return ResultData(null, false, "内容未被修改或修改的内容过少(无意义修改)！");
@@ -775,7 +773,7 @@ public sealed class PostController : BaseController
     [HttpPost, MyAuthorize, DistributedLockFilter]
     public async Task<ActionResult> Edit([FromBodyOrDefault] PostCommand cmd, CancellationToken cancellationToken = default)
     {
-        cmd.Content = await ImagebedClient.ReplaceImgSrc(await cmd.Content.Trim().ClearImgAttributes(cancellationToken: cancellationToken), cancellationToken);
+        cmd.Content = await cmd.Content.Trim().ClearImgAttributes(cancellationToken);
         if (!ValidatePost(cmd, out var resultData))
         {
             return resultData;
@@ -855,7 +853,7 @@ public sealed class PostController : BaseController
     [MyAuthorize, HttpPost, DistributedLockFilter]
     public async Task<ActionResult> Write([FromBodyOrDefault] PostCommand cmd, [FromBodyOrDefault] DateTime? timespan, [FromBodyOrDefault] bool schedule = false, CancellationToken cancellationToken = default)
     {
-        cmd.Content = await ImagebedClient.ReplaceImgSrc(await cmd.Content.Trim().ClearImgAttributes(cancellationToken: cancellationToken), cancellationToken);
+        cmd.Content = await cmd.Content.Trim().ClearImgAttributes(cancellationToken);
         if (!ValidatePost(cmd, out var resultData))
         {
             return resultData;

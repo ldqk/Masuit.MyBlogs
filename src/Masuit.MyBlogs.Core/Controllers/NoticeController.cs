@@ -17,8 +17,6 @@ public sealed class NoticeController : BaseController
     /// </summary>
     public INoticeService NoticeService { get; set; }
 
-    public ImagebedClient ImagebedClient { get; set; }
-
     /// <summary>
     /// 公告列表
     /// </summary>
@@ -72,7 +70,7 @@ public sealed class NoticeController : BaseController
     [HttpPost,MyAuthorize]
     public async Task<ActionResult> Write([FromBodyOrDefault] Notice notice, CancellationToken cancellationToken)
     {
-        notice.Content = await ImagebedClient.ReplaceImgSrc(await notice.Content.ClearImgAttributes(), cancellationToken);
+        notice.Content = await notice.Content.ClearImgAttributes(cancellationToken);
         if (notice.StartTime.HasValue && notice.EndTime.HasValue && notice.StartTime >= notice.EndTime)
         {
             return ResultData(null, false, "开始时间不能小于结束时间");
@@ -139,7 +137,7 @@ public sealed class NoticeController : BaseController
         entity.EndTime = notice.EndTime;
         entity.Title = notice.Title;
         entity.StrongAlert = notice.StrongAlert;
-        entity.Content = await ImagebedClient.ReplaceImgSrc(await notice.Content.ClearImgAttributes(), cancellationToken);
+        entity.Content = await notice.Content.ClearImgAttributes(cancellationToken);
         bool b = await NoticeService.SaveChangesAsync() > 0;
         return ResultData(null, b, b ? "修改成功" : "修改失败");
     }
