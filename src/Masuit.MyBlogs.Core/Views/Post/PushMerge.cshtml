@@ -171,7 +171,9 @@ createApp({
           message.success(data.Message);
           clearInterval(window.interval);
           localStorage.removeItem("merge-post-draft-" +@Model.Id);
-          window.location.href = "/" + this.post.PostId;
+          setTimeout(()=>{
+               window.location.href = "/" + this.post.PostId;
+          },5000);
         } else {
           message.error(data.Message);
         }
