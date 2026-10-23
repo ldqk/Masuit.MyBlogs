@@ -9,6 +9,7 @@ using Polly;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Web;
 using Newtonsoft.Json;
 using SkiaSharp;
 using TimeZoneConverter;
@@ -312,7 +313,7 @@ namespace Masuit.MyBlogs.Core.Common
             return context.OpenAsync(req => req.Content(html), cancel: cancellationToken).ContinueWith(t =>
             {
                 var summary = t.Result.DocumentElement.GetElementsByTagName("p").FirstOrDefault(n => n.TextContent.Length > min)?.TextContent ?? "没有摘要";
-                return summary.Length > length ? summary[..length] + "..." : summary;
+                return HttpUtility.HtmlEncode(summary.Length > length ? summary[..length] + "..." : summary);
             }, cancellationToken);
         }
 
