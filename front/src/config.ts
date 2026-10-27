@@ -21,7 +21,7 @@ export const globalConfig: GlobalConfig = {
   baseURL: process.env.VUE_APP_API_BASE_URL || "",
 
   // 请求超时时间
-  timeOut: 30000,
+  timeOut: 60000,
 
   // 组件最大缓存数
   Max_KeepAlive: 10,
