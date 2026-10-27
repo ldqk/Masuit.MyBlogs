@@ -242,6 +242,44 @@ public sealed class FileController : AdminController
                     success = "true"
                 });
                 break;
+
+            case "changePermissions":
+            {
+                if (OperatingSystem.IsWindows())
+                {
+                    return BadRequest(new
+                    {
+                        result = new
+                        {
+                            error = "POSIX 文件权限仅支持 Linux 或 macOS 运行环境。"
+                        }
+                    });
+                }
+
+                if (req.Items is not { Count: > 0 } || req.Perms is not { Length: 3 } || req.Perms.Any(c => c is < '0' or > '7'))
+                {
+                    return BadRequest(new
+                    {
+                        result = new
+                        {
+                            error = "权限或文件列表格式无效。"
+                        }
+                    });
+                }
+
+                var permissions = (UnixFileMode)Convert.ToInt32(req.Perms, 8);
+                var fullRoot = Path.GetFullPath(root);
+                foreach (var fullPath in req.Items.Select(item => ResolvePathWithinRoot(fullRoot, item)))
+                {
+                    ApplyPermissions(fullPath, fullRoot, permissions, req.Recursive);
+                }
+
+                list.Add(new
+                {
+                    success = "true"
+                });
+                break;
+            }
         }
         return Json(new
         {
@@ -353,5 +391,39 @@ public sealed class FileController : AdminController
         return !Path.IsPathRooted(relativePath)
             && relativePath != ".."
             && !relativePath.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal);
+    }
+
+    private static string ResolvePathWithinRoot(string root, string requestedPath)
+    {
+        var fullPath = Path.GetFullPath(Path.Combine(root, requestedPath.TrimStart('\\', '/')));
+        var relativePath = Path.GetRelativePath(root, fullPath);
+        if (Path.IsPathRooted(relativePath)
+            || relativePath == ".."
+            || relativePath.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+        {
+            throw new UnauthorizedAccessException("目标路径超出文件管理器根目录。");
+        }
+
+        return fullPath;
+    }
+
+    private static void ApplyPermissions(string path, string root, UnixFileMode permissions, bool recursive)
+    {
+        var attributes = System.IO.File.GetAttributes(path);
+        if ((attributes & FileAttributes.ReparsePoint) != 0)
+        {
+            throw new UnauthorizedAccessException("不支持修改符号链接的权限。");
+        }
+
+        System.IO.File.SetUnixFileMode(path, permissions);
+        if (!recursive || (attributes & FileAttributes.Directory) == 0)
+        {
+            return;
+        }
+
+        foreach (var fullPath in Directory.EnumerateFileSystemEntries(path).Select(entry => ResolvePathWithinRoot(root, Path.GetRelativePath(root, entry))))
+        {
+            ApplyPermissions(fullPath, root, permissions, recursive: true);
+        }
     }
 }

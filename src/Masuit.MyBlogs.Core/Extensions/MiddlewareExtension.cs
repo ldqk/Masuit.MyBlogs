@@ -83,12 +83,6 @@ public static class MiddlewareExtension
                 .Include("/Content/common/reset.css")
                 .Include("/Content/common/style.css")
                 .Include("/Assets/nav/css/style.css");
-            bundles.AddCss("/filemanager.css")
-                .Include("/Content/bootswatch.min.css")
-                .Include("/fonts/icomoon.css")
-                .Include("/ng-views/filemanager/css/animations.css")
-                .Include("/ng-views/filemanager/css/dialogs.css")
-                .Include("/ng-views/filemanager/css/main.css");
             bundles.AddCss("/article.css")
                 .Include("/Assets/auto-toc/auto-toc.css")
                 .Include("/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css");
@@ -100,20 +94,6 @@ public static class MiddlewareExtension
                 .Include("/Assets/tagcloud/js/tagcloud.js")
                 .Include("/Assets/scrolltop/js/scrolltop.js")
                 .Include("/Assets/nav/js/main.js");
-            bundles.AddJs("/filemanager.js")
-                .Include("/Scripts/ng-file-upload.min.js")
-                .Include("/ng-views/filemanager/js/app.js")
-                .Include("/ng-views/filemanager/js/directives/directives.js")
-                .Include("/ng-views/filemanager/js/filters/filters.js")
-                .Include("/ng-views/filemanager/js/providers/config.js")
-                .Include("/ng-views/filemanager/js/entities/chmod.js")
-                .Include("/ng-views/filemanager/js/entities/item.js")
-                .Include("/ng-views/filemanager/js/services/apihandler.js")
-                .Include("/ng-views/filemanager/js/services/apimiddleware.js")
-                .Include("/ng-views/filemanager/js/services/filenavigator.js")
-                .Include("/ng-views/filemanager/js/providers/translations.js")
-                .Include("/ng-views/filemanager/js/controllers/main.js")
-                .Include("/ng-views/filemanager/js/controllers/selector-controller.js");
             bundles.AddJs("/article.js")
                 .Include("/UEditorPlus/third-party/SyntaxHighlighter/shCore.js")
                 .Include("/Assets/auto-toc/auto-toc.js")

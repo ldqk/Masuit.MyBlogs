@@ -127,16 +127,6 @@ public sealed class DashboardController(IWebHostEnvironment env) : AdminControll
         return ResultData(null, message: "文件删除成功!");
     }
 
-    /// <summary>
-    /// 资源管理器
-    /// </summary>
-    /// <returns></returns>
-    [Route("filemanager"), ResponseCache(Duration = 60, VaryByHeader = "Cookie")]
-    public ActionResult FileManager()
-    {
-        return View();
-    }
-
     [HttpGet("refresh-memory")]
     public ActionResult RefreshMemory()
     {
