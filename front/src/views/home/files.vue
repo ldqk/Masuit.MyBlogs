@@ -280,7 +280,7 @@
           </template>
           <template v-else-if="dialogMode === 'edit'">
             <div class="text-caption text-grey-7 q-mb-sm"> {{ operationItems[0]?.fullPath }} </div>
-            <q-input v-model="dialogContent" type="textarea" outlined autogrow input-style="min-height: 48vh; font-family: monospace; white-space: pre;" :loading="dialogBusy" label="文件内容" />
+            <q-input v-model="dialogContent" class="file-content-editor" type="textarea" outlined :loading="dialogBusy" label="文件内容" />
           </template>
         </q-card-section>
         <q-card-actions align="right" class="q-px-md q-pb-md">
@@ -1280,6 +1280,14 @@ onMounted(() => {
 .file-dialog-card {
   width: min(680px, calc(100vw - 32px));
   max-width: 95vw;
+}
+
+.file-content-editor :deep(textarea) {
+  height: min(65vh, 560px);
+  max-height: 80vh;
+  overflow-y: auto;
+  font-family: monospace;
+  white-space: pre;
 }
 
 .destination-tree {
