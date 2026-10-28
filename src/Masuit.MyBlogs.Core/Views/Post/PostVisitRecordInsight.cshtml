@@ -12,7 +12,7 @@
   <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 </head>
 <body id="app" style="overflow-x: hidden">
-<h3 align="center">文章《@Model.Title》洞察分析</h3>
+<h3 align="center" v-pre>文章《@Model.Title》洞察分析</h3>
 <vxe-toolbar>
   <template #tools>
     <vxe-input @@search-click="loadData" placeholder="搜索" type="search" v-model="kw"></vxe-input>

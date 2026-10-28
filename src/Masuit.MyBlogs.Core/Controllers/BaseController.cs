@@ -21,6 +21,8 @@ public class BaseController : Controller
 {
     public IUserInfoService UserInfoService { get; set; }
 
+    public IAccessViewTicketService AccessViewTicketService { get; set; }
+
     public ILinksService LinksService { get; set; }
 
     public IAdvertisementService AdsService { get; set; }
@@ -41,7 +43,7 @@ public class BaseController : Controller
     /// <summary>
     /// 普通访客是否token合法
     /// </summary>
-    private bool VisitorTokenValid => Request.Cookies.ContainsKey("FullAccessToken") && Request.Cookies["Email"].MDString(AppConfig.EncryptKey).Equals(Request.Cookies["FullAccessToken"]);
+    private bool VisitorTokenValid => AccessViewTicketService.IsValid(Request.Cookies["FullAccessToken"]);
 
     private int[] HideCategories => Request.GetHideCategories();
 
@@ -113,10 +115,13 @@ public class BaseController : Controller
         ViewBag.Desc = CommonHelper.SystemSettings["Description"];
         var user = context.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
 #if DEBUG
-        if (HttpContext.Connection.RemoteIpAddress.IsPrivateIP())
+        if (HttpContext.Connection.RemoteIpAddress?.IsPrivateIP() == true)
         {
-            user = UserInfoService.GetByUsername("masuit").ToDto();
-            context.HttpContext.Session.Set(SessionKey.UserInfo, user);
+            user = UserInfoService.GetByUsername("masuit")?.ToDto();
+            if (user != null)
+            {
+                context.HttpContext.Session.Set(SessionKey.UserInfo, user);
+            }
         }
 #endif
         if (CommonHelper.SystemSettings.GetOrAdd("CloseSite", "false") == "true" && user?.IsAdmin != true)
@@ -129,31 +134,6 @@ public class BaseController : Controller
         {
             context.Result = ResultData("网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", false, "网站当前处于数据写保护状态，无法提交任何数据，如有疑问请联系网站管理员！", user != null, HttpStatusCode.BadRequest);
             return Task.CompletedTask;
-        }
-
-        if (user == null && Request.Cookies.ContainsKey("username") && Request.Cookies.ContainsKey("password")) //执行自动登录
-        {
-            var name = Request.Cookies["username"];
-            var pwd = Request.Cookies["password"];
-            var userInfo = UserInfoService.Login(name, pwd.AESDecrypt(AppConfig.EncryptKey));
-            if (userInfo?.IsAdmin == true)
-            {
-                Response.Cookies.Append("username", name, new CookieOptions
-                {
-                    Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax,
-                    HttpOnly = true,
-                    Secure = true
-                });
-                Response.Cookies.Append("password", pwd, new CookieOptions
-                {
-                    Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax,
-                    HttpOnly = true,
-                    Secure = true
-                });
-                context.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
-            }
         }
 
         if (ModelState.IsValid) return next();
@@ -283,7 +263,10 @@ public class BaseController : Controller
         switch (post.LimitMode)
         {
             case RegionLimitMode.OnlyForSearchEngine:
-                Disallow(post);
+                if (!Request.IsRobot())
+                {
+                    Disallow(post);
+                }
                 break;
 
             case RegionLimitMode.AllowRegion:

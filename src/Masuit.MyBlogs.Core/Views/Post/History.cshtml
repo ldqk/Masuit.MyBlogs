@@ -9,7 +9,7 @@
   AdvertisementDto ad = ViewBag.Ads;
 }
 <div class="main-container" id="historyApp" style="min-height: 70vh">
-  <ol class="breadcrumb">
+  <ol class="breadcrumb" v-pre>
     <li>
       <a asp-action="Index" asp-controller="Home">首页</a>
     </li>
@@ -60,7 +60,7 @@
             <input class="version-checkbox" type="checkbox" v-model="vers" value="0"/>
           </td>
           <td>
-            <a asp-action="Details" asp-controller="Post" asp-route-id="@post.Id" class="history-link">@post.Title</a>
+            <a asp-action="Details" asp-controller="Post" asp-route-id="@post.Id" class="history-link" v-pre>@post.Title</a>
             <span class="text-red">(最新版本)</span>
           </td>
           <td>
@@ -71,7 +71,7 @@
               <time>@post.ModifyDate.ToString("yyyy-MM-dd")</time>
             </a>
           </td>
-          <td>@post.Modifier</td>
+          <td v-pre>@post.Modifier</td>
         </tr>
         @foreach (var p in Model.Data) {
           <tr>
@@ -79,7 +79,7 @@
               <input class="version-checkbox" type="checkbox" v-model="vers" value="@p.Id"/>
             </td>
             <td>
-              <a asp-action="HistoryVersion" asp-controller="Post" asp-route-hid="@p.Id" asp-route-id="@p.PostId" class="history-link">@p.Title</a>
+              <a asp-action="HistoryVersion" asp-controller="Post" asp-route-hid="@p.Id" asp-route-id="@p.PostId" class="history-link" v-pre>@p.Title</a>
             </td>
             <td>
               <a asp-action="Category" asp-controller="Home" asp-route-id="@p.CategoryId" class="category-link">@p.Category.Name</a>
@@ -89,7 +89,7 @@
                 <time>@p.ModifyDate.ToString("yyyy-MM-dd")</time>
               </a>
             </td>
-            <td>@p.Modifier</td>
+            <td v-pre>@p.Modifier</td>
           </tr>
         }
         </tbody>

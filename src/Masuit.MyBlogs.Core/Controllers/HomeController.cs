@@ -39,7 +39,7 @@ public sealed class HomeController : BaseController
     /// 首页
     /// </summary>
     /// <returns></returns>
-    [ResponseCache(Duration = 600, VaryByHeader = nameof(HeaderNames.Cookie))]
+    [ResponseCache(Duration = 600, VaryByHeader = nameof(HeaderNames.Cookie), Location = ResponseCacheLocation.Client)]
     public async Task<ActionResult> Index([FromServices] IFastShareService fastShareService)
     {
         var postsQuery = PostService.GetQuery(PostBaseWhere()); //准备文章的查询
@@ -74,7 +74,7 @@ public sealed class HomeController : BaseController
     /// <param name="size"></param>
     /// <param name="orderBy"></param>
     /// <returns></returns>
-    [Route("posts"), Route("p", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie))]
+    [Route("posts"), Route("p", Order = 1), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie), Location = ResponseCacheLocation.Client)]
     public async Task<ActionResult> Post([Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         page = Math.Max(1, page);
@@ -117,7 +117,7 @@ public sealed class HomeController : BaseController
     /// <param name="size"></param>
     /// <param name="orderBy"></param>
     /// <returns></returns>
-    [Route("tag/{tag}"), Route("tags"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie))]
+    [Route("tag/{tag}"), Route("tags"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie), Location = ResponseCacheLocation.Client)]
     public async Task<ActionResult> Tag([FromBodyOrDefault] string tag, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         page = Math.Max(1, page);
@@ -164,7 +164,7 @@ public sealed class HomeController : BaseController
     /// <param name="size"></param>
     /// <param name="orderBy"></param>
     /// <returns></returns>
-    [Route("{yyyy:int}/{mm:int}/{dd:int}/{mode}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie))]
+    [Route("{yyyy:int}/{mm:int}/{dd:int}/{mode}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie), Location = ResponseCacheLocation.Client)]
     public async Task<ActionResult> Archieve([Range(2010, 2099)] int yyyy, [Range(1, 12)] int mm, [Range(1, 31)] int dd, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20, string mode = nameof(Models.Entity.Post.ModifyDate))
     {
         page = Math.Max(1, page);
@@ -212,7 +212,7 @@ public sealed class HomeController : BaseController
     /// <param name="size"></param>
     /// <param name="orderBy"></param>
     /// <returns></returns>
-    [Route("author/{author}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie))]
+    [Route("author/{author}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie), Location = ResponseCacheLocation.Client)]
     public async Task<ActionResult> Author(string author, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         page = Math.Max(1, page);
@@ -251,7 +251,7 @@ public sealed class HomeController : BaseController
     /// <param name="size"></param>
     /// <param name="orderBy"></param>
     /// <returns></returns>
-    [Route("cat/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie))]
+    [Route("cat/{id:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["page", "size", "orderBy"], VaryByHeader = nameof(HeaderNames.Cookie), Location = ResponseCacheLocation.Client)]
     public async Task<ActionResult> Category(int id, [Optional] OrderBy? orderBy, int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         page = Math.Max(1, page);
@@ -295,7 +295,7 @@ public sealed class HomeController : BaseController
         {
             Expires = DateTime.Now.AddYears(1),
         });
-        return Redirect(string.IsNullOrEmpty(Request.Headers[HeaderNames.Referer]) ? "/" : new Uri(Request.Headers[HeaderNames.Referer]).AbsolutePath);
+        return LocalRedirect(Request.LocalReferrerPath(Url));
     }
 
     /// <summary>

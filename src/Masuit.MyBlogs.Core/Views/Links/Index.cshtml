@@ -23,7 +23,7 @@
   <section>
     <div class="button-effect">
       @foreach (var link in Model) {
-        <a class="effect effect-5" href="@link.Url" referrerpolicy="unsafe-url" target="_blank" title="@link.Name">@link.Name</a>
+        <a class="effect effect-5" href="@link.Url" referrerpolicy="unsafe-url" target="_blank" title="@link.Name" v-pre>@link.Name</a>
       }
       <a @@click="showModal=true" class="effect effect-5">👉点我自助申请友链👈</a>
     </div>

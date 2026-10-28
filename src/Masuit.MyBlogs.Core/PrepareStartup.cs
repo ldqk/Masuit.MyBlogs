@@ -133,7 +133,7 @@ namespace Masuit.MyBlogs.Core
             {
                 options.ForwardLimit = null;
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-                options.ForwardedForHeaderName = AppConfig.TrueClientIPHeader;
+                    options.ForwardedForHeaderName = AppConfig.TrueClientIPHeader;
                 options.KnownIPNetworks.Clear();
                 options.KnownProxies.Clear();
             });
@@ -157,6 +157,7 @@ namespace Masuit.MyBlogs.Core
             {
                 var handler = new HttpClientHandler
                 {
+                    MaxAutomaticRedirections = 2,
                     AutomaticDecompression = DecompressionMethods.All,
                     ClientCertificateOptions = ClientCertificateOption.Manual,
                     ServerCertificateCustomValidationCallback = (_, _, _, _) => true

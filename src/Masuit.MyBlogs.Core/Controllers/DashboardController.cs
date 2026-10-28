@@ -88,7 +88,7 @@ public sealed class DashboardController(IWebHostEnvironment env) : AdminControll
             }
         }
 
-        return Ok();
+        return new EmptyResult();
     }
 
     /// <summary>

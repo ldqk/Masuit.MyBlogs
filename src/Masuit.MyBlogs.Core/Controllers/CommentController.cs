@@ -133,13 +133,7 @@ public sealed class CommentController : BaseController
             .Set("time", DateTime.Now.ToTimeZoneF(HttpContext.Session.Get<string>(SessionKey.TimeZone)))
             .Set("nickname", comment.NickName)
             .Set("content", comment.Content);
-        Response.Cookies.Append("Comment_" + post.Id, "1", new CookieOptions()
-        {
-            Expires = DateTimeOffset.Now.AddDays(2),
-            SameSite = SameSiteMode.Lax,
-            MaxAge = TimeSpan.FromDays(2),
-            Secure = true
-        });
+        HttpContext.Session.Set("Comment_" + post.Id, [1]);
         if (comment.Status == Status.Published)
         {
             if (!comment.IsMaster)

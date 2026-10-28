@@ -391,7 +391,7 @@ public sealed class MsgController : BaseController
             }
         }
 
-        return Ok();
+        return new EmptyResult();
     }
 
     /// <summary>

@@ -37,6 +37,6 @@ public sealed class DefaultController(IRedisClient redis) : Controller
             }
         }
         await redis.SRemAsync("GlobalOnline", ip);
-        return Ok();
+        return new EmptyResult();
     }
 }

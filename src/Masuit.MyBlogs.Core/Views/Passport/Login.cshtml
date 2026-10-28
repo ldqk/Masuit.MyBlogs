@@ -164,7 +164,7 @@
       </div>
       <div class="options-row">
         <input class="remember-checkbox" id="remember" type="checkbox" v-model="remember">
-        <label for="remember">记住密码</label>
+        <label for="remember">保持登录</label>
       </div>
       <button @@click="handleLogin" class="login-btn" type="submit" v-if="captchaInput.length === 6 && password.length>6 && username.length>2">登录</button>
     </div>

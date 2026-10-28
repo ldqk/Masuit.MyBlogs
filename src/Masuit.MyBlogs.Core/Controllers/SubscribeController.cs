@@ -31,7 +31,7 @@ public sealed class SubscribeController : Controller
     /// RSS订阅
     /// </summary>
     /// <returns></returns>
-    [Route("/rss"), ResponseCache(Duration = 3600)]
+    [Route("/rss"), ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Client)]
     public async Task<IActionResult> Rss()
     {
         if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") != "true")
@@ -119,7 +119,7 @@ public sealed class SubscribeController : Controller
     /// RSS分类订阅
     /// </summary>
     /// <returns></returns>
-    [Route("/cat/{id}/rss"), ResponseCache(Duration = 3600)]
+    [Route("/cat/{id}/rss"), ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Client)]
     public async Task<IActionResult> CategoryRss([FromServices] ICategoryService categoryService, int id)
     {
         if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") != "true")
@@ -184,7 +184,7 @@ public sealed class SubscribeController : Controller
     /// RSS专题订阅
     /// </summary>
     /// <returns></returns>
-    [Route("/special/{id}/rss"), ResponseCache(Duration = 3600)]
+    [Route("/special/{id}/rss"), ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Client)]
     public async Task<IActionResult> SeminarRss([FromServices] ISeminarService seminarService, int id)
     {
         if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") != "true")
@@ -248,7 +248,7 @@ public sealed class SubscribeController : Controller
     /// RSS文章订阅
     /// </summary>
     /// <returns></returns>
-    [Route("/{id}/rss"), ResponseCache(Duration = 3600)]
+    [Route("/{id}/rss"), ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Client)]
     public async Task<IActionResult> PostRss(int id)
     {
         if (CommonHelper.SystemSettings.GetOrAdd("EnableRss", "true") != "true")
@@ -376,7 +376,7 @@ public sealed class SubscribeController : Controller
     /// RSS站点地图
     /// </summary>
     /// <returns></returns>
-    [Route("/sitemap.rss"), ResponseCache(Duration = 86400)]
+    [Route("/sitemap.rss"), ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Client)]
     public async Task<IActionResult> Sitemap()
     {
         if (!Request.IsRobot())

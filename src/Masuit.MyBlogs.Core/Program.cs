@@ -27,7 +27,6 @@ await Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => build
     var port = config["Port"] ?? "5000";
     var sslport = config["Https:Port"] ?? "5001";
     opt.ListenAnyIP(port.ToInt32(), options => options.Protocols = HttpProtocols.Http1AndHttp2AndHttp3);
-#if !DEBUG
     if (config["Https:Enabled"].ToBoolean())
     {
         opt.ListenAnyIP(sslport.ToInt32(), s =>
@@ -39,8 +38,7 @@ await Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => build
 
             s.UseHttps(AppContext.BaseDirectory + config["Https:CertPath"], config["Https:CertPassword"]);
         });
-    } 
-#endif
+    }
 
     opt.Limits.MaxRequestBodySize = null;
     Console.WriteLine($"应用程序监听端口：http：{port}，https：{sslport}");

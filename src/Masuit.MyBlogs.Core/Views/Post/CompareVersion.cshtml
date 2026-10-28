@@ -21,7 +21,7 @@
 </style>
 <link href="~/UEditorPlus/third-party/SyntaxHighlighter/shCoreDefault.css" rel="stylesheet"/>
 <div class="container-fluid" id="postApp">
-  <ol class="breadcrumb">
+  <ol class="breadcrumb" v-pre>
     <li>
       <a asp-action="Index" asp-controller="Home">首页</a>
     </li>
@@ -57,12 +57,12 @@
       <!-- 头部信息 -->
       <section class="article-header">
         <div class="article-title-row">
-          <h2 class="article-title">@Model[1].Title</h2>
+          <h2 class="article-title" v-pre>@Model[1].Title</h2>
         </div>
         <!-- 文章标签展示区，可放在文章信息区或内容区上方，支持多个标签 -->
         <div class="article-meta-row">
           <div>
-            <span class="modifier">
+            <span class="modifier" v-pre>
               <a asp-action="Author" asp-controller="Home" asp-route-author="@Model[1].Modifier">@Model[1].Modifier</a>
             </span>
             <span>
@@ -74,7 +74,7 @@
           </div>
         </div>
         <div class="article-meta-row">
-          <div class="article-tags-row">
+          <div class="article-tags-row" v-pre>
             <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">
               原分类：
               <i class="icon-map-pin"></i>
@@ -86,7 +86,7 @@
             </span>
           </div>
           @if (Model[1].Seminar.Any()) {
-            <div class="article-tags-row">
+            <div class="article-tags-row" v-pre>
               <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">原所属专题：</span>
               @{
                 var seminars = Model[1].Seminar;
@@ -100,7 +100,7 @@
           }
           @{
             if (!string.IsNullOrEmpty(Model[1].Label)) {
-              <div class="article-tags-row">
+              <div class="article-tags-row" v-pre>
                 <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">标签：</span>
                 @foreach (string s in Model[1].Label.Split([',', '，'], StringSplitOptions.RemoveEmptyEntries)) {
                   <span class="article-tag">
@@ -116,7 +116,7 @@
       </section>
       <!-- 内容区 -->
       <section class="article-content-card">
-        <div class="article-content">
+        <div class="article-content" v-pre>
           @Html.Raw(Model[1].Content)
         </div>
         @{
@@ -131,12 +131,12 @@
       <!-- 头部信息 -->
       <section class="article-header">
         <div class="article-title-row">
-          <h2 class="article-title">@Model[2].Title</h2>
+          <h2 class="article-title" v-pre>@Model[2].Title</h2>
         </div>
         <!-- 文章标签展示区，可放在文章信息区或内容区上方，支持多个标签 -->
         <div class="article-meta-row">
           <div>
-            <span class="modifier">
+            <span class="modifier" v-pre>
               <a asp-action="Author" asp-controller="Home" asp-route-author="@Model[2].Modifier">@Model[2].Modifier</a>
             </span>
             <span>
@@ -148,7 +148,7 @@
           </div>
         </div>
         <div class="article-meta-row">
-          <div class="article-tags-row">
+          <div class="article-tags-row" v-pre>
             <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">
               原分类：
               <i class="icon-map-pin"></i>
@@ -160,7 +160,7 @@
             </span>
           </div>
           @if (Model[2].Seminar.Any()) {
-            <div class="article-tags-row">
+            <div class="article-tags-row" v-pre>
               <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">原所属专题：</span>
               @{
                 var seminars = Model[2].Seminar;
@@ -174,7 +174,7 @@
           }
           @{
             if (!string.IsNullOrEmpty(Model[2].Label)) {
-              <div class="article-tags-row">
+              <div class="article-tags-row" v-pre>
                 <span style="font-weight:600;color:#1566b6;font-size:1.06rem;">标签：</span>
                 @foreach (string s in Model[2].Label.Split([',', '，'], StringSplitOptions.RemoveEmptyEntries)) {
                   <span class="article-tag">
@@ -190,7 +190,7 @@
       </section>
       <!-- 内容区 -->
       <section class="article-content-card">
-        <div class="article-content">
+        <div class="article-content" v-pre>
           @Html.Raw(Model[2].Content)
         </div>
         @{

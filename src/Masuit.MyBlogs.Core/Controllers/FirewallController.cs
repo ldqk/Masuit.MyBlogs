@@ -86,7 +86,7 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
             });
         }
 
-        return Redirect(new Uri(Request.Headers[HeaderNames.Referer]).AbsolutePath);
+        return LocalRedirect(Request.LocalReferrerPath(Url, includeQuery: true));
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
             }
         }
 
-        return Redirect(Request.Headers[HeaderNames.Referer]);
+        return LocalRedirect(Request.LocalReferrerPath(Url, includeQuery: true));
     }
 
     /// <summary>

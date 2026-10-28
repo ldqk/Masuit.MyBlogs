@@ -24,6 +24,8 @@ public sealed class ErrorController : Controller
 {
     public IRedisClient RedisClient { get; set; }
 
+    public IAccessViewTicketService AccessViewTicketService { get; set; }
+
     /// <summary>
     /// 404
     /// </summary>
@@ -160,6 +162,12 @@ public sealed class ErrorController : Controller
             return ResultData(null, false, "访问密码不正确！");
         }
 
+        var ticket = AccessViewTicketService.CreateTicket(email);
+        if (ticket is null)
+        {
+            return ResultData(null, false, "您目前没有权限访问这个链接，请联系站长开通访问权限！");
+        }
+
         Response.Cookies.Append("Email", email, new CookieOptions
         {
             Expires = DateTime.Now.AddYears(1),
@@ -167,9 +175,9 @@ public sealed class ErrorController : Controller
             HttpOnly = true,
             Secure = true
         });
-        Response.Cookies.Append("FullAccessToken", email.MDString(AppConfig.EncryptKey), new CookieOptions
+        Response.Cookies.Append("FullAccessToken", ticket, new CookieOptions
         {
-            Expires = DateTime.Now.AddYears(1),
+            Expires = DateTimeOffset.UtcNow.AddDays(30),
             SameSite = SameSiteMode.Lax,
             HttpOnly = true,
             Secure = true

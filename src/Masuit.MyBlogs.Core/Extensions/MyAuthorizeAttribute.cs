@@ -1,4 +1,3 @@
-﻿using Masuit.MyBlogs.Core.Configs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Web;
@@ -14,64 +13,26 @@ public sealed class MyAuthorizeAttribute : ActionFilterAttribute
     /// <param name="filterContext">筛选器上下文。</param>
     public override void OnActionExecuting(ActionExecutingContext filterContext)
     {
+#if DEBUG
+        return;
+#endif
         if (filterContext.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any())
         {
             return;
         }
-#if !DEBUG
         var user = filterContext.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
         if (user?.IsAdmin == true)
         {
             return;
         }
 
-        //先尝试自动登录
-        if (filterContext.HttpContext.Request.Cookies.Any(x => x.Key is "username" or "password"))
+        if (filterContext.HttpContext.Request.Method.Equals(HttpMethods.Get))
         {
-            string name = filterContext.HttpContext.Request.Cookies["username"] ?? "";
-            string pwd = filterContext.HttpContext.Request.Cookies["password"]?.AESDecrypt(AppConfig.EncryptKey) ?? "";
-            var userInfo = filterContext.HttpContext.RequestServices.GetRequiredService<IUserInfoService>().Login(name, pwd);
-            if (userInfo?.IsAdmin == true)
-            {
-                filterContext.HttpContext.Response.Cookies.Append("username", name, new CookieOptions()
-                {
-                    Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax,
-                    HttpOnly = true,
-                    Secure = true
-                });
-                filterContext.HttpContext.Response.Cookies.Append("password", filterContext.HttpContext.Request.Cookies["password"], new CookieOptions()
-                {
-                    Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax,
-                    HttpOnly = true,
-                    Secure = true
-                });
-                filterContext.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
-            }
-            else
-            {
-                if (filterContext.HttpContext.Request.Method.Equals(HttpMethods.Get))
-                {
-                    filterContext.Result = new RedirectResult("/passport/login?from=" + HttpUtility.UrlEncode(filterContext.HttpContext.Request.Path.ToString())?.Replace("#", "%23"));
-                }
-                else
-                {
-                    filterContext.Result = new UnauthorizedObjectResult(new { StatusCode = 401, Success = false, IsLogin = false, Message = "未登录系统，请先登录！" });
-                }
-            }
+            filterContext.Result = new RedirectResult("/passport/login?from=" + HttpUtility.UrlEncode(filterContext.HttpContext.Request.Path.ToString()));
         }
         else
         {
-            if (filterContext.HttpContext.Request.Method.Equals(HttpMethods.Get))
-            {
-                filterContext.Result = new RedirectResult("/passport/login?from=" + HttpUtility.UrlEncode(filterContext.HttpContext.Request.Path.ToString()));
-            }
-            else
-            {
-                filterContext.Result = new UnauthorizedObjectResult(new { StatusCode = 401, Success = false, IsLogin = false, Message = "未登录系统，请先登录！" });
-            }
+            filterContext.Result = new UnauthorizedObjectResult(new { StatusCode = 401, Success = false, IsLogin = false, Message = "未登录系统，请先登录！" });
         }
-#endif
     }
 }

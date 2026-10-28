@@ -1,12 +1,10 @@
 ﻿using Hangfire;
-using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
 using Masuit.Tools.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Masuit.Tools.Logging;
 using System.Net;
-using System.Web;
 using Dispose.Scope;
 using FreeRedis;
 using Masuit.MyBlogs.Core.Extensions;
@@ -25,6 +23,8 @@ public sealed class PassportController : Controller
     /// 用户
     /// </summary>
     public IUserInfoService UserInfoService { get; set; }
+
+    public ILoginSessionService LoginSessionService { get; set; }
 
     public IFirewallReporter FirewallReporter { get; set; }
 
@@ -63,13 +63,16 @@ public sealed class PassportController : Controller
         });
         HttpContext.Session.Set(nameof(keys.PrivateKey), keys.PrivateKey);
         string from = Request.Query["from"];
-        if (!string.IsNullOrEmpty(from))
+        if (!string.IsNullOrEmpty(from) && Url.IsLocalUrl(from))
         {
-            from = HttpUtility.UrlDecode(from);
             Response.Cookies.Append("refer", from, new CookieOptions()
             {
                 SameSite = SameSiteMode.Lax
             });
+        }
+        else
+        {
+            from = null;
         }
 
         if (HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) != null)
@@ -80,38 +83,6 @@ public sealed class PassportController : Controller
             }
 
             return LocalRedirect(from);
-        }
-
-        if (Request.Cookies.Count > 2)
-        {
-            string name = Request.Cookies["username"];
-            string pwd = Request.Cookies["password"]?.AESDecrypt(AppConfig.EncryptKey);
-            var userInfo = UserInfoService.Login(name, pwd);
-            if (userInfo?.IsAdmin==true)
-            {
-                Response.Cookies.Append("username", name, new CookieOptions()
-                {
-                    Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax,
-                    HttpOnly = true,
-                    Secure = true
-                });
-                Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions()
-                {
-                    Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax,
-                    HttpOnly = true,
-                    Secure = true
-                });
-                HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
-                BackgroundJob.Enqueue<IHangfireBackJob>(job => job.LoginRecord(userInfo, ClientIP, LoginType.Default));
-                if (string.IsNullOrEmpty(from))
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-
-                return LocalRedirect(from);
-            }
         }
 
         return View();
@@ -126,7 +97,7 @@ public sealed class PassportController : Controller
     /// <param name="remem"></param>
     /// <returns></returns>
     [HttpPost, ValidateAntiForgeryToken, DistributedLockFilter]
-    public ActionResult Login([FromServices] IRedisClient cacheManager, [FromBodyOrDefault, Required] string username, [FromBodyOrDefault, Required] string password, [FromBodyOrDefault, Required] string valid, [FromBodyOrDefault, Required] string remem)
+    public ActionResult Login([FromServices] IRedisClient cacheManager, [FromBodyOrDefault, Required] string username, [FromBodyOrDefault, Required] string password, [FromBodyOrDefault, Required] string valid, [FromBodyOrDefault, Required] bool remem)
     {
         string validSession = HttpContext.GetRedisSession<string>("valid") ?? string.Empty; //将验证码从Session中取出来，用于登录验证比较
         if (string.IsNullOrEmpty(validSession) || !valid.Trim().Equals(validSession, StringComparison.InvariantCultureIgnoreCase))
@@ -162,25 +133,7 @@ public sealed class PassportController : Controller
             return ResultData(null, false, "用户名或密码错误");
         }
 
-        HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
-        if (remem.Trim().Contains(["on", "true"])) //是否记住登录
-        {
-            Response.Cookies.Append("username", HttpUtility.UrlEncode(username.Trim()), new CookieOptions()
-            {
-                Expires = DateTime.Now.AddYears(1),
-                SameSite = SameSiteMode.Lax,
-                HttpOnly = true,
-                Secure = true
-            });
-            Response.Cookies.Append("password", password.Trim().AESEncrypt(AppConfig.EncryptKey), new CookieOptions()
-            {
-                Expires = DateTime.Now.AddYears(1),
-                SameSite = SameSiteMode.Lax,
-                HttpOnly = true,
-                Secure = true
-            });
-        }
-
+        LoginSessionService.SignIn(HttpContext, userInfo, remem);
         BackgroundJob.Enqueue<IHangfireBackJob>(job => job.LoginRecord(userInfo, ClientIP, LoginType.Default));
         string refer = Request.Cookies["refer"];
         Response.Cookies.Delete(nameof(RsaKey.PublicKey), new CookieOptions()
@@ -192,7 +145,7 @@ public sealed class PassportController : Controller
             SameSite = SameSiteMode.Lax
         });
         HttpContext.Session.Remove(nameof(RsaKey.PrivateKey));
-        return ResultData(null, true, string.IsNullOrEmpty(refer) ? "/" : refer);
+        return ResultData(null, true, Url.IsLocalUrl(refer) ? refer : "/");
     }
 
     /// <summary>
@@ -244,15 +197,7 @@ public sealed class PassportController : Controller
     /// <returns></returns>
     public ActionResult Logout()
     {
-        HttpContext.Session.Remove(SessionKey.UserInfo);
-        Response.Cookies.Delete("username", new CookieOptions()
-        {
-            SameSite = SameSiteMode.Lax
-        });
-        Response.Cookies.Delete("password", new CookieOptions()
-        {
-            SameSite = SameSiteMode.Lax
-        });
+        LoginSessionService.SignOut(HttpContext);
         HttpContext.Session.Clear();
         return Request.Method.Equals(HttpMethods.Get) ? RedirectToAction("Index", "Home") : ResultData(null, message: "注销成功！");
     }

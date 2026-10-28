@@ -166,6 +166,11 @@ public class Startup
         app.SetupHttpsRedirection(Configuration);
         app.UseDefaultFiles().UseStaticFiles();
         app.UseSession().UseCookiePolicy(); //注入Session
+        app.Use(async (context, next) =>
+        {
+            context.RequestServices.GetRequiredService<ILoginSessionService>().AuthenticateRequest(context);
+            await next();
+        });
         app.UseWhen(c => c.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true, builder =>
         {
             builder.UseMiniProfiler();

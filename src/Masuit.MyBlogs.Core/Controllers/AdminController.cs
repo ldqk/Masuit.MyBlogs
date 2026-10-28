@@ -1,6 +1,5 @@
 ﻿using Dispose.Scope;
 using FreeRedis;
-using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -18,7 +17,13 @@ public class AdminController : Controller
     /// </summary>
     public IUserInfoService UserInfoService { get; set; }
 
+    public IAccessViewTicketService AccessViewTicketService { get; set; }
+
+    public ILoginSessionService LoginSessionService { get; set; }
+
     public IRedisClient RedisHelper { get; set; }
+
+    protected UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
 
     /// <summary>
     /// 返回结果json
@@ -44,40 +49,17 @@ public class AdminController : Controller
     public override void OnActionExecuting(ActionExecutingContext context)
     {
         base.OnActionExecuting(context);
-        var user = context.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
-        if (user?.IsAdmin == true)
-        {
-            return;
-        }
-
 #if DEBUG
-        user = UserInfoService.GetByUsername("masuit").ToDto();
-        context.HttpContext.Session.Set(SessionKey.UserInfo, user);
-#endif
-        if (user == null && Request.Cookies.Any(x => x.Key == "username" || x.Key == "password")) //执行自动登录
+        var user = context.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo);
+        if (user?.IsAdmin != true)
         {
-            string name = Request.Cookies["username"];
-            string pwd = Request.Cookies["password"]?.AESDecrypt(AppConfig.EncryptKey);
-            var userInfo = UserInfoService.Login(name, pwd);
-            if (userInfo?.IsAdmin == true)
+            user = UserInfoService.GetByUsername("masuit")?.ToDto();
+            if (user != null)
             {
-                Response.Cookies.Append("username", name, new CookieOptions
-                {
-                    Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax,
-                    HttpOnly = true,
-                    Secure = true
-                });
-                Response.Cookies.Append("password", Request.Cookies["password"], new CookieOptions
-                {
-                    Expires = DateTime.Now.AddYears(1),
-                    SameSite = SameSiteMode.Lax,
-                    HttpOnly = true,
-                    Secure = true
-                });
-                context.HttpContext.Session.Set(SessionKey.UserInfo, userInfo);
+                context.HttpContext.Session.Set(SessionKey.UserInfo, user);
             }
         }
+#endif
         if (ModelState.IsValid) return;
         var errmsgs = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => e.ErrorMessage)).ToPooledListScope();
         for (var i = 0; i < errmsgs.Count; i++)

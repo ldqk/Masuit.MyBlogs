@@ -26,6 +26,8 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
     public IFirewallService FirewallService { get; set; }
 
+    public IAccessViewTicketService AccessViewTicketService { get; set; }
+
     private static readonly char[] Separator = [',', '|', '，'];
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -43,7 +45,7 @@ public sealed class FirewallAttribute : IAsyncActionFilter
 
         request.Headers.Values.Contains("");
         var ip = context.HttpContext.Connection.RemoteIpAddress.ToString();
-        var tokenValid = request.Cookies.ContainsKey("FullAccessToken") && request.Cookies["Email"].MDString(AppConfig.EncryptKey).Equals(request.Cookies["FullAccessToken"]);
+        var tokenValid = AccessViewTicketService.IsValid(request.Cookies["FullAccessToken"]);
 
         //攻击重定向
         if (!string.IsNullOrWhiteSpace(CommonHelper.SystemSettings["AttackRedirects"]) && await FirewallService.ReportedAsync(ip))

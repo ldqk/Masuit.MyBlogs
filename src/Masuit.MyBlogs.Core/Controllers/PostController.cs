@@ -58,7 +58,7 @@ public sealed class PostController : BaseController
     /// 文章详情页
     /// </summary>
     /// <returns></returns>
-    [Route("{id:int}"), Route("{id:int}/comments/{cid:int}"), ResponseCache(Duration = 600, VaryByHeader = "Cookie")]
+    [Route("{id:int}"), Route("{id:int}/comments/{cid:int}"), ResponseCache(Duration = 600, VaryByHeader = nameof(HeaderNames.Cookie), Location = ResponseCacheLocation.Client)]
     public async Task<ActionResult> Details([FromServices] ISearchDetailsService searchService, int id, string kw, int cid, string t)
     {
         if (Request.IsRobot())
@@ -138,7 +138,7 @@ public sealed class PostController : BaseController
     /// <param name="page"></param>
     /// <param name="size"></param>
     /// <returns></returns>
-    [Route("{id:int}/history"), ResponseCache(Duration = 600, VaryByQueryKeys = ["id", "page", "size"], VaryByHeader = "Cookie")]
+    [Route("{id:int}/history"), ResponseCache(Duration = 600, VaryByQueryKeys = ["id", "page", "size"], VaryByHeader = "Cookie", Location = ResponseCacheLocation.Client)]
     public async Task<ActionResult> History(int id, [Range(1, int.MaxValue, ErrorMessage = "页码必须大于0")] int page = 1, [Range(1, 50, ErrorMessage = "页大小必须在0到50之间")] int size = 20)
     {
         var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
@@ -160,7 +160,7 @@ public sealed class PostController : BaseController
     /// <param name="id"></param>
     /// <param name="hid"></param>
     /// <returns></returns>
-    [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["id", "hid"], VaryByHeader = "Cookie")]
+    [Route("{id:int}/history/{hid:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["id", "hid"], VaryByHeader = "Cookie", Location = ResponseCacheLocation.Client)]
     public async Task<ActionResult> HistoryVersion(int id, int hid)
     {
         var history = await PostHistoryVersionService.GetAsync(v => v.Id == hid && (v.Post.Status == Status.Published || CurrentUser.IsAdmin)) ?? throw new NotFoundException("文章未找到");
@@ -187,7 +187,7 @@ public sealed class PostController : BaseController
     /// <param name="v1"></param>
     /// <param name="v2"></param>
     /// <returns></returns>
-    [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["id", "v1", "v2"], VaryByHeader = "Cookie")]
+    [Route("{id:int}/history/{v1:int}-{v2:int}"), ResponseCache(Duration = 600, VaryByQueryKeys = ["id", "v1", "v2"], VaryByHeader = "Cookie", Location = ResponseCacheLocation.Client)]
     public async Task<ActionResult> CompareVersion(int id, int v1, int v2)
     {
         var post = await PostService.GetAsync(p => p.Id == id && (p.Status == Status.Published || CurrentUser.IsAdmin));
@@ -376,17 +376,23 @@ public sealed class PostController : BaseController
         var s = RedisHelper.Get("token:" + email);
         if (token.Equals(s))
         {
-            HttpContext.Session.Set("AccessViewToken", token);
+            var ticket = AccessViewTicketService.CreateTicket(email);
+            if (ticket is null)
+            {
+                return ResultData(null, false, "您目前没有权限访问这个链接，请联系站长开通访问权限！");
+            }
+
+            HttpContext.Session.Set("AccessViewToken", ticket);
             Response.Cookies.Append("Email", email, new CookieOptions
             {
-                Expires = DateTime.Now.AddYears(1),
+                Expires = DateTimeOffset.UtcNow.AddHours(24),
                 SameSite = SameSiteMode.Lax,
                 HttpOnly = true,
                 Secure = true
             });
-            Response.Cookies.Append("PostAccessToken", email.MDString3(AppConfig.EncryptKey), new CookieOptions
+            Response.Cookies.Append("PostAccessToken", ticket, new CookieOptions
             {
-                Expires = DateTime.Now.AddYears(1),
+                Expires = DateTimeOffset.UtcNow.AddHours(24),
                 SameSite = SameSiteMode.Lax,
                 HttpOnly = true,
                 Secure = true
@@ -571,7 +577,7 @@ public sealed class PostController : BaseController
 
         await RedisHelper.SRemAsync(key, ClientIP.ToString());
 
-        return Ok();
+        return new EmptyResult();
     }
 
     /// <summary>
@@ -1233,7 +1239,6 @@ public sealed class PostController : BaseController
             }
         }
 
-        Response.Body.Close();
         return new EmptyResult();
     }
 
