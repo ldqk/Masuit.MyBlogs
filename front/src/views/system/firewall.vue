@@ -145,7 +145,7 @@
           </div>
         </div>
         <!-- 表格 -->
-        <vxe-table ref="tableRef" :data="paginatedLogs" stripe border :loading="loadingLogs">
+        <vxe-table ref="tableRef" class="page-sticky-table" :data="paginatedLogs" stripe border :loading="loadingLogs">
           <vxe-column field="IP" title="IP地址" width="160" sortable>
             <template #default="{ row }">
               <a :href="`/tools/ip/${row.IP}`" target="_blank" class="text-primary text-weight-bold"> {{ row.IP }} </a>
@@ -214,7 +214,7 @@
       <div class="text-h6 q-mb-md">
         <q-icon name="leaderboard" class="q-mr-sm" /> 拦截次数排行榜
       </div>
-      <vxe-table :data="ranking" stripe border>
+      <vxe-table class="page-sticky-table" :data="ranking" stripe border>
         <vxe-column field="index" title="序号" width="80" align="center">
           <template #default="{ $rowIndex }">
             <q-badge :color="$rowIndex + 1 <= 3 ? 'negative' : 'grey'" :label="$rowIndex + 1" />

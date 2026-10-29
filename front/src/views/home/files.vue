@@ -753,7 +753,7 @@ async function openDialog(mode: Exclude<DialogMode, null>, explicitItems?: FileE
       : "files"
     dialogName.value = `${name}.zip`
   } else if (mode === "extract" && operationItems.value[0]) {
-    dialogName.value = operationItems.value[0].name.replace(/\.[^.]+$/, "")
+    dialogName.value = '.'
   }
 
   if (mode === "copy" || mode === "move") {
@@ -790,9 +790,6 @@ function validateEntryName(value: string): true | string {
   const name = (value || "").trim()
   if (!name) {
     return "名称不能为空"
-  }
-  if (name === "." || name === ".." || /[\\/]/.test(name)) {
-    return "名称不能包含路径分隔符"
   }
   return true
 }

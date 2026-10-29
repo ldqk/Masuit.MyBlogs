@@ -21,7 +21,7 @@
       </div>
       <!-- 主表格 -->
       <div class="q-mt-md">
-        <vxe-table ref="tableRef" :data="tableData" :loading="loading" stripe border>
+        <vxe-table ref="tableRef" class="page-sticky-table" style="--sticky-fixed-right-width: 70px" :data="tableData" :loading="loading" stripe border>
           <!-- 关键词列 -->
           <vxe-column field="Keywords" title="关键词">
             <template #default="{ row }">
@@ -107,7 +107,7 @@
             <div class="text-h6">月度搜索排行</div>
           </q-card-section>
           <q-card-section>
-            <vxe-table :data="hotKeyData.month" :loading="loading" stripe border>
+            <vxe-table class="page-sticky-table" :data="hotKeyData.month" :loading="loading" stripe border>
               <vxe-column type="seq" title="序号" width="60" />
               <vxe-column field="Keywords" title="关键词">
                 <template #default="{ row }">
@@ -126,7 +126,7 @@
             <div class="text-h6">本周搜索排行</div>
           </q-card-section>
           <q-card-section>
-            <vxe-table :data="hotKeyData.week" :loading="loading" stripe border>
+            <vxe-table class="page-sticky-table" :data="hotKeyData.week" :loading="loading" stripe border>
               <vxe-column type="seq" title="序号" width="60" />
               <vxe-column field="Keywords" title="关键词">
                 <template #default="{ row }">
@@ -145,7 +145,7 @@
             <div class="text-h6">今日搜索排行</div>
           </q-card-section>
           <q-card-section>
-            <vxe-table :data="hotKeyData.today" :loading="loading" stripe border>
+            <vxe-table class="page-sticky-table" :data="hotKeyData.today" :loading="loading" stripe border>
               <vxe-column type="seq" title="序号" width="60" />
               <vxe-column field="Keywords" title="关键词">
                 <template #default="{ row }">
@@ -168,7 +168,7 @@
             <div class="text-caption text-grey-6">(搜索结果为0的热词)</div>
           </q-card-section>
           <q-card-section>
-            <vxe-table :data="hotKeyData.wish_month" :loading="loading" stripe border>
+            <vxe-table class="page-sticky-table" :data="hotKeyData.wish_month" :loading="loading" stripe border>
               <vxe-column type="seq" title="序号" width="60" />
               <vxe-column field="Keywords" title="关键词">
                 <template #default="{ row }">
@@ -188,7 +188,7 @@
             <div class="text-caption text-grey-6">(搜索结果为0的热词)</div>
           </q-card-section>
           <q-card-section>
-            <vxe-table :data="hotKeyData.wish_week" :loading="loading" stripe border>
+            <vxe-table class="page-sticky-table" :data="hotKeyData.wish_week" :loading="loading" stripe border>
               <vxe-column type="seq" title="序号" width="60" />
               <vxe-column field="Keywords" title="关键词">
                 <template #default="{ row }">
@@ -208,7 +208,7 @@
             <div class="text-caption text-grey-6">(搜索结果为0的热词)</div>
           </q-card-section>
           <q-card-section>
-            <vxe-table :data="hotKeyData.wish_today" :loading="loading" stripe border>
+            <vxe-table class="page-sticky-table" :data="hotKeyData.wish_today" :loading="loading" stripe border>
               <vxe-column type="seq" title="序号" width="60" />
               <vxe-column field="Keywords" title="关键词">
                 <template #default="{ row }">

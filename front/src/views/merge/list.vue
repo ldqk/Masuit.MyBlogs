@@ -5,7 +5,7 @@
       <q-btn color="info" icon="search" @click="loadPageData" :loading="loading" label="搜索" />
     </template>
   </q-input>
-  <vxe-table ref="tableRef" :data="tableData" :loading="loading" stripe border>
+  <vxe-table ref="tableRef" class="page-sticky-table" style="--sticky-fixed-right-width: 230px" :data="tableData" :loading="loading" stripe border>
     <!-- 原标题列 -->
     <vxe-column field="PostTitle" title="原标题" min-width="200" fixed="left">
       <template #default="{ row }">

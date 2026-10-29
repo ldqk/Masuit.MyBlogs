@@ -9,7 +9,7 @@
       </q-btn-group>
       <!-- 主表格 行内编辑 -->
       <div class="q-mt-md">
-        <vxe-table ref="tableRef" :data="tableData" :loading="loading" stripe border show-header-overflow show-overflow :edit-config="{ trigger: 'manual', mode: 'row' }">
+        <vxe-table ref="tableRef" class="page-sticky-table" style="--sticky-fixed-right-width: 130px" :data="tableData" :loading="loading" stripe border show-header-overflow show-overflow :edit-config="{ trigger: 'manual', mode: 'row' }">
           <!-- 打赏时间列 -->
           <vxe-column field="DonateTime" title="打赏时间" width="160" fixed="left" :edit-render="{ name: 'VxeInput', props: { type: 'date' } }" formatter="formatDate"></vxe-column>
           <!-- 昵称列 -->

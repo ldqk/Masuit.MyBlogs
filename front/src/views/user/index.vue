@@ -19,7 +19,7 @@
         </div>
       </div>
       <!-- 主表格 -->
-      <vxe-table :data="tableData" :loading="loading" stripe border>
+      <vxe-table class="page-sticky-table" style="--sticky-fixed-right-width: 180px" :data="tableData" :loading="loading" stripe border>
         <!-- 头像列 -->
         <vxe-column field="Avatar" title="头像" width="80" fixed="left">
           <template #default="{ row }">

@@ -1,0 +1,76 @@
+
+.donate-list-container[data-v-1e6aada6] {
+  padding: 16px;
+}
+.controls-row[data-v-1e6aada6] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* 表格样式优化 */
+[data-v-1e6aada6] .vxe-table {
+  font-size: 14px;
+}
+[data-v-1e6aada6] .vxe-table .vxe-body--column {
+  padding: 8px 12px;
+}
+[data-v-1e6aada6] .vxe-table .vxe-header--column {
+  font-weight: 600;
+  background-color: #fafafa;
+}
+
+/* 按钮样式 */
+.q-btn[data-v-1e6aada6] {
+  border-radius: 6px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+.donate-list-container[data-v-1e6aada6] {
+    padding: 8px;
+}
+.controls-row[data-v-1e6aada6] {
+    flex-direction: column;
+    align-items: stretch;
+}
+.row .col-md-4[data-v-1e6aada6] {
+    margin-bottom: 8px;
+}
+
+  /* 移动端表格滚动 */
+[data-v-1e6aada6] .vxe-table {
+    font-size: 12px;
+}
+[data-v-1e6aada6] .vxe-table .vxe-body--column {
+    padding: 6px 8px;
+}
+}
+@media (max-width: 576px) {
+.donate-list-container[data-v-1e6aada6] {
+    padding: 4px;
+}
+}
+
+/* 行内编辑输入间距优化 */
+[data-v-1e6aada6] .vxe-table .q-field {
+  margin: 0;
+}
+
+/* 分页组件样式 */
+[data-v-1e6aada6] .q-pagination {
+  margin-right: 16px;
+}
+
+/* 工具提示样式 */
+[data-v-1e6aada6] .q-tooltip {
+  font-size: 12px;
+}
+
+/* 加载状态优化 */
+[data-v-1e6aada6] .vxe-table--loading {
+  opacity: 0.6;
+}
+

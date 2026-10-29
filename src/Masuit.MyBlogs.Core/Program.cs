@@ -27,6 +27,9 @@ await Host.CreateDefaultBuilder(args).ConfigureAppConfiguration(builder => build
     var port = config["Port"] ?? "5000";
     var sslport = config["Https:Port"] ?? "5001";
     opt.ListenAnyIP(port.ToInt32(), options => options.Protocols = HttpProtocols.Http1AndHttp2AndHttp3);
+#if DEBUG
+    return;
+#endif
     if (config["Https:Enabled"].ToBoolean())
     {
         opt.ListenAnyIP(sslport.ToInt32(), s =>

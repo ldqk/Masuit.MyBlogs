@@ -35,8 +35,8 @@
         </div>
       </div>
       <!-- 主表格 -->
-      <div style="height: calc(100vh - 240px);margin-top: 10px;">
-        <vxe-table ref="tableRef" :data="tableData" :loading="loading" border height="auto" :row-config="{ isCurrent: true, isHover: true }" :row-class-name="getRowClassName">
+      <div style="margin-top: 10px;">
+        <vxe-table ref="tableRef" class="page-sticky-table" style="--sticky-fixed-right-width: 180px" :data="tableData" :loading="loading" border :scrollbar-config="{ x: { visible: 'visible' } }" :row-config="{ isCurrent: true, isHover: true }" :row-class-name="getRowClassName">
           <!-- 标题列 -->
           <vxe-column field="Title" title="标题" min-width="240" fixed="left">
             <template #default="{ row }">
@@ -192,7 +192,7 @@
           </q-card-section>
           <q-separator />
           <q-card-section>
-            <vxe-table :data="aggregateData.trending" stripe border>
+            <vxe-table class="page-sticky-table" :data="aggregateData.trending" stripe border>
               <vxe-column field="index" title="序号" width="80">
                 <template #default="{ rowIndex }">{{ rowIndex + 1 }}</template>
               </vxe-column>
@@ -214,7 +214,7 @@
           </q-card-section>
           <q-separator />
           <q-card-section>
-            <vxe-table :data="aggregateData.mostHots" stripe border>
+            <vxe-table class="page-sticky-table" :data="aggregateData.mostHots" stripe border>
               <vxe-column field="index" title="序号" width="80">
                 <template #default="{ rowIndex }">{{ rowIndex + 1 }}</template>
               </vxe-column>
@@ -238,7 +238,7 @@
           </q-card-section>
           <q-separator />
           <q-card-section>
-            <vxe-table :data="aggregateData.mostAverage" stripe border>
+            <vxe-table class="page-sticky-table" :data="aggregateData.mostAverage" stripe border>
               <vxe-column field="index" title="序号" width="80">
                 <template #default="{ rowIndex }">{{ rowIndex + 1 }}</template>
               </vxe-column>
@@ -260,7 +260,7 @@
           </q-card-section>
           <q-separator />
           <q-card-section>
-            <vxe-table :data="aggregateData.mostView" stripe border>
+            <vxe-table class="page-sticky-table" :data="aggregateData.mostView" stripe border>
               <vxe-column field="index" title="序号" width="80">
                 <template #default="{ rowIndex }">{{ rowIndex + 1 }}</template>
               </vxe-column>

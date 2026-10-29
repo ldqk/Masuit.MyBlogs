@@ -7,7 +7,7 @@
         <q-btn color="info" icon="refresh" label="刷新" @click="loadPageData" :loading="loading" />
       </div>
       <!-- 主表格 -->
-      <vxe-table ref="tableRef" :data="tableData" :loading="loading" stripe border>
+      <vxe-table ref="tableRef" class="page-sticky-table" style="--sticky-fixed-right-width: 120px" :data="tableData" :loading="loading" stripe border>
         <!-- 昵称列 -->
         <vxe-column field="NickName" title="昵称" width="120" fixed="left"></vxe-column>
         <!-- 内容列 -->

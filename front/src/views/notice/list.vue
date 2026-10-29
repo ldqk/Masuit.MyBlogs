@@ -20,7 +20,7 @@
       </div>
       <!-- 主表格 -->
       <div style="height: calc(100vh - 270px);">
-        <vxe-table ref="tableRef" :data="tableData" :loading="loading" stripe border height="100%" class="limited-row-height">
+        <vxe-table ref="tableRef" :data="tableData" :loading="loading" stripe border height="100%" class="page-sticky-table limited-row-height" style="--sticky-fixed-right-width: 80px">
           <!-- 标题列 -->
           <vxe-column field="Title" title="标题" min-width="200" fixed="left">
             <template #default="{ row }">

@@ -46,7 +46,7 @@
           </div>
         </div>
         <!-- 变量表格 -->
-        <vxe-table :data="paginatedVariables" border stripe>
+        <vxe-table class="page-sticky-table" style="--sticky-fixed-right-width: 100px" :data="paginatedVariables" border stripe>
           <vxe-column field="Key" title="变量名" width="200" :filters="filterOptions" :filter-render="{ name: 'input' }" />
           <vxe-column field="Value" title="变量值" :filters="filterOptions" :filter-render="{ name: 'input' }">
             <template #default="{ row }">

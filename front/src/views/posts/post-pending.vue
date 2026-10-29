@@ -11,7 +11,7 @@
           </q-input>
         </div>
         <!-- 主表格 -->
-        <vxe-table ref="tableRef" :data="tableData" :loading="loading" stripe border>
+        <vxe-table ref="tableRef" class="page-sticky-table" style="--sticky-fixed-right-width: 110px" :data="tableData" :loading="loading" stripe border>
           <!-- 标题列 -->
           <vxe-column field="Title" title="标题" min-width="200" fixed="left">
             <template #default="{ row }">

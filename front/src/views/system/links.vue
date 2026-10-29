@@ -32,7 +32,7 @@
         <div class="text-body2 q-mt-sm">点击上方"添加链接"按钮添加第一个友情链接</div>
       </div>
       <!-- 友情链接表格 -->
-      <vxe-table v-else ref="tableRef" :data="paginatedLinks" stripe border show-header-overflow show-overflow :loading="loading" :edit-config="{ trigger: 'manual', mode: 'row' }">
+      <vxe-table v-else ref="tableRef" class="page-sticky-table" :data="paginatedLinks" stripe border show-header-overflow show-overflow :loading="loading" :edit-config="{ trigger: 'manual', mode: 'row' }">
         <!-- 名称列 -->
         <vxe-column field="Name" title="名称" width="150" sortable :edit-render="{}">
           <template #default="{ row }">

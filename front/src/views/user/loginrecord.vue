@@ -6,7 +6,7 @@
   </q-btn-group>
   <!-- 主表格 -->
   <div class="q-mt-md">
-    <vxe-table :data="tableData" :loading="loading" stripe border>
+    <vxe-table class="page-sticky-table" :data="tableData" :loading="loading" stripe border>
       <!-- 登录时间列 -->
       <vxe-column field="LoginTime" title="登录时间" width="200">
         <template #default="{ row }"> {{ dayjs(row.LoginTime).format('YYYY-MM-DD HH:mm:ss') }} </template>
