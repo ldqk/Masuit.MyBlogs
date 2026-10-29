@@ -26,13 +26,19 @@ public sealed class MyAuthorizeAttribute : ActionFilterAttribute
             return;
         }
 
-        if (filterContext.HttpContext.Request.Method.Equals(HttpMethods.Get))
+        if (filterContext.HttpContext.Request.IsAjaxRequest())
         {
-            filterContext.Result = new RedirectResult("/passport/login?from=" + HttpUtility.UrlEncode(filterContext.HttpContext.Request.Path.ToString()));
+            filterContext.Result = new UnauthorizedObjectResult(new
+            {
+                StatusCode = 401,
+                Success = false,
+                IsLogin = false,
+                Message = "未登录系统，请先登录！"
+            });
         }
         else
         {
-            filterContext.Result = new UnauthorizedObjectResult(new { StatusCode = 401, Success = false, IsLogin = false, Message = "未登录系统，请先登录！" });
+            filterContext.Result = new RedirectResult("/passport/login?from=" + HttpUtility.UrlEncode(filterContext.HttpContext.Request.Path.ToString()));
         }
     }
 }

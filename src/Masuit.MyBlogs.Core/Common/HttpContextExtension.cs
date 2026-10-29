@@ -104,4 +104,24 @@ public static class HttpContextExtension
             return false;
         });
     }
+
+    /// <summary>
+    /// 判断是否是Ajax异步请求（XHR / fetch / axios）
+    /// </summary>
+    public static bool IsAjaxRequest(this HttpRequest request)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+
+        // 1. 传统jQuery ajax标记
+        bool isXhr = string.Equals(request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+
+        // 2. 现代fetch/axios：Sec-Fetch-Mode = cors / no-cors，整页跳转是 navigate
+        string secFetchMode = request.Headers["Sec-Fetch-Mode"];
+        bool isFetch = secFetchMode is "cors" or "no-cors";
+
+        // 3. Accept优先json（接口请求特征）
+        bool acceptJson = request.Headers["Accept"].Any(x => x.Contains("application/json"));
+
+        return isXhr || isFetch || acceptJson;
+    }
 }
