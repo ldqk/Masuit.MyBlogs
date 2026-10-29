@@ -165,7 +165,13 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
         }
 
         var sitemap = Path.Combine(env.WebRootPath, "sitemap.txt");
-        return System.IO.File.Exists(sitemap) ? Redirect(System.IO.File.ReadLines(sitemap).OrderByRandom().FirstOrDefault() ?? "/") : Redirect("/");
+        var destination = System.IO.File.Exists(sitemap) ? System.IO.File.ReadLines(sitemap).OrderByRandom().FirstOrDefault() ?? "/" : "/";
+        if (Uri.TryCreate(destination, UriKind.Absolute, out var uri))
+        {
+            destination = uri.PathAndQuery;
+        }
+
+        return Redirect(destination);
     }
 }
 
