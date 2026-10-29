@@ -78,12 +78,13 @@ public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration con
 
                 var fileName = Path.GetFileNameWithoutExtension(SourceUrl).Next(s => Regex.Matches(s, @"\w+").LastOrDefault()?.Value);
                 ServerUrl = PathFormatter.Format(fileName, CommonHelper.SystemSettings.GetOrAdd("UploadPath", "upload") + UeditorConfig.GetString("catcherPathFormat")) + MimeMapper.ExtTypes[response.Content.Headers.ContentType?.MediaType ?? "image/jpeg"][0];
-                return response.Content.ReadAsStreamAsync().Result;
+                using var stm = response.Content.ReadAsStreamAsync(token).Result;
+                return stm.SaveAsMemoryStream();
             }
 
             State = "远程请求失败";
             return new PooledMemoryStream();
-        });
+        }, token);
         if (stream.Length == 0)
         {
             return this;
