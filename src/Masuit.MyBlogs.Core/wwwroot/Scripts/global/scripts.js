@@ -87,6 +87,10 @@ $(function () {
   }).catch(function (e) {
     console.log("Oops, error");
   });
+  let pingProbe = null;
+  let pingTimer = null;
+  let pingTimeout = null;
+
   initEventSource();
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
@@ -100,22 +104,75 @@ $(function () {
 
   function initEventSource() {
     // 如果页面不可见，不初始化连接
-    if (document.hidden) {
+    if (document.hidden || window.eventSource) {
       return
     }
 
     window.eventSource = new EventSource(`/ping`)
-    window.eventSource.onmessage = (event) => {
-      $("#ping").text((Date.now() - event.data));
-    }
-
     window.eventSource.onerror = (error) => {
       console.error('EventSource 连接错误！', error)
     }
+    probePing()
+  }
+
+  function probePing() {
+    const started = performance.now()
+    const source = new EventSource('/ping?probe=true')
+    pingProbe = source
+
+    function finish() {
+      if (pingProbe !== source) {
+        return false
+      }
+      source.close()
+      pingProbe = null
+      clearTimeout(pingTimeout)
+      pingTimeout = null
+      if (!document.hidden) {
+        pingTimer = setTimeout(probePing, 2000)
+      }
+      return true
+    }
+
+    source.onmessage = (event) => {
+      const elapsed = performance.now() - started
+      const serverTime = Number(event.data)
+      if (!finish()) {
+        return
+      }
+      if (event.data.trim() === '' || !Number.isFinite(serverTime) || serverTime < 0) {
+        console.error('延迟探测响应无效:', event.data)
+        $("#ping").text('--')
+        return
+      }
+      // 往返时间扣除服务端处理时间后，按双向链路对称估算单程延迟。
+      $("#ping").text(Math.round(Math.max(0, elapsed - serverTime) / 2))
+    }
+    source.onerror = (error) => {
+      if (finish()) {
+        console.error('延迟探测连接错误！', error)
+        $("#ping").text('--')
+      }
+    }
+    pingTimeout = setTimeout(() => {
+      if (finish()) {
+        console.error('延迟探测超时')
+        $("#ping").text('--')
+      }
+    }, 10000)
   }
 
   // 关闭 EventSource 连接
   function closeEventSources() {
+    clearTimeout(pingTimer)
+    clearTimeout(pingTimeout)
+    pingTimer = null
+    pingTimeout = null
+    if (pingProbe) {
+      pingProbe.close()
+      pingProbe = null
+    }
+    $("#ping").text('--')
     if (window.eventSource) {
       window.eventSource.close()
       window.eventSource = null

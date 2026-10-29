@@ -20,6 +20,11 @@ public class PerfCounterFilterAttribute : ActionFilterAttribute
     /// <inheritdoc />
     public override void OnResultExecuting(ResultExecutingContext context)
     {
+        if (context.HttpContext.Response.HasStarted)
+        {
+            return;
+        }
+
         Stopwatch.Restart();
         context.HttpContext.Response.OnStarting(() =>
         {
