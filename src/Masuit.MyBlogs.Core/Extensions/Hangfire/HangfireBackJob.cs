@@ -50,7 +50,6 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
             PhysicAddress = ip.GetIPLocation(),
             UserInfoId = userInfo.Id
         };
-        var settingService = _serviceScope.ServiceProvider.GetRequiredService<ISystemSettingService>();
         var recordService = _serviceScope.ServiceProvider.GetRequiredService<ILoginRecordService>();
         recordService.AddEntity(record);
         recordService.SaveChanges();
@@ -59,7 +58,7 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
             .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
             .Set("ip", record.IP)
             .Set("address", record.PhysicAddress).Render();
-        _mailSender.Send(settingService.Get(s => s.Name.Equals("Title")).Value + "账号登录通知", content, settingService.Get(s => s.Name.Equals("ReceiveEmail")).Value, "127.0.0.1");
+        _mailSender.Send(CommonHelper.SystemSettings["Title"] + "账号登录通知", content, userInfo.Email, "127.0.0.1");
     }
 
     /// <summary>
