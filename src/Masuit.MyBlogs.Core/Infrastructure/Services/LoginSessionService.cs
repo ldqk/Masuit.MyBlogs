@@ -17,12 +17,13 @@ public sealed class LoginSessionService(IRedisClient redis, IUserInfoService use
     public void AuthenticateRequest(HttpContext context)
     {
         var sessionUser = context.Session.Get<UserInfoDto>(SessionKey.UserInfo);
+        var city = context.Request.Location().City;
         if (sessionUser != null)
         {
             var stamp = context.Session.Get<string>(SessionStampKey);
             var sessionTicketKey = context.Session.Get<string>(SessionTicketKey);
             var sessionTicket = sessionTicketKey == null ? null : redis.Get<RememberTicket>(sessionTicketKey);
-            if (stamp == CredentialStamp(sessionUser) && (sessionTicketKey == null || IsValidTicket(sessionTicket, sessionUser)))
+            if (stamp == CredentialStamp(sessionUser, city) && (sessionTicketKey == null || IsValidTicket(sessionTicket, sessionUser, city)))
             {
                 return;
             }
@@ -46,7 +47,7 @@ public sealed class LoginSessionService(IRedisClient redis, IUserInfoService use
         var key = TicketKey(token);
         var ticket = redis.Get<RememberTicket>(key);
         var rememberedUser = ticket == null ? null : users.GetById(ticket.UserId).ToDto();
-        if (!IsValidTicket(ticket, rememberedUser))
+        if (!IsValidTicket(ticket, rememberedUser, city))
         {
             redis.Del(key);
             DeleteRememberCookie(context);
@@ -70,7 +71,8 @@ public sealed class LoginSessionService(IRedisClient redis, IUserInfoService use
         var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         var expiresAt = DateTimeOffset.UtcNow.Add(TicketLifetime);
         var key = TicketKey(token);
-        redis.Set(key, new RememberTicket(user.Id, CredentialStamp(authenticatedUser), expiresAt), TicketLifetime);
+        var city = context.Request.Location().City;
+        redis.Set(key, new RememberTicket(user.Id, CredentialStamp(authenticatedUser, city), expiresAt), TicketLifetime);
         SetSession(context, authenticatedUser, key);
         context.Response.Cookies.Append(CookieName, token, CookieOptions(expiresAt));
     }
@@ -89,15 +91,15 @@ public sealed class LoginSessionService(IRedisClient redis, IUserInfoService use
         redis.Set(VersionPrefix + userId, Convert.ToHexString(RandomNumberGenerator.GetBytes(32)));
     }
 
-    private bool IsValidTicket(RememberTicket ticket, UserInfoDto user)
+    private bool IsValidTicket(RememberTicket ticket, UserInfoDto user, string city)
     {
-        return ticket != null && ticket.ExpiresAtUtc > DateTimeOffset.UtcNow && user?.IsAdmin == true && ticket.UserId == user.Id && ticket.CredentialStamp == CredentialStamp(user);
+        return ticket != null && ticket.ExpiresAtUtc > DateTimeOffset.UtcNow && user?.IsAdmin == true && ticket.UserId == user.Id && ticket.CredentialStamp == CredentialStamp(user, city);
     }
 
     private void SetSession(HttpContext context, UserInfoDto user, string ticketKey)
     {
         context.Session.Set(SessionKey.UserInfo, user);
-        context.Session.Set(SessionStampKey, CredentialStamp(user));
+        context.Session.Set(SessionStampKey, CredentialStamp(user, context.Request.Location().City));
         if (ticketKey == null)
         {
             context.Session.Remove(SessionTicketKey);
@@ -122,9 +124,9 @@ public sealed class LoginSessionService(IRedisClient redis, IUserInfoService use
         }
     }
 
-    private string CredentialStamp(UserInfoDto user)
+    private string CredentialStamp(UserInfoDto user, string city)
     {
-        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(user.Email + "\0" + user.IsAdmin + "\0" + redis.Get<string>(VersionPrefix + user.Id))));
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(user.Email + "\0" + user.IsAdmin + "\0" + city + "\0" + redis.Get<string>(VersionPrefix + user.Id))));
     }
 
     private static string TicketKey(string token)

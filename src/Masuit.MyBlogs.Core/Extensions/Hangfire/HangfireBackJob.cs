@@ -47,16 +47,15 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
             IP = ip,
             LoginTime = DateTime.Now,
             LoginType = type,
-            PhysicAddress = ip.GetIPLocation()
+            PhysicAddress = ip.GetIPLocation(),
+            UserInfoId = userInfo.Id
         };
-        var userInfoService = _serviceScope.ServiceProvider.GetRequiredService<IUserInfoService>();
         var settingService = _serviceScope.ServiceProvider.GetRequiredService<ISystemSettingService>();
-        var u = userInfoService.GetByUsername(userInfo.Username);
         var recordService = _serviceScope.ServiceProvider.GetRequiredService<ILoginRecordService>();
         recordService.AddEntity(record);
         recordService.SaveChanges();
         var content = new Template(File.ReadAllText(Path.Combine(_hostEnvironment.WebRootPath, "template", "login.html")))
-            .Set("name", u.Username)
+            .Set("name", userInfo.Username)
             .Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"))
             .Set("ip", record.IP)
             .Set("address", record.PhysicAddress).Render();

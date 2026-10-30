@@ -1,8 +1,8 @@
 
-.loginrecord-list-container[data-v-55411e66] {
+.loginrecord-list-container[data-v-320be39e] {
   padding: 16px;
 }
-.controls-row[data-v-55411e66] {
+.controls-row[data-v-320be39e] {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -11,63 +11,63 @@
 }
 
 /* 表格样式优化 */
-[data-v-55411e66] .vxe-table {
+[data-v-320be39e] .vxe-table {
   font-size: 14px;
 }
-[data-v-55411e66] .vxe-table .vxe-body--column {
+[data-v-320be39e] .vxe-table .vxe-body--column {
   padding: 8px 12px;
 }
-[data-v-55411e66] .vxe-table .vxe-header--column {
+[data-v-320be39e] .vxe-table .vxe-header--column {
   font-weight: 600;
   background-color: #fafafa;
 }
 
 /* 按钮样式 */
-.q-btn[data-v-55411e66] {
+.q-btn[data-v-320be39e] {
   border-radius: 6px;
 }
 
 /* 状态芯片样式 */
-.q-chip[data-v-55411e66] {
+.q-chip[data-v-320be39e] {
   font-size: 12px;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-.loginrecord-list-container[data-v-55411e66] {
+.loginrecord-list-container[data-v-320be39e] {
     padding: 8px;
 }
-.controls-row[data-v-55411e66] {
+.controls-row[data-v-320be39e] {
     flex-direction: column;
     align-items: stretch;
 }
 
   /* 移动端表格滚动 */
-[data-v-55411e66] .vxe-table {
+[data-v-320be39e] .vxe-table {
     font-size: 12px;
 }
-[data-v-55411e66] .vxe-table .vxe-body--column {
+[data-v-320be39e] .vxe-table .vxe-body--column {
     padding: 6px 8px;
 }
 }
 @media (max-width: 576px) {
-.loginrecord-list-container[data-v-55411e66] {
+.loginrecord-list-container[data-v-320be39e] {
     padding: 4px;
 }
 }
 
 /* 分页组件样式 */
-[data-v-55411e66] .q-pagination {
+[data-v-320be39e] .q-pagination {
   margin-right: 16px;
 }
 
 /* 工具提示样式 */
-[data-v-55411e66] .q-tooltip {
+[data-v-320be39e] .q-tooltip {
   font-size: 12px;
 }
 
 /* 加载状态优化 */
-[data-v-55411e66] .vxe-table--loading {
+[data-v-320be39e] .vxe-table--loading {
   opacity: 0.6;
 }
 

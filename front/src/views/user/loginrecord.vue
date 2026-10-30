@@ -53,24 +53,12 @@ const pagination = ref({
   total: 0
 })
 
-// 获取当前用户ID
-const getCurrentUserId = () => {
-  // 默认用户ID或从localStorage获取
-  return localStorage.getItem('userId') || '1'
-}
-
 // 加载数据
 const loadPageData = async () => {
   loading.value = true
   try {
-    const userId = getCurrentUserId()
-    if (!userId) {
-      toast.error('无法获取用户信息', { autoClose: 2000, position: 'top-center' })
-      return
-    }
-
     // 根据AngularJS控制器，调用登录记录接口
-    const response = await api.get(`/login/getrecent/${userId}`)
+    const response = await api.get(`/login/getrecent`)
 
     if (response) {
       // 处理数据格式
