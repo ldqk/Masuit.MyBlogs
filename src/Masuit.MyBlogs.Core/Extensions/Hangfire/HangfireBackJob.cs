@@ -201,14 +201,14 @@ public sealed class HangfireBackJob : Disposable, IHangfireBackJob
             {
                 if (t.IsCanceled || t.IsFaulted)
                 {
-                    LogManager.Info($"广告【[{e.Id}] {e.Title}】因访问超时被自动下架！");
-                    e.Color= "red";
+                    LogManager.Info($"广告【[{e.Id}] {e.Title}】访问超时！");
+                    e.Color = "yellow";
                 }
 
                 if (t.Result.StatusCode == HttpStatusCode.NotFound)
                 {
-                    LogManager.Info($"广告【[{e.Id}] {e.Title}】因广告链接404被自动下架！");
-                    e.Color = "yellow";
+                    LogManager.Info($"广告【[{e.Id}] {e.Title}】广告链接404！");
+                    e.Color= "red";
                 }
             }).Wait(cts.Token);
         });
