@@ -1,10 +1,13 @@
-﻿using EFCoreSecondLevelCacheInterceptor;
+using EFCoreSecondLevelCacheInterceptor;
 using FreeRedis;
 
 namespace Masuit.MyBlogs.Core;
 
 public class EFCoreCacheProvider(IRedisClient redisClient) : IEFCacheServiceProvider
 {
+    private static readonly TimeSpan AdmissionWindow = TimeSpan.FromMinutes(15);
+    private const long AdmissionThreshold = 2;
+
     /// <summary>
     ///     Adds a new item to the cache.
     /// </summary>
@@ -24,6 +27,11 @@ public class EFCoreCacheProvider(IRedisClient redisClient) : IEFCacheServiceProv
         };
 
         var keyHash = cacheKey.KeyHash;
+        if (redisClient.Incr($"EFCache:Admission:{keyHash}", AdmissionWindow) < AdmissionThreshold)
+        {
+            return;
+        }
+
         foreach (var rootCacheKey in cacheKey.CacheDependencies.Where(rootCacheKey => !string.IsNullOrWhiteSpace(rootCacheKey)))
         {
             redisClient.SAdd(rootCacheKey, keyHash);

@@ -1,4 +1,4 @@
-﻿using FreeRedis;
+using FreeRedis;
 using Masuit.Tools.Logging;
 
 namespace Masuit.MyBlogs.Core.Extensions;

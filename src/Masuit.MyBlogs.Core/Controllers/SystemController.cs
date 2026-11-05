@@ -1,4 +1,4 @@
-﻿using Collections.Pooled;
+using Collections.Pooled;
 using Dispose.Scope;
 using Hangfire;
 using Masuit.MyBlogs.Core.Common.Mails;

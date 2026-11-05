@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Autofac;
 using CLRStats;
 using Dispose.Scope.AspNetCore;

@@ -1,4 +1,4 @@
-﻿using FreeRedis;
+using FreeRedis;
 
 namespace Masuit.MyBlogs.Core.Common;
 

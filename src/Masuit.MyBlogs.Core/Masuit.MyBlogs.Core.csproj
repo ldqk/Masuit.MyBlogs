@@ -45,18 +45,18 @@
         <PackageReference Include="CHTCHSConv" Version="1.0.0" />
         <PackageReference Include="CLRStats" Version="1.0.0" />
         <PackageReference Include="Dispose.Scope.AspNetCore" Version="1.0.0" />
-        <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="5.5.2" />
+        <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="5.6.0" />
         <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="10.0.1" />
         <PackageReference Include="FreeRedis" Version="1.5.5" />
         <PackageReference Include="Hangfire" Version="1.8.25" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.2" />
-        <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.10.0" />
+        <PackageReference Include="Karambolo.AspNetCore.Bundling.NUglify" Version="3.10.1" />
         <PackageReference Include="Mammoth.Core" Version="1.0.1" />
-        <PackageReference Include="Markdig" Version="1.4.2" />
+        <PackageReference Include="Markdig" Version="1.6.0" />
         <PackageReference Include="MaxMind.GeoIP2" Version="6.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.13" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="10.0.13" />
-        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.13" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.14" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="10.0.14" />
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.14" />
         <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
         <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
@@ -64,7 +64,7 @@
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
         <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.4" />
-        <PackageReference Include="TimeZoneConverter" Version="8.0.0" />
+        <PackageReference Include="TimeZoneConverter" Version="8.0.1" />
         <PackageReference Include="WilderMinds.RssSyndication" Version="1.7.1" />
         <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
     </ItemGroup>
