@@ -31,16 +31,18 @@ public static class HttpContextExtension
     /// <returns></returns>
     public static IPLocation Location(this HttpRequest request)
     {
-        var location = (IPLocation)request.HttpContext.Items.GetOrAdd("ip.location", request.HttpContext.Connection.RemoteIpAddress.GetIPLocation);
-        if (request.HttpContext.RequestServices.GetRequiredService<IConfiguration>()["UseCloudflare"]?.ToBoolean() ?? false)
+        return (IPLocation)request.HttpContext.Items.GetOrAdd("ip.location", () =>
         {
-            request.Headers.TryGetValue("cf-ipcity", out var city);
-            request.Headers.TryGetValue("cf-region", out var region);
-            request.Headers.TryGetValue("cf-ipcountry", out var country);
-            location.Address2 += $"({country},{region},{city})";
-        }
-
-        return location;
+            var ipLocation = request.HttpContext.Connection.RemoteIpAddress.GetIPLocation();
+            if (request.HttpContext.RequestServices.GetRequiredService<IConfiguration>()["UseCloudflare"]?.ToBoolean() ?? false)
+            {
+                request.Headers.TryGetValue("cf-ipcity", out var city);
+                request.Headers.TryGetValue("cf-region", out var region);
+                request.Headers.TryGetValue("cf-ipcountry", out var country);
+                ipLocation.Address2 += $"({country},{region},{city})";
+            }
+            return ipLocation;
+        });
     }
 
     public static int[] GetHideCategories(this HttpRequest request)
