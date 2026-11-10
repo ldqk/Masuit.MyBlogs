@@ -101,11 +101,11 @@
       <div class="text-h6">自定义脚本和样式</div>
       <div>
         <div class="text-subtitle1">CSS样式代码：</div>
-        <div ref="stylesEditor" class="editor-container" style="height: 200px;"></div>
+        <div ref="stylesEditor" class="code-mirror-editor" style="height: 200px;"></div>
       </div>
       <div>
         <div class="text-subtitle1 q-mb-sm">JS脚本代码：</div>
-        <div ref="scriptsEditor" class="editor-container" style="height: 400px;"></div>
+        <div ref="scriptsEditor" class="code-mirror-editor" style="height: 400px;"></div>
       </div>
     </q-card-section>
   </q-card>
@@ -458,6 +458,7 @@ const initEditors = () => {
     styleCodeMirrorEditor = CodeMirror(stylesEditor.value, {
       value: settings.value.Styles || '',
       lineNumbers: true,
+      lineWrapping: true,
       mode: 'css'
     })
   }
@@ -466,6 +467,7 @@ const initEditors = () => {
     scriptCodeMirrorEditor = CodeMirror(scriptsEditor.value, {
       value: settings.value.Scripts || '',
       lineNumbers: true,
+      lineWrapping: true,
       mode: 'javascript'
     })
   }
@@ -494,19 +496,6 @@ onUnmounted(() => {
 .system-settings-page {
   padding: 20px;
   margin: 0 auto;
-}
-
-.editor-container {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-:deep(.CodeMirror) {
-  height: 100%;
-}
-
-:deep(.CodeMirror-scroll) {
-  height: 100%;
 }
 
 .logo-preview {

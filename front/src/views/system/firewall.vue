@@ -90,11 +90,11 @@
       <div class="text-h6 q-mb-md">提示信息配置</div>
       <div class="q-mb-md">
         <div class="text-subtitle1 q-mb-sm">受限制提示语：</div>
-        <div ref="accessDenyTipsEditor" class="editor-container" style="height: 200px"></div>
+        <div ref="accessDenyTipsEditor" class="code-mirror-editor" style="height: 200px"></div>
       </div>
       <div class="q-mb-md">
         <div class="text-subtitle1 q-mb-sm">UA限制提示语：</div>
-        <div ref="userAgentBlockedMsgEditor" class="editor-container" style="height: 400px"></div>
+        <div ref="userAgentBlockedMsgEditor" class="code-mirror-editor" style="height: 400px"></div>
       </div>
     </q-card-section>
   </q-card>
@@ -735,6 +735,7 @@ const initEditors = async () => {
     accessDenyTipsCodeMirrorEditor = CodeMirror(accessDenyTipsEditor.value, {
       value: settings.value.AccessDenyTips || "",
       lineNumbers: true,
+      lineWrapping: true,
       mode: 'htmlmixed'
     });
   }
@@ -743,6 +744,7 @@ const initEditors = async () => {
     userAgentBlockedMsgCodeMirrorEditor = CodeMirror(userAgentBlockedMsgEditor.value, {
       value: settings.value.UserAgentBlockedMsg || "",
       lineNumbers: true,
+      lineWrapping: true,
       mode: 'htmlmixed'
     });
   }
@@ -771,19 +773,6 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .firewall-page {
   padding: 20px;
-}
-
-.editor-container {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-:deep(.CodeMirror) {
-  height: 100%;
-}
-
-:deep(.CodeMirror-scroll) {
-  height: 100%;
 }
 
 .headers-content {

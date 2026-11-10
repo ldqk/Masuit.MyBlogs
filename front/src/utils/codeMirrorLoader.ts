@@ -1,4 +1,5 @@
 ﻿import 'codemirror/lib/codemirror.css'
+import '../assets/css/code-mirror.css'
 
 type CodeMirrorInstance = any
 

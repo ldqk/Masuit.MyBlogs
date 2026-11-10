@@ -1,0 +1,15 @@
+.code-mirror-editor {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.code-mirror-editor .CodeMirror {
+  height: 100%;
+}
+
+.code-mirror-editor .CodeMirror pre.CodeMirror-line,
+.code-mirror-editor .CodeMirror pre.CodeMirror-line-like {
+  padding-right: 16px;
+}
+
+.system-settings-page[data-v-7062f2f2]{padding:20px;margin:0 auto}.logo-preview[data-v-7062f2f2]{border-radius:4px;transition:all .3s ease}.logo-preview[data-v-7062f2f2]:hover{opacity:.8}.q-card[data-v-7062f2f2]{margin-bottom:16px}@media(max-width: 768px){.system-settings-page[data-v-7062f2f2]{padding:10px}.row.q-gutter-md .col-md-6[data-v-7062f2f2],.row.q-gutter-md .col-md-4[data-v-7062f2f2],.row.q-gutter-md .col-md-3[data-v-7062f2f2]{margin-bottom:16px}}

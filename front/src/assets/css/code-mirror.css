@@ -1,0 +1,13 @@
+.code-mirror-editor {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.code-mirror-editor .CodeMirror {
+  height: 100%;
+}
+
+.code-mirror-editor .CodeMirror pre.CodeMirror-line,
+.code-mirror-editor .CodeMirror pre.CodeMirror-line-like {
+  padding-right: 16px;
+}

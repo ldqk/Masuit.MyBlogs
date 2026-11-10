@@ -35,10 +35,10 @@
       </q-card-section>
       <q-card-section class="q-pt-none">
         <div v-if="isEditing">
-          <div ref="templateEditor" class="template-editor"></div>
+          <div ref="templateEditor" class="template-editor code-mirror-editor"></div>
         </div>
         <div v-else>
-          <q-scroll-area style="height: 70vh">
+          <q-scroll-area style="height: 90vh">
             <div class="template-preview" v-html="templateContent"></div>
           </q-scroll-area>
         </div>
@@ -171,6 +171,7 @@ const initEditor = () => {
   codeMirrorEditor = CodeMirror(templateEditor.value, {
     value: templateContent.value,
     lineNumbers: true,
+    lineWrapping: true,
     mode: 'htmlmixed'
   })
 
@@ -256,13 +257,7 @@ onUnmounted(() => {
 }
 
 .template-editor {
-  height: 70vh;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-:deep(.CodeMirror-scroll) {
-  height: 70vh;
+  height: 90vh;
 }
 
 .template-preview {
