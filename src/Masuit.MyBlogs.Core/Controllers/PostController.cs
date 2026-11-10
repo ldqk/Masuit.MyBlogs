@@ -63,7 +63,10 @@ public sealed class PostController : BaseController
     {
         if (Request.IsRobot())
         {
-            return View("Details_SEO", PostService[id] ?? throw new NotFoundException("文章未找到"));
+            var seoPost = PostService[id] ?? throw new NotFoundException("文章未找到");
+            seoPost.Category = CategoryService[seoPost.CategoryId];
+            seoPost.Content = ReplaceVariables(seoPost.Content);
+            return View("Details_SEO", seoPost);
         }
 
         if (string.IsNullOrEmpty(t))

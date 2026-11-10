@@ -32,21 +32,25 @@
   <title>@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])</title>
   <meta content="@(CommonHelper.SystemSettings["Keyword"] + "," + ViewBag.Keyword)" name="keywords"/>
   <meta content="@ViewBag.Desc" name="description"/>
+  @if (ViewBag.NoIndex == true) {
+    <meta name="robots" content="noindex,follow">
+  }
   <meta content="telephone=no" name="format-detection">
   <meta content="#ffffff" name="theme-color">
   <meta content="summary" name="twitter:card">
   <meta content="@(ViewBag.Title + "_" + CommonHelper.SystemSettings["Title"])" property="og:title">
   <meta content="@ViewBag.Desc" property="og:description">
-  <meta content="website" property="og:type">
+  <meta content="@(ViewData.ContainsKey(nameof(Post.PostDate)) ? "article" : "website")" property="og:type">
+  <meta content="@SeoUrl.Canonical(Context.Request)" property="og:url">
   <meta content="@ViewData.GetValueOrDefault("cover", () => "/favicon.png")" property="og:image"/>
   <meta content="@ViewBag.Desc" property="og:image:alt"/>
   <meta content="zh_CN" property="og:locale">
-  <meta content="@ViewData.GetValueOrDefault(nameof(Post.Author), () => CommonHelper.SystemSettings["Title"])" property="og:author"/>
-  <meta content="@ViewData.GetValueOrDefault(nameof(Post.PostDate), () => DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss")" property="og:release_date"/>
-  <meta content="@ViewData.GetValueOrDefault(nameof(Post.Author), () => CommonHelper.SystemSettings["Title"])" property="article:author"/>
-  <meta content="@ViewData.GetValueOrDefault(nameof(Post.PostDate), () => DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss")" property="article:published_time">
-  <meta content="@ViewData.GetValueOrDefault(nameof(Post.ModifyDate), () => DateTime.Now).ToString("yyyy-MM-dd HH:mm:ss")" property="article:modified_time">
-  <link href="@Context.Request.GetEncodedUrl()" rel="canonical">
+  @if (ViewData.ContainsKey(nameof(Post.PostDate))) {
+    <meta content="@ViewData[nameof(Post.Author)]" property="article:author"/>
+    <meta content="@(((DateTime)ViewData[nameof(Post.PostDate)]).ToString("O"))" property="article:published_time">
+    <meta content="@(((DateTime)ViewData[nameof(Post.ModifyDate)]).ToString("O"))" property="article:modified_time">
+  }
+  <link href="@SeoUrl.Canonical(Context.Request)" rel="canonical">
   @Html.Raw(CommonHelper.SystemSettings.GetOrAdd("Styles", ""))
   <link async defer href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet">
   <link async defer href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">

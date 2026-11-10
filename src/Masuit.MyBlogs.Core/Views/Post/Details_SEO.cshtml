@@ -3,7 +3,8 @@
 @{
   ViewBag.Title = Model.Title;
   Layout = null;
-  var summary = await Model.Content.GetSummary();
+  var summary = await Model.Content.GetSummary(200);
+  ViewData["SeoDescription"] = summary;
 }
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -21,9 +22,14 @@
   <meta content="summary" name="twitter:card">
   <meta content="@(Model.Title + "_" + CommonHelper.SystemSettings["Title"])" property="og:title">
   <meta content="@summary" property="og:description">
-  <meta content="website" property="og:type">
+  <meta content="article" property="og:type">
+  <meta content="@SeoUrl.Canonical(Context.Request)" property="og:url">
+  <meta content="@Model.Author" property="article:author">
+  <meta content="@Model.PostDate.ToString("O")" property="article:published_time">
+  <meta content="@Model.ModifyDate.ToString("O")" property="article:modified_time">
   <meta content="@summary" property="og:image:alt"/>
   <meta content="zh_CN" property="og:locale">
+  <link rel="canonical" href="@SeoUrl.Canonical(Context.Request)">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -59,7 +65,7 @@
     </li>
   </ol>
   <div class="page-header">
-    <h2>@Model.Title</h2>
+    <h1>@Model.Title</h1>
   </div>
   <div class="row">
     <div class="col-sm-8">
@@ -98,6 +104,7 @@
   <article class="article" id="article">
     @Html.Raw(Model.Content)
   </article>
+  <partial name="_ArticleStructuredData" model="Model" />
 </div>
 </body>
 </html>

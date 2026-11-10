@@ -47,6 +47,7 @@ public sealed class HomeController : BaseController
         posts.Data.InsertRange(0, postsQuery.Where(p => p.IsFixedTop).ProjectDto().Cacheable().ToPooledListScope().OrderByRandom());
         if (Request.IsRobot())
         {
+            ViewBag.Title = "首页";
             return View("SEO_List", posts);
         }
         var viewModel = GetIndexPageViewModel();
@@ -93,6 +94,7 @@ public sealed class HomeController : BaseController
 
         if (Request.IsRobot())
         {
+            ViewBag.Title = "文章列表页";
             return View("SEO_List", posts);
         }
 
@@ -136,6 +138,7 @@ public sealed class HomeController : BaseController
         };
         if (Request.IsRobot())
         {
+            ViewBag.Title = "标签_" + tag;
             return View("SEO_List", posts);
         }
 
@@ -187,6 +190,7 @@ public sealed class HomeController : BaseController
         };
         if (Request.IsRobot())
         {
+            ViewBag.Title = $"归档_{yyyy}-{mm}-{dd}";
             return View("SEO_List", posts);
         }
 
@@ -225,6 +229,7 @@ public sealed class HomeController : BaseController
         };
         if (Request.IsRobot())
         {
+            ViewBag.Title = "作者_" + author;
             return View("SEO_List", posts);
         }
 
@@ -265,6 +270,7 @@ public sealed class HomeController : BaseController
         };
         if (Request.IsRobot())
         {
+            ViewBag.Title = "分类_" + cat.Name;
             return View("SEO_List", posts);
         }
 

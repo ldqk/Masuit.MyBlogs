@@ -1,0 +1,15 @@
+@using System.Text.Json
+@model Masuit.MyBlogs.Core.Models.Entity.Post
+@{
+  var data = new Dictionary<string, object> {
+    ["@context"] = "https://schema.org",
+    ["@type"] = "BlogPosting",
+    ["headline"] = Model.Title,
+    ["description"] = ViewData["SeoDescription"] as string ?? await Model.Content.GetSummary(200),
+    ["url"] = SeoUrl.Canonical(Context.Request),
+    ["datePublished"] = (ViewData[nameof(Model.PostDate)] is DateTime published ? published : Model.PostDate).ToString("O"),
+    ["dateModified"] = (ViewData[nameof(Model.ModifyDate)] is DateTime modified ? modified : Model.ModifyDate).ToString("O"),
+    ["author"] = new Dictionary<string, string> { ["@type"] = "Person", ["name"] = Model.Author }
+  };
+}
+<script type="application/ld+json">@Html.Raw(JsonSerializer.Serialize(data))</script>

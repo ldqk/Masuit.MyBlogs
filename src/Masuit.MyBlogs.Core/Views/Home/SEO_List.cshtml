@@ -1,8 +1,18 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Masuit.MyBlogs.Core.Models
+@using Microsoft.AspNetCore.WebUtilities
 @model PagedList<PostDto>
 @{
     Layout = null;
+    var title = ViewBag.Title + (Model.CurrentPage > 1 ? " - 第" + Model.CurrentPage + "页" : "");
+    var pageCount = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
+    var path = Context.Request.RouteValues["action"]?.ToString() == "Index" ? Context.Request.PathBase.ToUriComponent() + "/posts" : Context.Request.PathBase.ToUriComponent() + Context.Request.Path.ToUriComponent();
+    string PageUrl(int page) {
+        var values = Context.Request.Query.Where(q => !q.Key.Equals("page", StringComparison.OrdinalIgnoreCase))
+            .SelectMany(q => q.Value.Select(value => new KeyValuePair<string, string>(q.Key, value))).ToList();
+        values.Add(new KeyValuePair<string, string>("page", page.ToString()));
+        return QueryHelpers.AddQueryString(path, values);
+    }
 }
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -12,19 +22,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>@CommonHelper.SystemSettings["Title"]</title>
+    <title>@(title + "_" + CommonHelper.SystemSettings["Title"])</title>
     <meta name="keywords" content="@CommonHelper.SystemSettings["Keyword"]" />
+    <meta name="description" content="@ViewBag.Desc" />
     <meta name="format-detection" content="telephone=no">
     <meta name="theme-color" content="#ffffff">
     <meta name="twitter:card" content="summary">
     <meta property="og:type" content="website">
+    <meta property="og:title" content="@(title + "_" + CommonHelper.SystemSettings["Title"])">
+    <meta property="og:description" content="@ViewBag.Desc">
+    <meta property="og:url" content="@SeoUrl.Canonical(Context.Request)">
     <meta property="og:locale" content="zh_CN">
+    <link rel="canonical" href="@SeoUrl.Canonical(Context.Request)">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <div class="page-header">
             <h2><a asp-controller="Home" asp-action="Index">@CommonHelper.SystemSettings["Title"]</a></h2>
+            <h1>@title</h1>
         </div>
         <div class="list-group">
             @foreach (var post in Model.Data)
@@ -35,11 +51,16 @@
                 </a>
             }
         </div>
-        <div>
-            @{
-                await Html.RenderPartialAsync("_Pagination",new Pagination(Model.CurrentPage,Model.PageSize,Model.TotalCount));
-            }
-        </div>
+        @if (pageCount > 1) {
+            <nav aria-label="分页">
+                @if (Model.CurrentPage > 1) {
+                    <a href="@PageUrl(Model.CurrentPage - 1)">上一页</a>
+                }
+                @if (Model.CurrentPage < pageCount) {
+                    <a href="@PageUrl(Model.CurrentPage + 1)">下一页</a>
+                }
+            </nav>
+        }
     </div>
 </body>
 </html>
