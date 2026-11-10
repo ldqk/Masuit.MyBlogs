@@ -1,7 +1,7 @@
-using System.Net;
 using Autofac;
 using CLRStats;
 using Dispose.Scope.AspNetCore;
+using EFCoreSecondLevelCacheInterceptor;
 using FreeRedis;
 using Hangfire;
 using Hangfire.MemoryStorage;
@@ -12,14 +12,16 @@ using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.MyBlogs.Core.Extensions.Hangfire;
-using Masuit.Tools.Mime;
+using Masuit.Tools.AspNetCore.ModelBinder;
 using Masuit.Tools.Config;
 using Masuit.Tools.Core.AspNetCore;
+using Masuit.Tools.Mime;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
+using System.Net;
 using System.Text.RegularExpressions;
-using Masuit.Tools.AspNetCore.ModelBinder;
-using EFCoreSecondLevelCacheInterceptor;
 
 namespace Masuit.MyBlogs.Core;
 
@@ -54,7 +56,6 @@ public class Startup
             AppConfig.Redis = configuration[nameof(AppConfig.Redis)];
             AppConfig.TrueClientIPHeader = configuration[nameof(AppConfig.TrueClientIPHeader)] ?? "CF-Connecting-IP";
             AppConfig.EnableIPDirect = bool.Parse(configuration[nameof(AppConfig.EnableIPDirect)] ?? "false");
-            AppConfig.EncryptKey = configuration[nameof(AppConfig.EncryptKey)]?? AppConfig.ConnString;
             configuration.Bind("Imgbed:Gitlabs", AppConfig.GitlabConfigs);
             configuration.AddToMasuitTools();
         }
@@ -92,8 +93,11 @@ public class Startup
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.Cookie.HttpOnly = true;
         }).AddAntiforgery(); //注入Session
-        services.AddDataProtection();
+        services.AddSingleton(new DataProtectionKeyXmlStore(AppConfig.ConnString));
+        services.AddDataProtection().SetApplicationName("Masuit.MyBlogs");
+        services.AddOptions<KeyManagementOptions>().Configure<DataProtectionKeyXmlStore>((options, repository) => options.XmlRepository = repository);
         services.AddSingleton<EmailVerificationTicket>();
+        services.AddSingleton<ChallengeBypassTicket>();
         services.AddSingleton<EmailVerificationCode>();
         services.AddResponseCache();
         services.AddHangfireServer().AddHangfire((serviceProvider, configuration) =>

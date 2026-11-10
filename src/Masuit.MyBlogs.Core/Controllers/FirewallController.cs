@@ -1,13 +1,12 @@
 ﻿using Dispose.Scope;
 using FreeRedis;
-using Masuit.MyBlogs.Core.Configs;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Extensions.Firewall;
 using Masuit.Tools.Mime;
 using Masuit.Tools.AspNetCore.ResumeFileResults.Extensions;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
-using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.Extension.Object;
 
@@ -15,6 +14,8 @@ namespace Masuit.MyBlogs.Core.Controllers;
 
 public sealed class FirewallController(IHttpClientFactory httpClientFactory) : Controller
 {
+    public ChallengeBypassTicket ChallengeBypassTicket { get; set; }
+
     public IRedisClient RedisClient { get; set; }
 
     public IFirewallService FirewallService { get; set; }
@@ -31,13 +32,7 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
         try
         {
             HttpContext.Session.Set("js-challenge", 1);
-            Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.EncryptKey), new CookieOptions()
-            {
-                SameSite = SameSiteMode.Lax,
-                Expires = DateTime.Now.AddDays(1),
-                HttpOnly = true,
-                Secure = true
-            });
+            ChallengeBypassTicket.Write(Response);
             return Ok();
         }
         catch
@@ -77,13 +72,7 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
         {
             HttpContext.Session.Set("js-challenge", 1);
             HttpContext.Session.Remove("challenge-captcha");
-            Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.EncryptKey), new CookieOptions()
-            {
-                SameSite = SameSiteMode.Lax,
-                Expires = DateTime.Now.AddDays(1),
-                HttpOnly = true,
-                Secure = true
-            });
+            ChallengeBypassTicket.Write(Response);
         }
 
         return LocalRedirect(Request.LocalReferrerPath(Url, includeQuery: true));
@@ -112,13 +101,7 @@ public sealed class FirewallController(IHttpClientFactory httpClientFactory) : C
             if (result.Success)
             {
                 HttpContext.Session.Set("js-challenge", 1);
-                Response.Cookies.Append(SessionKey.ChallengeBypass, DateTime.Now.AddSeconds(new Random().Next(60, 86400)).ToString("yyyy-MM-dd HH:mm:ss").AESEncrypt(AppConfig.EncryptKey), new CookieOptions()
-                {
-                    SameSite = SameSiteMode.Lax,
-                    Expires = DateTime.Now.AddDays(1),
-                    HttpOnly = true,
-                    Secure = true
-                });
+                ChallengeBypassTicket.Write(Response);
             }
         }
 

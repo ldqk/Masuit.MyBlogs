@@ -1,5 +1,6 @@
 ﻿using FreeRedis;
 using Markdig;
+using Masuit.MyBlogs.Core.Common;
 using Masuit.MyBlogs.Core.Configs;
 using Masuit.MyBlogs.Core.Controllers;
 using Masuit.Tools.Mime;
@@ -27,6 +28,8 @@ public sealed class FirewallAttribute : IAsyncActionFilter
     public IFirewallService FirewallService { get; set; }
 
     public IAccessViewTicketService AccessViewTicketService { get; set; }
+
+    public ChallengeBypassTicket ChallengeBypassTicket { get; set; }
 
     private static readonly char[] Separator = [',', '|', '，'];
 
@@ -143,18 +146,15 @@ public sealed class FirewallAttribute : IAsyncActionFilter
             return;
         }
 
-        try
+        if (ChallengeBypassTicket.IsValid(request))
         {
-            if (request.Cookies.TryGetValue(SessionKey.ChallengeBypass, out var time) && time.AESDecrypt(AppConfig.EncryptKey).ToDateTime() > DateTime.Now)
-            {
-                context.HttpContext.Session.Set("js-challenge", 1);
-                await next();
-                return;
-            }
+            context.HttpContext.Session.Set("js-challenge", 1);
+            await next();
+            return;
         }
-        catch
+        if (request.Cookies.ContainsKey(SessionKey.ChallengeBypass))
         {
-            context.HttpContext.Response.Cookies.Delete(SessionKey.ChallengeBypass);
+            ChallengeBypassTicket.Clear(context.HttpContext.Response);
         }
 
         if (Challenge(context))
