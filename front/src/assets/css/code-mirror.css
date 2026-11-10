@@ -11,3 +11,7 @@
 .code-mirror-editor .CodeMirror pre.CodeMirror-line-like {
   padding-right: 16px;
 }
+
+.code-mirror-editor .CodeMirror-scroll {
+  height: 100%;
+}

@@ -12,4 +12,7 @@
   padding-right: 16px;
 }
 
+.code-mirror-editor .CodeMirror-scroll {
+  height: 100%;
+}
 .firewall-page[data-v-007fe0aa]{padding:20px}.headers-content[data-v-007fe0aa]{background-color:#f5f5f5;padding:16px;border-radius:4px;overflow-x:auto;white-space:pre-wrap;word-wrap:break-word;max-height:400px}@media(max-width: 768px){.firewall-page[data-v-007fe0aa]{padding:10px}.q-btn-group[data-v-007fe0aa]{flex-direction:column}.q-btn-group .q-btn[data-v-007fe0aa]{margin-bottom:8px}}
