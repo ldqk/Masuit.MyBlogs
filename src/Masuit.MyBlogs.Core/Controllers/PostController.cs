@@ -275,9 +275,10 @@ public sealed class PostController : BaseController
     public async Task<ActionResult> Publish([FromBodyOrDefault] PostCommand post, [Required(ErrorMessage = "验证码不能为空"), FromBodyOrDefault] string code, CancellationToken cancellationToken)
     {
 #if !DEBUG
-        if (await RedisHelper.GetAsync("code:" + post.Email) != code)
+        var codeError = await EmailVerificationCode.VerifyAsync(post.Email, code);
+        if (!string.IsNullOrEmpty(codeError))
         {
-            return ResultData(null, false, "验证码错误！");
+            return ResultData(null, false, codeError);
         }
 
 #endif
@@ -463,9 +464,10 @@ public sealed class PostController : BaseController
     public async Task<ActionResult> PushMerge([FromServices] IInternalMessageService messageService, [FromServices] IPostMergeRequestService postMergeRequestService, [FromBodyOrDefault] PostMergeRequestCommand dto, CancellationToken cancellationToken)
     {
 #if !DEBUG
-        if (await RedisHelper.GetAsync("code:" + dto.ModifierEmail) != dto.Code)
+        var codeError = await EmailVerificationCode.VerifyAsync(dto.ModifierEmail, dto.Code);
+        if (!string.IsNullOrEmpty(codeError))
         {
-            return ResultData(null, false, "验证码错误！");
+            return ResultData(null, false, codeError);
         }
 #endif
 

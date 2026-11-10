@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using System.Security.Cryptography;
 using Masuit.MyBlogs.Core.Common.Mails;
 using Masuit.MyBlogs.Core.Extensions;
 using Masuit.Tools.AspNetCore.ModelBinder;
@@ -13,7 +14,7 @@ public sealed class ValidateController : BaseController
     /// </summary>
     /// <param name="email"></param>
     /// <returns></returns>
-    [HttpPost, ValidateAntiForgeryToken, ResponseCache(Duration = 115, VaryByQueryKeys = new[] { "email" }), DistributedLockFilter]
+    [HttpPost, ValidateAntiForgeryToken, DistributedLockFilter]
     public ActionResult SendCode([FromBodyOrDefault] string email)
     {
         var validator = new IsEmailAttribute();
@@ -37,5 +38,12 @@ public sealed class ValidateController : BaseController
 #else
         return ResultData(null, true, "验证码：" + code);
 #endif
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public ActionResult ForgetEmail()
+    {
+        EmailVerificationTicket.Clear(Response);
+        return ResultData(null);
     }
 }

@@ -123,7 +123,6 @@ public sealed class CommentController : BaseController
             HttpOnly = true,
             Secure = true
         });
-        WriteEmailKeyCookie(cmd.Email);
         await RedisHelper.ExpireAsync("Comments:" + comment.IP, TimeSpan.FromMinutes(1));
         var emails = new HashSet<string>();
         var email = CommonHelper.SystemSettings["ReceiveEmail"]; //站长邮箱

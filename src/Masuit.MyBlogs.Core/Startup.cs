@@ -92,6 +92,9 @@ public class Startup
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.Cookie.HttpOnly = true;
         }).AddAntiforgery(); //注入Session
+        services.AddDataProtection();
+        services.AddSingleton<EmailVerificationTicket>();
+        services.AddSingleton<EmailVerificationCode>();
         services.AddResponseCache();
         services.AddHangfireServer().AddHangfire((serviceProvider, configuration) =>
         {

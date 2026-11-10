@@ -204,7 +204,6 @@ public sealed class MsgController : BaseController
             HttpOnly = true,
             Secure = true
         });
-        WriteEmailKeyCookie(cmd.Email);
         await RedisHelper.ExpireAsync("Comments:" + ip, TimeSpan.FromMinutes(1));
         var email = CommonHelper.SystemSettings["ReceiveEmail"];
         var content = new Template(await new FileInfo(HostEnvironment.WebRootPath + "/template/notify.html").ShareReadWrite().ReadAllTextAsync(Encoding.UTF8)).Set("title", "网站留言板").Set("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")).Set("nickname", msg.NickName).Set("content", msg.Content);

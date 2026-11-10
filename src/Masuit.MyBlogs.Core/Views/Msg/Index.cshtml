@@ -1,9 +1,11 @@
 ﻿@using System.Text.Json
+@inject Masuit.MyBlogs.Core.Common.EmailVerificationTicket EmailTicket
 @model string
 @{
   ViewBag.Title = "留言板";
   Layout = "~/Views/Shared/_Layout.cshtml";
-  string hidden = string.IsNullOrEmpty(Context.Request.Cookies["ValidateKey"]) ? "" : "hidden";
+  var verifiedEmail = EmailTicket.GetEmail(Context.Request);
+  string hidden = string.IsNullOrEmpty(verifiedEmail) ? "" : "hidden";
 }
 <div class="main-container min-height610" id="msgApp">
   <ol class="breadcrumb">
@@ -22,7 +24,7 @@
   <div class="comment-form">
     @Html.AntiForgeryToken()
     @if (hidden == nameof(hidden)) {
-      <p>@Context.Request.Cookies["NickName"] 您好！</p>
+        <p>@Context.Request.Cookies["NickName"] 您好！<button class="comment-form-btn" type="button" onclick="forgetEmailVerification()">更换邮箱</button></p>
     } else {
       <div class="comment-form-row @hidden" style="display:flex;gap:12px;flex-wrap:wrap;">
         <input name="nickname" placeholder="您的称呼" required style="flex:1 1 140px;min-width:120px;" type="text" v-model="msg.NickName">
@@ -64,7 +66,7 @@
     <form class="comment-form">
       @Html.AntiForgeryToken()
       @if (hidden == nameof(hidden)) {
-        <p>@Context.Request.Cookies["NickName"] 您好！</p>
+          <p>@Context.Request.Cookies["NickName"] 您好！<button class="comment-form-btn" type="button" onclick="forgetEmailVerification()">更换邮箱</button></p>
       } else {
         <div class="comment-form-row @hidden" style="display:flex;gap:12px;flex-wrap:wrap;">
           <input name="nickname" placeholder="您的称呼" required style="flex:1 1 140px;min-width:120px;" type="text" v-model="reply.NickName">
@@ -96,11 +98,12 @@
 <script>
 window.defaultUser=function(){
   return {
-    NickName: @Html.Raw(JsonSerializer.Serialize(Context.Request.Cookies["NickName"])),
-    Email: '@Context.Request.Cookies["Email"]',
+    NickName: @Html.Raw(JsonSerializer.Serialize(Context.Request.Cookies["NickName"] ?? "")),
+    Email: @Html.Raw(JsonSerializer.Serialize(verifiedEmail ?? Context.Request.Cookies["Email"] ?? "")),
     Agree:true,
     IsAdmin:true
   };
 }
 </script>
+<script src="~/Scripts/global/email-verification.js"></script>
 <script src="~/Scripts/global/leavemsg.js"></script>

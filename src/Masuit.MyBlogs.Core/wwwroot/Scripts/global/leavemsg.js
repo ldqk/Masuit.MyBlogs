@@ -247,6 +247,8 @@ createApp({
         const data = response.data;
         if (data && data.Success) {
           message.success(data.Message);
+          this.msg.NickName = this.reply.NickName = item.NickName;
+          this.msg.Email = this.reply.Email = item.Email;
           this.getmsgs();
           try {
             this.msg.Content = '';

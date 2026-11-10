@@ -33,6 +33,10 @@ public class BaseController : Controller
 
     public IFirewallService FirewallService { get; set; }
 
+    public EmailVerificationTicket EmailVerificationTicket { get; set; }
+
+    public EmailVerificationCode EmailVerificationCode { get; set; }
+
     protected UserInfoDto CurrentUser => HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo) ?? new UserInfoDto();
 
     /// <summary>
@@ -160,53 +164,50 @@ public class BaseController : Controller
             return string.Empty;
         }
 
-        if (string.IsNullOrEmpty(Request.Cookies["ValidateKey"]))
+        if (string.IsNullOrWhiteSpace(email))
         {
-            if (string.IsNullOrEmpty(code))
-            {
-                return "请输入验证码！";
-            }
-            if (await RedisHelper.GetAsync("code:" + email) != code)
-            {
-                return "验证码错误！";
-            }
-        }
-        else if (Request.Cookies["ValidateKey"].AESDecrypt(AppConfig.EncryptKey) != email)
-        {
-            Response.Cookies.Delete("Email");
-            Response.Cookies.Delete("NickName");
-            Response.Cookies.Delete("ValidateKey");
-            return "邮箱验证信息已失效，请刷新页面后重新评论！";
+            return "请输入有效的邮箱地址！";
         }
 
         if (mailSender.Any(e => e.Email == email))
         {
-            Response.Cookies.Delete("Email");
-            Response.Cookies.Delete("NickName");
-            Response.Cookies.Delete("ValidateKey");
+            ClearEmailVerification();
             return "邮箱地址错误，请刷新页面后重新使用有效的邮箱地址！";
         }
 
-        await RedisHelper.DelAsync("code:" + email);
+        var verifiedEmail = EmailVerificationTicket.GetEmail(Request);
+        if (string.Equals(verifiedEmail, email, StringComparison.Ordinal))
+        {
+            return string.Empty;
+        }
+        if (string.IsNullOrEmpty(code))
+        {
+            return verifiedEmail == null && Request.Cookies.ContainsKey(EmailVerificationTicket.CookieName)
+                ? "邮箱验证信息已失效，请刷新页面后重新验证！"
+                : "请输入邮箱验证码；如果未显示输入框，请刷新页面！";
+        }
+        var error = await EmailVerificationCode.VerifyAsync(email, code, true);
+        if (!string.IsNullOrEmpty(error))
+        {
+            return error;
+        }
+
+        EmailVerificationTicket.Write(Response, email);
+        Response.Cookies.Append("Email", email, new CookieOptions()
+        {
+            Expires = DateTimeOffset.UtcNow.AddDays(30),
+            SameSite = SameSiteMode.Lax,
+            HttpOnly = true,
+            Secure = true
+        });
         return string.Empty;
     }
 
-    internal void WriteEmailKeyCookie(string email)
+    internal void ClearEmailVerification()
     {
-        Response.Cookies.Append("Email", email, new CookieOptions()
-        {
-            Expires = DateTimeOffset.Now.AddYears(1),
-            SameSite = SameSiteMode.Lax,
-            HttpOnly = true,
-            Secure = true
-        });
-        Response.Cookies.Append("ValidateKey", email.AESEncrypt(AppConfig.EncryptKey), new CookieOptions()
-        {
-            Expires = DateTimeOffset.Now.AddYears(1),
-            SameSite = SameSiteMode.Lax,
-            HttpOnly = true,
-            Secure = true
-        });
+        Response.Cookies.Delete("Email");
+        Response.Cookies.Delete("NickName");
+        EmailVerificationTicket.Clear(Response);
     }
 
     protected Expression<Func<Post, bool>> PostBaseWhere()

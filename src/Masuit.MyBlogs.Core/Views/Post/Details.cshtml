@@ -3,11 +3,13 @@
 @using Masuit.MyBlogs.Core.Common
 @using Masuit.MyBlogs.Core.Models.DTO
 @using Masuit.MyBlogs.Core.Models.ViewModel
+@inject Masuit.MyBlogs.Core.Common.EmailVerificationTicket EmailTicket
 @model Masuit.MyBlogs.Core.Models.Entity.Post
 @{
   ViewBag.Title = Model.Title;
   Layout = "~/Views/Shared/_Layout.cshtml";
-  string hidden = string.IsNullOrEmpty(Context.Request.Cookies["ValidateKey"]) ? "" : "hidden";
+  var verifiedEmail = EmailTicket.GetEmail(Context.Request);
+  string hidden = string.IsNullOrEmpty(verifiedEmail) ? "" : "hidden";
   AdvertisementDto ad = ViewBag.Ads;
   ViewData["SeoDescription"] = ViewBag.Desc;
 }
@@ -18,8 +20,8 @@
 <script>
   window.defaultUser=function(){
     return {
-        NickName: @Html.Raw(JsonSerializer.Serialize(Context.Request.Cookies["NickName"])),
-        Email: '@Context.Request.Cookies["Email"]',
+        NickName: @Html.Raw(JsonSerializer.Serialize(Context.Request.Cookies["NickName"] ?? "")),
+        Email: @Html.Raw(JsonSerializer.Serialize(verifiedEmail ?? Context.Request.Cookies["Email"] ?? "")),
       Agree:true,
       IsAdmin:true,
       voteDownCount:@Model.VoteDownCount,
@@ -27,6 +29,7 @@
     };
   }
 </script>
+<script src="~/Scripts/global/email-verification.js"></script>
 <div class="container" id="postApp">
   <ol class="breadcrumb" v-pre>
     <li>
@@ -217,7 +220,7 @@
         <h2 class="comment-list-title" id="comment">评论区</h2>
         @Html.AntiForgeryToken()
         @if (hidden == nameof(hidden)) {
-          <p>@Context.Request.Cookies["NickName"] 您好！</p>
+          <p>@Context.Request.Cookies["NickName"] 您好！<button class="comment-form-btn" type="button" onclick="forgetEmailVerification()">更换邮箱</button></p>
         } else {
           <div class="comment-form-row @hidden" style="display:flex;gap:12px;flex-wrap:wrap;">
             <input name="nickname" placeholder="您的称呼" required style="flex:1 1 140px;min-width:120px;" type="text" v-model="msg.NickName">
@@ -260,7 +263,7 @@
     <form class="comment-form">
       @Html.AntiForgeryToken()
       @if (hidden == nameof(hidden)) {
-        <p>@Context.Request.Cookies["NickName"] 您好！</p>
+          <p>@Context.Request.Cookies["NickName"] 您好！<button class="comment-form-btn" type="button" onclick="forgetEmailVerification()">更换邮箱</button></p>
       } else {
         <div class="comment-form-row @hidden" style="display:flex;gap:12px;flex-wrap:wrap;">
           <input name="nickname" placeholder="您的称呼" required style="flex:1 1 140px;min-width:120px;" type="text" v-model="reply.NickName">
