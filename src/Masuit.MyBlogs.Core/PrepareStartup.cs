@@ -20,6 +20,34 @@ namespace Masuit.MyBlogs.Core
 {
     public static class PrepareStartup
     {
+#if DEBUG
+        internal static readonly object LocalProfilerAccessKey = new();
+
+        internal static bool IsLocalProfilerRequest(HttpContext context)
+        {
+            var address = context.Connection.RemoteIpAddress;
+            if (address?.IsIPv4MappedToIPv6 == true)
+            {
+                address = address.MapToIPv4();
+            }
+            return address != null && IPAddress.IsLoopback(address)
+                && context.Request.Headers["X-Dev-Proxy-Client"] == "local";
+        }
+#endif
+
+        internal static bool IsMiniProfilerAllowed(HttpContext context)
+        {
+            if (context.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true)
+            {
+                return true;
+            }
+#if DEBUG
+            return context.Items.TryGetValue(LocalProfilerAccessKey, out var local) && local is true;
+#else
+            return false;
+#endif
+        }
+
         /// <summary>
         /// 初始化系统设置参数
         /// </summary>
@@ -116,7 +144,7 @@ namespace Masuit.MyBlogs.Core
             {
                 options.RouteBasePath = "/profiler";
                 options.EnableServerTimingHeader = true;
-                options.ResultsAuthorize = req => req.HttpContext.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true;
+                options.ResultsAuthorize = req => IsMiniProfilerAllowed(req.HttpContext);
                 options.ResultsListAuthorize = options.ResultsAuthorize;
                 options.IgnoredPaths.AddRange("/Assets/", "/Content/", "/fonts/", "/images/", "/ng-views/", "/Scripts/", "/static/", "/template/", "/cloud10.png", "/favicon.ico", "/_blazor");
                 options.PopupRenderPosition = RenderPosition.BottomLeft;

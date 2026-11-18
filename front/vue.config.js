@@ -16,7 +16,12 @@ module.exports = {
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
-        pathRewrite: { '^/api': '' }
+        pathRewrite: { '^/api': '' },
+        onProxyReq: (proxyReq, req) => {
+          const address = req.socket.remoteAddress
+          const local = address === '::1' || address === '127.0.0.1' || address === '::ffff:127.0.0.1'
+          proxyReq.setHeader('X-Dev-Proxy-Client', local ? 'local' : 'remote')
+        }
       }
     }
   },

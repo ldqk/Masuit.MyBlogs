@@ -159,6 +159,17 @@ public class Startup
         app.UseRedisSession();
         app.UseDisposeScope();
         app.UseLuceneSearch(env, hangfire, luceneIndexerOptions);
+#if DEBUG
+        if (env.IsDevelopment())
+        {
+            app.Use((context, next) =>
+            {
+                // Check the socket address before forwarded headers can replace it.
+                context.Items[PrepareStartup.LocalProfilerAccessKey] = PrepareStartup.IsLocalProfilerRequest(context);
+                return next();
+            });
+        }
+#endif
         app.UseForwardedHeaders().UseCertificateForwarding(); // X-Forwarded-For
         if (env.IsDevelopment())
         {
@@ -178,11 +189,8 @@ public class Startup
             context.RequestServices.GetRequiredService<ILoginSessionService>().AuthenticateRequest(context);
             await next();
         });
-        app.UseWhen(c => c.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true, builder =>
-        {
-            builder.UseMiniProfiler();
-            builder.UseCLRStatsDashboard();
-        });
+        app.UseWhen(PrepareStartup.IsMiniProfilerAllowed, builder => builder.UseMiniProfiler());
+        app.UseWhen(c => c.Session.Get<UserInfoDto>(SessionKey.UserInfo)?.IsAdmin == true, builder => builder.UseCLRStatsDashboard());
         app.UseWhen(c => !c.Request.Path.StartsWithSegments("/_blazor"), builder => builder.UseMiddleware<RequestInterceptMiddleware>()); //启用网站请求拦截
         app.SetupHangfire();
         app.UseResponseCaching(); //启动Response缓存

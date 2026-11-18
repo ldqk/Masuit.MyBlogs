@@ -6,6 +6,7 @@
 import qs from "qs";
 import { globalConfig } from "../config";
 import { toast } from "vue3-toastify";
+import { showMiniProfilerResults } from "../utils/MiniProfiler";
 
 /**
  * axios 初始化
@@ -50,12 +51,16 @@ api.interceptors.request.use(
 // 响应拦截器
 api.interceptors.response.use(
   (response: AxiosResponse) => {
+    showMiniProfilerResults(response.headers["x-miniprofiler-ids"]);
     if (typeof response.data == "object" && Object.keys(response.data).includes("Success") && response.data.Success !== true) {
       toast.error(response.data.Message || `请求失败:${response.request.responseURL}`, { autoClose: 3000, position: "top-center", });
     }
     return response.data;
   },
   (error: AxiosError) => {
+    if (error.response) {
+      showMiniProfilerResults(error.response.headers["x-miniprofiler-ids"]);
+    }
     if (error.code === "ECONNABORTED" || (error.message && error.message.indexOf("timeout") !== -1) || error.message === "Network Error") {
       toast.error("网络异常", { autoClose: 3000, position: "top-center" });
       return Promise.reject(error);
