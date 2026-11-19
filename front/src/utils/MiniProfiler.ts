@@ -39,7 +39,7 @@ function getClient(): Promise<MiniProfilerClient> {
         trivial: "true",
         children: "true",
         controls: "true",
-        maxTraces: "5",
+        maxTraces: "10",
         trivialMilliseconds: "2",
       });
     }

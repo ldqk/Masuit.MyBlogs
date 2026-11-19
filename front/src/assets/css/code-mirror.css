@@ -7,6 +7,17 @@
   height: 100%;
 }
 
+/* Keep UEditor's legacy CodeMirror styles from changing gutter layout. */
+.code-mirror-editor .CodeMirror-gutter {
+  position: static;
+  min-width: 0;
+  border-right: 0;
+}
+
+.code-mirror-editor .CodeMirror-lines {
+  padding: 4px 0;
+}
+
 .code-mirror-editor .CodeMirror pre.CodeMirror-line,
 .code-mirror-editor .CodeMirror pre.CodeMirror-line-like {
   padding-right: 16px;
