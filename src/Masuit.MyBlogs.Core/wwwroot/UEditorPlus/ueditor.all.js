@@ -23042,7 +23042,7 @@ UE.plugins["autoheight"] = function () {
                 if (node && node.nodeType == 1) {
                     node.style.clear = "both";
                     currentHeight = Math.max(
-                        domUtils.getXY(node).y + node.offsetHeight + 25,
+                        node.getBoundingClientRect().bottom + me.window.pageYOffset + 25,
                         Math.max(options.minFrameHeight, options.initialFrameHeight)
                     );
                     if (currentHeight !== lastHeight) {
