@@ -5,21 +5,15 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <!-- 生产环境CDN资源 -->
-    <% if (process.env.NODE_ENV==='production' ) { %>
-      <!-- CSS 资源 -->
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css">
-      <link href="https://cdn.jsdelivr.net/npm/quasar@2.18.5/dist/quasar.prod.css" rel="stylesheet">
-      <% } %>
-        <script>
-          // 设置UEditor资源路径
-          window.UEDITOR_HOME_URL = '/UEditorPlus/';
-          window.UEDITOR_CORS_URL = '/UEditorPlus/';
-        </script>
-        <!-- 直接引入UEditor脚本 -->
-        <script type="text/javascript" charset="utf-8" src="/UEditorPlus/ueditor.config.js"></script>
-        <script type="text/javascript" charset="utf-8" src="/UEditorPlus/ueditor.all.js"></script>
-        <script type="text/javascript" charset="utf-8" src="/UEditorPlus/lang/zh-cn/zh-cn.js"></script>
+    <script>
+      // 设置UEditor资源路径
+      window.UEDITOR_HOME_URL = '/UEditorPlus/';
+      window.UEDITOR_CORS_URL = '/UEditorPlus/';
+    </script>
+    <!-- 直接引入UEditor脚本 -->
+    <script type="text/javascript" charset="utf-8" src="/UEditorPlus/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/UEditorPlus/ueditor.all.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/UEditorPlus/lang/zh-cn/zh-cn.js"></script>
   </head>
 
   <body>

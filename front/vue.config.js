@@ -62,14 +62,18 @@ module.exports = {
 
     // 生产环境配置
     if (process.env.NODE_ENV === 'production') {
-      // 优化配置但禁用CSS压缩器
-      config.optimization = config.optimization || {}
-
-      // 临时禁用CSS压缩以避免构建错误
-      config.optimization.minimizer = config.optimization.minimizer || []
-      config.optimization.minimizer = config.optimization.minimizer.filter(plugin =>
-        !plugin.constructor.name.includes('CssMinimizerPlugin')
+      const cssMinimizer = config.optimization.minimizer.find(plugin =>
+        plugin.constructor.name.includes('CssMinimizerPlugin')
       )
+      if (cssMinimizer) {
+        cssMinimizer.options.parallel = false
+        // 部分依赖样式的选择器无法被 cssnano 解析，跳过选择器相关优化。
+        const [preset, presetOptions = {}] = cssMinimizer.options.minimizer.options.preset
+        cssMinimizer.options.minimizer.options.preset = [
+          preset,
+          { ...presetOptions, minifySelectors: false, mergeRules: false, uniqueSelectors: false }
+        ]
+      }
 
       // 优化代码分割
       config.optimization.splitChunks = {
@@ -118,18 +122,6 @@ module.exports = {
           terserPlugin.options.terserOptions.compress.drop_debugger = true
         }
       }
-
-      // Gzip 压缩
-      const CompressionPlugin = require('compression-webpack-plugin')
-      config.plugins.push(
-        new CompressionPlugin({
-          algorithm: 'gzip',
-          test: /\.(js|css|woff|woff2|svg)$/, // 匹配文件名
-          threshold: 10240, // 对超过10k的数据压缩
-          deleteOriginalAssets: false, // 不删除源文件
-          minRatio: 0.8 // 压缩比
-        })
-      )
 
       // 将 js 文件夹添加时间戳，这样浏览器不会加载上个版本缓存的代码
       config.output.filename = `js/[name].${timeStamp}.js`
