@@ -37,6 +37,8 @@
     "@vue/eslint-config-standard": "^8.0.1",
     "animate.css": "^4.1.1",
     "babel-plugin-transform-imports": "2.0.0",
+    "baseline-browser-mapping": "^2.11.38",
+    "caniuse-lite": "^1.0.30001826",
     "cross-env": "^10.1.0",
     "echarts": "^6.1.0",
     "eslint": "^8.57.1",

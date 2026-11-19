@@ -131,6 +131,13 @@ module.exports = {
     }
   },
   chainWebpack: config => {
+    if (process.env.NODE_ENV === 'production') {
+      config.plugin('copy').tap(([options]) => {
+        options.patterns[0].globOptions.ignore.push('**/UEditorPlus/**')
+        return [options]
+      })
+    }
+
     // 移除 prefetch 插件减少不必要的预加载
     config.plugins.delete('prefetch')
     config.plugins.delete('preload')
