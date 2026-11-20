@@ -22105,7 +22105,8 @@ UE.plugins["enterkey"] = function () {
 /* 处理特殊键的兼容性问题 */
 UE.plugins["keystrokes"] = function () {
     var me = this;
-    var collapsed = true;
+    var collapsed = true,
+        lastBodyChildBeforeBackspace;
     me.addListener("keydown", function (type, evt) {
         var keyCode = evt.keyCode || evt.which,
             rng = me.selection.getRange();
@@ -22163,6 +22164,7 @@ UE.plugins["keystrokes"] = function () {
 
         //处理backspace
         if (keyCode == keymap.Backspace) {
+            lastBodyChildBeforeBackspace = me.body.lastChild;
             rng = me.selection.getRange();
             collapsed = rng.collapsed;
             if (me.fireEvent("delkeydown", evt)) {
@@ -22341,6 +22343,12 @@ UE.plugins["keystrokes"] = function () {
                 }
                 //处理当删除到body时，要重新给p标签展位
                 if (domUtils.isBody(rng.startContainer)) {
+                    var nextNode = me.body.childNodes[rng.startOffset];
+                    // 浏览器可能在删除末尾内容后插入 br 占位，避免与新段落重复。
+                    if (nextNode && nextNode === me.body.lastChild &&
+                        nextNode !== lastBodyChildBeforeBackspace && domUtils.isBr(nextNode)) {
+                        domUtils.remove(nextNode);
+                    }
                     var tmpNode = domUtils.createElement(me.document, "p", {
                         innerHTML: browser.ie ? domUtils.fillChar : "<br/>"
                     });
