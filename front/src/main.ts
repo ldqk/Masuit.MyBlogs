@@ -18,11 +18,14 @@ import "animate.css";
 
 // vxe-table
 import VxeUIAll from "vxe-pc-ui";
-import "vxe-pc-ui/es/style.css";
 import XEUtils from 'xe-utils'
 
 import VxeUITable from "vxe-table";
-import "vxe-table/es/style.css";
+
+if (process.env.NODE_ENV !== "production") {
+  require("vxe-pc-ui/es/style.css");
+  require("vxe-table/es/style.css");
+}
 
 // dayjs
 import dayjs from "dayjs";

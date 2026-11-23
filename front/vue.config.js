@@ -176,9 +176,8 @@ module.exports = {
         dayjs: 'dayjs',
         pinia: 'Pinia',
         quasar: 'Quasar',
-        // vxe-table 和 vxe-pc-ui 暂时不使用 CDN，保持打包到 bundle 中
-        // 'vxe-table': 'VxeTable',
-        // 'vxe-pc-ui': 'VxeTable',
+        'vxe-pc-ui': 'VxeUI',
+        'vxe-table': 'VxeUITable',
         'xe-utils': 'XEUtils',
         'lottie-web': 'lottie'
       })

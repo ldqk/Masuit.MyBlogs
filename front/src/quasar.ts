@@ -19,7 +19,9 @@ const {
 }: QuasarPlugins = require('quasar')
 
 // 导入样式文件
-import 'quasar/dist/quasar.prod.css'
+if (process.env.NODE_ENV !== 'production') {
+  require('quasar/dist/quasar.prod.css')
+}
 import '@quasar/extras/roboto-font/roboto-font.css'
 import '@quasar/extras/material-icons/material-icons.css'
 import '@quasar/extras/material-icons-outlined/material-icons-outlined.css'
