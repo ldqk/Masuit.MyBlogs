@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
         <ServerGarbageCollection>false</ServerGarbageCollection>
         <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
         <TieredPGO>true</TieredPGO>
@@ -46,7 +46,7 @@
         <PackageReference Include="CLRStats" Version="1.0.0" />
         <PackageReference Include="Dispose.Scope.AspNetCore" Version="1.0.0" />
         <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="5.6.2" />
-        <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="10.0.2" />
+        <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="11.0.0" />
         <PackageReference Include="FreeRedis" Version="1.5.5" />
         <PackageReference Include="Hangfire" Version="1.8.25" />
         <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.2" />
@@ -54,12 +54,11 @@
         <PackageReference Include="Mammoth.Core" Version="1.0.1" />
         <PackageReference Include="Markdig" Version="1.6.0" />
         <PackageReference Include="MaxMind.GeoIP2" Version="6.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.14" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="10.0.14" />
-        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.14" />
-        <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="11.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="11.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="11.0.0" />
         <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="11.0.0" />
         <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.5.4" />
         <PackageReference Include="PanGu.HighLight" Version="1.0.0" />
         <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
