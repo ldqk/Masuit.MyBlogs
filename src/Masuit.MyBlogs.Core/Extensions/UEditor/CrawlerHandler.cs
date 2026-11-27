@@ -101,10 +101,9 @@ public class Crawler(string sourceUrl, HttpClient httpClient, IConfiguration con
         {
             using var codec = SKCodec.Create(stream);
             using var bmp = SKBitmap.Decode(codec);
-            var image = SKImage.FromBitmap(bmp);
-            var skData = image.Encode(SKEncodedImageFormat.Jpeg, 100);
+            var skData = bmp.Encode(SKEncodedImageFormat.Webp, 100);
             skData.SaveTo(stream);
-            ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), ".jpg");
+            ServerUrl = ServerUrl.Replace(Path.GetExtension(ServerUrl), ".webp");
             var savePath = AppContext.BaseDirectory + "wwwroot" + ServerUrl;
             await stream.SaveFileAsync(savePath);
             State = "SUCCESS";

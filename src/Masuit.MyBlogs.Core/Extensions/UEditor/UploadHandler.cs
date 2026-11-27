@@ -49,11 +49,10 @@ public class UploadHandler(HttpContext context, UploadConfig config) : Handler(c
                 {
                     var memoryStream = new PooledMemoryStream();
                     using var bmp = SKBitmap.Decode(stream2);
-                    using var image = SKImage.FromBitmap(bmp);
-                    using var skData = image.Encode(SKEncodedImageFormat.Jpeg, 100);
+                    using var skData = bmp.Encode(SKEncodedImageFormat.Webp, 100);
                     skData.SaveTo(memoryStream);
                     stream2 = memoryStream;
-                    savePath = savePath.Replace(Path.GetExtension(savePath), ".jpg");
+                    savePath = savePath.Replace(Path.GetExtension(savePath), ".webp");
                 }
 
                 var localPath = AppContext.BaseDirectory + "wwwroot" + savePath;
